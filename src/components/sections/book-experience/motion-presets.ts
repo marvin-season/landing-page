@@ -5,17 +5,17 @@ import type { Phase } from "./types";
 export const easingCurve = cubicBezier(0.16, 1, 0.3, 1);
 
 export const sceneTransition = {
-  duration: 0.8,
+  duration: 1,
   ease: easingCurve,
 };
 
 export const accentTransition = {
-  duration: 0.6,
+  duration: 0.8,
   ease: easingCurve,
 };
 
 export const hoverTransition = {
-  duration: 0.3,
+  duration: 0.6,
   ease: easingCurve,
 };
 

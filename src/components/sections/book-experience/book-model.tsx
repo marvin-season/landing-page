@@ -53,9 +53,9 @@ const BookModel: React.FC<BookModelProps> = ({
             <span>2025</span>
           </div>
           <div>
-            <p className="text-lg font-semibold leading-tight">未开启的章节</p>
+            <p className="text-lg font-semibold leading-tight">Chapters Awaiting You</p>
             <p className="mt-2 text-xs text-white/60">
-              点击封面，唤醒一段全新的创作旅程
+              Click the cover to awaken a new creative journey.
             </p>
           </div>
         </div>
@@ -75,13 +75,13 @@ const BookModel: React.FC<BookModelProps> = ({
       >
         <div className="flex h-full flex-col justify-between p-8 text-left text-slate-700">
           <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
-            目录
+            Table of Contents
           </span>
           <div className="space-y-3 text-sm text-slate-500">
-            <p>• 创作工作流</p>
-            <p>• AI 共创工作室</p>
-            <p>• 洞察驱动表达</p>
-            <p>• 内容管治中心</p>
+            <p>- Creative Workflow</p>
+            <p>- AI Co-Creation Studio</p>
+            <p>- Insight-Driven Expression</p>
+            <p>- Content Governance Hub</p>
           </div>
         </div>
       </div>

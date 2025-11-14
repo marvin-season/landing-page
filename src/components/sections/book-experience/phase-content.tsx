@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowLeft, ArrowLeftCircle, Bookmark, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ const ContentView: React.FC<ContentViewProps> = ({
       </div>
       <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur">
         <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
-          章节书签
+          Chapter Bookmarks
         </span>
         <div className="flex flex-col gap-2">
           {chapters.map((chapter, index) => {
@@ -101,7 +101,7 @@ const ContentView: React.FC<ContentViewProps> = ({
           >
             <span className="flex items-center gap-2">
               <ArrowLeftCircle className="h-4 w-4" />
-              返回目录
+              Back to Index
             </span>
             <ArrowLeft className="h-4 w-4" />
           </Link>

@@ -10,7 +10,7 @@ type SceneLayoutProps = {
 };
 
 const SceneLayout = ({
-  badge = "AI 内容工作室",
+  badge = "AI Content Studio",
   title,
   description,
   children,
@@ -30,7 +30,7 @@ const SceneLayout = ({
             <p className="max-w-2xl text-base text-slate-500">{description}</p>
           ) : null}
         </header>
-        <div className="mt-12 flex-1">{children}</div>
+        <div className="mt-24 flex-1">{children}</div>
       </div>
     </section>
   );

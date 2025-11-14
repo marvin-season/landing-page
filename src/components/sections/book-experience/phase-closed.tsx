@@ -39,8 +39,8 @@ const ClosedView: React.FC<ClosedViewProps> = ({
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">
         <p className="text-base leading-relaxed text-slate-500">
-          一本刚刚抵达你桌面的 AI
-          创作手册。点击封面，进入目录，与团队一起探索全新的内容生产方式。
+          A freshly delivered AI creation handbook. Tap the cover to open the
+          index and explore a new way of producing content with your team.
         </p>
         <Link
           href={directoryHref}
@@ -48,7 +48,7 @@ const ClosedView: React.FC<ClosedViewProps> = ({
             "group inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3 text-base text-white shadow-lg shadow-slate-900/15 transition-colors hover:bg-slate-800",
           )}
         >
-          立即翻阅
+          Start Reading
           <motion.span
             className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20"
             whileHover={{ x: 4 }}

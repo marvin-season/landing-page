@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 import BookModel from "./book-model";
 import {
@@ -36,29 +36,31 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
       <div className="flex flex-col items-center gap-6 lg:items-start">
         <Link
           href={coverHref}
+          aria-label="Return to cover"
           className="relative flex justify-center lg:justify-start"
           style={{ perspective: "1900px" }}
         >
           <BookModel phase={phase} interactive />
-          <motion.div
-            className="absolute -bottom-10 right-4 rounded-full bg-slate-900/80 px-4 py-2 text-xs uppercase tracking-[0.28em] text-white shadow-lg shadow-slate-900/30"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...hoverTransition, delay: 0.4 }}
-          >
-            点击封面返回
-          </motion.div>
         </Link>
+        <motion.div
+          className="self-center rounded-full bg-slate-900/80 px-5 py-3 uppercase tracking-[0.28em] text-white shadow-lg text-sm shadow-slate-900/30 lg:self-start"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...hoverTransition, delay: 0.4 }}
+        >
+          Click the cover to return
+        </motion.div>
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-slate-400">
-            目录
+            Table of Contents
           </span>
           <h2 className="text-balance text-3xl font-semibold text-slate-950">
-            选择你想深入的章节
+            Choose the chapter you want to explore
           </h2>
           <p className="mt-3 max-w-sm text-sm text-slate-500">
-            我们为 AI
-            驱动的内容平台整理了四个核心章节。选择任意章节，书本会为你展开相应的故事与能力。
+            We curated four core chapters for an AI-powered content platform.
+            Pick any chapter and the book will reveal the stories and
+            capabilities inside.
           </p>
         </div>
       </div>
