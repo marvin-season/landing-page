@@ -1,119 +1,26 @@
 "use client";
 
-import { ArrowLeft, ArrowLeftCircle, Bookmark, BookOpen } from "lucide-react";
-import { motion } from "motion/react";
-import Link from "next/link";
+import { BookOpen } from "lucide-react";
+import { memo } from "react";
+import AnimatedContent from "@/components/AnimatedContent";
+import { ChapterSidebar } from "@/components/sections/book-experience/chapter-sidebar";
 
-import { cn } from "@/lib/utils";
-
-import BookModel from "./book-model";
-import { easingCurve, hoverTransition } from "./motion-presets";
 import type { Chapter } from "./types";
 
 type ContentViewProps = {
   activeChapter: Chapter;
 };
 
-type ChapterSidebarProps = {
-  activeChapterId: string;
-  chapters: Chapter[];
-  chapterHrefBuilder?: (chapterId: string) => string;
-  directoryHref: string;
-};
-
-const ChapterSidebar: React.FC<ChapterSidebarProps> = ({
-  activeChapterId,
-  chapters,
-  chapterHrefBuilder = (id) => `/chapter/${id}`,
-  directoryHref,
-}) => {
-  return (
-    <aside className="relative flex flex-col gap-6 lg:w-72">
-      <div className="absolute -left-24 top-12 hidden h-80 w-64 lg:block">
-        <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-white/60 blur-2xl" />
-        <div className="pointer-events-none" style={{ perspective: "1900px" }}>
-          <BookModel phase="content" />
-        </div>
-      </div>
-      <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur">
-        <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
-          Chapter Bookmarks
-        </span>
-        <div className="flex flex-col gap-2">
-          {chapters.map((chapter, index) => {
-            const isActive = chapter.id === activeChapterId;
-            return (
-              <motion.div
-                key={chapter.id}
-                className="group rounded-2xl"
-                whileHover={isActive ? undefined : { x: 4 }}
-                transition={hoverTransition}
-              >
-                <Link
-                  href={chapterHrefBuilder(chapter.id)}
-                  className={cn(
-                    "flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
-                    isActive
-                      ? "border-slate-900/80 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                      : "border-transparent bg-slate-100/70 text-slate-600 hover:border-slate-900/10 hover:bg-slate-100",
-                  )}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <div className="flex flex-col">
-                    <span
-                      className={cn(
-                        "text-[11px] font-semibold uppercase tracking-[0.36em]",
-                        isActive ? "text-white/70" : "text-slate-400",
-                      )}
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        isActive ? "text-white" : "text-slate-700",
-                      )}
-                    >
-                      {chapter.title}
-                    </span>
-                  </div>
-                  <Bookmark
-                    className={cn(
-                      "h-4 w-4 transition-colors",
-                      isActive ? "text-white" : "text-slate-400",
-                    )}
-                  />
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
-        <div className="pt-4">
-          <Link
-            href={directoryHref}
-            className="flex w-full items-center justify-between rounded-2xl border border-slate-200/70 bg-white/60 px-4 py-3 text-sm text-slate-600 transition-colors hover:bg-white"
-          >
-            <span className="flex items-center gap-2">
-              <ArrowLeftCircle className="h-4 w-4" />
-              Back to Index
-            </span>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </div>
-      </nav>
-    </aside>
-  );
-};
-
 const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
-  <motion.article
-    key={activeChapter.id}
-    layout
-    className="flex-1 rounded-[40px] border border-slate-200/70 bg-white/80 p-8 backdrop-blur md:p-10"
-    initial={{ opacity: 0, x: 64 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -64 }}
-    transition={{ duration: 0.45, ease: easingCurve }}
+  <AnimatedContent
+    distance={150}
+    direction="horizontal"
+    reverse={false}
+    duration={1.2}
+    initialOpacity={0.2}
+    animateOpacity
+    scale={1.1}
+    threshold={0.2}
   >
     <div className="flex flex-col gap-4">
       <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
@@ -173,8 +80,10 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
         </div>
       ))}
     </div>
-  </motion.article>
+  </AnimatedContent>
 );
 
-export { ChapterSidebar };
-export default ContentView;
+const MemoizedChapterSidebar = memo(ChapterSidebar);
+const MemoizedContentView = memo(ContentView);
+
+export { MemoizedChapterSidebar, MemoizedContentView };

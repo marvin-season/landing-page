@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
 
-import BackgroundDecor from "@/components/sections/book-experience/background-decor";
+import SceneLayout from "@/components/sections/book-experience/scene-layout";
 
 const ChapterLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
-      <BackgroundDecor />
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-16 md:px-10">
-        {children}
-      </div>
-    </section>
+    <SceneLayout
+      title="Open the index and plan your AI content blueprint together"
+      description="From workflows to insights and asset governance, we curated four core chapters for AI-powered content teams. Choose one to dive deeper."
+    >
+      {children}
+    </SceneLayout>
   );
 };
 

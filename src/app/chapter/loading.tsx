@@ -2,7 +2,7 @@ const ChapterDirectoryLoading = () => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-50">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.18),transparent_55%)]" />
-      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white via-white/60 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-white via-white/60 to-transparent" />
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16 md:px-10">
         <div className="space-y-4">
           <div className="h-4 w-32 rounded-full bg-slate-200/80" />
@@ -30,4 +30,3 @@ const ChapterDirectoryLoading = () => {
 };
 
 export default ChapterDirectoryLoading;
-
