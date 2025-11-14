@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -12,19 +13,17 @@ import {
 import type { Chapter, Phase } from "./types";
 
 type DirectoryViewProps = {
-  phase: Phase;
+  phase?: Phase;
   chapters: Chapter[];
-  onBackToCover: () => void;
-  onSelectChapter: (chapterId: string) => void;
-  disabled?: boolean;
+  coverHref: string;
+  chapterHrefBuilder?: (chapterId: string) => string;
 };
 
 const DirectoryView: React.FC<DirectoryViewProps> = ({
-  phase,
+  phase = "directory",
   chapters,
-  onBackToCover,
-  onSelectChapter,
-  disabled,
+  coverHref,
+  chapterHrefBuilder = (id) => `/chapter/${id}`,
 }) => {
   return (
     <motion.div
@@ -35,16 +34,12 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
       transition={sceneTransition}
     >
       <div className="flex flex-col items-center gap-6 lg:items-start">
-        <div
+        <Link
+          href={coverHref}
           className="relative flex justify-center lg:justify-start"
           style={{ perspective: "1900px" }}
         >
-          <BookModel
-            phase={phase}
-            interactive={!disabled}
-            onClick={onBackToCover}
-            label="关闭回到封面"
-          />
+          <BookModel phase={phase} interactive />
           <motion.div
             className="absolute -bottom-10 right-4 rounded-full bg-slate-900/80 px-4 py-2 text-xs uppercase tracking-[0.28em] text-white shadow-lg shadow-slate-900/30"
             initial={{ opacity: 0, y: 16 }}
@@ -53,7 +48,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           >
             点击封面返回
           </motion.div>
-        </div>
+        </Link>
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-slate-400">
             目录
@@ -78,14 +73,12 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           <motion.li
             key={chapter.id}
             className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur transition-shadow hover:shadow-xl hover:shadow-slate-900/10"
-            whileHover={disabled ? undefined : { y: -4 }}
+            whileHover={{ y: -4 }}
             transition={hoverTransition}
           >
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={() => onSelectChapter(chapter.id)}
-              className="flex w-full items-start justify-between text-left disabled:cursor-not-allowed disabled:opacity-50"
+            <Link
+              href={chapterHrefBuilder(chapter.id)}
+              className="flex w-full items-start justify-between text-left"
             >
               <div className="flex flex-col gap-3 pr-6">
                 <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
@@ -113,7 +106,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200/60 bg-slate-100/50">
                 <ArrowRight className="h-5 w-5 text-slate-500" />
               </div>
-            </button>
+            </Link>
           </motion.li>
         ))}
       </motion.ul>

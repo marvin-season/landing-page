@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowLeft, ArrowLeftCircle, Bookmark, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import BookModel from "./book-model";
@@ -17,17 +17,15 @@ import type { Chapter } from "./types";
 type ContentViewProps = {
   activeChapter: Chapter;
   chapters: Chapter[];
-  onSelectChapter: (chapterId: string) => void;
-  onBackToDirectory: () => void;
-  disabled?: boolean;
+  chapterHrefBuilder?: (chapterId: string) => string;
+  directoryHref: string;
 };
 
 const ContentView: React.FC<ContentViewProps> = ({
   activeChapter,
   chapters,
-  onSelectChapter,
-  onBackToDirectory,
-  disabled,
+  chapterHrefBuilder = (id) => `/chapter/${id}`,
+  directoryHref,
 }) => (
   <motion.div
     className="flex flex-col gap-10 lg:flex-row"
@@ -40,7 +38,7 @@ const ContentView: React.FC<ContentViewProps> = ({
       <div className="absolute -left-24 top-12 hidden h-80 w-64 lg:block">
         <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-white/60 blur-2xl" />
         <div className="pointer-events-none" style={{ perspective: "1900px" }}>
-          <BookModel phase="content" label="章节过渡动画" />
+          <BookModel phase="content" />
         </div>
       </div>
       <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur">
@@ -51,64 +49,62 @@ const ContentView: React.FC<ContentViewProps> = ({
           {chapters.map((chapter, index) => {
             const isActive = chapter.id === activeChapter.id;
             return (
-              <motion.button
+              <motion.div
                 key={chapter.id}
-                type="button"
-                onClick={() => onSelectChapter(chapter.id)}
-                disabled={disabled || isActive}
-                className={cn(
-                  "group flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all",
-                  isActive
-                    ? "border-slate-900/80 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                    : "border-transparent bg-slate-100/70 text-slate-600 hover:border-slate-900/10 hover:bg-slate-100",
-                )}
-                whileHover={
-                  disabled || isActive ? undefined : { x: 4 }
-                }
+                className="group rounded-2xl"
+                whileHover={isActive ? undefined : { x: 4 }}
                 transition={hoverTransition}
-                aria-disabled={disabled || isActive}
               >
-                <div className="flex flex-col">
-                  <span
-                    className={cn(
-                      "text-[11px] font-semibold uppercase tracking-[0.36em]",
-                      isActive ? "text-white/70" : "text-slate-400",
-                    )}
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-sm font-medium",
-                      isActive ? "text-white" : "text-slate-700",
-                    )}
-                  >
-                    {chapter.title}
-                  </span>
-                </div>
-                <Bookmark
+                <Link
+                  href={chapterHrefBuilder(chapter.id)}
                   className={cn(
-                    "h-4 w-4 transition-colors",
-                    isActive ? "text-white" : "text-slate-400",
+                    "flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
+                    isActive
+                      ? "border-slate-900/80 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
+                      : "border-transparent bg-slate-100/70 text-slate-600 hover:border-slate-900/10 hover:bg-slate-100",
                   )}
-                />
-              </motion.button>
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <div className="flex flex-col">
+                    <span
+                      className={cn(
+                        "text-[11px] font-semibold uppercase tracking-[0.36em]",
+                        isActive ? "text-white/70" : "text-slate-400",
+                      )}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-sm font-medium",
+                        isActive ? "text-white" : "text-slate-700",
+                      )}
+                    >
+                      {chapter.title}
+                    </span>
+                  </div>
+                  <Bookmark
+                    className={cn(
+                      "h-4 w-4 transition-colors",
+                      isActive ? "text-white" : "text-slate-400",
+                    )}
+                  />
+                </Link>
+              </motion.div>
             );
           })}
         </div>
         <div className="pt-4">
-          <Button
-            variant="ghost"
-            className="w-full justify-between rounded-2xl border border-slate-200/70 bg-white/60 px-4 py-3 text-sm text-slate-600 hover:bg-white"
-            onClick={onBackToDirectory}
-            disabled={disabled}
+          <Link
+            href={directoryHref}
+            className="flex w-full items-center justify-between rounded-2xl border border-slate-200/70 bg-white/60 px-4 py-3 text-sm text-slate-600 transition-colors hover:bg-white"
           >
             <span className="flex items-center gap-2">
               <ArrowLeftCircle className="h-4 w-4" />
               返回目录
             </span>
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </Link>
         </div>
       </nav>
     </aside>

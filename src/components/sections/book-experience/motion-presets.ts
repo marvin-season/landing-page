@@ -2,8 +2,6 @@ import { cubicBezier } from "motion";
 
 import type { Phase } from "./types";
 
-export const chapterNavigationDelay = 620;
-
 export const easingCurve = cubicBezier(0.16, 1, 0.3, 1);
 
 export const sceneTransition = {

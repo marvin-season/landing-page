@@ -10,36 +10,29 @@ import type { Phase } from "./types";
 type BookModelProps = {
   phase: Phase;
   interactive?: boolean;
-  onClick?: () => void;
-  label?: string;
+  className?: string;
 };
 
 const BookModel: React.FC<BookModelProps> = ({
   phase,
   interactive = false,
-  onClick,
-  label,
+  className,
 }) => {
   return (
-    <motion.button
-      type="button"
-      aria-label={label}
-      onClick={interactive ? onClick : undefined}
-      disabled={!interactive}
+    <motion.div
       className={cn(
         "group relative h-[320px] w-[240px] rounded-[32px] sm:h-[360px] sm:w-[280px]",
         interactive ? "cursor-pointer" : "cursor-default",
+        className,
       )}
       style={{
         transformStyle: "preserve-3d",
-        pointerEvents: interactive ? "auto" : "none",
       }}
       variants={bookVariants}
       animate={phase}
       initial={false}
       transition={bookSpringTransition}
       whileHover={interactive ? { translateY: -6 } : undefined}
-      whileTap={interactive ? { scale: 0.98 } : undefined}
     >
       <div
         className="absolute inset-0 rounded-[32px]"
@@ -113,7 +106,7 @@ const BookModel: React.FC<BookModelProps> = ({
           backfaceVisibility: "hidden",
         }}
       />
-    </motion.button>
+    </motion.div>
   );
 };
 
