@@ -7,33 +7,27 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 import BookModel from "./book-model";
-import {
-  accentTransition,
-  hoverTransition,
-  sceneTransition,
-} from "./motion-presets";
+import { easingCurve, hoverTransition } from "./motion-presets";
 import type { Chapter } from "./types";
 
 type ContentViewProps = {
   activeChapter: Chapter;
+};
+
+type ChapterSidebarProps = {
+  activeChapterId: string;
   chapters: Chapter[];
   chapterHrefBuilder?: (chapterId: string) => string;
   directoryHref: string;
 };
 
-const ContentView: React.FC<ContentViewProps> = ({
-  activeChapter,
+const ChapterSidebar: React.FC<ChapterSidebarProps> = ({
+  activeChapterId,
   chapters,
   chapterHrefBuilder = (id) => `/chapter/${id}`,
   directoryHref,
-}) => (
-  <motion.div
-    className="flex flex-col gap-10 lg:flex-row"
-    initial={{ opacity: 0, y: 48 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -48 }}
-    transition={sceneTransition}
-  >
+}) => {
+  return (
     <aside className="relative flex flex-col gap-6 lg:w-72">
       <div className="absolute -left-24 top-12 hidden h-80 w-64 lg:block">
         <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-white/60 blur-2xl" />
@@ -47,7 +41,7 @@ const ContentView: React.FC<ContentViewProps> = ({
         </span>
         <div className="flex flex-col gap-2">
           {chapters.map((chapter, index) => {
-            const isActive = chapter.id === activeChapter.id;
+            const isActive = chapter.id === activeChapterId;
             return (
               <motion.div
                 key={chapter.id}
@@ -108,73 +102,79 @@ const ContentView: React.FC<ContentViewProps> = ({
         </div>
       </nav>
     </aside>
-    <motion.article
-      key={activeChapter.id}
-      className="flex-1 rounded-[40px] border border-slate-200/70 bg-white/80 p-8 backdrop-blur md:p-10"
-      initial={{ opacity: 0, x: 48 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={accentTransition}
-    >
-      <div className="flex flex-col gap-4">
-        <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
-          {activeChapter.tagline}
-        </span>
-        <h2 className="text-balance text-4xl font-semibold text-slate-950">
-          {activeChapter.title}
-        </h2>
-        <p className="text-base leading-relaxed text-slate-500">
-          {activeChapter.content.hero}
-        </p>
-        <p className="text-sm leading-relaxed text-slate-500">
-          {activeChapter.content.description}
-        </p>
-      </div>
+  );
+};
 
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
-        {activeChapter.content.bullets.map((bullet) => (
-          <div
-            key={bullet.title}
-            className="rounded-3xl border border-slate-200/70 bg-white/70 p-6 backdrop-blur"
-          >
-            <div className="flex items-start gap-3">
-              <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold uppercase tracking-[0.32em] text-white">
-                <BookOpen className="h-4 w-4" />
-              </span>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-base font-semibold text-slate-900">
-                  {bullet.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-slate-500">
-                  {bullet.body}
-                </p>
-              </div>
+const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
+  <motion.article
+    key={activeChapter.id}
+    layout
+    className="flex-1 rounded-[40px] border border-slate-200/70 bg-white/80 p-8 backdrop-blur md:p-10"
+    initial={{ opacity: 0, x: 64 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -64 }}
+    transition={{ duration: 0.45, ease: easingCurve }}
+  >
+    <div className="flex flex-col gap-4">
+      <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
+        {activeChapter.tagline}
+      </span>
+      <h2 className="text-balance text-4xl font-semibold text-slate-950">
+        {activeChapter.title}
+      </h2>
+      <p className="text-base leading-relaxed text-slate-500">
+        {activeChapter.content.hero}
+      </p>
+      <p className="text-sm leading-relaxed text-slate-500">
+        {activeChapter.content.description}
+      </p>
+    </div>
+
+    <div className="mt-10 grid gap-6 md:grid-cols-2">
+      {activeChapter.content.bullets.map((bullet) => (
+        <div
+          key={bullet.title}
+          className="rounded-3xl border border-slate-200/70 bg-white/70 p-6 backdrop-blur"
+        >
+          <div className="flex items-start gap-3">
+            <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold uppercase tracking-[0.32em] text-white">
+              <BookOpen className="h-4 w-4" />
+            </span>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-semibold text-slate-900">
+                {bullet.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-slate-500">
+                {bullet.body}
+              </p>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
 
-      <div className="mt-10 flex flex-wrap gap-6">
-        {activeChapter.content.metrics.map((metric) => (
-          <div
-            key={metric.label}
-            className="flex-1 min-w-[160px] rounded-3xl border border-slate-200/70 bg-slate-900 text-white"
-          >
-            <div className="flex flex-col gap-2 p-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.32em] text-white/50">
-                {metric.label}
-              </span>
-              <span className="text-3xl font-semibold leading-none">
-                {metric.value}
-              </span>
-              <span className="text-xs uppercase tracking-[0.24em] text-white/60">
-                {metric.caption}
-              </span>
-            </div>
+    <div className="mt-10 flex flex-wrap gap-6">
+      {activeChapter.content.metrics.map((metric) => (
+        <div
+          key={metric.label}
+          className="flex-1 min-w-[160px] rounded-3xl border border-slate-200/70 bg-slate-900 text-white"
+        >
+          <div className="flex flex-col gap-2 p-6">
+            <span className="text-xs font-semibold uppercase tracking-[0.32em] text-white/50">
+              {metric.label}
+            </span>
+            <span className="text-3xl font-semibold leading-none">
+              {metric.value}
+            </span>
+            <span className="text-xs uppercase tracking-[0.24em] text-white/60">
+              {metric.caption}
+            </span>
           </div>
-        ))}
-      </div>
-    </motion.article>
-  </motion.div>
+        </div>
+      ))}
+    </div>
+  </motion.article>
 );
 
+export { ChapterSidebar };
 export default ContentView;
