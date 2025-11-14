@@ -1,8 +1,9 @@
-import SplitText from "@/components/SplitText";
+import LandingExperience from "@/components/sections/book-experience/landing-shell";
+
 export default function Home() {
   return (
-    <div>
-      <SplitText text="Hello World" />
+    <div className="min-h-screen">
+      <LandingExperience />
     </div>
   );
 }
