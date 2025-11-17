@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-
+import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
 
 type SceneLayoutProps = {
@@ -25,9 +25,11 @@ const SceneLayout = ({
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/70 px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-slate-500 backdrop-blur">
             {badge}
           </span>
-          <h1 className="text-balance text-4xl font-semibold leading-tight text-slate-950 sm:text-5xl">
-            {title}
-          </h1>
+          <ShimmeringText
+            text={title}
+            duration={1.2}
+            className="text-balance text-4xl font-semibold leading-tight text-slate-950 sm:text-5xl"
+          />
           {description ? (
             <p className="max-w-2xl text-base text-slate-500">{description}</p>
           ) : null}

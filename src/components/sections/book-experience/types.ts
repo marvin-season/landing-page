@@ -1,6 +1,7 @@
 export type Phase = "closed" | "directory" | "content";
 
 export type Chapter = {
+  link?: string;
   id: string;
   title: string;
   tagline: string;

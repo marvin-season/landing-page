@@ -77,7 +77,7 @@ const ChapterSidebar: React.FC = () => {
                     </div>
                     <Bookmark
                       className={cn(
-                        "h-4 w-4 transition-colors",
+                        "h-4 w-4 transition-colors shrink-0",
                         isActive ? "text-white" : "text-slate-400",
                       )}
                     />

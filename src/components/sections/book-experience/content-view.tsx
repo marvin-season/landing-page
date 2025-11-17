@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpen } from "lucide-react";
+import { BookOpen, LinkIcon } from "lucide-react";
+import Link from "next/link";
 import AnimatedContent from "@/components/AnimatedContent";
 import type { Chapter } from "./types";
 
@@ -24,9 +25,24 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
       <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
         {activeChapter.tagline}
       </span>
+
       <h2 className="text-balance text-4xl font-semibold text-slate-950">
-        {activeChapter.title}
+        {activeChapter.link ? (
+          <Link
+            href={activeChapter.link}
+            target="_blank"
+            rel="noreferrer"
+            prefetch={false}
+            className="group inline-flex items-center gap-3 transition-all hover:text-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            {activeChapter.title}
+            <LinkIcon className="h-5 w-5 shrink-0 transition-transform group-hover:-translate-y-0.5" />
+          </Link>
+        ) : (
+          activeChapter.title
+        )}
       </h2>
+
       <p className="text-base leading-relaxed text-slate-500">
         {activeChapter.content.hero}
       </p>
