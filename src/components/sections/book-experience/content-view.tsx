@@ -1,10 +1,7 @@
 "use client";
 
 import { BookOpen } from "lucide-react";
-import { memo } from "react";
 import AnimatedContent from "@/components/AnimatedContent";
-import { ChapterSidebar } from "@/components/sections/book-experience/chapter-sidebar";
-
 import type { Chapter } from "./types";
 
 type ContentViewProps = {
@@ -13,14 +10,15 @@ type ContentViewProps = {
 
 const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
   <AnimatedContent
-    distance={150}
+    distance={50}
     direction="horizontal"
-    reverse={false}
-    duration={1.2}
-    initialOpacity={0.2}
+    duration={0.3}
+    ease="power3.out"
+    initialOpacity={0}
     animateOpacity
-    scale={1.1}
+    scale={0.9}
     threshold={0.2}
+    delay={0.1}
   >
     <div className="flex flex-col gap-4">
       <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
@@ -83,7 +81,4 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
   </AnimatedContent>
 );
 
-const MemoizedChapterSidebar = memo(ChapterSidebar);
-const MemoizedContentView = memo(ContentView);
-
-export { MemoizedChapterSidebar, MemoizedContentView };
+export default ContentView;

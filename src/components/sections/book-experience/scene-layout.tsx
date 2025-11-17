@@ -7,6 +7,7 @@ type SceneLayoutProps = {
   title: string;
   description?: string;
   children: ReactNode;
+  className?: string;
 };
 
 const SceneLayout = ({
@@ -14,6 +15,7 @@ const SceneLayout = ({
   title,
   description,
   children,
+  className,
 }: SceneLayoutProps) => {
   return (
     <section className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
@@ -30,7 +32,7 @@ const SceneLayout = ({
             <p className="max-w-2xl text-base text-slate-500">{description}</p>
           ) : null}
         </header>
-        <div className="mt-24 flex-1">{children}</div>
+        <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>
     </section>
   );

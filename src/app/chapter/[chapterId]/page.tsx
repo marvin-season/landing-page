@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { chapters } from "@/components/sections/book-experience/chapters";
-import { MemoizedContentView } from "@/components/sections/book-experience/phase-content";
+import ContentView from "@/components/sections/book-experience/content-view";
 
 interface ChapterPageProps {
   params: Promise<{ chapterId: string }>;
@@ -19,7 +19,7 @@ const ChapterPage = async ({ params }: ChapterPageProps) => {
     notFound();
   }
 
-  return <MemoizedContentView activeChapter={activeChapter} />;
+  return <ContentView activeChapter={activeChapter} />;
 };
 
 export default ChapterPage;
