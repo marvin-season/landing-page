@@ -30,7 +30,7 @@ const ChapterSidebar: React.FC = () => {
     >
       <aside className="relative flex flex-col gap-6 lg:w-72 shrink-0">
         <div className="absolute -left-24 top-12 hidden h-80 w-64 lg:block">
-          <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-white/60 blur-2xl" />
+          <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-sidebar/60 blur-2xl" />
           <div
             className="pointer-events-none"
             style={{ perspective: "1900px" }}
@@ -38,8 +38,8 @@ const ChapterSidebar: React.FC = () => {
             <BookModel phase="content" />
           </div>
         </div>
-        <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur">
-          <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">
+        <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-sidebar-border/60 bg-sidebar/80 p-6 text-sidebar-foreground backdrop-blur">
+          <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-sidebar-foreground/60">
             Chapter Bookmarks
           </span>
           <div className="flex flex-col gap-2">
@@ -52,8 +52,8 @@ const ChapterSidebar: React.FC = () => {
                     className={cn(
                       "flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
                       isActive
-                        ? "border-slate-900/80 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                        : "border-transparent bg-slate-100/70 text-slate-600 hover:border-slate-900/10 hover:bg-slate-100",
+                        ? "border-sidebar-primary/70 bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_18px_40px_-20px_var(--sidebar-ring)]"
+                        : "border-transparent bg-sidebar-accent/80 text-sidebar-foreground/80 hover:border-sidebar-ring/40 hover:bg-sidebar-accent/90",
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
@@ -61,7 +61,9 @@ const ChapterSidebar: React.FC = () => {
                       <span
                         className={cn(
                           "text-[11px] font-semibold uppercase tracking-[0.36em]",
-                          isActive ? "text-white/70" : "text-slate-400",
+                          isActive
+                            ? "text-sidebar-primary-foreground/70"
+                            : "text-sidebar-foreground/50",
                         )}
                       >
                         {String(index + 1).padStart(2, "0")}
@@ -69,7 +71,9 @@ const ChapterSidebar: React.FC = () => {
                       <span
                         className={cn(
                           "text-sm font-medium",
-                          isActive ? "text-white" : "text-slate-700",
+                          isActive
+                            ? "text-sidebar-primary-foreground"
+                            : "text-sidebar-foreground",
                         )}
                       >
                         {chapter.title}
@@ -78,7 +82,9 @@ const ChapterSidebar: React.FC = () => {
                     <Bookmark
                       className={cn(
                         "h-4 w-4 transition-colors shrink-0",
-                        isActive ? "text-white" : "text-slate-400",
+                        isActive
+                          ? "text-sidebar-primary-foreground"
+                          : "text-sidebar-foreground/50",
                       )}
                     />
                   </Link>
@@ -89,7 +95,7 @@ const ChapterSidebar: React.FC = () => {
           <div className="pt-4">
             <Link
               href={"/chapter"}
-              className="flex w-full items-center justify-between rounded-2xl border border-slate-200/70 bg-white/60 px-4 py-3 text-sm text-slate-600 transition-colors hover:bg-white"
+              className="flex w-full items-center justify-between rounded-2xl border border-sidebar-border/60 bg-sidebar/70 px-4 py-3 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar/80"
             >
               <span className="flex items-center gap-2">
                 <ArrowLeftCircle className="h-4 w-4" />

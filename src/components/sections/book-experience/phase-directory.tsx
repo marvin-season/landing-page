@@ -43,7 +43,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           <BookModel phase={phase} interactive />
         </Link>
         <motion.div
-          className="self-center rounded-full bg-slate-900/80 px-5 py-3 uppercase tracking-[0.28em] text-white shadow-lg text-sm shadow-slate-900/30 lg:self-start"
+          className="self-center rounded-full bg-primary/80 px-5 py-3 text-sm uppercase tracking-[0.28em] text-primary-foreground shadow-[0_28px_48px_-36px_var(--ring)] lg:self-start"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...hoverTransition, delay: 0.4 }}
@@ -51,13 +51,13 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           Click the cover to return
         </motion.div>
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-slate-400">
+          <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-muted-foreground/70">
             Table of Contents
           </span>
-          <h2 className="text-balance text-3xl font-semibold text-slate-950">
+          <h2 className="text-balance text-3xl font-semibold text-foreground">
             Choose the chapter you want to explore
           </h2>
-          <p className="mt-3 max-w-sm text-sm text-slate-500">
+          <p className="mt-3 max-w-sm text-sm text-muted-foreground">
             We curated four core chapters for an AI-powered content platform.
             Pick any chapter and the book will reveal the stories and
             capabilities inside.
@@ -74,7 +74,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
         {chapters.map((chapter, index) => (
           <motion.li
             key={chapter.id}
-            className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 backdrop-blur transition-shadow hover:shadow-xl hover:shadow-slate-900/10"
+            className="rounded-3xl border border-border/60 bg-card/80 p-6 text-foreground backdrop-blur transition-shadow hover:shadow-[0_28px_60px_-38px_var(--ring)]"
             whileHover={{ y: -4 }}
             transition={hoverTransition}
           >
@@ -83,14 +83,14 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
               className="flex w-full items-start justify-between text-left"
             >
               <div className="flex flex-col gap-3 pr-6">
-                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
+                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground/70">
                   Chapter {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <p className="text-lg font-semibold text-slate-900">
+                  <p className="text-lg font-semibold text-foreground">
                     {chapter.title}
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {chapter.summary}
                   </p>
                 </div>
@@ -98,15 +98,15 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
                   {chapter.keywords.map((keyword) => (
                     <span
                       key={keyword}
-                      className="rounded-full border border-slate-200/60 bg-slate-100/80 px-3 py-1 text-xs font-medium text-slate-500 backdrop-blur"
+                      className="rounded-full border border-border/50 bg-muted/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur"
                     >
                       {keyword}
                     </span>
                   ))}
                 </div>
               </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200/60 bg-slate-100/50">
-                <ArrowRight className="h-5 w-5 text-slate-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 text-muted-foreground">
+                <ArrowRight className="h-5 w-5" />
               </div>
             </Link>
           </motion.li>

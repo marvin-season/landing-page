@@ -22,18 +22,18 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
     delay={0.1}
   >
     <div className="flex flex-col gap-4">
-      <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-slate-400">
+      <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-muted-foreground/70">
         {activeChapter.tagline}
       </span>
 
-      <h2 className="text-balance text-4xl font-semibold text-slate-950">
+      <h2 className="text-balance text-4xl font-semibold text-foreground">
         {activeChapter.link ? (
           <Link
             href={activeChapter.link}
             target="_blank"
             rel="noreferrer"
             prefetch={false}
-            className="group inline-flex items-center gap-3 transition-all hover:text-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            className="group inline-flex items-center gap-3 transition-all hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {activeChapter.title}
             <LinkIcon className="h-5 w-5 shrink-0 transition-transform group-hover:-translate-y-0.5" />
@@ -43,10 +43,10 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
         )}
       </h2>
 
-      <p className="text-base leading-relaxed text-slate-500">
+      <p className="text-base leading-relaxed text-muted-foreground">
         {activeChapter.content.hero}
       </p>
-      <p className="text-sm leading-relaxed text-slate-500">
+      <p className="text-sm leading-relaxed text-muted-foreground">
         {activeChapter.content.description}
       </p>
     </div>
@@ -55,17 +55,17 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
       {activeChapter.content.bullets.map((bullet) => (
         <div
           key={bullet.title}
-          className="rounded-3xl border border-slate-200/70 bg-white/70 p-6 backdrop-blur"
+          className="rounded-3xl border border-border/70 bg-card/70 p-6 text-foreground backdrop-blur"
         >
           <div className="flex items-start gap-3">
-            <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold uppercase tracking-[0.32em] text-white">
+            <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold uppercase tracking-[0.32em] text-primary-foreground">
               <BookOpen className="h-4 w-4" />
             </span>
             <div className="flex flex-col gap-2">
-              <h3 className="text-base font-semibold text-slate-900">
+              <h3 className="text-base font-semibold text-foreground">
                 {bullet.title}
               </h3>
-              <p className="text-sm leading-relaxed text-slate-500">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {bullet.body}
               </p>
             </div>
@@ -78,16 +78,16 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
       {activeChapter.content.metrics.map((metric) => (
         <div
           key={metric.label}
-          className="flex-1 min-w-[160px] rounded-3xl border border-slate-200/70 bg-slate-900 text-white"
+          className="flex-1 min-w-[160px] rounded-3xl border border-border/70 bg-primary text-primary-foreground"
         >
           <div className="flex flex-col gap-2 p-6">
-            <span className="text-xs font-semibold uppercase tracking-[0.32em] text-white/50">
+            <span className="text-xs font-semibold uppercase tracking-[0.32em] text-primary-foreground/60">
               {metric.label}
             </span>
             <span className="text-3xl font-semibold leading-none">
               {metric.value}
             </span>
-            <span className="text-xs uppercase tracking-[0.24em] text-white/60">
+            <span className="text-xs uppercase tracking-[0.24em] text-primary-foreground/70">
               {metric.caption}
             </span>
           </div>

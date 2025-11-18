@@ -28,7 +28,7 @@ const ClosedView: React.FC<ClosedViewProps> = ({
       transition={sceneTransition}
     >
       <div className="relative flex justify-center">
-        <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-white/20 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-card/30 blur-3xl" />
         <Link
           href={directoryHref}
           className="relative flex justify-center"
@@ -38,19 +38,19 @@ const ClosedView: React.FC<ClosedViewProps> = ({
         </Link>
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">
-        <p className="text-base leading-relaxed text-slate-500">
+        <p className="text-base leading-relaxed text-muted-foreground">
           A freshly delivered AI creation handbook. Tap the cover to open the
           index and explore a new way of producing content with your team.
         </p>
         <Link
           href={directoryHref}
           className={cn(
-            "group inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3 text-base text-white shadow-lg shadow-slate-900/15 transition-colors hover:bg-slate-800",
+            "group inline-flex items-center gap-3 rounded-full bg-primary px-7 py-3 text-base text-primary-foreground shadow-[0_28px_52px_-40px_var(--ring)] transition-colors hover:bg-primary/90",
           )}
         >
           Start Reading
           <motion.span
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20"
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-foreground/20"
             whileHover={{ x: 4 }}
             transition={hoverTransition}
           >
