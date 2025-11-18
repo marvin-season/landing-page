@@ -1,10 +1,10 @@
 import { msg } from "@lingui/core/macro";
+import { setI18n } from "@lingui/react/server";
 import type { PropsWithChildren } from "react";
-import linguiConfig from "../../../lingui.config";
-import { allMessages, getI18nInstance } from "./appRouterI18n";
-import { initLingui, type PageLangParam } from "./initLingui";
-import { LinguiClientProvider } from "./LinguiClientProvider";
-
+import { allMessages, getI18nInstance } from "@/lib/i18n/appRouterI18n";
+import type { PageLangParam } from "@/lib/i18n/initLingui";
+import { LinguiClientProvider } from "@/lib/i18n/LinguiClientProvider";
+import linguiConfig from "~/lingui.config";
 export async function generateStaticParams() {
   return linguiConfig.locales.map((lang) => ({ lang }));
 }
@@ -22,7 +22,10 @@ export default async function RootLayout({
   params,
 }: PropsWithChildren<PageLangParam>) {
   const lang = (await params).lang;
-  initLingui(lang);
+  const i18n = getI18nInstance(lang);
+
+  // @ts-expect-error
+  setI18n(i18n);
 
   return (
     <html lang={lang}>

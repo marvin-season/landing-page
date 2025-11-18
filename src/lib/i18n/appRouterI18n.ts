@@ -1,7 +1,7 @@
 import "server-only";
 
 import { type I18n, type Messages, setupI18n } from "@lingui/core";
-import linguiConfig from "../../../lingui.config";
+import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;
 // optionally use a stricter union type

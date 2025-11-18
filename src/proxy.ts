@@ -5,7 +5,7 @@
 
 import Negotiator from "negotiator";
 import { type NextRequest, NextResponse } from "next/server";
-import linguiConfig from "../lingui.config";
+import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;
 
