@@ -11,15 +11,15 @@ type ContentViewProps = {
 
 const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
   <AnimatedContent
-    distance={50}
+    distance={0}
     direction="horizontal"
     duration={0.3}
-    ease="power3.out"
+    ease=""
     initialOpacity={0}
     animateOpacity
-    scale={0.9}
-    threshold={0.2}
-    delay={0.1}
+    scale={0.95}
+    threshold={0}
+    delay={0}
   >
     <div className="flex flex-col gap-4">
       <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-muted-foreground/70">
@@ -58,7 +58,7 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
           className="rounded-3xl border border-border/70 bg-card/70 p-6 text-foreground backdrop-blur"
         >
           <div className="flex items-start gap-3">
-            <span className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold uppercase tracking-[0.32em] text-primary-foreground">
+            <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold uppercase tracking-[0.32em] text-primary-foreground">
               <BookOpen className="h-4 w-4" />
             </span>
             <div className="flex flex-col gap-2">

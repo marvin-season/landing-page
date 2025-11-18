@@ -17,16 +17,16 @@ const ChapterSidebar: React.FC = () => {
   }
   return (
     <AnimatedContent
-      distance={50}
+      distance={0}
       direction="horizontal"
       reverse={false}
       duration={0.3}
       ease="power3.out"
       initialOpacity={0}
       animateOpacity
-      scale={0.8}
-      threshold={0.2}
-      delay={0.1}
+      scale={0.95}
+      threshold={0}
+      delay={0}
     >
       <aside className="relative flex flex-col gap-6 lg:w-72 shrink-0">
         <div className="absolute -left-24 top-12 hidden h-80 w-64 lg:block">
@@ -42,7 +42,7 @@ const ChapterSidebar: React.FC = () => {
           <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-sidebar-foreground/60">
             Chapter Bookmarks
           </span>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             {chapters.map((chapter, index) => {
               const isActive = chapter.id === activeChapterId;
               return (

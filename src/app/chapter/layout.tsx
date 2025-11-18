@@ -11,7 +11,7 @@ const ChapterLayout = ({ children }: { children: ReactNode }) => {
       className="flex flex-col gap-10 lg:flex-row"
     >
       <ChapterSidebar />
-      <div className="flex-1 w-0">{children}</div>
+      <div className="flex-1">{children}</div>
     </SceneLayout>
   );
 };
