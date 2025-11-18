@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
@@ -39,6 +40,7 @@ const SceneLayout = ({
             ) : null}
           </div>
           <ThemeSwitcher className="self-start" />
+          <LanguageSwitcher />
         </header>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>

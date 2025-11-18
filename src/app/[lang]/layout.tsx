@@ -2,13 +2,13 @@ import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { PropsWithChildren } from "react";
+import { LinguiClientProvider } from "@/components/language/LinguiClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import {
   allMessages,
   getI18nInstance,
   type PageLangParam,
 } from "@/lib/i18n/appRouterI18n";
-import { LinguiClientProvider } from "@/lib/i18n/LinguiClientProvider";
 import linguiConfig from "~/lingui.config";
 import "@/app/globals.css";
 const geistSans = Geist({
