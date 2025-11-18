@@ -12,7 +12,7 @@ export const LanguageSwitcher = () => {
     <label className="flex items-center gap-2 text-sm">
       <span className="text-muted-foreground">Language</span>
       <select
-        value={sourceLocale}
+        defaultValue={sourceLocale}
         onChange={(event) => {
           router.replace(`/${event.target.value}`);
         }}
