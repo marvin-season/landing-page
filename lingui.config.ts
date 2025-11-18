@@ -1,5 +1,5 @@
 export default {
-  locales: ["en", "sr", "es", "pseudo"],
+  locales: ["en", "zh", "ja", "pseudo"],
   pseudoLocale: "pseudo",
   sourceLocale: "en",
   fallbackLocales: {
