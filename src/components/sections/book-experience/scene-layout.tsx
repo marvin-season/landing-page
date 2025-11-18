@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import BackgroundDecor from "./background-decor";
 
 type SceneLayoutProps = {
@@ -18,21 +19,26 @@ const SceneLayout = ({
   className,
 }: SceneLayoutProps) => {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
+    <section className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <BackgroundDecor />
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16 md:px-10">
-        <header className="flex flex-col items-start gap-4">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/70 px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-slate-500 backdrop-blur">
-            {badge}
-          </span>
-          <ShimmeringText
-            text={title}
-            duration={1.2}
-            className="text-balance text-4xl font-semibold leading-tight text-slate-950 sm:text-5xl"
-          />
-          {description ? (
-            <p className="max-w-2xl text-base text-slate-500">{description}</p>
-          ) : null}
+        <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col items-start gap-4">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-muted-foreground backdrop-blur">
+              {badge}
+            </span>
+            <ShimmeringText
+              text={title}
+              duration={1.2}
+              className="text-balance text-4xl font-semibold leading-tight text-foreground sm:text-5xl"
+            />
+            {description ? (
+              <p className="max-w-2xl text-base text-muted-foreground">
+                {description}
+              </p>
+            ) : null}
+          </div>
+          <ThemeSwitcher className="self-start" />
         </header>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>
