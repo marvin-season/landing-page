@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { useMounted } from "@/hooks/use-mounted";
 import { cn } from "@/lib/utils";
 
 type ThemeSwitcherProps = {
@@ -8,7 +9,10 @@ type ThemeSwitcherProps = {
 };
 
 export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
+  const mounted = useMounted();
   const { setTheme, theme } = useTheme();
+
+  if (!mounted) return null;
 
   return (
     <label className={cn("flex items-center gap-2 text-sm", className)}>
