@@ -15,274 +15,274 @@ msgstr ""
 
 #: src/components/sections/book-experience/phase-closed.tsx:43
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
-msgstr ""
+msgstr "一本新鲜出炉的 AI 创作手册。轻触封面打开目录，与团队一起探索内容创作的新方式。"
 
 #: src/components/sections/book-experience/chapters.ts:16
 msgid "A unified workspace built around engineering best practices. From Shadcn UI design system and automated Fumadocs documentation, to UI automation and robust docs integration—engineers can scale content delivery globally with optimal tooling."
-msgstr ""
+msgstr "围绕工程最佳实践构建的统一工作空间。从 Shadcn UI 设计系统和自动化 Fumadocs 文档，到 UI 自动化和强大的文档集成——工程师可以使用最佳工具在全球范围内扩展内容交付。"
 
 #: src/components/sections/book-experience/chapters.ts:31
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
-msgstr ""
+msgstr "通过 Shadcn UI 组件和 Fumadocs 驱动的自动化文档，实现无与伦比的一致性和速度——让工程师掌控 AI 内容生命周期。"
 
 #: src/components/sections/book-experience/chapters.ts:11
 #: src/components/sections/book-experience/chapters.ts:103
 msgid "AI orchestrates every step of content production."
-msgstr ""
+msgstr "AI 编排内容生产的每一步。"
 
 #: src/components/sections/book-experience/chapters.ts:73
 msgid "All UI uses Shadcn UI—customizable, accessible, and consistent components."
-msgstr ""
+msgstr "所有 UI 都使用 Shadcn UI——可定制、可访问且一致的组件。"
 
 #: src/components/sections/book-experience/chapters.ts:112
 msgid "Audience Adaptation"
-msgstr ""
+msgstr "受众适配"
 
 #: src/components/sections/book-experience/chapters.ts:44
 msgid "Automated Live Documentation"
-msgstr ""
+msgstr "自动化实时文档"
 
 #: src/components/sections/book-experience/chapters.ts:105
 msgid "Automation keeps every stage from inspiration to delivery aligned."
-msgstr ""
+msgstr "自动化确保从灵感到交付的每个阶段都保持一致。"
 
 #: src/components/sections/book-experience/chapters.ts:152
 msgid "Average delivery cycle reduced"
-msgstr ""
+msgstr "平均交付周期缩短"
 
 #: src/components/sections/book-experience/chapter-sidebar.tsx:105
 msgid "Back to Index"
-msgstr ""
+msgstr "返回目录"
 
 #: src/components/sections/book-experience/chapters.ts:157
 msgid "Brand voice alignment"
-msgstr ""
+msgstr "品牌声音对齐"
 
 #: src/components/sections/book-experience/chapters.ts:130
 msgid "Brand Voice Guardrails"
-msgstr ""
+msgstr "品牌声音护栏"
 
 #: src/components/sections/book-experience/chapters.ts:108
 msgid "Build a closed-loop workspace for ideation, proofreading, and distribution while keeping your brand voice consistent."
-msgstr ""
+msgstr "构建一个闭环工作空间，用于构思、校对和分发，同时保持品牌声音的一致性。"
 
 #: src/components/sections/book-experience/chapters.ts:62
 msgid "Built for Extensibility"
-msgstr ""
+msgstr "为可扩展性而构建"
 
 #. placeholder {0}: String(index + 1).padStart(2, "0")
 #: src/components/sections/book-experience/phase-directory.tsx:95
 msgid "Chapter {0}"
-msgstr ""
+msgstr "第 {0} 章"
 
 #: src/components/sections/book-experience/chapter-sidebar.tsx:46
 msgid "Chapter Bookmarks"
-msgstr ""
+msgstr "章节书签"
 
 #: src/components/sections/book-experience/phase-directory.tsx:64
 msgid "Choose the chapter you want to explore"
-msgstr ""
+msgstr "选择您想要探索的章节"
 
 #: src/components/sections/book-experience/phase-directory.tsx:57
 msgid "Click the cover to return"
-msgstr ""
+msgstr "点击封面返回"
 
 #: src/components/sections/book-experience/chapters.ts:21
 msgid "Component System"
-msgstr ""
+msgstr "组件系统"
 
 #: src/components/sections/book-experience/chapters.ts:117
 msgid "Connect every node between inspiration and publication so collaboration stays traceable, reusable, and optimizable."
-msgstr ""
+msgstr "连接从灵感到发布的每个节点，使协作保持可追溯、可重用和可优化。"
 
 #: src/components/sections/book-experience/chapters.ts:155
 msgid "Consistency"
-msgstr ""
+msgstr "一致性"
 
 #: src/app/[lang]/layout.tsx:32
 msgid "Create Next App"
-msgstr ""
+msgstr "创建 Next 应用"
 
 #: src/components/sections/book-experience/chapters.ts:20
 msgid "Design System"
-msgstr ""
+msgstr "设计系统"
 
 #: src/components/sections/book-experience/chapters.ts:70
 msgid "Design System Adoption"
-msgstr ""
+msgstr "设计系统采用"
 
 #: src/components/sections/book-experience/chapters.ts:26
 msgid "Developer Experience"
-msgstr ""
+msgstr "开发者体验"
 
 #: src/components/sections/book-experience/chapters.ts:91
 msgid "Developer Onboarding"
-msgstr ""
+msgstr "开发者入门"
 
 #: src/components/sections/book-experience/chapters.ts:50
 msgid "Developer-Centric Workflow"
-msgstr ""
+msgstr "以开发者为中心的工作流"
 
 #: src/components/sections/book-experience/chapters.ts:77
 msgid "Doc Coverage"
-msgstr ""
+msgstr "文档覆盖率"
 
 #: src/components/sections/book-experience/chapters.ts:23
 msgid "Docs Integration"
-msgstr ""
+msgstr "文档集成"
 
 #: src/components/sections/book-experience/chapters.ts:27
 msgid "Documentation Automation"
-msgstr ""
+msgstr "文档自动化"
 
 #: src/components/sections/book-experience/chapters.ts:126
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
-msgstr ""
+msgstr "拖放多模态模板并自动分发到每个渠道，消除重复的跨平台工作。"
 
 #: src/components/sections/book-experience/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
-msgstr ""
+msgstr "轻松添加新的基于 Shadcn 的组件——Fumadocs 会立即在所有用例中记录它们，最大限度地减少入门和维护开销。"
 
 #: src/components/sections/book-experience/chapters.ts:150
 msgid "Efficiency Boost"
-msgstr ""
+msgstr "效率提升"
 
 #: src/components/sections/book-experience/chapters.ts:19
 msgid "Engineering"
-msgstr ""
+msgstr "工程"
 
 #: src/components/sections/book-experience/chapters.ts:10
 msgid "Engineering-First AI Studio"
-msgstr ""
+msgstr "工程优先的 AI 工作室"
 
 #: src/app/[lang]/page.tsx:13
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
-msgstr ""
+msgstr "通过「书籍」界面进入下一代 AI 内容协作平台"
 
 #: src/components/sections/book-experience/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
-msgstr ""
+msgstr "每个功能、API 和 UI 元素都通过 Fumadocs 记录。"
 
 #: src/components/sections/book-experience/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
-msgstr ""
+msgstr "通过文档和组件系统协同，加快入门速度。"
 
 #: src/components/sections/book-experience/chapters.ts:87
 msgid "Faster release cycles vs. legacy stacks due to unified automation."
-msgstr ""
+msgstr "由于统一的自动化，发布周期比传统技术栈更快。"
 
 #: src/components/sections/book-experience/chapters.ts:160
 msgid "Feedback Convergence"
-msgstr ""
+msgstr "反馈汇聚"
 
 #: src/components/sections/book-experience/chapters.ts:162
 msgid "Fewer revision loops"
-msgstr ""
+msgstr "更少的修订循环"
 
 #: src/components/sections/book-experience/chapters.ts:13
 msgid "Full-stack automation integrates design systems, documentation, UI components, and delivery for seamless engineering productivity."
-msgstr ""
+msgstr "全栈自动化集成设计系统、文档、UI 组件和交付，实现无缝的工程生产力。"
 
 #: src/components/sections/book-experience/chapters.ts:25
 msgid "Fumadocs"
-msgstr ""
+msgstr "Fumadocs"
 
 #: src/components/sections/book-experience/chapters.ts:46
 msgid "Fumadocs keeps component and API documentation always current—complete with live code previews—so every update is immediately reflected across platforms."
-msgstr ""
+msgstr "Fumadocs 保持组件和 API 文档始终最新——包含实时代码预览——因此每次更新都会立即反映在所有平台上。"
 
 #: src/components/sections/book-experience/chapters.ts:144
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
-msgstr ""
+msgstr "自动生成多维审查建议，确保每个输出都专业、合规且符合品牌。"
 
 #: src/app/[lang]/layout.tsx:33
 msgid "Generated by create next app"
-msgstr ""
+msgstr "由 create next app 生成"
 
 #: src/components/sections/book-experience/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
-msgstr ""
+msgstr "热重载功能、灵活的主题和原子设计模式帮助工程师快速部署新功能。文档和 UI 始终保持同步更新。"
 
 #: src/components/sections/book-experience/chapters.ts:102
 msgid "Intelligent Creative Workflows"
-msgstr ""
+msgstr "智能创意工作流"
 
 #: src/components/sections/book-experience/chapters.ts:142
 msgid "Intelligent Proofreading"
-msgstr ""
+msgstr "智能校对"
 
 #: src/components/sections/book-experience/chapters.ts:111
 msgid "Multimodal Templates"
-msgstr ""
+msgstr "多模态模板"
 
 #: src/components/sections/book-experience/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
-msgstr ""
+msgstr "实时参考您的品牌语料库，确保每个外部接触点的语调和风格保持一致。"
 
 #: src/components/sections/book-experience/chapters.ts:56
 msgid "Robust UI Automation"
-msgstr ""
+msgstr "强大的 UI 自动化"
 
 #: src/components/sections/book-experience/chapters.ts:138
 msgid "Role-based permissions with comments, annotations, and history let teams collaborate smoothly across key checkpoints."
-msgstr ""
+msgstr "基于角色的权限，配合评论、注释和历史记录，让团队在关键检查点顺畅协作。"
 
 #: src/components/sections/book-experience/chapters.ts:24
 msgid "Shadcn UI"
-msgstr ""
+msgstr "Shadcn UI"
 
 #: src/components/sections/book-experience/chapters.ts:40
 msgid "Shadcn UI underpins the studio's visual language, offering accessible, reusable, and consistent components for fast, error-free development."
-msgstr ""
+msgstr "Shadcn UI 支撑着工作室的视觉语言，提供可访问、可重用且一致的组件，实现快速、无错误的开发。"
 
 #: src/components/sections/book-experience/phase-closed.tsx:54
 msgid "Start Reading"
-msgstr ""
+msgstr "开始阅读"
 
 #: src/components/sections/book-experience/chapters.ts:120
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
-msgstr ""
+msgstr "将想法捕获、生成、审查和全渠道分发串联起来。可视化编排器和策略引擎为您的团队提供不知疲倦的 AI 合作伙伴。"
 
 #: src/components/sections/book-experience/phase-directory.tsx:61
 msgid "Table of Contents"
-msgstr ""
+msgstr "目录"
 
 #: src/components/sections/book-experience/chapters.ts:113
 msgid "Team Collaboration"
-msgstr ""
+msgstr "团队协作"
 
 #: src/components/sections/book-experience/chapters.ts:136
 msgid "Team Sync"
-msgstr ""
+msgstr "团队同步"
 
 #: src/components/sections/book-experience/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
-msgstr ""
+msgstr "AI 工作室采用最先进的组件系统（Shadcn UI），与实时自动化文档（Fumadocs）深度耦合。设计、代码和文档始终保持同步，使工程团队能够保持质量、快速迭代并自信地扩展。"
 
 #: src/components/sections/book-experience/chapters.ts:84
 msgid "Time-to-Delivery"
-msgstr ""
+msgstr "交付时间"
 
 #: src/components/sections/book-experience/chapters.ts:22
 msgid "UI Automation"
-msgstr ""
+msgstr "UI 自动化"
 
 #: src/components/sections/book-experience/chapters.ts:58
 msgid "UI automation and docs integration ensure updates flow instantly from the codebase to all internal and external endpoints for a true single source of truth."
-msgstr ""
+msgstr "UI 自动化和文档集成确保更新从代码库即时流向所有内部和外部端点，实现真正的单一数据源。"
 
 #: src/components/sections/book-experience/chapters.ts:38
 msgid "Unified Design System"
-msgstr ""
+msgstr "统一设计系统"
 
 #: src/components/sections/book-experience/phase-directory.tsx:67
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
-msgstr ""
+msgstr "我们为 AI 驱动的内容平台精选了四个核心章节。选择任意章节，书籍将揭示其中的故事和功能。"
 
 #: src/app/[lang]/page.tsx:16
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
-msgstr ""
+msgstr "我们将体验塑造成一本会呼吸的书。打开它，触手可及地揭示关于策略、创作、洞察和治理的章节。"
 
 #: src/components/sections/book-experience/chapters.ts:124
 msgid "Workflow Orchestration"
-msgstr ""
+msgstr "工作流编排"

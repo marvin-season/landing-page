@@ -15,274 +15,274 @@ msgstr ""
 
 #: src/components/sections/book-experience/phase-closed.tsx:43
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
-msgstr ""
+msgstr "新しく届いた AI クリエイションハンドブック。カバーをタップしてインデックスを開き、チームと一緒にコンテンツ制作の新しい方法を探求してください。"
 
 #: src/components/sections/book-experience/chapters.ts:16
 msgid "A unified workspace built around engineering best practices. From Shadcn UI design system and automated Fumadocs documentation, to UI automation and robust docs integration—engineers can scale content delivery globally with optimal tooling."
-msgstr ""
+msgstr "エンジニアリングのベストプラクティスを中心に構築された統一ワークスペース。Shadcn UI デザインシステムと自動化された Fumadocs ドキュメントから、UI 自動化と堅牢なドキュメント統合まで、エンジニアは最適なツールでコンテンツ配信をグローバルに拡張できます。"
 
 #: src/components/sections/book-experience/chapters.ts:31
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
-msgstr ""
+msgstr "Shadcn UI コンポーネントと Fumadocs による自動化ドキュメントで、比類のない一貫性と速度を実現し、エンジニアが AI コンテンツのライフサイクルを制御できるようにします。"
 
 #: src/components/sections/book-experience/chapters.ts:11
 #: src/components/sections/book-experience/chapters.ts:103
 msgid "AI orchestrates every step of content production."
-msgstr ""
+msgstr "AI がコンテンツ制作のすべてのステップを調整します。"
 
 #: src/components/sections/book-experience/chapters.ts:73
 msgid "All UI uses Shadcn UI—customizable, accessible, and consistent components."
-msgstr ""
+msgstr "すべての UI は Shadcn UI を使用しています。カスタマイズ可能で、アクセシブルで、一貫性のあるコンポーネントです。"
 
 #: src/components/sections/book-experience/chapters.ts:112
 msgid "Audience Adaptation"
-msgstr ""
+msgstr "オーディエンス適応"
 
 #: src/components/sections/book-experience/chapters.ts:44
 msgid "Automated Live Documentation"
-msgstr ""
+msgstr "自動化されたライブドキュメント"
 
 #: src/components/sections/book-experience/chapters.ts:105
 msgid "Automation keeps every stage from inspiration to delivery aligned."
-msgstr ""
+msgstr "自動化により、インスピレーションから配信までのすべての段階が整列されます。"
 
 #: src/components/sections/book-experience/chapters.ts:152
 msgid "Average delivery cycle reduced"
-msgstr ""
+msgstr "平均配信サイクルの短縮"
 
 #: src/components/sections/book-experience/chapter-sidebar.tsx:105
 msgid "Back to Index"
-msgstr ""
+msgstr "インデックスに戻る"
 
 #: src/components/sections/book-experience/chapters.ts:157
 msgid "Brand voice alignment"
-msgstr ""
+msgstr "ブランドボイスの整合"
 
 #: src/components/sections/book-experience/chapters.ts:130
 msgid "Brand Voice Guardrails"
-msgstr ""
+msgstr "ブランドボイスガードレール"
 
 #: src/components/sections/book-experience/chapters.ts:108
 msgid "Build a closed-loop workspace for ideation, proofreading, and distribution while keeping your brand voice consistent."
-msgstr ""
+msgstr "ブランドボイスを一貫させながら、アイデア創出、校正、配信のためのクローズドループワークスペースを構築します。"
 
 #: src/components/sections/book-experience/chapters.ts:62
 msgid "Built for Extensibility"
-msgstr ""
+msgstr "拡張性のために構築"
 
 #. placeholder {0}: String(index + 1).padStart(2, "0")
 #: src/components/sections/book-experience/phase-directory.tsx:95
 msgid "Chapter {0}"
-msgstr ""
+msgstr "第 {0} 章"
 
 #: src/components/sections/book-experience/chapter-sidebar.tsx:46
 msgid "Chapter Bookmarks"
-msgstr ""
+msgstr "章のブックマーク"
 
 #: src/components/sections/book-experience/phase-directory.tsx:64
 msgid "Choose the chapter you want to explore"
-msgstr ""
+msgstr "探索したい章を選択してください"
 
 #: src/components/sections/book-experience/phase-directory.tsx:57
 msgid "Click the cover to return"
-msgstr ""
+msgstr "カバーをクリックして戻る"
 
 #: src/components/sections/book-experience/chapters.ts:21
 msgid "Component System"
-msgstr ""
+msgstr "コンポーネントシステム"
 
 #: src/components/sections/book-experience/chapters.ts:117
 msgid "Connect every node between inspiration and publication so collaboration stays traceable, reusable, and optimizable."
-msgstr ""
+msgstr "インスピレーションから公開までのすべてのノードを接続し、コラボレーションを追跡可能、再利用可能、最適化可能に保ちます。"
 
 #: src/components/sections/book-experience/chapters.ts:155
 msgid "Consistency"
-msgstr ""
+msgstr "一貫性"
 
 #: src/app/[lang]/layout.tsx:32
 msgid "Create Next App"
-msgstr ""
+msgstr "Next アプリを作成"
 
 #: src/components/sections/book-experience/chapters.ts:20
 msgid "Design System"
-msgstr ""
+msgstr "デザインシステム"
 
 #: src/components/sections/book-experience/chapters.ts:70
 msgid "Design System Adoption"
-msgstr ""
+msgstr "デザインシステムの採用"
 
 #: src/components/sections/book-experience/chapters.ts:26
 msgid "Developer Experience"
-msgstr ""
+msgstr "開発者体験"
 
 #: src/components/sections/book-experience/chapters.ts:91
 msgid "Developer Onboarding"
-msgstr ""
+msgstr "開発者のオンボーディング"
 
 #: src/components/sections/book-experience/chapters.ts:50
 msgid "Developer-Centric Workflow"
-msgstr ""
+msgstr "開発者中心のワークフロー"
 
 #: src/components/sections/book-experience/chapters.ts:77
 msgid "Doc Coverage"
-msgstr ""
+msgstr "ドキュメントカバレッジ"
 
 #: src/components/sections/book-experience/chapters.ts:23
 msgid "Docs Integration"
-msgstr ""
+msgstr "ドキュメント統合"
 
 #: src/components/sections/book-experience/chapters.ts:27
 msgid "Documentation Automation"
-msgstr ""
+msgstr "ドキュメント自動化"
 
 #: src/components/sections/book-experience/chapters.ts:126
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
-msgstr ""
+msgstr "ドラッグアンドドロップのマルチモーダルテンプレートを使用し、各チャネルに自動配信して、繰り返しのクロスプラットフォーム作業を排除します。"
 
 #: src/components/sections/book-experience/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
-msgstr ""
+msgstr "新しい Shadcn ベースのコンポーネントを簡単に追加できます。Fumadocs がすべてのユースケースで即座にドキュメント化し、オンボーディングとメンテナンスのオーバーヘッドを最小限に抑えます。"
 
 #: src/components/sections/book-experience/chapters.ts:150
 msgid "Efficiency Boost"
-msgstr ""
+msgstr "効率向上"
 
 #: src/components/sections/book-experience/chapters.ts:19
 msgid "Engineering"
-msgstr ""
+msgstr "エンジニアリング"
 
 #: src/components/sections/book-experience/chapters.ts:10
 msgid "Engineering-First AI Studio"
-msgstr ""
+msgstr "エンジニアリングファーストの AI スタジオ"
 
 #: src/app/[lang]/page.tsx:13
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
-msgstr ""
+msgstr "「本」のインターフェースを通じて次世代 AI コンテンツコラボレーションプラットフォームに入る"
 
 #: src/components/sections/book-experience/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
-msgstr ""
+msgstr "すべての機能、API、UI 要素が Fumadocs を通じてドキュメント化されています。"
 
 #: src/components/sections/book-experience/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
-msgstr ""
+msgstr "ドキュメントとコンポーネントシステムの相乗効果により、オンボーディングが高速化されます。"
 
 #: src/components/sections/book-experience/chapters.ts:87
 msgid "Faster release cycles vs. legacy stacks due to unified automation."
-msgstr ""
+msgstr "統一された自動化により、レガシースタックと比較してリリースサイクルが高速化されます。"
 
 #: src/components/sections/book-experience/chapters.ts:160
 msgid "Feedback Convergence"
-msgstr ""
+msgstr "フィードバックの収束"
 
 #: src/components/sections/book-experience/chapters.ts:162
 msgid "Fewer revision loops"
-msgstr ""
+msgstr "修正ループの削減"
 
 #: src/components/sections/book-experience/chapters.ts:13
 msgid "Full-stack automation integrates design systems, documentation, UI components, and delivery for seamless engineering productivity."
-msgstr ""
+msgstr "フルスタック自動化は、デザインシステム、ドキュメント、UI コンポーネント、配信を統合し、シームレスなエンジニアリング生産性を実現します。"
 
 #: src/components/sections/book-experience/chapters.ts:25
 msgid "Fumadocs"
-msgstr ""
+msgstr "Fumadocs"
 
 #: src/components/sections/book-experience/chapters.ts:46
 msgid "Fumadocs keeps component and API documentation always current—complete with live code previews—so every update is immediately reflected across platforms."
-msgstr ""
+msgstr "Fumadocs は、コンポーネントと API のドキュメントを常に最新の状態に保ちます。ライブコードプレビューが含まれているため、すべての更新がプラットフォーム全体に即座に反映されます。"
 
 #: src/components/sections/book-experience/chapters.ts:144
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
-msgstr ""
+msgstr "多次元のレビュー提案を自動生成し、すべての出力をプロフェッショナルで、コンプライアンスに準拠し、ブランドに合ったものに保ちます。"
 
 #: src/app/[lang]/layout.tsx:33
 msgid "Generated by create next app"
-msgstr ""
+msgstr "create next app によって生成"
 
 #: src/components/sections/book-experience/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
-msgstr ""
+msgstr "ホットリロード機能、柔軟なテーマ設定、アトミックデザインパターンにより、エンジニアは新機能を迅速にデプロイできます。ドキュメントと UI は常に同期して更新されます。"
 
 #: src/components/sections/book-experience/chapters.ts:102
 msgid "Intelligent Creative Workflows"
-msgstr ""
+msgstr "インテリジェントクリエイティブワークフロー"
 
 #: src/components/sections/book-experience/chapters.ts:142
 msgid "Intelligent Proofreading"
-msgstr ""
+msgstr "インテリジェント校正"
 
 #: src/components/sections/book-experience/chapters.ts:111
 msgid "Multimodal Templates"
-msgstr ""
+msgstr "マルチモーダルテンプレート"
 
 #: src/components/sections/book-experience/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
-msgstr ""
+msgstr "ブランドコーパスをリアルタイムで参照し、すべての外部タッチポイントでトーンとスタイルを一貫させます。"
 
 #: src/components/sections/book-experience/chapters.ts:56
 msgid "Robust UI Automation"
-msgstr ""
+msgstr "堅牢な UI 自動化"
 
 #: src/components/sections/book-experience/chapters.ts:138
 msgid "Role-based permissions with comments, annotations, and history let teams collaborate smoothly across key checkpoints."
-msgstr ""
+msgstr "コメント、注釈、履歴を備えたロールベースの権限により、チームは重要なチェックポイントでスムーズにコラボレーションできます。"
 
 #: src/components/sections/book-experience/chapters.ts:24
 msgid "Shadcn UI"
-msgstr ""
+msgstr "Shadcn UI"
 
 #: src/components/sections/book-experience/chapters.ts:40
 msgid "Shadcn UI underpins the studio's visual language, offering accessible, reusable, and consistent components for fast, error-free development."
-msgstr ""
+msgstr "Shadcn UI はスタジオのビジュアル言語を支え、アクセシブルで再利用可能で一貫性のあるコンポーネントを提供し、高速でエラーのない開発を実現します。"
 
 #: src/components/sections/book-experience/phase-closed.tsx:54
 msgid "Start Reading"
-msgstr ""
+msgstr "読み始める"
 
 #: src/components/sections/book-experience/chapters.ts:120
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
-msgstr ""
+msgstr "アイデアのキャプチャ、生成、レビュー、オムニチャネル配信を連携させます。ビジュアルオーケストレーターと戦略エンジンが、チームに疲れを知らない AI パートナーを提供します。"
 
 #: src/components/sections/book-experience/phase-directory.tsx:61
 msgid "Table of Contents"
-msgstr ""
+msgstr "目次"
 
 #: src/components/sections/book-experience/chapters.ts:113
 msgid "Team Collaboration"
-msgstr ""
+msgstr "チームコラボレーション"
 
 #: src/components/sections/book-experience/chapters.ts:136
 msgid "Team Sync"
-msgstr ""
+msgstr "チーム同期"
 
 #: src/components/sections/book-experience/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
-msgstr ""
+msgstr "AI スタジオは、最先端のコンポーネントシステム（Shadcn UI）を活用し、ライブで自動化されたドキュメント（Fumadocs）と深く統合されています。デザイン、コード、ドキュメントは常に同期しており、エンジニアリングチームが品質を維持し、迅速に反復し、自信を持ってスケールできるようにします。"
 
 #: src/components/sections/book-experience/chapters.ts:84
 msgid "Time-to-Delivery"
-msgstr ""
+msgstr "配信までの時間"
 
 #: src/components/sections/book-experience/chapters.ts:22
 msgid "UI Automation"
-msgstr ""
+msgstr "UI 自動化"
 
 #: src/components/sections/book-experience/chapters.ts:58
 msgid "UI automation and docs integration ensure updates flow instantly from the codebase to all internal and external endpoints for a true single source of truth."
-msgstr ""
+msgstr "UI 自動化とドキュメント統合により、更新がコードベースからすべての内部および外部エンドポイントに即座に流れ、真の単一の情報源を実現します。"
 
 #: src/components/sections/book-experience/chapters.ts:38
 msgid "Unified Design System"
-msgstr ""
+msgstr "統一デザインシステム"
 
 #: src/components/sections/book-experience/phase-directory.tsx:67
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
-msgstr ""
+msgstr "AI を活用したコンテンツプラットフォームのために、4 つのコアチャプターを厳選しました。任意の章を選ぶと、本がその中のストーリーと機能を明らかにします。"
 
 #: src/app/[lang]/page.tsx:16
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
-msgstr ""
+msgstr "私たちは体験を呼吸する本として形作りました。それを開くと、戦略、創造、洞察、ガバナンスに関する章が指先で明らかになります。"
 
 #: src/components/sections/book-experience/chapters.ts:124
 msgid "Workflow Orchestration"
-msgstr ""
+msgstr "ワークフローオーケストレーション"
