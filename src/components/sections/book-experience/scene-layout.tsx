@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { ShimmeringText } from "@/components/ui/shadcn-io";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
+import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
 
 type SceneLayoutProps = {

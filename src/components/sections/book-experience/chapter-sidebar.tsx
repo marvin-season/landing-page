@@ -1,16 +1,19 @@
 "use client";
 
+import { Trans } from "@lingui/react/macro";
 import { ArrowLeft, ArrowLeftCircle, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import AnimatedContent from "@/components/AnimatedContent";
-import { chapters } from "@/components/sections/book-experience/chapters";
+import { useChapters } from "@/hooks/use-chapters";
 import { cn } from "@/lib/utils";
 import BookModel from "./book-model";
 
 const ChapterSidebar: React.FC = () => {
   const params = useParams();
+  const lang = params.lang as string;
   const activeChapterId = params.chapterId as string | undefined;
+  const chapters = useChapters();
 
   if (!activeChapterId) {
     return null;
@@ -40,7 +43,7 @@ const ChapterSidebar: React.FC = () => {
         </div>
         <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-sidebar-border/60 bg-sidebar/80 p-6 text-sidebar-foreground backdrop-blur">
           <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-sidebar-foreground/60">
-            Chapter Bookmarks
+            <Trans>Chapter Bookmarks</Trans>
           </span>
           <div className="flex flex-col gap-4">
             {chapters.map((chapter, index) => {
@@ -48,7 +51,7 @@ const ChapterSidebar: React.FC = () => {
               return (
                 <div key={chapter.id} className="group rounded-2xl">
                   <Link
-                    href={`/chapter/${chapter.id}`}
+                    href={`/${lang}/chapter/${chapter.id}`}
                     className={cn(
                       "flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors",
                       isActive
@@ -94,12 +97,12 @@ const ChapterSidebar: React.FC = () => {
           </div>
           <div className="pt-4">
             <Link
-              href={"/chapter"}
+              href={`/${lang}/chapter`}
               className="flex w-full items-center justify-between rounded-2xl border border-sidebar-border/60 bg-sidebar/70 px-4 py-3 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar/80"
             >
               <span className="flex items-center gap-2">
                 <ArrowLeftCircle className="h-4 w-4" />
-                Back to Index
+                <Trans>Back to Index</Trans>
               </span>
               <ArrowLeft className="h-4 w-4" />
             </Link>

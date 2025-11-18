@@ -3,7 +3,11 @@ import { setI18n } from "@lingui/react/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { allMessages, getI18nInstance } from "@/lib/i18n/appRouterI18n";
+import {
+  allMessages,
+  getI18nInstance,
+  type PageLangParam,
+} from "@/lib/i18n/appRouterI18n";
 import { LinguiClientProvider } from "@/lib/i18n/LinguiClientProvider";
 import linguiConfig from "~/lingui.config";
 import "@/app/globals.css";
@@ -16,9 +20,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-type PageLangParam = {
-  params: Promise<{ lang: string }>;
-};
+
 export async function generateStaticParams() {
   return linguiConfig.locales.map((lang) => ({ lang }));
 }
@@ -47,14 +49,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <LinguiClientProvider
-            initialLocale={lang}
-            initialMessages={allMessages[lang]}
-          >
-            {children}
-          </LinguiClientProvider>
-        </ThemeProvider>
+        <LinguiClientProvider
+          initialLocale={lang}
+          initialMessages={allMessages[lang]}
+        >
+          <ThemeProvider>{children}</ThemeProvider>
+        </LinguiClientProvider>
       </body>
     </html>
   );

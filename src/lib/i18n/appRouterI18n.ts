@@ -42,3 +42,7 @@ export const getI18nInstance = (locale: SupportedLocales): I18n => {
   }
   return allI18nInstances[locale] || allI18nInstances["en"];
 };
+
+export type PageLangParam = {
+  params: Promise<{ lang: string }>;
+};

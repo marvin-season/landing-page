@@ -1,8 +1,10 @@
 "use client";
 
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import BookModel from "./book-model";
 import {
@@ -23,8 +25,12 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
   phase = "directory",
   chapters,
   coverHref,
-  chapterHrefBuilder = (id) => `/chapter/${id}`,
+  chapterHrefBuilder,
 }) => {
+  const { t } = useLingui();
+  const params = useParams();
+  const lang = params.lang as string;
+  const defaultChapterHrefBuilder = chapterHrefBuilder || ((id) => `/${lang}/chapter/${id}`);
   return (
     <motion.div
       className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]"
@@ -48,19 +54,21 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...hoverTransition, delay: 0.4 }}
         >
-          Click the cover to return
+          <Trans>Click the cover to return</Trans>
         </motion.div>
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-muted-foreground/70">
-            Table of Contents
+            <Trans>Table of Contents</Trans>
           </span>
           <h2 className="text-balance text-3xl font-semibold text-foreground">
-            Choose the chapter you want to explore
+            <Trans>Choose the chapter you want to explore</Trans>
           </h2>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-            We curated four core chapters for an AI-powered content platform.
-            Pick any chapter and the book will reveal the stories and
-            capabilities inside.
+            <Trans>
+              We curated four core chapters for an AI-powered content platform.
+              Pick any chapter and the book will reveal the stories and
+              capabilities inside.
+            </Trans>
           </p>
         </div>
       </div>
@@ -79,12 +87,12 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
             transition={hoverTransition}
           >
             <Link
-              href={chapterHrefBuilder(chapter.id)}
+              href={defaultChapterHrefBuilder(chapter.id)}
               className="flex w-full items-start justify-between text-left"
             >
               <div className="flex flex-col gap-3 pr-6">
                 <span className="text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground/70">
-                  Chapter {String(index + 1).padStart(2, "0")}
+                  {t`Chapter ${String(index + 1).padStart(2, "0")}`}
                 </span>
                 <div>
                   <p className="text-lg font-semibold text-foreground">

@@ -1,5 +1,6 @@
 "use client";
 
+import { Trans } from "@lingui/react/macro";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -39,8 +40,10 @@ const ClosedView: React.FC<ClosedViewProps> = ({
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">
         <p className="text-base leading-relaxed text-muted-foreground">
-          A freshly delivered AI creation handbook. Tap the cover to open the
-          index and explore a new way of producing content with your team.
+          <Trans>
+            A freshly delivered AI creation handbook. Tap the cover to open the
+            index and explore a new way of producing content with your team.
+          </Trans>
         </p>
         <Link
           href={directoryHref}
@@ -48,7 +51,7 @@ const ClosedView: React.FC<ClosedViewProps> = ({
             "group inline-flex items-center gap-3 rounded-full bg-primary px-7 py-3 text-base text-primary-foreground shadow-[0_28px_52px_-40px_var(--ring)] transition-colors hover:bg-primary/90",
           )}
         >
-          Start Reading
+          <Trans>Start Reading</Trans>
           <motion.span
             className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-foreground/20"
             whileHover={{ x: 4 }}
