@@ -11,6 +11,7 @@ import BookModel from "./book-model";
 
 const ChapterSidebar: React.FC = () => {
   const params = useParams();
+
   const lang = params.lang as string;
   const activeChapterId = params.chapterId as string | undefined;
   const chapters = useChapters();

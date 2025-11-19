@@ -17,7 +17,7 @@ export default async function Home({ params }: PageLangParam) {
         msg`We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips.`,
       )}
     >
-      <ClosedView directoryHref="/chapter" />
+      <ClosedView directoryHref={`/${lang}/chapter`} />
     </SceneLayout>
   );
 }

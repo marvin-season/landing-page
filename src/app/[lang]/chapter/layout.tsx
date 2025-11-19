@@ -9,7 +9,7 @@ const ChapterLayout = async ({
   params,
 }: { children: ReactNode } & PageLangParam) => {
   const lang = (await params).lang;
-  
+
   return (
     <SceneLayout
       lang={lang}

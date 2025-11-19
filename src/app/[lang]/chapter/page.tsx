@@ -7,7 +7,7 @@ const ChapterDirectoryPage = async ({ params }: PageLangParam) => {
   const lang = (await params).lang;
   const i18n = getI18nInstance(lang);
   const chapters = getChapters(i18n);
-  return <DirectoryView chapters={chapters} coverHref="/" />;
+  return <DirectoryView chapters={chapters} coverHref={`/${lang}`} />;
 };
 
 export default ChapterDirectoryPage;

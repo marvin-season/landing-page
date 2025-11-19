@@ -1,4 +1,6 @@
-import { headers } from "next/headers";
+"use client";
+
+import { usePathname } from "next/navigation";
 import {
   type DropdownItem,
   HoverDropdown,
@@ -17,41 +19,18 @@ const languageNames: Record<string, string> = {
 
 type LanguageSwitcherProps = {
   currentLang?: string;
-  pathname?: string;
 };
 
 export const LanguageSwitcher = async ({
   currentLang,
-  pathname: providedPathname,
 }: LanguageSwitcherProps = {}) => {
-  // 优先使用传入的 pathname，否则从 headers 获取
-  let pathname = providedPathname;
-  if (!pathname) {
-    const headersList = await headers();
-    // 尝试从 referer 获取路径
-    const referer = headersList.get("referer");
-    if (referer) {
-      try {
-        const url = new URL(referer);
-        pathname = url.pathname;
-      } catch {
-        pathname = "/";
-      }
-    } else {
-      pathname = "/";
-    }
-  }
-
-  // 从路径中提取当前语言（路径格式：/lang/...）
+  const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathLocale = currentLang || pathSegments[0] || locales[0];
 
-  // 构建新路径：替换路径中的语言部分
-  const buildLanguagePath = (newLocale: string) => {
-    const newPathSegments = [newLocale, ...pathSegments.slice(1)];
-    return `/${newPathSegments.join("/")}`;
-  };
-
+  function buildLanguagePath(locale: string) {
+    return `/${locale}/${pathSegments.slice(1).join("/")}`;
+  }
   // 构建下拉菜单项
   const dropdownItems: DropdownItem[] = locales.map((locale) => ({
     id: locale,
