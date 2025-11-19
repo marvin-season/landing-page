@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getChapters } from "@/components/sections/book-experience/chapters";
-import ContentView from "@/components/sections/book-experience/content-view";
+import ContentView from "@/components/book-experience/content-view";
+import { getChapters } from "@/lib/chapters";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";

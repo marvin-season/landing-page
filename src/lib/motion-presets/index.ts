@@ -1,6 +1,6 @@
 import { cubicBezier } from "motion";
 
-import type { Phase } from "./types";
+import type { Phase } from "../../types/chapter";
 
 export const easingCurve = cubicBezier(0.16, 1, 0.3, 1);
 

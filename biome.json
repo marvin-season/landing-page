@@ -21,7 +21,8 @@
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",
-        "noTsIgnore": "off"
+        "noTsIgnore": "off",
+        "noNonNullAssertion": "off"
       }
     },
     "domains": {

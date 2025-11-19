@@ -3,7 +3,7 @@
 import { BookOpen, LinkIcon } from "lucide-react";
 import Link from "next/link";
 import AnimatedContent from "@/components/AnimatedContent";
-import type { Chapter } from "./types";
+import type { Chapter } from "../../../types/chapter";
 
 type ContentViewProps = {
   activeChapter: Chapter;

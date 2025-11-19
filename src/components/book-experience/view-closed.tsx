@@ -4,19 +4,17 @@ import { Trans } from "@lingui/react/macro";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-
+import { hoverTransition, sceneTransition } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
-
+import type { Phase } from "../../../types/chapter";
 import BookModel from "./book-model";
-import { hoverTransition, sceneTransition } from "./motion-presets";
-import type { Phase } from "./types";
 
-type ClosedViewProps = {
+type ViewClosedProps = {
   phase?: Phase;
   directoryHref: string;
 };
 
-const ClosedView: React.FC<ClosedViewProps> = ({
+const ViewClosed: React.FC<ViewClosedProps> = ({
   phase = "closed",
   directoryHref,
 }) => {
@@ -65,4 +63,4 @@ const ClosedView: React.FC<ClosedViewProps> = ({
   );
 };
 
-export default ClosedView;
+export default ViewClosed;

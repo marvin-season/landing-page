@@ -5,23 +5,22 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-
-import BookModel from "./book-model";
 import {
   accentTransition,
   hoverTransition,
   sceneTransition,
-} from "./motion-presets";
-import type { Chapter, Phase } from "./types";
+} from "@/lib/motion-presets";
+import type { Chapter, Phase } from "../../../types/chapter";
+import BookModel from "./book-model";
 
-type DirectoryViewProps = {
+type ViewDirectoryProps = {
   phase?: Phase;
   chapters: Chapter[];
   coverHref: string;
   chapterHrefBuilder?: (chapterId: string) => string;
 };
 
-const DirectoryView: React.FC<DirectoryViewProps> = ({
+const ViewDirectory: React.FC<ViewDirectoryProps> = ({
   phase = "directory",
   chapters,
   coverHref,
@@ -125,4 +124,4 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
   );
 };
 
-export default DirectoryView;
+export default ViewDirectory;
