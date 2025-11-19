@@ -1,6 +1,6 @@
 import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { Chapter } from "../types/chapter";
+import type { Chapter } from "@/types/chapter";
 
 export function getChapters(i18n: I18n): Chapter[] {
   return [

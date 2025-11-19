@@ -10,7 +10,7 @@ import {
   hoverTransition,
   sceneTransition,
 } from "@/lib/motion-presets";
-import type { Chapter, Phase } from "../../../types/chapter";
+import type { Chapter, Phase } from "@/types/chapter";
 import BookModel from "./book-model";
 
 type ViewDirectoryProps = {

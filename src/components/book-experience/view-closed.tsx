@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { hoverTransition, sceneTransition } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
-import type { Phase } from "../../../types/chapter";
+import type { Phase } from "@/types/chapter";
 import BookModel from "./book-model";
 
 type ViewClosedProps = {

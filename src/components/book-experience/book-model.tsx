@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { motion } from "motion/react";
 import { bookSpringTransition, bookVariants } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
-import type { Phase } from "../../../types/chapter";
+import type { Phase } from "@/types/chapter";
 
 type BookModelProps = {
   phase: Phase;

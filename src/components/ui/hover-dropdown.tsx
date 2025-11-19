@@ -39,7 +39,6 @@ export const HoverDropdown = ({
     right: "right-0",
     center: "left-1/2 -translate-x-1/2",
   };
-  console.log('items', items);
   return (
     <div className={cn("group relative", className)}>
       {trigger}
