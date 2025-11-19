@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { PropsWithChildren } from "react";
-import { LinguiClientProvider } from "@/components/language/LinguiClientProvider";
+import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import {
   allMessages,

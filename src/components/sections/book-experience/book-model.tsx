@@ -53,7 +53,9 @@ const BookModel: React.FC<BookModelProps> = ({
             <span>2025</span>
           </div>
           <div>
-            <p className="text-lg font-semibold leading-tight">Chapters Awaiting You</p>
+            <p className="text-lg font-semibold leading-tight">
+              Chapters Awaiting You
+            </p>
             <p className="mt-2 text-xs text-white/60">
               Click the cover to awaken a new creative journey.
             </p>

@@ -30,7 +30,8 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
   const { t } = useLingui();
   const params = useParams();
   const lang = params.lang as string;
-  const defaultChapterHrefBuilder = chapterHrefBuilder || ((id) => `/${lang}/chapter/${id}`);
+  const defaultChapterHrefBuilder =
+    chapterHrefBuilder || ((id) => `/${lang}/chapter/${id}`);
   return (
     <motion.div
       className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]"
