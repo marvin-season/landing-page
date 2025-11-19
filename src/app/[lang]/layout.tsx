@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Sofadi_One, Yuji_Boku, Zhi_Mang_Xing } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -11,15 +11,29 @@ import {
 } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";
 import "@/app/globals.css";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+
+const sofadiOne = Sofadi_One({
+  weight: "400",
+  style: "normal",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const zhiMangXing = Zhi_Mang_Xing({
+  weight: "400",
+  style: "normal",
 });
+
+const yujiBoku = Yuji_Boku({
+  weight: "400",
+  style: "normal",
+});
+
+// 语言到字体的映射
+const fontMap: Record<string, string> = {
+  zh: zhiMangXing.className,
+  ja: yujiBoku.className,
+  en: sofadiOne.className,
+  pseudo: sofadiOne.className,
+};
 
 export async function generateStaticParams() {
   return linguiConfig.locales.map((lang) => ({ lang }));
@@ -44,11 +58,12 @@ export default async function RootLayout({
   // @ts-ignore
   setI18n(i18n);
 
+  // 根据语言选择字体：中文使用 zhiMangXing，日文使用 yujiBoku，其他语言使用 sofadiOne
+  const fontClassName = fontMap[lang] || sofadiOne.className;
+
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${fontClassName} antialiased`}>
         <LinguiClientProvider
           initialLocale={lang}
           initialMessages={allMessages[lang]}

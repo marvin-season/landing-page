@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import LetterGlitch from "@/components/LetterGlitch";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
