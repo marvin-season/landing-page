@@ -9,6 +9,7 @@ export default async function Home({ params }: PageLangParam) {
   const i18n = getI18nInstance(lang);
   return (
     <SceneLayout
+      lang={lang}
       title={i18n._(
         msg`Enter the next-gen AI content collaboration platform through a "book" interface`,
       )}

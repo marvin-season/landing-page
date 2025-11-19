@@ -10,6 +10,7 @@ type SceneLayoutProps = {
   description?: string;
   children: ReactNode;
   className?: string;
+  lang?: string;
 };
 
 const SceneLayout = ({
@@ -18,6 +19,7 @@ const SceneLayout = ({
   description,
   children,
   className,
+  lang,
 }: SceneLayoutProps) => {
   return (
     <section className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -40,7 +42,7 @@ const SceneLayout = ({
             ) : null}
           </div>
           <ThemeSwitcher className="self-start" />
-          <LanguageSwitcher />
+          <LanguageSwitcher currentLang={lang} />
         </header>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>
