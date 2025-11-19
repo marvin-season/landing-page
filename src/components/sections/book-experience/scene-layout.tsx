@@ -41,8 +41,10 @@ const SceneLayout = ({
               </p>
             ) : null}
           </div>
-          <ThemeSwitcher className="self-start" />
-          <LanguageSwitcher currentLang={lang} />
+          <div className="fixed z-1 top-4 right-4 flex items-center gap-2 rounded-lg bg-background/60 backdrop-blur-md px-4 py-2 shadow-md">
+            <ThemeSwitcher />
+            <LanguageSwitcher currentLang={lang} />
+          </div>
         </header>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>
