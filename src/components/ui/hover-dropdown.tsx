@@ -39,7 +39,7 @@ export const HoverDropdown = ({
     right: "right-0",
     center: "left-1/2 -translate-x-1/2",
   };
-
+  console.log('items', items);
   return (
     <div className={cn("group relative", className)}>
       {trigger}
@@ -55,7 +55,7 @@ export const HoverDropdown = ({
           {items.map((item) => {
             const isActive = item.id === activeId;
             const baseItemClasses = cn(
-              "block px-4 py-2 text-sm transition-colors",
+              "block px-4 py-2 text-sm transition-colors w-full text-left",
               isActive
                 ? cn(
                     "bg-accent font-medium text-foreground",
