@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/components/sections/book-experience/book-model.tsx:55
+msgid "2025"
+msgstr "2025"
+
 #: src/components/sections/book-experience/phase-closed.tsx:43
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
 msgstr "新しく届いた AI クリエイションハンドブック。カバーをタップしてインデックスを開き、チームと一緒にコンテンツ制作の新しい方法を探求してください。"
@@ -25,10 +29,18 @@ msgstr "エンジニアリングのベストプラクティスを中心に構築
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
 msgstr "Shadcn UI コンポーネントと Fumadocs による自動化ドキュメントで、比類のない一貫性と速度を実現し、エンジニアが AI コンテンツのライフサイクルを制御できるようにします。"
 
+#: src/components/sections/book-experience/book-model.tsx:90
+msgid "AI Co-Creation Studio"
+msgstr "AI コラボレーションスタジオ"
+
 #: src/components/sections/book-experience/chapters.ts:11
 #: src/components/sections/book-experience/chapters.ts:103
 msgid "AI orchestrates every step of content production."
 msgstr "AI がコンテンツ制作のすべてのステップを調整します。"
+
+#: src/components/sections/book-experience/book-model.tsx:51
+msgid "AI STUDIO"
+msgstr "AI スタジオ"
 
 #: src/components/sections/book-experience/chapters.ts:73
 msgid "All UI uses Shadcn UI—customizable, accessible, and consistent components."
@@ -50,7 +62,7 @@ msgstr "自動化により、インスピレーションから配信までのす
 msgid "Average delivery cycle reduced"
 msgstr "平均配信サイクルの短縮"
 
-#: src/components/sections/book-experience/chapter-sidebar.tsx:105
+#: src/components/sections/book-experience/chapter-sidebar.tsx:106
 msgid "Back to Index"
 msgstr "インデックスに戻る"
 
@@ -71,19 +83,27 @@ msgid "Built for Extensibility"
 msgstr "拡張性のために構築"
 
 #. placeholder {0}: String(index + 1).padStart(2, "0")
-#: src/components/sections/book-experience/phase-directory.tsx:95
+#: src/components/sections/book-experience/phase-directory.tsx:96
 msgid "Chapter {0}"
 msgstr "第 {0} 章"
 
-#: src/components/sections/book-experience/chapter-sidebar.tsx:46
+#: src/components/sections/book-experience/chapter-sidebar.tsx:47
 msgid "Chapter Bookmarks"
 msgstr "章のブックマーク"
 
-#: src/components/sections/book-experience/phase-directory.tsx:64
+#: src/components/sections/book-experience/book-model.tsx:60
+msgid "Chapters Awaiting You"
+msgstr "あなたに待ち受けている章"
+
+#: src/components/sections/book-experience/phase-directory.tsx:65
 msgid "Choose the chapter you want to explore"
 msgstr "探索したい章を選択してください"
 
-#: src/components/sections/book-experience/phase-directory.tsx:57
+#: src/components/sections/book-experience/book-model.tsx:63
+msgid "Click the cover to awaken a new creative journey."
+msgstr "カバーをクリックして新しいクリエイティブな旅を始めましょう。"
+
+#: src/components/sections/book-experience/phase-directory.tsx:58
 msgid "Click the cover to return"
 msgstr "カバーをクリックして戻る"
 
@@ -99,9 +119,17 @@ msgstr "インスピレーションから公開までのすべてのノードを
 msgid "Consistency"
 msgstr "一貫性"
 
+#: src/components/sections/book-experience/book-model.tsx:96
+msgid "Content Governance Hub"
+msgstr "コンテンツガバナンスハブ"
+
 #: src/app/[lang]/layout.tsx:32
 msgid "Create Next App"
 msgstr "Next アプリを作成"
+
+#: src/components/sections/book-experience/book-model.tsx:87
+msgid "Creative Workflow"
+msgstr "クリエイティブワークフロー"
 
 #: src/components/sections/book-experience/chapters.ts:20
 msgid "Design System"
@@ -155,7 +183,7 @@ msgstr "エンジニアリング"
 msgid "Engineering-First AI Studio"
 msgstr "エンジニアリングファーストの AI スタジオ"
 
-#: src/app/[lang]/page.tsx:13
+#: src/app/[lang]/page.tsx:14
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr "「本」のインターフェースを通じて次世代 AI コンテンツコラボレーションプラットフォームに入る"
 
@@ -178,6 +206,10 @@ msgstr "フィードバックの収束"
 #: src/components/sections/book-experience/chapters.ts:162
 msgid "Fewer revision loops"
 msgstr "修正ループの削減"
+
+#: src/app/[lang]/chapter/layout.tsx:21
+msgid "From workflows to insights and asset governance, we curated four core chapters for AI-powered content teams. Choose one to dive deeper."
+msgstr "ワークフローから洞察と資産管理まで、AI を活用したコンテンツチームのために 4 つのコアチャプターを厳選しました。深く掘り下げるために 1 つを選んでください。"
 
 #: src/components/sections/book-experience/chapters.ts:13
 msgid "Full-stack automation integrates design systems, documentation, UI components, and delivery for seamless engineering productivity."
@@ -203,6 +235,10 @@ msgstr "create next app によって生成"
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "ホットリロード機能、柔軟なテーマ設定、アトミックデザインパターンにより、エンジニアは新機能を迅速にデプロイできます。ドキュメントと UI は常に同期して更新されます。"
 
+#: src/components/sections/book-experience/book-model.tsx:93
+msgid "Insight-Driven Expression"
+msgstr "洞察に基づく表現"
+
 #: src/components/sections/book-experience/chapters.ts:102
 msgid "Intelligent Creative Workflows"
 msgstr "インテリジェントクリエイティブワークフロー"
@@ -214,6 +250,10 @@ msgstr "インテリジェント校正"
 #: src/components/sections/book-experience/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr "マルチモーダルテンプレート"
+
+#: src/app/[lang]/chapter/layout.tsx:18
+msgid "Open the index and plan your AI content blueprint together"
+msgstr "インデックスを開き、AI コンテンツのブループリントを一緒に計画しましょう。"
 
 #: src/components/sections/book-experience/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
@@ -243,7 +283,8 @@ msgstr "読み始める"
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
 msgstr "アイデアのキャプチャ、生成、レビュー、オムニチャネル配信を連携させます。ビジュアルオーケストレーターと戦略エンジンが、チームに疲れを知らない AI パートナーを提供します。"
 
-#: src/components/sections/book-experience/phase-directory.tsx:61
+#: src/components/sections/book-experience/book-model.tsx:83
+#: src/components/sections/book-experience/phase-directory.tsx:62
 msgid "Table of Contents"
 msgstr "目次"
 
@@ -275,11 +316,11 @@ msgstr "UI 自動化とドキュメント統合により、更新がコードベ
 msgid "Unified Design System"
 msgstr "統一デザインシステム"
 
-#: src/components/sections/book-experience/phase-directory.tsx:67
+#: src/components/sections/book-experience/phase-directory.tsx:68
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr "AI を活用したコンテンツプラットフォームのために、4 つのコアチャプターを厳選しました。任意の章を選ぶと、本がその中のストーリーと機能を明らかにします。"
 
-#: src/app/[lang]/page.tsx:16
+#: src/app/[lang]/page.tsx:17
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr "私たちは体験を呼吸する本として形作りました。それを開くと、戦略、創造、洞察、ガバナンスに関する章が指先で明らかになります。"
 

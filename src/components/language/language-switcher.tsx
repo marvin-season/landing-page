@@ -14,7 +14,6 @@ const languageNames: Record<string, string> = {
   en: "English",
   zh: "中文",
   ja: "日本語",
-  pseudo: "Pseudo",
 };
 
 type LanguageSwitcherProps = {
@@ -32,11 +31,13 @@ export const LanguageSwitcher = async ({
     return `/${locale}/${pathSegments.slice(1).join("/")}`;
   }
   // 构建下拉菜单项
-  const dropdownItems: DropdownItem[] = locales.map((locale) => ({
-    id: locale,
-    label: languageNames[locale] || locale,
-    href: buildLanguagePath(locale),
-  }));
+  const dropdownItems: DropdownItem[] = locales
+    .filter((locale) => locale !== "pseudo")
+    .map((locale) => ({
+      id: locale,
+      label: languageNames[locale] || locale,
+      href: buildLanguagePath(locale),
+    }));
 
   // 触发按钮
   const trigger = (

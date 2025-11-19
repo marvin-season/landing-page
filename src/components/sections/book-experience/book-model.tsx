@@ -1,9 +1,8 @@
 "use client";
 
+import { Trans } from "@lingui/react/macro";
 import { motion } from "motion/react";
-
 import { cn } from "@/lib/utils";
-
 import { bookSpringTransition, bookVariants } from "./motion-presets";
 import type { Phase } from "./types";
 
@@ -48,16 +47,20 @@ const BookModel: React.FC<BookModelProps> = ({
       >
         <div className="flex h-full flex-col justify-between p-8 text-left text-white">
           <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
-            <span>AI STUDIO</span>
+            <span>
+              <Trans>AI STUDIO</Trans>
+            </span>
             <span className="h-1 w-1 rounded-full bg-white/40" />
-            <span>2025</span>
+            <span>
+              <Trans>2025</Trans>
+            </span>
           </div>
           <div>
             <p className="text-lg font-semibold leading-tight">
-              Chapters Awaiting You
+              <Trans>Chapters Awaiting You</Trans>
             </p>
             <p className="mt-2 text-xs text-white/60">
-              Click the cover to awaken a new creative journey.
+              <Trans>Click the cover to awaken a new creative journey.</Trans>
             </p>
           </div>
         </div>
@@ -77,13 +80,21 @@ const BookModel: React.FC<BookModelProps> = ({
       >
         <div className="flex h-full flex-col justify-between p-8 text-left text-slate-700">
           <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
-            Table of Contents
+            <Trans>Table of Contents</Trans>
           </span>
           <div className="space-y-3 text-sm text-slate-500">
-            <p>- Creative Workflow</p>
-            <p>- AI Co-Creation Studio</p>
-            <p>- Insight-Driven Expression</p>
-            <p>- Content Governance Hub</p>
+            <p>
+              <Trans>Creative Workflow</Trans>
+            </p>
+            <p>
+              <Trans>AI Co-Creation Studio</Trans>
+            </p>
+            <p>
+              <Trans>Insight-Driven Expression</Trans>
+            </p>
+            <p>
+              <Trans>Content Governance Hub</Trans>
+            </p>
           </div>
         </div>
       </div>

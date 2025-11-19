@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/components/sections/book-experience/book-model.tsx:55
+msgid "2025"
+msgstr "2025"
+
 #: src/components/sections/book-experience/phase-closed.tsx:43
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
 msgstr "一本新鲜出炉的 AI 创作手册。轻触封面打开目录，与团队一起探索内容创作的新方式。"
@@ -25,10 +29,18 @@ msgstr "围绕工程最佳实践构建的统一工作空间。从 Shadcn UI 设�
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
 msgstr "通过 Shadcn UI 组件和 Fumadocs 驱动的自动化文档，实现无与伦比的一致性和速度——让工程师掌控 AI 内容生命周期。"
 
+#: src/components/sections/book-experience/book-model.tsx:90
+msgid "AI Co-Creation Studio"
+msgstr "AI 协同创作工作室"
+
 #: src/components/sections/book-experience/chapters.ts:11
 #: src/components/sections/book-experience/chapters.ts:103
 msgid "AI orchestrates every step of content production."
 msgstr "AI 编排内容生产的每一步。"
+
+#: src/components/sections/book-experience/book-model.tsx:51
+msgid "AI STUDIO"
+msgstr "AI 工作室"
 
 #: src/components/sections/book-experience/chapters.ts:73
 msgid "All UI uses Shadcn UI—customizable, accessible, and consistent components."
@@ -50,7 +62,7 @@ msgstr "自动化确保从灵感到交付的每个阶段都保持一致。"
 msgid "Average delivery cycle reduced"
 msgstr "平均交付周期缩短"
 
-#: src/components/sections/book-experience/chapter-sidebar.tsx:105
+#: src/components/sections/book-experience/chapter-sidebar.tsx:106
 msgid "Back to Index"
 msgstr "返回目录"
 
@@ -71,19 +83,27 @@ msgid "Built for Extensibility"
 msgstr "为可扩展性而构建"
 
 #. placeholder {0}: String(index + 1).padStart(2, "0")
-#: src/components/sections/book-experience/phase-directory.tsx:95
+#: src/components/sections/book-experience/phase-directory.tsx:96
 msgid "Chapter {0}"
 msgstr "第 {0} 章"
 
-#: src/components/sections/book-experience/chapter-sidebar.tsx:46
+#: src/components/sections/book-experience/chapter-sidebar.tsx:47
 msgid "Chapter Bookmarks"
 msgstr "章节书签"
 
-#: src/components/sections/book-experience/phase-directory.tsx:64
+#: src/components/sections/book-experience/book-model.tsx:60
+msgid "Chapters Awaiting You"
+msgstr "等待您的章节"
+
+#: src/components/sections/book-experience/phase-directory.tsx:65
 msgid "Choose the chapter you want to explore"
 msgstr "选择您想要探索的章节"
 
-#: src/components/sections/book-experience/phase-directory.tsx:57
+#: src/components/sections/book-experience/book-model.tsx:63
+msgid "Click the cover to awaken a new creative journey."
+msgstr "点击封面唤醒新的创意旅程。"
+
+#: src/components/sections/book-experience/phase-directory.tsx:58
 msgid "Click the cover to return"
 msgstr "点击封面返回"
 
@@ -99,9 +119,17 @@ msgstr "连接从灵感到发布的每个节点，使协作保持可追溯、可
 msgid "Consistency"
 msgstr "一致性"
 
+#: src/components/sections/book-experience/book-model.tsx:96
+msgid "Content Governance Hub"
+msgstr "内容治理中心"
+
 #: src/app/[lang]/layout.tsx:32
 msgid "Create Next App"
 msgstr "创建 Next 应用"
+
+#: src/components/sections/book-experience/book-model.tsx:87
+msgid "Creative Workflow"
+msgstr "创意工作流"
 
 #: src/components/sections/book-experience/chapters.ts:20
 msgid "Design System"
@@ -155,7 +183,7 @@ msgstr "工程"
 msgid "Engineering-First AI Studio"
 msgstr "工程优先的 AI 工作室"
 
-#: src/app/[lang]/page.tsx:13
+#: src/app/[lang]/page.tsx:14
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr "通过「书籍」界面进入下一代 AI 内容协作平台"
 
@@ -178,6 +206,10 @@ msgstr "反馈汇聚"
 #: src/components/sections/book-experience/chapters.ts:162
 msgid "Fewer revision loops"
 msgstr "更少的修订循环"
+
+#: src/app/[lang]/chapter/layout.tsx:21
+msgid "From workflows to insights and asset governance, we curated four core chapters for AI-powered content teams. Choose one to dive deeper."
+msgstr "从工作流到洞察和资产治理，我们为 AI 驱动的内容团队精心挑选了四个核心章节。选择一个深入探索。"
 
 #: src/components/sections/book-experience/chapters.ts:13
 msgid "Full-stack automation integrates design systems, documentation, UI components, and delivery for seamless engineering productivity."
@@ -203,6 +235,10 @@ msgstr "由 create next app 生成"
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "热重载功能、灵活的主题和原子设计模式帮助工程师快速部署新功能。文档和 UI 始终保持同步更新。"
 
+#: src/components/sections/book-experience/book-model.tsx:93
+msgid "Insight-Driven Expression"
+msgstr "洞察驱动的表达"
+
 #: src/components/sections/book-experience/chapters.ts:102
 msgid "Intelligent Creative Workflows"
 msgstr "智能创意工作流"
@@ -214,6 +250,10 @@ msgstr "智能校对"
 #: src/components/sections/book-experience/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr "多模态模板"
+
+#: src/app/[lang]/chapter/layout.tsx:18
+msgid "Open the index and plan your AI content blueprint together"
+msgstr "打开目录并一起规划您的 AI 内容蓝图"
 
 #: src/components/sections/book-experience/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
@@ -243,7 +283,8 @@ msgstr "开始阅读"
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
 msgstr "将想法捕获、生成、审查和全渠道分发串联起来。可视化编排器和策略引擎为您的团队提供不知疲倦的 AI 合作伙伴。"
 
-#: src/components/sections/book-experience/phase-directory.tsx:61
+#: src/components/sections/book-experience/book-model.tsx:83
+#: src/components/sections/book-experience/phase-directory.tsx:62
 msgid "Table of Contents"
 msgstr "目录"
 
@@ -275,11 +316,11 @@ msgstr "UI 自动化和文档集成确保更新从代码库即时流向所有内
 msgid "Unified Design System"
 msgstr "统一设计系统"
 
-#: src/components/sections/book-experience/phase-directory.tsx:67
+#: src/components/sections/book-experience/phase-directory.tsx:68
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr "我们为 AI 驱动的内容平台精选了四个核心章节。选择任意章节，书籍将揭示其中的故事和功能。"
 
-#: src/app/[lang]/page.tsx:16
+#: src/app/[lang]/page.tsx:17
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr "我们将体验塑造成一本会呼吸的书。打开它，触手可及地揭示关于策略、创作、洞察和治理的章节。"
 
