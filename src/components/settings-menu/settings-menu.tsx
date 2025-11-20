@@ -1,6 +1,8 @@
 "use client";
 
 import { SettingsIcon } from "lucide-react";
+import { LanguageSwitcher } from "@/components/language/language-switcher";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,12 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LanguageSwitcher } from "@/components/language/language-switcher";
-import { ThemeSwitcher } from "@/components/theme/theme-switcher";
-
-type SettingsMenuProps = {
-  currentLang?: string;
-};
+import type { SettingsMenuProps } from "./type";
 
 export const SettingsMenu = ({ currentLang }: SettingsMenuProps) => {
   return (
@@ -29,11 +26,8 @@ export const SettingsMenu = ({ currentLang }: SettingsMenuProps) => {
             <SettingsIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="w-auto sm:min-w-56 bg-background/95 backdrop-blur-md border-border/60 p-3"
-        >
-          <ThemeSwitcher className="w-full" />
+        <DropdownMenuContent className="min-w-48 sm:min-w-56 px-4 py-3">
+          <ThemeSwitcher />
           <DropdownMenuSeparator />
           <LanguageSwitcher currentLang={currentLang} />
         </DropdownMenuContent>

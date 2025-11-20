@@ -46,14 +46,20 @@ export const LanguageSwitcher = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between gap-2">
       {!hideLabel && (
-        <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+        <label
+          htmlFor="language-select"
+          className="hidden sm:inline text-muted-foreground font-bold text-sm"
+        >
           Language
         </label>
       )}
       <Select value={pathLocale} onValueChange={handleValueChange}>
-        <SelectTrigger className={cn("w-32 sm:w-40", hideLabel && "w-full")}>
+        <SelectTrigger
+          id="language-select"
+          className={cn("w-32 sm:w-40", hideLabel && "w-full")}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

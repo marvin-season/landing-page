@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { SettingsMenu } from "@/components/settings-menu";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
-import { SettingsMenu } from "./settings-menu";
 
 type SceneLayoutProps = {
   badge?: string;

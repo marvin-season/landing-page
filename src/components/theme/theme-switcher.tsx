@@ -34,14 +34,20 @@ export const ThemeSwitcher = ({
   if (!mounted) return null;
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center justify-between gap-2", className)}>
       {!hideLabel && (
-        <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+        <label
+          htmlFor="theme-select"
+          className="hidden sm:inline text-muted-foreground font-bold text-sm"
+        >
           Theme
         </label>
       )}
       <Select value={theme || undefined} onValueChange={setTheme}>
-        <SelectTrigger className={cn("w-32 sm:w-40", hideLabel && "w-full")}>
+        <SelectTrigger
+          id="theme-select"
+          className={cn("w-32 sm:w-40", hideLabel && "w-full")}
+        >
           <SelectValue placeholder="System" />
         </SelectTrigger>
         <SelectContent>
