@@ -1,10 +1,13 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  type DropdownItem,
-  HoverDropdown,
-} from "@/components/ui/hover-dropdown";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;
@@ -20,58 +23,40 @@ type LanguageSwitcherProps = {
   currentLang?: string;
 };
 
-export const LanguageSwitcher = async ({
+export const LanguageSwitcher = ({
   currentLang,
 }: LanguageSwitcherProps = {}) => {
   const pathname = usePathname();
+  const router = useRouter();
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathLocale = currentLang || pathSegments[0] || locales[0];
 
   function buildLanguagePath(locale: string) {
     return `/${locale}/${pathSegments.slice(1).join("/")}`;
   }
-  // 构建下拉菜单项
-  const dropdownItems: DropdownItem[] = locales
-    .filter((locale) => locale !== "pseudo")
-    .map((locale) => ({
-      id: locale,
-      label: languageNames[locale] || locale,
-      href: buildLanguagePath(locale),
-    }));
 
-  // 触发按钮
-  const trigger = (
-    <div className="flex items-center gap-2">
-      <span className="text-muted-foreground">Language</span>
-      <span className="shrink-0 flex cursor-pointer items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-accent">
-        <span className="font-medium">
-          {languageNames[pathLocale] || pathLocale}
-        </span>
-        <svg
-          className="h-4 w-4 transition-transform group-hover:rotate-180"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </span>
-    </div>
-  );
+  const availableLocales = locales.filter((locale) => locale !== "pseudo");
+
+  const handleValueChange = (locale: string) => {
+    const newPath = buildLanguagePath(locale);
+    router.push(newPath);
+  };
 
   return (
-    <HoverDropdown
-      trigger={trigger}
-      items={dropdownItems}
-      activeId={pathLocale}
-      align="right"
-      width="w-40"
-    />
+    <div className="flex items-center gap-2">
+      <label className="text-muted-foreground font-bold">Language</label>
+      <Select value={pathLocale} onValueChange={handleValueChange}>
+        <SelectTrigger className="w-40">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {availableLocales.map((locale) => (
+            <SelectItem key={locale} value={locale}>
+              {languageNames[locale] || locale}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
