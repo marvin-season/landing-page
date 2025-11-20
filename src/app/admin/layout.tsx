@@ -1,11 +1,15 @@
+import TankQueryClientProvider from "@/trpc/provider";
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <TankQueryClientProvider>{children}</TankQueryClientProvider>
+      </body>
     </html>
   );
 }

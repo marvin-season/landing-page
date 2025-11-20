@@ -7,8 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["src/**/*.{ts,tsx,js,jsx,json}"
-    ]
+    "includes": ["src/**/*.{ts,tsx,js,jsx,json}"]
   },
   "formatter": {
     "enabled": true,
@@ -22,8 +21,7 @@
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",
-        "noTsIgnore": "off",
-        "noNonNullAssertion": "off"
+        "noTsIgnore": "off"
       }
     },
     "domains": {
