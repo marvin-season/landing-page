@@ -1,10 +1,13 @@
-"use client";
+import { apiCaller } from "@/server";
 
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/utils";
-
-export default function AdminPage() {
-  const trpc = useTRPC();
-  const user = useQuery(trpc.userList.queryOptions());
-  return <div>{user.data?.map((user) => user.name).join(", ")}</div>;
+export default async function AdminPage() {
+  const user = await apiCaller.userList();
+  console.log(user);
+  return (
+    <div>
+      {user.map((user) => (
+        <div key={user.id}>{user.name}</div>
+      ))}
+    </div>
+  );
 }

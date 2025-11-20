@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { publicProcedure, router } from "./trpc";
+import { createCallerFactory, publicProcedure, router } from "./trpc";
 
 export const appRouter = router({
   userList: publicProcedure.query(async () => {
     return [
       { id: 1, name: "John Doe" },
-      { id: 2, name: "Jane Doe" },
+      { id: 2, name: "John Smith" },
     ];
   }),
   userById: publicProcedure
@@ -17,3 +17,4 @@ export const appRouter = router({
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
+export const apiCaller = createCallerFactory(appRouter)({});
