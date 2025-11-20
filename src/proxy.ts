@@ -11,7 +11,10 @@ const { locales } = linguiConfig;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+  const isAdminPath = pathname.startsWith("/admin");
+  if (isAdminPath) {
+    return NextResponse.next();
+  }
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
