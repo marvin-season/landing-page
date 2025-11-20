@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 type ThemeSwitcherProps = {
   className?: string;
+  hideLabel?: boolean;
 };
 
 const themeNames: Record<string, string> = {
@@ -23,7 +24,10 @@ const themeNames: Record<string, string> = {
 
 const themes: string[] = ["light", "dark", "neutral"];
 
-export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
+export const ThemeSwitcher = ({
+  className,
+  hideLabel = false,
+}: ThemeSwitcherProps) => {
   const mounted = useMounted();
   const { setTheme, theme } = useTheme();
 
@@ -31,11 +35,13 @@ export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
-        Theme
-      </label>
+      {!hideLabel && (
+        <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+          Theme
+        </label>
+      )}
       <Select value={theme || undefined} onValueChange={setTheme}>
-        <SelectTrigger className="w-32 sm:w-40">
+        <SelectTrigger className={cn("w-32 sm:w-40", hideLabel && "w-full")}>
           <SelectValue placeholder="System" />
         </SelectTrigger>
         <SelectContent>

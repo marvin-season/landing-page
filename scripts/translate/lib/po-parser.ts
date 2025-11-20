@@ -18,7 +18,7 @@ export interface POFile {
  * 解析 .po 文件
  */
 export function parsePOFile(content: string): POFile {
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   const result: POFile = {
     headers: {},
     entries: [],
@@ -33,11 +33,18 @@ export function parsePOFile(content: string): POFile {
     const trimmed = line.trim();
 
     // 处理文件头
-    if (inHeaders && trimmed.startsWith('msgid ""') && lines[i + 1]?.trim().startsWith('msgstr ""')) {
+    if (
+      inHeaders &&
+      trimmed.startsWith('msgid ""') &&
+      lines[i + 1]?.trim().startsWith('msgstr ""')
+    ) {
       i++; // 跳过 msgid ""
       i++; // 跳过 msgstr ""
       let headerLine = lines[i];
-      while (headerLine && (headerLine.trim().startsWith('"') || headerLine.trim() === '')) {
+      while (
+        headerLine &&
+        (headerLine.trim().startsWith('"') || headerLine.trim() === "")
+      ) {
         if (headerLine.trim().startsWith('"')) {
           headerBuffer.push(headerLine.trim());
         }
@@ -48,11 +55,11 @@ export function parsePOFile(content: string): POFile {
 
       // 解析 headers
       const headerText = headerBuffer
-        .join('')
-        .replace(/^"/, '')
-        .replace(/"$/g, '')
-        .replace(/\\n/g, '\n');
-      const headerLines = headerText.split('\n');
+        .join("")
+        .replace(/^"/, "")
+        .replace(/"$/g, "")
+        .replace(/\\n/g, "\n");
+      const headerLines = headerText.split("\n");
       for (const hLine of headerLines) {
         const match = hLine.match(/^([^:]+):\s*(.+)$/);
         if (match) {
@@ -64,54 +71,63 @@ export function parsePOFile(content: string): POFile {
     }
 
     // 跳过空行和注释（但保留注释信息）
-    if (trimmed === '' || trimmed.startsWith('#')) {
+    if (trimmed === "" || trimmed.startsWith("#")) {
       // 如果是空行，且当前条目已经有 msgid，说明这个条目已经完成，跳过
-      if (trimmed === '' && currentEntry && currentEntry.msgid !== undefined && currentEntry.msgid !== '') {
+      if (
+        trimmed === "" &&
+        currentEntry &&
+        currentEntry.msgid !== undefined &&
+        currentEntry.msgid !== ""
+      ) {
         continue;
       }
-      
+
       // 如果当前条目已经有 msgid，说明这是下一个条目的注释，需要重置
-      if (currentEntry && currentEntry.msgid !== undefined && currentEntry.msgid !== '') {
+      if (
+        currentEntry &&
+        currentEntry.msgid !== undefined &&
+        currentEntry.msgid !== ""
+      ) {
         // 保存当前条目
         result.entries.push({
           msgid: currentEntry.msgid,
-          msgstr: currentEntry.msgstr || '',
+          msgstr: currentEntry.msgstr || "",
           comments: currentEntry.comments || [],
           context: currentEntry.context,
         });
         // 重置 currentEntry，准备收集新条目的注释
-        currentEntry = { comments: [], msgid: '', msgstr: '' };
+        currentEntry = { comments: [], msgid: "", msgstr: "" };
       }
-      
+
       // 确保 currentEntry 存在
       if (!currentEntry) {
-        currentEntry = { comments: [], msgid: '', msgstr: '' };
+        currentEntry = { comments: [], msgid: "", msgstr: "" };
       }
       if (!currentEntry.comments) {
         currentEntry.comments = [];
       }
-      
+
       // 添加注释
-      if (trimmed.startsWith('#:')) {
+      if (trimmed.startsWith("#:")) {
         currentEntry.comments.push(trimmed);
-      } else if (trimmed.startsWith('#.')) {
+      } else if (trimmed.startsWith("#.")) {
         currentEntry.comments.push(trimmed);
-      } else if (trimmed.startsWith('#,')) {
+      } else if (trimmed.startsWith("#,")) {
         currentEntry.comments.push(trimmed);
-      } else if (trimmed.startsWith('#')) {
+      } else if (trimmed.startsWith("#")) {
         currentEntry.comments.push(trimmed);
       }
       continue;
     }
 
     // 处理 msgid
-    if (trimmed.startsWith('msgid ')) {
+    if (trimmed.startsWith("msgid ")) {
       if (currentEntry && currentEntry.msgid !== undefined) {
         // 保存上一个条目
-        if (currentEntry.msgid && currentEntry.msgid !== '') {
+        if (currentEntry.msgid && currentEntry.msgid !== "") {
           result.entries.push({
             msgid: currentEntry.msgid,
-            msgstr: currentEntry.msgstr || '',
+            msgstr: currentEntry.msgstr || "",
             comments: currentEntry.comments || [],
             context: currentEntry.context,
           });
@@ -120,15 +136,17 @@ export function parsePOFile(content: string): POFile {
       // 创建新条目，使用当前收集的注释（在遇到 msgid 之前收集的注释）
       // 注释应该已经在 currentEntry.comments 中（在遇到 msgid 之前收集的）
       // 重要：复制注释数组，避免引用问题，并重置 currentEntry
-      const savedComments: string[] = currentEntry?.comments ? [...currentEntry.comments] : [];
+      const savedComments: string[] = currentEntry?.comments
+        ? [...currentEntry.comments]
+        : [];
       currentEntry = {
         comments: savedComments, // 使用当前收集的注释（复制数组，避免引用问题）
-        msgid: '',
-        msgstr: '',
+        msgid: "",
+        msgstr: "",
       };
 
       // 提取 msgid 值
-      let msgidValue = trimmed.replace(/^msgid\s+/, '');
+      let msgidValue = trimmed.replace(/^msgid\s+/, "");
       if (msgidValue.startsWith('"') && msgidValue.endsWith('"')) {
         currentEntry.msgid = unescapeString(msgidValue.slice(1, -1));
       } else if (msgidValue.startsWith('"')) {
@@ -145,12 +163,12 @@ export function parsePOFile(content: string): POFile {
     }
 
     // 处理 msgstr
-    if (trimmed.startsWith('msgstr ')) {
+    if (trimmed.startsWith("msgstr ")) {
       if (!currentEntry) {
-        currentEntry = { msgid: '', msgstr: '', comments: [] };
+        currentEntry = { msgid: "", msgstr: "", comments: [] };
       }
 
-      let msgstrValue = trimmed.replace(/^msgstr\s+/, '');
+      let msgstrValue = trimmed.replace(/^msgstr\s+/, "");
       if (msgstrValue.startsWith('"') && msgstrValue.endsWith('"')) {
         currentEntry.msgstr = unescapeString(msgstrValue.slice(1, -1));
       } else if (msgstrValue.startsWith('"')) {
@@ -169,10 +187,10 @@ export function parsePOFile(content: string): POFile {
   }
 
   // 保存最后一个条目
-  if (currentEntry && currentEntry.msgid && currentEntry.msgid !== '') {
+  if (currentEntry && currentEntry.msgid && currentEntry.msgid !== "") {
     result.entries.push({
       msgid: currentEntry.msgid,
-      msgstr: currentEntry.msgstr || '',
+      msgstr: currentEntry.msgstr || "",
       comments: currentEntry.comments || [],
       context: currentEntry.context,
     });
@@ -195,9 +213,9 @@ export function generatePOFile(poFile: POFile): string {
     headerLines.push(`${key}: ${value}\\n`);
   }
   if (headerLines.length > 0) {
-    lines.push(`"${headerLines.join('')}"`);
+    lines.push(`"${headerLines.join("")}"`);
   }
-  lines.push('');
+  lines.push("");
 
   // 写入条目
   for (const entry of poFile.entries) {
@@ -208,9 +226,9 @@ export function generatePOFile(poFile: POFile): string {
 
     // 写入 msgid
     const msgidEscaped = escapeString(entry.msgid);
-    if (msgidEscaped.includes('\n') || msgidEscaped.length > 80) {
+    if (msgidEscaped.includes("\n") || msgidEscaped.length > 80) {
       lines.push('msgid ""');
-      const msgidLines = msgidEscaped.split('\n');
+      const msgidLines = msgidEscaped.split("\n");
       for (const line of msgidLines) {
         lines.push(`"${line}\\n"`);
       }
@@ -220,9 +238,9 @@ export function generatePOFile(poFile: POFile): string {
 
     // 写入 msgstr
     const msgstrEscaped = escapeString(entry.msgstr);
-    if (msgstrEscaped.includes('\n') || msgstrEscaped.length > 80) {
+    if (msgstrEscaped.includes("\n") || msgstrEscaped.length > 80) {
       lines.push('msgstr ""');
-      const msgstrLines = msgstrEscaped.split('\n');
+      const msgstrLines = msgstrEscaped.split("\n");
       for (const line of msgstrLines) {
         lines.push(`"${line}\\n"`);
       }
@@ -230,10 +248,10 @@ export function generatePOFile(poFile: POFile): string {
       lines.push(`msgstr "${msgstrEscaped}"`);
     }
 
-    lines.push('');
+    lines.push("");
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -241,10 +259,10 @@ export function generatePOFile(poFile: POFile): string {
  */
 function escapeString(str: string): string {
   return str
-    .replace(/\\/g, '\\\\')
+    .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/\n/g, '\\n')
-    .replace(/\t/g, '\\t');
+    .replace(/\n/g, "\\n")
+    .replace(/\t/g, "\\t");
 }
 
 /**
@@ -252,9 +270,8 @@ function escapeString(str: string): string {
  */
 function unescapeString(str: string): string {
   return str
-    .replace(/\\n/g, '\n')
-    .replace(/\\t/g, '\t')
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
     .replace(/\\"/g, '"')
-    .replace(/\\\\/g, '\\');
+    .replace(/\\\\/g, "\\");
 }
-

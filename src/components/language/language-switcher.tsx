@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;
@@ -21,10 +22,12 @@ const languageNames: Record<string, string> = {
 
 type LanguageSwitcherProps = {
   currentLang?: string;
+  hideLabel?: boolean;
 };
 
 export const LanguageSwitcher = ({
   currentLang,
+  hideLabel = false,
 }: LanguageSwitcherProps = {}) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -44,11 +47,13 @@ export const LanguageSwitcher = ({
 
   return (
     <div className="flex items-center gap-2">
-      <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
-        Language
-      </label>
+      {!hideLabel && (
+        <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+          Language
+        </label>
+      )}
       <Select value={pathLocale} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-32 sm:w-40">
+        <SelectTrigger className={cn("w-32 sm:w-40", hideLabel && "w-full")}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

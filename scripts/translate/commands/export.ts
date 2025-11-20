@@ -2,16 +2,27 @@
  * 导出命令：将所有语言的翻译条目导出到 CSV
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { parsePOFile, type POFile } from '../lib/po-parser';
-import { createTranslator } from '../lib/translator';
-import { exportToMultiLangCSV, readExistingCSV, unescapeCSVField } from '../lib/csv-handler';
-import { getAllPOFiles, getLangFromFilename } from '../utils';
-import type { ExportOptions } from '../types';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { join, dirname } from "path";
+import { parsePOFile, type POFile } from "../lib/po-parser";
+import { createTranslator } from "../lib/translator";
+import {
+  exportToMultiLangCSV,
+  readExistingCSV,
+  unescapeCSVField,
+} from "../lib/csv-handler";
+import { getAllPOFiles, getLangFromFilename } from "../utils";
+import type { ExportOptions } from "../types";
 
 export async function exportTranslations(options: ExportOptions) {
-  const { output, provider, apiKey, appId, sourceLang = 'en', localesDir = 'src/locales' } = options;
+  const {
+    output,
+    provider,
+    apiKey,
+    appId,
+    sourceLang = "en",
+    localesDir = "src/locales",
+  } = options;
 
   const localesPath = join(process.cwd(), localesDir);
   if (!existsSync(localesPath)) {
@@ -20,7 +31,7 @@ export async function exportTranslations(options: ExportOptions) {
 
   // 获取所有 .po 文件
   const poFiles = getAllPOFiles(localesPath);
-  console.log(`Found ${poFiles.length} PO files: ${poFiles.join(', ')}`);
+  console.log(`Found ${poFiles.length} PO files: ${poFiles.join(", ")}`);
 
   // 读取所有 .po 文件
   const poDataMap = new Map<string, POFile>();
@@ -29,14 +40,18 @@ export async function exportTranslations(options: ExportOptions) {
   for (const poFile of poFiles) {
     const lang = getLangFromFilename(poFile);
     const filePath = join(localesPath, poFile);
-    const content = readFileSync(filePath, 'utf-8');
+    const content = readFileSync(filePath, "utf-8");
     const poFileData = parsePOFile(content);
     poDataMap.set(lang, poFileData);
     languages.push(lang);
   }
 
   // 以 msgid 为 key 合并所有语言的翻译
-  const entriesList: Array<{ msgid: string; entry: { comments: string[]; msgid: string; msgstr: string }; translations: Record<string, string> }> = [];
+  const entriesList: Array<{
+    msgid: string;
+    entry: { comments: string[]; msgid: string; msgstr: string };
+    translations: Record<string, string>;
+  }> = [];
 
   // 首先从源语言（通常是 en）获取所有 msgid
   const sourcePO = poDataMap.get(sourceLang);
@@ -46,10 +61,10 @@ export async function exportTranslations(options: ExportOptions) {
 
   // 收集所有 msgid（以源语言为准），保持顺序
   for (const entry of sourcePO.entries) {
-    if (entry.msgid && entry.msgid !== '') {
+    if (entry.msgid && entry.msgid !== "") {
       entriesList.push({
         msgid: entry.msgid,
-        entry: { 
+        entry: {
           comments: entry.comments,
           msgid: entry.msgid,
           msgstr: entry.msgstr,
@@ -60,7 +75,13 @@ export async function exportTranslations(options: ExportOptions) {
   }
 
   // 创建 msgid 到条目的映射（用于快速查找）
-  const entriesMap = new Map<string, { entry: { comments: string[]; msgid: string; msgstr: string }; translations: Record<string, string> }>();
+  const entriesMap = new Map<
+    string,
+    {
+      entry: { comments: string[]; msgid: string; msgstr: string };
+      translations: Record<string, string>;
+    }
+  >();
   for (const item of entriesList) {
     // 如果 msgid 已存在，保留第一个（保持原始注释）
     if (!entriesMap.has(item.msgid)) {
@@ -76,14 +97,14 @@ export async function exportTranslations(options: ExportOptions) {
     // 创建 msgid 到 msgstr 的映射
     const langTranslations = new Map<string, string>();
     for (const entry of poData.entries) {
-      if (entry.msgid && entry.msgid !== '') {
-        langTranslations.set(entry.msgid, entry.msgstr || '');
+      if (entry.msgid && entry.msgid !== "") {
+        langTranslations.set(entry.msgid, entry.msgstr || "");
       }
     }
 
     // 填充到 entriesMap
     for (const [msgid, data] of entriesMap.entries()) {
-      data.translations[lang] = langTranslations.get(msgid) || '';
+      data.translations[lang] = langTranslations.get(msgid) || "";
     }
   }
 
@@ -109,7 +130,10 @@ export async function exportTranslations(options: ExportOptions) {
       const msgidsToTranslate: string[] = [];
 
       for (const [msgid, data] of entriesMap.entries()) {
-        if (!data.translations[targetLang] || data.translations[targetLang] === '') {
+        if (
+          !data.translations[targetLang] ||
+          data.translations[targetLang] === ""
+        ) {
           const sourceText = data.translations[sourceLang] || msgid;
           if (sourceText) {
             textsToTranslate.push(sourceText);
@@ -119,21 +143,25 @@ export async function exportTranslations(options: ExportOptions) {
       }
 
       if (textsToTranslate.length > 0) {
-        console.log(`Found ${textsToTranslate.length} entries to translate for ${targetLang}`);
+        console.log(
+          `Found ${textsToTranslate.length} entries to translate for ${targetLang}`,
+        );
 
         // 批量翻译
         const batchSize = 50;
         for (let i = 0; i < textsToTranslate.length; i += batchSize) {
           const batch = textsToTranslate.slice(i, i + batchSize);
           const batchMsgids = msgidsToTranslate.slice(i, i + batchSize);
-          console.log(`Translating batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(textsToTranslate.length / batchSize)}...`);
+          console.log(
+            `Translating batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(textsToTranslate.length / batchSize)}...`,
+          );
 
           try {
             const batchResults = await translator.translateBatch(batch);
             // 更新翻译结果
             for (let j = 0; j < batchMsgids.length; j++) {
               const msgid = batchMsgids[j];
-              const translation = batchResults[j] || '';
+              const translation = batchResults[j] || "";
               const data = entriesMap.get(msgid);
               if (data) {
                 data.translations[targetLang] = translation;
@@ -151,18 +179,19 @@ export async function exportTranslations(options: ExportOptions) {
 
   // 检查是否需要读取现有 CSV 并合并
   const outputPath = join(process.cwd(), output);
-  let existingData: { headers: string[]; rows: Map<string, string[]> } | null = null;
+  let existingData: { headers: string[]; rows: Map<string, string[]> } | null =
+    null;
 
   if (existsSync(outputPath)) {
-    console.log('Reading existing CSV file to merge...');
-    const existingContent = readFileSync(outputPath, 'utf-8');
+    console.log("Reading existing CSV file to merge...");
+    const existingContent = readFileSync(outputPath, "utf-8");
     existingData = readExistingCSV(existingContent);
   }
 
   // 如果存在现有 CSV，保留其中的翻译（优先使用 CSV 中的值）
   if (existingData && existingData.headers.length > 0) {
     const existingHeaders = existingData.headers;
-    const msgidIndex = existingHeaders.indexOf('msgId');
+    const msgidIndex = existingHeaders.indexOf("msgId");
 
     if (msgidIndex !== -1) {
       for (const [msgid, row] of existingData.rows.entries()) {
@@ -192,8 +221,9 @@ export async function exportTranslations(options: ExportOptions) {
     mkdirSync(outputDir, { recursive: true });
   }
 
-  writeFileSync(outputPath, csvContent, 'utf-8');
+  writeFileSync(outputPath, csvContent, "utf-8");
 
-  console.log(`Exported ${entriesMap.size} entries with ${languages.length} languages to ${outputPath}`);
+  console.log(
+    `Exported ${entriesMap.size} entries with ${languages.length} languages to ${outputPath}`,
+  );
 }
-

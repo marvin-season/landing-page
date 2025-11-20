@@ -1,11 +1,11 @@
 /**
  * CSV 文件处理工具
  * 用于导出翻译条目到 CSV，以及从 CSV 导入翻译结果
- * 
+ *
  * CSV 格式：#: | msgId | en | zh | ja | ...
  */
 
-import type { POEntry } from './po-parser';
+import type { POEntry } from "./po-parser";
 
 export interface MultiLangCSVRow {
   comments: string; // #: 注释信息
@@ -20,12 +20,15 @@ export interface MultiLangCSVRow {
  * @param languages 语言列表，如 ['en', 'zh', 'ja']
  */
 export function exportToMultiLangCSV(
-  entriesList: Array<{ msgid: string; entry: { comments: string[]; msgid: string; msgstr: string } }>,
+  entriesList: Array<{
+    msgid: string;
+    entry: { comments: string[]; msgid: string; msgstr: string };
+  }>,
   entriesMap: Map<string, { translations: Record<string, string> }>,
   languages: string[],
 ): string {
   // 生成表头：#: | msgId | en | zh | ja | ...
-  const headers = ['#:', 'msgId', ...languages];
+  const headers = ["#:", "msgId", ...languages];
 
   // 生成数据行（按 entriesList 的顺序，每个条目使用自己的注释）
   const rows: string[] = [];
@@ -34,28 +37,28 @@ export function exportToMultiLangCSV(
     // 从 entriesMap 获取翻译（如果存在）
     const data = entriesMap.get(msgid);
     const translations = data?.translations || {};
-    
+
     // 处理注释信息：保留 "#:" 前缀，只取第一个源文件位置注释
     // 使用当前条目的注释，而不是从 entriesMap 获取
-    let comments = '';
+    let comments = "";
     for (const comment of entry.comments) {
       // 只处理源文件位置注释（以 "#:" 开头）
-      if (comment.trim().startsWith('#:')) {
+      if (comment.trim().startsWith("#:")) {
         // 保留原值，包括 "#:" 前缀
         comments = comment.trim();
         break; // 只取第一个注释位置
       }
     }
-    
+
     const row = [
       escapeCSVField(comments),
       escapeCSVField(msgid),
-      ...languages.map((lang) => escapeCSVField(translations[lang] || '')),
+      ...languages.map((lang) => escapeCSVField(translations[lang] || "")),
     ];
-    rows.push(row.join(','));
+    rows.push(row.join(","));
   }
 
-  return [headers.join(','), ...rows].join('\n');
+  return [headers.join(","), ...rows].join("\n");
 }
 
 /**
@@ -63,8 +66,11 @@ export function exportToMultiLangCSV(
  * @param csvContent CSV 文件内容
  * @param targetLang 目标语言代码，如 'zh', 'ja'
  */
-export function importFromCSV(csvContent: string, targetLang: string): Map<string, string> {
-  const lines = csvContent.split('\n').filter((line) => line.trim() !== '');
+export function importFromCSV(
+  csvContent: string,
+  targetLang: string,
+): Map<string, string> {
+  const lines = csvContent.split("\n").filter((line) => line.trim() !== "");
   const result = new Map<string, string>();
 
   // 解析表头
@@ -74,7 +80,7 @@ export function importFromCSV(csvContent: string, targetLang: string): Map<strin
   }
 
   const headers = parseCSVLine(headerLine);
-  const msgidIndex = headers.indexOf('msgId');
+  const msgidIndex = headers.indexOf("msgId");
   const langIndex = headers.indexOf(targetLang);
 
   if (msgidIndex === -1) {
@@ -93,7 +99,7 @@ export function importFromCSV(csvContent: string, targetLang: string): Map<strin
       const translation = unescapeCSVField(fields[langIndex]);
       if (msgid) {
         // 即使翻译为空也记录（可能是需要翻译的条目）
-        result.set(msgid, translation || '');
+        result.set(msgid, translation || "");
       }
     }
   }
@@ -108,7 +114,7 @@ export function readExistingCSV(csvContent: string): {
   headers: string[];
   rows: Map<string, string[]>; // msgid -> [comments, msgid, en, zh, ja, ...]
 } {
-  const lines = csvContent.split('\n').filter((line) => line.trim() !== '');
+  const lines = csvContent.split("\n").filter((line) => line.trim() !== "");
   const result = new Map<string, string[]>();
 
   if (lines.length === 0) {
@@ -116,7 +122,7 @@ export function readExistingCSV(csvContent: string): {
   }
 
   const headers = parseCSVLine(lines[0]);
-  const msgidIndex = headers.indexOf('msgId');
+  const msgidIndex = headers.indexOf("msgId");
 
   if (msgidIndex === -1) {
     return { headers, rows: result };
@@ -141,7 +147,7 @@ export function readExistingCSV(csvContent: string): {
  */
 export function escapeCSVField(field: string): string {
   // 如果包含逗号、引号或换行符，需要用引号包裹并转义引号
-  if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+  if (field.includes(",") || field.includes('"') || field.includes("\n")) {
     return `"${field.replace(/"/g, '""')}"`;
   }
   return field;
@@ -165,7 +171,7 @@ export function unescapeCSVField(field: string): string {
  */
 function parseCSVLine(line: string): string[] {
   const fields: string[] = [];
-  let currentField = '';
+  let currentField = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -181,10 +187,10 @@ function parseCSVLine(line: string): string[] {
         // 切换引号状态
         inQuotes = !inQuotes;
       }
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       // 字段分隔符
       fields.push(currentField);
-      currentField = '';
+      currentField = "";
     } else {
       currentField += char;
     }
@@ -195,4 +201,3 @@ function parseCSVLine(line: string): string[] {
 
   return fields;
 }
-

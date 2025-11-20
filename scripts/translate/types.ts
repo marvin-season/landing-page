@@ -16,4 +16,3 @@ export interface ImportOptions {
   po: string; // 目标 .po 文件路径
   localesDir?: string; // locales 目录路径（默认 'src/locales'）
 }
-
