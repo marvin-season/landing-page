@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import {
   Select,
   SelectContent,
@@ -9,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMounted } from "@/hooks/use-mounted";
+import { themeNames, useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 
 type ThemeSwitcherProps = {
@@ -16,21 +16,12 @@ type ThemeSwitcherProps = {
   hideLabel?: boolean;
 };
 
-const themeNames: Record<string, string> = {
-  light: "Light",
-  dark: "Dark",
-  neutral: "Neutral",
-};
-
-const themes: string[] = ["light", "dark", "neutral"];
-
 export const ThemeSwitcher = ({
   className,
   hideLabel = false,
 }: ThemeSwitcherProps) => {
+  const { theme, themes, setTheme } = useTheme();
   const mounted = useMounted();
-  const { setTheme, theme } = useTheme();
-
   if (!mounted) return null;
 
   return (

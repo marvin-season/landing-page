@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -8,17 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { languageNames, useLanguage } from "@/hooks/use-language";
 import { cn } from "@/lib/utils";
-import linguiConfig from "~/lingui.config";
-
-const { locales } = linguiConfig;
-
-// 语言显示名称映射
-const languageNames: Record<string, string> = {
-  en: "English",
-  zh: "中文",
-  ja: "日本語",
-};
 
 type LanguageSwitcherProps = {
   currentLang?: string;
@@ -29,21 +19,8 @@ export const LanguageSwitcher = ({
   currentLang,
   hideLabel = false,
 }: LanguageSwitcherProps = {}) => {
-  const pathname = usePathname();
-  const router = useRouter();
-  const pathSegments = pathname.split("/").filter(Boolean);
-  const pathLocale = currentLang || pathSegments[0] || locales[0];
-
-  function buildLanguagePath(locale: string) {
-    return `/${locale}/${pathSegments.slice(1).join("/")}`;
-  }
-
-  const availableLocales = locales.filter((locale) => locale !== "pseudo");
-
-  const handleValueChange = (locale: string) => {
-    const newPath = buildLanguagePath(locale);
-    router.push(newPath);
-  };
+  const { currentLanguage, availableLanguages, setLanguage } =
+    useLanguage(currentLang);
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -55,7 +32,7 @@ export const LanguageSwitcher = ({
           Language
         </label>
       )}
-      <Select value={pathLocale} onValueChange={handleValueChange}>
+      <Select value={currentLanguage} onValueChange={setLanguage}>
         <SelectTrigger
           id="language-select"
           className={cn("w-32 sm:w-40", hideLabel && "w-full")}
@@ -63,7 +40,7 @@ export const LanguageSwitcher = ({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {availableLocales.map((locale) => (
+          {availableLanguages.map((locale) => (
             <SelectItem key={locale} value={locale}>
               {languageNames[locale] || locale}
             </SelectItem>
