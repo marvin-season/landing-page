@@ -1,29 +1,38 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 const ChapterLoading = () => {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-50">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.18),transparent_55%)]" />
-      <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-white via-white/60 to-transparent" />
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16 md:px-10">
-        <div className="space-y-4">
-          <div className="h-4 w-32 rounded-full bg-slate-200/80" />
-          <div className="h-10 w-2/3 rounded-2xl bg-slate-200/80" />
-          <div className="h-20 w-1/2 rounded-3xl bg-slate-200/70" />
-        </div>
-        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.1fr)]">
-          <div className="space-y-6">
-            <div className="h-[360px] rounded-[32px] bg-slate-200/60 backdrop-blur" />
-            <div className="h-32 rounded-3xl bg-slate-200/60 backdrop-blur" />
-          </div>
-          <div className="space-y-6">
-            <div className="h-24 rounded-3xl bg-white shadow-sm shadow-slate-900/5" />
-            <div className="h-24 rounded-3xl bg-white shadow-sm shadow-slate-900/5" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="h-24 rounded-3xl bg-slate-900/80" />
-              <div className="h-24 rounded-3xl bg-slate-900/70" />
-              <div className="h-24 rounded-3xl bg-slate-900/60" />
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-4 w-48 rounded-full" />
+      <Skeleton className="h-12 w-3/4 rounded-2xl" />
+      <Skeleton className="h-6 w-full rounded-lg" />
+      <Skeleton className="h-5 w-4/5 rounded-lg" />
+
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="rounded-3xl border border-border/70 bg-card/70 p-6 backdrop-blur"
+          >
+            <div className="flex items-start gap-3">
+              <Skeleton className="size-8 shrink-0 rounded-full" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-5 w-3/4 rounded-lg" />
+                <Skeleton className="h-4 w-full rounded-lg" />
+                <Skeleton className="h-4 w-5/6 rounded-lg" />
+              </div>
             </div>
           </div>
-        </div>
+        ))}
+      </div>
+
+      <div className="mt-10 flex flex-wrap gap-6">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton
+            key={index}
+            className="h-32 min-w-[160px] flex-1 rounded-3xl"
+          />
+        ))}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
-import { Sofadi_One, Yuji_Boku, Liu_Jian_Mao_Cao } from "next/font/google";
+import { Liu_Jian_Mao_Cao, Sofadi_One, Yuji_Boku } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";

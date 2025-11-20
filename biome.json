@@ -7,7 +7,8 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build", "!.vscode"]
+    "includes": ["src/**/*.{ts,tsx,js,jsx,json}"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -21,7 +22,8 @@
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",
-        "noTsIgnore": "off"
+        "noTsIgnore": "off",
+        "noNonNullAssertion": "off"
       }
     },
     "domains": {

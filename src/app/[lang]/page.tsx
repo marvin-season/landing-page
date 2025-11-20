@@ -8,18 +8,16 @@ export default async function Home({ params }: PageLangParam) {
   const lang = (await params).lang;
   const i18n = getI18nInstance(lang);
   return (
-    <>
-      <SceneLayout
-        lang={lang}
-        title={i18n._(
-          msg`Enter the next-gen AI content collaboration platform through a "book" interface`,
-        )}
-        description={i18n._(
-          msg`We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips.`,
-        )}
-      >
-        <ViewClosed directoryHref={`/${lang}/chapter`} />
-      </SceneLayout>
-    </>
+    <SceneLayout
+      lang={lang}
+      title={i18n._(
+        msg`Enter the next-gen AI content collaboration platform through a "book" interface`,
+      )}
+      description={i18n._(
+        msg`We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips.`,
+      )}
+    >
+      <ViewClosed directoryHref={`/${lang}/chapter`} />
+    </SceneLayout>
   );
 }
