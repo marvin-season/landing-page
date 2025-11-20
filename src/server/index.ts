@@ -1,20 +1,15 @@
-import { z } from "zod";
-import { createCallerFactory, publicProcedure, router } from "./trpc";
+import { headers } from "next/headers";
+import { userRouter } from "@/server/user";
+import { createCallerFactory, createTRPCContext, router } from "./trpc";
 
 export const appRouter = router({
-  userList: publicProcedure.query(async () => {
-    return [
-      { id: 1, name: "John Doe" },
-      { id: 2, name: "John Smith" },
-    ];
-  }),
-  userById: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      return { id: input.id, name: "John Doe" };
-    }),
+  user: userRouter,
 });
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
-export const apiCaller = createCallerFactory(appRouter)({});
+export const apiCaller = createCallerFactory(appRouter)(async () => {
+  const heads = new Headers(await headers());
+  heads.set("x-trpc-source", "rsc");
+  return await createTRPCContext({ headers: heads });
+});

@@ -1,8 +1,7 @@
 import { apiCaller } from "@/server";
 
 export default async function AdminPage() {
-  const user = await apiCaller.userList();
-  console.log(user);
+  const user = await apiCaller.user.list();
   return (
     <div>
       {user.map((user) => (
