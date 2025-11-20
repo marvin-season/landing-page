@@ -44,9 +44,11 @@ export const LanguageSwitcher = ({
 
   return (
     <div className="flex items-center gap-2">
-      <label className="text-muted-foreground font-bold">Language</label>
+      <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+        Language
+      </label>
       <Select value={pathLocale} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-40">
+        <SelectTrigger className="w-32 sm:w-40">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

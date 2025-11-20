@@ -31,9 +31,11 @@ export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <label className="text-muted-foreground font-bold">Theme</label>
+      <label className="hidden sm:inline text-muted-foreground font-bold text-sm">
+        Theme
+      </label>
       <Select value={theme || undefined} onValueChange={setTheme}>
-        <SelectTrigger className="w-40">
+        <SelectTrigger className="w-32 sm:w-40">
           <SelectValue placeholder="System" />
         </SelectTrigger>
         <SelectContent>
