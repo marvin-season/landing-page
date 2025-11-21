@@ -1,4 +1,4 @@
-import { apiCaller } from "@/server";
+import { apiCaller } from "~/server";
 
 export default async function AdminPage() {
   const user = await apiCaller.user.list();

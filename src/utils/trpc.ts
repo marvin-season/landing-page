@@ -1,8 +1,8 @@
-import { createTRPCContext } from "@trpc/tanstack-react-query";
-import type { AppRouter } from "@/server";
+import { createTRPCContext as createTRPCContextTank } from "@trpc/tanstack-react-query";
+import type { AppRouter } from "~/server";
 
 export const { TRPCProvider, useTRPC, useTRPCClient } =
-  createTRPCContext<AppRouter>();
+  createTRPCContextTank<AppRouter>();
 
 export function getBaseUrl() {
   if (typeof window !== "undefined") return window.location.origin;

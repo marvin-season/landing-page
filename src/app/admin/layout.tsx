@@ -1,4 +1,4 @@
-import TankQueryClientProvider from "@/trpc/provider";
+import TankQueryClientProvider from "@/components/trpc/provider";
 
 export default function AdminLayout({
   children,

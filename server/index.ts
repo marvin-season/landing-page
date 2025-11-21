@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { userRouter } from "@/server/user";
+import { userRouter } from "~/server/user";
 import { createCallerFactory, createTRPCContext, router } from "./trpc";
 
 export const appRouter = router({
