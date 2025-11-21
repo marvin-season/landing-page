@@ -8,12 +8,7 @@
     "start": "next start -p 3001",
     "lint": "biome check --write",
     "format": "biome format --write",
-    "lingui:extract": "lingui extract --clean",
-    "translate:export": "tsx scripts/translate/cli.ts export",
-    "translate:import": "tsx scripts/translate/cli.ts import",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "lingui:extract": "lingui extract --clean"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
