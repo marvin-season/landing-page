@@ -1,12 +1,8 @@
 import { initTRPC } from "@trpc/server";
-
+import { prisma } from "~/server/lib/prisma";
 export const createTRPCContext = async (opts?: { headers: Headers }) => {
   return {
-    session: {
-      id: "1",
-      name: "John Doe",
-      email: "john.doe@example.com",
-    },
+    db: prisma,
     ...opts,
   };
 };
