@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { MotionDiv, MotionLi, MotionUl } from "../motion";
+import Book from "./book";
 import BookModel from "./book-model";
 
 type ViewDirectoryProps = {
@@ -28,7 +29,9 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
           className="relative flex justify-center lg:justify-start"
           style={{ perspective: "1900px" }}
         >
-          <BookModel interactive />
+          <BookModel phase="directory" interactive>
+            <Book lang={lang} />
+          </BookModel>
         </Link>
         <MotionDiv
           className="self-center rounded-full bg-primary/80 px-5 py-3 text-sm uppercase tracking-[0.28em] text-primary-foreground shadow-[0_28px_48px_-36px_var(--ring)] lg:self-start"

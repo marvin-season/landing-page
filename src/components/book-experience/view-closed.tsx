@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";
 import { MotionDiv, MotionSpan } from "../motion";
+import Book from "./book";
 import BookModel from "./book-model";
 
 type ViewClosedProps = {
@@ -27,7 +28,9 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           className="relative flex justify-center"
           style={{ perspective: "1900px" }}
         >
-          <BookModel interactive />
+          <BookModel phase="closed" interactive>
+            <Book lang={lang} />
+          </BookModel>
         </Link>
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">
