@@ -1,0 +1,11 @@
+{
+  "translator": {
+    "provider": "deepl",
+    "apiKey": "YOUR_API_KEY_HERE",
+    "appId": "",
+    "endpoint": ""
+  },
+  "defaultSourceLang": "en",
+  "targetLanguages": ["zh", "ja"],
+  "csvOutputDir": "./translations"
+}
