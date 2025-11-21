@@ -1,24 +1,24 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { motion } from "motion/react";
-import { bookSpringTransition, bookVariants } from "@/lib/motion-presets";
+import { bookVariants } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
 import type { Phase } from "@/types/chapter";
+import { MotionDiv } from "../motion";
 
 type BookModelProps = {
-  phase: Phase;
+  phase?: Phase;
   interactive?: boolean;
   className?: string;
 };
 
 const BookModel: React.FC<BookModelProps> = ({
-  phase,
+  phase = "directory",
   interactive = false,
   className,
 }) => {
   return (
-    <motion.div
+    <MotionDiv
       className={cn(
         "group relative h-[320px] w-[240px] rounded-[32px] sm:h-[360px] sm:w-[280px]",
         interactive ? "cursor-pointer" : "cursor-default",
@@ -30,7 +30,6 @@ const BookModel: React.FC<BookModelProps> = ({
       variants={bookVariants}
       animate={phase}
       initial={false}
-      transition={bookSpringTransition}
       whileHover={interactive ? { translateY: -6 } : undefined}
     >
       <div
@@ -119,7 +118,7 @@ const BookModel: React.FC<BookModelProps> = ({
           backfaceVisibility: "hidden",
         }}
       />
-    </motion.div>
+    </MotionDiv>
   );
 };
 
