@@ -1,10 +1,11 @@
 import { initTRPC } from "@trpc/server";
+import { prisma } from "~/server/lib/prisma";
 export const createTRPCContext = async (opts?: { headers: Headers }) => {
   return {
+    db: prisma,
     ...opts,
   };
 };
-
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
