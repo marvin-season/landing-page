@@ -35,8 +35,9 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">
         <p className="text-base leading-relaxed text-muted-foreground">
-          {i18n._(msg`A freshly delivered AI creation handbook. Tap the cover to open the
-            index and explore a new way of producing content with your team.`)}
+          {i18n._(
+            msg`A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team.`,
+          )}
         </p>
         <Link
           href={directoryHref}

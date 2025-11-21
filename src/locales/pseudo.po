@@ -13,173 +13,168 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/sections/book-experience/book-model.tsx:55
+#: src/components/book-experience/book.tsx:25
 msgid "2025"
 msgstr ""
 
-#: src/components/sections/book-experience/phase-closed.tsx:43
+#: src/components/book-experience/view-closed.tsx:39
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:16
+#: src/lib/chapters.ts:16
 msgid "A unified workspace built around engineering best practices. From Shadcn UI design system and automated Fumadocs documentation, to UI automation and robust docs integration—engineers can scale content delivery globally with optimal tooling."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:31
+#: src/lib/chapters.ts:31
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:90
+#: src/components/book-experience/book.tsx:56
 msgid "AI Co-Creation Studio"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:11
-#: src/components/sections/book-experience/chapters.ts:103
+#: src/lib/chapters.ts:11
+#: src/lib/chapters.ts:103
 msgid "AI orchestrates every step of content production."
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:51
+#: src/components/book-experience/book.tsx:23
 msgid "AI STUDIO"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:73
+#: src/lib/chapters.ts:73
 msgid "All UI uses Shadcn UI—customizable, accessible, and consistent components."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:112
+#: src/lib/chapters.ts:112
 msgid "Audience Adaptation"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:44
+#: src/lib/chapters.ts:44
 msgid "Automated Live Documentation"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:105
+#: src/lib/chapters.ts:105
 msgid "Automation keeps every stage from inspiration to delivery aligned."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:152
+#: src/lib/chapters.ts:152
 msgid "Average delivery cycle reduced"
 msgstr ""
 
-#: src/components/sections/book-experience/chapter-sidebar.tsx:106
+#: src/components/book-experience/chapter-sidebar.tsx:96
 msgid "Back to Index"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:157
+#: src/lib/chapters.ts:157
 msgid "Brand voice alignment"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:130
+#: src/lib/chapters.ts:130
 msgid "Brand Voice Guardrails"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:108
+#: src/lib/chapters.ts:108
 msgid "Build a closed-loop workspace for ideation, proofreading, and distribution while keeping your brand voice consistent."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:62
+#: src/lib/chapters.ts:62
 msgid "Built for Extensibility"
 msgstr ""
 
-#. placeholder {0}: String(index + 1).padStart(2, "0")
-#: src/components/sections/book-experience/phase-directory.tsx:96
-msgid "Chapter {0}"
-msgstr ""
-
-#: src/components/sections/book-experience/chapter-sidebar.tsx:47
+#: src/components/book-experience/chapter-sidebar.tsx:37
 msgid "Chapter Bookmarks"
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:60
+#: src/components/book-experience/book.tsx:29
 msgid "Chapters Awaiting You"
 msgstr ""
 
-#: src/components/sections/book-experience/phase-directory.tsx:65
+#: src/components/book-experience/view-directory.tsx:48
 msgid "Choose the chapter you want to explore"
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:63
+#: src/components/book-experience/book.tsx:32
 msgid "Click the cover to awaken a new creative journey."
 msgstr ""
 
-#: src/components/sections/book-experience/phase-directory.tsx:58
+#: src/components/book-experience/view-directory.tsx:41
 msgid "Click the cover to return"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:21
+#: src/lib/chapters.ts:21
 msgid "Component System"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:117
+#: src/lib/chapters.ts:117
 msgid "Connect every node between inspiration and publication so collaboration stays traceable, reusable, and optimizable."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:155
+#: src/lib/chapters.ts:155
 msgid "Consistency"
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:96
+#: src/components/book-experience/book.tsx:58
 msgid "Content Governance Hub"
 msgstr ""
 
-#: src/app/[lang]/layout.tsx:32
+#: src/app/[lang]/layout.tsx:46
 msgid "Create Next App"
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:87
+#: src/components/book-experience/book.tsx:55
 msgid "Creative Workflow"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:20
+#: src/lib/chapters.ts:20
 msgid "Design System"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:70
+#: src/lib/chapters.ts:70
 msgid "Design System Adoption"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:26
+#: src/lib/chapters.ts:26
 msgid "Developer Experience"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:91
+#: src/lib/chapters.ts:91
 msgid "Developer Onboarding"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:50
+#: src/lib/chapters.ts:50
 msgid "Developer-Centric Workflow"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:77
+#: src/lib/chapters.ts:77
 msgid "Doc Coverage"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:23
+#: src/lib/chapters.ts:23
 msgid "Docs Integration"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:27
+#: src/lib/chapters.ts:27
 msgid "Documentation Automation"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:126
+#: src/lib/chapters.ts:126
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:64
+#: src/lib/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:150
+#: src/lib/chapters.ts:150
 msgid "Efficiency Boost"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:19
+#: src/lib/chapters.ts:19
 msgid "Engineering"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:10
+#: src/lib/chapters.ts:10
 msgid "Engineering-First AI Studio"
 msgstr ""
 
@@ -187,136 +182,136 @@ msgstr ""
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:80
+#: src/lib/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:94
+#: src/lib/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:87
+#: src/lib/chapters.ts:87
 msgid "Faster release cycles vs. legacy stacks due to unified automation."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:160
+#: src/lib/chapters.ts:160
 msgid "Feedback Convergence"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:162
+#: src/lib/chapters.ts:162
 msgid "Fewer revision loops"
 msgstr ""
 
-#: src/app/[lang]/chapter/layout.tsx:21
+#: src/app/[lang]/chapter/layout.tsx:22
 msgid "From workflows to insights and asset governance, we curated four core chapters for AI-powered content teams. Choose one to dive deeper."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:13
+#: src/lib/chapters.ts:13
 msgid "Full-stack automation integrates design systems, documentation, UI components, and delivery for seamless engineering productivity."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:25
+#: src/lib/chapters.ts:25
 msgid "Fumadocs"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:46
+#: src/lib/chapters.ts:46
 msgid "Fumadocs keeps component and API documentation always current—complete with live code previews—so every update is immediately reflected across platforms."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:144
+#: src/lib/chapters.ts:144
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
 msgstr ""
 
-#: src/app/[lang]/layout.tsx:33
+#: src/app/[lang]/layout.tsx:47
 msgid "Generated by create next app"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:52
+#: src/lib/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:93
+#: src/components/book-experience/book.tsx:57
 msgid "Insight-Driven Expression"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:102
+#: src/lib/chapters.ts:102
 msgid "Intelligent Creative Workflows"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:142
+#: src/lib/chapters.ts:142
 msgid "Intelligent Proofreading"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:111
+#: src/lib/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr ""
 
-#: src/app/[lang]/chapter/layout.tsx:18
+#: src/app/[lang]/chapter/layout.tsx:19
 msgid "Open the index and plan your AI content blueprint together"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:132
+#: src/lib/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:56
+#: src/lib/chapters.ts:56
 msgid "Robust UI Automation"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:138
+#: src/lib/chapters.ts:138
 msgid "Role-based permissions with comments, annotations, and history let teams collaborate smoothly across key checkpoints."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:24
+#: src/lib/chapters.ts:24
 msgid "Shadcn UI"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:40
+#: src/lib/chapters.ts:40
 msgid "Shadcn UI underpins the studio's visual language, offering accessible, reusable, and consistent components for fast, error-free development."
 msgstr ""
 
-#: src/components/sections/book-experience/phase-closed.tsx:54
+#: src/components/book-experience/view-closed.tsx:48
 msgid "Start Reading"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:120
+#: src/lib/chapters.ts:120
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
 msgstr ""
 
-#: src/components/sections/book-experience/book-model.tsx:83
-#: src/components/sections/book-experience/phase-directory.tsx:62
+#: src/components/book-experience/book.tsx:52
+#: src/components/book-experience/view-directory.tsx:45
 msgid "Table of Contents"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:113
+#: src/lib/chapters.ts:113
 msgid "Team Collaboration"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:136
+#: src/lib/chapters.ts:136
 msgid "Team Sync"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:34
+#: src/lib/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:84
+#: src/lib/chapters.ts:84
 msgid "Time-to-Delivery"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:22
+#: src/lib/chapters.ts:22
 msgid "UI Automation"
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:58
+#: src/lib/chapters.ts:58
 msgid "UI automation and docs integration ensure updates flow instantly from the codebase to all internal and external endpoints for a true single source of truth."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:38
+#: src/lib/chapters.ts:38
 msgid "Unified Design System"
 msgstr ""
 
-#: src/components/sections/book-experience/phase-directory.tsx:68
+#: src/components/book-experience/view-directory.tsx:52
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr ""
 
@@ -324,6 +319,6 @@ msgstr ""
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr ""
 
-#: src/components/sections/book-experience/chapters.ts:124
+#: src/lib/chapters.ts:124
 msgid "Workflow Orchestration"
 msgstr ""
