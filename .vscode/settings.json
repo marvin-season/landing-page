@@ -3,15 +3,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
   },
-  "material-icon-theme.folders.associations": {
-    "blocks": "components",
-    "components": "components",
-    "fumadocs-mdx-component": "components",
-    "utils": "tools",
-    "lib": "tools",
-    "fumadocs": "docs",
-    "registry": "repository"
-  },
   "cSpell.words": [
     "gsap",
     "shiki"
