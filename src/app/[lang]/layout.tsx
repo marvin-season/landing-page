@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
-import { Liu_Jian_Mao_Cao, Sofadi_One, Yuji_Boku } from "next/font/google";
+import { Ma_Shan_Zheng, Sofadi_One, Yuji_Boku } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -17,7 +17,7 @@ const sofadiOne = Sofadi_One({
   style: "normal",
 });
 
-const liuJianMaoCao = Liu_Jian_Mao_Cao({
+const maShanZheng = Ma_Shan_Zheng({
   weight: "400",
   style: "normal",
 });
@@ -29,7 +29,7 @@ const yujiBoku = Yuji_Boku({
 
 // 语言到字体的映射
 const fontMap: Record<string, string> = {
-  zh: liuJianMaoCao.className,
+  zh: maShanZheng.className,
   ja: yujiBoku.className,
   en: sofadiOne.className,
   pseudo: sofadiOne.className,
