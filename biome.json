@@ -18,6 +18,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "performance": {
+        "noAccumulatingSpread": "off"
+      },
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",

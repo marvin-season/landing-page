@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import ContentView from "@/components/book-experience/content-view";
+import ContentView from "@/app/[lang]/chapter/[chapterId]/_components/content-view";
 import { getChapters } from "@/lib/chapters";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";

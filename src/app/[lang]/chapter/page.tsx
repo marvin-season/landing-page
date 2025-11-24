@@ -1,4 +1,4 @@
-import ViewDirectory from "@/components/book-experience/view-directory";
+import ViewDirectory from "@/app/[lang]/chapter/_components/view-directory";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
 
 const ChapterDirectoryPage = async ({ params }: PageLangParam) => {

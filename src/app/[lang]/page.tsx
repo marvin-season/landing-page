@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
-import SceneLayout from "@/components/book-experience/scene-layout";
-import ViewClosed from "@/components/book-experience/view-closed";
+import SceneLayout from "@/app/[lang]/_components/scene-layout";
+import ViewClosed from "@/app/[lang]/_components/view-closed";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 

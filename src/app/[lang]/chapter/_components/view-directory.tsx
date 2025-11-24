@@ -1,11 +1,11 @@
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Book from "@/app/[lang]/chapter/_components/book";
+import { MotionDiv, MotionLi, MotionUl } from "@/components/ui";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
-import { MotionDiv, MotionLi, MotionUl } from "../ui/motion";
-import Book from "./book";
-import BookModel from "./book-model";
+import BookModel from "../../_components/book-model";
 
 type ViewDirectoryProps = {
   lang: string;
