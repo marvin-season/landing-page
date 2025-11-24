@@ -1,7 +1,7 @@
+import SceneLayout from "@app/_components/scene-layout";
+import ChapterSidebar from "@app/chapter/_components/chapter-sidebar";
 import { msg } from "@lingui/core/macro";
 import type { ReactNode } from "react";
-import SceneLayout from "@/app/[lang]/_components/scene-layout";
-import ChapterSidebar from "@/app/[lang]/chapter/_components/chapter-sidebar";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 

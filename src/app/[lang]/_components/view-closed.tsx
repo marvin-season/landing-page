@@ -1,8 +1,8 @@
+import BookModel from "@app/_components/book-model";
+import Book from "@app/chapter/_components/book";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import BookModel from "@/app/[lang]/_components/book-model";
-import Book from "@/app/[lang]/chapter/_components/book";
 import { MotionDiv, MotionSpan } from "@/components/ui";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";

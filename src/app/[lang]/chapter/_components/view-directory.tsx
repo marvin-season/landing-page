@@ -1,7 +1,7 @@
+import Book from "@app/chapter/_components/book";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import Book from "@/app/[lang]/chapter/_components/book";
 import { MotionDiv, MotionLi, MotionUl } from "@/components/ui";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
