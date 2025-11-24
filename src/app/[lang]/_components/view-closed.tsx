@@ -1,4 +1,4 @@
-import BookModel from "@app/_components/book-model";
+import BookClient from "@app/_components/book-client";
 import Book from "@app/chapter/_components/book";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
@@ -28,9 +28,9 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           className="relative flex justify-center"
           style={{ perspective: "1900px" }}
         >
-          <BookModel phase="closed" interactive>
+          <BookClient phase="cover" interactive>
             <Book lang={lang} />
-          </BookModel>
+          </BookClient>
         </Link>
       </div>
       <div className="flex max-w-lg flex-col items-center gap-4">

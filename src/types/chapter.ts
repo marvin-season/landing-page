@@ -1,4 +1,4 @@
-export type Phase = "closed" | "directory" | "content";
+export type Phase = "cover" | "content";
 
 export type Chapter = {
   link?: string;

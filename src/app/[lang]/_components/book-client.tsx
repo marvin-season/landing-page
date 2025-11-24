@@ -1,18 +1,39 @@
 "use client";
 
 import { MotionDiv } from "@/components/ui";
-import { bookVariants } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
 import type { Phase } from "@/types/chapter";
+export const variants: Record<Phase, Record<string, number>> = {
+  cover: {
+    rotateY: 0,
+    rotateX: 12,
+    rotateZ: -2,
+    x: 0,
+    y: 0,
+    z: 0,
+    scale: 1,
+    opacity: 1,
+  },
+  content: {
+    rotateY: -135,
+    rotateX: 10,
+    rotateZ: -4,
+    x: -10,
+    y: -16,
+    z: 0,
+    scale: 1,
+    opacity: 1,
+  },
+};
 
-type BookModelProps = {
+type BookClientProps = {
   phase?: Phase;
   interactive?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
 
-const BookModel: React.FC<BookModelProps> = ({
+const BookClient: React.FC<BookClientProps> = ({
   phase = "closed",
   interactive = false,
   className,
@@ -28,14 +49,16 @@ const BookModel: React.FC<BookModelProps> = ({
       style={{
         transformStyle: "preserve-3d",
       }}
-      variants={bookVariants}
+      variants={variants}
       animate={phase}
-      initial={false}
       whileHover={interactive ? { translateY: -6 } : undefined}
+      transition={{
+        duration: 1,
+      }}
     >
       {children}
     </MotionDiv>
   );
 };
 
-export default BookModel;
+export default BookClient;

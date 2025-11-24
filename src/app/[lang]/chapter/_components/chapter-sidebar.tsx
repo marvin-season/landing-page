@@ -19,7 +19,11 @@ const ChapterSidebar: React.FC = () => {
     return null;
   }
   return (
-    <MotionDiv>
+    <MotionDiv
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+    >
       <aside className="relative flex flex-col gap-6 lg:w-72 shrink-0">
         <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-sidebar-border/60 bg-sidebar/80 p-6 text-sidebar-foreground backdrop-blur">
           <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-sidebar-foreground/60">

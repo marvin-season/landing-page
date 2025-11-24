@@ -1,3 +1,4 @@
+import BookClient from "@app/_components/book-client";
 import Book from "@app/chapter/_components/book";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
@@ -5,7 +6,6 @@ import Link from "next/link";
 import { MotionDiv, MotionLi, MotionUl } from "@/components/ui";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
-import BookModel from "../../_components/book-model";
 
 type ViewDirectoryProps = {
   lang: string;
@@ -16,12 +16,7 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
   const chapters = getChapters(i18n);
   const defaultChapterHrefBuilder = (id: string) => `/${lang}/chapter/${id}`;
   return (
-    <MotionDiv
-      className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]"
-      initial={{ opacity: 0, y: 48 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -48 }}
-    >
+    <div className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]">
       <div className="flex flex-col items-center gap-6 lg:items-start">
         <Link
           href={`/${lang}`}
@@ -29,9 +24,9 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
           className="relative flex justify-center lg:justify-start"
           style={{ perspective: "1900px" }}
         >
-          <BookModel phase="directory" interactive>
-            <Book lang={lang} />
-          </BookModel>
+          <BookClient phase="content" interactive>
+            <Book lang={lang} chapters={chapters} />
+          </BookClient>
         </Link>
         <MotionDiv
           className="self-center rounded-full bg-primary/80 px-5 py-3 text-sm uppercase tracking-[0.28em] text-primary-foreground shadow-[0_28px_48px_-36px_var(--ring)] lg:self-start"
@@ -54,11 +49,11 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
           </p>
         </div>
       </div>
-
       <MotionUl
         className="space-y-4"
-        initial={{ opacity: 0, x: 32 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
       >
         {chapters.map((chapter, index) => (
           <MotionLi
@@ -100,7 +95,7 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
           </MotionLi>
         ))}
       </MotionUl>
-    </MotionDiv>
+    </div>
   );
 };
 
