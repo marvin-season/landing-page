@@ -86,7 +86,7 @@ const ChapterSidebar: React.FC = () => {
             >
               <span className="flex items-center gap-2">
                 <ArrowLeftCircle className="h-4 w-4" />
-                <Trans>Back to Index</Trans>
+                <Trans>Back to cover</Trans>
               </span>
               <ArrowLeft className="h-4 w-4" />
             </Link>
