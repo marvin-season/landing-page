@@ -19,3 +19,7 @@ export const MotionOption = motion.option;
 export const MotionUl = motion.ul;
 
 export const MotionLi = motion.li;
+
+export const MotionSection = motion.section;
+
+export const MotionHeader = motion.header;

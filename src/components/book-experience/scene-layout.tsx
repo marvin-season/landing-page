@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { SettingsMenu } from "@/components/settings-menu";
+import { MotionHeader } from "@/components/ui";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
 
@@ -24,7 +25,13 @@ const SceneLayout = ({
     <section className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <BackgroundDecor />
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16 md:px-10">
-        <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <MotionHeader
+          initial={{ opacity: 0, scale: 0.95, y: 48 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -48 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between"
+        >
           <div className="flex flex-col items-start gap-4">
             <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-muted-foreground backdrop-blur">
               {badge}
@@ -41,7 +48,7 @@ const SceneLayout = ({
             ) : null}
           </div>
           <SettingsMenu currentLang={lang} />
-        </header>
+        </MotionHeader>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>
     </section>

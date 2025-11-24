@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";
-import { MotionDiv, MotionSpan } from "../motion";
+import { MotionDiv, MotionSpan } from "../ui/motion";
 import Book from "./book";
 import BookModel from "./book-model";
 

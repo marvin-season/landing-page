@@ -3,7 +3,7 @@
 import { bookVariants } from "@/lib/motion-presets";
 import { cn } from "@/lib/utils";
 import type { Phase } from "@/types/chapter";
-import { MotionDiv } from "../motion";
+import { MotionDiv } from "../ui/motion";
 
 type BookModelProps = {
   phase?: Phase;

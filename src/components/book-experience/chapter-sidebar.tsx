@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { ArrowLeft, ArrowLeftCircle, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import AnimatedContent from "@/components/ui/react-bits/animated-content";
+import { MotionDiv } from "@/components/ui";
 import { useChapters } from "@/hooks/use-chapters";
 import { cn } from "@/lib/utils";
 
@@ -19,18 +19,7 @@ const ChapterSidebar: React.FC = () => {
     return null;
   }
   return (
-    <AnimatedContent
-      distance={0}
-      direction="horizontal"
-      reverse={false}
-      duration={0.3}
-      ease="power3.out"
-      initialOpacity={0}
-      animateOpacity
-      scale={0.95}
-      threshold={0}
-      delay={0}
-    >
+    <MotionDiv>
       <aside className="relative flex flex-col gap-6 lg:w-72 shrink-0">
         <nav className="relative z-10 flex flex-col gap-2 rounded-3xl border border-sidebar-border/60 bg-sidebar/80 p-6 text-sidebar-foreground backdrop-blur">
           <span className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-sidebar-foreground/60">
@@ -100,7 +89,7 @@ const ChapterSidebar: React.FC = () => {
           </div>
         </nav>
       </aside>
-    </AnimatedContent>
+    </MotionDiv>
   );
 };
 

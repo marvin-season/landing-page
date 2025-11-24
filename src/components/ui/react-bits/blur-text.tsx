@@ -1,3 +1,5 @@
+"use client";
+
 import { type Easing, motion, type Transition } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 

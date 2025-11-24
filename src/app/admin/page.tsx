@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/utils/trpc";
-import { MotionDiv } from "../../components/motion";
+import { MotionDiv } from "../../components/ui/motion";
 
 export default function AdminPage() {
   const trpc = useTRPC();

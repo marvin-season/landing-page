@@ -1,8 +1,6 @@
-"use client";
-
 import { BookOpen, LinkIcon } from "lucide-react";
 import Link from "next/link";
-import AnimatedContent from "@/components/ui/react-bits/animated-content";
+import { MotionDiv } from "@/components/ui";
 import type { Chapter } from "@/types/chapter";
 
 type ContentViewProps = {
@@ -10,17 +8,7 @@ type ContentViewProps = {
 };
 
 const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
-  <AnimatedContent
-    distance={0}
-    direction="horizontal"
-    duration={0.3}
-    ease=""
-    initialOpacity={0}
-    animateOpacity
-    scale={0.95}
-    threshold={0}
-    delay={0}
-  >
+  <MotionDiv>
     <div className="flex flex-col gap-4">
       <span className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.36em] text-muted-foreground/70">
         {activeChapter.tagline}
@@ -94,7 +82,7 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
         </div>
       ))}
     </div>
-  </AnimatedContent>
+  </MotionDiv>
 );
 
 export default ContentView;
