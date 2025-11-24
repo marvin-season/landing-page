@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { ArrowLeft, ArrowLeftCircle, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import AnimatedContent from "@/components/AnimatedContent";
+import AnimatedContent from "@/components/ui/react-bits/animated-content";
 import { useChapters } from "@/hooks/use-chapters";
 import { cn } from "@/lib/utils";
 
