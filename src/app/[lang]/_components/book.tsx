@@ -1,5 +1,6 @@
 import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import Link from "next/link";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";
 import type { Chapter } from "@/types/chapter";
@@ -59,18 +60,29 @@ function BookCover({ i18n }: BookCoverProps) {
 type BookTableOfContentsProps = {
   i18n: I18n;
   chapters: ChapterItem[];
+  lang: string;
 };
 
-function BookTableOfContents({ i18n, chapters }: BookTableOfContentsProps) {
+function BookTableOfContents({
+  i18n,
+  chapters,
+  lang,
+}: BookTableOfContentsProps) {
   return (
     <div className={COVER_BACK_STYLES}>
       <div className="flex h-full flex-col justify-between p-8 text-left text-slate-700">
         <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
           {i18n._(msg`Table of Contents`)}
         </span>
-        <div className="space-y-3 text-sm text-slate-500">
+        <div className="gap-3 flex flex-col text-sm text-slate-500">
           {chapters.map((chapter) => (
-            <p key={chapter.id}>{chapter.title}</p>
+            <Link
+              key={chapter.id}
+              href={`/${lang}/chapter/${chapter.id}`}
+              className="truncate hover:text-primary hover:underline"
+            >
+              {chapter.title}
+            </Link>
           ))}
         </div>
       </div>
@@ -104,7 +116,7 @@ export default function Book({ lang, chapters = [] }: BookProps) {
   return (
     <>
       <BookCover i18n={i18n} />
-      <BookTableOfContents i18n={i18n} chapters={displayChapters} />
+      <BookTableOfContents i18n={i18n} chapters={displayChapters} lang={lang} />
     </>
   );
 }

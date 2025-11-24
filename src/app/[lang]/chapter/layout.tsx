@@ -1,5 +1,5 @@
 import SceneLayout from "@app/_components/scene-layout";
-import ChapterSidebar from "@app/chapter/_components/chapter-sidebar";
+// import ChapterSidebar from "@app/chapter/_components/chapter-sidebar";
 import { msg } from "@lingui/core/macro";
 import type { ReactNode } from "react";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
@@ -22,7 +22,7 @@ const ChapterLayout = async ({
       )}
       className="flex flex-col gap-10 lg:flex-row"
     >
-      <ChapterSidebar />
+      {/* <ChapterSidebar /> */}
       <div className="flex-1">{children}</div>
     </SceneLayout>
   );

@@ -1,9 +1,10 @@
 import BookClient from "@app/_components/book-client";
-import Book from "@app/chapter/_components/book";
+
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { MotionDiv, MotionSpan } from "@/components/ui";
+import Book from "@/app/[lang]/_components/book";
+import { MotionSpan } from "@/components/ui";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";
 
@@ -14,13 +15,9 @@ type ViewClosedProps = {
 const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
   const directoryHref = `/${lang}/chapter`;
   const i18n = getI18nInstance(lang);
+
   return (
-    <MotionDiv
-      className="flex flex-col items-center justify-center gap-10 text-center"
-      initial={{ opacity: 0, y: 48 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -48 }}
-    >
+    <div className="flex flex-col items-center justify-center gap-10 text-center">
       <div className="relative flex justify-center">
         <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-card/30 blur-3xl" />
         <Link
@@ -54,7 +51,7 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           </MotionSpan>
         </Link>
       </div>
-    </MotionDiv>
+    </div>
   );
 };
 

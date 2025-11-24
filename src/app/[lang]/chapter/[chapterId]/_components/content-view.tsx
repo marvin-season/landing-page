@@ -14,7 +14,7 @@ const ContentView: React.FC<ContentViewProps> = ({ activeChapter }) => (
         {activeChapter.tagline}
       </span>
 
-      <h2 className="text-balance text-4xl font-semibold text-foreground">
+      <h2 className="text-balance text-2xl font-semibold text-foreground">
         {activeChapter.link ? (
           <Link
             href={activeChapter.link}

@@ -1,9 +1,9 @@
 import BookClient from "@app/_components/book-client";
-import Book from "@app/chapter/_components/book";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { MotionDiv, MotionLi, MotionUl } from "@/components/ui";
+import Book from "@/app/[lang]/_components/book";
+import { MotionLi, MotionUl } from "@/components/ui";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 
@@ -18,23 +18,17 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
   return (
     <div className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]">
       <div className="flex flex-col items-center gap-6 lg:items-start">
+        <BookClient phase="content">
+          <Book lang={lang} chapters={chapters} />
+        </BookClient>
         <Link
           href={`/${lang}`}
-          aria-label="Return to cover"
-          className="relative flex justify-center lg:justify-start"
+          aria-label="Back to cover"
+          className="w-[300px] truncate text-center rounded-full bg-primary/80 px-5 py-3 text-sm uppercase tracking-[0.28em] text-primary-foreground shadow-[0_28px_48px_-36px_var(--ring)] lg:self-start hover:bg-primary/90"
           style={{ perspective: "1900px" }}
         >
-          <BookClient phase="content" interactive>
-            <Book lang={lang} chapters={chapters} />
-          </BookClient>
+          {i18n._(msg`Back to cover`)}
         </Link>
-        <MotionDiv
-          className="self-center rounded-full bg-primary/80 px-5 py-3 text-sm uppercase tracking-[0.28em] text-primary-foreground shadow-[0_28px_48px_-36px_var(--ring)] lg:self-start"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {i18n._(msg`Click the cover to return`)}
-        </MotionDiv>
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.28em] text-muted-foreground/70">
             {i18n._(msg`Table of Contents`)}

@@ -35,7 +35,6 @@ type BookClientProps = {
 
 const BookClient: React.FC<BookClientProps> = ({
   phase = "closed",
-  interactive = false,
   className,
   children,
 }) => {
@@ -43,7 +42,6 @@ const BookClient: React.FC<BookClientProps> = ({
     <MotionDiv
       className={cn(
         "group relative h-[320px] w-[240px] rounded-[32px] sm:h-[360px] sm:w-[280px]",
-        interactive ? "cursor-pointer" : "cursor-default",
         className,
       )}
       style={{
@@ -51,7 +49,7 @@ const BookClient: React.FC<BookClientProps> = ({
       }}
       variants={variants}
       animate={phase}
-      whileHover={interactive ? { translateY: -6 } : undefined}
+      whileHover={{ translateY: -6 }}
       transition={{
         duration: 1,
       }}
