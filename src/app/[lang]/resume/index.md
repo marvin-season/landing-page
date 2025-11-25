@@ -1,0 +1,16 @@
+- Intro
+    - I'm a web developer with a passion for building web applications that are both functional and beautiful.
+    - Graduated from University of Southern California with a Bachelor of Science in Computer Science.
+- Skills
+    - React & Next.js、TypeScript、Tailwind CSS、Shadcn UI
+- Experience
+    - 2024 - Present: Web Developer at Google
+        - Projects
+            - Project 1: A web application that allows users to create and share their own web applications
+            - Project 2: A web application that allows users to create and share their own web applications
+    - 2023 - 2024: Web Developer at Facebook
+
+- Contact
+    - Email: mrvnseason@gmail.com
+    - Phone: +86 156-23192717
+    - GitHub: https://github.com/marvin-season
