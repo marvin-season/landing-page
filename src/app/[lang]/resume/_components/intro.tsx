@@ -25,7 +25,7 @@ function IntroArticle() {
               text={t`Wuhan University of Science and Technology.`}
               className="inline-block text-foreground"
             />
-            &nbsp;<Trans>I'am skilled in &nbsp;</Trans>
+            &nbsp;<Trans>,I'am skilled in &nbsp;</Trans>
             <GradientText>React & Next.js</GradientText>
             &nbsp;<Trans>, TypeScript, Tailwind CSS, Shadcn UI</Trans>
           </p>
