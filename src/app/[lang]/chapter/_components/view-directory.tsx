@@ -5,7 +5,6 @@ import Link from "next/link";
 import { MotionLi, MotionUl } from "@/components/ui";
 import { getChapters } from "@/lib/chapters";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
-import { cn } from "@/lib/utils";
 
 type ViewDirectoryProps = {
   lang: string;
@@ -19,14 +18,7 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
     <div className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]">
       <div className="flex flex-col items-center gap-6 lg:items-start">
         <BookClient>
-          <div
-            className={cn(
-              "absolute inset-0 rounded-[32px] backface-hidden",
-              "bg-linear-to-r from-[#f8fafc]/96 to-[#e2e8f0]/92",
-              "[border:1px_solid_rgba(148,163,184,0.35)]",
-              "[box-shadow:0_30px_60px_-40px_rgba(15,23,42,0.25),inset_0_1px_0_rgba(255,255,255,0.7)]",
-            )}
-          >
+          <div className="book-cover-directory">
             <div className="flex h-full flex-col justify-between p-8 text-left text-slate-700">
               <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
                 {i18n._(msg`Table of Contents`)}

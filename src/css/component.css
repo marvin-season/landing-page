@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* BookClient 子元素样式 - 使用 Tailwind 工具类定义可复用样式 */
+
+@layer components {
+  /* 书籍封面样式 - 深色主题（关闭状态） */
+  .book-cover-closed {
+    @apply absolute inset-0 rounded-[32px] border border-slate-300/25;
+    @apply backface-hidden;
+    background: linear-gradient(
+      120deg,
+      rgba(15, 23, 42, 0.95),
+      rgba(30, 41, 59, 0.8),
+      rgba(15, 23, 42, 0.95)
+    );
+    box-shadow:
+      0 40px 80px -40px rgba(15, 23, 42, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* 书籍封面样式 - 浅色主题（目录状态） */
+  .book-cover-directory {
+    @apply absolute inset-0 rounded-[32px];
+    @apply backface-hidden;
+    @apply bg-linear-to-r from-[#f8fafc]/96 to-[#e2e8f0]/92;
+    @apply border border-slate-400/35;
+    box-shadow:
+      0 30px 60px -40px rgba(15, 23, 42, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+}
+

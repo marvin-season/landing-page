@@ -10,7 +10,7 @@ import {
   type PageLangParam,
 } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";
-import "@/app/globals.css";
+import "@/css/globals.css";
 
 const sofadiOne = Sofadi_One({
   weight: "400",

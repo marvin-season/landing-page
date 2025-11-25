@@ -25,11 +25,7 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           style={{ perspective: "1900px" }}
         >
           <BookClient interactive>
-            <div
-              className={
-                "absolute inset-0 rounded-[32px] backface-hidden border border-slate-300/25 [background:linear-gradient(120deg,rgba(15,23,42,0.95),rgba(30,41,59,0.8),rgba(15,23,42,0.95))] [box-shadow:0_40px_80px_-40px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.1)]"
-              }
-            >
+            <div className="book-cover-closed">
               <div className="flex h-full flex-col justify-between p-8 text-left text-white">
                 <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
                   <span>{i18n._(msg`AI STUDIO`)}</span>
