@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { SettingsMenu } from "@/components/settings-menu";
 import { MotionHeader } from "@/components/ui";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
 import BackgroundDecor from "./background-decor";
@@ -19,7 +18,6 @@ const SceneLayout = ({
   description,
   children,
   className,
-  lang,
 }: SceneLayoutProps) => {
   return (
     <section className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -47,7 +45,6 @@ const SceneLayout = ({
               </p>
             ) : null}
           </div>
-          <SettingsMenu currentLang={lang} />
         </MotionHeader>
         <div className={`mt-24 flex-1 ${className}`}>{children}</div>
       </div>

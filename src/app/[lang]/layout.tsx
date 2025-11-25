@@ -11,6 +11,7 @@ import {
 } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
+import { SettingsMenu } from "@/components/settings-menu";
 
 const sofadiOne = Sofadi_One({
   weight: "400",
@@ -68,7 +69,10 @@ export default async function RootLayout({
           initialLocale={lang}
           initialMessages={allMessages[lang]}
         >
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <SettingsMenu currentLang={lang} />
+            {children}
+          </ThemeProvider>
         </LinguiClientProvider>
       </body>
     </html>

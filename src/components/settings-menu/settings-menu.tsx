@@ -14,7 +14,7 @@ import type { SettingsMenuProps } from "./type";
 
 export const SettingsMenu = ({ currentLang }: SettingsMenuProps) => {
   return (
-    <div className="fixed z-10 top-3 right-3 sm:top-4 sm:right-4">
+    <div className="fixed z-100 top-3 right-3 sm:top-4 sm:right-4">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
