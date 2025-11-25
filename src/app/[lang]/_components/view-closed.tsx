@@ -24,7 +24,7 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           className="relative flex justify-center"
           style={{ perspective: "1900px" }}
         >
-          <BookClient interactive>
+          <BookClient>
             <div className="book-cover-closed">
               <div className="flex h-full flex-col justify-between p-8 text-left text-white">
                 <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/60">

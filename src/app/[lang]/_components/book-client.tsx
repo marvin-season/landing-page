@@ -4,7 +4,6 @@ import { MotionDiv } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 type BookClientProps = {
-  interactive?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
