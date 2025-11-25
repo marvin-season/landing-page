@@ -13,11 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/[lang]/_components/book.tsx:44
+#: src/app/[lang]/_components/view-closed.tsx:33
 msgid "2025"
 msgstr ""
 
-#: src/app/[lang]/_components/view-closed.tsx:36
+#: src/app/[lang]/_components/view-closed.tsx:53
 msgid "A freshly delivered AI creation handbook. Tap the cover to open the index and explore a new way of producing content with your team."
 msgstr ""
 
@@ -29,16 +29,12 @@ msgstr ""
 msgid "Achieve unmatched consistency and velocity with Shadcn UI components and Fumadocs-powered automated documentation—putting engineers in control of the AI content lifecycle."
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:97
-msgid "AI Co-Creation Studio"
-msgstr ""
-
 #: src/lib/chapters.ts:11
 #: src/lib/chapters.ts:103
 msgid "AI orchestrates every step of content production."
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:42
+#: src/app/[lang]/_components/view-closed.tsx:31
 msgid "AI STUDIO"
 msgstr ""
 
@@ -63,7 +59,7 @@ msgid "Average delivery cycle reduced"
 msgstr ""
 
 #: src/app/[lang]/chapter/_components/chapter-sidebar.tsx:89
-#: src/app/[lang]/chapter/_components/view-directory.tsx:30
+#: src/app/[lang]/chapter/_components/view-directory.tsx:46
 msgid "Back to cover"
 msgstr ""
 
@@ -91,15 +87,15 @@ msgstr ""
 msgid "Chapter Bookmarks"
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:48
+#: src/app/[lang]/_components/view-closed.tsx:37
 msgid "Chapters Awaiting You"
 msgstr ""
 
-#: src/app/[lang]/chapter/_components/view-directory.tsx:37
+#: src/app/[lang]/chapter/_components/view-directory.tsx:53
 msgid "Choose the chapter you want to explore"
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:51
+#: src/app/[lang]/_components/view-closed.tsx:41
 msgid "Click the cover to awaken a new creative journey."
 msgstr ""
 
@@ -115,16 +111,8 @@ msgstr ""
 msgid "Consistency"
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:99
-msgid "Content Governance Hub"
-msgstr ""
-
 #: src/app/[lang]/layout.tsx:46
 msgid "Create Next App"
-msgstr ""
-
-#: src/app/[lang]/_components/book.tsx:96
-msgid "Creative Workflow"
 msgstr ""
 
 #: src/lib/chapters.ts:20
@@ -231,10 +219,6 @@ msgstr ""
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:98
-msgid "Insight-Driven Expression"
-msgstr ""
-
 #: src/lib/chapters.ts:102
 msgid "Intelligent Creative Workflows"
 msgstr ""
@@ -271,7 +255,7 @@ msgstr ""
 msgid "Shadcn UI underpins the studio's visual language, offering accessible, reusable, and consistent components for fast, error-free development."
 msgstr ""
 
-#: src/app/[lang]/_components/view-closed.tsx:45
+#: src/app/[lang]/_components/view-closed.tsx:62
 msgid "Start Reading"
 msgstr ""
 
@@ -279,8 +263,8 @@ msgstr ""
 msgid "String together idea capture, generation, review, and omnichannel distribution. A visual orchestrator and strategy engine give your team a tireless AI partner."
 msgstr ""
 
-#: src/app/[lang]/_components/book.tsx:75
-#: src/app/[lang]/chapter/_components/view-directory.tsx:34
+#: src/app/[lang]/chapter/_components/view-directory.tsx:24
+#: src/app/[lang]/chapter/_components/view-directory.tsx:50
 msgid "Table of Contents"
 msgstr ""
 
@@ -312,7 +296,7 @@ msgstr ""
 msgid "Unified Design System"
 msgstr ""
 
-#: src/app/[lang]/chapter/_components/view-directory.tsx:41
+#: src/app/[lang]/chapter/_components/view-directory.tsx:57
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr ""
 
