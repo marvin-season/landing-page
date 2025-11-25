@@ -1,5 +1,3 @@
-export type Phase = "cover" | "content";
-
 export type Chapter = {
   link?: string;
   id: string;

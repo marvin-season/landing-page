@@ -3,7 +3,6 @@ import BookClient from "@app/_components/book-client";
 import { msg } from "@lingui/core/macro";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import Book from "@/app/[lang]/_components/book";
 import { MotionSpan } from "@/components/ui";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
 import { cn } from "@/lib/utils";
@@ -25,8 +24,30 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           className="relative flex justify-center"
           style={{ perspective: "1900px" }}
         >
-          <BookClient phase="cover" interactive>
-            <Book lang={lang} />
+          <BookClient interactive>
+            <div
+              className={
+                "absolute inset-0 rounded-[32px] backface-hidden border border-slate-300/25 [background:linear-gradient(120deg,rgba(15,23,42,0.95),rgba(30,41,59,0.8),rgba(15,23,42,0.95))] [box-shadow:0_40px_80px_-40px_rgba(15,23,42,0.55),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              }
+            >
+              <div className="flex h-full flex-col justify-between p-8 text-left text-white">
+                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
+                  <span>{i18n._(msg`AI STUDIO`)}</span>
+                  <span className="h-1 w-1 rounded-full bg-white/40" />
+                  <span>{i18n._(msg`2025`)}</span>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold leading-tight">
+                    {i18n._(msg`Chapters Awaiting You`)}
+                  </p>
+                  <p className="mt-2 text-xs text-white/60">
+                    {i18n._(
+                      msg`Click the cover to awaken a new creative journey.`,
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
           </BookClient>
         </Link>
       </div>
