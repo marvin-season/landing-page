@@ -34,6 +34,10 @@ msgstr "通过 Shadcn UI 组件和 Fumadocs 驱动的自动化文档，实现无
 msgid "AI orchestrates every step of content production."
 msgstr "AI 编排内容生产的每一步。"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:45
+msgid "AI PC"
+msgstr "AIPC"
+
 #: src/app/[lang]/_components/view-closed.tsx:31
 msgid "AI STUDIO"
 msgstr "AI 工作室"
@@ -111,9 +115,14 @@ msgstr "连接从灵感到发布的每个节点，使协作保持可追溯、可
 msgid "Consistency"
 msgstr "一致性"
 
-#: src/app/[lang]/layout.tsx:46
+#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/resume/layout.tsx:9
 msgid "Create Next App"
 msgstr "创建 Next 应用"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:38
+msgid "Created internationalization solution based on Vite and Babel"
+msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
 #: src/lib/chapters.ts:20
 msgid "Design System"
@@ -122,6 +131,54 @@ msgstr "设计系统"
 #: src/lib/chapters.ts:70
 msgid "Design System Adoption"
 msgstr "设计系统采用"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:51
+msgid "Designed and implemented frontend-backend separation architecture"
+msgstr "设计并实现前端后端分离架构"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:39
+msgid "Designed and implemented new user onboarding system"
+msgstr "设计并实现新用户入职系统"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:90
+msgid "Developed coupon module APIs supporting coupon creation and distribution"
+msgstr "开发优惠券模块 API，支持优惠券创建和分发"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:37
+msgid "Developed document processing system with PDF, Excel, and Markdown support"
+msgstr "开发文档处理系统，支持 PDF、Excel 和 Markdown"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:73
+msgid "Developed homepage decoration system (low-code)"
+msgstr "开发首页装饰系统（低代码）"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:92
+msgid "Developed member management system with Vue2"
+msgstr "开发会员管理系统 with Vue2"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:89
+msgid "Developed member module APIs for member information management"
+msgstr "开发会员模块 API，支持会员信息管理"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:52
+msgid "Developed rich text editor and AI intelligent writing system"
+msgstr "开发富文本编辑器和 AI 智能写作系统"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:71
+msgid "Developed shopping cart and order system"
+msgstr "开发购物车和订单系统"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:72
+msgid "Developed user management system"
+msgstr "开发用户管理系统"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:93
+msgid "Developed user personal center page with UniApp"
+msgstr "开发用户个人中心页面 with UniApp"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:40
+msgid "Developed workflow system with visual process editing"
+msgstr "开发工作流系统，支持可视化流程编辑"
 
 #: src/lib/chapters.ts:26
 msgid "Developer Experience"
@@ -134,6 +191,14 @@ msgstr "开发者入门"
 #: src/lib/chapters.ts:50
 msgid "Developer-Centric Workflow"
 msgstr "以开发者为中心的工作流"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:25
+msgid "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+msgstr "神州数码 · 通明湖云和信创研究院 · 产研中心"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:30
+msgid "Digital China Smart Vision"
+msgstr 神州问学"
 
 #: src/lib/chapters.ts:77
 msgid "Doc Coverage"
@@ -151,6 +216,10 @@ msgstr "文档自动化"
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
 msgstr "拖放多模态模板并自动分发到每个渠道，消除重复的跨平台工作。"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:67
+msgid "E-commerce platform focused on providing users with excellent shopping experience."
+msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
+
 #: src/lib/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
 msgstr "轻松添加新的基于 Shadcn 的组件——Fumadocs 会立即在所有用例中记录它们，最大限度地减少入门和维护开销。"
@@ -167,13 +236,21 @@ msgstr "工程"
 msgid "Engineering-First AI Studio"
 msgstr "工程优先的 AI 工作室"
 
-#: src/app/[lang]/page.tsx:14
+#: src/app/[lang]/(home)/page.tsx:14
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr "通过「书籍」界面进入下一代 AI 内容协作平台"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:32
+msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
+msgstr "企业级 AI 应用一站式建设和管理平台，完全集成模型、数据、应用和计算能力。"
 
 #: src/lib/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
 msgstr "每个功能、API 和 UI 元素都通过 Fumadocs 记录。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:49
+msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
 #: src/lib/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
@@ -211,13 +288,62 @@ msgstr "Fumadocs 保持组件和 API 文档始终最新——包含实时代码�
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
 msgstr "自动生成多维审查建议，确保每个输出都专业、合规且符合品牌。"
 
-#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/layout.tsx:48
+#: src/app/[lang]/resume/layout.tsx:10
 msgid "Generated by create next app"
 msgstr "由 create next app 生成"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:86
+msgid "Health management software providing health management services for users."
+msgstr "健康管理软件，为用户提供健康管理服务。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:84
+msgid "Health Planet"
+msgstr "健康星球"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:79
+msgid "Health Planet International Technology Co., Ltd."
+msgstr "健康星球国际科技有限公司"
 
 #: src/lib/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "热重载功能、灵活的主题和原子设计模式帮助工程师快速部署新功能。文档和 UI 始终保持同步更新。"
+
+#: src/app/[lang]/resume/_components/intro.tsx:12
+msgid "I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+msgstr "我是一名热衷于构建功能强大、美观的 Web 应用的开发者，拥有计算机科学学士学位"
+
+#: src/app/[lang]/resume/_components/intro.tsx:28
+msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Java, web development, and mini program development."
+msgstr "我曾在四家公司工作，包括北京健康星球、深圳找人科技、神州数码通明湖武汉产研中心和深圳积云科技。我有丰富的 Java、Web 开发和小程序开发经验。"
+
+#: src/app/[lang]/resume/_components/intro.tsx:22
+msgid "I'am skilled in  "
+msgstr "我擅长  "
+
+#: src/app/[lang]/resume/_components/skills.tsx:8
+msgid "I'am skilled in React & Next.js, TypeScript, Tailwind CSS, Shadcn UI"
+msgstr "我擅长 React & Next.js, TypeScript, Tailwind CSS, Shadcn UI"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:91
+msgid "Implemented member information statistics functionality"
+msgstr "实现会员信息统计功能"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:70
+msgid "Implemented product management system supporting CRUD operations"
+msgstr "实现产品管理系统，支持 CRUD 操作"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:53
+msgid "Implemented RAG retrieval augmentation and tool calling features"
+msgstr "实现 RAG 检索增强和工具调用功能 "
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:36
+msgid "Implemented streaming chat interface with real-time message push"
+msgstr "实现实时消息推送的流式聊天接口"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:54
+msgid "Integrated Ollama for local large model deployment"
+msgstr "集成 Ollama 用于本地大型模型部署"
 
 #: src/lib/chapters.ts:102
 msgid "Intelligent Creative Workflows"
@@ -227,6 +353,42 @@ msgstr "智能创意工作流"
 msgid "Intelligent Proofreading"
 msgstr "智能校对"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:47
+msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
+msgstr "基于大型语言模型的智能 Q&A 系统，支持云端 DeepSeek 免费完整功能版本或本地 DeepSeek 轻量级版本。"
+
+#: src/app/[lang]/resume/_components/intro.tsx:43
+msgid "Introduction"
+msgstr "介绍"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:80
+msgid "Java Developer"
+msgstr "Java 开发工程师"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:87
+msgid "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+msgstr "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:62
+msgid "July 2022 - June 2023"
+msgstr "2022 年 7 月 - 2023 年 6 月"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:81
+msgid "June 2021 - May 2022"
+msgstr "2021 年 6 月 - 2022 年 5 月"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:27
+msgid "June 2023 - April 2025"
+msgstr "2023 年 6 月 - 2025 年 4 月"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:65
+msgid "Jushihui"
+msgstr "聚实惠"
+
+#: src/app/[lang]/resume/_components/experience.tsx:49
+msgid "Key Responsibilities"
+msgstr "关键职责"
+
 #: src/lib/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr "多模态模板"
@@ -234,6 +396,14 @@ msgstr "多模态模板"
 #: src/app/[lang]/chapter/layout.tsx:18
 msgid "Open the index and plan your AI content blueprint together"
 msgstr "打开目录并一起规划您的 AI 内容蓝图"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:41
+msgid "Optimized performance with lazy loading and data virtualization"
+msgstr "优化性能，支持懒加载和数据虚拟化"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:34
+msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
+msgstr ""
 
 #: src/lib/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
@@ -276,6 +446,10 @@ msgstr "团队协作"
 msgid "Team Sync"
 msgstr "团队同步"
 
+#: src/app/[lang]/resume/_components/experience.tsx:34
+msgid "Tech Stack"
+msgstr "技术栈"
+
 #: src/lib/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
 msgstr "AI 工作室采用最先进的组件系统（Shadcn UI），与实时自动化文档（Fumadocs）深度耦合。设计、代码和文档始终保持同步，使工程团队能够保持质量、快速迭代并自信地扩展。"
@@ -296,14 +470,35 @@ msgstr "UI 自动化和文档集成确保更新从代码库即时流向所有内
 msgid "Unified Design System"
 msgstr "统一设计系统"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:68
+msgid "Vue2, UniApp, Vuex, VantUI"
+msgstr ""
+
 #: src/app/[lang]/chapter/_components/view-directory.tsx:57
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr "我们为 AI 驱动的内容平台精选了四个核心章节。选择任意章节，书籍将揭示其中的故事和功能。"
 
-#: src/app/[lang]/page.tsx:17
+#: src/app/[lang]/(home)/page.tsx:17
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr "我们将体验塑造成一本会呼吸的书。打开它，触手可及地揭示关于策略、创作、洞察和治理的章节。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:26
+#: src/app/[lang]/resume/hooks/use-experience.ts:61
+msgid "Web Developer"
+msgstr "Web 开发工程师"
+
+#: src/app/[lang]/resume/_components/experience.tsx:97
+msgid "Work Experience"
+msgstr "工作经验"
 
 #: src/lib/chapters.ts:124
 msgid "Workflow Orchestration"
 msgstr "工作流编排"
+
+#: src/app/[lang]/resume/_components/intro.tsx:19
+msgid "Wuhan University of Science and Technology."
+msgstr "武汉科技大学"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:60
+msgid "Wuhan Zhaori Technology Co., Ltd."
+msgstr "武汉兆日科技有限责任公司"

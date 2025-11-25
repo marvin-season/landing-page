@@ -34,6 +34,10 @@ msgstr "Shadcn UI コンポーネントと Fumadocs による自動化ドキュ�
 msgid "AI orchestrates every step of content production."
 msgstr "AI がコンテンツ制作のすべてのステップを調整します。"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:45
+msgid "AI PC"
+msgstr ""
+
 #: src/app/[lang]/_components/view-closed.tsx:31
 msgid "AI STUDIO"
 msgstr "AI スタジオ"
@@ -111,9 +115,14 @@ msgstr "インスピレーションから公開までのすべてのノードを
 msgid "Consistency"
 msgstr "一貫性"
 
-#: src/app/[lang]/layout.tsx:46
+#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/resume/layout.tsx:9
 msgid "Create Next App"
 msgstr "Next アプリを作成"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:38
+msgid "Created internationalization solution based on Vite and Babel"
+msgstr ""
 
 #: src/lib/chapters.ts:20
 msgid "Design System"
@@ -122,6 +131,54 @@ msgstr "デザインシステム"
 #: src/lib/chapters.ts:70
 msgid "Design System Adoption"
 msgstr "デザインシステムの採用"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:51
+msgid "Designed and implemented frontend-backend separation architecture"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:39
+msgid "Designed and implemented new user onboarding system"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:90
+msgid "Developed coupon module APIs supporting coupon creation and distribution"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:37
+msgid "Developed document processing system with PDF, Excel, and Markdown support"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:73
+msgid "Developed homepage decoration system (low-code)"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:92
+msgid "Developed member management system with Vue2"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:89
+msgid "Developed member module APIs for member information management"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:52
+msgid "Developed rich text editor and AI intelligent writing system"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:71
+msgid "Developed shopping cart and order system"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:72
+msgid "Developed user management system"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:93
+msgid "Developed user personal center page with UniApp"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:40
+msgid "Developed workflow system with visual process editing"
+msgstr ""
 
 #: src/lib/chapters.ts:26
 msgid "Developer Experience"
@@ -134,6 +191,14 @@ msgstr "開発者のオンボーディング"
 #: src/lib/chapters.ts:50
 msgid "Developer-Centric Workflow"
 msgstr "開発者中心のワークフロー"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:25
+msgid "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:30
+msgid "Digital China Smart Vision"
+msgstr ""
 
 #: src/lib/chapters.ts:77
 msgid "Doc Coverage"
@@ -151,6 +216,10 @@ msgstr "ドキュメント自動化"
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
 msgstr "ドラッグアンドドロップのマルチモーダルテンプレートを使用し、各チャネルに自動配信して、繰り返しのクロスプラットフォーム作業を排除します。"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:67
+msgid "E-commerce platform focused on providing users with excellent shopping experience."
+msgstr ""
+
 #: src/lib/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
 msgstr "新しい Shadcn ベースのコンポーネントを簡単に追加できます。Fumadocs がすべてのユースケースで即座にドキュメント化し、オンボーディングとメンテナンスのオーバーヘッドを最小限に抑えます。"
@@ -167,13 +236,21 @@ msgstr "エンジニアリング"
 msgid "Engineering-First AI Studio"
 msgstr "エンジニアリングファーストの AI スタジオ"
 
-#: src/app/[lang]/page.tsx:14
+#: src/app/[lang]/(home)/page.tsx:14
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr "「本」のインターフェースを通じて次世代 AI コンテンツコラボレーションプラットフォームに入る"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:32
+msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
+msgstr ""
 
 #: src/lib/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
 msgstr "すべての機能、API、UI 要素が Fumadocs を通じてドキュメント化されています。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:49
+msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+msgstr ""
 
 #: src/lib/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
@@ -211,13 +288,62 @@ msgstr "Fumadocs は、コンポーネントと API のドキュメントを常�
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
 msgstr "多次元のレビュー提案を自動生成し、すべての出力をプロフェッショナルで、コンプライアンスに準拠し、ブランドに合ったものに保ちます。"
 
-#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/layout.tsx:48
+#: src/app/[lang]/resume/layout.tsx:10
 msgid "Generated by create next app"
 msgstr "create next app によって生成"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:86
+msgid "Health management software providing health management services for users."
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:84
+msgid "Health Planet"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:79
+msgid "Health Planet International Technology Co., Ltd."
+msgstr ""
 
 #: src/lib/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "ホットリロード機能、柔軟なテーマ設定、アトミックデザインパターンにより、エンジニアは新機能を迅速にデプロイできます。ドキュメントと UI は常に同期して更新されます。"
+
+#: src/app/[lang]/resume/_components/intro.tsx:12
+msgid "I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+msgstr ""
+
+#: src/app/[lang]/resume/_components/intro.tsx:28
+msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Java, web development, and mini program development."
+msgstr ""
+
+#: src/app/[lang]/resume/_components/intro.tsx:22
+msgid "I'am skilled in  "
+msgstr ""
+
+#: src/app/[lang]/resume/_components/skills.tsx:8
+msgid "I'am skilled in React & Next.js, TypeScript, Tailwind CSS, Shadcn UI"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:91
+msgid "Implemented member information statistics functionality"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:70
+msgid "Implemented product management system supporting CRUD operations"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:53
+msgid "Implemented RAG retrieval augmentation and tool calling features"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:36
+msgid "Implemented streaming chat interface with real-time message push"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:54
+msgid "Integrated Ollama for local large model deployment"
+msgstr ""
 
 #: src/lib/chapters.ts:102
 msgid "Intelligent Creative Workflows"
@@ -227,6 +353,42 @@ msgstr "インテリジェントクリエイティブワークフロー"
 msgid "Intelligent Proofreading"
 msgstr "インテリジェント校正"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:47
+msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
+msgstr ""
+
+#: src/app/[lang]/resume/_components/intro.tsx:43
+msgid "Introduction"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:80
+msgid "Java Developer"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:87
+msgid "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:62
+msgid "July 2022 - June 2023"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:81
+msgid "June 2021 - May 2022"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:27
+msgid "June 2023 - April 2025"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:65
+msgid "Jushihui"
+msgstr ""
+
+#: src/app/[lang]/resume/_components/experience.tsx:49
+msgid "Key Responsibilities"
+msgstr ""
+
 #: src/lib/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr "マルチモーダルテンプレート"
@@ -234,6 +396,14 @@ msgstr "マルチモーダルテンプレート"
 #: src/app/[lang]/chapter/layout.tsx:18
 msgid "Open the index and plan your AI content blueprint together"
 msgstr "インデックスを開き、AI コンテンツのブループリントを一緒に計画しましょう。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:41
+msgid "Optimized performance with lazy loading and data virtualization"
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:34
+msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
+msgstr ""
 
 #: src/lib/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
@@ -276,6 +446,10 @@ msgstr "チームコラボレーション"
 msgid "Team Sync"
 msgstr "チーム同期"
 
+#: src/app/[lang]/resume/_components/experience.tsx:34
+msgid "Tech Stack"
+msgstr ""
+
 #: src/lib/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
 msgstr "AI スタジオは、最先端のコンポーネントシステム（Shadcn UI）を活用し、ライブで自動化されたドキュメント（Fumadocs）と深く統合されています。デザイン、コード、ドキュメントは常に同期しており、エンジニアリングチームが品質を維持し、迅速に反復し、自信を持ってスケールできるようにします。"
@@ -296,14 +470,35 @@ msgstr "UI 自動化とドキュメント統合により、更新がコードベ
 msgid "Unified Design System"
 msgstr "統一デザインシステム"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:68
+msgid "Vue2, UniApp, Vuex, VantUI"
+msgstr ""
+
 #: src/app/[lang]/chapter/_components/view-directory.tsx:57
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr "AI を活用したコンテンツプラットフォームのために、4 つのコアチャプターを厳選しました。任意の章を選ぶと、本がその中のストーリーと機能を明らかにします。"
 
-#: src/app/[lang]/page.tsx:17
+#: src/app/[lang]/(home)/page.tsx:17
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr "私たちは体験を呼吸する本として形作りました。それを開くと、戦略、創造、洞察、ガバナンスに関する章が指先で明らかになります。"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:26
+#: src/app/[lang]/resume/hooks/use-experience.ts:61
+msgid "Web Developer"
+msgstr ""
+
+#: src/app/[lang]/resume/_components/experience.tsx:97
+msgid "Work Experience"
+msgstr ""
 
 #: src/lib/chapters.ts:124
 msgid "Workflow Orchestration"
 msgstr "ワークフローオーケストレーション"
+
+#: src/app/[lang]/resume/_components/intro.tsx:19
+msgid "Wuhan University of Science and Technology."
+msgstr ""
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:60
+msgid "Wuhan Zhaori Technology Co., Ltd."
+msgstr ""

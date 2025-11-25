@@ -34,6 +34,10 @@ msgstr "Achieve unmatched consistency and velocity with Shadcn UI components and
 msgid "AI orchestrates every step of content production."
 msgstr "AI orchestrates every step of content production."
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:45
+msgid "AI PC"
+msgstr "AI PC"
+
 #: src/app/[lang]/_components/view-closed.tsx:31
 msgid "AI STUDIO"
 msgstr "AI STUDIO"
@@ -111,9 +115,14 @@ msgstr "Connect every node between inspiration and publication so collaboration 
 msgid "Consistency"
 msgstr "Consistency"
 
-#: src/app/[lang]/layout.tsx:46
+#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/resume/layout.tsx:9
 msgid "Create Next App"
 msgstr "Create Next App"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:38
+msgid "Created internationalization solution based on Vite and Babel"
+msgstr "Created internationalization solution based on Vite and Babel"
 
 #: src/lib/chapters.ts:20
 msgid "Design System"
@@ -122,6 +131,54 @@ msgstr "Design System"
 #: src/lib/chapters.ts:70
 msgid "Design System Adoption"
 msgstr "Design System Adoption"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:51
+msgid "Designed and implemented frontend-backend separation architecture"
+msgstr "Designed and implemented frontend-backend separation architecture"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:39
+msgid "Designed and implemented new user onboarding system"
+msgstr "Designed and implemented new user onboarding system"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:90
+msgid "Developed coupon module APIs supporting coupon creation and distribution"
+msgstr "Developed coupon module APIs supporting coupon creation and distribution"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:37
+msgid "Developed document processing system with PDF, Excel, and Markdown support"
+msgstr "Developed document processing system with PDF, Excel, and Markdown support"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:73
+msgid "Developed homepage decoration system (low-code)"
+msgstr "Developed homepage decoration system (low-code)"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:92
+msgid "Developed member management system with Vue2"
+msgstr "Developed member management system with Vue2"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:89
+msgid "Developed member module APIs for member information management"
+msgstr "Developed member module APIs for member information management"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:52
+msgid "Developed rich text editor and AI intelligent writing system"
+msgstr "Developed rich text editor and AI intelligent writing system"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:71
+msgid "Developed shopping cart and order system"
+msgstr "Developed shopping cart and order system"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:72
+msgid "Developed user management system"
+msgstr "Developed user management system"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:93
+msgid "Developed user personal center page with UniApp"
+msgstr "Developed user personal center page with UniApp"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:40
+msgid "Developed workflow system with visual process editing"
+msgstr "Developed workflow system with visual process editing"
 
 #: src/lib/chapters.ts:26
 msgid "Developer Experience"
@@ -134,6 +191,14 @@ msgstr "Developer Onboarding"
 #: src/lib/chapters.ts:50
 msgid "Developer-Centric Workflow"
 msgstr "Developer-Centric Workflow"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:25
+msgid "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:30
+msgid "Digital China Smart Vision"
+msgstr "Digital China Smart Vision"
 
 #: src/lib/chapters.ts:77
 msgid "Doc Coverage"
@@ -151,6 +216,10 @@ msgstr "Documentation Automation"
 msgid "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
 msgstr "Drag-and-drop multimodal templates and auto-distribute to each channel, eliminating repetitive cross-platform work."
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:67
+msgid "E-commerce platform focused on providing users with excellent shopping experience."
+msgstr "E-commerce platform focused on providing users with excellent shopping experience."
+
 #: src/lib/chapters.ts:64
 msgid "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
 msgstr "Easily add new Shadcn-based components—Fumadocs instantly documents them across all use cases, minimizing onboarding and maintenance overhead."
@@ -167,13 +236,21 @@ msgstr "Engineering"
 msgid "Engineering-First AI Studio"
 msgstr "Engineering-First AI Studio"
 
-#: src/app/[lang]/page.tsx:14
+#: src/app/[lang]/(home)/page.tsx:14
 msgid "Enter the next-gen AI content collaboration platform through a \"book\" interface"
 msgstr "Enter the next-gen AI content collaboration platform through a \"book\" interface"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:32
+msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
+msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
 #: src/lib/chapters.ts:80
 msgid "Every feature, API, and UI element documented via Fumadocs."
 msgstr "Every feature, API, and UI element documented via Fumadocs."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:49
+msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
 #: src/lib/chapters.ts:94
 msgid "Faster onboarding via documentation and component system synergy."
@@ -211,13 +288,62 @@ msgstr "Fumadocs keeps component and API documentation always current—complete
 msgid "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
 msgstr "Generate multi-dimensional review suggestions automatically to keep every output professional, compliant, and on-brand."
 
-#: src/app/[lang]/layout.tsx:47
+#: src/app/[lang]/layout.tsx:48
+#: src/app/[lang]/resume/layout.tsx:10
 msgid "Generated by create next app"
 msgstr "Generated by create next app"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:86
+msgid "Health management software providing health management services for users."
+msgstr "Health management software providing health management services for users."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:84
+msgid "Health Planet"
+msgstr "Health Planet"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:79
+msgid "Health Planet International Technology Co., Ltd."
+msgstr "Health Planet International Technology Co., Ltd."
 
 #: src/lib/chapters.ts:52
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
+
+#: src/app/[lang]/resume/_components/intro.tsx:12
+msgid "I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+msgstr "I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+
+#: src/app/[lang]/resume/_components/intro.tsx:28
+msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Java, web development, and mini program development."
+msgstr "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Java, web development, and mini program development."
+
+#: src/app/[lang]/resume/_components/intro.tsx:22
+msgid "I'am skilled in  "
+msgstr "I'am skilled in  "
+
+#: src/app/[lang]/resume/_components/skills.tsx:8
+msgid "I'am skilled in React & Next.js, TypeScript, Tailwind CSS, Shadcn UI"
+msgstr "I'am skilled in React & Next.js, TypeScript, Tailwind CSS, Shadcn UI"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:91
+msgid "Implemented member information statistics functionality"
+msgstr "Implemented member information statistics functionality"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:70
+msgid "Implemented product management system supporting CRUD operations"
+msgstr "Implemented product management system supporting CRUD operations"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:53
+msgid "Implemented RAG retrieval augmentation and tool calling features"
+msgstr "Implemented RAG retrieval augmentation and tool calling features"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:36
+msgid "Implemented streaming chat interface with real-time message push"
+msgstr "Implemented streaming chat interface with real-time message push"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:54
+msgid "Integrated Ollama for local large model deployment"
+msgstr "Integrated Ollama for local large model deployment"
 
 #: src/lib/chapters.ts:102
 msgid "Intelligent Creative Workflows"
@@ -227,6 +353,42 @@ msgstr "Intelligent Creative Workflows"
 msgid "Intelligent Proofreading"
 msgstr "Intelligent Proofreading"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:47
+msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
+msgstr "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
+
+#: src/app/[lang]/resume/_components/intro.tsx:43
+msgid "Introduction"
+msgstr "Introduction"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:80
+msgid "Java Developer"
+msgstr "Java Developer"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:87
+msgid "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+msgstr "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:62
+msgid "July 2022 - June 2023"
+msgstr "July 2022 - June 2023"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:81
+msgid "June 2021 - May 2022"
+msgstr "June 2021 - May 2022"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:27
+msgid "June 2023 - April 2025"
+msgstr "June 2023 - April 2025"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:65
+msgid "Jushihui"
+msgstr "Jushihui"
+
+#: src/app/[lang]/resume/_components/experience.tsx:49
+msgid "Key Responsibilities"
+msgstr "Key Responsibilities"
+
 #: src/lib/chapters.ts:111
 msgid "Multimodal Templates"
 msgstr "Multimodal Templates"
@@ -234,6 +396,14 @@ msgstr "Multimodal Templates"
 #: src/app/[lang]/chapter/layout.tsx:18
 msgid "Open the index and plan your AI content blueprint together"
 msgstr "Open the index and plan your AI content blueprint together"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:41
+msgid "Optimized performance with lazy loading and data virtualization"
+msgstr "Optimized performance with lazy loading and data virtualization"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:34
+msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
+msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 
 #: src/lib/chapters.ts:132
 msgid "Reference your brand corpus in real time to keep tone and style consistent for every external touchpoint."
@@ -276,6 +446,10 @@ msgstr "Team Collaboration"
 msgid "Team Sync"
 msgstr "Team Sync"
 
+#: src/app/[lang]/resume/_components/experience.tsx:34
+msgid "Tech Stack"
+msgstr "Tech Stack"
+
 #: src/lib/chapters.ts:34
 msgid "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
 msgstr "The AI Studio harnesses a state-of-the-art component system (Shadcn UI), deeply coupled with live, automated documentation (Fumadocs). Design, code, and docs are always in sync, enabling engineering teams to maintain quality, iterate rapidly, and scale confidently."
@@ -296,14 +470,35 @@ msgstr "UI automation and docs integration ensure updates flow instantly from th
 msgid "Unified Design System"
 msgstr "Unified Design System"
 
+#: src/app/[lang]/resume/hooks/use-experience.ts:68
+msgid "Vue2, UniApp, Vuex, VantUI"
+msgstr "Vue2, UniApp, Vuex, VantUI"
+
 #: src/app/[lang]/chapter/_components/view-directory.tsx:57
 msgid "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 msgstr "We curated four core chapters for an AI-powered content platform. Pick any chapter and the book will reveal the stories and capabilities inside."
 
-#: src/app/[lang]/page.tsx:17
+#: src/app/[lang]/(home)/page.tsx:17
 msgid "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
 msgstr "We shaped the experience as a breathing book. Open it to reveal chapters on strategy, creation, insight, and governance right at your fingertips."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:26
+#: src/app/[lang]/resume/hooks/use-experience.ts:61
+msgid "Web Developer"
+msgstr "Web Developer"
+
+#: src/app/[lang]/resume/_components/experience.tsx:97
+msgid "Work Experience"
+msgstr "Work Experience"
 
 #: src/lib/chapters.ts:124
 msgid "Workflow Orchestration"
 msgstr "Workflow Orchestration"
+
+#: src/app/[lang]/resume/_components/intro.tsx:19
+msgid "Wuhan University of Science and Technology."
+msgstr "Wuhan University of Science and Technology."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:60
+msgid "Wuhan Zhaori Technology Co., Ltd."
+msgstr "Wuhan Zhaori Technology Co., Ltd."

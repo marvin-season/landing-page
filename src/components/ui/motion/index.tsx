@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { TransitionPanel } from "./transition-panel";
 
 export const MotionDiv = motion.div;
 
@@ -25,3 +26,5 @@ export const MotionSection = motion.section;
 export const MotionHeader = motion.header;
 
 export { AnimatePresence };
+
+export { TransitionPanel };
