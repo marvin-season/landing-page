@@ -1,6 +1,5 @@
 - Intro
-    - I'm a web developer with a passion for building web applications that are both functional and beautiful.
-    - Graduated from University of Southern California with a Bachelor of Science in Computer Science.
+    - I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of Southern California.
 - Skills
     - React & Next.js、TypeScript、Tailwind CSS、Shadcn UI
 - Experience

@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "./component.css";
 
+@plugin "@tailwindcss/typography";
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
