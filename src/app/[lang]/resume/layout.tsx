@@ -13,5 +13,5 @@ export async function generateMetadata(props: PageLangParam) {
 export default function ResumeLayout({
   children,
 }: PropsWithChildren<PageLangParam>) {
-  return <div className="p-16">{children}</div>;
+  return <div className="p-4 lg:p-16">{children}</div>;
 }

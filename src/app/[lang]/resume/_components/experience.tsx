@@ -14,7 +14,7 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
       <div className="mb-4">
-        <h4 className="text-xl font-semibold mb-2">{project.title}</h4>
+        <h4 className="text-lg font-semibold mb-2">{project.title}</h4>
         {project.link && (
           <a
             href={project.link}
@@ -97,7 +97,7 @@ export default function Experience() {
         <Trans>Work Experience</Trans>
       </h2>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 max-w-full overflow-x-auto">
           {experiences.map((experience) => (
             <TabsTrigger key={experience.period} value={experience.period}>
               {experience.period}
