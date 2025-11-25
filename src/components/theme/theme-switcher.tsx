@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMounted } from "@/hooks/use-mounted";
 import { themeNames, useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +20,6 @@ export const ThemeSwitcher = ({
   hideLabel = false,
 }: ThemeSwitcherProps) => {
   const { theme, themes, setTheme } = useTheme();
-  const mounted = useMounted();
-  if (!mounted) return null;
 
   return (
     <div className={cn("flex items-center justify-between gap-2", className)}>
@@ -34,7 +31,7 @@ export const ThemeSwitcher = ({
           Theme
         </label>
       )}
-      <Select value={theme || undefined} onValueChange={setTheme}>
+      <Select value={theme} onValueChange={setTheme}>
         <SelectTrigger
           id="theme-select"
           className={cn("w-32 sm:w-40", hideLabel && "w-full")}
