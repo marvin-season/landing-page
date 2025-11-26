@@ -25,6 +25,9 @@
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",
         "noTsIgnore": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       }
     },
     "domains": {
