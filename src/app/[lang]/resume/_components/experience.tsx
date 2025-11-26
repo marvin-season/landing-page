@@ -126,11 +126,11 @@ export default function Experience() {
         <TabsContent value={activeTab} className="mt-0">
           <TransitionPanel
             activeIndex={activeIndex}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             variants={{
-              enter: { opacity: 0, x: -50, filter: "blur(4px)" },
-              center: { opacity: 1, x: 0, filter: "blur(0px)" },
-              exit: { opacity: 0, x: 50, filter: "blur(4px)" },
+              enter: { opacity: 0, y: -50, filter: "blur(4px)" },
+              center: { opacity: 1, y: 0, filter: "blur(0px)" },
+              exit: { opacity: 0, y: 50, filter: "blur(4px)" },
             }}
           >
             {experienceContents}
