@@ -2,8 +2,9 @@
 @import "tw-animate-css";
 @import "./component.css";
 
-@plugin "@tailwindcss/typography";
+@custom-variant dark (&:is(.dark *));
 
+@plugin "@tailwindcss/typography";
 
 @theme inline {
   --color-background: var(--background);
@@ -43,6 +44,31 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --animate-beam-move: beam-move 8s linear infinite;
+  @keyframes beam-move {
+  0% {
+    transform: translateX(0);
+    }
+  100% {
+    transform: translateX(100vw);
+    }
+  }
+  @keyframes beam-move {
+  0% {
+    transform: translateX(0);
+    }
+  100% {
+    transform: translateX(100vw);
+    }
+  }
+  @keyframes beam-move {
+  0% {
+    transform: translateX(0);
+    }
+  100% {
+    transform: translateX(100vw);
+    }
+  }
 }
 
 :root {

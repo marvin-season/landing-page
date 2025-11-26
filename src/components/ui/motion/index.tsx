@@ -23,7 +23,7 @@ export const MotionLi = motion.li;
 
 export const MotionSection = motion.section;
 
-export const MotionHeader = motion.header;
+export const MotionH1 = motion.h1;
 
 export { AnimatePresence };
 
