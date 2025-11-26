@@ -20,10 +20,7 @@ export default async function ResumeLayout({
   const lang = (await params).lang;
   const i18n = getI18nInstance(lang);
   return (
-    <FireworksBackground
-      className="absolute inset-0 flex items-center justify-center rounded-xl"
-      population={1}
-    >
+    <FireworksBackground className="" population={1}>
       <SceneLayout
         lang={lang}
         badge="Resume"
