@@ -19,6 +19,21 @@ export const useExperience = () => {
   const { t } = useLingui();
   const experiences: WorkExperience[] = [
     {
+      company: t`Jiuling Technology`,
+      position: t`Web Developer`,
+      period: t`May 2025 - Present`,
+      projects: [
+        {
+          title: t`HIX.AI`,
+          description: t`HIX.AI is a platform for AI-powered healthcare solutions.`,
+          techStack: t`React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS`,
+          responsibilities: [
+            t`Developed HIX.AI platform with NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS`,
+          ],
+        },
+      ],
+    },
+    {
       company: t`Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center`,
       position: t`Web Developer`,
       period: t`June 2023 - April 2025`,
