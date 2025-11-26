@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { MotionH1 } from "@/components/ui";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
+import { cn } from "@/lib/utils";
 
 type SceneLayoutProps = {
   badge?: string;
@@ -28,7 +29,7 @@ const SceneLayout = ({
         className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between pb-12 lg:pb-24"
       >
         <div className="flex flex-col items-start gap-4">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-muted-foreground backdrop-blur">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-transparent px-4 py-1 text-xs font-medium uppercase tracking-[0.32em] text-muted-foreground backdrop-blur">
             {badge}
           </span>
           <ShimmeringText
@@ -43,7 +44,7 @@ const SceneLayout = ({
           ) : null}
         </div>
       </MotionH1>
-      <div className={`flex-1 ${className}`}>{children}</div>
+      <div className={cn("flex-1", className)}>{children}</div>
     </section>
   );
 };
