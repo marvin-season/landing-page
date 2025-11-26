@@ -103,9 +103,21 @@ export default function Experience() {
         </h2>
       </div>
       <Tabs className="w-full">
-        <TabsList className="mb-6 max-w-full overflow-x-auto rounded-full border border-border/60">
+        <TabsList className="relative mb-6 justify-start max-w-full overflow-x-auto">
           {experiences.map((experience) => (
             <TabsTrigger
+              ref={(element) => {
+                if (element) {
+                  element.addEventListener("click", () => {
+                    element.scrollIntoView({
+                      // @ts-ignore https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView#container
+                      container: "nearest",
+                      behavior: "smooth",
+                      inline: "center",
+                    });
+                  });
+                }
+              }}
               key={experience.period}
               value={experience.period}
               className="rounded-full"
