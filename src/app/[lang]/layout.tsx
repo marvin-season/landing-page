@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
-import { Ma_Shan_Zheng, Sofadi_One, Yuji_Boku } from "next/font/google";
+import { Lora } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -13,28 +13,10 @@ import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
 import { SettingsMenu } from "@/components/settings-menu";
 
-const sofadiOne = Sofadi_One({
+const lora = Lora({
   weight: "400",
   style: "normal",
 });
-
-const maShanZheng = Ma_Shan_Zheng({
-  weight: "400",
-  style: "normal",
-});
-
-const yujiBoku = Yuji_Boku({
-  weight: "400",
-  style: "normal",
-});
-
-// 语言到字体的映射
-const fontMap: Record<string, string> = {
-  zh: maShanZheng.className,
-  ja: yujiBoku.className,
-  en: sofadiOne.className,
-  pseudo: sofadiOne.className,
-};
 
 export async function generateStaticParams() {
   return linguiConfig.locales.map((lang) => ({ lang }));
@@ -59,12 +41,9 @@ export default async function RootLayout({
   // @ts-ignore
   setI18n(i18n);
 
-  // 根据语言选择字体：中文使用 zhiMangXing，日文使用 yujiBoku，其他语言使用 sofadiOne
-  const fontClassName = fontMap[lang] || sofadiOne.className;
-
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body className={`${fontClassName} antialiased max-h-dvh overflow-auto`}>
+      <body className={`${lora.className} antialiased max-h-dvh overflow-auto`}>
         <LinguiClientProvider
           initialLocale={lang}
           initialMessages={allMessages[lang]}
