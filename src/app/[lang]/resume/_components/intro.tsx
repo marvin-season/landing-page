@@ -28,10 +28,10 @@ function IntroArticle() {
             className="mx-2"
           >
             <ShimmeringText
-              color="#aaff40"
+              color="#ff0044"
               shimmeringColor="#9c40ff"
               text={t`Wuhan University of Science and Technology.`}
-              className="inline-block text-foreground"
+              className="inline-block text-foreground font-bold"
             />
           </Link>
           <Trans>

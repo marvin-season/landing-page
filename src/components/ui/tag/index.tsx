@@ -71,9 +71,8 @@ export function Tag({ children, size, className, ...props }: TagProps) {
 
   return (
     <span
-      className={cn(tagVariants({ size }), className)}
+      className={cn(tagVariants({ size }), "bg-transparent", className)}
       style={{
-        backgroundColor: colors.bg,
         color: colors.text,
         borderColor: colors.border,
       }}
