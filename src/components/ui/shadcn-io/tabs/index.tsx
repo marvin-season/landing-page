@@ -236,7 +236,7 @@ function TabsContents({
         transition={transition}
       >
         {childrenArray.map((child, index) => (
-          <div key={index} className="w-full shrink-0 px-2">
+          <div key={index} className="w-full shrink-0">
             {child}
           </div>
         ))}

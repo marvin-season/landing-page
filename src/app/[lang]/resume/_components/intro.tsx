@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import Link from "next/link";
 import { MotionDiv, ShimmeringText } from "@/components/ui";
 import GradientText from "@/components/ui/react-bits/gradient-text";
 
@@ -20,10 +21,14 @@ function IntroArticle() {
             Science from the University of
           </Trans>
           &nbsp;
-          <ShimmeringText
-            text={t`Wuhan University of Science and Technology.`}
-            className="inline-block text-foreground"
-          />
+          <Link href="https://www.wust.edu.cn/" target="_blank">
+            <ShimmeringText
+              color="#aaff40"
+              shimmeringColor="#9c40ff"
+              text={t`Wuhan University of Science and Technology.`}
+              className="inline-block text-foreground"
+            />
+          </Link>
           &nbsp;<Trans>,I'am skilled in &nbsp;</Trans>
           <GradientText>React & Next.js</GradientText>
           &nbsp;<Trans>, TypeScript, Tailwind CSS, Shadcn UI</Trans>
@@ -44,7 +49,7 @@ function IntroArticle() {
 export default function Intro() {
   return (
     <section>
-      <h2 className="text-balance text-2xl font-semibold text-foreground">
+      <h2 className="mb-6 text-balance text-2xl font-semibold text-foreground">
         <Trans>Introduction</Trans>
       </h2>
       <IntroArticle />

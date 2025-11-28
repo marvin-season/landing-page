@@ -5,7 +5,7 @@ import {
   type Project,
   useExperience,
 } from "@/app/[lang]/resume/hooks/use-experience";
-
+import { MotionDiv } from "@/components/ui";
 import {
   Tabs,
   TabsContent,
@@ -74,9 +74,14 @@ export default function Experience() {
       value={experience.period}
       className="mt-0"
     >
-      <div className="space-y-6">
-        <div className="prose prose-lg p-2 lg:p-6">
-          <h3 className="text-2xl font-semibold mb-1 text-foreground">
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="space-y-6"
+      >
+        <div className="prose prose-lg p-2 lg:p-4">
+          <h3 className="text-xl font-semibold mb-1 text-foreground">
             {experience.company}
           </h3>
           <p className="text-muted-foreground mb-2">
@@ -88,20 +93,15 @@ export default function Experience() {
             <ProjectCard key={index} project={project} />
           ))}
         </div>
-      </div>
+      </MotionDiv>
     </TabsContent>
   ));
 
   return (
     <section>
-      <div className="mb-6 flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.36em] text-muted-foreground/70">
-          <Trans>Career</Trans>
-        </span>
-        <h2 className="text-balance text-2xl font-semibold text-foreground">
-          <Trans>Work Experience</Trans>
-        </h2>
-      </div>
+      <h2 className="mb-6 text-2xl font-semibold text-foreground">
+        <Trans>Career</Trans>
+      </h2>
       <Tabs className="w-full">
         <TabsList className="relative mb-6 justify-start max-w-full overflow-x-auto">
           {experiences.map((experience) => (

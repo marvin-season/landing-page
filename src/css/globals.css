@@ -8,6 +8,9 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-1: var(--background-1);
+  --color-background-2: var(--background-2);
+  --color-background-3: var(--background-3);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -77,6 +80,9 @@
 
 :root {
   --background: oklch(1 0 0);
+  --background-1: oklch(0.968 0.007 247.896 / 0.65);
+  --background-2: oklch(0.929 0.013 255.508 / 0.65);
+  --background-3: oklch(0.89 0.006 255.508 / 0.65);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -114,7 +120,10 @@
 }
 
 .dark {
-  --background: oklch(0.18 0.02 268.8);
+  --background: oklch(0.18 0.02 268.8 / 0.95);
+  --background-1: oklch(0.12 0.025 268.8 / 0.65);
+  --background-2: oklch(0.22 0.015 270 / 0.65);
+  --background-3: oklch(0.35 0.018 272 / 0.65);
   --foreground: oklch(0.92 0.02 260.4);
   --card: oklch(0.22 0.018 270);
   --card-foreground: oklch(0.92 0.02 260.4);
@@ -149,6 +158,9 @@
 
 .neutral {
   --background: oklch(0.966 0.01 95);
+  --background-1: oklch(0.92 0.005 95 / 0.65);
+  --background-2: oklch(0.88 0.002 95 / 0.65);
+  --background-3: oklch(0.84 0.001 95);
   --foreground: oklch(0.26 0.01 95);
   --card: oklch(0.992 0 0);
   --card-foreground: oklch(0.26 0.01 95);

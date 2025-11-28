@@ -26,7 +26,7 @@ export const useExperience = () => {
         {
           title: t`HIX.AI`,
           description: t`HIX.AI is a platform for AI-powered healthcare solutions.`,
-          techStack: t`React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS`,
+          techStack: t`Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS`,
           responsibilities: [
             t`Developed HIX.AI platform with NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS`,
           ],
