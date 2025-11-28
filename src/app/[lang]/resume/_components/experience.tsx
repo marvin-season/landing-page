@@ -1,6 +1,8 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { CollapsibleList } from "@/app/[lang]/resume/_components/collapsible-list";
+import H2 from "@/app/[lang]/resume/_components/h2";
 import {
   type Project,
   useExperience,
@@ -50,16 +52,10 @@ function ProjectCard({ project }: { project: Project }) {
           ))}
         </div>
       </div>
-      <div>
-        <h5 className="text-sm font-semibold mb-2 text-foreground">
-          <Trans>Key Responsibilities</Trans>
-        </h5>
-        <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-          {project.responsibilities.map((resp, index) => (
-            <li key={index}>{resp}</li>
-          ))}
-        </ul>
-      </div>
+      <CollapsibleList
+        title={<Trans>Key Responsibilities</Trans>}
+        items={project.responsibilities}
+      />
     </div>
   );
 }
@@ -99,9 +95,9 @@ export default function Experience() {
 
   return (
     <section>
-      <h2 className="mb-6 text-2xl font-semibold text-foreground">
+      <H2>
         <Trans>Career</Trans>
-      </h2>
+      </H2>
       <Tabs className="w-full">
         <TabsList className="relative mb-6 justify-start max-w-full overflow-x-auto">
           {experiences.map((experience) => (

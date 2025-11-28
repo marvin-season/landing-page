@@ -25,6 +25,8 @@ export const MotionSection = motion.section;
 
 export const MotionH1 = motion.h1;
 
+export const MotionH2 = motion.h2;
+
 export { AnimatePresence };
 
 export { TransitionPanel };

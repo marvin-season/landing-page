@@ -2,6 +2,7 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import Link from "next/link";
+import H2 from "@/app/[lang]/resume/_components/h2";
 import { MotionDiv, ShimmeringText } from "@/components/ui";
 import GradientText from "@/components/ui/react-bits/gradient-text";
 
@@ -16,9 +17,9 @@ function IntroArticle() {
       <article className="space-y-4">
         <p className="text-base leading-relaxed text-muted-foreground">
           <Trans>
-            I am a web developer passionate about building functional and
-            beautiful web applications, with a Bachelor of Science in Computer
-            Science from the University of
+            Hello, My name is Marvin and I am a web developer passionate about
+            building functional and beautiful web applications, with a Bachelor
+            of Science in Computer Science from the University of
           </Trans>
           &nbsp;
           <Link href="https://www.wust.edu.cn/" target="_blank">
@@ -31,7 +32,7 @@ function IntroArticle() {
           </Link>
           &nbsp;<Trans>,I'am skilled in &nbsp;</Trans>
           <GradientText>React & Next.js</GradientText>
-          &nbsp;<Trans>, TypeScript, Tailwind CSS, Shadcn UI</Trans>
+          &nbsp;<Trans>, TypeScript, Tailwind CSS, Shadcn UI,</Trans>
         </p>
         <p className="text-base leading-relaxed text-muted-foreground">
           <Trans>
@@ -49,9 +50,9 @@ function IntroArticle() {
 export default function Intro() {
   return (
     <section>
-      <h2 className="mb-6 text-balance text-2xl font-semibold text-foreground">
+      <H2>
         <Trans>Introduction</Trans>
-      </h2>
+      </H2>
       <IntroArticle />
     </section>
   );
