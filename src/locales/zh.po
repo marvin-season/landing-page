@@ -375,7 +375,7 @@ msgstr "智能校对"
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr "基于大型语言模型的智能 Q&A 系统，支持云端 DeepSeek 免费完整功能版本或本地 DeepSeek 轻量级版本。"
 
-#: src/app/[lang]/resume/_components/intro.tsx:54
+#: src/app/[lang]/resume/_components/intro.tsx:63
 msgid "Introduction"
 msgstr "介绍"
 
@@ -541,3 +541,7 @@ msgstr "武汉科技大学"
 #: src/app/[lang]/resume/hooks/use-experience.ts:70
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr "武汉兆日科技有限责任公司"
+
+#: src/app/[lang]/resume/_components/intro.tsx:46
+msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
+msgstr "您可以通过邮箱 <0>mrvnseason@gmail.com</0> 或电话 <0>+86 15623192717</0> 与我联系。"

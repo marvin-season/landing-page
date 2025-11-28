@@ -21,7 +21,6 @@ function IntroArticle() {
             building functional and beautiful web applications, with a Bachelor
             of Science in Computer Science from the University of
           </Trans>
-          &nbsp;
           <Link href="https://www.wust.edu.cn/" target="_blank">
             <ShimmeringText
               color="#aaff40"
@@ -30,9 +29,9 @@ function IntroArticle() {
               className="inline-block text-foreground"
             />
           </Link>
-          &nbsp;<Trans>,I'am skilled in &nbsp;</Trans>
+          <Trans>,I'am skilled in &nbsp;</Trans>
           <GradientText>React & Next.js</GradientText>
-          &nbsp;<Trans>, TypeScript, Tailwind CSS, Shadcn UI,</Trans>
+          <Trans>, TypeScript, Tailwind CSS, Shadcn UI,</Trans>
         </p>
         <p className="text-base leading-relaxed text-muted-foreground">
           <Trans>
@@ -40,6 +39,15 @@ function IntroArticle() {
             Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D
             Center, and Shenzhen Jiuling Technology. I have rich experience in
             Java, web development, and mini program development.
+          </Trans>
+        </p>
+        <p className="text-base leading-relaxed text-muted-foreground">
+          <Trans>
+            You can contact me via:
+            <strong className="cursor-pointer hover:underline">
+              <a href="mailto:mrvnseason@gmail.com">mrvnseason@gmail.com</a>
+              <a href="tel:+8615623192717">or phone: +86 15623192717</a>
+            </strong>
           </Trans>
         </p>
       </article>

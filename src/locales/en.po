@@ -375,7 +375,7 @@ msgstr "Intelligent Proofreading"
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 
-#: src/app/[lang]/resume/_components/intro.tsx:54
+#: src/app/[lang]/resume/_components/intro.tsx:63
 msgid "Introduction"
 msgstr "Introduction"
 
@@ -541,3 +541,7 @@ msgstr "Wuhan University of Science and Technology."
 #: src/app/[lang]/resume/hooks/use-experience.ts:70
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr "Wuhan Zhaori Technology Co., Ltd."
+
+#: src/app/[lang]/resume/_components/intro.tsx:46
+msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
+msgstr "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
