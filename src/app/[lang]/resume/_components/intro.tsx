@@ -15,13 +15,18 @@ function IntroArticle() {
       transition={{ duration: 0.4 }}
     >
       <article className="space-y-4">
-        <p className="text-base leading-relaxed text-muted-foreground">
+        <span className="text-base leading-relaxed text-muted-foreground">
           <Trans>
-            Hello, My name is Marvin and I am a web developer passionate about
-            building functional and beautiful web applications, with a Bachelor
-            of Science in Computer Science from the University of
+            Hello, My name is <strong>Marvin</strong> and I am a web developer
+            passionate about building functional and beautiful web applications,
+            with a Bachelor of Science in Computer Science from the University
+            of
           </Trans>
-          <Link href="https://www.wust.edu.cn/" target="_blank">
+          <Link
+            href="https://www.wust.edu.cn/"
+            target="_blank"
+            className="mx-2"
+          >
             <ShimmeringText
               color="#aaff40"
               shimmeringColor="#9c40ff"
@@ -29,24 +34,28 @@ function IntroArticle() {
               className="inline-block text-foreground"
             />
           </Link>
-          <Trans>,I'am skilled in &nbsp;</Trans>
-          <GradientText>React & Next.js</GradientText>
-          <Trans>, TypeScript, Tailwind CSS, Shadcn UI,</Trans>
-        </p>
-        <p className="text-base leading-relaxed text-muted-foreground">
+          <Trans>
+            , I'am skilled in
+            <GradientText> React & Next.js </GradientText>
+            TypeScript, Tailwind CSS, Shadcn UI.
+          </Trans>
+        </span>
+        <span className="ml-2 text-base leading-relaxed text-muted-foreground">
           <Trans>
             I have worked at four companies, including Beijing Health Planet,
             Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D
             Center, and Shenzhen Jiuling Technology. I have rich experience in
-            Java, web development, and mini program development.
+            Web development and performance optimization.
           </Trans>
-        </p>
+        </span>
         <p className="text-base leading-relaxed text-muted-foreground">
           <Trans>
             You can contact me via:
             <strong className="cursor-pointer hover:underline">
               <a href="mailto:mrvnseason@gmail.com">mrvnseason@gmail.com</a>
-              <a href="tel:+8615623192717">or phone: +86 15623192717</a>
+              <a href="tel:+8615623192717" className="ml-2">
+                or phone: +86 15623192717
+              </a>
             </strong>
           </Trans>
         </p>

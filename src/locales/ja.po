@@ -13,12 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/[lang]/resume/_components/intro.tsx:35
-msgid ", TypeScript, Tailwind CSS, Shadcn UI,"
-msgstr ""
-
 #: src/app/[lang]/resume/_components/intro.tsx:33
-msgid ",I'am skilled in  "
+msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ""
 
 #: src/app/[lang]/_components/view-closed.tsx:33
@@ -324,7 +320,7 @@ msgid "Health Planet International Technology Co., Ltd."
 msgstr ""
 
 #: src/app/[lang]/resume/_components/intro.tsx:19
-msgid "Hello, My name is Marvin and I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+msgid "Hello, My name is <0>Marvin</0> and I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:27
@@ -339,8 +335,8 @@ msgstr ""
 msgid "Hot-reload capabilities, flexible theming, and atomic design patterns help engineers deploy new features fast. Docs and UI always update in lockstep."
 msgstr "ホットリロード機能、柔軟なテーマ設定、アトミックデザインパターンにより、エンジニアは新機能を迅速にデプロイできます。ドキュメントと UI は常に同期して更新されます。"
 
-#: src/app/[lang]/resume/_components/intro.tsx:38
-msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Java, web development, and mini program development."
+#: src/app/[lang]/resume/_components/intro.tsx:40
+msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
@@ -375,7 +371,7 @@ msgstr "インテリジェント校正"
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:63
+#: src/app/[lang]/resume/_components/intro.tsx:65
 msgid "Introduction"
 msgstr ""
 
@@ -542,6 +538,6 @@ msgstr ""
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:46
+#: src/app/[lang]/resume/_components/intro.tsx:48
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr ""
