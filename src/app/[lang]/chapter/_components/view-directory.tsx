@@ -18,7 +18,7 @@ const ViewDirectory: React.FC<ViewDirectoryProps> = ({ lang }) => {
     <div className="grid gap-12 lg:grid-cols-[minmax(280px,1fr)_minmax(340px,1.1fr)]">
       <div className="flex flex-col items-center gap-6 lg:items-start">
         <BookClient>
-          <div className="book-cover-directory">
+          <div className="book-cover">
             <div className="flex h-full flex-col justify-between p-8 text-left text-slate-700">
               <span className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
                 {i18n._(msg`Table of Contents`)}

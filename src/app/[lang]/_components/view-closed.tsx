@@ -25,18 +25,18 @@ const ViewClosed: React.FC<ViewClosedProps> = ({ lang }) => {
           style={{ perspective: "1900px" }}
         >
           <BookClient>
-            <div className="book-cover-closed">
-              <div className="flex h-full flex-col justify-between p-8 text-left text-white">
-                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
+            <div className="book-cover">
+              <div className="flex h-full flex-col justify-between p-8 text-left ">
+                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
                   <span>{i18n._(msg`AI STUDIO`)}</span>
                   <span className="h-1 w-1 rounded-full bg-white/40" />
                   <span>{i18n._(msg`2025`)}</span>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold leading-tight">
+                  <p className="text-lg font-semibold leading-tight text-slate-500">
                     {i18n._(msg`Chapters Awaiting You`)}
                   </p>
-                  <p className="mt-2 text-xs text-white/60">
+                  <p className="mt-2 text-xs text-slate-500">
                     {i18n._(
                       msg`Click the cover to awaken a new creative journey.`,
                     )}

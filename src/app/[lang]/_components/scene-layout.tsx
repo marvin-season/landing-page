@@ -20,7 +20,7 @@ const SceneLayout = ({
   className,
 }: SceneLayoutProps) => {
   return (
-    <section className="min-h-dvh relative z-10 rounded-md lg:rounded-lg bg-background/30 backdrop-blur-md text-foreground mx-auto size-fit lg:max-w-[1200px] max-w-full px-6 py-16 md:px-16">
+    <section className="min-h-dvh relative z-10 rounded-md lg:rounded-lg backdrop-blur-md text-foreground mx-auto size-fit lg:max-w-[1200px] max-w-full px-6 py-16 md:px-16">
       <MotionH1
         initial={{ opacity: 0, scale: 0.95, y: 48 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
