@@ -28,10 +28,6 @@ export default async function Home({ params }: PageLangParam) {
         label: i18n._(msg`Book a pilot`),
         href: `/${lang}/resume`,
       }}
-      secondaryCta={{
-        label: i18n._(msg`Explore knowledge chapters`),
-        href: `/${lang}/chapter`,
-      }}
     />
   );
 }
