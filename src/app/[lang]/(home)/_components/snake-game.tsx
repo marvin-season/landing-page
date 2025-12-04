@@ -610,7 +610,7 @@ export default function SnakeGameCanvas(): React.JSX.Element {
               onClick={() => {
                 if (!gameOver) setAutopilot(true);
               }}
-              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition font-bold uppercase
+              className={`w-full border-2 py-3 text-[10px] tracking-widest transition font-bold uppercase
                     ${
                       autopilot
                         ? "cursor-not-allowed border-primary/30 bg-primary/10 text-primary/50"
