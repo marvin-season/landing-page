@@ -1,6 +1,6 @@
 import { Press_Start_2P } from "next/font/google";
 import Link from "next/link";
-import { SnakeGame } from "./snake-game";
+import SnakeGameCanvas from "./snake-game";
 
 type PixelHeroProps = {
   badge: string;
@@ -83,7 +83,7 @@ export function PixelHero({
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-[520px]">
-            <SnakeGame />
+            <SnakeGameCanvas />
           </div>
         </div>
       </div>

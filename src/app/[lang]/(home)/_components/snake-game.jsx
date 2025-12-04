@@ -1,28 +1,16 @@
 'use client'
-
-import React, {
+import  {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 
-// --- Types and Constants ---
-
-/**
- * 游戏的点坐标类型
- * @typedef {Object} Point
- * @property {number} x - X轴坐标
- * @property {number} y - Y轴坐标
- */
-
-/**
- * @typedef {'UP' | 'DOWN' | 'LEFT' | 'RIGHT'} Direction
- */
-
+// --- Constants ---
 const GRID_SIZE = 18;
 const INITIAL_LENGTH = 4;
+const CANVAS_SIZE = 396; // Canvas 尺寸 (对应 CSS 宽度)
+const TILE_SIZE = CANVAS_SIZE / GRID_SIZE;
 const MOVE_INTERVAL = 1000; // 1秒移动一次
 const MAX_EXPLORED_NODES = 6000;
 
@@ -51,19 +39,12 @@ const KEYBOARD_DIRECTIONS = {
 const DIRECTION_ORDER = ["UP", "RIGHT", "DOWN", "LEFT"];
 const DIRECTION_LABELS = { UP: "↑", RIGHT: "→", DOWN: "↓", LEFT: "←" };
 
-/**
- * @typedef {Object} PathNode
- * @property {Point} head - 当前蛇头位置
- * @property {Point[]} body - 蛇的当前身体状态
- * @property {Direction[]} path - 从起点到当前状态的路径
- */
-
 // --- Utility Functions ---
 
-/**
- * @param {Point[]} occupied
- * @returns {Point[]}
- */
+/** @typedef {{x: number, y: number}} Point */
+/** @typedef {'UP' | 'DOWN' | 'LEFT' | 'RIGHT'} Direction */
+
+/** @returns {Point[]} */
 function createInitialSnake() {
   const center = Math.floor(GRID_SIZE / 2);
   return Array.from({ length: INITIAL_LENGTH }, (_, index) => ({
@@ -72,36 +53,23 @@ function createInitialSnake() {
   }));
 }
 
-/**
- * @param {Point} a
- * @param {Point} b
- */
+/** @param {Point} a @param {Point} b */
 function samePoint(a, b) {
   return a.x === b.x && a.y === b.y;
 }
 
-/**
- * @param {Point} point
- */
+/** @param {Point} point */
 function pointKey(point) {
   return `${point.x}-${point.y}`;
 }
 
-/**
- * @param {Point} point
- * @param {Direction} direction
- * @returns {Point}
- */
+/** @param {Point} point @param {Direction} direction @returns {Point} */
 function movePoint(point, direction) {
   const vector = DIRECTION_VECTORS[direction];
   return { x: point.x + vector.x, y: point.y + vector.y };
 }
 
-/**
- * @param {Direction} a
- * @param {Direction} b
- * @returns {boolean}
- */
+/** @param {Direction} a @param {Direction} b @returns {boolean} */
 function isOpposite(a, b) {
   return (
     (a === "UP" && b === "DOWN") ||
@@ -111,37 +79,24 @@ function isOpposite(a, b) {
   );
 }
 
-/**
- * @param {Point} point
- * @returns {boolean}
- */
+/** @param {Point} point @returns {boolean} */
 function isInside(point) {
   return (
     point.x >= 0 && point.x < GRID_SIZE && point.y >= 0 && point.y < GRID_SIZE
   );
 }
 
-/**
- * @param {Point} a
- * @param {Point} b
- * @returns {number}
- */
+/** @param {Point} a @param {Point} b @returns {number} */
 function manhattan(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
-/**
- * @param {Point[]} body
- * @returns {string}
- */
+/** @param {Point[]} body @returns {string} */
 function serializeBody(body) {
   return body.map(pointKey).join("|");
 }
 
-/**
- * @param {Point[]} occupied
- * @returns {Point}
- */
+/** @param {Point[]} occupied @returns {Point} */
 function randomFood(occupied) {
   const occupiedKeys = new Set(occupied.map(pointKey));
   const available = [];
@@ -159,7 +114,13 @@ function randomFood(occupied) {
   return available[Math.floor(Math.random() * available.length)];
 }
 
-// --- AI Logic ---
+// --- AI Logic (BFS) ---
+
+/** @typedef {Object} PathNode
+ * @property {Point} head - 蛇头位置
+ * @property {Point[]} body - 蛇身状态
+ * @property {Direction[]} path - 路径
+ */
 
 /**
  * 寻找一条安全到达食物的路径 (BFS)
@@ -191,19 +152,15 @@ function findPathToFood(initialSnake, targetFood) {
       if (!isInside(nextHead)) continue;
 
       const grows = samePoint(nextHead, targetFood);
-
-      // 确定需要避开的蛇身部分
       let segmentsToAvoid = current.body;
       if (!grows) {
-        // 如果不成长，尾巴会消失，检查身体除尾巴外的部分
         segmentsToAvoid = current.body.slice(0, current.body.length - 1);
       }
 
       if (segmentsToAvoid.some((segment) => samePoint(segment, nextHead))) {
-        continue; // 撞到自己
+        continue;
       }
 
-      // 构建下一个身体状态
       const nextBody = [nextHead, ...current.body];
       if (!grows) {
         nextBody.pop();
@@ -221,12 +178,11 @@ function findPathToFood(initialSnake, targetFood) {
       });
     }
   }
-
   return null;
 }
 
 /**
- * 当找不到通往食物的路径时，选择一个安全的备用方向（尽量靠近食物）
+ * 备用方向策略 (靠近食物且安全)
  * @param {Point[]} currentSnake
  * @param {Point} currentFood
  * @param {Direction} currentDir
@@ -234,8 +190,6 @@ function findPathToFood(initialSnake, targetFood) {
  */
 function fallbackDirection(currentSnake, currentFood, currentDir) {
   const head = currentSnake[0];
-
-  // 按照曼哈顿距离从近到远排序候选方向
   const candidates = [...DIRECTION_ORDER].sort((a, b) => {
     return (
       manhattan(movePoint(head, a), currentFood) -
@@ -243,45 +197,123 @@ function fallbackDirection(currentSnake, currentFood, currentDir) {
     );
   });
 
-  // 假设不成长，只检查除尾巴外的身体部分
   const nonTailBody = currentSnake.slice(0, currentSnake.length - 1);
 
   for (const dir of candidates) {
-    if (isOpposite(dir, currentDir)) {
-      continue;
-    }
+    if (isOpposite(dir, currentDir)) continue;
 
     const nextHead = movePoint(head, dir);
 
     // 1. 墙壁检查
-    if (!isInside(nextHead)) {
-      continue;
-    }
+    if (!isInside(nextHead)) continue;
 
     // 2. 身体检查
-    if (nonTailBody.some((segment) => samePoint(segment, nextHead))) {
-      continue;
-    }
+    if (nonTailBody.some((segment) => samePoint(segment, nextHead))) continue;
 
     return dir;
   }
-  // 如果所有方向都堵死，返回当前方向（下一帧就会 Game Over）
   return currentDir;
 }
 
-// --- React Components ---
+// --- Drawing Component ---
 
-function DirectionKey({ label, active, onClick }) {
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point} point
+ * @param {string} fillStyle
+ * @param {string} shadowColor
+ * @param {number} shadowBlur
+ */
+function drawTile(
+  ctx,
+  point,
+  fillStyle,
+  shadowColor = "transparent",
+  shadowBlur = 0,
+) {
+  const x = point.x * TILE_SIZE;
+  const y = point.y * TILE_SIZE;
+  const padding = 1;
+  const size = TILE_SIZE - padding * 2;
+  const radius = 3;
+
+  ctx.fillStyle = fillStyle;
+  ctx.shadowColor = shadowColor;
+  ctx.shadowBlur = shadowBlur;
+
+  ctx.beginPath();
+  ctx.moveTo(x + padding + radius, y + padding);
+  ctx.lineTo(x + padding + size - radius, y + padding);
+  ctx.arcTo(
+    x + padding + size,
+    y + padding,
+    x + padding + size,
+    y + padding + radius,
+    radius,
+  );
+  ctx.lineTo(x + padding + size, y + padding + size - radius);
+  ctx.arcTo(
+    x + padding + size,
+    y + padding + size,
+    x + padding + size - radius,
+    y + padding + size,
+    radius,
+  );
+  ctx.lineTo(x + padding + radius, y + padding + size);
+  ctx.arcTo(
+    x + padding,
+    y + padding + size,
+    x + padding,
+    y + padding + size - radius,
+    radius,
+  );
+  ctx.lineTo(x + padding, y + padding + radius);
+  ctx.arcTo(
+    x + padding,
+    y + padding,
+    x + padding + radius,
+    y + padding,
+    radius,
+  );
+  ctx.closePath();
+  ctx.fill();
+}
+
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} snake
+ * @param {Point} food
+ */
+function drawGame(ctx, snake, food) {
+  if (!ctx || !snake || !food) return;
+
+  // 1. Clear canvas
+  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+  // 2. Draw Food (Magenta Neon)
+  drawTile(ctx, food, "#e879f9", "rgba(232,121,249,0.8)", 15);
+
+  // 3. Draw Snake Body (Emerald Green)
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  for (let i = 1; i < snake.length; i++) {
+    drawTile(ctx, snake[i], "rgba(16, 185, 129, 0.8)"); // emerald-500/80
+  }
+
+  // 4. Draw Snake Head (Brighter Emerald Neon)
+  drawTile(ctx, snake[0], "#6ee7b7", "rgba(16,185,129,0.9)", 12);
+}
+
+// --- UI Components ---
+
+function DirectionKey({ label, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 text-lg font-black transition sm:h-14 sm:w-14 cursor-pointer select-none
-        ${
-          active
-            ? "border-emerald-300 bg-emerald-300/30 text-white shadow-[0_0_15px_rgba(16,185,129,0.6)]"
-            : "border-white/20 bg-[#060a1a] text-white/35 hover:border-white/30"
-        }`}
+        border-white/20 bg-[#060a1a] text-white/35 hover:border-white/30 active:border-emerald-300 active:bg-emerald-300/30 active:text-white active:shadow-[0_0_15px_rgba(16,185,129,0.6)]
+        `}
     >
       {label}
     </button>
@@ -299,7 +331,10 @@ function DirectionCore({ autopilot, direction }) {
   );
 }
 
-export  function SnakeGame() {
+// --- Main App Component ---
+
+export default function SnakeGameCanvas() {
+  // Game State
   const [snake, setSnake] = useState(createInitialSnake());
   const [food, setFood] = useState(() => randomFood(createInitialSnake()));
   const [direction, setDirection] = useState("RIGHT");
@@ -308,12 +343,19 @@ export  function SnakeGame() {
   const [autopilot, setAutopilot] = useState(true);
   const [countdown, setCountdown] = useState(3);
 
-  // Ref for mutable, up-to-date state in setInterval
+  // Refs for Canvas and mutable state access in setInterval
+  const canvasRef = useRef(null);
   const stateRef = useRef({ snake, food, direction, autopilot, gameOver });
 
   // Update ref whenever state changes
   useEffect(() => {
     stateRef.current = { snake, food, direction, autopilot, gameOver };
+    // Redraw game whenever snake/food state changes
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      drawGame(ctx, snake, food);
+    }
   }, [snake, food, direction, autopilot, gameOver]);
 
   // --- Game Control ---
@@ -349,98 +391,92 @@ export  function SnakeGame() {
   }, [resetGame]);
 
   const commitDirection = useCallback((newDir, manual = false) => {
-    // Only allow direction change if it's not the opposite
+    // 检查方向是否相反
     if (isOpposite(stateRef.current.direction, newDir)) {
       return;
     }
     setDirection(newDir);
 
-    // If manual input, disable autopilot
+    // 如果是手动输入，则禁用自动驾驶
     if (manual && stateRef.current.autopilot) {
       setAutopilot(false);
     }
   }, []);
 
-  // --- Game Loop (useEffect) ---
+  // --- Game Loop Logic ---
 
+  const gameTick = useCallback(() => {
+    if (stateRef.current.gameOver) return;
+
+    const { snake, food, direction, autopilot } = stateRef.current;
+
+    // 1. Determine next move (AI or Manual)
+    let finalDirection = direction;
+    if (autopilot) {
+      const path = findPathToFood(snake, food);
+      if (path && path.length > 0) {
+        finalDirection = path[0];
+      } else {
+        finalDirection = fallbackDirection(snake, food, direction);
+      }
+      // Update direction state if AI chose a different path
+      if (finalDirection !== direction) {
+        setDirection(finalDirection);
+      }
+    } else {
+      finalDirection = direction;
+    }
+
+    const nextHead = movePoint(snake[0], finalDirection);
+    const shouldGrow = samePoint(nextHead, food);
+
+    // 2. Collision Check
+    let isCollision = false;
+
+    // A. Wall Collision
+    if (!isInside(nextHead)) {
+      isCollision = true;
+    }
+
+    // B. Body Collision
+    const bodyToCheck = shouldGrow ? snake : snake.slice(0, snake.length - 1);
+
+    if (bodyToCheck.some((segment) => samePoint(segment, nextHead))) {
+      isCollision = true;
+    }
+
+    if (isCollision) {
+      handleGameOver();
+      return;
+    }
+
+    // 3. Update Snake State
+    setSnake((prevSnake) => {
+      const nextSnake = [nextHead, ...prevSnake];
+      if (!shouldGrow) {
+        nextSnake.pop();
+      }
+      return nextSnake;
+    });
+
+    // 4. Update Food/Score
+    if (shouldGrow) {
+      setScore((prev) => prev + 10);
+      setFood(randomFood([nextHead, ...snake])); // Use current snapshot of snake for new food position calculation
+    }
+  }, [handleGameOver]);
+
+  // --- Game Loop (useEffect) ---
   useEffect(() => {
     if (gameOver) return;
 
-    const gameTick = () => {
-      const currentDirection = stateRef.current.direction;
-      const currentSnake = stateRef.current.snake;
-      const currentFood = stateRef.current.food;
-      const currentAutopilot = stateRef.current.autopilot;
-
-      // 1. Determine next move (AI or Manual)
-      let finalDirection = currentDirection;
-      if (currentAutopilot) {
-        const path = findPathToFood(currentSnake, currentFood);
-        if (path && path.length > 0) {
-          finalDirection = path[0];
-        } else {
-          finalDirection = fallbackDirection(
-            currentSnake,
-            currentFood,
-            currentDirection,
-          );
-        }
-        // Update state if AI chose a different path
-        if (finalDirection !== currentDirection) {
-          setDirection(finalDirection);
-        }
-      } else {
-        finalDirection = currentDirection;
-      }
-
-      const nextHead = movePoint(currentSnake[0], finalDirection);
-      const shouldGrow = samePoint(nextHead, currentFood);
-
-      // 2. Collision Check
-      let isCollision = false;
-
-      // A. Wall Collision
-      if (!isInside(nextHead)) {
-        isCollision = true;
-      }
-
-      // B. Body Collision
-      const bodyToCheck = shouldGrow
-        ? currentSnake
-        : currentSnake.slice(0, currentSnake.length - 1);
-
-      if (bodyToCheck.some((segment) => samePoint(segment, nextHead))) {
-        isCollision = true;
-      }
-
-      if (isCollision) {
-        handleGameOver();
-        return;
-      }
-
-      // 3. Update Snake State
-      setSnake((prevSnake) => {
-        const nextSnake = [nextHead, ...prevSnake];
-        if (!shouldGrow) {
-          nextSnake.pop();
-        }
-        return nextSnake;
-      });
-
-      // 4. Update Food/Score
-      if (shouldGrow) {
-        setScore((prev) => prev + 10);
-        setFood((prevSnake) => randomFood([nextHead, ...currentSnake]));
-      }
-    };
-
+    // Use a reference to the gameTick function to avoid recreating the interval
     const intervalId = setInterval(gameTick, MOVE_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [gameOver, handleGameOver]); // Re-run effect only when game over status changes
+  }, [gameOver, gameTick]); // Only depend on gameOver and the stable gameTick function
 
   // --- Keyboard Input ---
-
   useEffect(() => {
     if (gameOver) return;
 
@@ -456,124 +492,99 @@ export  function SnakeGame() {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [gameOver, commitDirection]);
 
-  // --- Memoized Values for Rendering ---
-  const snakeBodyKeys = useMemo(() => new Set(snake.map(pointKey)), [snake]);
-  const headKey = pointKey(snake[0]);
-  const foodKey = pointKey(food);
-
-  const gridCells = useMemo(() => {
-    const cells = [];
-    for (let y = 0; y < GRID_SIZE; y += 1) {
-      for (let x = 0; x < GRID_SIZE; x += 1) {
-        const key = pointKey({ x, y });
-        const isHead = key === headKey;
-        const isBody = snakeBodyKeys.has(key);
-        const isFood = key === foodKey;
-
-        let cellClass =
-          "aspect-square rounded-sm border border-[#140836] bg-[#06030E] shadow-[inset_-2px_-2px_0_rgba(0,0,0,0.55)] transition-colors duration-150";
-
-        if (isFood) {
-          cellClass =
-            "bg-fuchsia-400 shadow-[0_0_15px_rgba(232,121,249,0.8)] rounded-sm transition-colors duration-150";
-        } else if (isHead) {
-          cellClass =
-            "bg-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.9)] rounded-sm transition-colors duration-150";
-        } else if (isBody) {
-          cellClass =
-            "bg-emerald-500/80 rounded-sm transition-colors duration-150";
-        }
-
-        cells.push(<div key={key} className={cellClass} />);
-      }
-    }
-    return cells;
-  }, [foodKey, headKey, snakeBodyKeys]);
-
   return (
-    <div className="rounded-[24px] border border-white/10 bg-[#04010B]/70 p-5 text-white shadow-[12px_12px_0_rgba(3,0,12,0.7)] backdrop-blur-lg w-full max-w-sm mx-auto my-8">
-      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
-        <span>PIXEL SNAKE (REACT)</span>
-        <span>{autopilot ? "AI MODE" : "MANUAL"}</span>
-      </div>
+    // 使用 Tailwind CSS 模仿科技感深色 UI
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0d001a] p-4 font-['Inter']">
+      <div className="rounded-[24px] border border-white/10 bg-[#04010B]/70 p-5 text-white shadow-[12px_12px_0_rgba(3,0,12,0.7)] backdrop-blur-lg w-full max-w-sm">
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
+          <span>PIXEL SNAKE (CANVAS)</span>
+          <span>{autopilot ? "AI MODE" : "MANUAL"}</span>
+        </div>
 
-      {/* Game Grid */}
-      <div
-        className="mt-4 grid gap-[3px] rounded-2xl border border-white/10 bg-gradient-to-b from-[#0E041B] to-[#06010D] p-4 shadow-inner shadow-black/50 relative"
-        style={{
-          gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-        }}
-      >
-        {gridCells}
-        {gameOver && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/80 text-center">
-            <p className="text-2xl font-black tracking-[0.5em] text-red-400">
-              GAME OVER
-            </p>
-            <p className="mt-2 text-xs tracking-[0.3em] text-white/70">
-              REBOOT IN {countdown}
-            </p>
+        {/* Canvas 游戏区域 */}
+        <div className="mt-4 flex justify-center items-center relative">
+          <canvas
+            ref={canvasRef}
+            width={CANVAS_SIZE}
+            height={CANVAS_SIZE}
+            className="rounded-2xl border border-white/10 shadow-inner shadow-black/50"
+            style={{
+              background: "linear-gradient(180deg, #0E041B 0%, #06010D 100%)",
+            }}
+          />
+
+          {/* Game Over 消息框 */}
+          {gameOver && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/80 text-center">
+              <p className="text-2xl font-black tracking-[0.5em] text-red-400">
+                GAME OVER
+              </p>
+              <p className="mt-2 text-xs tracking-[0.3em] text-white/70">
+                REBOOT IN {countdown}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* 控制区和得分显示 */}
+        <div className="mt-6 grid gap-5 rounded-2xl border border-white/15 bg-[#050818]/80 p-5 text-xs uppercase tracking-[0.3em]">
+          <div className="flex items-center justify-between text-sm tracking-normal text-white">
+            <span>SCORE</span>
+            <span className="font-mono text-2xl text-emerald-300">
+              {score.toString().padStart(3, "0")}
+            </span>
           </div>
-        )}
-      </div>
-
-      {/* Controls and Score */}
-      <div className="mt-6 grid gap-5 rounded-2xl border border-white/15 bg-[#050818]/80 p-5 text-xs uppercase tracking-[0.3em]">
-        <div className="flex items-center justify-between text-sm tracking-normal text-white">
-          <span>SCORE</span>
-          <span className="font-mono text-2xl text-emerald-300">
-            {score.toString().padStart(3, "0")}
-          </span>
-        </div>
-        <div className="flex items-center justify-between text-[10px] text-white/70">
-          <span>PACE / 1.0S</span>
-          <span>ARROWS · OR · WASD TAKEOVER</span>
-        </div>
-
-        {/* Direction Pad */}
-        <div className="flex flex-col items-center gap-3 text-[10px]">
-          <p className="uppercase tracking-[0.4em] text-white/45">INPUT</p>
-          <div className="grid grid-cols-3 gap-2">
-            <div />
-            <DirectionKey
-              label={DIRECTION_LABELS.UP}
-              onClick={() => commitDirection("UP", true)}
-            />
-            <div />
-            <DirectionKey
-              label={DIRECTION_LABELS.LEFT}
-              onClick={() => commitDirection("LEFT", true)}
-            />
-            <DirectionCore autopilot={autopilot} direction={direction} />
-            <DirectionKey
-              label={DIRECTION_LABELS.RIGHT}
-              onClick={() => commitDirection("RIGHT", true)}
-            />
-            <div />
-            <DirectionKey
-              label={DIRECTION_LABELS.DOWN}
-              onClick={() => commitDirection("DOWN", true)}
-            />
-            <div />
+          <div className="flex items-center justify-between text-[10px] text-white/70">
+            <span>PACE / 1.0S</span>
+            <span>ARROWS · OR · WASD TAKEOVER</span>
           </div>
+
+          {/* 方向键控制 */}
+          <div className="flex flex-col items-center gap-3 text-[10px]">
+            <p className="uppercase tracking-[0.4em] text-white/45">INPUT</p>
+            <div className="grid grid-cols-3 gap-2">
+              <div />
+              <DirectionKey
+                label={DIRECTION_LABELS.UP}
+                onClick={() => commitDirection("UP", true)}
+              />
+              <div />
+              <DirectionKey
+                label={DIRECTION_LABELS.LEFT}
+                onClick={() => commitDirection("LEFT", true)}
+              />
+              <DirectionCore autopilot={autopilot} direction={direction} />
+              <DirectionKey
+                label={DIRECTION_LABELS.RIGHT}
+                onClick={() => commitDirection("RIGHT", true)}
+              />
+              <div />
+              <DirectionKey
+                label={DIRECTION_LABELS.DOWN}
+                onClick={() => commitDirection("DOWN", true)}
+              />
+              <div />
+            </div>
+          </div>
+
+          {/* 自动驾驶按钮 */}
+          <button
+            type="button"
+            disabled={autopilot || gameOver}
+            onClick={() => {
+              if (!gameOver) setAutopilot(true);
+            }}
+            className="rounded-lg border border-white/25 bg-gradient-to-r from-[#0C1724] to-[#071426] px-4 py-3 text-[10px] tracking-[0.35em] text-white/80 transition disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {autopilot ? "AI PILOT ACTIVE" : "RESTORE AUTOPILOT"}
+          </button>
         </div>
 
-        {/* Autopilot Button */}
-        <button
-          type="button"
-          disabled={autopilot || gameOver}
-          onClick={() => {
-            if (!gameOver) setAutopilot(true);
-          }}
-          className="rounded-lg border border-white/25 bg-gradient-to-r from-[#0C1724] to-[#071426] px-4 py-3 text-[10px] tracking-[0.35em] text-white/80 transition disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {autopilot ? "AI PILOT ACTIVE" : "RESTORE AUTOPILOT"}
-        </button>
+        <p className="mt-4 text-[11px] leading-relaxed text-white/60">
+          AI 自动驾驶通过 BFS 算法找到前往食物的最短安全路径。按下方向键或 WASD
+          即可接管控制权。
+        </p>
       </div>
-
-      <p className="mt-4 text-[11px] leading-relaxed text-white/60">
-        AI 以 1.0 秒节奏规划安全路径，点击方向键或键盘输入会立即切换到手动模式。
-      </p>
     </div>
   );
 }
