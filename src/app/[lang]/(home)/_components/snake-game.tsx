@@ -1,4 +1,5 @@
 "use client";
+import { Trans } from "@lingui/react/macro";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -534,9 +535,9 @@ export default function SnakeGameCanvas(): React.JSX.Element {
 
         <div className="border-2 border-border bg-muted/20 p-4">
           <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-primary font-bold">
-            <span>RETRO SNAKE</span>
+            <span><Trans>Retro Snake</Trans></span>
             <span className={autopilot ? "animate-pulse" : ""}>
-              {autopilot ? "AI AUTO" : "MANUAL"}
+              {autopilot ? <Trans>AI auto</Trans> : <Trans>Manual</Trans>}
             </span>
           </div>
 
@@ -556,11 +557,11 @@ export default function SnakeGameCanvas(): React.JSX.Element {
             {/* Game Over 消息框 */}
             {gameOver && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/85 text-center">
-                <p className="mb-4 text-xl text-destructive shadow-[2px_2px_0_#000]">
-                  GAME OVER
+                <p className="mb-4 text-xl text-destructive shadow-[2px_2px_0_#000] uppercase">
+                  <Trans>Game over</Trans>
                 </p>
-                <p className="blink text-[10px] text-white/70">
-                  RESET IN {countdown}
+                <p className="blink text-[10px] text-white/70 uppercase">
+                  <Trans>Reset in {countdown}</Trans>
                 </p>
               </div>
             )}
@@ -569,7 +570,7 @@ export default function SnakeGameCanvas(): React.JSX.Element {
           {/* 控制区和得分显示 */}
           <div className="mt-6 space-y-6">
             <div className="flex items-center justify-between border-b-2 border-border pb-2">
-              <span className="text-[10px] text-muted-foreground">SCORE</span>
+              <span className="text-[10px] text-muted-foreground uppercase"><Trans>Score</Trans></span>
               <span className="text-xl text-primary">
                 {score.toString().padStart(4, "0")}
               </span>
@@ -609,19 +610,19 @@ export default function SnakeGameCanvas(): React.JSX.Element {
               onClick={() => {
                 if (!gameOver) setAutopilot(true);
               }}
-              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition font-bold
+              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition font-bold uppercase
                     ${
                       autopilot
                         ? "cursor-not-allowed border-primary/30 bg-primary/10 text-primary/50"
                         : "border-border text-foreground hover:bg-secondary active:translate-y-1"
                     }`}
             >
-              {autopilot ? "AI ACTIVE" : "ENABLE AI"}
+              {autopilot ? <Trans>AI active</Trans> : <Trans>Enable AI</Trans>}
             </button>
           </div>
 
-          <div className="mt-6 border-t border-border pt-4 text-center text-[8px] text-muted-foreground">
-            WASD / ARROW KEYS TO OVERRIDE
+          <div className="mt-6 border-t border-border pt-4 text-center text-[8px] text-muted-foreground uppercase">
+            <Trans>WASD / ARROW keys to override</Trans>
           </div>
         </div>
       </div>

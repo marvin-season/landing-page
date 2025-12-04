@@ -25,7 +25,7 @@ export default async function Home({ params }: PageLangParam) {
         ),
       ]}
       primaryCta={{
-        label: i18n._(msg`Book a pilot`),
+        label: i18n._(msg`About me`),
         href: `/${lang}/resume`,
       }}
     />
