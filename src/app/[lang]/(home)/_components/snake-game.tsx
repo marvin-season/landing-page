@@ -1,4 +1,10 @@
-'use client'
+"use client";
+import {
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+} from "lucide-react";
 import { Press_Start_2P } from "next/font/google";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,7 +32,7 @@ const GRID_SIZE = 18;
 const INITIAL_LENGTH = 4;
 const CANVAS_SIZE = 396; // Canvas 尺寸 (对应 CSS 宽度)
 const TILE_SIZE = CANVAS_SIZE / GRID_SIZE;
-const MOVE_INTERVAL = 1000; // 1秒移动一次
+const MOVE_INTERVAL = 1000; // Standard arcade speed
 const MAX_EXPLORED_NODES = 6000;
 
 const DIRECTION_VECTORS: { [key in Direction]: Point } = {
@@ -52,11 +58,11 @@ const KEYBOARD_DIRECTIONS: { [key: string]: Direction } = {
 };
 
 const DIRECTION_ORDER: Direction[] = ["UP", "RIGHT", "DOWN", "LEFT"];
-const DIRECTION_LABELS: { [key in Direction]: string } = {
-  UP: "↑",
-  RIGHT: "→",
-  DOWN: "↓",
-  LEFT: "←",
+const DIRECTION_LABELS: { [key in Direction]: React.ReactNode } = {
+  UP: <ArrowUpIcon className="w-4 h-4" />,
+  RIGHT: <ArrowRightIcon className="w-4 h-4" />,
+  DOWN: <ArrowDownIcon className="w-4 h-4" />,
+  LEFT: <ArrowLeftIcon className="w-4 h-4" />,
 };
 
 // --- Utility Functions ---
@@ -248,7 +254,7 @@ function drawTile(
 ): void {
   const x = point.x * TILE_SIZE;
   const y = point.y * TILE_SIZE;
-  const padding = 2;
+  const padding = 1; // Sharper pixels
   const size = TILE_SIZE - padding * 2;
 
   ctx.shadowColor = "transparent";
@@ -258,15 +264,9 @@ function drawTile(
   ctx.fillStyle = fillStyle;
   ctx.fillRect(x + padding, y + padding, size, size);
 
-  // 2. Inner Highlight (Top-Left)
-  ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-  ctx.fillRect(x + padding, y + padding, size - 4, 4);
-  ctx.fillRect(x + padding, y + padding, 4, size - 4);
-
-  // 3. Inner Shadow (Bottom-Right)
-  ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-  ctx.fillRect(x + padding + size - 4, y + padding + 4, 4, size - 4);
-  ctx.fillRect(x + padding + 4, y + padding + size - 4, size - 4, 4);
+  // 2. Simple shine
+  ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+  ctx.fillRect(x + padding, y + padding, size, size / 2);
 }
 
 /**
@@ -281,38 +281,32 @@ function drawGame(
 ): void {
   if (!ctx || !snake || !food) return;
 
-  // 1. Clear canvas
-  ctx.fillStyle = "#020202"; // Dark background for canvas
+  // 1. Clear canvas - Keep strict black for retro screen feel
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-  // Optional: Draw Grid
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  for (let i = 0; i <= GRID_SIZE; i++) {
-    ctx.moveTo(i * TILE_SIZE, 0);
-    ctx.lineTo(i * TILE_SIZE, CANVAS_SIZE);
-    ctx.moveTo(0, i * TILE_SIZE);
-    ctx.lineTo(CANVAS_SIZE, i * TILE_SIZE);
+  // Grid (Scanlines)
+  ctx.fillStyle = "rgba(0, 255, 0, 0.03)";
+  for (let i = 0; i < CANVAS_SIZE; i += 2) {
+    ctx.fillRect(0, i, CANVAS_SIZE, 1);
   }
-  ctx.stroke();
 
-  // 2. Draw Food (Pixel Apple Red)
-  drawTile(ctx, food, "#ef4444"); // red-500
+  // 2. Draw Food (Retro Red)
+  drawTile(ctx, food, "#ef4444");
 
-  // 3. Draw Snake Body (Pixel Green)
+  // 3. Draw Snake Body (Retro Green)
   for (let i = 1; i < snake.length; i++) {
-    drawTile(ctx, snake[i], "#10b981"); // emerald-500
+    drawTile(ctx, snake[i], "#22c55e");
   }
 
   // 4. Draw Snake Head (Brighter Green)
-  drawTile(ctx, snake[0], "#34d399"); // emerald-400
+  drawTile(ctx, snake[0], "#86efac");
 }
 
 // --- UI Components ---
 
 interface DirectionKeyProps {
-  label: string;
+  label: React.ReactNode;
   onClick: () => void;
 }
 
@@ -321,7 +315,7 @@ const DirectionKey: React.FC<DirectionKeyProps> = ({ label, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-12 w-12 items-center justify-center border-b-4 border-r-4 border-t-2 border-l-2 border-white/30 bg-[#222] text-sm transition active:border-t-4 active:border-l-4 active:border-b-2 active:border-r-2 active:translate-y-0.5 active:bg-[#333] hover:bg-[#2a2a2a] cursor-pointer select-none text-white`}
+      className={`flex h-12 w-12 items-center justify-center border-2 border-b-4 border-border bg-secondary text-sm transition active:border-b-2 active:translate-y-0.5 hover:bg-secondary/80 cursor-pointer select-none text-foreground font-bold`}
     >
       {label}
     </button>
@@ -334,13 +328,11 @@ interface DirectionCoreProps {
 }
 
 const DirectionCore: React.FC<DirectionCoreProps> = ({
-  autopilot,
   direction,
 }) => {
   return (
-    <div className="flex h-12 flex-col items-center justify-center border-2 border-white/10 bg-[#111] text-[8px] uppercase tracking-widest text-white/60">
-      <span>{autopilot ? "AI" : "P1"}</span>
-      <span className="text-xs text-emerald-400 mt-1">
+    <div className="flex h-12 flex-col items-center justify-center border-2 border-border bg-black text-[8px] uppercase tracking-widest text-white/60">
+      <span className="text-xs text-primary mt-1">
         {DIRECTION_LABELS[direction]}
       </span>
     </div>
@@ -531,17 +523,17 @@ export default function SnakeGameCanvas(): React.JSX.Element {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-screen bg-[#111] p-4 ${pressStart.className} text-white`}
+      className={`flex flex-col items-center justify-center min-h-full bg-transparent p-4 ${pressStart.className} text-foreground`}
     >
-      <div className="relative w-full max-w-sm border-4 border-white bg-[#222] p-1 shadow-[8px_8px_0_rgba(0,0,0,0.5)]">
+      <div className="relative w-full max-w-sm border-4 border-border bg-card p-1 shadow-[8px_8px_0_var(--color-border)]">
         {/* Decorative corners */}
-        <div className="absolute -left-1 -top-1 h-2 w-2 bg-white" />
-        <div className="absolute -right-1 -top-1 h-2 w-2 bg-white" />
-        <div className="absolute -bottom-1 -left-1 h-2 w-2 bg-white" />
-        <div className="absolute -bottom-1 -right-1 h-2 w-2 bg-white" />
+        <div className="absolute -left-1 -top-1 h-2 w-2 bg-border" />
+        <div className="absolute -right-1 -top-1 h-2 w-2 bg-border" />
+        <div className="absolute -bottom-1 -left-1 h-2 w-2 bg-border" />
+        <div className="absolute -bottom-1 -right-1 h-2 w-2 bg-border" />
 
-        <div className="border-2 border-white/10 bg-black p-4">
-          <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-emerald-400">
+        <div className="border-2 border-border bg-muted/20 p-4">
+          <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-primary font-bold">
             <span>RETRO SNAKE</span>
             <span className={autopilot ? "animate-pulse" : ""}>
               {autopilot ? "AI AUTO" : "MANUAL"}
@@ -549,20 +541,22 @@ export default function SnakeGameCanvas(): React.JSX.Element {
           </div>
 
           {/* Canvas 游戏区域 */}
-          <div className="relative flex items-center justify-center border-4 border-[#333] bg-black">
+          <div className="relative flex items-center justify-center border-4 border-border bg-black">
             <canvas
               ref={canvasRef}
               width={CANVAS_SIZE}
               height={CANVAS_SIZE}
               style={{
                 imageRendering: "pixelated",
+                width: "100%",
+                height: "auto",
               }}
             />
 
             {/* Game Over 消息框 */}
             {gameOver && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/85 text-center">
-                <p className="mb-4 text-xl text-red-500 shadow-[2px_2px_0_#000]">
+                <p className="mb-4 text-xl text-destructive shadow-[2px_2px_0_#000]">
                   GAME OVER
                 </p>
                 <p className="blink text-[10px] text-white/70">
@@ -574,9 +568,9 @@ export default function SnakeGameCanvas(): React.JSX.Element {
 
           {/* 控制区和得分显示 */}
           <div className="mt-6 space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-white/10 pb-2">
-              <span className="text-[10px] text-white/60">SCORE</span>
-              <span className="text-xl text-emerald-400">
+            <div className="flex items-center justify-between border-b-2 border-border pb-2">
+              <span className="text-[10px] text-muted-foreground">SCORE</span>
+              <span className="text-xl text-primary">
                 {score.toString().padStart(4, "0")}
               </span>
             </div>
@@ -615,20 +609,18 @@ export default function SnakeGameCanvas(): React.JSX.Element {
               onClick={() => {
                 if (!gameOver) setAutopilot(true);
               }}
-              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition 
+              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition font-bold
                     ${
                       autopilot
-                        ? "cursor-not-allowed border-emerald-500/30 bg-emerald-900/10 text-emerald-500/50"
-                        : "border-white/40 text-white hover:bg-white hover:text-black active:translate-y-1"
+                        ? "cursor-not-allowed border-primary/30 bg-primary/10 text-primary/50"
+                        : "border-border text-foreground hover:bg-secondary active:translate-y-1"
                     }`}
             >
               {autopilot ? "AI ACTIVE" : "ENABLE AI"}
             </button>
           </div>
 
-          <div className="mt-6 border-t border-white/5 pt-4 text-center text-[8px] leading-relaxed text-white/30">
-            BFS PATHFINDING ALGORITHM
-            <br />
+          <div className="mt-6 border-t border-border pt-4 text-center text-[8px] text-muted-foreground">
             WASD / ARROW KEYS TO OVERRIDE
           </div>
         </div>
