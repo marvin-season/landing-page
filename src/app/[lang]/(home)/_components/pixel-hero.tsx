@@ -34,47 +34,53 @@ export function PixelHero({
   secondaryCta,
 }: PixelHeroProps) {
   return (
-    <section className="relative min-h-dvh overflow-hidden bg-[#020016] px-4 py-16 md:px-8">
+    <section className="relative min-h-dvh overflow-hidden bg-[#111] px-4 py-16 md:px-8 font-mono">
       <PixelBackdrop />
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 rounded-[32px] border border-white/15 bg-[linear-gradient(135deg,rgba(10,3,45,0.96),rgba(3,0,15,0.94))] p-8 shadow-[0_35px_70px_rgba(2,0,20,0.85)] backdrop-blur-2xl lg:flex-row lg:gap-14 lg:p-12">
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 border-4 border-white/20 bg-[#1a1a1a] p-8 shadow-[16px_16px_0_rgba(0,0,0,0.5)] lg:flex-row lg:gap-14 lg:p-12">
+        {/* Decorative Corner Squares */}
+        <div className="absolute -left-1 -top-1 h-4 w-4 bg-white" />
+        <div className="absolute -right-1 -top-1 h-4 w-4 bg-white" />
+        <div className="absolute -bottom-1 -left-1 h-4 w-4 bg-white" />
+        <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-white" />
+
         <div className="flex flex-1 flex-col justify-center gap-8 text-pretty">
           <span
-            className={`${pressStart.className} inline-flex w-max items-center gap-3 rounded-sm border-2 border-white/40 bg-black/60 px-4 py-2 text-[10px] uppercase tracking-[0.4em] text-emerald-300 shadow-[4px_4px_0_rgba(0,0,0,0.85)]`}
+            className={`${pressStart.className} inline-flex w-max items-center gap-3 border-2 border-emerald-500/50 bg-emerald-900/20 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-emerald-400 shadow-[4px_4px_0_rgba(0,0,0,0.5)]`}
           >
+            <span className="h-2 w-2 animate-pulse bg-emerald-500" />
             {badge}
-            <span className="h-2 w-2 animate-pulse rounded-sm bg-emerald-400" />
           </span>
-          <h1 className="text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className={`text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl tracking-tight ${pressStart.className} leading-[1.4]`}>
             {title}
           </h1>
-          <p className="max-w-2xl text-base text-white/70 sm:text-lg">
+          <p className="max-w-2xl text-base text-white/70 sm:text-lg leading-relaxed border-l-4 border-white/10 pl-4">
             {description}
           </p>
-          <div className="flex flex-wrap gap-4 text-xs">
+          <div className="flex flex-wrap gap-4 text-xs mt-2">
             <Link
               href={primaryCta.href}
-              className={`${pixelButtonBase} bg-emerald-300 text-black shadow-[6px_6px_0_rgba(0,0,0,0.8)]`}
+              className={`${pixelButtonBase} bg-emerald-400 text-black shadow-[6px_6px_0_rgba(0,0,0,0.8)] hover:bg-emerald-300`}
             >
               {primaryCta.label}
             </Link>
             <Link
               href={secondaryCta.href}
-              className={`${pixelButtonBase} border-white/50 bg-[#0E0A1A] text-white shadow-[6px_6px_0_rgba(0,0,0,0.8)]`}
+              className={`${pixelButtonBase} border-white/40 bg-[#222] text-white shadow-[6px_6px_0_rgba(0,0,0,0.8)] hover:bg-[#333] hover:text-emerald-300`}
             >
               {secondaryCta.label}
             </Link>
           </div>
-          <div className="rounded-xl border border-white/15 bg-white/10 p-4 shadow-inner shadow-black/30 backdrop-blur">
-            <p className="mb-3 text-xs tracking-[0.3em] text-white/60">
-              SYSTEM NOTES
+          <div className="border-2 border-white/10 bg-black/40 p-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+            <p className={`mb-4 text-xs uppercase tracking-[0.2em] text-emerald-500/80 ${pressStart.className}`}>
+              &gt; SYSTEM_LOGS
             </p>
-            <ul className="grid gap-2 text-sm text-white/80">
+            <ul className="grid gap-3 text-sm text-white/80 font-mono">
               {highlights.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-3 text-sm font-medium"
+                  className="flex items-start gap-3 text-xs sm:text-sm leading-relaxed"
                 >
-                  <span className="h-2 w-2 rounded-sm bg-emerald-400 shadow-[0_0_10px_rgba(34,197,94,0.8)]" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-emerald-500" />
                   {item}
                 </li>
               ))}
@@ -94,11 +100,26 @@ export function PixelHero({
 function PixelBackdrop() {
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(circle_at_center,rgba(4,2,22,0.95),rgba(0,0,0,1))]" />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.32),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_bottom,rgba(59,130,246,0.3),transparent_60%)] mix-blend-screen" />
-      <div className="pointer-events-none absolute inset-6 -z-10 rounded-[40px] border border-white/12 bg-[linear-gradient(120deg,rgba(20,12,60,0.95),rgba(5,2,25,0.92))] shadow-[0_0_90px_rgba(45,212,191,0.25)]" />
-      <div className="pointer-events-none absolute inset-0 -z-5 opacity-70 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-size-[22px_22px]" />
+      {/* Dark base background */}
+      <div className="pointer-events-none absolute inset-0 -z-30 bg-[#050505]" />
+      
+      {/* Grid Pattern */}
+      <div 
+        className="pointer-events-none absolute inset-0 -z-20 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #333 1px, transparent 1px),
+            linear-gradient(to bottom, #333 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }}
+      />
+
+      {/* Vignette Effect */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]" />
+      
+      {/* Retro Scanlines */}
+      <div className="pointer-events-none absolute inset-0 -z-5 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-size-[100%_4px,3px_100%] opacity-20" />
     </>
   );
 }

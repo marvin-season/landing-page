@@ -1,5 +1,11 @@
 'use client'
+import { Press_Start_2P } from "next/font/google";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+const pressStart = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 // --- Types and Constants ---
 
@@ -234,62 +240,33 @@ function fallbackDirection(
  * @param {CanvasRenderingContext2D} ctx
  * @param {Point} point
  * @param {string} fillStyle
- * @param {string} shadowColor
- * @param {number} shadowBlur
  */
 function drawTile(
   ctx: CanvasRenderingContext2D,
   point: Point,
   fillStyle: string,
-  shadowColor: string = "transparent",
-  shadowBlur: number = 0,
 ): void {
   const x = point.x * TILE_SIZE;
   const y = point.y * TILE_SIZE;
-  const padding = 1;
+  const padding = 2;
   const size = TILE_SIZE - padding * 2;
-  const radius = 3;
 
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+
+  // 1. Main Block
   ctx.fillStyle = fillStyle;
-  ctx.shadowColor = shadowColor;
-  ctx.shadowBlur = shadowBlur;
+  ctx.fillRect(x + padding, y + padding, size, size);
 
-  ctx.beginPath();
-  ctx.moveTo(x + padding + radius, y + padding);
-  ctx.lineTo(x + padding + size - radius, y + padding);
-  ctx.arcTo(
-    x + padding + size,
-    y + padding,
-    x + padding + size,
-    y + padding + radius,
-    radius,
-  );
-  ctx.lineTo(x + padding + size, y + padding + size - radius);
-  ctx.arcTo(
-    x + padding + size,
-    y + padding + size,
-    x + padding + size - radius,
-    y + padding + size,
-    radius,
-  );
-  ctx.lineTo(x + padding + radius, y + padding + size);
-  ctx.arcTo(
-    x + padding,
-    y + padding + size,
-    x + padding,
-    y + padding + size - radius,
-    radius,
-  );
-  ctx.lineTo(x + padding, y + padding + radius);
-  ctx.arcTo(
-    x + padding,
-    y + padding,
-    x + padding + radius,
-    y + padding,
-    radius,
-  );
-  ctx.closePath();
-  ctx.fill();
+  // 2. Inner Highlight (Top-Left)
+  ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+  ctx.fillRect(x + padding, y + padding, size - 4, 4);
+  ctx.fillRect(x + padding, y + padding, 4, size - 4);
+
+  // 3. Inner Shadow (Bottom-Right)
+  ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+  ctx.fillRect(x + padding + size - 4, y + padding + 4, 4, size - 4);
+  ctx.fillRect(x + padding + 4, y + padding + size - 4, size - 4, 4);
 }
 
 /**
@@ -305,20 +282,31 @@ function drawGame(
   if (!ctx || !snake || !food) return;
 
   // 1. Clear canvas
-  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  ctx.fillStyle = "#020202"; // Dark background for canvas
+  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-  // 2. Draw Food (Magenta Neon)
-  drawTile(ctx, food, "#e879f9", "rgba(232,121,249,0.8)", 15);
+  // Optional: Draw Grid
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 0; i <= GRID_SIZE; i++) {
+    ctx.moveTo(i * TILE_SIZE, 0);
+    ctx.lineTo(i * TILE_SIZE, CANVAS_SIZE);
+    ctx.moveTo(0, i * TILE_SIZE);
+    ctx.lineTo(CANVAS_SIZE, i * TILE_SIZE);
+  }
+  ctx.stroke();
 
-  // 3. Draw Snake Body (Emerald Green)
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
+  // 2. Draw Food (Pixel Apple Red)
+  drawTile(ctx, food, "#ef4444"); // red-500
+
+  // 3. Draw Snake Body (Pixel Green)
   for (let i = 1; i < snake.length; i++) {
-    drawTile(ctx, snake[i], "rgba(16, 185, 129, 0.8)"); // emerald-500/80
+    drawTile(ctx, snake[i], "#10b981"); // emerald-500
   }
 
-  // 4. Draw Snake Head (Brighter Emerald Neon)
-  drawTile(ctx, snake[0], "#6ee7b7", "rgba(16,185,129,0.9)", 12);
+  // 4. Draw Snake Head (Brighter Green)
+  drawTile(ctx, snake[0], "#34d399"); // emerald-400
 }
 
 // --- UI Components ---
@@ -333,9 +321,7 @@ const DirectionKey: React.FC<DirectionKeyProps> = ({ label, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 text-lg font-black transition sm:h-14 sm:w-14 cursor-pointer select-none
-        border-white/20 bg-[#060a1a] text-white/35 hover:border-white/30 active:border-emerald-300 active:bg-emerald-300/30 active:text-white active:shadow-[0_0_15px_rgba(16,185,129,0.6)]
-        `}
+      className={`flex h-12 w-12 items-center justify-center border-b-4 border-r-4 border-t-2 border-l-2 border-white/30 bg-[#222] text-sm transition active:border-t-4 active:border-l-4 active:border-b-2 active:border-r-2 active:translate-y-0.5 active:bg-[#333] hover:bg-[#2a2a2a] cursor-pointer select-none text-white`}
     >
       {label}
     </button>
@@ -352,9 +338,9 @@ const DirectionCore: React.FC<DirectionCoreProps> = ({
   direction,
 }) => {
   return (
-    <div className="flex h-12 flex-col items-center justify-center rounded-xl border-2 border-white/20 bg-[#060b1d] text-[9px] font-semibold uppercase tracking-[0.35em] text-white/60 sm:h-14">
-      <span>{autopilot ? "AI" : "YOU"}</span>
-      <span className="text-lg font-black text-white">
+    <div className="flex h-12 flex-col items-center justify-center border-2 border-white/10 bg-[#111] text-[8px] uppercase tracking-widest text-white/60">
+      <span>{autopilot ? "AI" : "P1"}</span>
+      <span className="text-xs text-emerald-400 mt-1">
         {DIRECTION_LABELS[direction]}
       </span>
     </div>
@@ -544,97 +530,108 @@ export default function SnakeGameCanvas(): React.JSX.Element {
   }, [gameOver, commitDirection]);
 
   return (
-    // 使用 Tailwind CSS 模仿科技感深色 UI
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0d001a] p-4 font-['Inter']">
-      <div className="rounded-[24px] border border-white/10 bg-[#04010B]/70 p-5 text-white shadow-[12px_12px_0_rgba(3,0,12,0.7)] backdrop-blur-lg w-full max-w-sm">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
-          <span>PIXEL SNAKE (CANVAS)</span>
-          <span>{autopilot ? "AI MODE" : "MANUAL"}</span>
-        </div>
+    <div
+      className={`flex flex-col items-center justify-center min-h-screen bg-[#111] p-4 ${pressStart.className} text-white`}
+    >
+      <div className="relative w-full max-w-sm border-4 border-white bg-[#222] p-1 shadow-[8px_8px_0_rgba(0,0,0,0.5)]">
+        {/* Decorative corners */}
+        <div className="absolute -left-1 -top-1 h-2 w-2 bg-white" />
+        <div className="absolute -right-1 -top-1 h-2 w-2 bg-white" />
+        <div className="absolute -bottom-1 -left-1 h-2 w-2 bg-white" />
+        <div className="absolute -bottom-1 -right-1 h-2 w-2 bg-white" />
 
-        {/* Canvas 游戏区域 */}
-        <div className="mt-4 flex justify-center items-center relative">
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            className="rounded-2xl border border-white/10 shadow-inner shadow-black/50"
-            style={{
-              background: "linear-gradient(180deg, #0E041B 0%, #06010D 100%)",
-            }}
-          />
-
-          {/* Game Over 消息框 */}
-          {gameOver && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/80 text-center">
-              <p className="text-2xl font-black tracking-[0.5em] text-red-400">
-                GAME OVER
-              </p>
-              <p className="mt-2 text-xs tracking-[0.3em] text-white/70">
-                REBOOT IN {countdown}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* 控制区和得分显示 */}
-        <div className="mt-6 grid gap-5 rounded-2xl border border-white/15 bg-[#050818]/80 p-5 text-xs uppercase tracking-[0.3em]">
-          <div className="flex items-center justify-between text-sm tracking-normal text-white">
-            <span>SCORE</span>
-            <span className="font-mono text-2xl text-emerald-300">
-              {score.toString().padStart(3, "0")}
+        <div className="border-2 border-white/10 bg-black p-4">
+          <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-emerald-400">
+            <span>RETRO SNAKE</span>
+            <span className={autopilot ? "animate-pulse" : ""}>
+              {autopilot ? "AI AUTO" : "MANUAL"}
             </span>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-white/70">
-            <span>PACE / 1.0S</span>
-            <span>ARROWS · OR · WASD TAKEOVER</span>
+
+          {/* Canvas 游戏区域 */}
+          <div className="relative flex items-center justify-center border-4 border-[#333] bg-black">
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_SIZE}
+              height={CANVAS_SIZE}
+              style={{
+                imageRendering: "pixelated",
+              }}
+            />
+
+            {/* Game Over 消息框 */}
+            {gameOver && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/85 text-center">
+                <p className="mb-4 text-xl text-red-500 shadow-[2px_2px_0_#000]">
+                  GAME OVER
+                </p>
+                <p className="blink text-[10px] text-white/70">
+                  RESET IN {countdown}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* 方向键控制 */}
-          <div className="flex flex-col items-center gap-3 text-[10px]">
-            <p className="uppercase tracking-[0.4em] text-white/45">INPUT</p>
-            <div className="grid grid-cols-3 gap-2">
-              <div />
-              <DirectionKey
-                label={DIRECTION_LABELS.UP}
-                onClick={() => commitDirection("UP", true)}
-              />
-              <div />
-              <DirectionKey
-                label={DIRECTION_LABELS.LEFT}
-                onClick={() => commitDirection("LEFT", true)}
-              />
-              <DirectionCore autopilot={autopilot} direction={direction} />
-              <DirectionKey
-                label={DIRECTION_LABELS.RIGHT}
-                onClick={() => commitDirection("RIGHT", true)}
-              />
-              <div />
-              <DirectionKey
-                label={DIRECTION_LABELS.DOWN}
-                onClick={() => commitDirection("DOWN", true)}
-              />
-              <div />
+          {/* 控制区和得分显示 */}
+          <div className="mt-6 space-y-6">
+            <div className="flex items-center justify-between border-b-2 border-white/10 pb-2">
+              <span className="text-[10px] text-white/60">SCORE</span>
+              <span className="text-xl text-emerald-400">
+                {score.toString().padStart(4, "0")}
+              </span>
             </div>
+
+            {/* 方向键控制 */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="grid grid-cols-3 gap-2">
+                <div />
+                <DirectionKey
+                  label={DIRECTION_LABELS.UP}
+                  onClick={() => commitDirection("UP", true)}
+                />
+                <div />
+                <DirectionKey
+                  label={DIRECTION_LABELS.LEFT}
+                  onClick={() => commitDirection("LEFT", true)}
+                />
+                <DirectionCore autopilot={autopilot} direction={direction} />
+                <DirectionKey
+                  label={DIRECTION_LABELS.RIGHT}
+                  onClick={() => commitDirection("RIGHT", true)}
+                />
+                <div />
+                <DirectionKey
+                  label={DIRECTION_LABELS.DOWN}
+                  onClick={() => commitDirection("DOWN", true)}
+                />
+                <div />
+              </div>
+            </div>
+
+            {/* 自动驾驶按钮 */}
+            <button
+              type="button"
+              disabled={autopilot || gameOver}
+              onClick={() => {
+                if (!gameOver) setAutopilot(true);
+              }}
+              className={`w-full border-2 py-3 text-[10px] uppercase tracking-widest transition 
+                    ${
+                      autopilot
+                        ? "cursor-not-allowed border-emerald-500/30 bg-emerald-900/10 text-emerald-500/50"
+                        : "border-white/40 text-white hover:bg-white hover:text-black active:translate-y-1"
+                    }`}
+            >
+              {autopilot ? "AI ACTIVE" : "ENABLE AI"}
+            </button>
           </div>
 
-          {/* 自动驾驶按钮 */}
-          <button
-            type="button"
-            disabled={autopilot || gameOver}
-            onClick={() => {
-              if (!gameOver) setAutopilot(true);
-            }}
-            className="rounded-lg border border-white/25 bg-gradient-to-r from-[#0C1724] to-[#071426] px-4 py-3 text-[10px] tracking-[0.35em] text-white/80 transition disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {autopilot ? "AI PILOT ACTIVE" : "RESTORE AUTOPILOT"}
-          </button>
+          <div className="mt-6 border-t border-white/5 pt-4 text-center text-[8px] leading-relaxed text-white/30">
+            BFS PATHFINDING ALGORITHM
+            <br />
+            WASD / ARROW KEYS TO OVERRIDE
+          </div>
         </div>
-
-        <p className="mt-4 text-[11px] leading-relaxed text-white/60">
-          AI 自动驾驶通过 BFS 算法找到前往食物的最短安全路径。按下方向键或 WASD
-          即可接管控制权。
-        </p>
       </div>
     </div>
   );
