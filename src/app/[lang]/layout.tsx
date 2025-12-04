@@ -12,7 +12,6 @@ import {
 import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
 import { SettingsMenu } from "@/components/settings-menu";
-import { Background } from "@/components/ui";
 
 const lora = Lora({
   weight: "400",
@@ -51,7 +50,7 @@ export default async function RootLayout({
         >
           <ThemeProvider>
             <SettingsMenu currentLang={lang} />
-            <Background>{children}</Background>
+            {children}
           </ThemeProvider>
         </LinguiClientProvider>
       </body>
