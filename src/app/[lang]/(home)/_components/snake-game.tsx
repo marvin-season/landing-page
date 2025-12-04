@@ -1,12 +1,21 @@
 'use client'
-import  {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-// --- Constants ---
+// --- Types and Constants ---
+
+type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface PathNode {
+  head: Point;
+  body: Point[];
+  path: Direction[];
+}
+
 const GRID_SIZE = 18;
 const INITIAL_LENGTH = 4;
 const CANVAS_SIZE = 396; // Canvas 尺寸 (对应 CSS 宽度)
@@ -14,14 +23,14 @@ const TILE_SIZE = CANVAS_SIZE / GRID_SIZE;
 const MOVE_INTERVAL = 1000; // 1秒移动一次
 const MAX_EXPLORED_NODES = 6000;
 
-const DIRECTION_VECTORS = {
+const DIRECTION_VECTORS: { [key in Direction]: Point } = {
   UP: { x: 0, y: -1 },
   DOWN: { x: 0, y: 1 },
   LEFT: { x: -1, y: 0 },
   RIGHT: { x: 1, y: 0 },
 };
 
-const KEYBOARD_DIRECTIONS = {
+const KEYBOARD_DIRECTIONS: { [key: string]: Direction } = {
   ArrowUp: "UP",
   ArrowDown: "DOWN",
   ArrowLeft: "LEFT",
@@ -36,16 +45,18 @@ const KEYBOARD_DIRECTIONS = {
   D: "RIGHT",
 };
 
-const DIRECTION_ORDER = ["UP", "RIGHT", "DOWN", "LEFT"];
-const DIRECTION_LABELS = { UP: "↑", RIGHT: "→", DOWN: "↓", LEFT: "←" };
+const DIRECTION_ORDER: Direction[] = ["UP", "RIGHT", "DOWN", "LEFT"];
+const DIRECTION_LABELS: { [key in Direction]: string } = {
+  UP: "↑",
+  RIGHT: "→",
+  DOWN: "↓",
+  LEFT: "←",
+};
 
 // --- Utility Functions ---
 
-/** @typedef {{x: number, y: number}} Point */
-/** @typedef {'UP' | 'DOWN' | 'LEFT' | 'RIGHT'} Direction */
-
 /** @returns {Point[]} */
-function createInitialSnake() {
+function createInitialSnake(): Point[] {
   const center = Math.floor(GRID_SIZE / 2);
   return Array.from({ length: INITIAL_LENGTH }, (_, index) => ({
     x: center - index,
@@ -54,23 +65,23 @@ function createInitialSnake() {
 }
 
 /** @param {Point} a @param {Point} b */
-function samePoint(a, b) {
+function samePoint(a: Point, b: Point): boolean {
   return a.x === b.x && a.y === b.y;
 }
 
 /** @param {Point} point */
-function pointKey(point) {
+function pointKey(point: Point): string {
   return `${point.x}-${point.y}`;
 }
 
 /** @param {Point} point @param {Direction} direction @returns {Point} */
-function movePoint(point, direction) {
+function movePoint(point: Point, direction: Direction): Point {
   const vector = DIRECTION_VECTORS[direction];
   return { x: point.x + vector.x, y: point.y + vector.y };
 }
 
 /** @param {Direction} a @param {Direction} b @returns {boolean} */
-function isOpposite(a, b) {
+function isOpposite(a: Direction, b: Direction): boolean {
   return (
     (a === "UP" && b === "DOWN") ||
     (a === "DOWN" && b === "UP") ||
@@ -80,35 +91,36 @@ function isOpposite(a, b) {
 }
 
 /** @param {Point} point @returns {boolean} */
-function isInside(point) {
+function isInside(point: Point): boolean {
   return (
     point.x >= 0 && point.x < GRID_SIZE && point.y >= 0 && point.y < GRID_SIZE
   );
 }
 
 /** @param {Point} a @param {Point} b @returns {number} */
-function manhattan(a, b) {
+function manhattan(a: Point, b: Point): number {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 /** @param {Point[]} body @returns {string} */
-function serializeBody(body) {
+function serializeBody(body: Point[]): string {
   return body.map(pointKey).join("|");
 }
 
 /** @param {Point[]} occupied @returns {Point} */
-function randomFood(occupied) {
+function randomFood(occupied: Point[]): Point {
   const occupiedKeys = new Set(occupied.map(pointKey));
-  const available = [];
+  const available: Point[] = [];
   for (let y = 0; y < GRID_SIZE; y += 1) {
     for (let x = 0; x < GRID_SIZE; x += 1) {
-      const candidate = { x, y };
+      const candidate: Point = { x, y };
       if (!occupiedKeys.has(pointKey(candidate))) {
         available.push(candidate);
       }
     }
   }
   if (!available.length) {
+    // Should only happen when the grid is full
     return occupied[occupied.length - 1] ?? { x: 0, y: 0 };
   }
   return available[Math.floor(Math.random() * available.length)];
@@ -116,33 +128,30 @@ function randomFood(occupied) {
 
 // --- AI Logic (BFS) ---
 
-/** @typedef {Object} PathNode
- * @property {Point} head - 蛇头位置
- * @property {Point[]} body - 蛇身状态
- * @property {Direction[]} path - 路径
- */
-
 /**
  * 寻找一条安全到达食物的路径 (BFS)
  * @param {Point[]} initialSnake
  * @param {Point} targetFood
  * @returns {Direction[] | null}
  */
-function findPathToFood(initialSnake, targetFood) {
+function findPathToFood(
+  initialSnake: Point[],
+  targetFood: Point,
+): Direction[] | null {
   /** @type {PathNode[]} */
-  const queue = [
+  const queue: PathNode[] = [
     {
       head: initialSnake[0],
       body: initialSnake,
       path: [],
     },
   ];
-  const visited = new Set([serializeBody(initialSnake)]);
+  const visited = new Set<string>([serializeBody(initialSnake)]);
   let explored = 0;
 
   while (queue.length && explored < MAX_EXPLORED_NODES) {
     explored += 1;
-    const current = queue.shift();
+    const current = queue.shift()!;
     if (samePoint(current.head, targetFood)) {
       return current.path;
     }
@@ -152,7 +161,7 @@ function findPathToFood(initialSnake, targetFood) {
       if (!isInside(nextHead)) continue;
 
       const grows = samePoint(nextHead, targetFood);
-      let segmentsToAvoid = current.body;
+      let segmentsToAvoid: Point[] = current.body;
       if (!grows) {
         segmentsToAvoid = current.body.slice(0, current.body.length - 1);
       }
@@ -188,9 +197,13 @@ function findPathToFood(initialSnake, targetFood) {
  * @param {Direction} currentDir
  * @returns {Direction}
  */
-function fallbackDirection(currentSnake, currentFood, currentDir) {
+function fallbackDirection(
+  currentSnake: Point[],
+  currentFood: Point,
+  currentDir: Direction,
+): Direction {
   const head = currentSnake[0];
-  const candidates = [...DIRECTION_ORDER].sort((a, b) => {
+  const candidates: Direction[] = [...DIRECTION_ORDER].sort((a, b) => {
     return (
       manhattan(movePoint(head, a), currentFood) -
       manhattan(movePoint(head, b), currentFood)
@@ -204,10 +217,10 @@ function fallbackDirection(currentSnake, currentFood, currentDir) {
 
     const nextHead = movePoint(head, dir);
 
-    // 1. 墙壁检查
+    // 1. Wall Collision Check
     if (!isInside(nextHead)) continue;
 
-    // 2. 身体检查
+    // 2. Body Collision Check (assuming no growth)
     if (nonTailBody.some((segment) => samePoint(segment, nextHead))) continue;
 
     return dir;
@@ -215,7 +228,7 @@ function fallbackDirection(currentSnake, currentFood, currentDir) {
   return currentDir;
 }
 
-// --- Drawing Component ---
+// --- Drawing Logic ---
 
 /**
  * @param {CanvasRenderingContext2D} ctx
@@ -225,12 +238,12 @@ function fallbackDirection(currentSnake, currentFood, currentDir) {
  * @param {number} shadowBlur
  */
 function drawTile(
-  ctx,
-  point,
-  fillStyle,
-  shadowColor = "transparent",
-  shadowBlur = 0,
-) {
+  ctx: CanvasRenderingContext2D,
+  point: Point,
+  fillStyle: string,
+  shadowColor: string = "transparent",
+  shadowBlur: number = 0,
+): void {
   const x = point.x * TILE_SIZE;
   const y = point.y * TILE_SIZE;
   const padding = 1;
@@ -284,7 +297,11 @@ function drawTile(
  * @param {Point[]} snake
  * @param {Point} food
  */
-function drawGame(ctx, snake, food) {
+function drawGame(
+  ctx: CanvasRenderingContext2D,
+  snake: Point[],
+  food: Point,
+): void {
   if (!ctx || !snake || !food) return;
 
   // 1. Clear canvas
@@ -306,7 +323,12 @@ function drawGame(ctx, snake, food) {
 
 // --- UI Components ---
 
-function DirectionKey({ label, onClick }) {
+interface DirectionKeyProps {
+  label: string;
+  onClick: () => void;
+}
+
+const DirectionKey: React.FC<DirectionKeyProps> = ({ label, onClick }) => {
   return (
     <button
       type="button"
@@ -318,9 +340,17 @@ function DirectionKey({ label, onClick }) {
       {label}
     </button>
   );
+};
+
+interface DirectionCoreProps {
+  autopilot: boolean;
+  direction: Direction;
 }
 
-function DirectionCore({ autopilot, direction }) {
+const DirectionCore: React.FC<DirectionCoreProps> = ({
+  autopilot,
+  direction,
+}) => {
   return (
     <div className="flex h-12 flex-col items-center justify-center rounded-xl border-2 border-white/20 bg-[#060b1d] text-[9px] font-semibold uppercase tracking-[0.35em] text-white/60 sm:h-14">
       <span>{autopilot ? "AI" : "YOU"}</span>
@@ -329,38 +359,56 @@ function DirectionCore({ autopilot, direction }) {
       </span>
     </div>
   );
-}
+};
 
 // --- Main App Component ---
 
-export default function SnakeGameCanvas() {
+interface GameStateRef {
+  snake: Point[];
+  food: Point;
+  direction: Direction;
+  autopilot: boolean;
+  gameOver: boolean;
+}
+
+export default function SnakeGameCanvas(): React.JSX.Element {
   // Game State
-  const [snake, setSnake] = useState(createInitialSnake());
-  const [food, setFood] = useState(() => randomFood(createInitialSnake()));
-  const [direction, setDirection] = useState("RIGHT");
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [autopilot, setAutopilot] = useState(true);
-  const [countdown, setCountdown] = useState(3);
+  const [snake, setSnake] = useState<Point[]>(createInitialSnake());
+  const [food, setFood] = useState<Point>(() =>
+    randomFood(createInitialSnake()),
+  );
+  const [direction, setDirection] = useState<Direction>("RIGHT");
+  const [score, setScore] = useState<number>(0);
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [autopilot, setAutopilot] = useState<boolean>(true);
+  const [countdown, setCountdown] = useState<number>(3);
 
   // Refs for Canvas and mutable state access in setInterval
-  const canvasRef = useRef(null);
-  const stateRef = useRef({ snake, food, direction, autopilot, gameOver });
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const stateRef = useRef<GameStateRef>({
+    snake,
+    food,
+    direction,
+    autopilot,
+    gameOver,
+  });
 
-  // Update ref whenever state changes
+  // Update ref whenever state changes and trigger canvas redraw
   useEffect(() => {
     stateRef.current = { snake, food, direction, autopilot, gameOver };
-    // Redraw game whenever snake/food state changes
+
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
-      drawGame(ctx, snake, food);
+      if (ctx) {
+        drawGame(ctx, snake, food);
+      }
     }
   }, [snake, food, direction, autopilot, gameOver]);
 
   // --- Game Control ---
 
-  const resetGame = useCallback(() => {
+  const resetGame = useCallback((): void => {
     const initialSnake = createInitialSnake();
     setSnake(initialSnake);
     setFood(randomFood(initialSnake));
@@ -371,7 +419,7 @@ export default function SnakeGameCanvas() {
     setCountdown(3);
   }, []);
 
-  const handleGameOver = useCallback(() => {
+  const handleGameOver = useCallback((): (() => void) | undefined => {
     if (stateRef.current.gameOver) return;
     setGameOver(true);
 
@@ -390,28 +438,31 @@ export default function SnakeGameCanvas() {
     return () => clearInterval(ticker);
   }, [resetGame]);
 
-  const commitDirection = useCallback((newDir, manual = false) => {
-    // 检查方向是否相反
-    if (isOpposite(stateRef.current.direction, newDir)) {
-      return;
-    }
-    setDirection(newDir);
+  const commitDirection = useCallback(
+    (newDir: Direction, manual: boolean = false): void => {
+      // 检查方向是否相反
+      if (isOpposite(stateRef.current.direction, newDir)) {
+        return;
+      }
+      setDirection(newDir);
 
-    // 如果是手动输入，则禁用自动驾驶
-    if (manual && stateRef.current.autopilot) {
-      setAutopilot(false);
-    }
-  }, []);
+      // 如果是手动输入，则禁用自动驾驶
+      if (manual && stateRef.current.autopilot) {
+        setAutopilot(false);
+      }
+    },
+    [],
+  );
 
   // --- Game Loop Logic ---
 
-  const gameTick = useCallback(() => {
+  const gameTick = useCallback((): void => {
     if (stateRef.current.gameOver) return;
 
     const { snake, food, direction, autopilot } = stateRef.current;
 
     // 1. Determine next move (AI or Manual)
-    let finalDirection = direction;
+    let finalDirection: Direction = direction;
     if (autopilot) {
       const path = findPathToFood(snake, food);
       if (path && path.length > 0) {
@@ -474,13 +525,13 @@ export default function SnakeGameCanvas() {
     const intervalId = setInterval(gameTick, MOVE_INTERVAL);
 
     return () => clearInterval(intervalId);
-  }, [gameOver, gameTick]); // Only depend on gameOver and the stable gameTick function
+  }, [gameOver, gameTick]);
 
   // --- Keyboard Input ---
   useEffect(() => {
     if (gameOver) return;
 
-    const handleKeydown = (event) => {
+    const handleKeydown = (event: KeyboardEvent): void => {
       const newDir = KEYBOARD_DIRECTIONS[event.key];
       if (newDir) {
         event.preventDefault();
