@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <ignore> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <ignore> */
 "use client";
 
 import { AnimatePresence, motion, type Transition } from "motion/react";
@@ -33,7 +35,6 @@ type MotionHighlightContextType<T extends string> = {
 };
 
 const MotionHighlightContext = React.createContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   MotionHighlightContextType<any> | undefined
 >(undefined);
 
@@ -512,7 +513,7 @@ function MotionHighlightItem({
 
           <div
             data-slot="motion-highlight-item"
-            className={cn("relative z-[1]", className)}
+            className={cn("relative z-1", className)}
             {...dataAttributes}
           >
             {children}
