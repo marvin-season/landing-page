@@ -1,5 +1,4 @@
 import type { UIMessage } from "ai";
-import dayjs from "dayjs";
 import { Bot, BrainCircuit, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -88,15 +87,6 @@ export function ChatMessage(props: { messages: UIMessage[] }) {
                   {renderParts(m)}
                 </div>
               )}
-
-              <div
-                className={cn(
-                  "text-[10px] text-slate-400 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity",
-                  isUser ? "pr-1" : "pl-1",
-                )}
-              >
-                {dayjs().format("HH:mm")}
-              </div>
             </div>
           </div>
         );

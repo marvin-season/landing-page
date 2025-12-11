@@ -79,11 +79,11 @@ function Item(props: {
   const { questionText, assistantText, isSelected, onClick } = props;
   return (
     <MotionButton
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, x: 8 }}
+      animate={{ opacity: 1, x: 0 }}
       type="button"
       className={cn(
-        "group relative p-3 rounded-lg cursor-pointer transition-all duration-200 text-left w-full border border-transparent",
+        "group relative p-3 rounded-xl cursor-pointer text-left w-full border border-transparent",
         isSelected
           ? "bg-slate-100 border-slate-200 shadow-sm"
           : "hover:bg-slate-50 hover:border-slate-100",
@@ -109,12 +109,6 @@ function Item(props: {
           )}
         >
           {assistantText}
-        </div>
-      )}
-
-      {isSelected && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
-          <ChevronRight size={14} />
         </div>
       )}
     </MotionButton>
