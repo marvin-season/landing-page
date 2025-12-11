@@ -58,7 +58,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
       if (index !== -1) {
         const userMsg = messages[index];
         const assistantMessage = messages[index + 1];
-        return [userMsg, assistantMessage];
+        return [userMsg, assistantMessage].filter(Boolean);
       }
     }
     return messages.slice(-2);
