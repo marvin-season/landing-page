@@ -2,7 +2,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect, useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useChatStore, useCurrentSession } from "@/store/chat-store";
+import { useChatStore, useCurrentSession } from "@/store/session-store";
 
 export function useChatController() {
   const {

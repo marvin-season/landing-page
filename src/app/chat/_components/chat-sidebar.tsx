@@ -2,23 +2,14 @@
 
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useChatStore } from "@/store/chat-store";
+import { useSessionStore } from "@/store/session-store";
 
 export function ChatSidebar() {
-  const { sessions, currentSessionId, createSession, deleteSession } =
-    useChatStore();
-
-  // Initialize a session if none exists on mount
-  useEffect(() => {
-    // Only run on client side and if no sessions exist
-    if (sessions.length === 0) {
-      createSession();
-    }
-  }, [sessions.length, createSession]);
-
+  const { sessions, deleteSession } = useSessionStore();
+  const { sessionId } = useParams();
   return (
     <div className="w-[280px] border-r border-slate-200 bg-slate-50/50 flex flex-col h-full">
       <div className="p-4 border-b border-slate-200 bg-white">
@@ -40,7 +31,7 @@ export function ChatSidebar() {
             key={session.id}
             className={cn(
               "group relative flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm",
-              currentSessionId === session.id
+              sessionId === session.id
                 ? "bg-white shadow-sm ring-1 ring-slate-200 text-slate-900 font-medium"
                 : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900",
             )}
@@ -50,7 +41,7 @@ export function ChatSidebar() {
                 size={16}
                 className={cn(
                   "shrink-0 transition-opacity",
-                  currentSessionId === session.id
+                  sessionId === session.id
                     ? "opacity-100 text-primary"
                     : "opacity-50 group-hover:opacity-75",
                 )}

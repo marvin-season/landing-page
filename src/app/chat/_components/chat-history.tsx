@@ -2,13 +2,13 @@
 
 import { ChevronRight, History } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useChatStore, useCurrentSessionMessages } from "@/store/chat-store";
+import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
 export function ChatHistory({ sessionId }: { sessionId: string }) {
-  const { selectedMessageId, setSelectedMessageId } = useChatStore();
+  const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
   // Use selector to efficiently subscribe to only the messages of the current session
-  const messages = useCurrentSessionMessages(sessionId);
+  const messages = useCurrentMessages(sessionId);
 
   // Filter only user messages to show as "history items"
   const userMessages = messages.filter((m) => m.role === "user");
@@ -52,16 +52,6 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
                   onClick={() => setSelectedMessageId(msg.id)}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span
-                      className={cn(
-                        "flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-medium",
-                        selectedMessageId === msg.id
-                          ? "bg-slate-900 text-white"
-                          : "bg-slate-200 text-slate-600",
-                      )}
-                    >
-                      {index + 1}
-                    </span>
                     <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
                       User Step
                     </span>
