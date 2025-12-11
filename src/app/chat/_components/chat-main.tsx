@@ -173,7 +173,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50/30">
+    <div className="flex-1 flex flex-col h-full bg-slate-50/30">
       <div className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-sm px-6 flex items-center justify-between shrink-0 sticky top-0 z-10">
         <div className="font-medium text-slate-900 truncate max-w-xl flex items-center gap-2.5">
           <span className="bg-primary/10 p-1.5 rounded-lg text-primary">

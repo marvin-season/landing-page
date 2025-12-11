@@ -64,9 +64,9 @@ export function ChatSidebar() {
                 "opacity-0 group-hover:opacity-100 focus-within:opacity-100",
               )}
             >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
+              <Link
+                href={`/chat/${session.id}`}
+                onClick={() => {
                   deleteSession(session.id);
                 }}
                 className="p-1.5 hover:bg-red-100 text-slate-400 hover:text-red-500 rounded-md transition-colors"
@@ -74,7 +74,7 @@ export function ChatSidebar() {
                 title="Delete session"
               >
                 <Trash2 size={14} />
-              </button>
+              </Link>
             </div>
           </Link>
         ))}

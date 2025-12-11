@@ -1,5 +1,6 @@
 import { use } from "react";
-import { ChatMain } from "@/components/chat/chat-main";
+import { ChatHistory } from "@/app/chat/_components/chat-history";
+import { ChatMain } from "@/app/chat/_components/chat-main";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -7,5 +8,10 @@ interface SessionPageProps {
 
 export default function SessionPage({ params }: SessionPageProps) {
   const { sessionId } = use(params);
-  return <ChatMain sessionId={sessionId} />;
+  return (
+    <div className="flex-1 flex min-w-0">
+      <ChatMain sessionId={sessionId} />
+      <ChatHistory />
+    </div>
+  );
 }

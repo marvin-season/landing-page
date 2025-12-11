@@ -1,6 +1,5 @@
 import "@/css/globals.css";
-import { ChatHistory } from "@/components/chat/chat-history";
-import { ChatSidebar } from "@/components/chat/chat-sidebar";
+import { ChatSidebar } from "@/app/chat/_components/chat-sidebar";
 
 export default function ChatLayout({
   children,
@@ -9,10 +8,11 @@ export default function ChatLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex h-screen bg-white overflow-hidden">
-        <ChatSidebar />
-        <div className="flex-1 flex flex-col h-full min-w-0">{children}</div>
-        <ChatHistory />
+      <body>
+        <div className="flex h-screen bg-white overflow-hidden">
+          <ChatSidebar />
+          {children}
+        </div>
       </body>
     </html>
   );
