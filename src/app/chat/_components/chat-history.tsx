@@ -1,17 +1,25 @@
 "use client";
 
 import { ChevronRight, History } from "lucide-react";
+import { MotionButton } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
 export function ChatHistory({ sessionId }: { sessionId: string }) {
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
-  // Use selector to efficiently subscribe to only the messages of the current session
   const messages = useCurrentMessages(sessionId);
 
-  // Filter only user messages to show as "history items"
   const userMessages = messages.filter((m) => m.role === "user");
+
+  const messagePairs = userMessages.map((userMsg) => {
+    const userIndex = messages.findIndex((m) => m.id === userMsg.id);
+    const assistantMsg =
+      userIndex !== -1 && messages[userIndex + 1]?.role === "assistant"
+        ? messages[userIndex + 1]
+        : null;
+    return { userMsg, assistantMsg };
+  });
 
   return (
     <div className="w-[280px] border-l border-slate-200 bg-white flex flex-col h-full shadow-[inset_10px_0_20px_-10px_rgba(0,0,0,0.02)]">
@@ -21,7 +29,7 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {userMessages.length === 0 ? (
+        {messagePairs.length === 0 ? (
           <div className="p-8 text-center">
             <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <History className="w-6 h-6 text-slate-300" />
@@ -32,52 +40,83 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col p-2 space-y-1">
-            {userMessages.map((msg, index) => {
+          <div className="flex flex-col p-2 space-y-2">
+            {messagePairs.map(({ userMsg, assistantMsg }) => {
               // Find the text content for preview
-              const textContent =
-                msg.parts?.find((p) => p.type === "text")?.text ||
+              const questionText =
+                userMsg.parts?.find((p) => p.type === "text")?.text ||
                 "image/content";
 
-              return (
-                <button
-                  type="button"
-                  key={msg.id}
-                  className={cn(
-                    "group relative p-3 rounded-lg cursor-pointer transition-all duration-200 text-left w-full border border-transparent",
-                    selectedMessageId === msg.id
-                      ? "bg-slate-100 border-slate-200 shadow-sm"
-                      : "hover:bg-slate-50 hover:border-slate-100",
-                  )}
-                  onClick={() => setSelectedMessageId(msg.id)}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
-                      User Step
-                    </span>
-                  </div>
-                  <div
-                    className={cn(
-                      "text-sm leading-relaxed line-clamp-2",
-                      selectedMessageId === msg.id
-                        ? "text-slate-900 font-medium"
-                        : "text-slate-600",
-                    )}
-                  >
-                    {textContent}
-                  </div>
+              const assistantText = assistantMsg
+                ? assistantMsg.parts?.find((p) => p.type === "text")?.text || ""
+                : "";
 
-                  {selectedMessageId === msg.id && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
-                      <ChevronRight size={14} />
-                    </div>
-                  )}
-                </button>
+              const isSelected = selectedMessageId === userMsg.id;
+
+              return (
+                <Item
+                  key={userMsg.id}
+                  questionText={questionText}
+                  assistantText={assistantText}
+                  isSelected={isSelected}
+                  onClick={() => setSelectedMessageId(userMsg.id)}
+                />
               );
             })}
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function Item(props: {
+  questionText: string;
+  assistantText: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const { questionText, assistantText, isSelected, onClick } = props;
+  return (
+    <MotionButton
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      type="button"
+      className={cn(
+        "group relative p-3 rounded-lg cursor-pointer transition-all duration-200 text-left w-full border border-transparent",
+        isSelected
+          ? "bg-slate-100 border-slate-200 shadow-sm"
+          : "hover:bg-slate-50 hover:border-slate-100",
+      )}
+      onClick={onClick}
+    >
+      {/* 问题 - 突出显示 */}
+      <div
+        className={cn(
+          "text-sm font-semibold leading-snug mb-2",
+          isSelected ? "text-slate-900" : "text-slate-800",
+        )}
+      >
+        {questionText}
+      </div>
+
+      {/* 回答 - 次要展示，超出两行省略 */}
+      {assistantText && (
+        <div
+          className={cn(
+            "text-xs leading-relaxed line-clamp-2",
+            isSelected ? "text-slate-600" : "text-slate-500",
+          )}
+        >
+          {assistantText}
+        </div>
+      )}
+
+      {isSelected && (
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
+          <ChevronRight size={14} />
+        </div>
+      )}
+    </MotionButton>
   );
 }

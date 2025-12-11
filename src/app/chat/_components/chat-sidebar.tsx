@@ -40,7 +40,7 @@ export function ChatSidebar() {
           Sessions
         </div>
         {sessions
-          .sort((a, b) => b.createdAt - a.createdAt)
+          .toSorted((a, b) => b.createdAt - a.createdAt)
           .map((session) => (
             <Link
               href={`/chat/${session.id}`}

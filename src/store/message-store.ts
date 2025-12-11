@@ -18,7 +18,12 @@ export const useMessageStore = create<IMessageStore>()(
         messagesMap: {},
         addMessages: (sessionId, messages) => {
           set((state) => {
-            state.messagesMap[sessionId] = messages
+            return {
+              messagesMap: {
+                ...state.messagesMap,
+                [sessionId]: messages,
+              },
+            };
           });
         },
         selectedMessageId: undefined,
