@@ -1,21 +1,14 @@
 "use client";
 
-import { ChevronRight, History, } from "lucide-react";
-import { useShallow } from "zustand/react/shallow";
+import { ChevronRight, History } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useChatStore } from "@/store/chat-store";
+import { useChatStore, useCurrentSessionMessages } from "@/store/chat-store";
 
-export function ChatHistory() {
+export function ChatHistory({ sessionId }: { sessionId: string }) {
   const { selectedMessageId, setSelectedMessageId } = useChatStore();
 
   // Use selector to efficiently subscribe to only the messages of the current session
-  const messages = useChatStore(
-    useShallow((state) =>
-      state.currentSessionId
-        ? state.messages[state.currentSessionId] || []
-        : [],
-    ),
-  );
+  const messages = useCurrentSessionMessages(sessionId);
 
   // Filter only user messages to show as "history items"
   const userMessages = messages.filter((m) => m.role === "user");

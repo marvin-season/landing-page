@@ -11,7 +11,7 @@ export default function SessionPage({ params }: SessionPageProps) {
   return (
     <div className="flex-1 flex min-w-0">
       <ChatMain sessionId={sessionId} />
-      <ChatHistory />
+      <ChatHistory sessionId={sessionId} />
     </div>
   );
 }
