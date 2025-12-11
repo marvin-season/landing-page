@@ -25,7 +25,7 @@ msgstr "1秒のカードナンバーで、各フードノードへの自律的�
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:28
+#: src/app/[lang]/(home)/page.tsx:29
 msgid "About me"
 msgstr "私について"
 
@@ -36,6 +36,10 @@ msgstr "AI アクティブ"
 #: src/app/[lang]/(home)/_components/snake-game.tsx:540
 msgid "AI auto"
 msgstr "AI 自動"
+
+#: src/app/[lang]/(home)/page.tsx:33
+msgid "AI Chat"
+msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"

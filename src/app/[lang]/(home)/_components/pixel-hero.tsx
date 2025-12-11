@@ -6,10 +6,10 @@ type PixelHeroProps = {
   title: string;
   description: string;
   highlights: string[];
-  primaryCta: {
+  ctas: {
     label: string;
     href: string;
-  };
+  }[];
 };
 
 const pixelButtonBase =
@@ -20,7 +20,7 @@ export function PixelHero({
   title,
   description,
   highlights,
-  primaryCta,
+  ctas,
 }: PixelHeroProps) {
   return (
     <section className="relative min-h-dvh overflow-hidden bg-background px-4 py-16 md:px-8 font-mono selection:bg-primary selection:text-primary-foreground">
@@ -32,29 +32,35 @@ export function PixelHero({
             <span className="h-2 w-2 animate-pulse bg-primary" />
             {badge}
           </span>
-          <h1 className={`text-3xl font-bold tracking-wide md:text-4xl lg:text-4xl`}>
+          <h1
+            className={`text-3xl font-bold tracking-wide md:text-4xl lg:text-4xl`}
+          >
             {title}
           </h1>
           <p className="max-w-2xl text-base text-muted-foreground sm:text-lg leading-relaxed border-l-4 border-primary pl-4">
             {description}
           </p>
           <div className="flex flex-wrap gap-4 text-xs mt-2">
-            <Link
-              href={primaryCta.href}
-              className={`${pixelButtonBase} bg-primary text-primary-foreground hover:bg-primary/90 border-border`}
-            >
-              {primaryCta.label}
-            </Link>
-
+            {ctas.map((cta) => (
+              <Link
+                key={cta.href}
+                href={cta.href}
+                className={`${pixelButtonBase} bg-primary text-primary-foreground hover:bg-primary/90 border-border`}
+              >
+                {cta.label}
+              </Link>
+            ))}
           </div>
           <div className="border-2 border-border bg-muted/20 p-6 relative">
-             {/* Decorative corner squares */}
+            {/* Decorative corner squares */}
             <div className="absolute -top-1 -left-1 w-2 h-2 bg-border" />
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-border" />
             <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-border" />
             <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-border" />
 
-            <p className={`mb-4 text-xs uppercase tracking-[0.2em] text-primary font-bold`}>
+            <p
+              className={`mb-4 text-xs uppercase tracking-[0.2em] text-primary font-bold`}
+            >
               &gt; SYSTEM_LOGS
             </p>
             <ul className="grid gap-3 text-sm text-muted-foreground font-mono">
@@ -79,4 +85,3 @@ export function PixelHero({
     </section>
   );
 }
-

@@ -24,10 +24,16 @@ export default async function Home({ params }: PageLangParam) {
           msg`Crashes trigger GAME OVER and a 3s cold reboot for resilience drills.`,
         ),
       ]}
-      primaryCta={{
-        label: i18n._(msg`About me`),
-        href: `/${lang}/resume`,
-      }}
+      ctas={[
+        {
+          label: i18n._(msg`About me`),
+          href: `/${lang}/resume`,
+        },
+        {
+          label: i18n._(msg`AI Chat`),
+          href: `/chat`,
+        },
+      ]}
     />
   );
 }

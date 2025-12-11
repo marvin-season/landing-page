@@ -25,7 +25,7 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/(home)/page.tsx:28
+#: src/app/[lang]/(home)/page.tsx:29
 msgid "About me"
 msgstr "关于我"
 
@@ -36,6 +36,10 @@ msgstr "AI 主动模式"
 #: src/app/[lang]/(home)/_components/snake-game.tsx:540
 msgid "AI auto"
 msgstr "AI 自动模式"
+
+#: src/app/[lang]/(home)/page.tsx:33
+msgid "AI Chat"
+msgstr "AI 聊天"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
