@@ -1,19 +1,15 @@
 "use client";
 
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useChatStore } from "@/store/chat-store";
 
 export function ChatSidebar() {
-  const {
-    sessions,
-    currentSessionId,
-    createSession,
-    switchSession,
-    deleteSession,
-  } = useChatStore();
+  const { sessions, currentSessionId, createSession, deleteSession } =
+    useChatStore();
 
   // Initialize a session if none exists on mount
   useEffect(() => {
@@ -26,17 +22,12 @@ export function ChatSidebar() {
   return (
     <div className="w-[280px] border-r border-slate-200 bg-slate-50/50 flex flex-col h-full">
       <div className="p-4 border-b border-slate-200 bg-white">
-        <Button
-          onClick={() => {
-            const sessionId = createSession();
-            switchSession(sessionId);
-          }}
-          className="w-full justify-start gap-2 shadow-sm"
-          variant="default"
-        >
-          <Plus size={16} />
-          New Chat
-        </Button>
+        <Link href="/chat">
+          <Button className="w-full justify-start gap-2 shadow-sm">
+            <Plus size={16} />
+            New Chat
+          </Button>
+        </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -44,7 +35,8 @@ export function ChatSidebar() {
           Sessions
         </div>
         {sessions.map((session) => (
-          <button
+          <Link
+            href={`/chat/${session.id}`}
             key={session.id}
             className={cn(
               "group relative flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm",
@@ -52,8 +44,6 @@ export function ChatSidebar() {
                 ? "bg-white shadow-sm ring-1 ring-slate-200 text-slate-900 font-medium"
                 : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900",
             )}
-            onClick={() => switchSession(session.id)}
-            type="button"
           >
             <div className="flex items-center gap-3 overflow-hidden">
               <MessageSquare
@@ -86,7 +76,7 @@ export function ChatSidebar() {
                 <Trash2 size={14} />
               </button>
             </div>
-          </button>
+          </Link>
         ))}
       </div>
     </div>

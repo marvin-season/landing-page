@@ -1,18 +1,19 @@
-
-import { ChatHistory } from "@/components/chat/chat-history";
-import { ChatMain } from "@/components/chat/chat-main";
-import { ChatSidebar } from "@/components/chat/chat-sidebar";
+import { Bot } from "lucide-react";
 
 export default function ChatPage() {
-
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
-      <ChatSidebar />
-      <div className="flex-1 flex flex-col h-full min-w-0">
-        {/* Use key to force re-mount ChatMain when session changes to reset useChat internal state */}
-        <ChatMain  />
+    <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-6">
+      <div className="w-20 h-20 bg-linear-to-br from-white to-slate-50 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-center">
+        <Bot className="w-10 h-10 opacity-10" />
       </div>
-      <ChatHistory />
+      <div className="text-center space-y-2">
+        <p className="text-lg font-medium text-slate-600">
+          How can I help you today?
+        </p>
+        <p className="text-sm text-slate-400">
+          Ask any question or start a conversation
+        </p>
+      </div>
     </div>
   );
 }

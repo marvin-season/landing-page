@@ -9,5 +9,8 @@
     "gsap",
     "partialize",
     "shiki"
-  ]
+  ],
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }

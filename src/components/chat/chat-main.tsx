@@ -15,9 +15,13 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useChatStore, useCurrentSession, useCurrentSessionMessages } from "@/store/chat-store";
+import {
+  useChatStore,
+  useCurrentSession,
+  useCurrentSessionMessages,
+} from "@/store/chat-store";
 
-export function ChatMain() {
+export function ChatMain({ sessionId }: { sessionId: string }) {
   const {
     currentSessionId,
     updateSessionMessages,
@@ -26,9 +30,9 @@ export function ChatMain() {
     setSelectedMessageId,
   } = useChatStore();
 
-  const currentSessionMessages = useCurrentSessionMessages()
+  const currentSessionMessages = useCurrentSessionMessages(sessionId);
 
-  const currentSession = useCurrentSession()
+  const currentSession = useCurrentSession(sessionId);
 
   const [inputValue, setInputValue] = useState("");
 
@@ -36,7 +40,7 @@ export function ChatMain() {
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
-    id: currentSessionId || undefined,
+    id: sessionId,
     onFinish: ({ messages }) => {
       console.log("onFinish", messages);
       // Sync full history to store on every completion
@@ -191,102 +195,86 @@ export function ChatMain() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
-        {displayMessages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-6">
-            <div className="w-20 h-20 bg-linear-to-br from-white to-slate-50 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-center">
-              <Bot className="w-10 h-10 opacity-10" />
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-lg font-medium text-slate-600">
-                How can I help you today?
-              </p>
-              <p className="text-sm text-slate-400">
-                Ask any question or start a conversation
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-3xl mx-auto space-y-6 pb-4">
-            {displayMessages.map((m) => {
-              const isUser = m.role === "user";
-              return (
+        <div className="max-w-3xl mx-auto space-y-6 pb-4">
+          {displayMessages.map((m) => {
+            const isUser = m.role === "user";
+            return (
+              <div
+                key={m.id}
+                className={cn(
+                  "flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
+                  isUser ? "flex-row-reverse" : "flex-row",
+                )}
+              >
                 <div
-                  key={m.id}
                   className={cn(
-                    "flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
-                    isUser ? "flex-row-reverse" : "flex-row",
+                    "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                    isUser
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-primary border border-slate-100",
                   )}
                 >
-                  <div
-                    className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                      isUser
-                        ? "bg-slate-900 text-white"
-                        : "bg-white text-primary border border-slate-100",
-                    )}
-                  >
-                    {isUser ? <User size={16} /> : <Bot size={16} />}
-                  </div>
+                  {isUser ? <User size={16} /> : <Bot size={16} />}
+                </div>
 
-                  <div
-                    className={cn(
-                      "flex-1 max-w-[85%]",
-                      isUser ? "text-right" : "text-left",
-                    )}
-                  >
-                    {isUser ? (
-                      <div className="bg-slate-900 text-white rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-md inline-block text-left">
-                        {m.parts.map((p, i) =>
-                          p.type === "text" ? (
-                            <span
-                              key={i}
-                              className="whitespace-pre-wrap text-sm leading-relaxed"
-                            >
-                              {p.text}
-                            </span>
-                          ) : null,
-                        )}
-                      </div>
-                    ) : (
-                      <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5">
-                        {renderParts(m)}
-                      </div>
-                    )}
-
-                    <div
-                      className={cn(
-                        "text-[10px] text-slate-400 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity",
-                        isUser ? "pr-1" : "pl-1",
+                <div
+                  className={cn(
+                    "flex-1 max-w-[85%]",
+                    isUser ? "text-right" : "text-left",
+                  )}
+                >
+                  {isUser ? (
+                    <div className="bg-slate-900 text-white rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-md inline-block text-left">
+                      {m.parts.map((p, i) =>
+                        p.type === "text" ? (
+                          <span
+                            key={i}
+                            className="whitespace-pre-wrap text-sm leading-relaxed"
+                          >
+                            {p.text}
+                          </span>
+                        ) : null,
                       )}
-                    >
-                      {dayjs().format("HH:mm")}
                     </div>
+                  ) : (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5">
+                      {renderParts(m)}
+                    </div>
+                  )}
+
+                  <div
+                    className={cn(
+                      "text-[10px] text-slate-400 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity",
+                      isUser ? "pr-1" : "pl-1",
+                    )}
+                  >
+                    {dayjs().format("HH:mm")}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
 
-            {isLoading &&
-              displayMessages.length === 1 &&
-              displayMessages[0].role === "user" && (
-                <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="w-8 h-8 rounded-lg bg-white text-primary border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  </div>
-                  <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5 flex items-center gap-2">
-                    <span className="text-sm text-slate-500">Thinking...</span>
-                  </div>
+          {isLoading &&
+            displayMessages.length === 1 &&
+            displayMessages[0].role === "user" && (
+              <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="w-8 h-8 rounded-lg bg-white text-primary border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 </div>
-              )}
-
-            {error && (
-              <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500" />
-                Error: {error.message}
+                <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5 flex items-center gap-2">
+                  <span className="text-sm text-slate-500">Thinking...</span>
+                </div>
               </div>
             )}
-          </div>
-        )}
+
+          {error && (
+            <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-red-500" />
+              Error: {error.message}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="p-4 bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20">

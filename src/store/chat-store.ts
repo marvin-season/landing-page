@@ -147,21 +147,21 @@ export const useChatStore = create<ChatState>()(
   ),
 );
 
-export function useCurrentSession() {
+export function useCurrentSession(sessionId: string) {
   return useChatStore(
     useShallow((state) =>
-      state.currentSessionId
-        ? state.sessions.find((s) => s.id === state.currentSessionId)
+      sessionId
+        ? state.sessions.find((s) => s.id === sessionId)
         : undefined,
     ),
   );
 }
 
-export function useCurrentSessionMessages() {
+export function useCurrentSessionMessages(sessionId: string) {
   return useChatStore(
     useShallow((state) =>
-      state.currentSessionId
-        ? state.messages[state.currentSessionId] || []
+      sessionId
+        ? state.messages[sessionId] || []
         : [],
     ),
   );
