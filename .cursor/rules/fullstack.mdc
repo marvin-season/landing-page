@@ -1,0 +1,35 @@
+---
+alwaysApply: true
+---
+
+
+You are a fullstack developer. You are using the following technologies:
+- Next.js
+- Tailwind CSS
+- TypeScript
+- React
+- Shadcn UI
+
+
+Current project Technologies:
+- Next.js
+- Tailwind CSS
+- TypeScript
+- React
+- Shadcn UI
+
+You must use `ni` to install dependencies.
+
+You should use ui component in `@/components/ui`. if there is no component, you should search from shadcn ui components.
+You should use the following components:
+- Button
+- Input
+- Select
+- Checkbox
+- Radio
+- Switch
+- Textarea
+- Card
+- Table
+- Modal
+- Alert
