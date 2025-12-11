@@ -1,14 +1,25 @@
-import type { UIMessage } from "ai";
+import type { ChatStatus, UIMessage } from "ai";
 import { Bot, BrainCircuit, User } from "lucide-react";
-
+import { memo } from "react";
+import { MotionSpan } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
-export function ChatMessage(props: { messages: UIMessage[] }) {
-  const { messages } = props;
+export function ChatMessage(props: {
+  messages: UIMessage[];
+  status: ChatStatus;
+}) {
+  const { messages, status } = props;
 
   const renderParts = (m: UIMessage) => {
     return m.parts.map((part, i) => {
       if (part.type === "text") {
+        if (status === "streaming") {
+          // 按照标点符号进行分割
+          return part.text
+            .split(/([。！？,.!?、；;])/)
+            .filter((chunk) => chunk.length > 0)
+            .map((chunk, i) => <MemoTextChunk key={i} text={chunk} />);
+        }
         return (
           <span
             key={i}
@@ -94,3 +105,18 @@ export function ChatMessage(props: { messages: UIMessage[] }) {
     </>
   );
 }
+
+function TextChunk({ text }: { text: string }) {
+  return (
+    <MotionSpan
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 2 }}
+      className="inline-block"
+    >
+      {text}
+    </MotionSpan>
+  );
+}
+
+const MemoTextChunk = memo(TextChunk);

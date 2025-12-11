@@ -84,7 +84,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
         <div className="max-w-3xl mx-auto space-y-6 pb-4">
-          <ChatMessage messages={displayMessages} />
+          <ChatMessage messages={displayMessages} status={status} />
 
           {isLoading &&
             displayMessages.length === 1 &&
