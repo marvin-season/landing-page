@@ -78,7 +78,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50/30">
       <ChatHeader
-        title={currentSession.title}
+        currentSession={currentSession}
         messagesCount={currentMessages.length}
       />
 

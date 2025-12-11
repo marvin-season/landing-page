@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, History } from "lucide-react";
+import { History } from "lucide-react";
 import { MotionButton } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
@@ -23,7 +23,7 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
 
   return (
     <div className="w-[280px] border-l border-slate-200 bg-white flex flex-col h-full shadow-[inset_10px_0_20px_-10px_rgba(0,0,0,0.02)]">
-      <div className="p-4 border-b border-slate-200 flex items-center gap-2 font-medium text-sm text-slate-700 bg-slate-50/50">
+      <div className="h-16 p-4 border-b border-slate-200 flex items-center gap-2 font-medium text-sm text-slate-700 bg-slate-50/50">
         <History size={16} />
         Context History
       </div>
@@ -79,7 +79,7 @@ function Item(props: {
   const { questionText, assistantText, isSelected, onClick } = props;
   return (
     <MotionButton
-      initial={{ opacity: 0, x: 8 }}
+      initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       type="button"
       className={cn(
