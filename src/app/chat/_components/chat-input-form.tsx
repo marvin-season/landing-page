@@ -1,10 +1,9 @@
 import { Loader2, Send, Sparkles } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (data: { input: string }) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -14,8 +13,8 @@ export function ChatInputForm(props: ChatInputProps) {
     <div className="p-4 bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20">
       <div className="max-w-3xl mx-auto">
         <form
-          onSubmit={(e) => {
-            onSubmit(e);
+          action={(formData) => {
+            onSubmit({ input: formData.get("input") as string });
           }}
           className="relative flex items-end gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/20 transition-all focus-within:bg-white"
         >
