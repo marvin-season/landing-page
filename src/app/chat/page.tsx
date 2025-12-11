@@ -1,5 +1,4 @@
 import { Bot } from "lucide-react";
-import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 
 export default function ChatPage() {
   return (
@@ -15,7 +14,6 @@ export default function ChatPage() {
           Ask any question or start a conversation
         </p>
       </div>
-      <ChatInputForm />
     </div>
   );
 }

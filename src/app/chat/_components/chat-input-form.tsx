@@ -1,10 +1,8 @@
 "use client";
 
 import { Loader2, Send, Sparkles } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { useSessionStore } from "@/store/session-store";
 
 interface ChatInputProps {
   onSubmit?: (data: { input: string }) => Promise<void>;
@@ -12,21 +10,12 @@ interface ChatInputProps {
 }
 
 export function ChatInputForm(props: ChatInputProps) {
-  const { sessionId } = useParams();
   const { onSubmit, isLoading } = props;
-  const { createNewSession } = useSessionStore();
-  const router = useRouter();
   return (
     <div className="w-full p-4 bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20">
       <div className="max-w-3xl mx-auto">
         <form
           action={(formData) => {
-            if (!sessionId) {
-              console.log("No session ID");
-              const newSessionId = createNewSession();
-              router.push(`/chat/${newSessionId}`);
-              return;
-            }
             onSubmit?.({ input: formData.get("input") as string });
           }}
           className="relative flex items-end gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/20 transition-all focus-within:bg-white"
