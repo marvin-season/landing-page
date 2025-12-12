@@ -7,4 +7,5 @@ export * from "./react-bits";
 export * from "./select";
 export * from "./shadcn-io";
 export * from "./skeleton";
+export * from "./switch";
 export * from "./tag";

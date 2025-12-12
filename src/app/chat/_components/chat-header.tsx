@@ -1,14 +1,6 @@
 "use client";
 
-import dayjs from "dayjs";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Clock,
-  Menu,
-  PanelRight,
-  Sparkles,
-} from "lucide-react";
+import { Menu, PanelRight, Sparkles } from "lucide-react";
 import { useChatShell } from "@/app/chat/_components/chat-shell";
 import { MotionDiv } from "@/components/ui";
 import { Button } from "@/components/ui/button";
@@ -17,13 +9,13 @@ import type { ISession } from "@/store/session-store";
 export function ChatHeader(props: {
   currentSession: ISession;
   messagesCount: number;
-  onPageChange: (direction: "previous" | "next") => void;
   onOpenHistory?: () => void;
+  outletBottom?: React.ReactNode;
 }) {
-  const { currentSession, messagesCount, onPageChange, onOpenHistory } = props;
+  const { currentSession, messagesCount, onOpenHistory, outletBottom } = props;
   const { openSidebar } = useChatShell();
   return (
-    <header className="sticky top-0 z-10 h-16 shrink-0 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl supports-backdrop-filter:bg-white/60">
+    <header className="sticky top-0 z-10 h-16 shrink-0 border-b border-slate-200/60 bg-white/60 backdrop-blur-md supports-backdrop-filter:bg-white/60">
       <div className="mx-auto flex h-full max-w-6xl items-center gap-3 px-3 sm:px-8">
         {/* Left: menu + icon + title */}
         <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -52,11 +44,6 @@ export function ChatHeader(props: {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <span className="inline-flex items-center gap-1.5">
-                <Clock size={12} className="shrink-0 opacity-80" />
-                {dayjs(currentSession?.createdAt).format("MMM D, HH:mm")}
-              </span>
-              <span className="opacity-70">·</span>
               <span className="opacity-80">{messagesCount} messages</span>
             </MotionDiv>
           </div>
@@ -64,26 +51,6 @@ export function ChatHeader(props: {
 
         {/* Right: actions */}
         <div className="ml-auto flex items-center gap-1.5">
-          {/* Pagination group */}
-          <div className="flex items-center rounded-lg border border-slate-200 bg-white/70 shadow-xs backdrop-blur-md">
-            <button
-              type="button"
-              aria-label="Previous Page"
-              onClick={() => onPageChange("previous")}
-              className="grid size-8 place-items-center rounded-l-xl text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <ChevronUpIcon size={16} />
-            </button>
-            <div className="h-6 w-px bg-slate-200/70" />
-            <button
-              type="button"
-              aria-label="Next Page"
-              onClick={() => onPageChange("next")}
-              className="grid size-8 place-items-center rounded-r-xl text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <ChevronDownIcon size={16} />
-            </button>
-          </div>
           {/* Mobile: history */}
           {onOpenHistory ? (
             <Button
@@ -99,6 +66,7 @@ export function ChatHeader(props: {
           ) : null}
         </div>
       </div>
+      {outletBottom}
     </header>
   );
 }

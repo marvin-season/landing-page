@@ -1,5 +1,6 @@
 import type { UIMessage } from "ai";
 import { getUserMessages } from "@/app/chat/_utils";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 import type { IMessageStore } from "@/store/message-store";
 
 /**
@@ -15,7 +16,11 @@ export function useMessagesPagination(params: {
   setSelectedMessageId: IMessageStore["setSelectedMessageId"];
 }) {
   const { messages, selectedMessageId, setSelectedMessageId } = params;
+  const disableMessagePagination = useChatSettingsStore(
+    (s) => s.disableMessagePagination,
+  );
   const onPagination = (direction: "previous" | "next") => {
+    if (disableMessagePagination) return;
     if (!selectedMessageId) return;
     const userMessages = getUserMessages(messages);
     const currentMessageIndex = userMessages.findIndex(

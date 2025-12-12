@@ -8,6 +8,8 @@ import { ChatError } from "@/app/chat/_components/chat-error";
 import { ChatHeader } from "@/app/chat/_components/chat-header";
 import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 import { ChatLoading } from "@/app/chat/_components/chat-loading";
+import { ChatPagination } from "@/app/chat/_components/chat-pagination";
+import { DisablePagination } from "@/app/chat/_components/disable-pagination";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
 import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
@@ -94,14 +96,22 @@ export function ChatMain(props: {
       <ChatHeader
         currentSession={currentSession}
         messagesCount={currentMessages.length}
-        onPageChange={onPagination}
         onOpenHistory={onOpenHistory}
+        outletBottom={
+          <div className="flex gap-2 backdrop-blur-2xl">
+            <ChatPagination
+              onPageChange={onPagination}
+              className=" rounded-t-none border-t-0"
+            />
+            <DisablePagination />
+          </div>
+        }
       />
 
       <div
         ref={scrollContainerRef}
         onWheel={handleWheel}
-        className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 scroll-smooth"
+        className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22"
       >
         <div className="max-w-3xl mx-auto space-y-6 pb-6">
           {displayMessages.map((m, index) => {
