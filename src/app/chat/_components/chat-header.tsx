@@ -10,7 +10,7 @@ export function ChatHeader(props: {
 }) {
   const { currentSession, messagesCount, onPageChange } = props;
   return (
-    <div className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between shrink-0 sticky top-0 z-20">
+    <div className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between shrink-0 sticky top-0 z-9">
       {/* Left: Icon + Title + Time */}
       <div className="flex items-center gap-4 min-w-0 flex-1">
         {/* Chat Icon */}
