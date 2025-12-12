@@ -1,6 +1,12 @@
 import type { UIMessage } from "ai";
 import { useMemo } from "react";
 
+/**
+ * 根据选中的消息id，获取显示的消息列表
+ * @param messages 消息列表
+ * @param selectedMessageId 选中的消息用户消息id
+ * @returns 显示的消息列表
+ */
 export function useDisplayMessages(
   messages: UIMessage[],
   selectedMessageId?: string,

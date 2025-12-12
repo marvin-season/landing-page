@@ -2,6 +2,13 @@ import type { UIMessage } from "ai";
 import { getUserMessages } from "@/app/chat/_utils";
 import type { IMessageStore } from "@/store/message-store";
 
+/**
+ *
+ * @param params.messages 消息列表
+ * @param params.selectedMessageId 选中的消息用户消息id
+ * @param params.setSelectedMessageId 设置选中的消息用户消息id
+ * @returns 分页操作函数, 向前/向后翻页
+ */
 export function useMessagesPagination(params: {
   messages: UIMessage[];
   selectedMessageId?: string;
