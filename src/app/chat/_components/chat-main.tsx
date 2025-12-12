@@ -8,7 +8,7 @@ import { ChatError } from "@/app/chat/_components/chat-error";
 import { ChatHeader } from "@/app/chat/_components/chat-header";
 import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 import { ChatLoading } from "@/app/chat/_components/chat-loading";
-import { ChatMessage } from "@/app/chat/_components/chat-message";
+import { MessageItem } from "@/app/chat/_components/message/message-item";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
@@ -82,7 +82,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
   const handleWheel = (e: React.WheelEvent) => {
     const now = Date.now();
     // 500ms throttle to prevent rapid switching
-    if (now - lastScrollTimeRef.current < 300) return;
+    if (now - lastScrollTimeRef.current < 200) return;
 
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -128,7 +128,9 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
         className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth"
       >
         <div className="max-w-3xl mx-auto space-y-6 pb-4">
-          <ChatMessage messages={displayMessages} status={status} />
+          {displayMessages.map((m) => {
+            return <MessageItem key={m.id} m={m} status={status} />;
+          })}
 
           {isLoading &&
             displayMessages[displayMessages.length - 1].role === "user" && (
