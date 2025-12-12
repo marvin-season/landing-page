@@ -10,10 +10,7 @@ export function MessageItem(props: { m: UIMessage; status: ChatStatus }) {
   return (
     <div
       key={m.id}
-      className={cn(
-        "flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500",
-        isUser ? "flex-row-reverse" : "flex-row",
-      )}
+      className={cn("flex gap-4 ", isUser ? "flex-row-reverse" : "flex-row")}
     >
       <div
         className={cn(

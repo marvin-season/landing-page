@@ -16,9 +16,7 @@ export function useDisplayMessages(
     if (selectedMessageId) {
       const index = messages.findLastIndex((m) => m.id === selectedMessageId);
       if (index !== -1) {
-        const userMsg = messages[index];
-        const assistantMessage = messages[index + 1];
-        return [userMsg, assistantMessage].filter(Boolean);
+        return messages.slice(index < 0 ? 0 : index, index + 2).filter(Boolean);
       }
     }
     return messages.slice(-2);

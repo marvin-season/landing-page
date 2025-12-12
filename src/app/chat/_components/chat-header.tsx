@@ -10,39 +10,59 @@ export function ChatHeader(props: {
 }) {
   const { currentSession, messagesCount, onPageChange } = props;
   return (
-    <div className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-sm px-6 flex items-center justify-between shrink-0 sticky top-0 z-10">
-      <div className="font-medium text-slate-900 truncate max-w-xl flex items-center gap-3">
-        <span className="bg-primary/10 p-1.5 rounded-lg text-primary">
-          <Sparkles size={16} />
+    <div className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between shrink-0 sticky top-0 z-20">
+      {/* Left: Icon + Title + Time */}
+      <div className="flex items-center gap-4 min-w-0 flex-1">
+        {/* Chat Icon */}
+        <span className="bg-primary/10 p-2 rounded-lg text-primary flex items-center justify-center shrink-0">
+          <Sparkles size={18} />
         </span>
-        <MotionDiv
-          className="flex flex-col"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <span className="truncate text-sm font-semibold">
+        {/* Title, Time, Message Count */}
+        <div className="flex flex-col min-w-0">
+          <span className="truncate text-sm font-semibold text-slate-900 leading-tight">
             {currentSession?.title || "New Conversation"}
           </span>
-          <span className="text-[10px] text-slate-400 font-normal">
-            {messagesCount} messages in this session
-          </span>
-        </MotionDiv>
-        <div className="flex flex-col justify-center items-center gap-0">
-          <ChevronUpIcon
-            onClick={() => onPageChange("previous")}
-            size={16}
-            className="text-slate-500 hover:text-slate-900 cursor-pointer"
-          />
-          <ChevronDownIcon
-            onClick={() => onPageChange("next")}
-            size={16}
-            className="text-slate-500 hover:text-slate-900 cursor-pointer"
-          />
+          <MotionDiv
+            className="flex items-center gap-4 mt-0.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="flex items-center gap-2 text-[11px] text-slate-400 leading-4">
+              <Clock size={12} className="shrink-0" />
+              <span>
+                {dayjs(currentSession?.createdAt).format("MMM D, HH:mm")}
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400 font-normal">
+              {messagesCount} messages
+            </span>
+          </MotionDiv>
         </div>
       </div>
-      <div className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
-        <Clock size={12} />
-        {dayjs(currentSession?.createdAt).format("MMM D, HH:mm")}
+      {/* Right: Page Actions */}
+      <div className="flex flex-col justify-center items-center gap-1 ml-6">
+        <button
+          type="button"
+          aria-label="Previous Page"
+          onClick={() => onPageChange("previous")}
+          className="rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <ChevronUpIcon
+            size={18}
+            className="text-slate-500 hover:text-slate-900"
+          />
+        </button>
+        <button
+          type="button"
+          aria-label="Next Page"
+          onClick={() => onPageChange("next")}
+          className="rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <ChevronDownIcon
+            size={18}
+            className="text-slate-500 hover:text-slate-900"
+          />
+        </button>
       </div>
     </div>
   );

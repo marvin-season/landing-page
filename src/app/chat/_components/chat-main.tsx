@@ -13,6 +13,7 @@ import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
 import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
 import { usePageWheel } from "@/app/chat/_hooks/use-page-wheel";
 import { getLastUserMessage } from "@/app/chat/_utils";
+import { MotionDiv } from "@/components/ui";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
@@ -98,8 +99,17 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
         className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth"
       >
         <div className="max-w-3xl mx-auto space-y-6 pb-4">
-          {displayMessages.map((m) => {
-            return <MessageItem key={m.id} m={m} status={status} />;
+          {displayMessages.map((m, index) => {
+            return (
+              <MotionDiv
+                key={m.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 * index }}
+              >
+                <MessageItem key={m.id} m={m} status={status} />
+              </MotionDiv>
+            );
           })}
 
           {isLoading &&
