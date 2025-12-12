@@ -3,12 +3,15 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Bot } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect } from "react";
 import { ChatError } from "@/app/chat/_components/chat-error";
 import { ChatHeader } from "@/app/chat/_components/chat-header";
 import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 import { ChatLoading } from "@/app/chat/_components/chat-loading";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
+import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
+import { usePageMessages } from "@/app/chat/_hooks/use-page-messages";
+import { usePageWheel } from "@/app/chat/_hooks/use-page-wheel";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
@@ -17,8 +20,6 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
   const { selectedMessageId, addMessages, setSelectedMessageId } =
     useMessageStore();
   const currentMessages = useCurrentMessages(sessionId);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const lastScrollTimeRef = useRef<number>(0);
 
   const currentSession = useCurrentSession(sessionId);
   const { messages, setMessages, sendMessage, status, error, stop } = useChat({
@@ -53,55 +54,18 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
     setMessages(currentMessages);
   }, [currentMessages, setMessages]);
 
-  const displayMessages = useMemo(() => {
-    if (messages.length === 0) return [];
-    if (selectedMessageId) {
-      const index = messages.findLastIndex((m) => m.id === selectedMessageId);
-      if (index !== -1) {
-        const userMsg = messages[index];
-        const assistantMessage = messages[index + 1];
-        return [userMsg, assistantMessage].filter(Boolean);
-      }
-    }
-    return messages.slice(-2);
-  }, [messages, selectedMessageId]);
+  const displayMessages = useDisplayMessages(messages, selectedMessageId);
 
-  const onPageChange = (step: -2 | 2) => {
-    if (!selectedMessageId) return;
-    const index = messages.findLastIndex((m) => m.id === selectedMessageId);
-    if (index === -1) return;
+  const { onPageChange } = usePageMessages({
+    messages,
+    selectedMessageId,
+    setSelectedMessageId,
+  });
 
-    const targetMessage = messages[index + step];
-    if (targetMessage) {
-      setSelectedMessageId(targetMessage.id);
-    } else {
-      setSelectedMessageId(step > 0 ? messages.at(-1)?.id : messages.at(0)?.id);
-    }
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    const now = Date.now();
-    // 500ms throttle to prevent rapid switching
-    if (now - lastScrollTimeRef.current < 200) return;
-
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const isAtTop = scrollTop <= 0;
-    // Check if at bottom with 1px buffer for float precision
-    const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 1;
-
-    if (e.deltaY < 0 && isAtTop) {
-      // Scrolling up at top -> previous page
-      onPageChange(-2);
-      lastScrollTimeRef.current = now;
-    } else if (e.deltaY > 0 && isAtBottom) {
-      // Scrolling down at bottom -> next page
-      onPageChange(2);
-      lastScrollTimeRef.current = now;
-    }
-  };
+  const { handleWheel, scrollContainerRef } = usePageWheel({
+    onScrollUp: () => onPageChange(-2),
+    onScrollDown: () => onPageChange(2),
+  });
 
   if (!currentSession) {
     return (

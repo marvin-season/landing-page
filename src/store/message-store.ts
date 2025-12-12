@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
 
-type IMessageStore = {
+export type IMessageStore = {
   messagesMap: Record<string, UIMessage[]>;
   addMessages: (sessionId: string, messages: UIMessage[]) => void;
   selectedMessageId: string | undefined;
