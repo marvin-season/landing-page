@@ -6,13 +6,13 @@ export default function AssistantMessageParts(props: {
   m: UIMessage;
   status: ChatStatus;
 }) {
-  const { m, status } = props;
+  const { m } = props;
   return m.parts.map((part, i) => {
     if (part.type === "text") {
-      if (status === "streaming") {
+      if (part.state === "streaming") {
         // 按照标点符号进行分割
         return part.text
-          .split(/([。！？,.!?、；;])/)
+          .split(/([。！？,，.!?、；;])/)
           .filter((chunk) => chunk.length > 0)
           .map((chunk, i) => <MemoTextChunk key={i} text={chunk} />);
       }
