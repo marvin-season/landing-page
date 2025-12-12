@@ -19,7 +19,7 @@ export function MessageItem(props: { m: UIMessage; status: ChatStatus }) {
       ) : (
         <div className="flex flex-col items-start gap-2">
           <Bot size={24} />
-          <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5">
+          <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5 max-w-[90vw]">
             <AssistantMessageParts m={m} status={status} />
           </div>
         </div>
