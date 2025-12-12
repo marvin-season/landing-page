@@ -10,8 +10,9 @@ import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 import { ChatLoading } from "@/app/chat/_components/chat-loading";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
-import { usePageMessages } from "@/app/chat/_hooks/use-page-messages";
+import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
 import { usePageWheel } from "@/app/chat/_hooks/use-page-wheel";
+import { getLastUserMessage } from "@/app/chat/_utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
@@ -31,10 +32,11 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
       console.log("onFinish", messages);
       // update
       addMessages(sessionId, messages);
-      const userMessages = messages.filter((m) => m.role === "user");
-      if (userMessages.length > 0) {
-        setSelectedMessageId(userMessages[userMessages.length - 1].id);
+      const lastUserMessage = getLastUserMessage(messages);
+      if (lastUserMessage) {
+        setSelectedMessageId(lastUserMessage.id);
       }
+
       if (currentSession?.title === "New Conversation") {
         // Find the first user message text
         const firstUserText = messages
@@ -52,19 +54,23 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
 
   useEffect(() => {
     setMessages(currentMessages);
-  }, [currentMessages, setMessages]);
+    const lastUserMessage = getLastUserMessage(currentMessages);
+    if (lastUserMessage) {
+      setSelectedMessageId(lastUserMessage.id);
+    }
+  }, [currentMessages, setMessages, setSelectedMessageId]);
 
   const displayMessages = useDisplayMessages(messages, selectedMessageId);
 
-  const { onPageChange } = usePageMessages({
+  const { onPagination } = useMessagesPagination({
     messages,
     selectedMessageId,
     setSelectedMessageId,
   });
 
   const { handleWheel, scrollContainerRef } = usePageWheel({
-    onScrollUp: () => onPageChange(-2),
-    onScrollDown: () => onPageChange(2),
+    onScrollUp: () => onPagination("previous"),
+    onScrollDown: () => onPagination("next"),
   });
 
   if (!currentSession) {
@@ -83,7 +89,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
       <ChatHeader
         currentSession={currentSession}
         messagesCount={currentMessages.length}
-        onPageChange={onPageChange}
+        onPageChange={onPagination}
       />
 
       <div

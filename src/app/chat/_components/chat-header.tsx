@@ -6,7 +6,7 @@ import type { ISession } from "@/store/session-store";
 export function ChatHeader(props: {
   currentSession: ISession;
   messagesCount: number;
-  onPageChange: (step: -2 | 2) => void;
+  onPageChange: (direction: "previous" | "next") => void;
 }) {
   const { currentSession, messagesCount, onPageChange } = props;
   return (
@@ -29,12 +29,12 @@ export function ChatHeader(props: {
         </MotionDiv>
         <div className="flex flex-col justify-center items-center gap-0">
           <ChevronUpIcon
-            onClick={() => onPageChange(-2)}
+            onClick={() => onPageChange("previous")}
             size={16}
             className="text-slate-500 hover:text-slate-900 cursor-pointer"
           />
           <ChevronDownIcon
-            onClick={() => onPageChange(2)}
+            onClick={() => onPageChange("next")}
             size={16}
             className="text-slate-500 hover:text-slate-900 cursor-pointer"
           />
