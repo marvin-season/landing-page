@@ -30,15 +30,7 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
 
       <div className="flex-1 overflow-y-auto">
         {messagePairs.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <History className="w-6 h-6 text-slate-300" />
-            </div>
-            <p className="text-sm text-slate-500 font-medium">No history yet</p>
-            <p className="text-xs text-slate-400 mt-1">
-              Start chatting to see your conversation trail
-            </p>
-          </div>
+          <EmptyHistory />
         ) : (
           <div className="flex flex-col p-2 space-y-2">
             {messagePairs.map(({ userMsg, assistantMsg }) => {
@@ -66,6 +58,20 @@ export function ChatHistory({ sessionId }: { sessionId: string }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function EmptyHistory() {
+  return (
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center">
+      <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+        <History className="w-6 h-6 text-slate-300" />
+      </div>
+      <p className="text-sm text-slate-500 font-medium">No history yet</p>
+      <p className="text-xs text-slate-400 mt-1">
+        Start chatting to see your conversation trail
+      </p>
     </div>
   );
 }
