@@ -100,7 +100,7 @@ export function ChatShell(props: { children: React.ReactNode }) {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 min-w-0 min-h-0">{children}</div>
+        <div className="flex-1 min-w-0 min-h-0 h-full flex">{children}</div>
       </div>
     </ChatShellContext.Provider>
   );

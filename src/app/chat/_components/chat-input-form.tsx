@@ -13,7 +13,7 @@ interface ChatInputProps {
 export function ChatInputForm(props: ChatInputProps) {
   const { onSubmit, onStop, isLoading } = props;
   return (
-    <div className="w-full p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20 shrink-0">
+    <div className="sticky bottom-0 z-20 w-full shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="max-w-3xl mx-auto">
         <form
           action={(formData) => {
@@ -23,12 +23,17 @@ export function ChatInputForm(props: ChatInputProps) {
             }
             onSubmit?.({ input: formData.get("input") as string });
           }}
-          className="relative flex items-end gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/20 transition-all focus-within:bg-white"
+          className="relative flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 p-2 shadow-lg backdrop-blur-md transition-all focus-within:border-primary/20 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/10"
         >
           <input
             name="input"
             placeholder="Ask anything..."
-            className="flex-1 p-3 bg-transparent border-none focus:outline-none text-sm min-h-[48px] max-h-[120px] resize-none"
+            inputMode="text"
+            enterKeyHint="send"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            className="flex-1 h-12 px-3 bg-transparent border-none focus:outline-none text-base sm:text-sm leading-6"
             disabled={isLoading}
           />
           {isLoading ? (
@@ -37,6 +42,7 @@ export function ChatInputForm(props: ChatInputProps) {
               variant={"ghost"}
               size="icon"
               onClick={onStop}
+              className="h-12 w-12 rounded-xl"
             >
               <CircleStopIcon size={24} />
             </Button>
@@ -46,7 +52,7 @@ export function ChatInputForm(props: ChatInputProps) {
               size="icon"
               disabled={isLoading}
               className={cn(
-                "w-10 h-10 rounded-xl mb-0.5 transition-all duration-300",
+                "h-12 w-12 rounded-xl transition-all duration-300",
                 isLoading
                   ? "bg-slate-200 text-slate-400 hover:bg-slate-200"
                   : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 hover:shadow-lg shadow-md",

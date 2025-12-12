@@ -15,7 +15,7 @@ export function ChatSessionShell(props: { sessionId: string }) {
   const closeHistory = useCallback(() => setIsHistoryOpen(false), []);
 
   return (
-    <div className="flex-1 flex min-w-0 min-h-0">
+    <div className="flex-1 flex min-w-0 min-h-0 h-full">
       <ChatMain sessionId={sessionId} onOpenHistory={openHistory} />
 
       {/* Desktop history */}

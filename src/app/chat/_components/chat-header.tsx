@@ -23,87 +23,82 @@ export function ChatHeader(props: {
   const { currentSession, messagesCount, onPageChange, onOpenHistory } = props;
   const { openSidebar } = useChatShell();
   return (
-    <div className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-3 sm:px-8 flex items-center justify-between shrink-0 sticky top-0 z-9">
-      {/* Left: Icon + Title + Time */}
-      <div className="flex items-center gap-4 min-w-0 flex-1">
-        {/* Mobile: sidebar */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={openSidebar}
-          className="md:hidden shrink-0"
-          aria-label="Open menu"
-        >
-          <Menu className="size-4" />
-        </Button>
-        {/* Chat Icon */}
-        <span className="bg-primary/10 p-2 rounded-lg text-primary flex items-center justify-center shrink-0">
-          <Sparkles size={18} />
-        </span>
-        {/* Title, Time, Message Count */}
-        <div className="flex flex-col min-w-0">
-          <span className="truncate text-sm font-semibold text-slate-900 leading-tight">
-            {currentSession?.title || "New Conversation"}
-          </span>
-          <MotionDiv
-            className="flex items-center gap-4 mt-0.5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="flex items-center gap-2 text-[11px] text-slate-400 leading-4">
-              <Clock size={12} className="shrink-0" />
-              <span>
-                {dayjs(currentSession?.createdAt).format("MMM D, HH:mm")}
-              </span>
-            </div>
-            <span className="text-[11px] text-slate-400 font-normal">
-              {messagesCount} messages
-            </span>
-          </MotionDiv>
-        </div>
-      </div>
-      {/* Right: Page Actions */}
-      <div className="flex items-center gap-2 ml-3 sm:ml-6">
-        {/* Mobile: history */}
-        {onOpenHistory ? (
+    <header className="sticky top-0 z-10 h-16 shrink-0 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl supports-backdrop-filter:bg-white/60">
+      <div className="mx-auto flex h-full max-w-6xl items-center gap-3 px-3 sm:px-8">
+        {/* Left: menu + icon + title */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          {/* Mobile: sidebar */}
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            onClick={onOpenHistory}
-            className="lg:hidden"
-            aria-label="Open history"
+            onClick={openSidebar}
+            className="md:hidden shrink-0"
+            aria-label="Open menu"
           >
-            <PanelRight className="size-4" />
+            <Menu className="size-4" />
           </Button>
-        ) : null}
+          {/* Chat Icon */}
+          <span className="flex shrink-0 items-center justify-center rounded-xl bg-primary/10 p-2 text-primary">
+            <Sparkles size={18} />
+          </span>
+          {/* Title, Time, Message Count */}
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-base font-semibold leading-tight text-slate-900">
+              {currentSession?.title || "New Conversation"}
+            </div>
+            <MotionDiv
+              className="mt-0.5 hidden items-center gap-3 text-[11px] leading-4 text-slate-400 sm:flex"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Clock size={12} className="shrink-0 opacity-80" />
+                {dayjs(currentSession?.createdAt).format("MMM D, HH:mm")}
+              </span>
+              <span className="opacity-70">·</span>
+              <span className="opacity-80">{messagesCount} messages</span>
+            </MotionDiv>
+          </div>
+        </div>
 
-        <div className="flex flex-col justify-center items-center gap-1">
-          <button
-            type="button"
-            aria-label="Previous Page"
-            onClick={() => onPageChange("previous")}
-            className="rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <ChevronUpIcon
-              size={18}
-              className="text-slate-500 hover:text-slate-900"
-            />
-          </button>
-          <button
-            type="button"
-            aria-label="Next Page"
-            onClick={() => onPageChange("next")}
-            className="rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <ChevronDownIcon
-              size={18}
-              className="text-slate-500 hover:text-slate-900"
-            />
-          </button>
+        {/* Right: actions */}
+        <div className="ml-auto flex items-center gap-1.5">
+          {/* Pagination group */}
+          <div className="flex items-center rounded-lg border border-slate-200 bg-white/70 shadow-xs backdrop-blur-md">
+            <button
+              type="button"
+              aria-label="Previous Page"
+              onClick={() => onPageChange("previous")}
+              className="grid size-8 place-items-center rounded-l-xl text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronUpIcon size={16} />
+            </button>
+            <div className="h-6 w-px bg-slate-200/70" />
+            <button
+              type="button"
+              aria-label="Next Page"
+              onClick={() => onPageChange("next")}
+              className="grid size-8 place-items-center rounded-r-xl text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronDownIcon size={16} />
+            </button>
+          </div>
+          {/* Mobile: history */}
+          {onOpenHistory ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onOpenHistory}
+              className="lg:hidden shrink-0"
+              aria-label="Open history"
+            >
+              <PanelRight className="size-4" />
+            </Button>
+          ) : null}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

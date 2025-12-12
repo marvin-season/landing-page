@@ -90,7 +90,7 @@ export function ChatMain(props: {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-slate-50/30">
+    <div className="flex-1 flex flex-col min-h-0 h-full bg-slate-50/30">
       <ChatHeader
         currentSession={currentSession}
         messagesCount={currentMessages.length}
