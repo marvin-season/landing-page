@@ -64,6 +64,17 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
     return messages.slice(-2);
   }, [messages, selectedMessageId]);
 
+  const onPageChange = (step: -2 | 2) => {
+    if (!selectedMessageId) return;
+    const index = messages.findLastIndex((m) => m.id === selectedMessageId);
+    if (index === -1) return;
+
+    const targetMessage = messages[index + step];
+    if (targetMessage) {
+      setSelectedMessageId(targetMessage.id);
+    }
+  };
+
   if (!currentSession) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/30 text-slate-400 gap-4">
@@ -80,6 +91,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
       <ChatHeader
         currentSession={currentSession}
         messagesCount={currentMessages.length}
+        onPageChange={onPageChange}
       />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
