@@ -34,10 +34,10 @@ export function ChatHistory(props: {
       )}
     >
       {showHeader ? (
-        <div className="h-16 p-4 border-b border-slate-200 flex items-center gap-2 font-medium text-sm text-slate-700 bg-slate-50/50">
-          <History size={16} />
-          Context History
-        </div>
+      <div className="h-16 p-4 border-b border-slate-200 flex items-center gap-2 font-medium text-sm text-slate-700 bg-slate-50/50">
+        <History size={16} />
+        Context History
+      </div>
       ) : null}
 
       <div className="flex-1 overflow-y-auto">

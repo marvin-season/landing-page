@@ -18,6 +18,11 @@ type ChatSettingsState = {
   setSidebarOpen: (open: boolean) => void;
 };
 
+type ChatSettingsPersistedState = Pick<
+  ChatSettingsState,
+  "disableMessagePagination" | "isSidebarOpen"
+>;
+
 export const useChatSettingsStore = create<ChatSettingsState>()(
   immer(
     persist(
@@ -52,11 +57,12 @@ export const useChatSettingsStore = create<ChatSettingsState>()(
       }),
       {
         name: "chat-settings",
-        storage: createIdbPersistStorage<{ disableMessagePagination: boolean }>({
+        storage: createIdbPersistStorage<ChatSettingsPersistedState>({
           prefix: "pcai",
         }),
         partialize: (state) => ({
           disableMessagePagination: state.disableMessagePagination,
+          isSidebarOpen: state.isSidebarOpen,
         }),
       },
     ),
