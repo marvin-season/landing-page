@@ -13,7 +13,7 @@ interface ChatInputProps {
 export function ChatInputForm(props: ChatInputProps) {
   const { onSubmit, onStop, isLoading } = props;
   return (
-    <div className="w-full p-4 bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20">
+    <div className="w-full p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-white border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)] z-20 shrink-0">
       <div className="max-w-3xl mx-auto">
         <form
           action={(formData) => {

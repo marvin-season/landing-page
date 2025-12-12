@@ -33,3 +33,5 @@ You should use the following components:
 - Table
 - Modal
 - Alert
+
+Formatting code use the script in package.json: "format": "biome format --write" if you find the warning about tailwind warning or code style warning, please use this script to format the code.

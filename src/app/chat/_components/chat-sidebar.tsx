@@ -7,14 +7,28 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/session-store";
 
-export function ChatSidebar() {
+export function ChatSidebar(props: {
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  const { className, onNavigate } = props;
   const { sessions, deleteSession, createNewSession } = useSessionStore();
   const router = useRouter();
   const { sessionId } = useParams();
   return (
-    <div className="w-[280px] border-r border-slate-200 bg-slate-50/50 flex flex-col h-full">
+    <div
+      className={cn(
+        "w-[280px] border-r border-slate-200 bg-slate-50/50 flex flex-col h-full",
+        className,
+      )}
+    >
       <div className="flex flex-col gap-2 p-4 border-b border-slate-200 bg-white">
-        <Link href="/chat">
+        <Link
+          href="/chat"
+          onClick={() => {
+            onNavigate?.();
+          }}
+        >
           <Button
             className="w-full flex items-center justify-start gap-2 shadow-sm"
             variant={"outline"}
@@ -27,6 +41,7 @@ export function ChatSidebar() {
           className="w-full flex items-center justify-start gap-2 shadow-sm"
           onClick={() => {
             const newSessionId = createNewSession();
+            onNavigate?.();
             router.push(`/chat/${newSessionId}`);
           }}
         >
@@ -45,6 +60,9 @@ export function ChatSidebar() {
             <Link
               href={`/chat/${session.id}`}
               key={session.id}
+              onClick={() => {
+                onNavigate?.();
+              }}
               className={cn(
                 "group relative flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm",
                 sessionId === session.id
@@ -75,6 +93,7 @@ export function ChatSidebar() {
                   href={`/chat/${session.id}`}
                   onClick={() => {
                     deleteSession(session.id);
+                    onNavigate?.();
                   }}
                   className="p-1.5 hover:bg-red-100 text-slate-400 hover:text-red-500 rounded-md transition-colors"
                   type="button"
