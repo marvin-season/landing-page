@@ -19,7 +19,7 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
   const currentMessages = useCurrentMessages(sessionId);
 
   const currentSession = useCurrentSession(sessionId);
-  const { messages, setMessages, sendMessage, status, error } = useChat({
+  const { messages, setMessages, sendMessage, status, error, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
@@ -87,8 +87,9 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
           <ChatMessage messages={displayMessages} status={status} />
 
           {isLoading &&
-            displayMessages.length === 1 &&
-            displayMessages[0].role === "user" && <ChatLoading />}
+            displayMessages[displayMessages.length - 1].role === "user" && (
+              <ChatLoading />
+            )}
 
           {error && <ChatError message={error.message} />}
         </div>
@@ -98,6 +99,9 @@ export function ChatMain({ sessionId }: { sessionId: string }) {
         onSubmit={async (data) => {
           setSelectedMessageId(undefined);
           sendMessage({ text: data.input });
+        }}
+        onStop={() => {
+          stop();
         }}
         isLoading={isLoading}
       />
