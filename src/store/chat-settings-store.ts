@@ -1,8 +1,9 @@
 "use client";
 
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
 type ChatSettingsState = {
   /** 是否禁用“上一条/下一条”消息翻页（滚轮/按钮） */
@@ -51,7 +52,9 @@ export const useChatSettingsStore = create<ChatSettingsState>()(
       }),
       {
         name: "chat-settings",
-        storage: createJSONStorage(() => localStorage),
+        storage: createIdbPersistStorage<{ disableMessagePagination: boolean }>({
+          prefix: "pcai",
+        }),
         partialize: (state) => ({
           disableMessagePagination: state.disableMessagePagination,
         }),

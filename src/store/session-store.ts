@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
+import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 export interface ISession {
   id: string;
   title: string;
@@ -18,6 +19,8 @@ interface ISessionStore {
   updateSessionTitle: (sessionId: string, title: string) => void;
   createNewSession: () => void;
 }
+
+type SessionPersistedState = Pick<ISessionStore, "sessions">;
 
 export const useSessionStore = create<ISessionStore>()(
   immer(
@@ -50,7 +53,13 @@ export const useSessionStore = create<ISessionStore>()(
           return newSessionId;
         },
       }),
-      { name: "session-storage", storage: createJSONStorage(() => localStorage) },
+      {
+        name: "session-storage",
+        storage: createIdbPersistStorage<SessionPersistedState>({ prefix: "pcai" }),
+        partialize: (state) => ({
+          sessions: state.sessions,
+        }),
+      },
     ),
   ),
 );

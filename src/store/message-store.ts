@@ -1,8 +1,9 @@
 import type { UIMessage } from "ai";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
+import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
 export type IMessageStore = {
   /**
@@ -16,6 +17,8 @@ export type IMessageStore = {
   selectedMessageId: string | undefined;
   setSelectedMessageId: (messageId: string | undefined) => void;
 };
+
+type MessagePersistedState = Pick<IMessageStore, "messagesMap" | "selectedMessageId">;
 
 export const useMessageStore = create<IMessageStore>()(
   immer(
@@ -38,7 +41,16 @@ export const useMessageStore = create<IMessageStore>()(
             state.selectedMessageId = messageId;
           });
         },
-      }), { name: "message-storage", storage: createJSONStorage(() => localStorage) }),
+      }),
+      {
+        name: "message-storage",
+        storage: createIdbPersistStorage<MessagePersistedState>({ prefix: "pcai" }),
+        partialize: (state) => ({
+          messagesMap: state.messagesMap,
+          selectedMessageId: state.selectedMessageId,
+        }),
+      },
+    ),
   ),
 );
 
