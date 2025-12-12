@@ -1,6 +1,6 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { BrainCircuit } from "lucide-react";
-import { MemoTextChunk } from "./text-chunk";
+import Markdown from "@/components/ui/markdown";
 
 export default function AssistantMessageParts(props: {
   m: UIMessage;
@@ -9,17 +9,13 @@ export default function AssistantMessageParts(props: {
   const { m } = props;
   return m.parts.map((part, i) => {
     if (part.type === "text") {
-      if (part.state === "streaming") {
-        // 按照标点符号进行分割
-        return part.text
-          .split(/([。！？,，.!?、；;])/)
-          .filter((chunk) => chunk.length > 0)
-          .map((chunk, i) => <MemoTextChunk key={i} text={chunk} />);
-      }
       return (
-        <span key={i} className="whitespace-pre-wrap leading-7 text-slate-700">
+        <Markdown
+          key={i}
+          streaming={{ hasNextChunk: part.state === "streaming" }}
+        >
           {part.text}
-        </span>
+        </Markdown>
       );
     }
     if (part.type === "reasoning") {
@@ -34,9 +30,12 @@ export default function AssistantMessageParts(props: {
               Reasoning Process
             </span>
           </div>
-          <div className="p-3 font-mono text-xs leading-relaxed opacity-90">
+          <Markdown
+            className="p-3 font-mono text-xs leading-relaxed opacity-90"
+            streaming={{ hasNextChunk: part.state === "streaming" }}
+          >
             {part.text}
-          </div>
+          </Markdown>
         </div>
       );
     }
