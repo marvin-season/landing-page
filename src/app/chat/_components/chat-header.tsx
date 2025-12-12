@@ -1,9 +1,9 @@
 "use client";
 
 import { Menu, PanelRight, Sparkles } from "lucide-react";
-import { useChatShell } from "@/app/chat/_components/chat-shell";
 import { MotionDiv } from "@/components/ui";
 import { Button } from "@/components/ui/button";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 import type { ISession } from "@/store/session-store";
 
 export function ChatHeader(props: {
@@ -13,7 +13,7 @@ export function ChatHeader(props: {
   outletBottom?: React.ReactNode;
 }) {
   const { currentSession, messagesCount, onOpenHistory, outletBottom } = props;
-  const { openSidebar } = useChatShell();
+  const openSidebar = useChatSettingsStore((s) => s.openSidebar);
   return (
     <header className="sticky top-0 z-10 h-16 shrink-0 border-b border-slate-200/60 bg-white/60 backdrop-blur-md supports-backdrop-filter:bg-white/60">
       <div className="mx-auto flex h-full max-w-6xl items-center gap-3 px-3 sm:px-8">

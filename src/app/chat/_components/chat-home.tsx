@@ -2,13 +2,13 @@
 
 import { Bot, Menu, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useChatShell } from "@/app/chat/_components/chat-shell";
 import { Button } from "@/components/ui/button";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useSessionStore } from "@/store/session-store";
 
 export function ChatHome() {
   const router = useRouter();
-  const { openSidebar } = useChatShell();
+  const openSidebar = useChatSettingsStore((s) => s.openSidebar);
   const { createNewSession } = useSessionStore();
 
   return (

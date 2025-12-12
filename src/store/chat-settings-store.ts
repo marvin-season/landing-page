@@ -9,6 +9,12 @@ type ChatSettingsState = {
   disableMessagePagination: boolean;
   setDisableMessagePagination: (disabled: boolean) => void;
   toggleDisableMessagePagination: () => void;
+
+  /** 控制移动端侧边栏抽屉 */
+  isSidebarOpen: boolean;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
 };
 
 export const useChatSettingsStore = create<ChatSettingsState>()(
@@ -26,10 +32,29 @@ export const useChatSettingsStore = create<ChatSettingsState>()(
             state.disableMessagePagination = !state.disableMessagePagination;
           });
         },
+        isSidebarOpen: false,
+        openSidebar: () => {
+          set((state) => {
+            state.isSidebarOpen = true;
+          });
+        },
+        closeSidebar: () => {
+          set((state) => {
+            state.isSidebarOpen = false;
+          });
+        },
+        setSidebarOpen: (open) => {
+          set((state) => {
+            state.isSidebarOpen = open;
+          });
+        },
       }),
       {
         name: "chat-settings",
         storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({
+          disableMessagePagination: state.disableMessagePagination,
+        }),
       },
     ),
   ),
