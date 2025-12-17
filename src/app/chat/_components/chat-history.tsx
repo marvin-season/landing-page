@@ -101,9 +101,9 @@ function Item(props: {
       animate={{ opacity: 1, x: 0 }}
       type="button"
       className={cn(
-        "group relative p-3 rounded-xl cursor-pointer text-left w-full border border-transparent",
+        "group relative p-2.5 rounded-lg cursor-pointer text-left w-full border border-transparent",
         isSelected
-          ? "bg-slate-100 border-slate-200 shadow-sm"
+          ? "bg-slate-100 border-slate-200 shadow-xs"
           : "hover:bg-slate-50 hover:border-slate-100",
       )}
       onClick={onClick}
@@ -111,18 +111,18 @@ function Item(props: {
       {/* 问题 - 突出显示 */}
       <div
         className={cn(
-          "text-sm font-semibold leading-snug mb-2",
+          "text-xs font-semibold leading-snug mb-1 truncate",
           isSelected ? "text-slate-900" : "text-slate-800",
         )}
       >
         {questionText}
       </div>
 
-      {/* 回答 - 次要展示，超出两行省略 */}
+      {/* 回答 - 次要展示 */}
       {assistantText && (
         <div
           className={cn(
-            "text-xs leading-relaxed line-clamp-2",
+            "text-xs leading-relaxed truncate",
             isSelected ? "text-slate-600" : "text-slate-500",
           )}
         >
