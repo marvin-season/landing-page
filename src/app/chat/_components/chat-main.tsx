@@ -111,29 +111,27 @@ export function ChatMain(props: {
       <div
         ref={scrollContainerRef}
         onWheel={handleWheel}
-        className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22"
+        className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22 mx-auto w-full lg:max-w-4xl space-y-6 pb-6"
       >
-        <div className="max-w-3xl mx-auto space-y-6 pb-6">
-          {displayMessages.map((m, index) => {
-            return (
-              <MotionDiv
-                key={m.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.25 * index }}
-              >
-                <MessageItem key={m.id} m={m} status={status} />
-              </MotionDiv>
-            );
-          })}
+        {displayMessages.map((m, index) => {
+          return (
+            <MotionDiv
+              key={m.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.25 * index }}
+            >
+              <MessageItem key={m.id} m={m} status={status} />
+            </MotionDiv>
+          );
+        })}
 
-          {isLoading &&
-            displayMessages[displayMessages.length - 1].role === "user" && (
-              <ChatLoading />
-            )}
+        {isLoading &&
+          displayMessages[displayMessages.length - 1].role === "user" && (
+            <ChatLoading />
+          )}
 
-          {error && <ChatError message={error.message} />}
-        </div>
+        {error && <ChatError message={error.message} />}
       </div>
 
       <ChatInputForm
