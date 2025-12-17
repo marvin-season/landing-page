@@ -9,8 +9,6 @@ export interface ISession {
   createdAt: number;
 }
 
-
-
 interface ISessionStore {
   sessions: ISession[];
 
@@ -28,22 +26,26 @@ export const useSessionStore = create<ISessionStore>()(
       (set, get) => ({
         sessions: [],
         deleteSession: (sessionId) => {
-          set(state => {
+          set((state) => {
             state.sessions = state.sessions.filter((s) => s.id !== sessionId);
           });
         },
         updateSessionTitle: (sessionId, title) => {
-          set(state => {
-            state.sessions = state.sessions.map((s) => s.id === sessionId ? { ...s, title } : s);
+          set((state) => {
+            state.sessions = state.sessions.map((s) =>
+              s.id === sessionId ? { ...s, title } : s,
+            );
           });
         },
         createNewSession: () => {
           const newSessionId = crypto.randomUUID();
-          const existingSession = get().sessions.find((s) => s.id === newSessionId || s.title === "New Conversation")
-          if(existingSession) {
-            return existingSession.id
+          const existingSession = get().sessions.find(
+            (s) => s.id === newSessionId || s.title === "New Conversation",
+          );
+          if (existingSession) {
+            return existingSession.id;
           }
-          set(state => {
+          set((state) => {
             state.sessions.push({
               id: newSessionId,
               title: "New Conversation",
@@ -55,7 +57,9 @@ export const useSessionStore = create<ISessionStore>()(
       }),
       {
         name: "session-storage",
-        storage: createIdbPersistStorage<SessionPersistedState>({ prefix: "pcai" }),
+        storage: createIdbPersistStorage<SessionPersistedState>({
+          prefix: "pcai",
+        }),
         partialize: (state) => ({
           sessions: state.sessions,
         }),

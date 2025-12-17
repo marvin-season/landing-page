@@ -18,7 +18,10 @@ export type IMessageStore = {
   setSelectedMessageId: (messageId: string | undefined) => void;
 };
 
-type MessagePersistedState = Pick<IMessageStore, "messagesMap" | "selectedMessageId">;
+type MessagePersistedState = Pick<
+  IMessageStore,
+  "messagesMap" | "selectedMessageId"
+>;
 
 export const useMessageStore = create<IMessageStore>()(
   immer(
@@ -44,7 +47,9 @@ export const useMessageStore = create<IMessageStore>()(
       }),
       {
         name: "message-storage",
-        storage: createIdbPersistStorage<MessagePersistedState>({ prefix: "pcai" }),
+        storage: createIdbPersistStorage<MessagePersistedState>({
+          prefix: "pcai",
+        }),
         partialize: (state) => ({
           messagesMap: state.messagesMap,
           selectedMessageId: state.selectedMessageId,
@@ -56,8 +61,6 @@ export const useMessageStore = create<IMessageStore>()(
 
 export function useCurrentMessages(sessionId: string) {
   return useMessageStore(
-    useShallow((state) =>
-      state.messagesMap[sessionId] || []
-    ),
+    useShallow((state) => state.messagesMap[sessionId] || []),
   );
 }

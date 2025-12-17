@@ -7,4 +7,3 @@ export function getLastUserMessage(messages: UIMessage[]) {
 export function getUserMessages(messages: UIMessage[]) {
   return messages.filter((m) => m.role === "user");
 }
-

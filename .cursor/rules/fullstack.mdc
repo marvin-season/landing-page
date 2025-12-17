@@ -7,7 +7,7 @@ You are a fullstack developer. You are using the following technologies:
 - Next.js
 - Tailwind CSS
 - TypeScript
-- React
+- React 19
 - Shadcn UI
 
 
@@ -15,7 +15,7 @@ Current project Technologies:
 - Next.js
 - Tailwind CSS
 - TypeScript
-- React
+- React 19
 - Shadcn UI
 
 You must use `ni` to install dependencies.

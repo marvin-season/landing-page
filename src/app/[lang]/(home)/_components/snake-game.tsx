@@ -328,9 +328,7 @@ interface DirectionCoreProps {
   direction: Direction;
 }
 
-const DirectionCore: React.FC<DirectionCoreProps> = ({
-  direction,
-}) => {
+const DirectionCore: React.FC<DirectionCoreProps> = ({ direction }) => {
   return (
     <div className="flex h-12 flex-col items-center justify-center border-2 border-border bg-black text-[8px] uppercase tracking-widest text-white/60">
       <span className="text-xs text-primary mt-1">
@@ -535,7 +533,9 @@ export default function SnakeGameCanvas(): React.JSX.Element {
 
         <div className="border-2 border-border bg-muted/20 p-4">
           <div className="mb-4 flex items-center justify-between text-[10px] uppercase tracking-widest text-primary font-bold">
-            <span><Trans>Retro Snake</Trans></span>
+            <span>
+              <Trans>Retro Snake</Trans>
+            </span>
             <span className={autopilot ? "animate-pulse" : ""}>
               {autopilot ? <Trans>AI auto</Trans> : <Trans>Manual</Trans>}
             </span>
@@ -570,7 +570,9 @@ export default function SnakeGameCanvas(): React.JSX.Element {
           {/* 控制区和得分显示 */}
           <div className="mt-6 space-y-6">
             <div className="flex items-center justify-between border-b-2 border-border pb-2">
-              <span className="text-[10px] text-muted-foreground uppercase"><Trans>Score</Trans></span>
+              <span className="text-[10px] text-muted-foreground uppercase">
+                <Trans>Score</Trans>
+              </span>
               <span className="text-xl text-primary">
                 {score.toString().padStart(4, "0")}
               </span>

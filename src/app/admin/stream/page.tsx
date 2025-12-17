@@ -2,7 +2,6 @@
 import { motion } from "motion/react";
 import { memo, useEffect, useState } from "react";
 
-
 export default function StreamPage() {
   const [chunks, setChunks] = useState<{ id: string; text: string }[]>([]);
 
@@ -34,12 +33,11 @@ export default function StreamPage() {
   );
 }
 
-
 function TxtChunk({ text }: { text: string }) {
   return (
     <motion.span
-      initial={{ opacity: 0, }}
-      animate={{ opacity: 1, }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
       className="inline-block"
     >

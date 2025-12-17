@@ -13,9 +13,8 @@ import { DisablePagination } from "@/app/chat/_components/disable-pagination";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
 import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
-import { usePageWheel } from "@/app/chat/_hooks/use-page-wheel";
 import { getLastUserMessage } from "@/app/chat/_utils";
-import { MotionDiv } from "@/components/ui";
+import { MotionDiv, ScrollArea } from "@/components/ui";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
@@ -75,11 +74,6 @@ export function ChatMain(props: {
     setSelectedMessageId,
   });
 
-  const { handleWheel, scrollContainerRef } = usePageWheel({
-    onScrollUp: () => onPagination("previous"),
-    onScrollDown: () => onPagination("next"),
-  });
-
   if (!currentSession) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/30 text-slate-400 gap-4">
@@ -108,9 +102,9 @@ export function ChatMain(props: {
         }
       />
 
-      <div
-        ref={scrollContainerRef}
-        onWheel={handleWheel}
+      <ScrollArea
+        onScrollUp={() => onPagination("previous")}
+        onScrollDown={() => onPagination("next")}
         className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22 mx-auto w-full lg:max-w-4xl space-y-6 pb-6"
       >
         {displayMessages.map((m, index) => {
@@ -132,7 +126,7 @@ export function ChatMain(props: {
           )}
 
         {error && <ChatError message={error.message} />}
-      </div>
+      </ScrollArea>
 
       <ChatInputForm
         onSubmit={async (data) => {

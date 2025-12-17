@@ -4,6 +4,7 @@ export * from "./dropdown-menu";
 export * from "./hover-dropdown";
 export * from "./motion";
 export * from "./react-bits";
+export * from "./scroll-area";
 export * from "./select";
 export * from "./shadcn-io";
 export * from "./skeleton";
