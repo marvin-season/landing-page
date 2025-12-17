@@ -30,15 +30,21 @@ export function ChatSidebar(props: {
           }}
         >
           <Button
-            className="w-full flex items-center justify-start gap-2 shadow-sm"
-            variant={"outline"}
+            className={cn(
+              "w-full flex items-center justify-start gap-2 shadow-none",
+              "bg-white hover:bg-blue-50 text-blue-700 border border-blue-100",
+            )}
+            variant="outline"
           >
             <Home size={16} />
             Home
           </Button>
         </Link>
         <Button
-          className="w-full flex items-center justify-start gap-2 shadow-sm"
+          className={cn(
+            "w-full flex items-center justify-start gap-2 font-semibold shadow-none",
+            "bg-linear-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white border-0",
+          )}
           onClick={() => {
             const newSessionId = createNewSession();
             onNavigate?.();
