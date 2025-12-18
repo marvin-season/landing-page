@@ -12,7 +12,8 @@ export interface ISession {
 interface ISessionStore {
   sessions: ISession[];
 
-  deleteSession: (sessionId: string) => void;
+  deleteSession: (sessionId: string) => ISession | undefined;
+  addSession: (session: ISession) => void;
   // New action to update a specific session's title
   updateSessionTitle: (sessionId: string, title: string) => void;
   createNewSession: () => void;
@@ -26,8 +27,15 @@ export const useSessionStore = create<ISessionStore>()(
       (set, get) => ({
         sessions: [],
         deleteSession: (sessionId) => {
+          const trashSession = get().sessions.find((s) => s.id === sessionId);
           set((state) => {
             state.sessions = state.sessions.filter((s) => s.id !== sessionId);
+          });
+          return trashSession
+        },
+        addSession: (session) => {
+          set((state) => {
+            state.sessions.push(session);
           });
         },
         updateSessionTitle: (sessionId, title) => {

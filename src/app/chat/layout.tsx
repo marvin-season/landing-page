@@ -2,7 +2,7 @@ import "@/css/globals.css";
 import type { Metadata } from "next";
 import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
 import { MobileSidebar } from "@/app/chat/_components/sidebar/mobile-sidebar";
-
+import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/bot.svg", type: "image/svg+xml" }],
@@ -18,7 +18,8 @@ export default function ChatLayout({
   return (
     <html lang="en">
       <body>
-        <div className="flex h-dvh min-h-dvh bg-white overflow-hidden">
+        <Toaster position="top-center" duration={5000} />
+        <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
           {/* Desktop sidebar */}
           <div className="hidden md:flex h-full shrink-0">
             <ChatSidebar />
@@ -30,7 +31,7 @@ export default function ChatLayout({
           <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full">
             {children}
           </div>
-        </div>
+        </main>
       </body>
     </html>
   );

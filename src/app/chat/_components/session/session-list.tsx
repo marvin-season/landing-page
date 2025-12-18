@@ -2,7 +2,7 @@
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { DeleteSessionBtn } from "@/app/chat/_components/session/delete-session.btn";
+import { DeleteSessionBtn } from "@/app/chat/_components/session/delete-session-btn";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/session-store";
 export function SessionList() {
