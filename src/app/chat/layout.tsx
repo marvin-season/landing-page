@@ -1,5 +1,6 @@
 import "@/css/globals.css";
-import { ChatShell } from "@/app/chat/_components/chat-shell";
+import { ChatSidebar } from "@/app/chat/_components/chat-sidebar";
+import { MobileSidebar } from "@/app/chat/_components/sidebar/mobile-sidebar";
 
 export default function ChatLayout({
   children,
@@ -9,7 +10,17 @@ export default function ChatLayout({
   return (
     <html lang="en">
       <body>
-        <ChatShell>{children}</ChatShell>
+        <div className="flex h-dvh min-h-dvh bg-white overflow-hidden">
+          {/* Desktop sidebar */}
+          <div className="hidden md:flex h-full shrink-0">
+            <ChatSidebar />
+          </div>
+
+          {/* Mobile sidebar */}
+          <MobileSidebar />
+          {/* Main content */}
+          <div className="flex-1 min-w-0 min-h-0 h-full flex">{children}</div>
+        </div>
       </body>
     </html>
   );
