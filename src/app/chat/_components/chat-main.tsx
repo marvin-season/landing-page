@@ -4,11 +4,9 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect } from "react";
 import { ChatError } from "@/app/chat/_components/chat-error";
-import { ChatHeader } from "@/app/chat/_components/chat-header";
 import { ChatInputForm } from "@/app/chat/_components/chat-input-form";
 import { ChatLoading } from "@/app/chat/_components/chat-loading";
-import { ChatPagination } from "@/app/chat/_components/chat-pagination";
-import { DisablePagination } from "@/app/chat/_components/disable-pagination";
+import { ChatHeader } from "@/app/chat/_components/header/chat-header";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
 import { EmptySession } from "@/app/chat/_components/session/empty-session";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
@@ -77,20 +75,7 @@ export function ChatMain(props: { sessionId: string }) {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 h-full bg-slate-50/30">
-      <ChatHeader
-        currentSession={currentSession}
-        messagesCount={currentMessages.length}
-        outletBottom={
-          <div className="flex gap-2 backdrop-blur-2xl">
-            <ChatPagination
-              onPageChange={onPagination}
-              className=" rounded-t-none border-t-0"
-            />
-            <DisablePagination />
-          </div>
-        }
-      />
-
+      <ChatHeader sessionId={sessionId} />
       <ScrollArea
         onScrollUp={() => onPagination("previous")}
         onScrollDown={() => onPagination("next")}
