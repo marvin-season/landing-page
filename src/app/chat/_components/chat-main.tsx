@@ -18,11 +18,8 @@ import { MotionDiv, ScrollArea } from "@/components/ui";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
-export function ChatMain(props: {
-  sessionId: string;
-  onOpenHistory?: () => void;
-}) {
-  const { sessionId, onOpenHistory } = props;
+export function ChatMain(props: { sessionId: string }) {
+  const { sessionId } = props;
   const { updateSessionTitle } = useSessionStore();
   const { selectedMessageId, addMessages, setSelectedMessageId } =
     useMessageStore();
@@ -90,7 +87,6 @@ export function ChatMain(props: {
       <ChatHeader
         currentSession={currentSession}
         messagesCount={currentMessages.length}
-        onOpenHistory={onOpenHistory}
         outletBottom={
           <div className="flex gap-2 backdrop-blur-2xl">
             <ChatPagination
