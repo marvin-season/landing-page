@@ -1,5 +1,5 @@
 import "@/css/globals.css";
-import { ChatSidebar } from "@/app/chat/_components/chat-sidebar";
+import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
 import { MobileSidebar } from "@/app/chat/_components/sidebar/mobile-sidebar";
 
 export default function ChatLayout({

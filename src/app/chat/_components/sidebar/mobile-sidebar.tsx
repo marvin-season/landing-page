@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { ChatSidebar } from "@/app/chat/_components/chat-sidebar";
+import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
@@ -50,10 +50,7 @@ export function MobileSidebar() {
           </Button>
         </div>
         <div className="h-[calc(100dvh-56px)] overflow-y-auto">
-          <ChatSidebar
-            className="w-full border-r-0"
-            onNavigate={closeSidebar}
-          />
+          <ChatSidebar className="w-full border-r-0" />
         </div>
       </div>
     </div>

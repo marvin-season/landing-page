@@ -1,7 +1,7 @@
 import { use } from "react";
-import { ChatHistory } from "@/app/chat/_components/chat-history";
 import { ChatMain } from "@/app/chat/_components/chat-main";
-import { MessageMobileSidebar } from "@/app/chat/_components/sidebar/message-mobile-sidebar";
+import { ChatHistory } from "@/app/chat/_components/sidebar/chat-history";
+import { HistoryMobileSidebar } from "@/app/chat/_components/sidebar/history-mobile-sidebar";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -16,7 +16,7 @@ export default function SessionPage({ params }: SessionPageProps) {
       <div className="hidden lg:flex h-full shrink-0">
         <ChatHistory sessionId={sessionId} />
       </div>
-      <MessageMobileSidebar sessionId={sessionId} />
+      <HistoryMobileSidebar sessionId={sessionId} />
     </div>
   );
 }

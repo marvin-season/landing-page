@@ -2,11 +2,11 @@
 
 import { X } from "lucide-react";
 import { useState } from "react";
-import { ChatHistory } from "@/app/chat/_components/chat-history";
+import { ChatHistory } from "@/app/chat/_components/sidebar/chat-history";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function MessageMobileSidebar(props: { sessionId: string }) {
+export function HistoryMobileSidebar(props: { sessionId: string }) {
   const { sessionId } = props;
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 

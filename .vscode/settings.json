@@ -2,7 +2,9 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
+    "source.removeUnusedImports": "explicit",
   },
+  
   "editor.defaultFormatter": "biomejs.biome",
   "cSpell.words": [
     "deepseek",

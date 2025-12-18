@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useSessionStore } from "@/store/session-store";
 
-export function CreateSessionBtn(props: { children?: React.ReactNode }) {
-  const { children } = props;
+export function CreateSessionBtn(props: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  const { children, className } = props;
 
   const router = useRouter();
   const { createNewSession } = useSessionStore();
@@ -14,7 +17,7 @@ export function CreateSessionBtn(props: { children?: React.ReactNode }) {
     <Button
       type="button"
       variant="outline"
-      className="mt-6"
+      className={className}
       onClick={() => {
         const id = createNewSession();
         router.push(`/chat/${id}`);

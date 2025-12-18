@@ -2,7 +2,6 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Bot } from "lucide-react";
 import { useEffect } from "react";
 import { ChatError } from "@/app/chat/_components/chat-error";
 import { ChatHeader } from "@/app/chat/_components/chat-header";
@@ -11,6 +10,7 @@ import { ChatLoading } from "@/app/chat/_components/chat-loading";
 import { ChatPagination } from "@/app/chat/_components/chat-pagination";
 import { DisablePagination } from "@/app/chat/_components/disable-pagination";
 import { MessageItem } from "@/app/chat/_components/message/message-item";
+import { EmptySession } from "@/app/chat/_components/session/empty-session";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
 import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
 import { getLastUserMessage } from "@/app/chat/_utils";
@@ -72,14 +72,7 @@ export function ChatMain(props: { sessionId: string }) {
   });
 
   if (!currentSession) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/30 text-slate-400 gap-4">
-        <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center">
-          <Bot className="w-8 h-8 opacity-20" />
-        </div>
-        <p>Select or create a chat to begin</p>
-      </div>
-    );
+    return <EmptySession />;
   }
 
   return (
