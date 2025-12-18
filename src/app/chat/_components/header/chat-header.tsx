@@ -1,3 +1,5 @@
+"use client";
+
 import { Sparkles } from "lucide-react";
 import { useCurrentSession } from "@/store/session-store";
 

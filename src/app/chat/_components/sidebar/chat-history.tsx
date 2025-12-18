@@ -10,7 +10,7 @@ export function ChatHistory(props: {
   showHeader?: boolean;
   className?: string;
 }) {
-  const { sessionId, showHeader = true, className } = props;
+  const { sessionId, showHeader = false, className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
   const messages = useCurrentMessages(sessionId);
