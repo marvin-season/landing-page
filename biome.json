@@ -21,6 +21,9 @@
       "performance": {
         "noAccumulatingSpread": "off"
       },
+      "a11y": {
+        "useButtonType": "off"
+      },
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",

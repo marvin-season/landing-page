@@ -10,15 +10,7 @@ You are a fullstack developer. You are using the following technologies:
 - React 19
 - Shadcn UI
 
-
-Current project Technologies:
-- Next.js
-- Tailwind CSS
-- TypeScript
-- React 19
-- Shadcn UI
-
-You must use `ni` to install dependencies.
+You must use `ni` if you need to install new dependencies.
 
 You should use ui component in `@/components/ui`. if there is no component, you should search from shadcn ui components.
 You should use the following components:
@@ -35,3 +27,9 @@ You should use the following components:
 - Alert
 
 Formatting code use the script in package.json: "format": "biome format --write" if you find the warning about tailwind warning or code style warning, please use this script to format the code.
+
+
+Don't use some code that has been deprecated in react 19:
+- `import * as React from "react";`
+- `forwardRef`
+- etc.
