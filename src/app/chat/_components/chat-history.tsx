@@ -1,7 +1,7 @@
 "use client";
 
 import { History } from "lucide-react";
-import { MotionButton } from "@/components/ui";
+import { MotionDiv } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
@@ -25,40 +25,36 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
   return (
     <div
       className={cn(
-        "w-[280px] border-l border-slate-200 bg-white flex flex-col h-full shadow-[inset_10px_0_20px_-10px_rgba(0,0,0,0.02)]",
+        "max-w-[260px] bg-white flex flex-col space-y-2 h-full shadow-[inset_10px_0_20px_-10px_rgba(0,0,0,0.02)]",
         className,
       )}
     >
-      <div className="flex-1 overflow-y-auto">
-        {messagePairs.length === 0 ? (
-          <EmptyHistory />
-        ) : (
-          <div className="flex flex-col p-2 space-y-2">
-            {messagePairs.map(({ userMsg, assistantMsg }) => {
-              // Find the text content for preview
-              const questionText =
-                userMsg.parts?.find((p) => p.type === "text")?.text ||
-                "image/content";
+      {messagePairs.length === 0 ? (
+        <EmptyHistory />
+      ) : (
+        messagePairs.map(({ userMsg, assistantMsg }) => {
+          // Find the text content for preview
+          const questionText =
+            userMsg.parts?.find((p) => p.type === "text")?.text ||
+            "image/content";
 
-              const assistantText = assistantMsg
-                ? assistantMsg.parts?.find((p) => p.type === "text")?.text || ""
-                : "";
+          const assistantText = assistantMsg
+            ? assistantMsg.parts?.find((p) => p.type === "text")?.text || ""
+            : "";
 
-              const isSelected = selectedMessageId === userMsg.id;
+          const isSelected = selectedMessageId === userMsg.id;
 
-              return (
-                <Item
-                  key={userMsg.id}
-                  questionText={questionText}
-                  assistantText={assistantText}
-                  isSelected={isSelected}
-                  onClick={() => setSelectedMessageId(userMsg.id)}
-                />
-              );
-            })}
-          </div>
-        )}
-      </div>
+          return (
+            <Item
+              key={userMsg.id}
+              questionText={questionText}
+              assistantText={assistantText}
+              isSelected={isSelected}
+              onClick={() => setSelectedMessageId(userMsg.id)}
+            />
+          );
+        })
+      )}
     </div>
   );
 }
@@ -85,10 +81,9 @@ function Item(props: {
 }) {
   const { questionText, assistantText, isSelected, onClick } = props;
   return (
-    <MotionButton
+    <MotionDiv
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
-      type="button"
       className={cn(
         "group relative p-2.5 rounded-lg cursor-pointer text-left w-full border border-transparent",
         isSelected
@@ -118,6 +113,6 @@ function Item(props: {
           {assistantText}
         </div>
       )}
-    </MotionButton>
+    </MotionDiv>
   );
 }

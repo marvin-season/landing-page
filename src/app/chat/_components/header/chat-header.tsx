@@ -1,7 +1,17 @@
 "use client";
 
+import { History } from "lucide-react";
+import dynamic from "next/dynamic";
 import { SessionMenuTrigger } from "@/app/chat/_components/session/session-menu-trigger";
+import { Drawer } from "@/components/drawer";
 import { useCurrentSession } from "@/store/session-store";
+
+const ChatHistory = dynamic(
+  () => import("../chat-history").then((mod) => mod.ChatHistory),
+  {
+    ssr: false,
+  },
+);
 
 export function ChatHeader(props: { sessionId: string }) {
   const { sessionId } = props;
@@ -14,6 +24,13 @@ export function ChatHeader(props: { sessionId: string }) {
           {currentSession?.title}
         </span>
       </div>
+      <Drawer
+        side="right"
+        trigger={<History size={16} className="lg:hidden mr-4" />}
+        title="Context History"
+      >
+        <ChatHistory sessionId={sessionId} className="" />
+      </Drawer>
     </header>
   );
 }

@@ -108,6 +108,7 @@ export function ChatMain(props: { sessionId: string }) {
       )}
 
       <MotionDiv
+        layout="position"
         initial={{ y: 10, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, delay: 0.25 }}
