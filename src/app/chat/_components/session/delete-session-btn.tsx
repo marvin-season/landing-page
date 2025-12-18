@@ -23,7 +23,7 @@ export function DeleteSessionBtn(props: { sessionId: string }) {
         });
       }}
       size={14}
-      className="hover:bg-red-100 text-slate-400 hover:text-red-500 rounded-md transition-colors"
+      className="hover:bg-red-100 text-red-500 hover:text-red-600 rounded-md transition-colors"
     />
   );
 }
