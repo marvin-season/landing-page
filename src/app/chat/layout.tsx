@@ -1,6 +1,14 @@
 import "@/css/globals.css";
+import type { Metadata } from "next";
 import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
 import { MobileSidebar } from "@/app/chat/_components/sidebar/mobile-sidebar";
+
+export const metadata: Metadata = {
+  icons: {
+    icon: [{ url: "/bot.svg", type: "image/svg+xml" }],
+    shortcut: ["/bot.svg"],
+  },
+};
 
 export default function ChatLayout({
   children,

@@ -5,12 +5,8 @@ import { MotionButton } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
-export function ChatHistory(props: {
-  sessionId: string;
-  showHeader?: boolean;
-  className?: string;
-}) {
-  const { sessionId, showHeader = false, className } = props;
+export function ChatHistory(props: { sessionId: string; className?: string }) {
+  const { sessionId, className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
   const messages = useCurrentMessages(sessionId);
@@ -33,13 +29,6 @@ export function ChatHistory(props: {
         className,
       )}
     >
-      {showHeader ? (
-        <div className="h-16 p-4 border-b border-slate-200 flex items-center gap-2 font-medium text-sm text-slate-700 bg-slate-50/50">
-          <History size={16} />
-          Context History
-        </div>
-      ) : null}
-
       <div className="flex-1 overflow-y-auto">
         {messagePairs.length === 0 ? (
           <EmptyHistory />

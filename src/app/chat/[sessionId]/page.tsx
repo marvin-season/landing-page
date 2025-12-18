@@ -1,8 +1,7 @@
 import { use } from "react";
+import { ChatHistory } from "@/app/chat/_components/chat-history";
 import { ChatMain } from "@/app/chat/_components/chat-main";
 import { ChatHeader } from "@/app/chat/_components/header";
-import { ChatHistory } from "@/app/chat/_components/sidebar/chat-history";
-import { HistoryMobileSidebar } from "@/app/chat/_components/sidebar/history-mobile-sidebar";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -16,10 +15,10 @@ export default function SessionPage({ params }: SessionPageProps) {
       <div className="flex-1 min-w-0 min-h-0 h-full flex">
         <ChatMain sessionId={sessionId} />
         {/* Desktop history */}
-        <div className="hidden lg:flex h-full shrink-0">
-          <ChatHistory sessionId={sessionId} />
-        </div>
-        <HistoryMobileSidebar sessionId={sessionId} />
+        <ChatHistory
+          sessionId={sessionId}
+          className="hidden lg:flex h-full shrink-0"
+        />
       </div>
     </div>
   );

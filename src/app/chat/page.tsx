@@ -1,8 +1,10 @@
 import { Bot } from "lucide-react";
 import { CreateSessionBtn } from "@/app/chat/_components/session/create-session-btn";
+import { SessionMenuTrigger } from "@/app/chat/_components/session/session-menu-trigger";
 export default function ChatPage() {
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-white">
+      <SessionMenuTrigger className="" />
       <div className="flex flex-1 min-h-0 flex-col items-center justify-center px-6 text-slate-400">
         <div className="w-20 h-20 bg-linear-to-br from-white to-slate-50 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-center">
           <Bot className="w-10 h-10 opacity-10" />

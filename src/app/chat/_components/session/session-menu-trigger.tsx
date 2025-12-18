@@ -2,10 +2,14 @@
 
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 
-export function SessionMenuTrigger(props: { children?: React.ReactNode }) {
-  const { children } = props;
+export function SessionMenuTrigger(props: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  const { children, className } = props;
   const openSidebar = useChatSettingsStore((s) => s.openSidebar);
   return (
     <Button
@@ -13,10 +17,10 @@ export function SessionMenuTrigger(props: { children?: React.ReactNode }) {
       variant="ghost"
       size="icon"
       onClick={openSidebar}
-      className="md:hidden"
+      className={cn("md:hidden z-10", className)}
       aria-label="Open menu"
     >
-      {children || <Menu className="size-4" />}
+      {children || <Menu className="size-5" />}
     </Button>
   );
 }
