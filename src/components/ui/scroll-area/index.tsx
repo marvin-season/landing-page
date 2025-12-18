@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentPropsWithoutRef, Ref } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
