@@ -2,12 +2,15 @@
 
 import { MotionDiv } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
 export function ChatHistory(props: { sessionId: string; className?: string }) {
   const { sessionId, className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
-
+  const paginationDisplay = useChatSettingsStore((s) =>
+    s.hasSetting("pagination-display"),
+  );
   const messages = useCurrentMessages(sessionId);
 
   const userMessages = messages.filter((m) => m.role === "user");
@@ -21,7 +24,7 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
     return { userMsg, assistantMsg };
   });
 
-  if (messagePairs.length === 0) {
+  if (messagePairs.length === 0 || !paginationDisplay) {
     return null;
   }
 
