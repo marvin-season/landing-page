@@ -1,8 +1,7 @@
 "use client";
 
-import { History } from "lucide-react";
+import { History, Menu } from "lucide-react";
 import dynamic from "next/dynamic";
-import { SessionMenuTrigger } from "@/app/chat/_components/session/session-menu-trigger";
 import { Drawer } from "@/components/drawer";
 import { useCurrentSession } from "@/store/session-store";
 
@@ -13,12 +12,24 @@ const ChatHistory = dynamic(
   },
 );
 
+const ChatSidebar = dynamic(
+  () => import("../sidebar/chat-sidebar").then((mod) => mod.ChatSidebar),
+  {
+    ssr: false,
+  },
+);
+
 export function ChatHeader(props: { sessionId: string }) {
   const { sessionId } = props;
   const currentSession = useCurrentSession(sessionId);
   return (
     <header className="sticky flex items-center top-0 z-10 h-16 shrink-0 shadow-xs border-slate-200/60 bg-white/60 backdrop-blur-md supports-backdrop-filter:bg-white/60">
-      <SessionMenuTrigger />
+      <Drawer
+        side="left"
+        trigger={<Menu size={16} className="lg:hidden m-4 z-10" />}
+      >
+        <ChatSidebar className="w-full border-r-0" />
+      </Drawer>
       <div className="-ml-10 flex-1 flex items-center justify-center gap-2 px-4">
         <span className="max-w-[100px] truncate text-base font-semibold leading-tight text-slate-900">
           {currentSession?.title}
@@ -26,10 +37,10 @@ export function ChatHeader(props: { sessionId: string }) {
       </div>
       <Drawer
         side="right"
+        className="px-4"
         trigger={<History size={16} className="lg:hidden mr-4" />}
-        title="Context History"
       >
-        <ChatHistory sessionId={sessionId} className="" />
+        <ChatHistory sessionId={sessionId} className="max-w-auto" />
       </Drawer>
     </header>
   );

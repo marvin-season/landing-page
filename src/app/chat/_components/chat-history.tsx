@@ -1,6 +1,5 @@
 "use client";
 
-import { History } from "lucide-react";
 import { MotionDiv } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
@@ -22,6 +21,10 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
     return { userMsg, assistantMsg };
   });
 
+  if (messagePairs.length === 0) {
+    return null;
+  }
+
   return (
     <div
       className={cn(
@@ -29,46 +32,28 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
         className,
       )}
     >
-      {messagePairs.length === 0 ? (
-        <EmptyHistory />
-      ) : (
-        messagePairs.map(({ userMsg, assistantMsg }) => {
-          // Find the text content for preview
-          const questionText =
-            userMsg.parts?.find((p) => p.type === "text")?.text ||
-            "image/content";
+      {messagePairs.map(({ userMsg, assistantMsg }) => {
+        // Find the text content for preview
+        const questionText =
+          userMsg.parts?.find((p) => p.type === "text")?.text ||
+          "image/content";
 
-          const assistantText = assistantMsg
-            ? assistantMsg.parts?.find((p) => p.type === "text")?.text || ""
-            : "";
+        const assistantText = assistantMsg
+          ? assistantMsg.parts?.find((p) => p.type === "text")?.text || ""
+          : "";
 
-          const isSelected = selectedMessageId === userMsg.id;
+        const isSelected = selectedMessageId === userMsg.id;
 
-          return (
-            <Item
-              key={userMsg.id}
-              questionText={questionText}
-              assistantText={assistantText}
-              isSelected={isSelected}
-              onClick={() => setSelectedMessageId(userMsg.id)}
-            />
-          );
-        })
-      )}
-    </div>
-  );
-}
-
-function EmptyHistory() {
-  return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-        <History className="w-6 h-6 text-slate-300" />
-      </div>
-      <p className="text-sm text-slate-500 font-medium">No history yet</p>
-      <p className="text-xs text-slate-400 mt-1">
-        Start chatting to see your conversation trail
-      </p>
+        return (
+          <Item
+            key={userMsg.id}
+            questionText={questionText}
+            assistantText={assistantText}
+            isSelected={isSelected}
+            onClick={() => setSelectedMessageId(userMsg.id)}
+          />
+        );
+      })}
     </div>
   );
 }

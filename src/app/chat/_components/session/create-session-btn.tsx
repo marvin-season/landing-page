@@ -3,6 +3,7 @@
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/session-store";
 
 export function CreateSessionBtn(props: {
@@ -17,7 +18,7 @@ export function CreateSessionBtn(props: {
     <Button
       type="button"
       variant="outline"
-      className={className}
+      className={cn("truncate", className)}
       onClick={() => {
         const id = createNewSession();
         router.push(`/chat/${id}`);
@@ -25,8 +26,8 @@ export function CreateSessionBtn(props: {
     >
       {children || (
         <>
-          <Plus className="size-4" />
-          开始新对话
+          <Plus className="size-4 shrink-0" />
+          New Session
         </>
       )}
     </Button>

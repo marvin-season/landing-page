@@ -27,71 +27,25 @@ export type DrawerProps = Omit<
   trigger?: React.ReactElement;
   /** 抽屉打开方向，默认 right */
   side?: DrawerSide;
-  /** 头部标题 */
-  title?: React.ReactNode;
-  /** 头部描述 */
-  description?: React.ReactNode;
-  /** 底部区域（常用于按钮组） */
-  footer?: React.ReactNode;
   /** 抽屉主体内容 */
   children?: React.ReactNode;
-
-  /** 传给 SheetContent 的 className */
-  contentClassName?: string;
-  /** 传给 SheetHeader 的 className */
-  headerClassName?: string;
-  /** 传给 DrawerBody 的 className */
-  bodyClassName?: string;
-  /** 传给 SheetFooter 的 className */
-  footerClassName?: string;
+  className?: string;
 };
 
 export function Drawer({
   trigger,
   side = "right",
-  title,
-  description,
-  footer,
   children,
-  contentClassName,
-  headerClassName,
-  bodyClassName,
-  footerClassName,
+  className,
   ...sheetProps
 }: DrawerProps) {
-  const hasHeader = Boolean(title || description);
-
   return (
     <Sheet {...sheetProps}>
       {trigger ? <SheetTrigger asChild>{trigger}</SheetTrigger> : null}
 
-      <SheetContent side={side} className={contentClassName}>
-        {hasHeader ? (
-          <SheetHeader className={headerClassName}>
-            {title ? <SheetTitle>{title}</SheetTitle> : null}
-            {description ? (
-              <SheetDescription>{description}</SheetDescription>
-            ) : null}
-          </SheetHeader>
-        ) : null}
-
-        {children ? (
-          <DrawerBody
-            className={cn(
-              "p-4",
-              hasHeader ? "pt-0" : null,
-              // 让 body 可滚动（header/footer 固定）
-              "min-h-0 flex-1 overflow-auto",
-              bodyClassName,
-            )}
-          >
-            {children}
-          </DrawerBody>
-        ) : null}
-
-        {footer ? (
-          <SheetFooter className={footerClassName}>{footer}</SheetFooter>
-        ) : null}
+      <SheetContent side={side} className={className}>
+        <SheetHeader></SheetHeader>
+        {children}
       </SheetContent>
     </Sheet>
   );
@@ -101,11 +55,7 @@ export type DrawerBodyProps = React.ComponentProps<"div">;
 
 export function DrawerBody({ className, ...props }: DrawerBodyProps) {
   return (
-    <div
-      data-slot="drawer-body"
-      className={cn("grid gap-4", className)}
-      {...props}
-    />
+    <div data-slot="drawer-body" className={cn("grid", className)} {...props} />
   );
 }
 

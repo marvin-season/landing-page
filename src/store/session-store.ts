@@ -31,7 +31,7 @@ export const useSessionStore = create<ISessionStore>()(
           set((state) => {
             state.sessions = state.sessions.filter((s) => s.id !== sessionId);
           });
-          return trashSession
+          return trashSession;
         },
         addSession: (session) => {
           set((state) => {

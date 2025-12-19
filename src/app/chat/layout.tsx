@@ -1,7 +1,6 @@
 import "@/css/globals.css";
 import type { Metadata } from "next";
 import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
-import { MobileSidebar } from "@/app/chat/_components/sidebar/mobile-sidebar";
 import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   icons: {
@@ -25,8 +24,6 @@ export default function ChatLayout({
             <ChatSidebar />
           </div>
 
-          {/* Mobile sidebar */}
-          <MobileSidebar />
           {/* Main content */}
           <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full">
             {children}
