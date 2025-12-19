@@ -11,11 +11,12 @@ export function ChatSidebar(props: { className?: string }) {
   return (
     <div
       className={cn(
-        "w-[280px] border-r border-slate-200 bg-slate-50/50 flex flex-col h-full",
+        "w-[280px] shadow-md flex flex-col h-full",
+        "bg-[linear-gradient(180deg,#00f9ff_0px,#ffffff_100px,#ffffff_100px,#ffffff_100%)]",
         className,
       )}
     >
-      <div className="flex items-center gap-1 p-4 border-b border-slate-200 bg-white">
+      <div className="flex items-center gap-1 p-4 ">
         <Link href="/chat">
           <Button variant="outline">
             <Home size={16} />
