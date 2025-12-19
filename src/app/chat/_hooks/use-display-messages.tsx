@@ -1,5 +1,6 @@
 import type { UIMessage } from "ai";
 import { useMemo } from "react";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 
 /**
  * 根据选中的消息id，获取显示的消息列表
@@ -11,8 +12,15 @@ export function useDisplayMessages(
   messages: UIMessage[],
   selectedMessageId?: string,
 ) {
+  const paginationDisplay = useChatSettingsStore((s) =>
+    s.hasSetting("pagination-display"),
+  );
   const displayMessages = useMemo(() => {
     if (messages.length === 0) return [];
+
+    if (!paginationDisplay) {
+      return messages;
+    }
     if (selectedMessageId) {
       const index = messages.findLastIndex((m) => m.id === selectedMessageId);
       if (index !== -1) {
@@ -20,7 +28,7 @@ export function useDisplayMessages(
       }
     }
     return messages.slice(-2);
-  }, [messages, selectedMessageId]);
+  }, [messages, selectedMessageId, paginationDisplay]);
 
   return displayMessages;
 }

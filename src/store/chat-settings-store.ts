@@ -2,57 +2,42 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
-type ChatSettingsState = {
-  /** 是否禁用“上一条/下一条”消息翻页（滚轮/按钮） */
-  disableMessagePagination: boolean;
-  setDisableMessagePagination: (disabled: boolean) => void;
-  toggleDisableMessagePagination: () => void;
+type SettingSetKey = 'fixed-chat' | 'pagination-display';
 
-  /** 控制移动端侧边栏抽屉 */
-  isSidebarOpen: boolean;
-  openSidebar: () => void;
-  closeSidebar: () => void;
-  setSidebarOpen: (open: boolean) => void;
+type ChatSettingsState = {
+
+  settingsSet: Set<SettingSetKey>;
+  addSetting: (setting: SettingSetKey) => void;
+  removeSetting: (setting: SettingSetKey) => void;
+  hasSetting: (setting: SettingSetKey) => boolean;
 };
 
 type ChatSettingsPersistedState = Pick<
   ChatSettingsState,
-  "disableMessagePagination" | "isSidebarOpen"
+  "settingsSet"
 >;
 
 export const useChatSettingsStore = create<ChatSettingsState>()(
-  immer(
     persist(
-      (set) => ({
-        disableMessagePagination: false,
-        setDisableMessagePagination: (disabled) => {
+      (set, get) => ({
+        settingsSet: new Set<SettingSetKey>(['pagination-display']),
+        addSetting: (setting) => {
+          set((state) => ({
+            // 重新创建一个新的 Set 对象，确保 zustand 能够检测到变更
+            settingsSet: new Set(state.settingsSet).add(setting),
+          }));
+        },
+        removeSetting: (setting) => {
           set((state) => {
-            state.disableMessagePagination = disabled;
+            const nextSet = new Set(state.settingsSet);
+            nextSet.delete(setting);
+            return { settingsSet: nextSet };
           });
         },
-        toggleDisableMessagePagination: () => {
-          set((state) => {
-            state.disableMessagePagination = !state.disableMessagePagination;
-          });
-        },
-        isSidebarOpen: false,
-        openSidebar: () => {
-          set((state) => {
-            state.isSidebarOpen = true;
-          });
-        },
-        closeSidebar: () => {
-          set((state) => {
-            state.isSidebarOpen = false;
-          });
-        },
-        setSidebarOpen: (open) => {
-          set((state) => {
-            state.isSidebarOpen = open;
-          });
+        hasSetting: (setting) => {
+          return get().settingsSet.has(setting);
         },
       }),
       {
@@ -61,10 +46,8 @@ export const useChatSettingsStore = create<ChatSettingsState>()(
           prefix: "pcai",
         }),
         partialize: (state) => ({
-          disableMessagePagination: state.disableMessagePagination,
-          isSidebarOpen: state.isSidebarOpen,
+          settingsSet: state.settingsSet,
         }),
       },
     ),
-  ),
 );

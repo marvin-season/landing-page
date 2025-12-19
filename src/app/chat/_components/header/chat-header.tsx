@@ -37,7 +37,7 @@ export function ChatHeader(props: { sessionId: string }) {
         <ChatSidebar className="w-full border-r-0" />
       </Drawer>
       <div className="-ml-10 flex-1 flex items-center justify-center gap-2 px-4">
-        <span className="max-w-[100px] truncate text-base font-semibold leading-tight text-slate-900">
+        <span className="max-w-[150px] truncate text-base font-semibold leading-tight text-slate-900">
           {currentSession?.title}
         </span>
       </div>
