@@ -32,6 +32,9 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
         className,
       )}
     >
+      <div className="p-2 my-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        History
+      </div>
       {messagePairs.map(({ userMsg, assistantMsg }) => {
         // Find the text content for preview
         const questionText =

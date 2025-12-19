@@ -20,7 +20,7 @@ export default function ChatLayout({
         <Toaster position="top-center" duration={5000} />
         <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
           {/* Desktop sidebar */}
-          <div className="hidden md:flex h-full shrink-0">
+          <div className="hidden lg:flex h-full shrink-0">
             <ChatSidebar />
           </div>
 
