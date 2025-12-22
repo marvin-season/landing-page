@@ -76,10 +76,8 @@ function Item(props: {
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       className={cn(
-        "group relative p-2.5 rounded-lg cursor-pointer text-left w-full border border-transparent",
-        isSelected
-          ? "bg-slate-100 border-slate-200 shadow-xs"
-          : "hover:bg-slate-50 hover:border-slate-100",
+        "group relative p-2.5 cursor-pointer text-left w-full border-b border-transparent hover:border-slate-200",
+        isSelected && "border-slate-200",
       )}
       onClick={onClick}
     >
@@ -87,7 +85,7 @@ function Item(props: {
       <div
         className={cn(
           "text-xs font-semibold leading-snug mb-1 truncate",
-          isSelected ? "text-slate-900" : "text-slate-800",
+          "text-slate-800",
         )}
       >
         {questionText}
@@ -96,10 +94,7 @@ function Item(props: {
       {/* 回答 - 次要展示 */}
       {assistantText && (
         <div
-          className={cn(
-            "text-xs leading-relaxed truncate",
-            isSelected ? "text-slate-600" : "text-slate-500",
-          )}
+          className={cn("text-xs leading-relaxed truncate", "text-slate-500")}
         >
           {assistantText}
         </div>
