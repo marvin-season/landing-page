@@ -23,7 +23,7 @@ export function ChatInputForm(props: ChatInputProps) {
           }
           onSubmit?.({ input: formData.get("input") as string });
         }}
-        className="relative flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 p-2 shadow-lg backdrop-blur-md transition-all focus-within:border-primary/20 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/10"
+        className="relative flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 lg:py-2 py-1 lg:px-3 px-1.5 shadow-lg backdrop-blur-md transition-all"
       >
         <input
           name="input"
@@ -33,7 +33,7 @@ export function ChatInputForm(props: ChatInputProps) {
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          className="flex-1 h-12 px-3 bg-transparent border-none focus:outline-none text-base sm:text-sm leading-6"
+          className="flex-1 h-10 lg:h-12 lg:px-3 px-2 bg-transparent border-none focus:outline-none lg:text-base text-sm leading-6"
           disabled={isLoading}
         />
         {isLoading ? (
@@ -42,7 +42,7 @@ export function ChatInputForm(props: ChatInputProps) {
             variant={"ghost"}
             size="icon"
             onClick={onStop}
-            className="h-12 w-12 rounded-xl"
+            className="rounded-xl"
           >
             <CircleStopIcon size={24} />
           </Button>
@@ -52,23 +52,23 @@ export function ChatInputForm(props: ChatInputProps) {
             size="icon"
             disabled={isLoading}
             className={cn(
-              "h-12 w-12 rounded-xl transition-all duration-300",
+              "rounded-xl transition-all duration-300",
               isLoading
                 ? "bg-slate-200 text-slate-400 hover:bg-slate-200"
                 : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 hover:shadow-lg shadow-md",
             )}
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="lg:size-4 size-3 animate-spin" />
             ) : (
-              <Send size={18} />
+              <Send className="lg:size-4 size-3" />
             )}
           </Button>
         )}
       </form>
       <div className="text-center mt-3">
         <span className="text-[10px] text-slate-400 flex items-center justify-center gap-1.5 opacity-70">
-          <Sparkles size={10} />
+          <Sparkles className="lg:size-4 size-3" />
           AI-generated content can be inaccurate.
         </span>
       </div>
