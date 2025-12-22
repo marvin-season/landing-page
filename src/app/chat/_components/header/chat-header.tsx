@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui";
+import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentSession } from "@/store/session-store";
 
 const ChatHistory = dynamic(
@@ -28,6 +29,10 @@ const ChatSidebar = dynamic(
 export function ChatHeader(props: { sessionId: string }) {
   const { sessionId } = props;
   const currentSession = useCurrentSession(sessionId);
+
+  const paginationDisplay = useChatSettingsStore((s) =>
+    s.hasSetting("pagination-display"),
+  );
   return (
     <header className="sticky flex items-center top-0 z-10 h-16 shrink-0 shadow-xs border-slate-200/60 bg-white/60 backdrop-blur-md supports-backdrop-filter:bg-white/60 p-4">
       <Drawer
@@ -42,13 +47,15 @@ export function ChatHeader(props: { sessionId: string }) {
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <Drawer
-          side="right"
-          className="px-4"
-          trigger={<History size={16} className="lg:hidden" />}
-        >
-          <ChatHistory sessionId={sessionId} className="max-w-auto" />
-        </Drawer>
+        {paginationDisplay && (
+          <Drawer
+            side="right"
+            className="px-4"
+            trigger={<History size={16} className="lg:hidden" />}
+          >
+            <ChatHistory sessionId={sessionId} className="max-w-auto" />
+          </Drawer>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
