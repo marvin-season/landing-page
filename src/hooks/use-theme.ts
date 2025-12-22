@@ -2,16 +2,15 @@
 
 import { useTheme as useNextTheme } from "next-themes";
 
-export type Theme = "light" | "dark" | "neutral" | "system";
+export type Theme = "light" | "dark" | "system";
 
 export const themeNames: Record<Theme, string> = {
   light: "Light",
   dark: "Dark",
-  neutral: "Neutral",
   system: "System",
 };
 
-export const themes: Theme[] = ["system", "light", "dark", "neutral"];
+export const themes: Theme[] = ["system", "light", "dark",];
 
 /**
  * 主题切换 Hook
