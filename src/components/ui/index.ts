@@ -11,3 +11,4 @@ export * from "./sheet";
 export * from "./skeleton";
 export * from "./switch";
 export * from "./tag";
+export * from "./tooltip";

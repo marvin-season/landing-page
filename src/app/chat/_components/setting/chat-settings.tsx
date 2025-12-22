@@ -1,4 +1,4 @@
-import { Tooltip } from "@/components/tooltip";
+import Tooltip from "@/components/tooltip";
 import { Switch } from "@/components/ui";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 
@@ -16,7 +16,7 @@ export function ChatSettings() {
       <div className="text-sm font-medium text-slate-600">
         Disable Scroll Switch
       </div>
-      <Tooltip arrow content="Disable scroll to load more messages">
+      <Tooltip content="Disable scroll to load more messages">
         <Switch
           disabled={!paginationDisplay}
           className={"ml-auto"}
