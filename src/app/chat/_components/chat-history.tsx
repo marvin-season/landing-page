@@ -9,7 +9,7 @@ export function ChatHistory(props: { sessionId: string; className?: string }) {
   const { sessionId, className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
   const paginationDisplay = useChatSettingsStore((s) =>
-    s.hasSetting("pagination-display"),
+    s.isSettingEnabled("pagination-display"),
   );
   const messages = useCurrentMessages(sessionId);
 

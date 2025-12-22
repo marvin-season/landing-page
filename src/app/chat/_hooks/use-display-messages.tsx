@@ -13,7 +13,7 @@ export function useDisplayMessages(
   selectedMessageId?: string,
 ) {
   const paginationDisplay = useChatSettingsStore((s) =>
-    s.hasSetting("pagination-display"),
+    s.isSettingEnabled("pagination-display"),
   );
   const displayMessages = useMemo(() => {
     if (messages.length === 0) return [];

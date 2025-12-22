@@ -2,52 +2,53 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
-type SettingSetKey = 'fixed-chat' | 'pagination-display';
+type ChatSettingKey = "fixed-chat" | "pagination-display";
 
 type ChatSettingsState = {
-
-  settingsSet: Set<SettingSetKey>;
-  addSetting: (setting: SettingSetKey) => void;
-  removeSetting: (setting: SettingSetKey) => void;
-  hasSetting: (setting: SettingSetKey) => boolean;
+  /**
+   * 用数组做持久化，避免 Set 在不同 storage/序列化策略下的兼容性问题。
+   * 业务侧请使用 isSettingEnabled/enableSetting/disableSetting，不要直接依赖该字段的具体结构。
+   */
+  enabledSettingKeys: ChatSettingKey[];
+  enableSetting: (key: ChatSettingKey) => void;
+  disableSetting: (key: ChatSettingKey) => void;
+  isSettingEnabled: (key: ChatSettingKey) => boolean;
 };
 
-type ChatSettingsPersistedState = Pick<
-  ChatSettingsState,
-  "settingsSet"
->;
+type ChatSettingsPersistedState = Pick<ChatSettingsState, "enabledSettingKeys">;
 
 export const useChatSettingsStore = create<ChatSettingsState>()(
-    persist(
-      (set, get) => ({
-        settingsSet: new Set<SettingSetKey>(['pagination-display']),
-        addSetting: (setting) => {
-          set((state) => ({
-            // 重新创建一个新的 Set 对象，确保 zustand 能够检测到变更
-            settingsSet: new Set(state.settingsSet).add(setting),
-          }));
-        },
-        removeSetting: (setting) => {
-          set((state) => {
-            const nextSet = new Set(state.settingsSet);
-            nextSet.delete(setting);
-            return { settingsSet: nextSet };
-          });
-        },
-        hasSetting: (setting) => {
-          return get().settingsSet.has(setting);
-        },
-      }),
-      {
-        name: "chat-settings",
-        storage: createIdbPersistStorage<ChatSettingsPersistedState>({
-          prefix: "pcai",
-        }),
-        partialize: (state) => ({
-          settingsSet: state.settingsSet,
-        }),
+  persist(
+    immer((set, get) => ({
+      enabledSettingKeys: ["pagination-display"],
+      enableSetting: (key) => {
+        set((state) => {
+          if (state.enabledSettingKeys.includes(key)) return;
+          state.enabledSettingKeys.push(key);
+        });
       },
-    ),
+      disableSetting: (key) => {
+        set((state) => {
+          state.enabledSettingKeys = state.enabledSettingKeys.filter(
+            (k) => k !== key,
+          );
+        });
+      },
+      isSettingEnabled: (key) => {
+        return get().enabledSettingKeys.includes(key);
+      },
+    })),
+    {
+      name: "chat-settings",
+      storage: createIdbPersistStorage<ChatSettingsPersistedState>({
+        prefix: "pcai",
+      }),
+      partialize: (state) => ({
+        enabledSettingKeys: state.enabledSettingKeys,
+      }),
+    },
+  ),
 );

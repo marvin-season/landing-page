@@ -31,7 +31,7 @@ export function ChatHeader(props: { sessionId: string }) {
   const currentSession = useCurrentSession(sessionId);
 
   const paginationDisplay = useChatSettingsStore((s) =>
-    s.hasSetting("pagination-display"),
+    s.isSettingEnabled("pagination-display"),
   );
   return (
     <header className="sticky flex items-center top-0 z-10 h-16 shrink-0 shadow-xs border-slate-200/60 bg-white/60 backdrop-blur-md supports-backdrop-filter:bg-white/60 p-4">

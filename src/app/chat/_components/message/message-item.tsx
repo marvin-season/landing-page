@@ -10,14 +10,14 @@ export function MessageItem(props: { m: UIMessage; status: ChatStatus }) {
   return isUser ? (
     <div className="flex flex-col items-end gap-2">
       <User size={20} className="text-sky-900" />
-      <div className="w-fit bg-sky-200/60 text-black rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-md inline-block text-left">
+      <div className="max-w-full bg-sky-200/60 text-black rounded-2xl rounded-tr-sm px-5 py-3.5 shadow-md">
         <UserMessageParts m={m} />
       </div>
     </div>
   ) : (
     <div className="flex flex-col items-start gap-2">
       <Bot size={20} />
-      <div className="bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5">
+      <div className="max-w-full bg-white border border-slate-200/60 rounded-2xl rounded-tl-sm shadow-sm px-6 py-5">
         <AssistantMessageParts m={m} status={status} />
       </div>
     </div>

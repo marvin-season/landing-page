@@ -16,10 +16,10 @@ export function useMessagesPagination(params: {
   setSelectedMessageId: IMessageStore["setSelectedMessageId"];
 }) {
   const { messages, selectedMessageId, setSelectedMessageId } = params;
-  const hasSetting = useChatSettingsStore((s) => s.hasSetting);
+  const isSettingEnabled = useChatSettingsStore((s) => s.isSettingEnabled);
 
   const onPagination = (direction: "previous" | "next") => {
-    if (hasSetting("fixed-chat")) return;
+    if (isSettingEnabled("fixed-chat")) return;
 
     if (!selectedMessageId) return;
     const userMessages = getUserMessages(messages);
