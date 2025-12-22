@@ -13,7 +13,7 @@ export type TooltipProps = {
 export default function Tooltip({ children, content }: TooltipProps) {
   return (
     <TooltipPrimitive>
-      <TooltipTrigger>{children}</TooltipTrigger>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent>{content}</TooltipContent>
     </TooltipPrimitive>
   );

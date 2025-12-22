@@ -30,14 +30,16 @@ export function ChatSettings() {
       <div className="text-sm font-medium text-slate-600">
         Pagination Display
       </div>
-      <Switch
-        className={"ml-auto"}
-        checked={paginationDisplay}
-        onCheckedChange={(next) => {
-          if (next) enableSetting("pagination-display");
-          else disableSetting("pagination-display");
-        }}
-      />
+      <Tooltip content="Display the message by page">
+        <Switch
+          className={"ml-auto"}
+          checked={paginationDisplay}
+          onCheckedChange={(next) => {
+            if (next) enableSetting("pagination-display");
+            else disableSetting("pagination-display");
+          }}
+        />
+      </Tooltip>
     </div>
   );
 }

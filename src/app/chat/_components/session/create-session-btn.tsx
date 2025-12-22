@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Tooltip from "@/components/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/session-store";
@@ -15,21 +16,23 @@ export function CreateSessionBtn(props: {
   const router = useRouter();
   const { createNewSession } = useSessionStore();
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className={cn("truncate", className)}
-      onClick={() => {
-        const id = createNewSession();
-        router.push(`/chat/${id}`);
-      }}
-    >
-      {children || (
-        <>
-          <Plus className="size-4 shrink-0" />
-          New Session
-        </>
-      )}
-    </Button>
+    <Tooltip content="Create a new session">
+      <Button
+        type="button"
+        variant="outline"
+        className={cn("truncate", className)}
+        onClick={() => {
+          const id = createNewSession();
+          router.push(`/chat/${id}`);
+        }}
+      >
+        {children || (
+          <>
+            <Plus className="size-4 shrink-0" />
+            New Session
+          </>
+        )}
+      </Button>
+    </Tooltip>
   );
 }
