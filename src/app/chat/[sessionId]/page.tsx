@@ -1,7 +1,7 @@
 import { use } from "react";
-import { ChatHistory } from "@/app/chat/_components/chat-history";
 import { ChatMain } from "@/app/chat/_components/chat-main";
 import { ChatHeader } from "@/app/chat/_components/header";
+import { MessageList } from "@/app/chat/_components/message/message-list";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -15,7 +15,7 @@ export default function SessionPage({ params }: SessionPageProps) {
         <ChatHeader sessionId={sessionId} />
         <ChatMain sessionId={sessionId} />
       </div>
-      <ChatHistory
+      <MessageList
         sessionId={sessionId}
         className="hidden lg:flex h-full shrink-0 border-l border-slate-200 p-2"
       />

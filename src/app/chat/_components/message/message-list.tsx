@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
-export function ChatHistory(props: { sessionId: string; className?: string }) {
+export function MessageList(props: { sessionId: string; className?: string }) {
   const { sessionId, className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
   const paginationDisplay = useChatSettingsStore((s) =>

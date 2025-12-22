@@ -13,7 +13,7 @@ import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentSession } from "@/store/session-store";
 
 const ChatHistory = dynamic(
-  () => import("../chat-history").then((mod) => mod.ChatHistory),
+  () => import("../message/message-list").then((mod) => mod.MessageList),
   {
     ssr: false,
   },

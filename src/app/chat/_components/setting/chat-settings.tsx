@@ -1,3 +1,4 @@
+import { Tooltip } from "@/components/tooltip";
 import { Switch } from "@/components/ui";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 
@@ -12,16 +13,20 @@ export function ChatSettings() {
   );
   return (
     <div className="space-y-2 grid grid-cols-2 gap-2">
-      <div className="text-sm font-medium text-slate-600">Fixed Chat</div>
-      <Switch
-        disabled={!paginationDisplay}
-        className={"ml-auto"}
-        checked={fixedChat}
-        onCheckedChange={(next) => {
-          if (next) enableSetting("fixed-chat");
-          else disableSetting("fixed-chat");
-        }}
-      />
+      <div className="text-sm font-medium text-slate-600">
+        Disable Scroll Switch
+      </div>
+      <Tooltip arrow content="Disable scroll to load more messages">
+        <Switch
+          disabled={!paginationDisplay}
+          className={"ml-auto"}
+          checked={fixedChat}
+          onCheckedChange={(next) => {
+            if (next) enableSetting("fixed-chat");
+            else disableSetting("fixed-chat");
+          }}
+        />
+      </Tooltip>
       <div className="text-sm font-medium text-slate-600">
         Pagination Display
       </div>
