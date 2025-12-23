@@ -1,91 +1,170 @@
 "use client";
 
-import { Canvas } from "fabric";
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
+import { usePptStore } from "@/store/ppt-store";
+import { PptCanvasPlayer } from "./_components/ppt-canvas-player";
+import { PRESETS } from "./_components/ppt-presets";
+import { PptToolbar } from "./_components/ppt-toolbar";
 import { SLIDES_DATA } from "./data";
+import {
+  fabricSlidesDocumentSchema,
+  normalizeFabricSlideJSON,
+} from "./fabric-slide-schema";
 
 export default function SimplePPTPlayer() {
-  const canvasEl = useRef<HTMLCanvasElement>(null);
-  const fabricCanvas = useRef<Canvas | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [presetId, setPresetId] = useState(PRESETS[0]?.id ?? "low-carbon");
+  const [dataSource, setDataSource] = useState<"mock" | "generated">("mock");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // 初始化 Canvas
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <1>
-  useEffect(() => {
-    if (!canvasEl.current) return;
+  const {
+    activeGeneratedPptId,
+    generatedPpts,
+    addGeneratedPpt,
+    setActiveGeneratedPptId,
+  } = usePptStore();
 
-    fabricCanvas.current = new Canvas(canvasEl.current, {
-      width: 600,
-      height: 360,
-      backgroundColor: "#ffffff",
-    });
+  const activeGeneratedPpt =
+    activeGeneratedPptId == null
+      ? null
+      : (generatedPpts.find((p) => p.id === activeGeneratedPptId) ?? null);
 
-    // 初始加载第一页
-    loadSlide(0);
+  const dataSourceSelectValue = useMemo(() => {
+    if (dataSource === "mock") return "mock";
+    if (activeGeneratedPptId) return `generated:${activeGeneratedPptId}`;
+    return "mock";
+  }, [activeGeneratedPptId, dataSource]);
 
-    return () => {
-      fabricCanvas.current?.dispose();
-    };
-  }, []);
+  const activeSlides =
+    dataSource === "generated" && activeGeneratedPpt
+      ? activeGeneratedPpt.slides
+      : SLIDES_DATA;
 
-  // 加载特定页码的函数
-  const loadSlide = async (index: number) => {
-    if (!fabricCanvas.current) return;
+  const onGenerate = async () => {
+    const preset = PRESETS.find((p) => p.id === presetId);
+    if (!preset) return;
 
-    // 清空当前画布
-    fabricCanvas.current.clear();
-    fabricCanvas.current.backgroundColor = "#ffffff";
+    setIsGenerating(true);
+    setErrorMsg(null);
 
-    // 加载 JSON 数据
-    // 注意：Fabric v6 的 loadFromJSON 是异步的
-    await fabricCanvas.current.loadFromJSON(SLIDES_DATA[index]);
+    try {
+      const res = await fetch("/api/ppt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: preset.topic,
+          slideCount: preset.slideCount,
+          tone: preset.tone,
+        }),
+      });
 
-    fabricCanvas.current.requestRenderAll();
-  };
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(err.error || `生成失败（HTTP ${res.status}）`);
+      }
 
-  // 切换页面处理
-  const goToSlide = (index: number) => {
-    if (index >= 0 && index < SLIDES_DATA.length) {
-      setCurrentIndex(index);
-      loadSlide(index);
+      const json = await res.json();
+      const parsed = fabricSlidesDocumentSchema.safeParse(json);
+      if (!parsed.success) {
+        throw new Error(
+          "返回数据不符合 PPT schema，请检查模型输出/服务端约束。",
+        );
+      }
+
+      const slides = parsed.data.slides.map(normalizeFabricSlideJSON);
+      addGeneratedPpt({
+        slides,
+        presetId: preset.id,
+        title: preset.label,
+      });
+
+      setDataSource("generated");
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "生成失败");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-xl font-bold">简易 Web PPT 渲染器</h1>
+    <div className="bg-gray-100 min-h-screen p-8">
+      <div className="mx-auto flex max-w-5xl flex-col gap-4">
+        <Card>
+          <CardHeader className="gap-3">
+            <CardTitle className="text-xl">简易 Web PPT 渲染器</CardTitle>
 
-      {/* PPT 画布区域 */}
-      <div className="shadow-2xl border-8 border-gray-800 rounded-lg overflow-hidden bg-white">
-        <canvas ref={canvasEl} />
+            <PptToolbar
+              presetId={presetId}
+              onPresetChange={setPresetId}
+              presets={PRESETS}
+              isGenerating={isGenerating}
+              onGenerate={onGenerate}
+              dataSourceValue={dataSourceSelectValue}
+              onDataSourceValueChange={(v) => {
+                if (v === "mock") {
+                  setDataSource("mock");
+                  return;
+                }
+
+                if (v.startsWith("generated:")) {
+                  const id = v.slice("generated:".length);
+                  setDataSource("generated");
+                  setActiveGeneratedPptId(id);
+                  return;
+                }
+
+                setDataSource("mock");
+              }}
+              generatedPpts={generatedPpts}
+            />
+          </CardHeader>
+
+          <CardContent className="flex flex-col items-center gap-4">
+            {errorMsg ? (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertTitle>生成失败</AlertTitle>
+                <AlertDescription>{errorMsg}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            <div className="flex w-full flex-col gap-2">
+              {dataSource === "generated" && activeGeneratedPpt ? (
+                <div className="text-sm text-slate-600">
+                  当前使用生成数据：{activeGeneratedPpt.title}（
+                  {activeGeneratedPpt.slides.length} 页）
+                  <span className="ml-2 text-slate-500">
+                    生成时间：
+                    {new Date(activeGeneratedPpt.createdAt).toLocaleString()}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-sm text-slate-600">
+                  当前使用 Mock 数据（{SLIDES_DATA.length} 页）
+                </div>
+              )}
+            </div>
+
+            <PptCanvasPlayer
+              slides={activeSlides}
+              slidesKey={dataSourceSelectValue}
+            />
+
+            <p className="text-sm text-gray-500 mt-2">
+              提示：Mock 数据保留；生成数据会写入 zustand +
+              IndexedDB（IDB）并可切换预览
+            </p>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* 控制条 */}
-      <div className="flex items-center gap-6 mt-4 bg-white px-6 py-3 rounded-full shadow-md">
-        <button
-          className="px-4 py-1 bg-gray-200 hover:bg-gray-300 disabled:opacity-30 rounded"
-          onClick={() => goToSlide(currentIndex - 1)}
-          disabled={currentIndex === 0}
-        >
-          上一页
-        </button>
-
-        <span className="font-mono font-bold">
-          {currentIndex + 1} / {SLIDES_DATA.length}
-        </span>
-
-        <button
-          className="px-4 py-1 bg-gray-200 hover:bg-gray-300 disabled:opacity-30 rounded"
-          onClick={() => goToSlide(currentIndex + 1)}
-          disabled={currentIndex === SLIDES_DATA.length - 1}
-        >
-          下一页
-        </button>
-      </div>
-
-      <p className="text-sm text-gray-500 mt-2">
-        提示：页面由 Fabric.js JSON 数据驱动渲染
-      </p>
     </div>
   );
 }

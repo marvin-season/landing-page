@@ -10,7 +10,7 @@ export const themeNames: Record<Theme, string> = {
   system: "System",
 };
 
-export const themes: Theme[] = ["system", "light", "dark",];
+export const themes: Theme[] = ["system", "light", "dark"];
 
 /**
  * 主题切换 Hook
