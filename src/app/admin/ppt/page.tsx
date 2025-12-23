@@ -17,6 +17,7 @@ import { PRESETS } from "./_components/ppt-presets";
 import { PptToolbar } from "./_components/ppt-toolbar";
 import SLIDES_DATA from "./data";
 import {
+  type FabricSlideJSON,
   fabricSlidesDocumentSchema,
   normalizeFabricSlideJSON,
 } from "./fabric-slide-schema";
@@ -69,9 +70,9 @@ export default function SimplePPTPlayer() {
   const activeSlides = useMemo(() => {
     if (isGenerating && streamedObject?.slides) {
       // 过滤掉不完整的 slide（至少要有 objects 数组）
-      return (streamedObject.slides as Array<Record<string, any>>)
+      return streamedObject.slides
         .filter((s) => s && Array.isArray(s.objects) && s.objects.length > 0)
-        .map((s) => normalizeFabricSlideJSON(s as any));
+        .map((s) => normalizeFabricSlideJSON(s as FabricSlideJSON));
     }
     return dataSource === "generated" && activeGeneratedPpt
       ? activeGeneratedPpt.slides
