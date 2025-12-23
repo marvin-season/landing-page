@@ -1,19 +1,23 @@
 "use client";
-import type { ReactNode } from "react";
+import type { Trigger } from "@radix-ui/react-tooltip";
+import type { ComponentProps, ReactNode } from "react";
+
+type TTrigger = ComponentProps<typeof Trigger>;
+
 import {
   TooltipContent,
   Tooltip as TooltipPrimitive,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 export type TooltipProps = {
-  children: ReactNode;
   content: ReactNode;
-};
+} & TTrigger;
 
-export default function Tooltip({ children, content }: TooltipProps) {
+export default function Tooltip(props: TooltipProps) {
+  const { content, ...restProps } = props;
   return (
     <TooltipPrimitive>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipTrigger {...restProps} />
       <TooltipContent>{content}</TooltipContent>
     </TooltipPrimitive>
   );

@@ -16,10 +16,12 @@ export function ChatSettings() {
       <div className="text-sm font-medium text-slate-600">
         Disable Scroll Switch
       </div>
-      <Tooltip content="Disable scroll to load more messages">
+      <Tooltip
+        content="Disable scroll to load more messages"
+        className={"ml-auto"}
+      >
         <Switch
           disabled={!paginationDisplay}
-          className={"ml-auto"}
           checked={fixedChat}
           onCheckedChange={(next) => {
             if (next) enableSetting("fixed-chat");
@@ -30,9 +32,8 @@ export function ChatSettings() {
       <div className="text-sm font-medium text-slate-600">
         Pagination Display
       </div>
-      <Tooltip content="Display the message by page">
+      <Tooltip content="Display the message by page" className={"ml-auto"}>
         <Switch
-          className={"ml-auto"}
           checked={paginationDisplay}
           onCheckedChange={(next) => {
             if (next) enableSetting("pagination-display");
