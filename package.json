@@ -71,6 +71,7 @@
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "negotiator": "^1.0.0",
+    "react-markdown": "^10.1.0",
     "shadcn": "^3.5.1",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.21.0",

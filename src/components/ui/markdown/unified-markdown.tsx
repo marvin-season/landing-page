@@ -1,10 +1,10 @@
 "use client";
 
-import { toJsxRuntime } from "hast-util-to-jsx-runtime";
-import { useMemo } from "react";
-import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { memo, useMemo } from "react";
+import * as prod from "react/jsx-runtime";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
+import rehypeReact from "rehype-react";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
@@ -19,6 +19,13 @@ interface UnifiedMarkdownProps {
   content: string;
   className?: string;
 }
+
+const MemoizedStrong = memo(({ className, ...props }: any) => {
+  return <strong className={cn("font-bold", className)} {...props} />;
+});
+const components = {
+  strong: MemoizedStrong,
+};
 
 /**
  * 使用 unified 生态实现的富文本解析组件
@@ -39,27 +46,24 @@ export function UnifiedMarkdown({ content, className }: UnifiedMarkdownProps) {
           detect: true,
           ignoreMissing: true,
         })
+        .use(rehypeReact, {
+          ...prod,
+          components: components,
+        })
     );
   }, []);
 
   const contentComponent = useMemo(() => {
-    const tree = processor.runSync(processor.parse(content), content) as any;
-    const result = toJsxRuntime(tree, {
-      Fragment,
-      components: {},
-      ignoreInvalidStyle: true,
-      jsx,
-      jsxs,
-      passKeys: true,
-      passNode: true,
+    console.log("processor", {
+      processor: processor,
     });
-    return result;
-    // try {
-    //   return processor.processSync(content).result;
-    // } catch (error) {
-    //   console.error("Markdown parsing error:", error);
-    //   return content;
-    // }
+
+    try {
+      return processor.processSync(content).result;
+    } catch (error) {
+      console.error("Markdown parsing error:", error);
+      return content;
+    }
   }, [processor, content]);
 
   return (
