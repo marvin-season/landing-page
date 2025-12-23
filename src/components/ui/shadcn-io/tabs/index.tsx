@@ -232,7 +232,7 @@ function TabsContents({
     >
       <motion.div
         className="flex -mx-2"
-        animate={{ x: activeIndex * -100 + "%" }}
+        animate={{ x: `${activeIndex * -100}%` }}
         transition={transition}
       >
         {childrenArray.map((child, index) => (

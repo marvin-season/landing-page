@@ -3,8 +3,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 import type { FabricSlideJSON } from "@/app/admin/ppt/fabric-slide-schema";
+import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
 export type GeneratedPptItem = {
   id: string;
