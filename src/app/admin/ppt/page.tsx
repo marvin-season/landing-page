@@ -14,7 +14,7 @@ import { usePptStore } from "@/store/ppt-store";
 import { PptCanvasPlayer } from "./_components/ppt-canvas-player";
 import { PRESETS } from "./_components/ppt-presets";
 import { PptToolbar } from "./_components/ppt-toolbar";
-import { SLIDES_DATA } from "./data";
+import SLIDES_DATA from "./data";
 import {
   fabricSlidesDocumentSchema,
   normalizeFabricSlideJSON,
