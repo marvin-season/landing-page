@@ -1,5 +1,5 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { generateObject } from "ai";
+import { streamObject } from "ai";
 import {
   FABRIC_PPT_SYSTEM_PROMPT,
   fabricSlidesDocumentSchema,
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   const slideCount = Math.min(10, Math.max(1, body.slideCount ?? 2));
   const tone = body.tone ?? "科普";
 
-  const result = await generateObject({
+  const result = await streamObject({
     model: deepseek("deepseek-chat"),
     schema: fabricSlidesDocumentSchema,
     system: FABRIC_PPT_SYSTEM_PROMPT,
@@ -41,5 +41,5 @@ export async function POST(req: Request) {
     ].join("\n"),
   });
 
-  return Response.json(result.object);
+  return result.toTextStreamResponse();
 }
