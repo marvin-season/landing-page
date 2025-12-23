@@ -158,8 +158,7 @@ export default function SimplePPTPlayer() {
             />
 
             <p className="text-sm text-gray-500 mt-2">
-              提示：Mock 数据保留；生成数据会写入 zustand +
-              IndexedDB（IDB）并可切换预览
+              提示：数据由 AI 生成，仅供参考。
             </p>
           </CardContent>
         </Card>
