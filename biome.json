@@ -27,7 +27,8 @@
       "suspicious": {
         "noUnknownAtRules": "off",
         "noArrayIndexKey": "off",
-        "noTsIgnore": "off"
+        "noTsIgnore": "off",
+        "noExplicitAny": "off"
       },
       "style": {
         "noNonNullAssertion": "off"
