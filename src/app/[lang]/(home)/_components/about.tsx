@@ -9,6 +9,12 @@ const c = `
 
 Welcome to **MyAI Portal** 
 
+
+\`\`\`javascript
+const a = 1;
+console.log(a);
+\`\`\`
+
 ---
 
 ## 🚀 Features
@@ -45,6 +51,7 @@ Inline math like $E=mc^2$ and block math:
 $$
 \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
 $$
+
 
 
 
