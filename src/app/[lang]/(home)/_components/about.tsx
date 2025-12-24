@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Markdown from "@/components/ui/markdown";
 import { UnifiedMarkdown } from "@/components/unified-markdown";
 
 const c = `
@@ -77,8 +76,10 @@ export function About() {
   }, []);
   return (
     <div className="flex gap-4">
-      <UnifiedMarkdown className="flex-1" content={content} />
-      <Markdown className="flex-1" content={content} />
+      <UnifiedMarkdown
+        className="flex-1 prose-stone prose-sm lg:prose-base xl:prose-lg"
+        content={content}
+      />
     </div>
   );
 }
