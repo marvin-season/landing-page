@@ -43,7 +43,9 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body className={`${lora.className} antialiased max-h-dvh overflow-auto`}>
+      <body
+        className={`${lora.className} antialiased max-h-dvh overflow-auto bg-[#fefeff]`}
+      >
         <LinguiClientProvider
           initialLocale={lang}
           initialMessages={allMessages[lang]}
