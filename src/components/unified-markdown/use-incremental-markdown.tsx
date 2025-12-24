@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Fragment, type ReactNode, useMemo, useRef } from "react";
-import { useIsVisible } from "@/hooks/use-visibility";
-import processor, { createProcessor } from "./processor";
+import { Fragment, type ReactNode, useMemo, useRef } from 'react';
+import processor, { createProcessor } from './processor';
+import { useIsVisible } from './use-visibility';
 
 const stableProcessor = createProcessor({ streaming: false });
 
@@ -44,10 +44,7 @@ export interface IncrementalMarkdownOptions {
   pauseOnBackground?: boolean;
 }
 
-export function useIncrementalMarkdown(
-  content: string,
-  options: IncrementalMarkdownOptions = {},
-) {
+export function useIncrementalMarkdown(content: string, options: IncrementalMarkdownOptions = {}) {
   const { pauseOnBackground = false } = options;
   const isVisible = useIsVisible();
 
@@ -66,19 +63,13 @@ export function useIncrementalMarkdown(
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
-      cachedStableResult.current = stableProcessor.processSync(
-        content.slice(0, splitPoint),
-      ).result;
+      cachedStableResult.current = stableProcessor.processSync(content.slice(0, splitPoint)).result as ReactNode;
     }
 
     const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
 
-    if (
-      cachedTailResult.current === null ||
-      typeof cachedTailResult.current !== "string" ||
-      tailContent !== ""
-    ) {
-      cachedTailResult.current = processor.processSync(tailContent).result;
+    if (cachedTailResult.current === null || typeof cachedTailResult.current !== 'string' || tailContent !== '') {
+      cachedTailResult.current = processor.processSync(tailContent).result as ReactNode;
     }
 
     const result = (

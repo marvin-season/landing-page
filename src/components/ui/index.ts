@@ -5,7 +5,6 @@ export * from "./card";
 export * from "./dropdown-menu";
 export * from "./hover-dropdown";
 export * from "./markdown";
-export * from "./markdown/unified-markdown";
 export * from "./motion";
 export * from "./react-bits";
 export * from "./scroll-area";

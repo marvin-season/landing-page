@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Markdown from "@/components/ui/markdown";
-import { UnifiedMarkdown } from "@/components/unified-markdown";
+import {  useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { UnifiedMarkdown } from './index';
 
 const c = `
 # About This Project
@@ -57,28 +57,37 @@ $$
 
 `;
 
-export function About() {
-  const [content, setContent] = useState<string>("");
-  useEffect(() => {
+export default function Demo() {
+  const [content, setContent] = useState<string>('');
+  const interval = useRef<any>(null);
+
+
+  const handleStart = () => {
     let i = 0;
-    const interval = setInterval(() => {
+    interval.current = setInterval(() => {
       const char = c.at(i);
       if (char) {
         setContent((prev) => prev + char);
       } else {
-        clearInterval(interval);
+        clearInterval(interval.current);
       }
       i += 1;
     }, 40);
-    return () => {
-      clearInterval(interval);
+
+  };
+
+  const handleReset = () => {
+    clearInterval(interval.current);
       setContent(c);
-    };
-  }, []);
+  };
+
   return (
-    <div className="flex gap-4">
+    <div className="">
+      <div className="flex gap-4">
+        <Button onClick={handleStart}>Start</Button>
+        <Button onClick={handleReset}>Reset</Button>
+      </div>
       <UnifiedMarkdown className="flex-1" content={content} />
-      <Markdown className="flex-1" content={content} />
     </div>
   );
 }

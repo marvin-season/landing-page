@@ -9,7 +9,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
-import components from "@/components/ui/markdown/components";
+import components from "./components";
 
 function rehypeStreamSplitter() {
   return (tree: any) => {
