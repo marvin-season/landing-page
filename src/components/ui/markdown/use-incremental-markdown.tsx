@@ -1,8 +1,9 @@
 "use client";
 
 import { Fragment, type ReactNode, useMemo, useRef } from "react";
-import processor from "./processor";
+import processor, { createProcessor } from "./processor";
 
+const stableProcessor = createProcessor({ streaming: false });
 /**
  * 寻找安全的分割点
  * 规则：最后一个双换行符 \n\n，且确保不在代码块或数学公式块中
@@ -36,7 +37,7 @@ function findSafeSplitPoint(content: string): number {
 export function useIncrementalMarkdown(content: string) {
   const lastSplitPointRef = useRef<number>(-1);
 
-  const cachedStableResults = useRef<ReactNode[]>([]);
+  const cachedStableResult = useRef<ReactNode>([]);
 
   const cachedTailResult = useRef<ReactNode>(null);
 
@@ -45,23 +46,25 @@ export function useIncrementalMarkdown(content: string) {
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
-      cachedStableResults.current.push(cachedTailResult.current);
-      console.log("cachedStableResults", cachedStableResults.current);
+      cachedStableResult.current = stableProcessor.processSync(
+        content.slice(0, splitPoint),
+      ).result;
+      console.log("cachedStableResults", cachedStableResult.current);
     }
 
-    if (splitPoint === -1) {
-      cachedTailResult.current = processor.processSync(content).result;
-    } else {
-      cachedTailResult.current = processor.processSync(
-        content.slice(splitPoint),
-      ).result;
+    const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
+
+    if (
+      cachedTailResult.current === null ||
+      typeof cachedTailResult.current !== "string" ||
+      tailContent !== ""
+    ) {
+      cachedTailResult.current = processor.processSync(tailContent).result;
     }
 
     return (
       <Fragment key="incremental-markdown-root">
-        {cachedStableResults.current.map((result, index) => (
-          <Fragment key={`stable-part-${index}`}>{result}</Fragment>
-        ))}
+        <Fragment key="stable-part">{cachedStableResult.current}</Fragment>
         <Fragment key="tail-part">{cachedTailResult.current}</Fragment>
       </Fragment>
     );
