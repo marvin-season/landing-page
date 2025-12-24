@@ -20,6 +20,14 @@ Welcome to **MyAI Portal**
 
 ---
 
+> “The best software is built by a community.”
+
+Check out the [GitHub repo](https://github.com/myaiportal/myai) and join us!
+
+- [x] Markdown parsing
+- [ ] AI-powered chat
+---
+
 ## 📚 Example Table
 
 | Name         | Role          | Active |
@@ -38,14 +46,7 @@ $$
 \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
 $$
 
----
 
-> “The best software is built by a community.”
-
-Check out the [GitHub repo](https://github.com/myaiportal/myai) and join us!
-
-- [x] Markdown parsing
-- [ ] AI-powered chat
 
 `;
 
@@ -61,7 +62,7 @@ export function About() {
         clearInterval(interval);
       }
       i += 1;
-    }, 30);
+    }, 40);
     return () => {
       clearInterval(interval);
       setContent(c);
@@ -69,8 +70,8 @@ export function About() {
   }, []);
   return (
     <div className="flex gap-4">
-      <UnifiedMarkdown content={content} />
-      <Markdown content={content} />
+      <UnifiedMarkdown className="flex-1" content={content} />
+      <Markdown className="flex-1" content={content} />
     </div>
   );
 }
