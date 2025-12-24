@@ -1,11 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
-
+import { useIncrementalMarkdown } from "@/components/ui/markdown/use-incremental-markdown";
 import { cn } from "@/lib/utils";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
-import processor from "@/components/ui/markdown/processor";
 
 export function UnifiedMarkdown({
   content,
@@ -14,15 +12,7 @@ export function UnifiedMarkdown({
   content: string;
   className?: string;
 }) {
-  const contentComponent = useMemo(() => {
-    try {
-      // 执行解析
-      return processor.processSync(content).result;
-    } catch (error) {
-      console.error("Markdown parsing error:", error);
-      return content;
-    }
-  }, [content]);
+  const contentComponent = useIncrementalMarkdown(content);
 
   return (
     <div

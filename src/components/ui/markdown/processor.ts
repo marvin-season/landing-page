@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import * as prod from "react/jsx-runtime";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
@@ -14,7 +15,7 @@ function rehypeStreamSplitter() {
   return (tree: any) => {
     // 1. 寻找最后一个包含文本的节点
     let lastTextNodeParent: any = null;
-    let lastTextNodeIndex: number = -1;
+    let lastTextNodeIndex = -1;
 
     // 深度优先遍历，找到最后一个文本节点
     visit(tree, "text", (node, index, parent) => {
@@ -28,7 +29,6 @@ function rehypeStreamSplitter() {
     if (lastTextNodeParent && lastTextNodeIndex !== -1) {
       const originalNode = lastTextNodeParent.children[lastTextNodeIndex];
       const textContent = originalNode.value;
-      console.log("textContent", textContent);
       // 将纯文本节点替换为一系列 span 节点
       const charNodes = textContent
         .split("")
@@ -50,19 +50,29 @@ function rehypeStreamSplitter() {
   };
 }
 
-export const createProcessor = () => {
-  return unified()
+export interface ProcessorOptions {
+  streaming?: boolean;
+}
+
+export const createProcessor = (options: ProcessorOptions = {}) => {
+  const p = unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkMath)
     .use(remarkRehype)
     .use(rehypeKatex)
-    .use(rehypeHighlight, { detect: true, ignoreMissing: true })
-    .use(rehypeStreamSplitter) // 如果需要精准控制动画节点可开启
-    .use(rehypeReact, {
-      ...prod,
-      components: components,
-    });
+    .use(rehypeHighlight, { detect: true, ignoreMissing: true });
+
+  if (options.streaming) {
+    p.use(rehypeStreamSplitter);
+  }
+
+  return p.use(rehypeReact, {
+    ...prod,
+    Fragment,
+    components: components,
+  });
 };
 
-export default createProcessor();
+const defaultProcessor = createProcessor({ streaming: true });
+export default defaultProcessor;
