@@ -8,11 +8,15 @@ import "highlight.js/styles/github-dark.css";
 export function UnifiedMarkdown({
   content,
   className,
+  pauseOnBackground = false,
 }: {
   content: string;
   className?: string;
+  pauseOnBackground?: boolean;
 }) {
-  const contentComponent = useIncrementalMarkdown(content);
+  const contentComponent = useIncrementalMarkdown(content, {
+    pauseOnBackground,
+  });
 
   return (
     <div

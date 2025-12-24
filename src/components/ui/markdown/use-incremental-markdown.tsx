@@ -1,9 +1,11 @@
 "use client";
 
 import { Fragment, type ReactNode, useMemo, useRef } from "react";
+import { useIsVisible } from "@/hooks/use-visibility";
 import processor, { createProcessor } from "./processor";
 
 const stableProcessor = createProcessor({ streaming: false });
+
 /**
  * 寻找安全的分割点
  * 规则：最后一个双换行符 \n\n，且确保不在代码块或数学公式块中
@@ -34,14 +36,32 @@ function findSafeSplitPoint(content: string): number {
   return lastMatchIndex;
 }
 
-export function useIncrementalMarkdown(content: string) {
+export interface IncrementalMarkdownOptions {
+  /**
+   * 当窗口在后台时是否暂停解析
+   * @default false
+   */
+  pauseOnBackground?: boolean;
+}
+
+export function useIncrementalMarkdown(
+  content: string,
+  options: IncrementalMarkdownOptions = {},
+) {
+  const { pauseOnBackground = false } = options;
+  const isVisible = useIsVisible();
+
   const lastSplitPointRef = useRef<number>(-1);
-
   const cachedStableResult = useRef<ReactNode>([]);
-
   const cachedTailResult = useRef<ReactNode>(null);
+  const lastResultRef = useRef<ReactNode>(null);
 
   return useMemo(() => {
+    // 如果开启了后台暂停，且窗口在后台，且已经有缓存结果，则直接返回上次的结果
+    if (pauseOnBackground && !isVisible && lastResultRef.current) {
+      return lastResultRef.current;
+    }
+
     const splitPoint = findSafeSplitPoint(content);
 
     if (splitPoint !== lastSplitPointRef.current) {
@@ -49,7 +69,6 @@ export function useIncrementalMarkdown(content: string) {
       cachedStableResult.current = stableProcessor.processSync(
         content.slice(0, splitPoint),
       ).result;
-      console.log("cachedStableResults", cachedStableResult.current);
     }
 
     const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
@@ -62,11 +81,14 @@ export function useIncrementalMarkdown(content: string) {
       cachedTailResult.current = processor.processSync(tailContent).result;
     }
 
-    return (
+    const result = (
       <Fragment key="incremental-markdown-root">
         <Fragment key="stable-part">{cachedStableResult.current}</Fragment>
         <Fragment key="tail-part">{cachedTailResult.current}</Fragment>
       </Fragment>
     );
-  }, [content]);
+
+    lastResultRef.current = result;
+    return result;
+  }, [content, isVisible, pauseOnBackground]);
 }
