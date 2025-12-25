@@ -17,19 +17,15 @@ msgstr ""
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:18
-msgid "1s cadence with autonomous pathfinding toward every food node."
-msgstr ""
-
 #: src/app/[lang]/resume/layout.tsx:29
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:29
-msgid "About me"
+#: src/app/[lang]/(home)/_components/mine.tsx:21
+msgid "About me in detail"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:620
+#: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "AI active"
 msgstr ""
 
@@ -37,36 +33,24 @@ msgstr ""
 msgid "AI auto"
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:33
-msgid "AI Chat"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
-msgstr ""
-
-#: src/app/[lang]/(home)/page.tsx:11
-msgid "AI PIXEL OPS"
-msgstr ""
-
-#: src/app/[lang]/(home)/page.tsx:21
-msgid "Arrow keys instantly revoke autopilot and hand controls to you."
 msgstr ""
 
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:24
-msgid "Crashes trigger GAME OVER and a 3s cold reboot for resilience drills."
-msgstr ""
-
-#: src/app/[lang]/layout.tsx:29
-msgid "Create Next App"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/mine.tsx:32
+msgid "Design is not just what it looks like. Design is how it works."
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/mine.tsx:24
+msgid "Design System & Component Libs"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:61
@@ -133,7 +117,11 @@ msgstr ""
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:620
+#: src/app/[lang]/layout.tsx:29
+msgid "effective"
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "Enable AI"
 msgstr ""
 
@@ -241,6 +229,10 @@ msgstr ""
 msgid "Key Responsibilities"
 msgstr ""
 
+#: src/app/[lang]/(home)/_components/mine.tsx:29
+msgid "Leveraging less data to generate greater insights."
+msgstr ""
+
 #: src/app/[lang]/(home)/_components/snake-game.tsx:540
 msgid "Manual"
 msgstr ""
@@ -261,10 +253,6 @@ msgstr ""
 msgid "Optimized performance with lazy loading and data virtualization"
 msgstr ""
 
-#: src/app/[lang]/(home)/page.tsx:12
-msgid "Pixel-grade AI command deck for content teams"
-msgstr ""
-
 #: src/app/[lang]/resume/layout.tsx:27
 msgid "Professional Experience & Skills"
 msgstr ""
@@ -281,12 +269,16 @@ msgstr ""
 msgid "Resume"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:538
+#: src/app/[lang]/(home)/_components/snake-game.tsx:537
 msgid "Retro Snake"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:573
+#: src/app/[lang]/(home)/_components/snake-game.tsx:574
 msgid "Score"
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/mine.tsx:16
+msgid "software engineer"
 msgstr ""
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
@@ -297,12 +289,8 @@ msgstr ""
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:625
+#: src/app/[lang]/(home)/_components/snake-game.tsx:627
 msgid "WASD / ARROW keys to override"
-msgstr ""
-
-#: src/app/[lang]/(home)/page.tsx:14
-msgid "We rebooted the landing experience into a living arcade shell. A self-driving snake simulates how our agents route briefs, and you can take over anytime just like co-creating with AI."
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:23

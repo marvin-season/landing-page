@@ -17,19 +17,15 @@ msgstr ""
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 
-#: src/app/[lang]/(home)/page.tsx:18
-msgid "1s cadence with autonomous pathfinding toward every food node."
-msgstr ""
-
 #: src/app/[lang]/resume/layout.tsx:29
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/(home)/page.tsx:29
-msgid "About me"
-msgstr "关于我"
+#: src/app/[lang]/(home)/_components/mine.tsx:21
+msgid "About me in detail"
+msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:620
+#: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "AI active"
 msgstr "AI 主动模式"
 
@@ -37,37 +33,25 @@ msgstr "AI 主动模式"
 msgid "AI auto"
 msgstr "AI 自动模式"
 
-#: src/app/[lang]/(home)/page.tsx:33
-msgid "AI Chat"
-msgstr "AI 聊天"
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
 msgstr "AIPC"
-
-#: src/app/[lang]/(home)/page.tsx:11
-msgid "AI PIXEL OPS"
-msgstr "AI PIXEL 操作"
-
-#: src/app/[lang]/(home)/page.tsx:21
-msgid "Arrow keys instantly revoke autopilot and hand controls to you."
-msgstr "箭头键瞬间收回自动驾驶和手动控制。"
 
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr "职业经历"
 
-#: src/app/[lang]/(home)/page.tsx:24
-msgid "Crashes trigger GAME OVER and a 3s cold reboot for resilience drills."
-msgstr "崩溃触发 GAME OVER 并进行 3 秒冷重启以进行弹性训练。"
-
-#: src/app/[lang]/layout.tsx:29
-msgid "Create Next App"
-msgstr "创建 Next 应用"
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
+
+#: src/app/[lang]/(home)/_components/mine.tsx:32
+msgid "Design is not just what it looks like. Design is how it works."
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/mine.tsx:24
+msgid "Design System & Component Libs"
+msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:61
 msgid "Designed and implemented frontend-backend separation architecture"
@@ -133,7 +117,11 @@ msgstr "神州数码"
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
 msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:620
+#: src/app/[lang]/layout.tsx:29
+msgid "effective"
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "Enable AI"
 msgstr "启用 AI"
 
@@ -241,6 +229,10 @@ msgstr "聚实惠"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
+#: src/app/[lang]/(home)/_components/mine.tsx:29
+msgid "Leveraging less data to generate greater insights."
+msgstr ""
+
 #: src/app/[lang]/(home)/_components/snake-game.tsx:540
 msgid "Manual"
 msgstr "手动模式"
@@ -261,10 +253,6 @@ msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR,
 msgid "Optimized performance with lazy loading and data virtualization"
 msgstr "优化性能，支持懒加载和数据虚拟化"
 
-#: src/app/[lang]/(home)/page.tsx:12
-msgid "Pixel-grade AI command deck for content teams"
-msgstr "像素级 AI 命令面板，用于内容团队"
-
 #: src/app/[lang]/resume/layout.tsx:27
 msgid "Professional Experience & Skills"
 msgstr "专业经验与技能"
@@ -281,13 +269,17 @@ msgstr "重置倒计时 {countdown}"
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:538
+#: src/app/[lang]/(home)/_components/snake-game.tsx:537
 msgid "Retro Snake"
 msgstr "复活"
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:573
+#: src/app/[lang]/(home)/_components/snake-game.tsx:574
 msgid "Score"
 msgstr "得分"
+
+#: src/app/[lang]/(home)/_components/mine.tsx:16
+msgid "software engineer"
+msgstr ""
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
@@ -297,13 +289,9 @@ msgstr "技术栈"
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr "Vue2, UniApp, Vuex, VantUI"
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:625
+#: src/app/[lang]/(home)/_components/snake-game.tsx:627
 msgid "WASD / ARROW keys to override"
 msgstr "WASD / ARROW 控制"
-
-#: src/app/[lang]/(home)/page.tsx:14
-msgid "We rebooted the landing experience into a living arcade shell. A self-driving snake simulates how our agents route briefs, and you can take over anytime just like co-creating with AI."
-msgstr "我们重新启动了登陆体验，变成一个活生生的街机外壳。一个自动驾驶的蛇模拟我们的代理如何路由简报，你可以在任何时候接管，就像与 AI 共同创作一样。"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:23
 #: src/app/[lang]/resume/hooks/use-experience.ts:38

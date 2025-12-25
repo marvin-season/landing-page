@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import Link from "next/link";
 import { MotionDiv, MotionP } from "@/components/ui";
 
@@ -11,18 +12,26 @@ export function Mine() {
   return (
     <div className="lg:max-w-xl mx-auto">
       <Section title="Marvin">
-        <div className="text-slate-350">software engineer</div>
+        <div className="text-slate-350">
+          <Trans>software engineer</Trans>
+        </div>
       </Section>
       <Section title="Links" delay={0.05}>
-        <Nav href={"/resume"}>About me in detail</Nav>
+        <Nav href={"/resume"}>
+          <Trans>About me in detail</Trans>
+        </Nav>
         <Nav href={"https://ds.fuelstack.icu"}>
-          Design System & Component Libs
+          <Trans>Design System & Component Libs</Trans>
         </Nav>
       </Section>
       <Section title="Sentences" delay={0.1}>
-        <Quote>Leveraging less data to generate greater insights.</Quote>
         <Quote>
-          Design is not just what it looks like. Design is how it works.
+          <Trans>Leveraging less data to generate greater insights.</Trans>
+        </Quote>
+        <Quote>
+          <Trans>
+            Design is not just what it looks like. Design is how it works.
+          </Trans>
         </Quote>
       </Section>
     </div>
