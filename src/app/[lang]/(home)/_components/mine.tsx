@@ -10,7 +10,7 @@ const getMotionProps = (delay: number = 0) => ({
 
 export function Mine() {
   return (
-    <div className="lg:max-w-xl mx-auto">
+    <div className="lg:max-w-xl mx-auto px-6 py-10 space-y-8">
       <Section title="Marvin">
         <div className="text-slate-350">
           <Trans>software engineer</Trans>
@@ -62,7 +62,7 @@ function Section({
   delay?: number;
 }) {
   return (
-    <section className="rounded-md py-4 my-8 flex flex-col gap-3">
+    <section className="rounded-md flex flex-col gap-3">
       <MotionP
         className="text-xl font-bold select-none"
         {...getMotionProps(delay)}
