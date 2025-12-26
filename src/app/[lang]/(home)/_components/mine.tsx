@@ -13,12 +13,18 @@ export function Mine() {
     <div className="lg:max-w-xl mx-auto px-6 py-10 space-y-8">
       <Section title="Marvin">
         <div className="text-slate-350">
-          <Trans>software engineer</Trans>
+          <Trans>Software Engineer</Trans>
         </div>
       </Section>
       <Section title="Links" delay={0.05}>
+        <Nav href={"/chat"}>
+          <Trans>Chat with me</Trans>
+        </Nav>
         <Nav href={"/resume"}>
           <Trans>About me in detail</Trans>
+        </Nav>
+        <Nav href={"/admin/ppt"}>
+          <Trans>A Simple PPT Generator</Trans>
         </Nav>
         <Nav href={"https://ds.fuelstack.icu"}>
           <Trans>Design System & Component Libs</Trans>
@@ -70,7 +76,7 @@ function Section({
         {title}
       </MotionP>
       <MotionDiv
-        className="flex flex-col gap-1 text-slate-350"
+        className="flex flex-col gap-2 text-slate-350"
         {...getMotionProps(delay + 0.05)}
       >
         {children}
