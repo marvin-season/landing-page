@@ -21,9 +21,13 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:21
+#: src/app/[lang]/(home)/_components/mine.tsx:27
+msgid "A Simple PPT Generator"
+msgstr "一个简单的 PPT 生成器"
+
+#: src/app/[lang]/(home)/_components/mine.tsx:24
 msgid "About me in detail"
-msgstr ""
+msgstr "关于我的详细信息"
 
 #: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "AI active"
@@ -41,17 +45,21 @@ msgstr "AIPC"
 msgid "Career"
 msgstr "职业经历"
 
+#: src/app/[lang]/(home)/_components/mine.tsx:21
+msgid "Chat with me"
+msgstr "与我聊天"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:32
+#: src/app/[lang]/(home)/_components/mine.tsx:38
 msgid "Design is not just what it looks like. Design is how it works."
-msgstr ""
+msgstr "设计不仅仅是外观，设计是功能。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:24
+#: src/app/[lang]/(home)/_components/mine.tsx:30
 msgid "Design System & Component Libs"
-msgstr ""
+msgstr "设计系统 & 组件库"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:61
 msgid "Designed and implemented frontend-backend separation architecture"
@@ -119,7 +127,7 @@ msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
 
 #: src/app/[lang]/layout.tsx:29
 msgid "effective"
-msgstr ""
+msgstr "高效"
 
 #: src/app/[lang]/(home)/_components/snake-game.tsx:622
 msgid "Enable AI"
@@ -229,9 +237,9 @@ msgstr "聚实惠"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:29
+#: src/app/[lang]/(home)/_components/mine.tsx:35
 msgid "Leveraging less data to generate greater insights."
-msgstr ""
+msgstr "利用更少的数据生成更大的洞察。"
 
 #: src/app/[lang]/(home)/_components/snake-game.tsx:540
 msgid "Manual"
@@ -278,8 +286,8 @@ msgid "Score"
 msgstr "得分"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:16
-msgid "software engineer"
-msgstr ""
+msgid "Software Engineer"
+msgstr "软件工程师"
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
