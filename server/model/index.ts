@@ -12,4 +12,7 @@ export const modelRouter = router({
   list: publicProcedure.query(async () => {
     return models;
   }),
+  defaultModel: publicProcedure.query(async () => {
+    return models[0];
+  }),
 });

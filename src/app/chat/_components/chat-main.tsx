@@ -14,6 +14,7 @@ import { getLastUserMessage } from "@/app/chat/_utils";
 import { MotionDiv, ScrollArea } from "@/components/ui";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
+import { ModelSelector } from "./model-selector";
 
 export function ChatMain(props: { sessionId: string }) {
   const { sessionId } = props;
@@ -111,13 +112,14 @@ export function ChatMain(props: { sessionId: string }) {
           {error && <ChatError message={error.message} />}
         </ScrollArea>
       )}
-
       <MotionDiv
         layout="position"
         initial={{ y: 10, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, delay: 0.25 }}
       >
+        <ModelSelector selectedModel={currentSession?.model} />
+
         <ChatInputForm
           className="sticky bottom-0 z-20 w-full lg:max-w-3xl mx-auto shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]"
           onSubmit={async (data) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
 import { useState } from "react";
 import {
@@ -16,22 +17,20 @@ import {
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
 import { Button } from "@/components/ui/button";
+import type { IModel } from "@/store/session-store";
+import { useTRPC } from "@/utils/trpc";
 
-const models = [
-  {
-    id: "deepseek-chat",
-    name: "DeepSeek Chat",
-    chef: "Deepseek",
-    chefSlug: "deepseek",
-    providers: ["deepseek"],
-  },
-];
-
-export const ModelSelector = () => {
+export const ModelSelector = (props: { selectedModel: IModel | undefined }) => {
+  const { selectedModel } = props;
+  const trpc = useTRPC();
+  const { data: models } = useQuery(trpc.model.list.queryOptions());
   const [open, setOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<string>("deepseek-chat");
 
-  const selectedModelData = models.find((model) => model.id === selectedModel);
+  if (!models) return null;
+
+  const selectedModelData = models.find(
+    (model) => model.id === selectedModel?.id,
+  );
 
   // Get unique chefs in order of appearance
   const chefs = Array.from(new Set(models.map((model) => model.chef)));
@@ -64,7 +63,6 @@ export const ModelSelector = () => {
                     <ModelSelectorItem
                       key={model.id}
                       onSelect={() => {
-                        setSelectedModel(model.id);
                         setOpen(false);
                       }}
                       value={model.id}
@@ -79,7 +77,7 @@ export const ModelSelector = () => {
                           />
                         ))}
                       </ModelSelectorLogoGroup>
-                      {selectedModel === model.id ? (
+                      {selectedModel?.id === model.id ? (
                         <CheckIcon className="ml-auto size-4" />
                       ) : (
                         <div className="ml-auto size-4" />

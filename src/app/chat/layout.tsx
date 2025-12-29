@@ -1,6 +1,7 @@
 import "@/css/globals.css";
 import type { Metadata } from "next";
 import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
+import TankQueryClientProvider from "@/components/trpc/provider";
 import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   icons: {
@@ -17,18 +18,20 @@ export default function ChatLayout({
   return (
     <html lang="en">
       <body>
-        <Toaster position="top-center" duration={5000} />
-        <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
-          {/* Desktop sidebar */}
-          <div className="hidden lg:flex h-full shrink-0">
-            <ChatSidebar />
-          </div>
+        <TankQueryClientProvider>
+          <Toaster position="top-center" duration={5000} />
+          <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
+            {/* Desktop sidebar */}
+            <div className="hidden lg:flex h-full shrink-0">
+              <ChatSidebar />
+            </div>
 
-          {/* Main content */}
-          <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full">
-            {children}
-          </div>
-        </main>
+            {/* Main content */}
+            <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full">
+              {children}
+            </div>
+          </main>
+        </TankQueryClientProvider>
       </body>
     </html>
   );

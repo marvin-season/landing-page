@@ -3,12 +3,21 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
+
+
+export interface IModel {
+  id: string;
+  name: string;
+  chef: string;
+  chefSlug: string;
+  providers: string[];
+}
+
 export interface ISession {
   id: string;
   title: string;
   createdAt: number;
-  
-  model?: string
+  model?: IModel;
 }
 
 interface ISessionStore {
@@ -18,7 +27,7 @@ interface ISessionStore {
   addSession: (session: ISession) => void;
   // New action to update a specific session's title
   updateSession: (sessionId: string, session: Partial<ISession>) => void;
-  createNewSession: () => void;
+  createNewSession: (session: Partial<ISession>) => void;
 }
 
 type SessionPersistedState = Pick<ISessionStore, "sessions">;
@@ -47,7 +56,7 @@ export const useSessionStore = create<ISessionStore>()(
             );
           });
         },
-        createNewSession: () => {
+        createNewSession: (session) => {
           const newSessionId = crypto.randomUUID();
           const existingSession = get().sessions.find(
             (s) => s.id === newSessionId || s.title === "New Conversation",
@@ -60,6 +69,7 @@ export const useSessionStore = create<ISessionStore>()(
               id: newSessionId,
               title: "New Conversation",
               createdAt: Date.now(),
+              ...session,
             });
           });
           return newSessionId;

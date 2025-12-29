@@ -42,7 +42,9 @@ export function ChatHeader(props: { sessionId: string }) {
         <ChatSidebar className="w-full border-r-0" />
       </Drawer>
       <div className="flex-1 flex items-center justify-center">
-        <span className="text-sm text-gray-500">{currentSession?.model}</span>
+        <span className="text-sm text-gray-500">
+          {currentSession?.model?.name}
+        </span>
       </div>
       <div className="flex items-center gap-4">
         {paginationDisplay && (
