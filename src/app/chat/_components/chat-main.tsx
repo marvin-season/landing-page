@@ -17,7 +17,7 @@ import { useCurrentSession, useSessionStore } from "@/store/session-store";
 
 export function ChatMain(props: { sessionId: string }) {
   const { sessionId } = props;
-  const { updateSessionTitle } = useSessionStore();
+  const { updateSession } = useSessionStore();
   const { selectedMessageId, addMessages, setSelectedMessageId } =
     useMessageStore();
   const currentMessages = useCurrentMessages(sessionId);
@@ -44,7 +44,9 @@ export function ChatMain(props: { sessionId: string }) {
           ?.parts.find((p) => p.type === "text")?.text;
 
         if (firstUserText) {
-          updateSessionTitle(sessionId, firstUserText.slice(0, 30));
+          updateSession(sessionId, {
+            title: firstUserText.slice(0, 30),
+          });
         }
       }
     },

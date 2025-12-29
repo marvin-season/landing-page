@@ -7,6 +7,8 @@ export interface ISession {
   id: string;
   title: string;
   createdAt: number;
+  
+  model?: string
 }
 
 interface ISessionStore {
@@ -15,7 +17,7 @@ interface ISessionStore {
   deleteSession: (sessionId: string) => ISession | undefined;
   addSession: (session: ISession) => void;
   // New action to update a specific session's title
-  updateSessionTitle: (sessionId: string, title: string) => void;
+  updateSession: (sessionId: string, session: Partial<ISession>) => void;
   createNewSession: () => void;
 }
 
@@ -38,10 +40,10 @@ export const useSessionStore = create<ISessionStore>()(
             state.sessions.push(session);
           });
         },
-        updateSessionTitle: (sessionId, title) => {
+        updateSession: (sessionId, session) => {
           set((state) => {
             state.sessions = state.sessions.map((s) =>
-              s.id === sessionId ? { ...s, title } : s,
+              s.id === sessionId ? { ...s, ...session } : s,
             );
           });
         },
