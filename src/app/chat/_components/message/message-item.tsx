@@ -1,5 +1,6 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { Bot, User } from "lucide-react";
+import { memo } from "react";
 import AssistantMessageParts from "@/app/chat/_components/message/assistant-message-parts";
 import UserMessageParts from "@/app/chat/_components/message/user-message-parts";
 
@@ -23,3 +24,5 @@ export function MessageItem(props: { m: UIMessage; status: ChatStatus }) {
     </div>
   );
 }
+
+export default memo(MessageItem);

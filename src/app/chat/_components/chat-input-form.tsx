@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleStopIcon, Loader2, Send, Sparkles } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -75,3 +76,5 @@ export function ChatInputForm(props: ChatInputProps) {
     </div>
   );
 }
+
+export default memo(ChatInputForm);
