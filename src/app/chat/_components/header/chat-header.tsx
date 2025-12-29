@@ -2,6 +2,7 @@
 
 import { History, Menu, SlidersHorizontal } from "lucide-react";
 import dynamic from "next/dynamic";
+import { ModelSelector } from "@/app/chat/_components/model-selector";
 import { ChatSettings } from "@/app/chat/_components/setting/chat-settings";
 import { Drawer } from "@/components/drawer";
 import {
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
-import { useCurrentSession } from "@/store/session-store";
 
 const ChatHistory = dynamic(
   () => import("../message/message-list").then((mod) => mod.MessageList),
@@ -28,7 +28,6 @@ const ChatSidebar = dynamic(
 
 export function ChatHeader(props: { sessionId: string }) {
   const { sessionId } = props;
-  const currentSession = useCurrentSession(sessionId);
 
   const paginationDisplay = useChatSettingsStore((s) =>
     s.isSettingEnabled("pagination-display"),
@@ -41,10 +40,8 @@ export function ChatHeader(props: { sessionId: string }) {
       >
         <ChatSidebar className="w-full border-r-0" />
       </Drawer>
-      <div className="-ml-10 flex-1 flex items-center justify-center gap-2 px-4">
-        <span className="max-w-[150px] truncate text-base font-semibold leading-tight text-slate-900">
-          {currentSession?.title}
-        </span>
+      <div className="flex-1 flex items-center justify-center">
+        <ModelSelector />
       </div>
       <div className="flex items-center gap-4">
         {paginationDisplay && (

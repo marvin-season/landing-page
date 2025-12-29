@@ -83,7 +83,7 @@ export function ChatMain(props: { sessionId: string }) {
         <ScrollArea
           onScrollUp={() => onPagination("previous")}
           onScrollDown={() => onPagination("next")}
-          className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22 mx-auto w-full lg:max-w-4xl space-y-6 pb-6"
+          className="-mt-16 flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 pt-20 sm:p-6 sm:pt-22 mx-auto w-full lg:max-w-7xl space-y-6 pb-6"
         >
           {displayMessages.map((m, index) => {
             return (
