@@ -17,14 +17,12 @@ import {
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
 import { Button } from "@/components/ui/button";
-import { type IModel, useSessionStore } from "@/store/session-store";
+import { useCurrentSession, useSessionStore } from "@/store/session-store";
 import { useTRPC } from "@/utils/trpc";
 
-export const ModelSelector = (props: {
-  selectedModel: IModel | undefined;
-  sessionId: string;
-}) => {
-  const { selectedModel, sessionId } = props;
+export const ModelSelector = () => {
+  const currentSession = useCurrentSession();
+  const { id: sessionId, model: currentModel } = currentSession!;
   const { updateSession } = useSessionStore();
   const trpc = useTRPC();
   const { data: models } = useQuery(trpc.model.list.queryOptions());
@@ -33,7 +31,7 @@ export const ModelSelector = (props: {
   if (!models) return null;
 
   const selectedModelData = models.find(
-    (model) => model.id === selectedModel?.id,
+    (model) => model.id === currentModel?.id,
   );
 
   // Get unique chefs in order of appearance
@@ -82,7 +80,7 @@ export const ModelSelector = (props: {
                           />
                         ))}
                       </ModelSelectorLogoGroup>
-                      {selectedModel?.id === model.id ? (
+                      {currentModel?.id === model.id ? (
                         <CheckIcon className="ml-auto size-4" />
                       ) : (
                         <div className="ml-auto size-4" />

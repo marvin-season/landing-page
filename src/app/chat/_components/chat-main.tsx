@@ -16,14 +16,14 @@ import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 import { ModelSelector } from "./model-selector";
 
-export function ChatMain(props: { sessionId: string }) {
-  const { sessionId } = props;
+export function ChatMain() {
   const { updateSession } = useSessionStore();
   const { selectedMessageId, addMessages, setSelectedMessageId } =
     useMessageStore();
-  const currentMessages = useCurrentMessages(sessionId);
+  const currentMessages = useCurrentMessages();
 
-  const currentSession = useCurrentSession(sessionId);
+  const currentSession = useCurrentSession();
+  const sessionId = currentSession?.id!;
   const { messages, setMessages, sendMessage, status, error, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
@@ -64,7 +64,8 @@ export function ChatMain(props: { sessionId: string }) {
   }, [currentMessages, setMessages, setSelectedMessageId]);
 
   const displayMessages = useDisplayMessages(messages, selectedMessageId);
-  const hasDisplayMessages = displayMessages.length > 0;
+
+  const isNewSession = !currentSession?.hasMessages;
 
   const { onPagination } = useMessagesPagination({
     messages,
@@ -79,10 +80,10 @@ export function ChatMain(props: { sessionId: string }) {
   return (
     <div
       className={`flex-1 flex flex-col min-h-0 h-full bg-slate-50/30 ${
-        hasDisplayMessages ? "" : "justify-center"
+        !isNewSession ? "" : "justify-center"
       }`}
     >
-      {hasDisplayMessages && (
+      {!isNewSession && (
         <ScrollArea
           onScrollUp={() => onPagination("previous")}
           onScrollDown={() => onPagination("next")}
@@ -96,7 +97,7 @@ export function ChatMain(props: { sessionId: string }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   duration: 0.3,
-                  delay: 0.5 * ((index + 1) / displayMessages.length),
+                  delay: 0.15 * ((index + 1) / displayMessages.length),
                 }}
               >
                 <MessageItem key={m.id} m={m} status={status} />
@@ -116,18 +117,16 @@ export function ChatMain(props: { sessionId: string }) {
         layout="position"
         initial={{ y: 10, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
-        transition={{ duration: 0.2, delay: 0.25 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
       >
-        <ModelSelector
-          selectedModel={currentSession?.model}
-          sessionId={sessionId}
-        />
+        {!currentSession?.hasMessages && <ModelSelector />}
 
         <ChatInputForm
           className="sticky bottom-0 z-20 w-full lg:max-w-3xl mx-auto shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]"
           onSubmit={async (data) => {
             setSelectedMessageId(undefined);
             sendMessage({ text: data.input });
+            updateSession(sessionId, { hasMessages: true });
           }}
           onStop={() => {
             stop();

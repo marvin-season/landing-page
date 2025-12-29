@@ -1,9 +1,9 @@
+import { useParams } from "next/navigation";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
-
 
 export interface IModel {
   id: string;
@@ -18,6 +18,7 @@ export interface ISession {
   title: string;
   createdAt: number;
   model?: IModel;
+  hasMessages: boolean;
 }
 
 interface ISessionStore {
@@ -69,6 +70,7 @@ export const useSessionStore = create<ISessionStore>()(
               id: newSessionId,
               title: "New Conversation",
               createdAt: Date.now(),
+              hasMessages: false,
               ...session,
             });
           });
@@ -88,7 +90,8 @@ export const useSessionStore = create<ISessionStore>()(
   ),
 );
 
-export function useCurrentSession(sessionId: string) {
+export function useCurrentSession() {
+  const { sessionId } = useParams();
   return useSessionStore(
     useShallow((state) =>
       sessionId ? state.sessions.find((s) => s.id === sessionId) : undefined,

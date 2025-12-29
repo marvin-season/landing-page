@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
-export function MessageList(props: { sessionId: string; className?: string }) {
-  const { sessionId, className } = props;
+export function MessageList(props: { className?: string }) {
+  const { className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
   const paginationDisplay = useChatSettingsStore((s) =>
     s.isSettingEnabled("pagination-display"),
   );
-  const messages = useCurrentMessages(sessionId);
+  const messages = useCurrentMessages();
 
   const userMessages = messages.filter((m) => m.role === "user");
 

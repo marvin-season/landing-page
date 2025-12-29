@@ -26,10 +26,8 @@ const ChatSidebar = dynamic(
   },
 );
 
-export function ChatHeader(props: { sessionId: string }) {
-  const { sessionId } = props;
-  const currentSession = useCurrentSession(sessionId);
-
+export function ChatHeader() {
+  const currentSession = useCurrentSession();
   const paginationDisplay = useChatSettingsStore((s) =>
     s.isSettingEnabled("pagination-display"),
   );
@@ -53,7 +51,7 @@ export function ChatHeader(props: { sessionId: string }) {
             className="px-4"
             trigger={<History size={16} className="lg:hidden" />}
           >
-            <ChatHistory sessionId={sessionId} className="max-w-auto" />
+            <ChatHistory className="max-w-auto" />
           </Drawer>
         )}
 

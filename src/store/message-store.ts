@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
+import { useCurrentSession } from "@/store/session-store";
 
 export type IMessageStore = {
   /**
@@ -59,8 +60,10 @@ export const useMessageStore = create<IMessageStore>()(
   ),
 );
 
-export function useCurrentMessages(sessionId: string) {
+export function useCurrentMessages() {
+  const currentSession = useCurrentSession();
+  const sessionId = currentSession?.id;
   return useMessageStore(
-    useShallow((state) => state.messagesMap[sessionId] || []),
+    useShallow((state) => sessionId ? state.messagesMap[sessionId] || [] : []),
   );
 }
