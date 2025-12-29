@@ -7,6 +7,13 @@ const models = [
     chefSlug: "deepseek",
     providers: ["deepseek"],
   },
+  {
+    id: "deepseek-reasoner",
+    name: "DeepSeek Reasoner",
+    chef: "Deepseek",
+    chefSlug: "deepseek",
+    providers: ["deepseek"],
+  },
 ];
 export const modelRouter = router({
   list: publicProcedure.query(async () => {

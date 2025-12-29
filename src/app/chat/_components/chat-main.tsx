@@ -118,7 +118,10 @@ export function ChatMain(props: { sessionId: string }) {
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, delay: 0.25 }}
       >
-        <ModelSelector selectedModel={currentSession?.model} />
+        <ModelSelector
+          selectedModel={currentSession?.model}
+          sessionId={sessionId}
+        />
 
         <ChatInputForm
           className="sticky bottom-0 z-20 w-full lg:max-w-3xl mx-auto shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]"

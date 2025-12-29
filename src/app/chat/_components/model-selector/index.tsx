@@ -17,11 +17,15 @@ import {
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
 import { Button } from "@/components/ui/button";
-import type { IModel } from "@/store/session-store";
+import { type IModel, useSessionStore } from "@/store/session-store";
 import { useTRPC } from "@/utils/trpc";
 
-export const ModelSelector = (props: { selectedModel: IModel | undefined }) => {
-  const { selectedModel } = props;
+export const ModelSelector = (props: {
+  selectedModel: IModel | undefined;
+  sessionId: string;
+}) => {
+  const { selectedModel, sessionId } = props;
+  const { updateSession } = useSessionStore();
   const trpc = useTRPC();
   const { data: models } = useQuery(trpc.model.list.queryOptions());
   const [open, setOpen] = useState(false);
@@ -64,6 +68,7 @@ export const ModelSelector = (props: { selectedModel: IModel | undefined }) => {
                       key={model.id}
                       onSelect={() => {
                         setOpen(false);
+                        updateSession(sessionId, { model });
                       }}
                       value={model.id}
                     >
