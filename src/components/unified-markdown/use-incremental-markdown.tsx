@@ -66,11 +66,9 @@ export function useIncrementalMarkdown(
       return lastResultRef.current;
     }
 
-    if (!streaming?.hasNextChunk) {
-      return stableProcessor.processSync(content).result as ReactNode;
-    }
-
-    const splitPoint = findSafeSplitPoint(content);
+    const splitPoint = !streaming?.hasNextChunk
+      ? content.length
+      : findSafeSplitPoint(content);
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
@@ -86,6 +84,7 @@ export function useIncrementalMarkdown(
       typeof cachedTailResult.current !== "string" ||
       tailContent !== ""
     ) {
+      console.log("tailContent", tailContent);
       cachedTailResult.current = processor.processSync(tailContent)
         .result as ReactNode;
     }
