@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Fragment, type ReactNode, useMemo, useRef } from 'react';
-import processor, { createProcessor } from './processor';
-import { useIsVisible } from './use-visibility';
+import { Fragment, type ReactNode, useMemo, useRef } from "react";
+import processor, { createProcessor } from "./processor";
+import { useIsVisible } from "./use-visibility";
 
 const stableProcessor = createProcessor({ streaming: false });
 
@@ -42,10 +42,17 @@ export interface IncrementalMarkdownOptions {
    * @default false
    */
   pauseOnBackground?: boolean;
+
+  streaming?: {
+    hasNextChunk: boolean;
+  };
 }
 
-export function useIncrementalMarkdown(content: string, options: IncrementalMarkdownOptions = {}) {
-  const { pauseOnBackground = false } = options;
+export function useIncrementalMarkdown(
+  content: string,
+  options: IncrementalMarkdownOptions = {},
+) {
+  const { pauseOnBackground = false, streaming } = options;
   const isVisible = useIsVisible();
 
   const lastSplitPointRef = useRef<number>(-1);
@@ -59,17 +66,28 @@ export function useIncrementalMarkdown(content: string, options: IncrementalMark
       return lastResultRef.current;
     }
 
+    if (!streaming?.hasNextChunk) {
+      return stableProcessor.processSync(content).result as ReactNode;
+    }
+
     const splitPoint = findSafeSplitPoint(content);
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
-      cachedStableResult.current = stableProcessor.processSync(content.slice(0, splitPoint)).result as ReactNode;
+      cachedStableResult.current = stableProcessor.processSync(
+        content.slice(0, splitPoint),
+      ).result as ReactNode;
     }
 
     const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
 
-    if (cachedTailResult.current === null || typeof cachedTailResult.current !== 'string' || tailContent !== '') {
-      cachedTailResult.current = processor.processSync(tailContent).result as ReactNode;
+    if (
+      cachedTailResult.current === null ||
+      typeof cachedTailResult.current !== "string" ||
+      tailContent !== ""
+    ) {
+      cachedTailResult.current = processor.processSync(tailContent)
+        .result as ReactNode;
     }
 
     const result = (
@@ -81,5 +99,5 @@ export function useIncrementalMarkdown(content: string, options: IncrementalMark
 
     lastResultRef.current = result;
     return result;
-  }, [content, isVisible, pauseOnBackground]);
+  }, [content, isVisible, streaming, pauseOnBackground]);
 }
