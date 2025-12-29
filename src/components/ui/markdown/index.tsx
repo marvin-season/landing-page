@@ -1,27 +1,21 @@
 "use client";
 
-import XMarkdown from "@ant-design/x-markdown";
-import type { ComponentProps } from "react";
+import { UnifiedMarkdown } from "@/components/unified-markdown";
 import { cn } from "@/lib/utils";
 
-export type MarkdownProps = ComponentProps<typeof XMarkdown>;
-
-const DEFAULT_STREAMING = {
-  enableAnimation: true,
-  hasNextChunk: false,
-  animationConfig: { fadeDuration: 400 },
-} satisfies NonNullable<MarkdownProps["streaming"]>;
-
-export default function Markdown(props: MarkdownProps) {
-  const { streaming = {}, className, ...rest } = props;
+export default function Markdown(props: {
+  children: string;
+  className?: string;
+  streaming?: {
+    hasNextChunk: boolean;
+  };
+}) {
+  const { children, className, streaming } = props;
   return (
-    <XMarkdown
-      {...rest}
+    <UnifiedMarkdown
+      content={children}
       className={cn("", className)}
-      streaming={{
-        ...DEFAULT_STREAMING,
-        ...streaming,
-      }}
+      streaming={streaming}
     />
   );
 }
