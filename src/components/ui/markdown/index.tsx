@@ -6,16 +6,14 @@ import { cn } from "@/lib/utils";
 export default function Markdown(props: {
   children: string;
   className?: string;
-  streaming?: {
-    hasNextChunk: boolean;
-  };
+  hasNextChunk?: boolean;
 }) {
-  const { children, className, streaming } = props;
+  const { children, className, hasNextChunk } = props;
   return (
     <UnifiedMarkdown
       content={children}
       className={cn("", className)}
-      streaming={streaming}
+      hasNextChunk={hasNextChunk}
     />
   );
 }

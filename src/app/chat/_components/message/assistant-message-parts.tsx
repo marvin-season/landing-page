@@ -10,10 +10,7 @@ export default function AssistantMessageParts(props: {
   return m.parts.map((part, i) => {
     if (part.type === "text") {
       return (
-        <Markdown
-          key={i}
-          streaming={{ hasNextChunk: part.state === "streaming" }}
-        >
+        <Markdown key={i} hasNextChunk={part.state === "streaming"}>
           {part.text}
         </Markdown>
       );
@@ -32,7 +29,7 @@ export default function AssistantMessageParts(props: {
           </div>
           <Markdown
             className="p-3 font-mono text-xs leading-relaxed opacity-90"
-            streaming={{ hasNextChunk: part.state === "streaming" }}
+            hasNextChunk={part.state === "streaming"}
           >
             {part.text}
           </Markdown>
