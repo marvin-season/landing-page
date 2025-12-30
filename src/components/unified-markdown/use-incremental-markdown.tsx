@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Fragment, type ReactNode, useMemo, useRef } from 'react';
-import processor, { createProcessor } from './processor';
+import { Fragment, type ReactNode, useMemo, useRef } from "react";
+import processor, { createProcessor } from "./processor";
 
 const stableProcessor = createProcessor({ streaming: false });
 
@@ -42,23 +42,32 @@ export interface IncrementalMarkdownOptions {
   hasNextChunk?: boolean;
 }
 
-export function useIncrementalMarkdown(content: string, options: IncrementalMarkdownOptions = {}) {
+export function useIncrementalMarkdown(
+  content: string,
+  options: IncrementalMarkdownOptions = {},
+) {
   const { hasNextChunk = false } = options;
 
   const lastSplitPointRef = useRef<number>(-1);
   const cachedStableResult = useRef<ReactNode>([]);
 
   return useMemo(() => {
-    const splitPoint = !hasNextChunk ? content.length : findSafeSplitPoint(content);
+    const splitPoint = !hasNextChunk
+      ? content.length
+      : findSafeSplitPoint(content);
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
-      cachedStableResult.current = stableProcessor.processSync(content.slice(0, splitPoint)).result as ReactNode;
+      cachedStableResult.current = stableProcessor.processSync(
+        content.slice(0, splitPoint),
+      ).result as ReactNode;
     }
 
     const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
 
-    const tail = tailContent ? (processor.processSync(tailContent).result as ReactNode) : undefined;
+    const tail = tailContent
+      ? (processor.processSync(tailContent).result as ReactNode)
+      : undefined;
 
     const result = (
       <Fragment key="incremental-markdown-root">

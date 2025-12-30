@@ -64,6 +64,8 @@ export function useCurrentMessages() {
   const currentSession = useCurrentSession();
   const sessionId = currentSession?.id;
   return useMessageStore(
-    useShallow((state) => sessionId ? state.messagesMap[sessionId] || [] : []),
+    useShallow((state) =>
+      sessionId ? state.messagesMap[sessionId] || [] : [],
+    ),
   );
 }

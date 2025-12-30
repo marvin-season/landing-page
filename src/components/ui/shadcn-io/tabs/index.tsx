@@ -15,7 +15,6 @@ type TabsContextType<T extends string> = {
   registerTrigger: (value: T, node: HTMLElement | null) => void;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: <特别指定>
 const TabsContext = React.createContext<TabsContextType<any> | undefined>(
   undefined,
 );
