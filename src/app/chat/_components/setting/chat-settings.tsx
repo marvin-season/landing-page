@@ -1,5 +1,5 @@
 import Tooltip from "@/components/tooltip";
-import { Switch } from "@/components/ui";
+import { Switch } from "@/components/ui/switch";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 
 export function ChatSettings() {

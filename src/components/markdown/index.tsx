@@ -1,6 +1,6 @@
 "use client";
 
-import { UnifiedMarkdown } from "@/components/unified-markdown";
+import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { cn } from "@/lib/utils";
 
 export default function Markdown(props: {

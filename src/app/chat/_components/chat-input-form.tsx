@@ -2,7 +2,7 @@
 
 import { CircleStopIcon, Loader2, Send, Sparkles } from "lucide-react";
 import { memo } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ChatInputProps {

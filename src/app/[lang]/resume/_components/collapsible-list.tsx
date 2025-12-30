@@ -2,7 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { MotionDiv } from "@/components/ui";
+import { MotionDiv } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 
 interface CollapsibleListProps {

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { MotionSpan } from "@/components/ui";
+import { MotionSpan } from "@/components/ui/motion";
 
 function TextChunk({ text }: { text: string }) {
   return (

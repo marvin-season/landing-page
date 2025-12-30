@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import Markdown from "@/components/ui/markdown";
+import Markdown from "@/components/markdown";
 
 export default function UserMessageParts(props: { m: UIMessage }) {
   const { m } = props;

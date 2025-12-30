@@ -3,7 +3,7 @@
 import { SettingsIcon } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,

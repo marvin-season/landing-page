@@ -1,6 +1,6 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { BrainCircuit } from "lucide-react";
-import Markdown from "@/components/ui/markdown";
+import Markdown from "@/components/markdown";
 
 export default function AssistantMessageParts(props: {
   m: UIMessage;

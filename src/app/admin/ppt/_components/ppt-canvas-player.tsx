@@ -3,13 +3,13 @@
 import { Canvas, StaticCanvas } from "fabric";
 import { ChevronDown, Download } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
 import type { FabricSlideJSON } from "../fabric-slide-schema";
 import {
   fabricSlideSchema,

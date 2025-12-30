@@ -8,7 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui";
+} from "@/components/ui/dropdown-menu";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentSession } from "@/store/session-store";
 

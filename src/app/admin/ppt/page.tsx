@@ -2,15 +2,8 @@
 
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePptStore } from "@/store/ppt-store";
 import { PptCanvasPlayer } from "./_components/ppt-canvas-player";
 import { PRESETS } from "./_components/ppt-presets";
