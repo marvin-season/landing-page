@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import Link from "next/link";
-import { MotionDiv, MotionP } from "@/components/ui";
+import { MotionDiv, MotionP } from "@/components/ui/motion";
 
 const getMotionProps = (delay: number = 0) => ({
   initial: { opacity: 0 },

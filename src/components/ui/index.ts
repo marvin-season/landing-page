@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/performance/noBarrelFile: <this file is a barrel file> */
 export * from "./alert";
 export * from "./background";
 export * from "./button";
