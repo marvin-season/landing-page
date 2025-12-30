@@ -11,7 +11,7 @@ import { EmptySession } from "@/app/chat/_components/session/empty-session";
 import { useDisplayMessages } from "@/app/chat/_hooks/use-display-messages";
 import { useMessagesPagination } from "@/app/chat/_hooks/use-messages-pagination";
 import { getLastUserMessage } from "@/app/chat/_utils";
-import { MotionDiv } from "@/components/ui/motion";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";

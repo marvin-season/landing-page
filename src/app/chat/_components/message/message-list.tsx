@@ -1,6 +1,6 @@
 "use client";
 
-import { MotionDiv } from "@/components/ui/motion";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";

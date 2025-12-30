@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import Link from "next/link";
-import { MotionDiv, MotionP } from "@/components/ui/motion";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 
 const getMotionProps = (delay: number = 0) => ({
   initial: { opacity: 0 },
@@ -69,12 +69,12 @@ function Section({
 }) {
   return (
     <section className="rounded-md flex flex-col gap-3">
-      <MotionP
+      <MotionDiv
         className="text-xl font-bold select-none"
         {...getMotionProps(delay)}
       >
         {title}
-      </MotionP>
+      </MotionDiv>
       <MotionDiv
         className="flex flex-col gap-2 text-slate-350"
         {...getMotionProps(delay + 0.05)}
@@ -87,8 +87,8 @@ function Section({
 
 function Quote({ children }: { children: React.ReactNode }) {
   return (
-    <MotionP className="italic" {...getMotionProps()}>
+    <MotionDiv className="italic" {...getMotionProps()}>
       &ldquo;{children}&rdquo;
-    </MotionP>
+    </MotionDiv>
   );
 }

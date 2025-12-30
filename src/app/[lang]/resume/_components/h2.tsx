@@ -1,4 +1,4 @@
-import { MotionH2 } from "@/components/ui/motion";
+import { MotionH2 } from "@/components/ui/motion/motion-h2";
 
 export default function H2({ children }: { children: React.ReactNode }) {
   return (

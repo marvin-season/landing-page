@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MotionH1 } from "@/components/ui/motion";
+import { MotionH1 } from "@/components/ui/motion/motion-h1";
 import { ShimmeringText } from "@/components/ui/shadcn-io";
 import { cn } from "@/lib/utils";
 

@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import { MotionDiv } from "@/components/ui/motion";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 
 export function ChatLoading() {
   return (

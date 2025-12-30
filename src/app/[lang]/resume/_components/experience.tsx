@@ -7,7 +7,7 @@ import {
   type Project,
   useExperience,
 } from "@/app/[lang]/resume/hooks/use-experience";
-import { MotionDiv } from "@/components/ui/motion";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 import {
   Tabs,
   TabsContent,
