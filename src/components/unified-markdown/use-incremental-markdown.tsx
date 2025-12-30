@@ -1,8 +1,7 @@
-"use client";
+'use client';
 
-import { Fragment, type ReactNode, useMemo, useRef } from "react";
-import processor, { createProcessor } from "./processor";
-import { useIsVisible } from "./use-visibility";
+import { Fragment, type ReactNode, useMemo, useRef } from 'react';
+import processor, { createProcessor } from './processor';
 
 const stableProcessor = createProcessor({ streaming: false });
 
@@ -38,65 +37,36 @@ function findSafeSplitPoint(content: string): number {
 
 export interface IncrementalMarkdownOptions {
   /**
-   * 当窗口在后台时是否暂停解析
-   * @default false
+   * 是否还有下一个 chunk
    */
-  pauseOnBackground?: boolean;
-
-  streaming?: {
-    hasNextChunk: boolean;
-  };
+  hasNextChunk?: boolean;
 }
 
-export function useIncrementalMarkdown(
-  content: string,
-  options: IncrementalMarkdownOptions = {},
-) {
-  const { pauseOnBackground = false, streaming } = options;
-  const isVisible = useIsVisible();
+export function useIncrementalMarkdown(content: string, options: IncrementalMarkdownOptions = {}) {
+  const { hasNextChunk = false } = options;
 
   const lastSplitPointRef = useRef<number>(-1);
   const cachedStableResult = useRef<ReactNode>([]);
-  const cachedTailResult = useRef<ReactNode>(null);
-  const lastResultRef = useRef<ReactNode>(null);
 
   return useMemo(() => {
-    // 如果开启了后台暂停，且窗口在后台，且已经有缓存结果，则直接返回上次的结果
-    if (pauseOnBackground && !isVisible && lastResultRef.current) {
-      return lastResultRef.current;
-    }
-
-    const splitPoint = !streaming?.hasNextChunk
-      ? content.length
-      : findSafeSplitPoint(content);
+    const splitPoint = !hasNextChunk ? content.length : findSafeSplitPoint(content);
 
     if (splitPoint !== lastSplitPointRef.current) {
       lastSplitPointRef.current = splitPoint;
-      cachedStableResult.current = stableProcessor.processSync(
-        content.slice(0, splitPoint),
-      ).result as ReactNode;
+      cachedStableResult.current = stableProcessor.processSync(content.slice(0, splitPoint)).result as ReactNode;
     }
 
     const tailContent = splitPoint === -1 ? content : content.slice(splitPoint);
 
-    if (
-      cachedTailResult.current === null ||
-      typeof cachedTailResult.current !== "string" ||
-      tailContent !== ""
-    ) {
-      console.log("tailContent", tailContent);
-      cachedTailResult.current = processor.processSync(tailContent)
-        .result as ReactNode;
-    }
+    const tail = tailContent ? (processor.processSync(tailContent).result as ReactNode) : undefined;
 
     const result = (
       <Fragment key="incremental-markdown-root">
         <Fragment key="stable-part">{cachedStableResult.current}</Fragment>
-        <Fragment key="tail-part">{cachedTailResult.current}</Fragment>
+        <Fragment key="tail-part">{tail}</Fragment>
       </Fragment>
     );
 
-    lastResultRef.current = result;
     return result;
-  }, [content, isVisible, streaming, pauseOnBackground]);
+  }, [content, hasNextChunk]);
 }
