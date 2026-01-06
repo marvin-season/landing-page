@@ -1,7 +1,8 @@
-// "use client";
+"use client";
 
 import Link from "next/link";
 import { use } from "react";
+import { log } from "@/utils/log";
 
 export interface IFeature {
   id: number;
@@ -22,6 +23,7 @@ export const FeaturesContent = ({
   //   });
   // };
 
+  log("features", "features2", "features3");
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {features.map((feature) => (
