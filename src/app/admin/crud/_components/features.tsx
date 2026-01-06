@@ -1,6 +1,5 @@
 "use client";
 
-import { useLingui } from "@lingui/react/macro";
 import { use } from "react";
 import { request } from "@/utils/request";
 
@@ -16,7 +15,6 @@ export const FeaturesContent = ({
   featuresPromise: Promise<IFeature[]>;
 }) => {
   const features = use(featuresPromise);
-  const { t } = useLingui();
 
   const handleClick = (id: number) => {
     request(`/posts/${id}`).then((data) => {
@@ -32,12 +30,8 @@ export const FeaturesContent = ({
           key={feature.id}
           className="text-left p-4 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors"
         >
-          <div className="text-sm text-gray-700 mb-2">
-            {t`Title`}: {feature.title}
-          </div>
-          <div className="text-sm text-gray-500">
-            {t`Body`}: {feature.body}
-          </div>
+          <div className="text-sm text-gray-700 mb-2">{feature.title}</div>
+          <div className="text-sm text-gray-500">{feature.body}</div>
         </button>
       ))}
     </div>

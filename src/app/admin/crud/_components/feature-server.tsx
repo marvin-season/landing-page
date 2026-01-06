@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import type { IFeature } from "@/app/[lang]/(home)/_components/features";
+import type { IFeature } from "@/app/admin/crud/_components/features";
 import { request } from "@/utils/request";
 
 export const FeatureServer = ({
