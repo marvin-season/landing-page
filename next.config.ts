@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // ... 其他配置
+  async rewrites() {
+    return [
+      {
+        // 匹配所有以 /api-remote 开头的请求
+        source: "/api-remote/:path*",
+        // 转发到目标 HTTP 地址
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
