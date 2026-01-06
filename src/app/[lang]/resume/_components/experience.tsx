@@ -71,9 +71,9 @@ export default function Experience() {
       className="mt-0"
     >
       <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ delay: 0.6 }}
         className="space-y-6"
       >
         <div className="prose prose-lg p-2 lg:p-4">
@@ -95,7 +95,7 @@ export default function Experience() {
 
   return (
     <section>
-      <H2>
+      <H2 delay={0.5}>
         <Trans>Career</Trans>
       </H2>
       <Tabs className="w-full">

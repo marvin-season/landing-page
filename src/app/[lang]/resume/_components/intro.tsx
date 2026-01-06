@@ -11,9 +11,9 @@ function IntroArticle() {
   const { t } = useLingui();
   return (
     <MotionDiv
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ delay: 0.3 }}
     >
       <article className="space-y-4">
         <span className="text-base leading-relaxed text-muted-foreground">
@@ -68,7 +68,7 @@ function IntroArticle() {
 export default function Intro() {
   return (
     <section>
-      <H2>
+      <H2 delay={0.2}>
         <Trans>Introduction</Trans>
       </H2>
       <IntroArticle />

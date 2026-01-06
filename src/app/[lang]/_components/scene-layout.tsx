@@ -22,9 +22,8 @@ const SceneLayout = ({
   return (
     <section className="min-h-dvh relative z-10 rounded-md lg:rounded-lg backdrop-blur-md text-foreground mx-auto size-fit lg:max-w-[1200px] max-w-full px-6 py-16 md:px-16">
       <MotionH1
-        initial={{ opacity: 0, scale: 0.95, y: 48 }}
+        initial={{ opacity: 0, scale: 0.99, y: 4 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: -48 }}
         transition={{ duration: 0.3 }}
         className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between pb-12 lg:pb-24"
       >

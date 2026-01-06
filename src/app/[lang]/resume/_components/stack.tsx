@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { Tag } from "@/components/ui/tag";
 
 interface StackItem {
@@ -18,7 +19,12 @@ const stacksConfig: StackItem[] = [
 export default function Stack() {
   const stacks = useMemo(() => stacksConfig, []);
   return (
-    <div className="flex flex-wrap gap-2">
+    <MotionDiv
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0 }}
+      className="flex flex-wrap gap-2"
+    >
       {stacks.map((stack) => (
         <a
           key={stack.name}
@@ -30,6 +36,6 @@ export default function Stack() {
           <Tag size={"compact"}>{stack.name}</Tag>
         </a>
       ))}
-    </div>
+    </MotionDiv>
   );
 }
