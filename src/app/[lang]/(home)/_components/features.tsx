@@ -1,5 +1,6 @@
 "use client";
 
+import { useLingui } from "@lingui/react/macro";
 import { use } from "react";
 
 export const FeaturesContent = ({
@@ -8,10 +9,13 @@ export const FeaturesContent = ({
   featuresPromise: Promise<any[]>;
 }) => {
   const features = use(featuresPromise);
+  const { t } = useLingui();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {features.map((feature) => (
-        <div key={feature.id}>{feature.name}</div>
+        <div key={feature.id}>
+          {t`Name`}: {feature.name}
+        </div>
       ))}
     </div>
   );

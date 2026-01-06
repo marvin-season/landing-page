@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/[lang]/resume/_components/intro.tsx:37
+#: src/app/[lang]/resume/_components/intro.tsx:38
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ""
 
@@ -27,14 +27,6 @@ msgstr ""
 
 #: src/app/[lang]/(home)/_components/mine.tsx:24
 msgid "About me in detail"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/snake-game.tsx:622
-msgid "AI active"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/snake-game.tsx:540
-msgid "AI auto"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
@@ -129,20 +121,12 @@ msgstr ""
 msgid "effective"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:622
-msgid "Enable AI"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:43
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/snake-game.tsx:561
-msgid "Game over"
 msgstr ""
 
 #: src/app/[lang]/layout.tsx:30
@@ -161,7 +145,7 @@ msgstr ""
 msgid "Health Planet International Technology Co., Ltd."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:19
+#: src/app/[lang]/resume/_components/intro.tsx:20
 msgid "Hello, My name is <0>Marvin</0> and I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
 msgstr ""
 
@@ -173,7 +157,7 @@ msgstr ""
 msgid "HIX.AI is a platform for AI-powered healthcare solutions."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:44
+#: src/app/[lang]/resume/_components/intro.tsx:45
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr ""
 
@@ -201,7 +185,7 @@ msgstr ""
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:71
+#: src/app/[lang]/resume/_components/intro.tsx:72
 msgid "Introduction"
 msgstr ""
 
@@ -241,16 +225,16 @@ msgstr ""
 msgid "Leveraging less data to generate greater insights."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:540
-msgid "Manual"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:24
 msgid "May 2025 - Present"
 msgstr ""
 
 #: src/app/[lang]/resume/layout.tsx:12
 msgid "My professional experience and skills"
+msgstr ""
+
+#: src/app/[lang]/(home)/_components/features.tsx:17
+msgid "Name"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
@@ -269,20 +253,8 @@ msgstr ""
 msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:564
-msgid "Reset in {countdown}"
-msgstr ""
-
 #: src/app/[lang]/resume/layout.tsx:11
 msgid "Resume"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/snake-game.tsx:537
-msgid "Retro Snake"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/snake-game.tsx:574
-msgid "Score"
 msgstr ""
 
 #: src/app/[lang]/(home)/_components/mine.tsx:16
@@ -297,17 +269,13 @@ msgstr ""
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/snake-game.tsx:627
-msgid "WASD / ARROW keys to override"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:23
 #: src/app/[lang]/resume/hooks/use-experience.ts:38
 #: src/app/[lang]/resume/hooks/use-experience.ts:71
 msgid "Web Developer"
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:33
+#: src/app/[lang]/resume/_components/intro.tsx:34
 msgid "Wuhan University of Science and Technology."
 msgstr ""
 
@@ -315,6 +283,6 @@ msgstr ""
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr ""
 
-#: src/app/[lang]/resume/_components/intro.tsx:52
+#: src/app/[lang]/resume/_components/intro.tsx:53
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr ""
