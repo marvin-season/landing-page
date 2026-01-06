@@ -233,10 +233,6 @@ msgstr ""
 msgid "My professional experience and skills"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/features.tsx:17
-msgid "Name"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr ""
