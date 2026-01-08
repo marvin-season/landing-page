@@ -1,5 +1,4 @@
 import type { IFeature } from "@/app/admin/crud/_components/features";
-import { logger } from "@/utils/logger";
 import { request } from "@/utils/request";
 
 export async function generateStaticParams() {
@@ -12,7 +11,6 @@ export default async function CRUDSinglePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  logger("request", id);
 
   const data = await request<IFeature>(`/posts/${id}`);
   return (

@@ -1,5 +1,8 @@
+import { logger } from "@/utils/logger";
 
 export async function request<T>(url: string): Promise<T> {
+  logger("request", url);
+
   const apiUrl = getApiUrl(url);
   const res = await fetch(apiUrl);
   return res.json() as Promise<T>;
