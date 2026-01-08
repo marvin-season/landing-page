@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { use } from "react";
-import { log } from "@/utils/log";
 
 export interface IFeature {
   id: number;
@@ -17,13 +16,6 @@ export const FeaturesContent = ({
 }) => {
   const features = use(featuresPromise);
 
-  // const handleClick = (id: number) => {
-  //   request(`/posts/${id}`).then((data) => {
-  //     console.log("data", data);
-  //   });
-  // };
-
-  log("features", "features2", "features3");
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {features.map((feature) => (

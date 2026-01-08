@@ -1,12 +1,15 @@
-import { FeatureServer } from "@/app/admin/crud/_components/feature-server";
-import { FeaturesContent } from "@/app/admin/crud/_components/features";
+import { Suspense } from "react";
 
+import {
+  FeaturesContent,
+  type IFeature,
+} from "@/app/admin/crud/_components/features";
+import { request } from "@/utils/request";
 export default function CRUDPage() {
+  const featuresPromise = request<IFeature[]>("/posts");
   return (
-    <FeatureServer>
-      {({ featuresPromise }) => (
-        <FeaturesContent featuresPromise={featuresPromise} />
-      )}
-    </FeatureServer>
+    <Suspense fallback={<div>Loading...</div>}>
+      <FeaturesContent featuresPromise={featuresPromise} />
+    </Suspense>
   );
 }
