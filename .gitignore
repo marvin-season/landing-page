@@ -43,3 +43,7 @@ next-env.d.ts
 /generated/prisma
 *.db
 .pnpm-store
+
+
+# 生产翻译文件
+/src/locales/*.js
