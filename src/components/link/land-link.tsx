@@ -1,17 +1,15 @@
-import Link from "next/link";
+import Link, { type LinkProps } from "next/link";
 import LazyLink from "@/components/link/lazy-link";
 
-export default function LandLink({
-  noPrefetch,
-  href,
-  children,
-  className,
-}: {
+interface Props extends LinkProps {
   noPrefetch?: boolean;
   href: string;
   children: React.ReactNode;
   className: string;
-}) {
+}
+
+export default function LandLink(props: Props) {
+  const { noPrefetch, href, children, className, ...restProps } = props;
   if (noPrefetch) {
     return (
       <LazyLink href={href} className={className}>
@@ -20,7 +18,7 @@ export default function LandLink({
     );
   }
   return (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} {...restProps}>
       {children}
     </Link>
   );
