@@ -10,7 +10,8 @@
     "lint": "biome check --write",
     "format": "biome format --write",
     "lingui:extract": "lingui extract --clean",
-    "lingui:compile": "lingui compile"
+    "lingui:compile": "lingui compile",
+    "postinstall": "pnpm lingui:compile"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.31",
