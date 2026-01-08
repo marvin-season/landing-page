@@ -12,13 +12,9 @@ interface Props {
 export default function LazyLink({ href, children, className }: Props) {
   const router = useRouter();
 
-  const handleClick = () => {
-    router.push(href);
-  };
-
   return (
     <div
-      onClick={handleClick}
+      onClick={() => router.push(href)}
       className={`cursor-pointer ${className}`} // 保持手型光标
       role="link"
     >
