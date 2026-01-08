@@ -5,7 +5,7 @@ color:#fff;font-size:10px;font-weight:bold;border-radius:4px;padding:2px 4px;mar
 background:linear-gradient(135deg, #12c2e9, #c471ed, #f64f59);
 `
 // 带颜色打印，适配 Node.js (Server) 与浏览器 (Client)
-export const log = (...params: any[]) => {
+export const logger = (...params: any[]) => {
   if (process.env.NODE_ENV === 'production') return;
 
   const isClient = typeof window !== 'undefined';

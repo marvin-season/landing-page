@@ -1,3 +1,4 @@
+
 export async function request<T>(url: string): Promise<T> {
   const apiUrl = getApiUrl(url);
   const res = await fetch(apiUrl);
@@ -6,6 +7,7 @@ export async function request<T>(url: string): Promise<T> {
 
 // src/lib/api-client.ts (示例)
 export const getApiUrl = (path: string) => {
+  
   // 如果是浏览器端，使用相对路径利用 rewrites
   if (typeof window !== "undefined") {
     return `/api-remote${path}`;
@@ -15,3 +17,4 @@ export const getApiUrl = (path: string) => {
   // 将 /api-remote 替换为真实的远程地址，或者直接拼接
   return `${baseUrl}${path}`;
 };
+
