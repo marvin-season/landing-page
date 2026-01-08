@@ -1,4 +1,13 @@
 import type { NextConfig } from "next";
+import type { TurbopackRuleConfigCollection } from "next/dist/server/config-shared";
+
+
+const rules: Record<string, TurbopackRuleConfigCollection> = {
+  "*.po": {
+      loaders: ["@lingui/loader"],
+      as: "*.js",
+    }
+}
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -7,12 +16,7 @@ const nextConfig: NextConfig = {
     swcPlugins: [["@lingui/swc-plugin", {}]],
   },
   turbopack: {
-    rules: {
-      "*.po": {
-        loaders: ["@lingui/loader"],
-        as: "*.js",
-      },
-    },
+    rules,
   },
   // ... 其他配置
   async rewrites() {

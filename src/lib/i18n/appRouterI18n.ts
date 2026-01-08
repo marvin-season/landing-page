@@ -1,7 +1,9 @@
 import "server-only";
 
 import { type I18n, type Messages, setupI18n } from "@lingui/core";
+import { isDevelopment } from "@/lib/constants";
 import linguiConfig from "~/lingui.config";
+
 
 const { locales } = linguiConfig;
 // optionally use a stricter union type
@@ -10,7 +12,11 @@ type SupportedLocales = string;
 async function loadCatalog(locale: SupportedLocales): Promise<{
   [k: string]: Messages;
 }> {
-  const { messages } = await import(`../../locales/${locale}.po`);
+  // 先确定后缀
+  const extension = isDevelopment ? "po" : "js";
+  const { messages } = await import(
+    `../../locales/${locale}.${extension}`
+  );
   return {
     [locale]: messages,
   };
