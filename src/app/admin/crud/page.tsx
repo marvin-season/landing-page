@@ -4,7 +4,7 @@ import {
   FeaturesContent,
   type IFeature,
 } from "@/app/admin/crud/_components/features";
-import { request } from "@/utils/request";
+import { request } from "@/lib/request";
 export default function CRUDPage() {
   const featuresPromise = request<IFeature[]>("/posts");
   return (

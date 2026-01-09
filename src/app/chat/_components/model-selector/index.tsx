@@ -17,8 +17,8 @@ import {
   ModelSelectorTrigger,
 } from "@/components/ai-elements/model-selector";
 import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/lib/trpc";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
-import { useTRPC } from "@/utils/trpc";
 
 export const ModelSelector = () => {
   const currentSession = useCurrentSession();

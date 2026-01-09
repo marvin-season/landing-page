@@ -1,5 +1,5 @@
 import type { IFeature } from "@/app/admin/crud/_components/features";
-import { request } from "@/utils/request";
+import { request } from "@/lib/request";
 
 export async function generateStaticParams() {
   return [1, 2, 3].map((id) => ({ id: id.toString() }));

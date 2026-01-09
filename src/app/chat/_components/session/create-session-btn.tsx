@@ -5,9 +5,9 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Tooltip from "@/components/tooltip";
 import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/session-store";
-import { useTRPC } from "@/utils/trpc";
 
 export function CreateSessionBtn(props: {
   children?: React.ReactNode;
