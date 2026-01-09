@@ -1,5 +1,5 @@
 export default {
-  locales: ["en", "zh", "ja", "pseudo"],
+  locales: ["en", "zh", "ja", "pseudo"] as const,
   pseudoLocale: "pseudo",
   sourceLocale: "en",
   fallbackLocales: {

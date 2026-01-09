@@ -23,7 +23,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: PageLangParam) {
-  const i18n = getI18nInstance((await props.params).lang);
+  const { lang } = await props.params;
+  const i18n = getI18nInstance(lang);
 
   return {
     title: i18n._(msg`effective`),
@@ -39,14 +40,16 @@ export default async function RootLayout({
   children,
   params,
 }: PropsWithChildren<PageLangParam>) {
-  const lang = (await params).lang;
+  const { lang } = await params;
+
   const i18n = getI18nInstance(lang);
 
-  // @ts-ignore
   setI18n(i18n);
 
+  console.log("lang", lang);
+
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang as string} suppressHydrationWarning>
       <body className={`${lora.className} antialiased max-h-dvh overflow-auto`}>
         <LinguiClientProvider
           initialLocale={lang}

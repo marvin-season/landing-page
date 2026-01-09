@@ -5,7 +5,8 @@ import { FireworksBackground } from "@/components/ui/shadcn-io/fireworks-backgro
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 
 export async function generateMetadata(props: PageLangParam) {
-  const i18n = getI18nInstance((await props.params).lang);
+  const { lang } = await props.params;
+  const i18n = getI18nInstance(lang);
 
   return {
     title: i18n._(msg`Resume`),
@@ -17,7 +18,7 @@ export default async function ResumeLayout({
   children,
   params,
 }: PropsWithChildren<PageLangParam>) {
-  const lang = (await params).lang;
+  const { lang } = await params;
   const i18n = getI18nInstance(lang);
   return (
     <FireworksBackground className="" population={1}>
