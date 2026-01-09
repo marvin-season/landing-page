@@ -98,32 +98,39 @@ export default function Experience() {
       <H2 delay={0.5}>
         <Trans>Career</Trans>
       </H2>
-      <Tabs className="w-full">
-        <TabsList className="relative mb-6 justify-start max-w-full overflow-x-auto">
-          {experiences.map((experience) => (
-            <TabsTrigger
-              ref={(element) => {
-                if (element) {
-                  element.addEventListener("click", () => {
-                    element.scrollIntoView({
-                      // @ts-ignore https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView#container
-                      container: "nearest",
-                      behavior: "smooth",
-                      inline: "center",
+      <MotionDiv
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
+        className="w-full"
+      >
+        <Tabs className="w-full">
+          <TabsList className="relative mb-6 justify-start max-w-full overflow-x-auto">
+            {experiences.map((experience) => (
+              <TabsTrigger
+                ref={(element) => {
+                  if (element) {
+                    element.addEventListener("click", () => {
+                      element.scrollIntoView({
+                        // @ts-ignore https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView#container
+                        container: "nearest",
+                        behavior: "smooth",
+                        inline: "center",
+                      });
                     });
-                  });
-                }
-              }}
-              key={experience.period}
-              value={experience.period}
-              className="rounded-full"
-            >
-              {experience.period}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <TabsContents className="">{experienceContents}</TabsContents>
-      </Tabs>
+                  }
+                }}
+                key={experience.period}
+                value={experience.period}
+                className="rounded-full"
+              >
+                {experience.period}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContents className="">{experienceContents}</TabsContents>
+        </Tabs>
+      </MotionDiv>
     </section>
   );
 }
