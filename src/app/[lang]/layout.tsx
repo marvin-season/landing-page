@@ -46,8 +46,6 @@ export default async function RootLayout({
 
   setI18n(i18n);
 
-  console.log("lang", lang);
-
   return (
     <html lang={lang as string} suppressHydrationWarning>
       <body className={`${lora.className} antialiased max-h-dvh overflow-auto`}>
