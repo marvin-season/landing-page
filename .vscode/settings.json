@@ -11,6 +11,7 @@
     "gsap",
     "partialize",
     "pcai",
+    "prosemirror",
     "shiki"
   ],
   "[typescriptreact]": {
