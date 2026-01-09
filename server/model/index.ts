@@ -1,5 +1,6 @@
 import { publicProcedure, router } from "~/server/trpc";
-const models = [
+import type { TModel } from "~/server/types/model";
+const models: TModel[] = [
   {
     id: "deepseek-chat",
     name: "DeepSeek Chat",
