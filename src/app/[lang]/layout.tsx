@@ -11,7 +11,7 @@ import {
 } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
-import { SettingsMenu } from "@/components/settings-menu";
+import { SettingsMenu } from "@/components/settings-menu/settings-menu";
 
 const lora = Lora({
   weight: "400",

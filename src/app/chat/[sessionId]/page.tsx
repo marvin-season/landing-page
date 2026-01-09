@@ -1,5 +1,5 @@
 import { ChatMain } from "@/app/chat/_components/chat-main";
-import { ChatHeader } from "@/app/chat/_components/header";
+import { ChatHeader } from "@/app/chat/_components/header/chat-header";
 import { MessageList } from "@/app/chat/_components/message/message-list";
 
 interface SessionPageProps {

@@ -10,7 +10,7 @@ const { locales } = linguiConfig;
 type TSupportedLocale = (typeof locales)[number];
 
 // 为了解决build时 [lang] 参数类型错误
-export type TSupportedLocalesTrap = TSupportedLocale | (string & {}); 
+export type TSupportedLocalesTrap = TSupportedLocale | (string & {});
 
 type AllI18nInstances = { [K in TSupportedLocalesTrap]: I18n };
 
@@ -34,21 +34,17 @@ export const allMessages = catalogs.reduce((acc, oneCatalog) => {
   return { ...acc, ...oneCatalog };
 }, {});
 
-
-export const allI18nInstances = locales.reduce(
-  (acc, locale) => {
-    const messages = allMessages[locale] ?? {};
-    const i18n = setupI18n({
-      locale,
-      messages: { [locale]: messages },
-    });
-    return { ...acc, [locale]: i18n };
-  },
-  {} as AllI18nInstances,
-);
+export const allI18nInstances = locales.reduce((acc, locale) => {
+  const messages = allMessages[locale] ?? {};
+  const i18n = setupI18n({
+    locale,
+    messages: { [locale]: messages },
+  });
+  return { ...acc, [locale]: i18n };
+}, {} as AllI18nInstances);
 
 export const getI18nInstance = (locale: TSupportedLocalesTrap): I18n => {
-  if(!isValidLocale(locale)) {
+  if (!isValidLocale(locale)) {
     return allI18nInstances.en;
   }
 
@@ -56,5 +52,5 @@ export const getI18nInstance = (locale: TSupportedLocalesTrap): I18n => {
 };
 
 export type PageLangParam = {
-  params: Promise<{ lang:  TSupportedLocalesTrap }>;
+  params: Promise<{ lang: TSupportedLocalesTrap }>;
 };
