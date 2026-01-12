@@ -5,8 +5,8 @@ const placeholderPlugin = (text: string) => {
   return new Plugin({
     props: {
       decorations(state) {
-        const { doc, selection,  } = state;
-        
+        const { doc, selection } = state;
+
         // 1. 获取光标位置的“解析”对象 ($from)
         // $from 包含了光标所在位置的深度、父节点、偏移量等丰富信息
         const { $from } = selection;
@@ -31,9 +31,7 @@ const placeholderPlugin = (text: string) => {
           span.className = "placeholder";
           span.style.pointerEvents = "none";
 
-          return DecorationSet.create(doc, [
-            Decoration.widget(pos + 1, span)
-          ]);
+          return DecorationSet.create(doc, [Decoration.widget(pos + 1, span)]);
         }
 
         return DecorationSet.empty;
@@ -42,4 +40,4 @@ const placeholderPlugin = (text: string) => {
   });
 };
 
-export default placeholderPlugin
+export default placeholderPlugin;

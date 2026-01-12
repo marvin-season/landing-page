@@ -8,19 +8,21 @@ import { Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   insertIntoCursor,
   toggleRedMark,
 } from "@/app/admin/prose/components/commands/tr-command";
 import initialJson from "@/app/admin/prose/components/data";
 import placeholderPlugin from "@/app/admin/prose/components/plugin/placeholder";
+import { variablePlugin } from "@/app/admin/prose/components/plugin/v-menu";
 import {
   myButton,
   myMark,
   userConfirm,
 } from "@/app/admin/prose/components/schema";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
+import { VariablePicker } from "@/app/admin/prose/components/v-menu-view";
 import { Button } from "@/components/ui/button";
 
 const myNodes = basicSchema.spec.nodes.append({
@@ -36,7 +38,7 @@ const schema = new Schema({
 });
 export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
+  const [view, setView] = useState<EditorView>();
   useEffect(() => {
     if (!editorRef.current) return;
     // 1. 定义你的初始数据对象 (通常从 API 获取)
@@ -55,6 +57,7 @@ export default function ProseMirrorEditor() {
         keymap(baseKeymap),
         history(),
         placeholderPlugin("请输入内容..."),
+        variablePlugin(),
       ],
     });
     const view = new EditorView(editorRef.current, {
@@ -65,7 +68,7 @@ export default function ProseMirrorEditor() {
       },
     });
 
-    viewRef.current = view;
+    setView(view);
     return () => {
       view.destroy();
     };
@@ -80,8 +83,8 @@ export default function ProseMirrorEditor() {
         <div className="flex gap-2">
           <Button
             onClick={() => {
-              if (!viewRef.current) return;
-              insertIntoCursor(viewRef.current, "prosemirror is");
+              if (!view) return;
+              insertIntoCursor(view, "prosemirror is");
             }}
           >
             insert
@@ -89,14 +92,20 @@ export default function ProseMirrorEditor() {
 
           <Button
             onClick={() => {
-              if (!viewRef.current) return;
-              toggleRedMark(viewRef.current);
+              if (!view) return;
+              toggleRedMark(view);
             }}
           >
             toggleRedMark
           </Button>
         </div>
         <div ref={editorRef} className="prose-container" />
+        {view && (
+          <VariablePicker
+            view={view}
+            options={["userName", "orderId", "createTime"]}
+          />
+        )}
       </div>
 
       <style jsx global>{`
