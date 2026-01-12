@@ -1,16 +1,19 @@
 import type {
   EditorView,
   NodeView,
+  NodeViewConstructor,
   ViewMutationRecord,
 } from "prosemirror-view";
+import { logger } from "@/lib/logger";
 
 export default class UserConfirmView implements NodeView {
   dom: HTMLElement;
-  node: any;
+  node: Parameters<NodeViewConstructor>[0];
   view: EditorView;
-  getPos: () => number;
+  getPos: () => number | undefined;
 
-  constructor(node: any, view: EditorView, getPos: () => number) {
+  constructor(...[node, view, getPos]: Parameters<NodeViewConstructor>) {
+    logger(node, view);
     this.node = node;
     this.view = view;
     this.getPos = getPos;
@@ -62,6 +65,9 @@ export default class UserConfirmView implements NodeView {
   updateStatus(newStatus: string) {
     const { state, dispatch } = this.view;
     const pos = this.getPos();
+    if (!pos) {
+      return;
+    }
     // 使用 Transaction 更新节点属性
     const tr = state.tr.setNodeMarkup(pos, null, {
       ...this.node.attrs,

@@ -15,7 +15,7 @@ import {
   myMark,
   userConfirm,
 } from "@/app/admin/prose/components/scheam";
-import UserConfirmView from "./user-confirm-view";
+import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
 
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
@@ -53,8 +53,7 @@ export default function ProseMirrorEditor() {
       state,
       // 关键：告诉编辑器，当遇到 user-confirm 节点时，用我的类来渲染
       nodeViews: {
-        "user-confirm": (node, view, getPos) =>
-          new UserConfirmView(node, view, getPos as () => number),
+        "user-confirm": (...params) => new UserConfirmView(...params),
       },
     });
     return () => {
