@@ -9,21 +9,25 @@ import { useEffect, useRef } from "react";
 const mySchema = new Schema({
   nodes: {
     doc: { content: "block+" },
-    paragraph: {
-      content: "inline*",
-      group: "block",
-      toDOM() {
-        return ["p", 0];
-      },
-      parseDOM: [{ tag: "p" }],
-    },
     heading: {
       content: "inline*",
       group: "block",
-      toDOM() {
-        return ["h1", 0];
+      // 定义属性：这个节点现在可以携带一个 level 变量
+      attrs: {
+        level: { default: 3 },
       },
-      parseDOM: [{ tag: "h1" }],
+
+      // 渲染时：根据 attrs.level 动态生成标签名
+      toDOM(node) {
+        return ["h" + node.attrs.level, 0];
+      },
+
+      // 解析时：不仅匹配标签，还要提取级别
+      parseDOM: [
+        { tag: "h1", attrs: { level: 1 } },
+        { tag: "h2", attrs: { level: 2 } },
+        { tag: "h3", attrs: { level: 3 } },
+      ],
     },
     text: { group: "inline" },
   },
