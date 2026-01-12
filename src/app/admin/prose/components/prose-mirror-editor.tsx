@@ -4,46 +4,10 @@ import { baseKeymap } from "prosemirror-commands";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
-import { Schema } from "prosemirror-model";
+import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
-
-// 组合成一个最简单的 Schema
-const mySchema = new Schema({
-  nodes: {
-    doc: { content: "block+" },
-    paragraph: {
-      content: "inline*",
-      group: "block",
-      toDOM() {
-        return ["p", 0];
-      },
-      parseDOM: [{ tag: "p" }],
-    },
-    heading: {
-      content: "inline*",
-      group: "block",
-      // 定义属性：这个节点现在可以携带一个 level 变量
-      attrs: {
-        level: { default: 3 },
-      },
-
-      // 渲染时：根据 attrs.level 动态生成标签名
-      toDOM(node) {
-        return ["h" + node.attrs.level, 0];
-      },
-
-      // 解析时：不仅匹配标签，还要提取级别
-      parseDOM: [
-        { tag: "h1", attrs: { level: 1 } },
-        { tag: "h2", attrs: { level: 2 } },
-        { tag: "h3", attrs: { level: 3 } },
-      ],
-    },
-    text: { group: "inline" },
-  },
-});
 
 export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -66,10 +30,10 @@ export default function ProseMirrorEditor() {
     };
 
     // 2. 将 JSON 转换为 ProseMirror 的 Node 对象
-    const doc = mySchema.nodeFromJSON(initialJson);
+    const doc = basicSchema.nodeFromJSON(initialJson);
 
     const state = EditorState.create({
-      schema: mySchema,
+      schema: basicSchema,
       doc: doc, // 直接传入转换后的文档对象
       plugins: [
         keymap({
