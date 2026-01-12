@@ -1,10 +1,13 @@
 "use client";
 
+import { baseKeymap } from "prosemirror-commands";
+// 1. 引入必要的命令和按键绑定
+import { history, redo, undo } from "prosemirror-history";
+import { keymap } from "prosemirror-keymap";
 import { Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
-import { logger } from "@/lib/logger";
 
 // 组合成一个最简单的 Schema
 const mySchema = new Schema({
@@ -65,13 +68,21 @@ export default function ProseMirrorEditor() {
     // 2. 将 JSON 转换为 ProseMirror 的 Node 对象
     const doc = mySchema.nodeFromJSON(initialJson);
 
-    const view = new EditorView(editorRef.current, {
-      state: EditorState.create({
-        schema: mySchema,
-        doc: doc, // 直接传入转换后的文档对象
-      }),
+    const state = EditorState.create({
+      schema: mySchema,
+      doc: doc, // 直接传入转换后的文档对象
+      plugins: [
+        keymap({
+          "Mod-z": undo,
+          "Mod-y": redo,
+        }),
+        keymap(baseKeymap),
+        history(),
+      ],
     });
-    logger(view.state.doc.toJSON());
+    const view = new EditorView(editorRef.current, {
+      state,
+    });
     return () => {
       view.destroy();
     };
