@@ -19,7 +19,7 @@ import {
   myButton,
   myMark,
   userConfirm,
-} from "@/app/admin/prose/components/scheam";
+} from "@/app/admin/prose/components/schema";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
 import { Button } from "@/components/ui/button";
 
