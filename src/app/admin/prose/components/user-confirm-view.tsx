@@ -1,4 +1,8 @@
-import type { EditorView, NodeView } from "prosemirror-view";
+import type {
+  EditorView,
+  NodeView,
+  ViewMutationRecord,
+} from "prosemirror-view";
 
 export default class UserConfirmView implements NodeView {
   dom: HTMLElement;
@@ -24,6 +28,16 @@ export default class UserConfirmView implements NodeView {
         this.updateStatus("canceled");
     });
   }
+  contentDOM?: HTMLElement | null | undefined;
+  multiType?: boolean | undefined;
+  selectNode?: (() => void) | undefined;
+  deselectNode?: (() => void) | undefined;
+  setSelection?:
+    | ((anchor: number, head: number, root: Document | ShadowRoot) => void)
+    | undefined;
+  stopEvent?: ((event: Event) => boolean) | undefined;
+  ignoreMutation?: ((mutation: ViewMutationRecord) => boolean) | undefined;
+  destroy?: (() => void) | undefined;
 
   updateAttributes(node: any) {
     this.dom.className = `user-confirm-node status-${node.attrs.status}`;
