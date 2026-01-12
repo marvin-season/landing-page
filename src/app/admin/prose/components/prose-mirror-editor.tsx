@@ -4,11 +4,17 @@ import { baseKeymap } from "prosemirror-commands";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
+import { Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
 
+const myNodes = basicSchema.spec.nodes.append({});
+const schema = new Schema({
+  ...basicSchema.spec,
+  nodes: myNodes,
+});
 export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -33,7 +39,7 @@ export default function ProseMirrorEditor() {
     const doc = basicSchema.nodeFromJSON(initialJson);
 
     const state = EditorState.create({
-      schema: basicSchema,
+      schema,
       doc: doc, // 直接传入转换后的文档对象
       plugins: [
         keymap({
