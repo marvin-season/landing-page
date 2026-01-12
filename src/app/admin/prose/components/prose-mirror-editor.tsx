@@ -4,11 +4,30 @@ import { baseKeymap } from "prosemirror-commands";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
-import { type MarkSpec, Schema } from "prosemirror-model";
+import { type MarkSpec, type NodeSpec, Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
+
+const myButton: NodeSpec = {
+  inline: true,
+  content: "text*",
+  group: "inline",
+  attrs: {
+    color: {
+      default: "red",
+    },
+  },
+  toDOM(node) {
+    return [
+      "button",
+      { class: "my-custom-button", style: `color: ${node.attrs.color};` },
+      0,
+    ];
+  },
+  parseDOM: [{ tag: "button.my-custom-button" }],
+};
 
 const myMark: MarkSpec = {
   attrs: {
@@ -35,7 +54,9 @@ const myMark: MarkSpec = {
   ],
 };
 
-const myNodes = basicSchema.spec.nodes.append({});
+const myNodes = basicSchema.spec.nodes.append({
+  "my-button": myButton,
+});
 const myMarks = basicSchema.spec.marks.append({
   "my-mark": myMark,
 });
@@ -74,8 +95,13 @@ export default function ProseMirrorEditor() {
           ],
         },
         {
-          type: "paragraph",
-          content: [{ type: "text", text: "这是通过 JSON 初始化的内容。" }],
+          type: "my-button",
+          content: [
+            {
+              type: "text",
+              text: "Click me",
+            },
+          ],
         },
         {
           type: "paragraph",
@@ -146,6 +172,13 @@ export default function ProseMirrorEditor() {
           padding: 2px 4px;
           border-radius: 4px;
           font-weight: bold;
+          background: #f0f0f0;
+          font-size: 14px;
+        }
+        .my-custom-button {
+          border: 1px solid blue;
+          padding: 2px 4px;
+          border-radius: 4px;
           background: #f0f0f0;
           font-size: 14px;
         }
