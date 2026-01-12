@@ -84,7 +84,7 @@ export default function ProseMirrorEditor() {
           <Button
             onClick={() => {
               if (!view) return;
-              insertIntoCursor(view, "prosemirror is");
+              insertIntoCursor(view, "{");
             }}
           >
             insert
