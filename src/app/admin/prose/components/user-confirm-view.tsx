@@ -4,7 +4,6 @@ import type {
   NodeViewConstructor,
   ViewMutationRecord,
 } from "prosemirror-view";
-import { logger } from "@/lib/logger";
 
 export default class UserConfirmView implements NodeView {
   dom: HTMLElement;
@@ -13,7 +12,6 @@ export default class UserConfirmView implements NodeView {
   getPos: () => number | undefined;
 
   constructor(...[node, view, getPos]: Parameters<NodeViewConstructor>) {
-    logger(node, view);
     this.node = node;
     this.view = view;
     this.getPos = getPos;

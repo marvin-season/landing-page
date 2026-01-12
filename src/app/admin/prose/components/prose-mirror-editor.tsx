@@ -10,6 +10,7 @@ import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
 import initialJson from "@/app/admin/prose/components/data";
+import placeholderPlugin from "@/app/admin/prose/components/plugin/placeholder";
 import {
   myButton,
   myMark,
@@ -30,6 +31,7 @@ const schema = new Schema({
 });
 export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
   useEffect(() => {
     if (!editorRef.current) return;
     // 1. 定义你的初始数据对象 (通常从 API 获取)
@@ -47,6 +49,7 @@ export default function ProseMirrorEditor() {
         }),
         keymap(baseKeymap),
         history(),
+        placeholderPlugin("请输入内容..."),
       ],
     });
     const view = new EditorView(editorRef.current, {
@@ -56,6 +59,8 @@ export default function ProseMirrorEditor() {
         "user-confirm": (...params) => new UserConfirmView(...params),
       },
     });
+
+    viewRef.current = view;
     return () => {
       view.destroy();
     };
