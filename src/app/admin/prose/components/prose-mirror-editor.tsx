@@ -14,6 +14,10 @@ const myButton: NodeSpec = {
   inline: true,
   content: "text*",
   group: "inline",
+  /**
+   * 默认情况下（defining: false），如果你选中一个节点的所有内容并按退格键，或者把内容替换为其他内容，这个节点容器通常会消失，内容会被“合并”到父节点中。
+   */
+  defining: true,
   attrs: {
     color: {
       default: "red",
