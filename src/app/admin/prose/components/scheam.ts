@@ -1,36 +1,62 @@
 // lib/editor/schema.ts
-import { Schema } from "prosemirror-model";
+import type { MarkSpec, NodeSpec } from "prosemirror-model";
 
+const userConfirm: NodeSpec = {
+  inline: false,
+  group: "block",
+  atom: true, // 设置为原子节点，不可直接编辑内部文字
+  attrs: {
+    status: { default: "pending" },
+    userName: { default: "Guest" },
+  },
+};
 
-export const mySchema = new Schema({
-  nodes: {
-    // 必须保留 doc 和 text，这是最基础的
-    doc: { content: "block+" },
-    text: { group: "inline" },
-    
-    // 我们的 H1 节点
-    heading: {
-      group: "block",      // 这是一个块级元素
-      content: "inline*",  // 里面可以包含任意数量的行内元素（文字、加粗等）
-      defining: true,      // 粘贴时尽量保留这个节点类型
-      
-      // 1. 从数据渲染成 HTML
-      toDOM() { 
-        return ["h1", 0]; // 0 是占位符，表示节点的内容（文字）将放在这里
-      },
-      
-      // 2. 从 HTML 解析成数据
-      parseDOM: [
-        { tag: "h1" }
-      ]
+const myButton: NodeSpec = {
+  inline: true,
+  content: "text*",
+  group: "inline",
+  /**
+   * 默认情况下（defining: false），如果你选中一个节点的所有内容并按退格键，或者把内容替换为其他内容，这个节点容器通常会消失，内容会被“合并”到父节点中。
+   */
+  defining: true,
+  attrs: {
+    color: {
+      default: "red",
     },
+  },
+  toDOM(node) {
+    return [
+      "button",
+      { class: "my-custom-button", style: `color: ${node.attrs.color};` },
+      0,
+    ];
+  },
+  parseDOM: [{ tag: "button.my-custom-button" }],
+};
 
-    // 还需要一个段落节点，否则回车没地方去
-    paragraph: {
-      group: "block",
-      content: "inline*",
-      toDOM() { return ["p", 0]; },
-      parseDOM: [{ tag: "p" }]
-    }
-  }
-});
+const myMark: MarkSpec = {
+  attrs: {
+    color: {
+      default: "red",
+    },
+  },
+  toDOM(mark) {
+    return [
+      "span",
+      {
+        style: `color: ${mark.attrs.color};`,
+        class: "my-custom-mark",
+      },
+      0,
+    ];
+  },
+  // 解析 DOM：识别什么样的 HTML 应该转为这个 mark 一般用于粘贴或者初始化 html 模板
+  parseDOM: [
+    {
+      tag: "span.my-custom-mark",
+      getAttrs: (dom) => ({ color: dom.style.color }),
+    },
+  ],
+};
+
+export { userConfirm, myButton, myMark };

@@ -4,70 +4,18 @@ import { baseKeymap } from "prosemirror-commands";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
-import { type MarkSpec, type NodeSpec, Schema } from "prosemirror-model";
+import { Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
+import initialJson from "@/app/admin/prose/components/data";
+import {
+  myButton,
+  myMark,
+  userConfirm,
+} from "@/app/admin/prose/components/scheam";
 import UserConfirmView from "./user-confirm-view";
-
-const userConfirm: NodeSpec = {
-  inline: false,
-  group: "block",
-  atom: true, // 设置为原子节点，不可直接编辑内部文字
-  attrs: {
-    status: { default: "pending" },
-    userName: { default: "Guest" },
-  },
-};
-
-const myButton: NodeSpec = {
-  inline: true,
-  content: "text*",
-  group: "inline",
-  /**
-   * 默认情况下（defining: false），如果你选中一个节点的所有内容并按退格键，或者把内容替换为其他内容，这个节点容器通常会消失，内容会被“合并”到父节点中。
-   */
-  defining: true,
-  attrs: {
-    color: {
-      default: "red",
-    },
-  },
-  toDOM(node) {
-    return [
-      "button",
-      { class: "my-custom-button", style: `color: ${node.attrs.color};` },
-      0,
-    ];
-  },
-  parseDOM: [{ tag: "button.my-custom-button" }],
-};
-
-const myMark: MarkSpec = {
-  attrs: {
-    color: {
-      default: "red",
-    },
-  },
-  toDOM(mark) {
-    return [
-      "span",
-      {
-        style: `color: ${mark.attrs.color};`,
-        class: "my-custom-mark",
-      },
-      0,
-    ];
-  },
-  // 解析 DOM：识别什么样的 HTML 应该转为这个 mark 一般用于粘贴或者初始化 html 模板
-  parseDOM: [
-    {
-      tag: "span.my-custom-mark",
-      getAttrs: (dom) => ({ color: dom.style.color }),
-    },
-  ],
-};
 
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
@@ -85,74 +33,6 @@ export default function ProseMirrorEditor() {
   useEffect(() => {
     if (!editorRef.current) return;
     // 1. 定义你的初始数据对象 (通常从 API 获取)
-    const initialJson = {
-      type: "doc",
-      content: [
-        {
-          type: "heading",
-          attrs: { level: 1 },
-          content: [
-            {
-              type: "text",
-              text: "Hello, world ",
-            },
-            {
-              type: "text",
-              text: "(From JSON)!",
-              marks: [
-                {
-                  type: "my-mark",
-                  attrs: {
-                    color: "red",
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "my-button",
-          content: [
-            {
-              type: "text",
-              text: "Click me",
-            },
-          ],
-        },
-        {
-          type: "user-confirm",
-          attrs: {
-            userName: "张三",
-            status: "pending",
-          },
-        },
-        {
-          type: "paragraph",
-          content: [
-            {
-              type: "text",
-              text: "这段文字带有 ",
-            },
-            {
-              type: "text",
-              marks: [
-                {
-                  type: "my-mark",
-                  attrs: {
-                    color: "blue",
-                  },
-                },
-              ],
-              text: "自定义标记",
-            },
-            {
-              type: "text",
-              text: "。",
-            },
-          ],
-        },
-      ],
-    };
 
     // 2. 将 JSON 转换为 ProseMirror 的 Node 对象
     const doc = schema.nodeFromJSON(initialJson);
@@ -197,28 +77,7 @@ export default function ProseMirrorEditor() {
           padding: 20px;
           outline: none;
         }
-        .my-custom-button {
-          border: 1px solid #007bff;
-          padding: 0 4px;
-          border-radius: 4px;
-          background: #e7f1ff;
-        }
-        .user-confirm-node {
-          align-items: center;
-          gap: 10px;
-          padding: 4px 12px;
-          border-radius: 20px;
-          border: 1px solid #ddd;
-          background: #fff;
-          margin: 0 5px;
-          font-size: 14px;
-        }
-        .user-label { font-weight: bold; }
-        .btn-confirm { background: #52c41a; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
-        .btn-cancel { background: #ff4d4f; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
-        .status-confirmed { border-color: #52c41a; background: #f6ffed; }
-        .status-canceled { border-color: #ff4d4f; background: #fff1f0; }
-        .status-text { font-weight: bold; }
+
       `}</style>
     </div>
   );
