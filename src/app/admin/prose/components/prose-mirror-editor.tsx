@@ -1,14 +1,23 @@
 "use client";
 
-import { DOMParser, Schema } from "prosemirror-model";
+import { Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
+import { logger } from "@/lib/logger";
 
 // 组合成一个最简单的 Schema
 const mySchema = new Schema({
   nodes: {
     doc: { content: "block+" },
+    paragraph: {
+      content: "inline*",
+      group: "block",
+      toDOM() {
+        return ["p", 0];
+      },
+      parseDOM: [{ tag: "p" }],
+    },
     heading: {
       content: "inline*",
       group: "block",
@@ -37,18 +46,32 @@ export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!editorRef.current) return;
-    // 修复点 1：创建一个临时的 DOM 元素来承载初始 HTML 字符串
-    const tempElement = document.createElement("div");
-    tempElement.innerHTML = "<h1>Hello, world!</h1>";
+    // 1. 定义你的初始数据对象 (通常从 API 获取)
+    const initialJson = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [{ type: "text", text: "Hello, world (From JSON)!" }],
+        },
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "这是通过 JSON 初始化的内容。" }],
+        },
+      ],
+    };
+
+    // 2. 将 JSON 转换为 ProseMirror 的 Node 对象
+    const doc = mySchema.nodeFromJSON(initialJson);
 
     const view = new EditorView(editorRef.current, {
       state: EditorState.create({
         schema: mySchema,
-        // 修复点 2：DOMParser.fromSchema(...).parse(domElement)
-        doc: DOMParser.fromSchema(mySchema).parse(tempElement),
+        doc: doc, // 直接传入转换后的文档对象
       }),
     });
-
+    logger(view.state.doc.toJSON());
     return () => {
       view.destroy();
     };
