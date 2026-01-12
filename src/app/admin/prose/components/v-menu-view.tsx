@@ -54,14 +54,22 @@ export const VariablePicker = ({ view, options }: Props) => {
   const onSelect = (val: string) => {
     if (!view) return;
     const { tr } = view.state;
+    const { pos } = state;
 
     // 事务操作：
     // 1. 删除输入的 { (位置是 state.pos 到 state.pos + 1)
     // 2. 插入选中的变量文字
     // 3. 关闭菜单（设置元数据）
+
+    // 1. 创建带属性的节点
+    const variableNode = view.state.schema.nodes["variable-node"].create({
+      label: val,
+    });
+
+    // 2. 使用 replaceWith 执行：从 pos 开始，到 pos + 1 结束（即删掉 {），替换为新节点
     const transaction = tr
-      .delete(state.pos, state.pos + 1)
-      .insertText(`{{${val}}}`)
+      .replaceWith(pos, pos + 1, variableNode)
+      // 标记这是插件操作，防止被 apply 误杀
       .setMeta(varMenuKey, { active: false, pos: 0 });
 
     view.dispatch(transaction);

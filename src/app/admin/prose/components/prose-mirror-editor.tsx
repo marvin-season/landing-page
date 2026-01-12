@@ -20,6 +20,7 @@ import {
   myButton,
   myMark,
   userConfirm,
+  variableNode,
 } from "@/app/admin/prose/components/schema";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
 import { VariablePicker } from "@/app/admin/prose/components/v-menu-view";
@@ -28,6 +29,7 @@ import { Button } from "@/components/ui/button";
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
   "user-confirm": userConfirm,
+  "variable-node": variableNode,
 });
 const myMarks = basicSchema.spec.marks.append({
   "my-mark": myMark,
