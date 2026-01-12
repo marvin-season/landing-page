@@ -77,6 +77,19 @@ export default function ProseMirrorEditor() {
     };
   }, []);
   return (
-    <div ref={editorRef} className="min-h-[600px] border border-red-500"></div>
+    <div>
+      <div ref={editorRef}></div>
+      <style global>{`
+        .ProseMirror {
+          min-height: 600px;
+          padding: 10px;
+          outline: none !important;
+        }
+        .ProseMirror-focused {
+          border: none;
+          outline: none !important;
+        }
+      `}</style>
+    </div>
   );
 }
