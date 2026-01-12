@@ -9,6 +9,10 @@ import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
+import {
+  insertIntoCursor,
+  toggleRedMark,
+} from "@/app/admin/prose/components/commands/tr-command";
 import initialJson from "@/app/admin/prose/components/data";
 import placeholderPlugin from "@/app/admin/prose/components/plugin/placeholder";
 import {
@@ -17,6 +21,7 @@ import {
   userConfirm,
 } from "@/app/admin/prose/components/scheam";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
+import { Button } from "@/components/ui/button";
 
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
@@ -71,6 +76,25 @@ export default function ProseMirrorEditor() {
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="p-4 border-b bg-gray-100 text-sm text-gray-500">
           提示：点击“确认”或“拒绝”会触发 Transaction，支持 Cmd+Z 撤销。
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => {
+              if (!viewRef.current) return;
+              insertIntoCursor(viewRef.current, "prosemirror is");
+            }}
+          >
+            insert
+          </Button>
+
+          <Button
+            onClick={() => {
+              if (!viewRef.current) return;
+              toggleRedMark(viewRef.current);
+            }}
+          >
+            toggleRedMark
+          </Button>
         </div>
         <div ref={editorRef} className="prose-container" />
       </div>
