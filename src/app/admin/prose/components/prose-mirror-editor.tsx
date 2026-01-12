@@ -1,71 +1,55 @@
 "use client";
 
-import { baseKeymap } from "prosemirror-commands";
-import { history, redo, undo } from "prosemirror-history";
-import { keymap } from "prosemirror-keymap";
-import { schema } from "prosemirror-schema-basic"; // 先用基础的，确保不出错
+import { DOMParser, Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef } from "react";
 
-// 必须引入基础结构样式，否则光标位置会错乱
-import "prosemirror-view/style/prosemirror.css";
+// 组合成一个最简单的 Schema
+const mySchema = new Schema({
+  nodes: {
+    doc: { content: "block+" },
+    paragraph: {
+      content: "inline*",
+      group: "block",
+      toDOM() {
+        return ["p", 0];
+      },
+      parseDOM: [{ tag: "p" }],
+    },
+    heading: {
+      content: "inline*",
+      group: "block",
+      toDOM() {
+        return ["h1", 0];
+      },
+      parseDOM: [{ tag: "h1" }],
+    },
+    text: { group: "inline" },
+  },
+});
 
-export default function BasicEditor() {
+export default function ProseMirrorEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
-
   useEffect(() => {
     if (!editorRef.current) return;
-
-    // 防止 React 严格模式下创建两个编辑器
-    if (viewRef.current) return;
-
-    const state = EditorState.create({
-      schema,
-      plugins: [
-        history(), // 允许撤销重做
-        keymap({
-          "Mod-z": undo,
-          "Mod-y": redo,
-        }),
-        keymap(baseKeymap), // 核心：绑定回车、删除、箭头移动等基础操作
-      ],
-    });
+    // 修复点 1：创建一个临时的 DOM 元素来承载初始 HTML 字符串
+    const tempElement = document.createElement("div");
+    tempElement.innerHTML = "<h1>Hello, world!</h1>";
 
     const view = new EditorView(editorRef.current, {
-      state,
-      dispatchTransaction(tr) {
-        const newState = view.state.apply(tr);
-        view.updateState(newState);
-      },
+      state: EditorState.create({
+        schema: mySchema,
+        // 修复点 2：DOMParser.fromSchema(...).parse(domElement)
+        doc: DOMParser.fromSchema(mySchema).parse(tempElement),
+      }),
     });
-
-    viewRef.current = view;
 
     return () => {
       view.destroy();
-      viewRef.current = null;
     };
   }, []);
-
   return (
-    <div className="m-10 border p-4 bg-white">
-      {/* 给编辑器一个类名并设置 min-height，否则没内容时你会点不到它 */}
-      <div
-        ref={editorRef}
-        className="prose max-w-none outline-none min-h-[150px]"
-      />
-      <style jsx global>{`
-        /* 关键：确保编辑器容器撑开，并且有焦点指示 */
-        .ProseMirror {
-          min-height: 150px;
-          outline: none;
-        }
-        .ProseMirror p {
-          margin-bottom: 1em;
-        }
-      `}</style>
-    </div>
+    <div ref={editorRef} className="min-h-[600px] border border-red-500"></div>
   );
 }
