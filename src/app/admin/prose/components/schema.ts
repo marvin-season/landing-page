@@ -17,22 +17,23 @@ const userConfirm: NodeSpec = {
 const variableNode: NodeSpec = {
   inline: true,
   group: "inline",
-  attrs: {
-    label: { default: "" } // 存储变量名，如 "userName"
-  },
+  content: "text*",
+  // attrs: {
+  //   label: { default: "" } // 存储变量名，如 "userName"
+  // },
   // atom: true 告诉编辑器这是一个原子，光标不能进入内部
-  atom: true, 
+  // atom: true, 
   // selectable: true 允许用户点击选中这个标签
   selectable: true,
   draggable: false,
-  toDOM(node) {
+  toDOM() {
     return [
       "span",
       { 
         class: "variable-tag", 
         style: `color: blue; background: #e6f7ff; border: 1px solid #91d5ff; padding: 0 4px; border-radius: 4px; font-size: 0.9em;` 
       },
-      `@${node.attrs.label}` // 直接显示属性内容，不使用 0
+      0 // 显示子节点
     ];
   },
 };

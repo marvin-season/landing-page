@@ -15,7 +15,6 @@ import {
   toggleRedMark,
 } from "@/app/admin/prose/components/commands/tr-command";
 import initialJson from "@/app/admin/prose/components/data";
-import placeholderPlugin from "@/app/admin/prose/components/plugin/placeholder";
 import { variablePlugin } from "@/app/admin/prose/components/plugin/variable-menu";
 import {
   myButton,
@@ -51,7 +50,7 @@ export default function ProseMirrorEditor() {
 
     const state = EditorState.create({
       schema,
-      doc: doc, // 直接传入转换后的文档对象
+      // doc: doc, // 直接传入转换后的文档对象
       plugins: [
         keymap({
           "Mod-z": undo,
@@ -59,7 +58,7 @@ export default function ProseMirrorEditor() {
         }),
         keymap(baseKeymap),
         history(),
-        placeholderPlugin("请输入内容..."),
+        // placeholderPlugin("请输入内容..."),
         variablePlugin(),
       ],
     });

@@ -55,14 +55,18 @@ export const VariablePicker = ({ view, options }: Props) => {
     // 3. 关闭菜单（设置元数据）
 
     // 1. 创建带属性的节点
-    const variableNode = view.state.schema.nodes["variable-node"].create({
-      label: val,
-    });
+    const variableNode = view.state.schema.nodes["variable-node"].create(
+      null,
+      view.state.schema.text(val),
+    );
     const { from } = view.state.selection;
-    const spaceNode = view.state.schema.text(" ");
-    // 2. 使用 replaceWith 执行：从 pos 开始，到 pos + 2 结束（即删掉 {），替换为新节点
+    // const spaceNode = view.state.schema.text(" ");
+    // 2. 使用 replaceWith 执行：替换为新节点
     const transaction = tr
-      .replaceWith(from, from + 1, [variableNode, spaceNode])
+      .replaceWith(from - 1, from, [
+        variableNode,
+        view.state.schema.text("\u200b"), // 零宽空格，不占用宽度
+      ])
       // 标记这是插件操作，防止被 apply 误杀
       .setMeta(variableMenuKey, { active: false, pos: 0 });
 
