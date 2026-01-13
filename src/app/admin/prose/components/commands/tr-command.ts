@@ -1,3 +1,4 @@
+import { Selection } from "prosemirror-state";
 import type { EditorView } from "prosemirror-view";
 
 export function insertIntoCursor(view: EditorView, value: string) {
@@ -35,5 +36,11 @@ export function toggleRedMark(view: EditorView) {
   }
 
   // 操作完成后让编辑器聚焦
+  view.focus();
+}
+
+export function focusAtEnd(view: EditorView) {
+  const tr = view.state.tr.setSelection(Selection.atEnd(view.state.doc));
+  view.dispatch(tr.scrollIntoView()); // scrollIntoView 确保视图滚动到最下方
   view.focus();
 }

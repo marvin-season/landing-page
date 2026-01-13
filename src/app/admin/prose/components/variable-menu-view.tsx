@@ -65,10 +65,10 @@ export const VariablePicker = ({ view, options }: Props) => {
     const variableNode = view.state.schema.nodes["variable-node"].create({
       label: val,
     });
-
-    // 2. 使用 replaceWith 执行：从 pos 开始，到 pos + 1 结束（即删掉 {），替换为新节点
+    const spaceNode = view.state.schema.text(" ");
+    // 2. 使用 replaceWith 执行：从 pos 开始，到 pos + 2 结束（即删掉 {），替换为新节点
     const transaction = tr
-      .replaceWith(pos, pos + 1, variableNode)
+      .replaceWith(pos, pos + 1, [variableNode, spaceNode])
       // 标记这是插件操作，防止被 apply 误杀
       .setMeta(variableMenuKey, { active: false, pos: 0 });
 

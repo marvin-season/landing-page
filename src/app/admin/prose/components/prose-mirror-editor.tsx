@@ -10,6 +10,7 @@ import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
 import {
+  focusAtEnd,
   insertIntoCursor,
   toggleRedMark,
 } from "@/app/admin/prose/components/commands/tr-command";
@@ -69,7 +70,8 @@ export default function ProseMirrorEditor() {
         "user-confirm": (...params) => new UserConfirmView(...params),
       },
     });
-
+    // 聚焦末尾
+    focusAtEnd(view);
     setView(view);
     return () => {
       view.destroy();
@@ -116,7 +118,12 @@ export default function ProseMirrorEditor() {
           padding: 20px;
           outline: none;
         }
-
+        .variable-tag.ProseMirror-selectednode {
+          outline: 2px solid #1890ff; /* 蓝色外轮廓 */
+          outline-offset: 1px;
+          background: #bae7ff !important; /* 加深背景色 */
+          box-shadow: 0 0 8px rgba(24, 144, 255, 0.5); /* 增加发光感 */
+        }
       `}</style>
     </div>
   );

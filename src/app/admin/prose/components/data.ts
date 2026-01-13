@@ -65,6 +65,21 @@ const initialJson = {
         },
       ],
     },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'variable-node',
+          attrs: {
+            label: 'userName',
+          },
+        },
+        {
+          type: 'text',
+          text: ' ',
+        }
+      ],
+    }
   ],
 };
 
