@@ -15,7 +15,7 @@ import {
 } from "@/app/admin/prose/components/commands/tr-command";
 import initialJson from "@/app/admin/prose/components/data";
 import placeholderPlugin from "@/app/admin/prose/components/plugin/placeholder";
-import { variablePlugin } from "@/app/admin/prose/components/plugin/v-menu";
+import { variablePlugin } from "@/app/admin/prose/components/plugin/variable-menu";
 import {
   myButton,
   myMark,
@@ -23,7 +23,7 @@ import {
   variableNode,
 } from "@/app/admin/prose/components/schema";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
-import { VariablePicker } from "@/app/admin/prose/components/v-menu-view";
+import { VariablePicker } from "@/app/admin/prose/components/variable-menu-view";
 import { Button } from "@/components/ui/button";
 
 const myNodes = basicSchema.spec.nodes.append({

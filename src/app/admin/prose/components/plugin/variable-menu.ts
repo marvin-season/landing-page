@@ -1,11 +1,11 @@
 import { Plugin, PluginKey } from "prosemirror-state";
 import { logger } from "@/lib/logger";
 
-export const varMenuKey = new PluginKey("variable-menu");
+export const variableMenuKey = new PluginKey("variable-menu");
 
 export const variablePlugin = () => {
   return new Plugin({
-    key: varMenuKey,
+    key: variableMenuKey,
     state: {
       init() {
         logger("init");
@@ -14,7 +14,7 @@ export const variablePlugin = () => {
       apply(tr, value) {
         logger("apply", tr, value);
         // 【关键修正】只有当文档内容真正变化（非当前插件操作）或选区移动时，才关闭菜单
-        const meta = tr.getMeta(varMenuKey);
+        const meta = tr.getMeta(variableMenuKey);
         if (meta !== undefined) return meta;
 
         // 如果用户移动了光标或输入了其他字符（且不是通过元数据更新的），则关闭
@@ -33,7 +33,7 @@ export const variablePlugin = () => {
           // 立即更新状态，记录位置（此时 { 即将输入到 from 位置）
           // 我们记录 from + 1，因为按下后字符会占 1 个位置
           setTimeout(() => {
-            const tr = view.state.tr.setMeta(varMenuKey, {
+            const tr = view.state.tr.setMeta(variableMenuKey, {
               active: true,
               pos: from,
             });

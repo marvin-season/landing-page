@@ -1,6 +1,6 @@
 import type { EditorView } from "prosemirror-view";
 import { useEffect, useState } from "react";
-import { varMenuKey } from "@/app/admin/prose/components/plugin/v-menu";
+import { variableMenuKey } from "@/app/admin/prose/components/plugin/variable-menu";
 
 interface Props {
   view: EditorView | null;
@@ -20,7 +20,7 @@ export const VariablePicker = ({ view, options }: Props) => {
 
     // 每一轮 Transaction 完成后，检查插件状态
     const update = () => {
-      const pluginState = varMenuKey.getState(view.state);
+      const pluginState = variableMenuKey.getState(view.state);
       if (pluginState?.active) {
         // 【关键】将文档位置转换为屏幕像素坐标
         const coords = view.coordsAtPos(pluginState.pos);
@@ -70,7 +70,7 @@ export const VariablePicker = ({ view, options }: Props) => {
     const transaction = tr
       .replaceWith(pos, pos + 1, variableNode)
       // 标记这是插件操作，防止被 apply 误杀
-      .setMeta(varMenuKey, { active: false, pos: 0 });
+      .setMeta(variableMenuKey, { active: false, pos: 0 });
 
     view.dispatch(transaction);
     view.focus(); // 让编辑器重新获得焦点
