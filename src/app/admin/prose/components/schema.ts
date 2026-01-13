@@ -24,7 +24,7 @@ const variableNode: NodeSpec = {
   atom: true, 
   // selectable: true 允许用户点击选中这个标签
   selectable: true,
-  draggable: true,
+  draggable: false,
   toDOM(node) {
     return [
       "span",
@@ -85,4 +85,4 @@ const myMark: MarkSpec = {
   ],
 };
 
-export { userConfirm,  myButton, myMark, variableNode };
+export { userConfirm, myButton, myMark, variableNode };

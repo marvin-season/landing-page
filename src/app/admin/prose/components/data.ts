@@ -10,28 +10,29 @@ const initialJson = {
           text: "Hello, world ",
         },
         {
+          type: "my-button",
+          content: [
+            {
+              type: "text",
+              text: "Click me",
+            },
+          ],
+        },
+        {
           type: "text",
           text: "(From JSON)!",
           marks: [
             {
               type: "my-mark",
               attrs: {
-                color: "red",
+                color: "blue",
               },
             },
           ],
         },
       ],
     },
-    {
-      type: "my-button",
-      content: [
-        {
-          type: "text",
-          text: "Click me",
-        },
-      ],
-    },
+
     {
       type: "user-confirm",
       attrs: {
@@ -60,7 +61,7 @@ const initialJson = {
         },
         {
           type: "text",
-          text: "。",
+          text: "hi",
         },
       ],
     },
