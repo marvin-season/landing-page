@@ -1,18 +1,21 @@
+import type { Node } from "prosemirror-model";
 import { Selection } from "prosemirror-state";
 import type { EditorView } from "prosemirror-view";
 
-export function insertIntoCursor(view: EditorView, value: string) {
+export function insertNode(view: EditorView, node: Node) {
   const { state, dispatch } = view;
   const { tr, selection } = state;
-
-  const insertTr = tr.insertText(value, selection.from);
-
+  const { from, to } = selection;
+  const insertTr = tr.replaceWith(from, to, node);
   dispatch(insertTr);
-
   view.focus();
 }
 
-export function toggleRedMark(view: EditorView) {
+export function insertText(view: EditorView, value: string) {
+  insertNode(view, view.state.schema.text(value));
+}
+
+export function toggleMark(view: EditorView, color: string) {
   const { state, dispatch } = view;
   const { tr, selection, schema } = state;
   const { from, to, empty } = selection;
@@ -31,7 +34,7 @@ export function toggleRedMark(view: EditorView) {
     dispatch(tr.removeMark(from, to, markType));
   } else {
     // 4. 如果没有，就添加它
-    const newMark = markType.create({ color: "red" });
+    const newMark = markType.create({ color });
     dispatch(tr.addMark(from, to, newMark));
   }
 

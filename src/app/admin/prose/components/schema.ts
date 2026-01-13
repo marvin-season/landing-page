@@ -18,7 +18,7 @@ const variableNode: NodeSpec = {
   inline: true,
   group: "inline",
   attrs: {
-    label: { default: "" } // 存储变量名，如 "userName"
+    label: { default: "" }, // 存储变量名，如 "userName"
   },
   // atom: true 告诉编辑器这是一个原子，光标不能进入内部
 
@@ -28,9 +28,9 @@ const variableNode: NodeSpec = {
   toDOM(node) {
     return [
       "span",
-      { 
-        class: "variable-tag", 
-        style: `color: blue; background: #e6f7ff; border: 1px solid #91d5ff; padding: 0 4px; border-radius: 4px; font-size: 0.9em;` 
+      {
+        class: "variable-tag",
+        style: `color: blue; background: #e6f7ff; border: 1px solid #91d5ff; padding: 0 4px; border-radius: 4px; font-size: 0.9em;`
       },
       `{${node.attrs.label}}` // 直接显示属性内容，不使用 0
     ];

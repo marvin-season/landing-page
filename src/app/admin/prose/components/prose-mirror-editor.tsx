@@ -9,12 +9,8 @@ import { schema as basicSchema } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
-import {
-  focusAtEnd,
-  insertIntoCursor,
-  toggleRedMark,
-} from "@/app/admin/prose/components/commands/tr-command";
-import initialJson from "@/app/admin/prose/components/data";
+import { ProseMirrorCommands } from "@/app/admin/prose/components/commands/prosemirror-commands";
+import { focusAtEnd } from "@/app/admin/prose/components/commands/tr-command";
 import { variablePlugin } from "@/app/admin/prose/components/plugin/variable-menu";
 import {
   myButton,
@@ -24,7 +20,6 @@ import {
 } from "@/app/admin/prose/components/schema";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
 import { VariablePicker } from "@/app/admin/prose/components/variable-menu-view";
-import { Button } from "@/components/ui/button";
 
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
@@ -46,7 +41,7 @@ export default function ProseMirrorEditor() {
     // 1. 定义你的初始数据对象 (通常从 API 获取)
 
     // 2. 将 JSON 转换为 ProseMirror 的 Node 对象
-    const doc = schema.nodeFromJSON(initialJson);
+    // const doc = schema.nodeFromJSON(initialJson);
 
     const state = EditorState.create({
       schema,
@@ -83,25 +78,7 @@ export default function ProseMirrorEditor() {
         <div className="p-4 border-b bg-gray-100 text-sm text-gray-500">
           提示：点击“确认”或“拒绝”会触发 Transaction，支持 Cmd+Z 撤销。
         </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => {
-              if (!view) return;
-              insertIntoCursor(view, "{");
-            }}
-          >
-            insert
-          </Button>
-
-          <Button
-            onClick={() => {
-              if (!view) return;
-              toggleRedMark(view);
-            }}
-          >
-            toggleRedMark
-          </Button>
-        </div>
+        {view && <ProseMirrorCommands view={view} />}
         <div ref={editorRef} className="prose-container" />
         <VariablePicker
           view={view}
