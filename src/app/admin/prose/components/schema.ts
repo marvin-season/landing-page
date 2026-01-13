@@ -17,12 +17,11 @@ const userConfirm: NodeSpec = {
 const variableNode: NodeSpec = {
   inline: true,
   group: "inline",
-  // content: "text*",
   attrs: {
     label: { default: "" } // 存储变量名，如 "userName"
   },
   // atom: true 告诉编辑器这是一个原子，光标不能进入内部
-  atom: true, 
+
   // selectable: true 允许用户点击选中这个标签
   selectable: true,
   draggable: false,

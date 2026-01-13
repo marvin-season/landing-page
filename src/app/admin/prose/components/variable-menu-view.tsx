@@ -49,24 +49,23 @@ export const VariablePicker = ({ view, options }: Props) => {
     if (!view) return;
     const { tr } = view.state;
 
-    // 事务操作：
-    // 1. 删除输入的 { (位置是 state.pos 到 state.pos + 1)
-    // 2. 插入选中的变量文字
-    // 3. 关闭菜单（设置元数据）
+    const { $from } = view.state.selection;
+    const index = $from.index();
+    if (
+      !$from.parent.canReplaceWith(
+        index,
+        index + 1,
+        view.state.schema.nodes["variable-node"],
+      )
+    )
+      return;
 
     // 1. 创建带属性的节点
     const variableNode = view.state.schema.nodes["variable-node"].create({
       label: val,
     });
-    const { from } = view.state.selection;
-    // const spaceNode = view.state.schema.text(" ");
-    // 2. 使用 replaceWith 执行：替换为新节点
     const transaction = tr
-      .replaceWith(from - 1, from, [
-        view.state.schema.text("\u200b"),
-        variableNode,
-        view.state.schema.text("\u200b"), // 零宽空格，不占用宽度
-      ])
+      .replaceWith(index, index + 1, variableNode)
       .setMeta(variableMenuKey, { active: false, pos: 0 });
 
     view.dispatch(transaction);

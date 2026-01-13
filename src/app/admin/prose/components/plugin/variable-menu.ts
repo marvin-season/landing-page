@@ -39,23 +39,6 @@ export const variablePlugin = () => {
             view.dispatch(tr);
           }, 10);
         }
-        // Backspace
-        if (event.key === "Backspace") {
-          // 判断当前光标节点是否是 variable-node
-          const { from } = view.state.selection;
-          logger("Backspace", from);
-
-          const node = view.state.doc.nodeAt(from - 2);
-          const nextNode = view.state.doc.nodeAt(from - 1);
-
-          if (node?.type.name === "variable-node" && nextNode?.type.name === "text" && nextNode.textContent === "\u200b") {
-            setTimeout(() => {
-              const tr = view.state.tr.delete(from - 2, from);
-              view.dispatch(tr);
-            }, 10);
-          }
-
-        }
         return false;
       },
     },
