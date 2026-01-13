@@ -63,6 +63,7 @@ export const VariablePicker = ({ view, options }: Props) => {
     // 2. 使用 replaceWith 执行：替换为新节点
     const transaction = tr
       .replaceWith(from - 1, from, [
+        view.state.schema.text("\u200b"),
         variableNode,
         view.state.schema.text("\u200b"), // 零宽空格，不占用宽度
       ])
