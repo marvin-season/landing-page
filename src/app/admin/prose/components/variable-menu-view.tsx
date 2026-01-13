@@ -3,36 +3,30 @@ import { useEffect, useState } from "react";
 import { variableMenuKey } from "@/app/admin/prose/components/plugin/variable-menu";
 
 interface Props {
-  view: EditorView | null;
+  view?: EditorView;
   options: string[];
 }
 
 export const VariablePicker = ({ view, options }: Props) => {
-  const [state, setState] = useState({
-    active: false,
+  const [state, setState] = useState<{
+    left: number;
+    top: number;
+    active?: boolean;
+  }>({
     left: 0,
     top: 0,
-    pos: 0,
   });
-
   useEffect(() => {
     if (!view) return;
-
-    // 每一轮 Transaction 完成后，检查插件状态
     const update = () => {
-      const pluginState = variableMenuKey.getState(view.state);
-      if (pluginState?.active) {
-        // 【关键】将文档位置转换为屏幕像素坐标
-        const coords = view.coordsAtPos(pluginState.pos);
-        setState({
-          active: true,
-          left: coords.left,
-          top: coords.bottom,
-          pos: pluginState.pos,
-        });
-      } else {
-        setState((s) => (s.active ? { ...s, active: false } : s));
-      }
+      const state = variableMenuKey.getState(view.state);
+      const { left, bottom } = view.coordsAtPos(view.state.selection.from);
+      setState((prev) => ({
+        ...prev,
+        left,
+        top: bottom,
+        active: state?.active,
+      }));
     };
 
     // 监听 view 的更新
@@ -54,7 +48,6 @@ export const VariablePicker = ({ view, options }: Props) => {
   const onSelect = (val: string) => {
     if (!view) return;
     const { tr } = view.state;
-    const { pos } = state;
 
     // 事务操作：
     // 1. 删除输入的 { (位置是 state.pos 到 state.pos + 1)
@@ -65,10 +58,11 @@ export const VariablePicker = ({ view, options }: Props) => {
     const variableNode = view.state.schema.nodes["variable-node"].create({
       label: val,
     });
+    const { from } = view.state.selection;
     const spaceNode = view.state.schema.text(" ");
     // 2. 使用 replaceWith 执行：从 pos 开始，到 pos + 2 结束（即删掉 {），替换为新节点
     const transaction = tr
-      .replaceWith(pos, pos + 1, [variableNode, spaceNode])
+      .replaceWith(from, from + 1, [variableNode, spaceNode])
       // 标记这是插件操作，防止被 apply 误杀
       .setMeta(variableMenuKey, { active: false, pos: 0 });
 
@@ -80,8 +74,8 @@ export const VariablePicker = ({ view, options }: Props) => {
     <div
       className="fixed z-999 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg py-1 min-w-[120px] max-h-[200px] overflow-y-auto"
       style={{
-        left: `${state.left}px`,
-        top: `${state.top + 5}px`,
+        left: `${state?.left}px`,
+        top: `${state?.top + 5}px`,
       }}
     >
       {options.map((opt) => (

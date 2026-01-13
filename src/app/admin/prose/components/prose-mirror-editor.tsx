@@ -104,12 +104,10 @@ export default function ProseMirrorEditor() {
           </Button>
         </div>
         <div ref={editorRef} className="prose-container" />
-        {view && (
-          <VariablePicker
-            view={view}
-            options={["userName", "orderId", "createTime"]}
-          />
-        )}
+        <VariablePicker
+          view={view}
+          options={["userName", "orderId", "createTime"]}
+        />
       </div>
 
       <style jsx global>{`
