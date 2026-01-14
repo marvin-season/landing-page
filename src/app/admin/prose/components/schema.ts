@@ -30,9 +30,9 @@ const variableNode: NodeSpec = {
       "span",
       {
         class: "variable-tag",
-        style: `color: blue; background: #e6f7ff; border: 1px solid #91d5ff; padding: 0 4px; border-radius: 4px; font-size: 0.9em;`
+        style: `color: blue; background: #e6f7ff; border: 1px solid #91d5ff; padding: 0 4px; border-radius: 4px; font-size: 0.9em;`,
       },
-      `{${node.attrs.label}}` // 直接显示属性内容，不使用 0
+      `{${node.attrs.label}}`, // 直接显示属性内容，不使用 0
     ];
   },
 };

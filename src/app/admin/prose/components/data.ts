@@ -66,20 +66,20 @@ const initialJson = {
       ],
     },
     {
-      type: 'paragraph',
+      type: "paragraph",
       content: [
         {
-          type: 'variable-node',
+          type: "variable-node",
           attrs: {
-            label: 'userName',
+            label: "userName",
           },
         },
         {
-          type: 'text',
-          text: ' ',
-        }
+          type: "text",
+          text: " ",
+        },
       ],
-    }
+    },
   ],
 };
 
