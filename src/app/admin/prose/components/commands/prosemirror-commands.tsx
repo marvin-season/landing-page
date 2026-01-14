@@ -45,13 +45,14 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
     {
       label: "Insert User Confirm",
       icon: <UserCheckIcon size={size} />,
-      onClick: () =>
+      onClick: () => {
         insertNode(
           view,
           view.state.schema.nodes["user-confirm"].create({
             label: "Click me",
           }),
-        ),
+        );
+      },
     },
     {
       icon: <PaletteIcon size={size} />,

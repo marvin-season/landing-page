@@ -4,7 +4,6 @@ import type { MarkSpec, NodeSpec } from "prosemirror-model";
 const userConfirm: NodeSpec = {
   inline: false,
   group: "block",
-  atom: true, // 设置为原子节点，不可直接编辑内部文字
   attrs: {
     status: { default: "pending" },
     userName: { default: "Guest" },
@@ -12,7 +11,7 @@ const userConfirm: NodeSpec = {
 };
 
 /**
- * variable mark
+ * variable node
  */
 const variableNode: NodeSpec = {
   inline: true,

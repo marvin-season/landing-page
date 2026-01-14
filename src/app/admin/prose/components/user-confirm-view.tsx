@@ -2,7 +2,6 @@ import type {
   EditorView,
   NodeView,
   NodeViewConstructor,
-  ViewMutationRecord,
 } from "prosemirror-view";
 
 export default class UserConfirmView implements NodeView {
@@ -45,13 +44,19 @@ export default class UserConfirmView implements NodeView {
   setSelection?:
     | ((anchor: number, head: number, root: Document | ShadowRoot) => void)
     | undefined;
-  stopEvent?: ((event: Event) => boolean) | undefined;
-  ignoreMutation?: ((mutation: ViewMutationRecord) => boolean) | undefined;
+  // stopEvent?: ((event: Event) => boolean) | undefined;
+  // ignoreMutation?: ((mutation: ViewMutationRecord) => boolean) | undefined;
   destroy?: (() => void) | undefined;
 
   updateAttributes(node: any) {
     this.dom.className = `user-confirm-node status-${node.attrs.status}`;
     this.dom.setAttribute("data-user", node.attrs.userName);
+  }
+  stopEvent() {
+    return true;
+  }
+  ignoreMutation() {
+    return true;
   }
 
   renderContents() {
