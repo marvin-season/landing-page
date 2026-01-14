@@ -30,9 +30,6 @@ export default function ProseMirrorEditor() {
   return (
     <div className="p-10 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="p-4 border-b bg-gray-100 text-sm text-gray-500">
-          提示：点击“确认”或“拒绝”会触发 Transaction，支持 Cmd+Z 撤销。
-        </div>
         {view && <ProseMirrorCommands view={view} />}
         <div ref={editorRef} className="prose-container" />
         {view && (

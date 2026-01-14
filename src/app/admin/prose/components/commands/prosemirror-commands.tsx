@@ -8,16 +8,18 @@ import {
 import type { EditorView } from "prosemirror-view";
 import { insertNode, insertText, toggleMark } from "./tr-command";
 
+const size = 14;
+
 export function ProseMirrorCommands({ view }: { view: EditorView }) {
   const commands = [
     {
       label: "Insert Text",
-      icon: <TextIcon size={12} />,
+      icon: <TextIcon size={size} />,
       onClick: () => insertText(view, "Hello, world!"),
     },
     {
       label: "Insert Variable",
-      icon: <VariableIcon size={12} />,
+      icon: <VariableIcon size={size} />,
       onClick: () =>
         insertNode(
           view,
@@ -28,7 +30,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
     },
     {
       label: "Insert Button",
-      icon: <SquarePenIcon size={12} />,
+      icon: <SquarePenIcon size={size} />,
       onClick: () =>
         insertNode(
           view,
@@ -42,7 +44,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
     },
     {
       label: "Insert User Confirm",
-      icon: <UserCheckIcon size={12} />,
+      icon: <UserCheckIcon size={size} />,
       onClick: () =>
         insertNode(
           view,
@@ -52,7 +54,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
         ),
     },
     {
-      icon: <PaletteIcon size={12} />,
+      icon: <PaletteIcon size={size} />,
       label: "Mark as Red",
       onClick: () => toggleMark(view, "red"),
     },
@@ -60,7 +62,11 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
   return (
     <div className="flex gap-2">
       {commands.map((command) => (
-        <div key={command.label} onClick={command.onClick}>
+        <div
+          key={command.label}
+          onClick={command.onClick}
+          className="cursor-pointer p-2 hover:text-blue-500"
+        >
           {command.icon}
         </div>
       ))}
