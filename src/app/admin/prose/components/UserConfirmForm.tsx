@@ -7,23 +7,16 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
   updateAttributes,
 }) => {
   return (
-    <div
-      style={{
-        border: "1px solid #007bff",
-        padding: "2px 8px",
-        borderRadius: "4px",
-        background: "#f0f7ff",
-        display: "flex",
-        gap: "8px",
-      }}
-    >
-      <span style={{ fontSize: "12px" }}>确认用户: {node.attrs.name}</span>
+    <div className="flex gap-2 border p-2 rounded-md">
+      <label>确认用户: </label>
       <input
         type="text"
-        style={{ width: "80px", border: "1px solid #ccc" }}
-        onChange={(e) => updateAttributes({ name: e.target.value })}
+        defaultValue={node.attrs.userName}
+        onChange={(e) => updateAttributes({ userName: e.target.value })}
       />
-      <button onClick={() => alert("提交成功")}>OK</button>
+      <button onClick={() => updateAttributes({ status: "confirmed" })}>
+        {node.attrs.status === "confirmed" ? "已确认" : "确认"}
+      </button>
     </div>
   );
 };
