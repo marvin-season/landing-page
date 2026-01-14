@@ -58,7 +58,10 @@ export const useNodeViewFactory = (): PortalProvider => {
     return () => (
       <>
         {[...portals.entries()].map(([container, { Component, props }]) =>
-          createPortal(<Component {...props} />, container),
+          createPortal(
+            <Component key={container.getAttribute("data-id")} {...props} />,
+            container,
+          ),
         )}
       </>
     );

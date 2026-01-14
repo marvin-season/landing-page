@@ -5,6 +5,7 @@ const userConfirm: NodeSpec = {
   inline: false,
   group: "block",
   attrs: {
+    id: { default: "" },
     status: { default: "pending" },
     userName: { default: "Guest" },
   },

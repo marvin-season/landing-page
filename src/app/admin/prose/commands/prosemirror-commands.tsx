@@ -50,6 +50,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
           view,
           view.state.schema.nodes["user-confirm"].create({
             label: "Click me",
+            id: "111",
           }),
         );
       },

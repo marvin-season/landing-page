@@ -6,6 +6,7 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
   node,
   updateAttributes,
 }) => {
+  console.log("node", node);
   return (
     <div className="flex gap-2 border p-2 rounded-md">
       <label>确认用户: </label>

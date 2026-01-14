@@ -33,6 +33,7 @@ export class ReactNodeView implements NodeView {
     // 创建容器
     this.dom = document.createElement("span");
     this.dom.classList.add("react-node-view-container");
+    this.dom.setAttribute("data-id", node.attrs.id);
     // 关键样式：确保行内块显示且不换行
     this.dom.style.display = "inline-block";
     this.dom.style.verticalAlign = "middle";
