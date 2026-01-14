@@ -46,6 +46,9 @@ export default function ProseMirrorEditor() {
           padding: 20px;
           outline: none;
         }
+        .ProseMirror-separator {
+          display: inline-block;
+        }
         .variable-tag.ProseMirror-selectednode {
           outline: 2px solid #1890ff; /* 蓝色外轮廓 */
           outline-offset: 1px;
