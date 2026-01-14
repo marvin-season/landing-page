@@ -3,7 +3,9 @@ import type {
   NodeView,
   NodeViewConstructor,
 } from "prosemirror-view";
-
+/**
+ * @deprecated 使用 ReactNodeView 代替
+ */
 export default class UserConfirmView implements NodeView {
   dom: HTMLElement;
   node: Parameters<NodeViewConstructor>[0];

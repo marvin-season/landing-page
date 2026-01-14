@@ -1,0 +1,68 @@
+import type { Node as PMNode } from "prosemirror-model";
+import type { EditorView } from "prosemirror-view";
+import type React from "react";
+import { useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+
+// 定义传递给 React 组件的 Props 接口
+export interface NodeViewProps {
+  node: PMNode;
+  view: EditorView;
+  getPos: () => number | undefined;
+  updateAttributes: (attrs: Record<string, any>) => void;
+}
+
+// Portal 管理器的工厂函数返回类型
+interface PortalProvider {
+  renderPortal: (
+    Component: React.ComponentType<NodeViewProps>,
+    props: NodeViewProps,
+    container: HTMLElement,
+  ) => void;
+  removePortal: (container: HTMLElement) => void;
+  PortalRenderer: React.ComponentType;
+}
+
+export const useNodeViewFactory = (): PortalProvider => {
+  const [portals, setPortals] = useState<
+    Map<
+      HTMLElement,
+      { Component: React.ComponentType<NodeViewProps>; props: NodeViewProps }
+    >
+  >(new Map());
+
+  const removePortal = useCallback((container: HTMLElement) => {
+    setPortals((prev) => {
+      const next = new Map(prev);
+      next.delete(container);
+      return next;
+    });
+  }, []);
+
+  const renderPortal = useCallback(
+    (
+      Component: React.ComponentType<NodeViewProps>,
+      props: NodeViewProps,
+      container: HTMLElement,
+    ) => {
+      setPortals((prev) => {
+        const next = new Map(prev);
+        next.set(container, { Component, props });
+        return next;
+      });
+    },
+    [],
+  );
+
+  const PortalRenderer = useMemo(() => {
+    return () => (
+      <>
+        {[...portals.entries()].map(([container, { Component, props }]) =>
+          createPortal(<Component {...props} />, container),
+        )}
+      </>
+    );
+  }, [portals]);
+
+  return { renderPortal, removePortal, PortalRenderer };
+};

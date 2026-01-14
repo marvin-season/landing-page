@@ -7,9 +7,12 @@ import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
 import { focusAtEnd } from "@/app/admin/prose/commands/tr-command";
-import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
+import { useNodeViewFactory } from "@/app/admin/prose/components/NodeViewPortal";
+import { ReactNodeView } from "@/app/admin/prose/components/ReactNodeView";
+import UserConfirmForm from "@/app/admin/prose/components/UserConfirmForm";
 import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
 export const useEditor = (schema: Schema) => {
+  const { renderPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);
   useEffect(() => {
@@ -29,9 +32,12 @@ export const useEditor = (schema: Schema) => {
     });
     const view = new EditorView(editorRef.current, {
       state,
-      // 关键：告诉编辑器，当遇到 user-confirm 节点时，用我的类来渲染
       nodeViews: {
-        "user-confirm": (...params) => new UserConfirmView(...params),
+        "user-confirm": (node, view, getPos) =>
+          new ReactNodeView(node, view, getPos, UserConfirmForm, {
+            renderPortal,
+            removePortal,
+          }),
       },
     });
     // 聚焦末尾
@@ -40,7 +46,7 @@ export const useEditor = (schema: Schema) => {
     return () => {
       view.destroy();
     };
-  }, [schema]);
+  }, [schema, renderPortal, removePortal]);
 
-  return { editorRef, view };
+  return { editorRef, view, renderPortal, removePortal, PortalRenderer };
 };

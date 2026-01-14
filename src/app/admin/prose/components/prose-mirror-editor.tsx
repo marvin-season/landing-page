@@ -26,10 +26,11 @@ const schema = new Schema({
   marks: myMarks,
 });
 export default function ProseMirrorEditor() {
-  const { editorRef, view } = useEditor(schema);
+  const { editorRef, view, PortalRenderer } = useEditor(schema);
   return (
     <div className="p-10 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <PortalRenderer />
         {view && <ProseMirrorCommands view={view} />}
         <div ref={editorRef} className="prose-container" />
         {view && (
