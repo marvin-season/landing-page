@@ -6,9 +6,9 @@ import type { Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
-import { focusAtEnd } from "@/app/admin/prose/components/commands/tr-command";
-import { variablePlugin } from "@/app/admin/prose/components/plugin/variable-menu";
+import { focusAtEnd } from "@/app/admin/prose/commands/tr-command";
 import UserConfirmView from "@/app/admin/prose/components/user-confirm-view";
+import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
 export const useEditor = (schema: Schema) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);

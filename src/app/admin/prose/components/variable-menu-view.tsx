@@ -1,6 +1,6 @@
 import type { EditorView } from "prosemirror-view";
 import { useEffect, useState } from "react";
-import { variableMenuKey } from "@/app/admin/prose/components/plugin/variable-menu";
+import { variableMenuKey } from "@/app/admin/prose/plugin/variable-menu";
 
 interface Props {
   view?: EditorView;
