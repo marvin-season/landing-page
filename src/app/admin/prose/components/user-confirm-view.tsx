@@ -27,6 +27,15 @@ export default class UserConfirmView implements NodeView {
         this.updateStatus("confirmed");
       if (target.classList.contains("btn-cancel"))
         this.updateStatus("canceled");
+      // remove node
+      if (target.classList.contains("remove")) {
+        const { state, dispatch } = view;
+        const pos = this.getPos();
+        if (!pos) return;
+        const tr = state.tr.delete(pos, pos + this.node.nodeSize);
+        dispatch(tr);
+        view.focus();
+      }
     });
   }
   contentDOM?: HTMLElement | null | undefined;
@@ -53,7 +62,8 @@ export default class UserConfirmView implements NodeView {
           isPending
             ? `
           <button class="btn-confirm">确认</button>
-          <button class="btn-cancel">拒绝</button>
+            <button class="btn-cancel">拒绝</button>
+            <button class="remove">删除</button>
         `
             : `<span class="status-text">${this.node.attrs.status === "confirmed" ? "✅ 已确认" : "❌ 已拒绝"}</span>`
         }
