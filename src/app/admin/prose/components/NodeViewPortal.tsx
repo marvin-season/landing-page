@@ -13,8 +13,8 @@ export interface NodeViewProps {
 }
 
 // Portal 管理器的工厂函数返回类型
-interface PortalProvider {
-  renderPortal: (
+export interface IPMPortalProvider {
+  addPortal: (
     Component: React.ComponentType<NodeViewProps>,
     props: NodeViewProps,
     container: HTMLElement,
@@ -23,7 +23,7 @@ interface PortalProvider {
   PortalRenderer: React.ComponentType;
 }
 
-export const useNodeViewFactory = (): PortalProvider => {
+export const useNodeViewFactory = (): IPMPortalProvider => {
   const [portals, setPortals] = useState<
     Map<
       HTMLElement,
@@ -39,7 +39,7 @@ export const useNodeViewFactory = (): PortalProvider => {
     });
   }, []);
 
-  const renderPortal = useCallback(
+  const addPortal = useCallback(
     (
       Component: React.ComponentType<NodeViewProps>,
       props: NodeViewProps,
@@ -67,5 +67,5 @@ export const useNodeViewFactory = (): PortalProvider => {
     );
   }, [portals]);
 
-  return { renderPortal, removePortal, PortalRenderer };
+  return { addPortal, removePortal, PortalRenderer };
 };

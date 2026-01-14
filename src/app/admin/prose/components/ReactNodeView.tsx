@@ -1,6 +1,6 @@
 import type { Node as PMNode } from "prosemirror-model";
 import type { EditorView, NodeView } from "prosemirror-view";
-import type { NodeViewProps } from "./NodeViewPortal";
+import type { IPMPortalProvider, NodeViewProps } from "./NodeViewPortal";
 
 export class ReactNodeView implements NodeView {
   dom: HTMLElement;
@@ -8,14 +8,7 @@ export class ReactNodeView implements NodeView {
   view: EditorView;
   getPos: () => number | undefined;
   component: React.ComponentType<NodeViewProps>;
-  factory: {
-    renderPortal: (
-      Component: React.ComponentType<NodeViewProps>,
-      props: NodeViewProps,
-      container: HTMLElement,
-    ) => void;
-    removePortal: (container: HTMLElement) => void;
-  };
+  factory: Pick<IPMPortalProvider, "addPortal" | "removePortal">;
 
   constructor(
     node: PMNode,
@@ -59,7 +52,7 @@ export class ReactNodeView implements NodeView {
       },
     };
 
-    this.factory.renderPortal(this.component, props, this.dom);
+    this.factory.addPortal(this.component, props, this.dom);
   }
 
   update(node: PMNode) {

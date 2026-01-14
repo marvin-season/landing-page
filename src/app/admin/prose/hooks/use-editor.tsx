@@ -12,7 +12,7 @@ import { ReactNodeView } from "@/app/admin/prose/components/ReactNodeView";
 import UserConfirmForm from "@/app/admin/prose/components/UserConfirmForm";
 import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
 export const useEditor = (schema: Schema) => {
-  const { renderPortal, removePortal, PortalRenderer } = useNodeViewFactory();
+  const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);
   useEffect(() => {
@@ -35,7 +35,7 @@ export const useEditor = (schema: Schema) => {
       nodeViews: {
         "user-confirm": (node, view, getPos) =>
           new ReactNodeView(node, view, getPos, UserConfirmForm, {
-            renderPortal,
+            addPortal,
             removePortal,
           }),
       },
@@ -46,7 +46,7 @@ export const useEditor = (schema: Schema) => {
     return () => {
       view.destroy();
     };
-  }, [schema, renderPortal, removePortal]);
+  }, [schema, addPortal, removePortal]);
 
-  return { editorRef, view, renderPortal, removePortal, PortalRenderer };
+  return { editorRef, view, PortalRenderer };
 };
