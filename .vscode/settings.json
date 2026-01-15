@@ -8,7 +8,9 @@
   "editor.defaultFormatter": "biomejs.biome",
   "cSpell.words": [
     "deepseek",
+    "gapcursor",
     "gsap",
+    "keymap",
     "partialize",
     "pcai",
     "prosemirror",

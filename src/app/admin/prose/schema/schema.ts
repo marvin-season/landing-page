@@ -6,6 +6,7 @@ const userConfirm: NodeSpec = {
   group: "block",
   atom: true,
   draggable: true,
+  allowGapCursor: true,
   attrs: {
     id: { default: "" },
     status: { default: "pending" },

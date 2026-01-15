@@ -1,4 +1,5 @@
 import { baseKeymap } from "prosemirror-commands";
+import { gapCursor } from "prosemirror-gapcursor";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
@@ -12,6 +13,7 @@ import { ReactNodeView } from "@/app/admin/prose/components/ReactNodeView";
 import UserConfirmForm from "@/app/admin/prose/components/UserConfirmForm";
 import initialJson from "@/app/admin/prose/data";
 import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
+
 export const useEditor = (schema: Schema) => {
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
@@ -31,6 +33,7 @@ export const useEditor = (schema: Schema) => {
         history(),
         // placeholderPlugin("请输入内容..."),
         variablePlugin(),
+        gapCursor(),
       ],
     });
     const view = new EditorView(editorRef.current, {
