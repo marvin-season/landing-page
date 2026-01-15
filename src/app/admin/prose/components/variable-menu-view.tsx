@@ -65,7 +65,7 @@ export const VariablePicker = ({ view, options }: Props) => {
       label: val,
     });
     const transaction = tr
-      .replaceWith(index, index + 1, variableNode)
+      .replaceWith($from.pos - 1, $from.pos, variableNode)
       .setMeta(variableMenuKey, { active: false, pos: 0 });
 
     view.dispatch(transaction);
