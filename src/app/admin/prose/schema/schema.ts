@@ -5,12 +5,19 @@ const userConfirm: NodeSpec = {
   inline: false,
   group: "block",
   atom: true,
-  draggable: false,
+  draggable: true,
   attrs: {
     id: { default: "" },
     status: { default: "pending" },
     userName: { default: "Guest" },
   },
+  toDOM() {
+    return [
+      "div",
+      { class: "user-confirm" },
+    ];
+  },
+  parseDOM: [{ tag: "div.user-confirm" }],
 };
 
 /**

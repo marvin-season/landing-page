@@ -10,14 +10,31 @@ const initialJson = {
         }
       ]
     },
-    // {
-    //   type: 'user-confirm',
-    //   attrs: {
-    //     id: '111',
-    //     status: 'pending',
-    //     userName: 'Lisa'
-    //   }
-    // }
+    {
+      type: 'user-confirm',
+      attrs: {
+        id: '111',
+        status: 'pending',
+        userName: 'Lisa'
+      }
+    },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Hello, world!'
+        }
+      ]
+    },
+    {
+      type: 'user-confirm',
+      attrs: {
+        id: '222',
+        status: 'pending',
+        userName: 'Lisa'
+      }
+    },
   ],
 };
 

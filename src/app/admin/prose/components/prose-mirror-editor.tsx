@@ -51,10 +51,8 @@ export default function ProseMirrorEditor() {
           display: inline-block;
         }
         .ProseMirror-selectednode {
-          outline: 1px solid #1890ff; /* 蓝色外轮廓 */
+          outline: 1px solid #1890cc; /* 蓝色外轮廓 */
           outline-offset: 1px;
-          background: #bae7ff !important; /* 加深背景色 */
-          box-shadow: 0 0 8px rgba(24, 144, 255, 0.5); /* 增加发光感 */
         }
       `}</style>
     </div>
