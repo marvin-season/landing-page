@@ -67,7 +67,11 @@ export class ReactNodeView implements NodeView {
   }
 
   // 拦截所有表单内部事件，防止 ProseMirror 误处理
-  stopEvent() {
+  stopEvent(event: Event) {
+    // 不拦截拖拽事件
+    if (event.type === "dragstart" || event.type === "dragend") {
+      return false;
+    }
     return true;
   }
 
