@@ -1,4 +1,5 @@
 import {
+  FileJson2Icon,
   PaletteIcon,
   SquarePenIcon,
   TextIcon,
@@ -12,6 +13,14 @@ const size = 14;
 
 export function ProseMirrorCommands({ view }: { view: EditorView }) {
   const commands = [
+    {
+      label: "Export To JSON",
+      icon: <FileJson2Icon size={size} />,
+      onClick: () => {
+        const json = view.state.doc.toJSON();
+        console.log(json);
+      },
+    },
     {
       label: "Insert Text",
       icon: <TextIcon size={size} />,

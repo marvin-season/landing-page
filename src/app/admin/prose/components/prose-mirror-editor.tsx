@@ -31,14 +31,16 @@ export default function ProseMirrorEditor() {
     <div className="p-10 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <PortalRenderer />
-        {view && <ProseMirrorCommands view={view} />}
-        <div ref={editorRef} className="prose-container" />
         {view && (
-          <VariablePicker
-            view={view}
-            options={["userName", "orderId", "createTime"]}
-          />
+          <>
+            <ProseMirrorCommands view={view} />
+            <VariablePicker
+              view={view}
+              options={["userName", "orderId", "createTime"]}
+            />
+          </>
         )}
+        <div ref={editorRef} className="prose-container" />
       </div>
 
       <style jsx global>{`
