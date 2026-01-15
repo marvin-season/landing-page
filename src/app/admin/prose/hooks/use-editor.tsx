@@ -10,6 +10,7 @@ import { focusAtEnd } from "@/app/admin/prose/commands/tr-command";
 import { useNodeViewFactory } from "@/app/admin/prose/components/NodeViewPortal";
 import { ReactNodeView } from "@/app/admin/prose/components/ReactNodeView";
 import UserConfirmForm from "@/app/admin/prose/components/UserConfirmForm";
+import initialJson from "@/app/admin/prose/data";
 import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
 export const useEditor = (schema: Schema) => {
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
@@ -17,8 +18,10 @@ export const useEditor = (schema: Schema) => {
   const [view, setView] = useState<EditorView | null>(null);
   useEffect(() => {
     if (!editorRef.current) return;
+    const doc = schema.nodeFromJSON(initialJson);
     const state = EditorState.create({
       schema,
+      doc,
       plugins: [
         keymap({
           "Mod-z": undo,

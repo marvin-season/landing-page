@@ -6,18 +6,17 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
   node,
   updateAttributes,
 }) => {
-  console.log("node", node);
   return (
-    <div className="flex gap-2 border p-2 rounded-md">
-      <label>确认用户: </label>
+    <div className="flex flex-col gap-2 border p-2 rounded-md ">
+      <label htmlFor="userName" className="text-sm">
+        确认用户: <span className="text-gray-500">{node.attrs.status}</span>
+      </label>
       <input
+        id="userName"
         type="text"
         defaultValue={node.attrs.userName}
-        onChange={(e) => updateAttributes({ userName: e.target.value })}
+        onBlur={(e) => updateAttributes({ userName: e.target.value })}
       />
-      <button onClick={() => updateAttributes({ status: "confirmed" })}>
-        {node.attrs.status === "confirmed" ? "已确认" : "确认"}
-      </button>
     </div>
   );
 };
