@@ -13,10 +13,7 @@ const userConfirm: NodeSpec = {
     userName: { default: "Guest" },
   },
   toDOM() {
-    return [
-      "div",
-      { class: "user-confirm" },
-    ];
+    return ["div", { class: "user-confirm" }];
   },
   parseDOM: [{ tag: "div.user-confirm" }],
 };

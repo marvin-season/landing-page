@@ -21,8 +21,7 @@ export function Mine() {
               alt="Marvin"
               width={36}
               height={36}
-              className="rounded-full"
-              objectFit="cover"
+              className="rounded-full object-cover"
             />
           </div>
         }

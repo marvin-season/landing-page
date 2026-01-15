@@ -11,7 +11,8 @@ const { locales } = linguiConfig;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isExcludePath = pathname.startsWith("/admin") || pathname.startsWith("/prose");
+  const isExcludePath =
+    pathname.startsWith("/admin") || pathname.startsWith("/prose");
   if (isExcludePath) {
     return NextResponse.next();
   }
