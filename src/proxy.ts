@@ -11,11 +11,6 @@ const { locales } = linguiConfig;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isExcludePath =
-    pathname.startsWith("/admin") || pathname.startsWith("/prose");
-  if (isExcludePath) {
-    return NextResponse.next();
-  }
 
   // Skip i18n routing for SEO files
   const seoFiles = ["/manifest.json", "/robots.txt", "/sitemap.xml"];
@@ -60,6 +55,6 @@ export const config = {
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|api|chat|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!_next/static|api|chat|admin|prose|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };
