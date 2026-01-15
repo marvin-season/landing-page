@@ -1,14 +1,15 @@
-import type { Node as PMNode } from "prosemirror-model";
-import type { EditorView } from "prosemirror-view";
+import type { NodeViewConstructor } from "prosemirror-view";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+type NodeViewConstructorParams = Parameters<NodeViewConstructor>;
+
 // 定义传递给 React 组件的 Props 接口
 export interface NodeViewProps {
-  node: PMNode;
-  view: EditorView;
-  getPos: () => number | undefined;
+  node: NodeViewConstructorParams[0];
+  view: NodeViewConstructorParams[1];
+  getPos: NodeViewConstructorParams[2];
   updateAttributes: (attrs: Record<string, any>) => void;
 }
 

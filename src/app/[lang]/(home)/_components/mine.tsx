@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import Image from "next/image";
 import Link from "next/link";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 
@@ -11,10 +12,24 @@ const getMotionProps = (delay: number = 0) => ({
 export function Mine() {
   return (
     <div className="lg:max-w-xl mx-auto px-6 py-10 space-y-8">
-      <Section title="Marvin">
-        <div className="text-slate-350">
+      <Section
+        title={
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold select-none">Marvin</span>
+            <Image
+              src="/avatar.gif"
+              alt="Marvin"
+              width={36}
+              height={36}
+              className="rounded-full"
+              objectFit="cover"
+            />
+          </div>
+        }
+      >
+        <span className="text-slate-350">
           <Trans>Software Engineer</Trans>
-        </div>
+        </span>
       </Section>
       <Section title="Links" delay={0.05}>
         <Nav href={"/chat"}>
@@ -64,7 +79,7 @@ function Section({
   delay = 0,
 }: {
   children: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   delay?: number;
 }) {
   return (
