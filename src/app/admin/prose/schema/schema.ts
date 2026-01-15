@@ -4,6 +4,8 @@ import type { MarkSpec, NodeSpec } from "prosemirror-model";
 const userConfirm: NodeSpec = {
   inline: false,
   group: "block",
+  atom: true,
+  draggable: false,
   attrs: {
     id: { default: "" },
     status: { default: "pending" },

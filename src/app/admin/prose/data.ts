@@ -2,19 +2,23 @@ const initialJson = {
   type: "doc",
   content: [
     {
-      type: "paragraph",
+      type: 'paragraph',
       content: [
         {
-          type: 'user-confirm',
-          attrs: {
-            id: '111',
-            status: 'pending',
-            userName: 'Lisa'
-          }
+          type: 'text',
+          text: 'Hello, world!'
         }
-      ],
+      ]
+    },
+    {
+      type: 'user-confirm',
+      attrs: {
+        id: '111',
+        status: 'pending',
+        userName: 'Lisa'
+      }
     }
-  ]
+  ],
 };
 
 export default initialJson;
