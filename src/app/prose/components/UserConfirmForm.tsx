@@ -1,5 +1,5 @@
 import type React from "react";
-import type { NodeViewProps } from "@/app/admin/prose/components/NodeViewPortal";
+import type { NodeViewProps } from "@/app/prose/components/NodeViewPortal";
 
 // 你的 React 表单组件
 const UserConfirmForm: React.FC<NodeViewProps> = ({

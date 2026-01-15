@@ -7,12 +7,12 @@ import type { Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
-import { focusAtEnd } from "@/app/admin/prose/commands/tr-command";
-import { useNodeViewFactory } from "@/app/admin/prose/components/NodeViewPortal";
-import { ReactNodeView } from "@/app/admin/prose/components/ReactNodeView";
-import UserConfirmForm from "@/app/admin/prose/components/UserConfirmForm";
-import initialJson from "@/app/admin/prose/data";
-import { variablePlugin } from "@/app/admin/prose/plugin/variable-menu";
+import { focusAtEnd } from "@/app/prose/commands/tr-command";
+import { useNodeViewFactory } from "@/app/prose/components/NodeViewPortal";
+import { ReactNodeView } from "@/app/prose/components/ReactNodeView";
+import UserConfirmForm from "@/app/prose/components/UserConfirmForm";
+import initialJson from "@/app/prose/data";
+import { variablePlugin } from "@/app/prose/plugin/variable-menu";
 
 export const useEditor = (schema: Schema) => {
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();

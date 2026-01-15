@@ -3,15 +3,15 @@
 // 1. 引入必要的命令和按键绑定
 import { Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
-import { ProseMirrorCommands } from "@/app/admin/prose/commands/prosemirror-commands";
-import { VariablePicker } from "@/app/admin/prose/components/variable-menu-view";
-import { useEditor } from "@/app/admin/prose/hooks/use-editor";
+import { ProseMirrorCommands } from "@/app/prose/commands/prosemirror-commands";
+import { VariablePicker } from "@/app/prose/components/variable-menu-view";
+import { useEditor } from "@/app/prose/hooks/use-editor";
 import {
   myButton,
   myMark,
   userConfirm,
   variableNode,
-} from "@/app/admin/prose/schema/schema";
+} from "@/app/prose/schema/schema";
 
 const myNodes = basicSchema.spec.nodes.append({
   "my-button": myButton,
