@@ -1,10 +1,7 @@
 import { Plugin, PluginKey } from "prosemirror-state";
 import { logger } from "@/lib/logger";
 
-export const variableMenuKey = new PluginKey(
-  "variable-menu",
-);
-
+export const variableMenuKey = new PluginKey("variable-menu");
 
 export const variablePlugin = () => {
   return new Plugin({
@@ -33,12 +30,16 @@ export const variablePlugin = () => {
 
         // 检测 { 键（Shift + [ 或直接输入 {）
         if (event.key === "{" || (event.key === "[" && event.shiftKey)) {
+          // const tr = view.state.tr.setMeta(variableMenuKey, {
+          //   active: true,
+          // });
+          // view.dispatch(tr);
+          // 使用 setProps 方式更高效：
+          // 1. 不需要创建 Transaction，避免状态管理开销
+          // 2. 不需要经过 Plugin 的 apply 流程，避免插件处理开销
+          // 3. 不会触发不必要的编辑器重新渲染
+          // 4. 直接更新 props，性能最优
           setTimeout(() => {
-            // const tr = view.state.tr.setMeta(variableMenuKey, {
-            //   active: true,
-            // });
-            // view.dispatch(tr);
-            console.log("update emit", view.props);
             view.setProps({
               active: true,
             });

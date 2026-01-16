@@ -33,55 +33,46 @@ export const VariablePicker = ({ view, options }: Props) => {
   useEffect(() => {
     if (!view) return;
 
-    const updater = (active: boolean) => {
-      setState((prev) => {
-        return { ...prev, active };
-      });
+    // 更新菜单状态和位置
+    const updateMenu = (active: boolean) => {
+      if (!active) {
+        setState((prev) => (prev.active ? { ...prev, active: false } : prev));
+        return;
+      }
 
       try {
         const { left, bottom } = view.coordsAtPos(view.state.selection.from);
-        setState((prev) => ({
-          ...prev,
+        setState({
           left,
           top: bottom,
-        }));
+          active: true,
+        });
       } catch {
         // 如果坐标计算失败，关闭菜单
         setState((prev) => ({ ...prev, active: false }));
       }
     };
 
-    // 初始更新
-    // updater();
+    // 初始检查
+    updateMenu(view.props.active ?? false);
 
-    // 使用更高效的方式：通过 Plugin 的 update 钩子来监听状态变化
-    // 创建一个自定义的更新机制，在每次事务后检查状态
-    let rafId: number | null = null;
-    let lastState = view.state;
-
-    const scheduleUpdate = (active: boolean) => {
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(() => {
-        if (view.state !== lastState) {
-          lastState = view.state;
-          updater(active);
-        }
-        rafId = null;
-      });
-    };
-
-    // 监听视图更新
+    // 监听 props 变化：使用 setProps 方式更高效
+    // 因为 setProps 只更新 props，不会创建 Transaction 或更新 EditorState
+    // 性能优势：
+    // 1. 不需要创建 Transaction（避免状态管理开销）
+    // 2. 不需要经过 Plugin 的 apply 流程（避免插件处理开销）
+    // 3. 不会触发不必要的编辑器重新渲染
+    // 4. 直接更新 props，然后通过 update 方法通知，开销最小
     const originalUpdate = view.update;
-    view.update = function (state) {
-      console.log("update listener", state);
-      originalUpdate.call(this, state);
-      scheduleUpdate(state.active ?? false);
+    view.update = function (props) {
+      originalUpdate.call(this, props);
+      // 当 props.active 变化时更新菜单
+      if (props.active !== undefined) {
+        updateMenu(props.active);
+      }
     };
 
     return () => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
       view.update = originalUpdate;
     };
   }, [view]);
