@@ -1,6 +1,7 @@
 import TankQueryClientProvider from "@/components/trpc/provider";
 import "@/css/globals.css";
-export default function AdminLayout({
+
+export default function ProseLayout({
   children,
 }: {
   children: React.ReactNode;

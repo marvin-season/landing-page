@@ -18,8 +18,10 @@ export const useEditor = (schema: Schema) => {
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);
+
   useEffect(() => {
     if (!editorRef.current) return;
+
     const doc = schema.nodeFromJSON(initialJson);
     const state = EditorState.create({
       schema,
@@ -31,12 +33,12 @@ export const useEditor = (schema: Schema) => {
         }),
         keymap(baseKeymap),
         history(),
-        // placeholderPlugin("请输入内容..."),
         variablePlugin(),
         gapCursor(),
       ],
     });
-    const view = new EditorView(editorRef.current, {
+
+    const editorView = new EditorView(editorRef.current, {
       state,
       nodeViews: {
         "user-confirm": (node, view, getPos) =>
@@ -46,11 +48,14 @@ export const useEditor = (schema: Schema) => {
           }),
       },
     });
+
     // 聚焦末尾
-    focusAtEnd(view);
-    setView(view);
+    focusAtEnd(editorView);
+    setView(editorView);
+
     return () => {
-      view.destroy();
+      editorView.destroy();
+      setView(null);
     };
   }, [schema, addPortal, removePortal]);
 

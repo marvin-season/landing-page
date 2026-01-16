@@ -7,28 +7,35 @@ import {
   VariableIcon,
 } from "lucide-react";
 import type { EditorView } from "prosemirror-view";
+import { Button } from "@/components/ui/button";
 import { insertNode, insertText, toggleMark } from "./tr-command";
 
-const size = 14;
+const ICON_SIZE = 16;
+
+interface Command {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}
 
 export function ProseMirrorCommands({ view }: { view: EditorView }) {
-  const commands = [
+  const commands: Command[] = [
     {
       label: "Export To JSON",
-      icon: <FileJson2Icon size={size} />,
+      icon: <FileJson2Icon size={ICON_SIZE} />,
       onClick: () => {
         const json = view.state.doc.toJSON();
-        console.log(json);
+        console.log(JSON.stringify(json, null, 2));
       },
     },
     {
       label: "Insert Text",
-      icon: <TextIcon size={size} />,
+      icon: <TextIcon size={ICON_SIZE} />,
       onClick: () => insertText(view, "Hello, world!"),
     },
     {
       label: "Insert Variable",
-      icon: <VariableIcon size={size} />,
+      icon: <VariableIcon size={ICON_SIZE} />,
       onClick: () =>
         insertNode(
           view,
@@ -39,7 +46,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
     },
     {
       label: "Insert Button",
-      icon: <SquarePenIcon size={size} />,
+      icon: <SquarePenIcon size={ICON_SIZE} />,
       onClick: () =>
         insertNode(
           view,
@@ -53,33 +60,39 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
     },
     {
       label: "Insert User Confirm",
-      icon: <UserCheckIcon size={size} />,
+      icon: <UserCheckIcon size={ICON_SIZE} />,
       onClick: () => {
+        const id = `confirm-${Date.now()}`;
         insertNode(
           view,
           view.state.schema.nodes["user-confirm"].create({
-            label: "Click me",
-            id: "111",
+            id,
+            status: "pending",
+            userName: "Guest",
           }),
         );
       },
     },
     {
-      icon: <PaletteIcon size={size} />,
       label: "Mark as Red",
+      icon: <PaletteIcon size={ICON_SIZE} />,
       onClick: () => toggleMark(view, "red"),
     },
   ];
+
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 p-2 border-b">
       {commands.map((command) => (
-        <div
+        <Button
           key={command.label}
+          variant="ghost"
+          size="icon"
           onClick={command.onClick}
-          className="cursor-pointer p-2 hover:text-blue-500"
+          title={command.label}
+          className="h-8 w-8"
         >
           {command.icon}
-        </div>
+        </Button>
       ))}
     </div>
   );

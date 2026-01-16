@@ -7,39 +7,73 @@ interface Props {
   options: string[];
 }
 
+interface MenuState {
+  left: number;
+  top: number;
+  active?: boolean;
+}
+
 export const VariablePicker = ({ view, options }: Props) => {
-  const [state, setState] = useState<{
-    left: number;
-    top: number;
-    active?: boolean;
-  }>({
+  const [state, setState] = useState<MenuState>({
     left: 0,
     top: 0,
+    active: false,
   });
+
   useEffect(() => {
     if (!view) return;
+
     const update = () => {
-      const state = variableMenuKey.getState(view.state);
-      const { left, bottom } = view.coordsAtPos(view.state.selection.from);
-      setState((prev) => ({
-        ...prev,
-        left,
-        top: bottom,
-        active: state?.active,
-      }));
+      const pluginState = variableMenuKey.getState(view.state);
+      if (!pluginState?.active) {
+        setState((prev) => (prev.active ? { ...prev, active: false } : prev));
+        return;
+      }
+
+      try {
+        const { left, bottom } = view.coordsAtPos(view.state.selection.from);
+        setState({
+          left,
+          top: bottom,
+          active: true,
+        });
+      } catch {
+        // 如果坐标计算失败，关闭菜单
+        setState((prev) => ({ ...prev, active: false }));
+      }
     };
 
-    // 监听 view 的更新
-    // 注意：如果你的 EditorView 是在 useEffect 里创建的，可以手动调用 update
-    // 或者利用 view 内部的 dispatchTransaction 钩子
-    const originalDispatch = view.dispatch;
-    view.dispatch = (tr) => {
-      originalDispatch.call(view, tr);
-      update();
+    // 初始更新
+    update();
+
+    // 使用更高效的方式：通过 Plugin 的 update 钩子来监听状态变化
+    // 创建一个自定义的更新机制，在每次事务后检查状态
+    let rafId: number | null = null;
+    let lastState = view.state;
+
+    const scheduleUpdate = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        if (view.state !== lastState) {
+          lastState = view.state;
+          update();
+        }
+        rafId = null;
+      });
+    };
+
+    // 监听视图更新
+    const originalUpdate = view.update;
+    view.update = function (state) {
+      originalUpdate.call(this, state);
+      scheduleUpdate();
     };
 
     return () => {
-      view.dispatch = originalDispatch;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      view.update = originalUpdate;
     };
   }, [view]);
 

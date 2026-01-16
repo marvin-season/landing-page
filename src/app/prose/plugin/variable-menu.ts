@@ -30,8 +30,8 @@ export const variablePlugin = () => {
       handleKeyDown(view, event) {
         logger("handleKeyDown");
 
-        // 检测 { 键
-        if (event.key === "{" && !event.shiftKey === false) {
+        // 检测 { 键（Shift + [ 或直接输入 {）
+        if (event.key === "{" || (event.key === "[" && event.shiftKey)) {
           // 立即更新状态，记录位置（此时 { 即将输入到 from 位置）
           // 我们记录 from + 1，因为按下后字符会占 1 个位置
           setTimeout(() => {

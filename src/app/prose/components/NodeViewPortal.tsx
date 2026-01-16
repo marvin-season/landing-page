@@ -58,12 +58,10 @@ export const useNodeViewFactory = (): IPMPortalProvider => {
   const PortalRenderer = useMemo(() => {
     return () => (
       <>
-        {[...portals.entries()].map(([container, { Component, props }]) =>
-          createPortal(
-            <Component key={container.getAttribute("data-id")} {...props} />,
-            container,
-          ),
-        )}
+        {[...portals.entries()].map(([container, { Component, props }]) => {
+          const id = container.getAttribute("data-id") || container.outerHTML;
+          return createPortal(<Component key={id} {...props} />, container);
+        })}
       </>
     );
   }, [portals]);

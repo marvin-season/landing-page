@@ -2,6 +2,10 @@ import type { Node as PMNode } from "prosemirror-model";
 import type { EditorView, NodeView } from "prosemirror-view";
 import type { IPMPortalProvider, NodeViewProps } from "./NodeViewPortal";
 
+/**
+ * ReactNodeView 实现了 ProseMirror 的 NodeView 接口
+ * 用于将 React 组件渲染到 ProseMirror 编辑器中
+ */
 export class ReactNodeView implements NodeView {
   dom: HTMLElement;
   node: PMNode;
@@ -23,10 +27,12 @@ export class ReactNodeView implements NodeView {
     this.component = component;
     this.factory = factory;
 
-    // 创建容器
+    // 创建容器 DOM 元素
     this.dom = document.createElement("span");
     this.dom.classList.add("react-node-view-container");
-    this.dom.setAttribute("data-id", node.attrs.id);
+    // 使用节点 ID 或生成唯一标识符
+    const nodeId = node.attrs.id || `node-${Date.now()}-${Math.random()}`;
+    this.dom.setAttribute("data-id", String(nodeId));
     // 关键样式：确保行内块显示且不换行
     this.dom.style.display = "inline-block";
     this.dom.style.verticalAlign = "middle";
