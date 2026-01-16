@@ -2,6 +2,16 @@ import type { EditorView } from "prosemirror-view";
 import { useEffect, useState } from "react";
 import { variableMenuKey } from "@/app/prose/plugin/variable-menu";
 
+// 扩展 DirectEditorProps 类型，添加 active 属性
+declare module "prosemirror-view" {
+  interface DirectEditorProps {
+    /**
+     * 是否显示变量菜单
+     */
+    active?: boolean;
+  }
+}
+
 interface Props {
   view?: EditorView;
   options: string[];
@@ -23,20 +33,18 @@ export const VariablePicker = ({ view, options }: Props) => {
   useEffect(() => {
     if (!view) return;
 
-    const update = () => {
-      const pluginState = variableMenuKey.getState(view.state);
-      if (!pluginState?.active) {
-        setState((prev) => (prev.active ? { ...prev, active: false } : prev));
-        return;
-      }
+    const updater = (active: boolean) => {
+      setState((prev) => {
+        return { ...prev, active };
+      });
 
       try {
         const { left, bottom } = view.coordsAtPos(view.state.selection.from);
-        setState({
+        setState((prev) => ({
+          ...prev,
           left,
           top: bottom,
-          active: true,
-        });
+        }));
       } catch {
         // 如果坐标计算失败，关闭菜单
         setState((prev) => ({ ...prev, active: false }));
@@ -44,19 +52,19 @@ export const VariablePicker = ({ view, options }: Props) => {
     };
 
     // 初始更新
-    update();
+    // updater();
 
     // 使用更高效的方式：通过 Plugin 的 update 钩子来监听状态变化
     // 创建一个自定义的更新机制，在每次事务后检查状态
     let rafId: number | null = null;
     let lastState = view.state;
 
-    const scheduleUpdate = () => {
+    const scheduleUpdate = (active: boolean) => {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
         if (view.state !== lastState) {
           lastState = view.state;
-          update();
+          updater(active);
         }
         rafId = null;
       });
@@ -65,8 +73,9 @@ export const VariablePicker = ({ view, options }: Props) => {
     // 监听视图更新
     const originalUpdate = view.update;
     view.update = function (state) {
+      console.log("update listener", state);
       originalUpdate.call(this, state);
-      scheduleUpdate();
+      scheduleUpdate(state.active ?? false);
     };
 
     return () => {
@@ -104,6 +113,8 @@ export const VariablePicker = ({ view, options }: Props) => {
 
     view.dispatch(transaction);
     view.focus(); // 让编辑器重新获得焦点
+
+    view.setProps({ active: false });
   };
 
   return (
