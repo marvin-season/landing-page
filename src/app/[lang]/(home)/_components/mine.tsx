@@ -40,7 +40,7 @@ export function Mine() {
         <Nav href={"/admin/ppt"}>
           <Trans>A Simple PPT Generator</Trans>
         </Nav>
-        <Nav href={"https://ds.fuelstack.icu"}>
+        <Nav href={"https://marvin-season.github.io/registry-template/"}>
           <Trans>Design System & Component Libs</Trans>
         </Nav>
       </Section>
