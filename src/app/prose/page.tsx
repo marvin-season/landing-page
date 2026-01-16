@@ -1,4 +1,4 @@
-import ProseMirrorEditor from "./components/prose-mirror-editor";
+import ProseMirrorEditor from "./components/ProseMirrorEditor";
 
 export default function ProsePage() {
   return <ProseMirrorEditor />;

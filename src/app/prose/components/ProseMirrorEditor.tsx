@@ -2,13 +2,13 @@
 
 import { useMemo } from "react";
 import { ProseMirrorCommands } from "@/app/prose/commands/prosemirror-commands";
-import { VariablePicker } from "@/app/prose/components/variable-menu-view";
+import { VariablePicker } from "@/app/prose/components/VariableMenuView";
 import { useEditor } from "@/app/prose/hooks/use-editor";
 import { createProseMirrorSchema } from "@/app/prose/schema/create-schema";
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);
-  const { editorRef, view, PortalRenderer } = useEditor(schema);
+  const { editorRef, view, PortalRenderer } = useEditor({ schema });
 
   return (
     <div className="p-10 bg-gray-50 min-h-screen">

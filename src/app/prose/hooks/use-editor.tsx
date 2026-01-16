@@ -3,7 +3,7 @@ import { gapCursor } from "prosemirror-gapcursor";
 // 1. 引入必要的命令和按键绑定
 import { history, redo, undo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
-import type { Schema } from "prosemirror-model";
+import type { Node, Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
@@ -11,10 +11,11 @@ import { focusAtEnd } from "@/app/prose/commands/tr-command";
 import { useNodeViewFactory } from "@/app/prose/components/NodeViewPortal";
 import { ReactNodeView } from "@/app/prose/components/ReactNodeView";
 import UserConfirmForm from "@/app/prose/components/UserConfirmForm";
-import initialJson from "@/app/prose/data";
+import placeholderPlugin from "@/app/prose/plugin/placeholder";
 import { variablePlugin } from "@/app/prose/plugin/variable-menu";
 
-export const useEditor = (schema: Schema) => {
+export const useEditor = (props: { schema: Schema; doc?: Node }) => {
+  const { schema, doc } = props;
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);
@@ -22,7 +23,6 @@ export const useEditor = (schema: Schema) => {
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const doc = schema.nodeFromJSON(initialJson);
     const state = EditorState.create({
       schema,
       doc,
@@ -35,6 +35,7 @@ export const useEditor = (schema: Schema) => {
         history(),
         variablePlugin(),
         gapCursor(),
+        placeholderPlugin("Please enter your content here..."),
       ],
     });
 
@@ -57,7 +58,7 @@ export const useEditor = (schema: Schema) => {
       editorView.destroy();
       setView(null);
     };
-  }, [schema, addPortal, removePortal]);
+  }, [schema, doc, addPortal, removePortal]);
 
   return { editorRef, view, PortalRenderer };
 };
