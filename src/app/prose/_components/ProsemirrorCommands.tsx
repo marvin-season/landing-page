@@ -13,6 +13,7 @@ import {
   insertText,
   toggleMark,
 } from "../_lib/commands/tr-command";
+import { ProseSettings } from "./ProseSetting";
 
 const ICON_SIZE = 16;
 
@@ -98,6 +99,7 @@ export function ProseMirrorCommands({ view }: { view: EditorView }) {
           {command.icon}
         </Button>
       ))}
+      <ProseSettings />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { ProseSettings } from "@/app/prose/_components/ProseSetting";
 import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
 import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
 import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
@@ -25,7 +24,7 @@ export default function ProseMirrorEditor() {
         {view && (
           <>
             <ProseMirrorCommands view={view} />
-            <ProseSettings />
+
             <VariablePicker
               view={view}
               options={["userName", "orderId", "createTime"]}
