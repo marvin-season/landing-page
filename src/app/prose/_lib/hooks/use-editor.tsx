@@ -14,8 +14,12 @@ import { focusAtEnd } from "@/app/prose/_lib/commands/tr-command";
 import placeholderPlugin from "@/app/prose/_lib/plugin/placeholder";
 import { variablePlugin } from "@/app/prose/_lib/plugin/variable-menu";
 
-export const useEditor = (props: { schema: Schema; doc?: Node }) => {
-  const { schema, doc } = props;
+export const useEditor = (props: {
+  schema: Schema;
+  doc?: Node;
+  editable?: (state: EditorState) => boolean;
+}) => {
+  const { schema, doc, editable } = props;
   const { addPortal, removePortal, PortalRenderer } = useNodeViewFactory();
   const editorRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<EditorView | null>(null);
@@ -41,6 +45,7 @@ export const useEditor = (props: { schema: Schema; doc?: Node }) => {
 
     const editorView = new EditorView(editorRef.current, {
       state,
+      editable,
       nodeViews: {
         "user-confirm": (node, view, getPos) =>
           new ReactNodeView(node, view, getPos, UserConfirmForm, {
@@ -58,7 +63,7 @@ export const useEditor = (props: { schema: Schema; doc?: Node }) => {
       editorView.destroy();
       setView(null);
     };
-  }, [schema, doc, addPortal, removePortal]);
+  }, [schema, doc, addPortal, removePortal, editable]);
 
   return { editorRef, view, PortalRenderer };
 };

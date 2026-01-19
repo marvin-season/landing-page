@@ -1,14 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { ProseSettings } from "@/app/prose/_components/ProseSetting";
 import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
 import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
 import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
+import { useProseSettingsStore } from "../_lib/store/prose-setting";
 import { ProseMirrorCommands } from "./ProsemirrorCommands";
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);
-  const { editorRef, view, PortalRenderer } = useEditor({ schema });
+  const isReadonly = useProseSettingsStore((s) =>
+    s.isSettingEnabled("readonly-mode"),
+  );
+  const editable = useCallback(() => {
+    return !isReadonly;
+  }, [isReadonly]);
+  const { editorRef, view, PortalRenderer } = useEditor({ schema, editable });
 
   return (
     <div className="p-10 bg-gray-50 min-h-screen">
@@ -17,6 +25,7 @@ export default function ProseMirrorEditor() {
         {view && (
           <>
             <ProseMirrorCommands view={view} />
+            <ProseSettings />
             <VariablePicker
               view={view}
               options={["userName", "orderId", "createTime"]}
