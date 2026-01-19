@@ -1,6 +1,6 @@
 import type { EditorView } from "prosemirror-view";
 import { useEffect, useState } from "react";
-import { variableMenuKey } from "@/app/prose/plugin/variable-menu";
+import { variableMenuKey } from "@/app/prose/_lib/plugin/variable-menu";
 
 // 扩展 DirectEditorProps 类型，添加 active 属性
 declare module "prosemirror-view" {

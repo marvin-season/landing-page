@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { NodeViewProps } from "@/app/prose/components/NodeViewPortal";
+import type { NodeViewProps } from "@/app/prose/_components/NodeViewPortal";
 
 /**
  * 用户确认表单组件

@@ -7,12 +7,12 @@ import type { Node, Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
-import { focusAtEnd } from "@/app/prose/commands/tr-command";
-import { useNodeViewFactory } from "@/app/prose/components/NodeViewPortal";
-import { ReactNodeView } from "@/app/prose/components/ReactNodeView";
-import UserConfirmForm from "@/app/prose/components/UserConfirmForm";
-import placeholderPlugin from "@/app/prose/plugin/placeholder";
-import { variablePlugin } from "@/app/prose/plugin/variable-menu";
+import { useNodeViewFactory } from "@/app/prose/_components/NodeViewPortal";
+import { ReactNodeView } from "@/app/prose/_components/ReactNodeView";
+import UserConfirmForm from "@/app/prose/_components/UserConfirmForm";
+import { focusAtEnd } from "@/app/prose/_lib/commands/tr-command";
+import placeholderPlugin from "@/app/prose/_lib/plugin/placeholder";
+import { variablePlugin } from "@/app/prose/_lib/plugin/variable-menu";
 
 export const useEditor = (props: { schema: Schema; doc?: Node }) => {
   const { schema, doc } = props;

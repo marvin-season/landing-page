@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { ProseMirrorCommands } from "@/app/prose/commands/prosemirror-commands";
-import { VariablePicker } from "@/app/prose/components/VariableMenuView";
-import { useEditor } from "@/app/prose/hooks/use-editor";
-import { createProseMirrorSchema } from "@/app/prose/schema/create-schema";
+import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
+import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
+import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
+import { ProseMirrorCommands } from "./ProsemirrorCommands";
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);

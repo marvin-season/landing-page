@@ -8,7 +8,11 @@ import {
 } from "lucide-react";
 import type { EditorView } from "prosemirror-view";
 import { Button } from "@/components/ui/button";
-import { insertNode, insertText, toggleMark } from "./tr-command";
+import {
+  insertNode,
+  insertText,
+  toggleMark,
+} from "../_lib/commands/tr-command";
 
 const ICON_SIZE = 16;
 
