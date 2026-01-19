@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
-type ProseSettingKey = "readonly-mode";
+type ProseSettingKey = "readonly-mode" | "dark-mode";
 
 type ProseSettingsState = {
   /**
@@ -42,9 +42,9 @@ export const useProseSettingsStore = create<ProseSettingsState>()(
       },
     })),
     {
-      name: "chat-settings",
+      name: "prose-settings",
       storage: createIdbPersistStorage<ProseSettingsPersistedState>({
-        prefix: "pcai",
+        prefix: "prose-",
       }),
       partialize: (state) => ({
         enabledSettingKeys: state.enabledSettingKeys,
