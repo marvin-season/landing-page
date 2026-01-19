@@ -7,6 +7,7 @@ import {
   VariableIcon,
 } from "lucide-react";
 import type { EditorView } from "prosemirror-view";
+import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   insertNode,
@@ -24,82 +25,94 @@ interface Command {
 }
 
 export function ProseMirrorCommands({ view }: { view: EditorView }) {
-  const commands: Command[] = [
-    {
-      label: "Export To JSON",
-      icon: <FileJson2Icon size={ICON_SIZE} />,
-      onClick: () => {
-        const json = view.state.doc.toJSON();
-        console.log(JSON.stringify(json, null, 2));
+  const commands: Command[] = useMemo(() => {
+    return [
+      {
+        label: "Export To JSON",
+        icon: <FileJson2Icon size={ICON_SIZE} />,
+        onClick: () => {
+          const json = view.state.doc.toJSON();
+          console.log(JSON.stringify(json, null, 2));
+        },
       },
-    },
-    {
-      label: "Insert Text",
-      icon: <TextIcon size={ICON_SIZE} />,
-      onClick: () => insertText(view, "Hello, world!"),
-    },
-    {
-      label: "Insert Variable",
-      icon: <VariableIcon size={ICON_SIZE} />,
-      onClick: () =>
-        insertNode(
-          view,
-          view.state.schema.nodes["variable-node"].create({
-            label: "userName",
-          }),
-        ),
-    },
-    {
-      label: "Insert Button",
-      icon: <SquarePenIcon size={ICON_SIZE} />,
-      onClick: () =>
-        insertNode(
-          view,
-          view.state.schema.nodes["my-button"].create(
-            {
-              color: "red",
-            },
-            view.state.schema.text("button"),
+      {
+        label: "Insert Text",
+        icon: <TextIcon size={ICON_SIZE} />,
+        onClick: () => insertText(view, "Hello, world!"),
+      },
+      {
+        label: "Insert Variable",
+        icon: <VariableIcon size={ICON_SIZE} />,
+        onClick: () =>
+          insertNode(
+            view,
+            view.state.schema.nodes["variable-node"].create({
+              label: "userName",
+            }),
           ),
-        ),
-    },
-    {
-      label: "Insert User Confirm",
-      icon: <UserCheckIcon size={ICON_SIZE} />,
-      onClick: () => {
-        const id = `confirm-${Date.now()}`;
-        insertNode(
-          view,
-          view.state.schema.nodes["user-confirm"].create({
-            id,
-            status: "pending",
-            userName: "Guest",
-          }),
-        );
       },
-    },
-    {
-      label: "Mark as Red",
-      icon: <PaletteIcon size={ICON_SIZE} />,
-      onClick: () => toggleMark(view, "red"),
-    },
-  ];
+      {
+        label: "Insert Button",
+        icon: <SquarePenIcon size={ICON_SIZE} />,
+        onClick: () =>
+          insertNode(
+            view,
+            view.state.schema.nodes["my-button"].create(
+              {
+                color: "red",
+              },
+              view.state.schema.text("button"),
+            ),
+          ),
+      },
+      {
+        label: "Insert User Confirm",
+        icon: <UserCheckIcon size={ICON_SIZE} />,
+        onClick: () => {
+          const id = `confirm-${Date.now()}`;
+          insertNode(
+            view,
+            view.state.schema.nodes["user-confirm"].create({
+              id,
+              status: "pending",
+              userName: "Guest",
+            }),
+          );
+        },
+      },
+      {
+        label: "Mark as Red",
+        icon: <PaletteIcon size={ICON_SIZE} />,
+        onClick: () => toggleMark(view, "red"),
+      },
+    ];
+  }, [view]);
 
   return (
     <div className="flex gap-2 p-2 border-b">
       {commands.map((command) => (
-        <Button
-          key={command.label}
-          variant="ghost"
-          size="icon"
-          onClick={command.onClick}
-          title={command.label}
-          className="h-8 w-8"
-        >
-          {command.icon}
-        </Button>
+        <CommandButton key={command.label} command={command} />
       ))}
       <ProseSettings />
     </div>
   );
 }
+
+const CommandButton = memo(
+  function CommandButton(props: { command: Command }) {
+    const { command } = props;
+    return (
+      <Button
+        key={command.label}
+        variant="ghost"
+        size="icon"
+        onClick={command.onClick}
+        title={command.label}
+        className="h-8 w-8"
+      >
+        {command.icon}
+      </Button>
+    );
+  },
+  (prev, next) => prev.command === next.command,
+);
