@@ -1,52 +1,67 @@
 import { Lock, Moon } from "lucide-react";
-import { useProseSettingsStore } from "@/app/prose/_lib/store/prose-setting";
+import { memo, useMemo } from "react";
+import {
+  type ProseSettingKey,
+  useProseSettingsStore,
+} from "@/app/prose/_lib/store/prose-setting";
 export function ProseSettings() {
+  const settings = useMemo(() => {
+    return [
+      {
+        settingKey: "readonly-mode",
+        iconRender: (isActive: boolean) => (
+          <Lock
+            size={16}
+            className={`cursor-pointer ${isActive ? "text-blue-600" : "text-gray-400"}`}
+          />
+        ),
+      },
+      {
+        settingKey: "dark-mode",
+        iconRender: (isActive: boolean) => (
+          <Moon
+            size={16}
+            className={`cursor-pointer ${isActive ? "text-gray-400" : "text-blue-600"}`}
+          />
+        ),
+      },
+    ] satisfies {
+      settingKey: ProseSettingKey;
+      iconRender: (active: boolean) => React.ReactNode;
+    }[];
+  }, []);
   return (
     <div className="flex items-center space-x-2">
-      <ReadonlySetting />
-      <DarkModeSetting />
+      {settings.map((setting) => (
+        <ButtonSetting
+          key={setting.settingKey}
+          settingKey={setting.settingKey}
+          iconRender={setting.iconRender}
+        />
+      ))}
     </div>
   );
 }
 
-function ReadonlySetting() {
+const ButtonSetting = memo(function ButtonSetting(props: {
+  iconRender: (isActive: boolean) => React.ReactNode;
+  settingKey: ProseSettingKey;
+}) {
+  const { iconRender, settingKey } = props;
+  const isActive = useProseSettingsStore((s) => s.isSettingEnabled(settingKey));
   const enableSetting = useProseSettingsStore((s) => s.enableSetting);
   const disableSetting = useProseSettingsStore((s) => s.disableSetting);
-  const isReadonly = useProseSettingsStore((s) =>
-    s.isSettingEnabled("readonly-mode"),
-  );
   return (
-    <Lock
-      size={16}
-      className={`text-blue-600 cursor-pointer ${isReadonly ? "text-blue-600" : "text-gray-400"}`}
+    <button
       onClick={() => {
-        if (isReadonly) {
-          disableSetting("readonly-mode");
+        if (isActive) {
+          disableSetting(settingKey);
         } else {
-          enableSetting("readonly-mode");
+          enableSetting(settingKey);
         }
       }}
-    />
+    >
+      {iconRender(isActive)}
+    </button>
   );
-}
-
-function DarkModeSetting() {
-  const enableSetting = useProseSettingsStore((s) => s.enableSetting);
-  const disableSetting = useProseSettingsStore((s) => s.disableSetting);
-  const isDarkMode = useProseSettingsStore((s) =>
-    s.isSettingEnabled("dark-mode"),
-  );
-  return (
-    <Moon
-      size={16}
-      className={` cursor-pointer ${isDarkMode ? "text-gray-400" : "text-blue-600"}`}
-      onClick={() => {
-        if (isDarkMode) {
-          disableSetting("dark-mode");
-        } else {
-          enableSetting("dark-mode");
-        }
-      }}
-    />
-  );
-}
+});

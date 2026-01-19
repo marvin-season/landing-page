@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
-type ProseSettingKey = "readonly-mode" | "dark-mode";
+export type ProseSettingKey = "readonly-mode" | "dark-mode";
 
 type ProseSettingsState = {
   /**
