@@ -19,7 +19,6 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
   const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUserName(value);
-    updateAttributes({ userName: value });
   };
 
   return (
@@ -32,6 +31,7 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
         type="text"
         value={userName}
         onChange={handleUserNameChange}
+        onBlur={() => updateAttributes({ userName })}
         className="px-2 py-1 border rounded"
         placeholder="请输入用户名"
       />
