@@ -1,4 +1,5 @@
 import {
+  FileCodeIcon,
   FileJson2Icon,
   PaletteIcon,
   SquarePenIcon,
@@ -6,6 +7,7 @@ import {
   UserCheckIcon,
   VariableIcon,
 } from "lucide-react";
+import { DOMSerializer } from "prosemirror-model";
 import type { EditorView } from "prosemirror-view";
 import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +28,36 @@ interface Command {
 
 export function ProseMirrorCommands({ view }: { view: EditorView }) {
   const commands: Command[] = useMemo(() => {
+    // 将文档序列化为 HTML
+    const exportToHTML = () => {
+      const serializer = DOMSerializer.fromSchema(view.state.schema);
+      const fragment = serializer.serializeFragment(view.state.doc.content);
+      const html = Array.from(fragment.children)
+        .map((node) => (node as HTMLElement).outerHTML)
+        .join("");
+      return html;
+    };
+
     return [
+      {
+        label: "Export To HTML",
+        icon: <FileCodeIcon size={ICON_SIZE} />,
+        onClick: () => {
+          const html = exportToHTML();
+          console.log("HTML 内容:");
+          console.log(html);
+          // 同时复制到剪贴板
+          navigator.clipboard
+            .writeText(html)
+            .then(() => {
+              console.log("✅ HTML 已复制到剪贴板");
+            })
+            .catch((err) => {
+              console.error("❌ 复制失败:", err);
+            });
+        },
+      },
+
       {
         label: "Export To JSON",
         icon: <FileJson2Icon size={ICON_SIZE} />,
