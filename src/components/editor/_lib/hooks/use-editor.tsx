@@ -1,3 +1,5 @@
+"use client";
+
 import { baseKeymap } from "prosemirror-commands";
 import { gapCursor } from "prosemirror-gapcursor";
 // 1. 引入必要的命令和按键绑定
@@ -7,12 +9,12 @@ import type { Node, Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { useEffect, useRef, useState } from "react";
-import { useNodeViewFactory } from "@/app/prose/_components/NodeViewPortal";
-import { ReactNodeView } from "@/app/prose/_components/ReactNodeView";
-import UserConfirmForm from "@/app/prose/_components/UserConfirmForm";
-import { focusAtEnd } from "@/app/prose/_lib/commands/tr-command";
-import placeholderPlugin from "@/app/prose/_lib/plugin/placeholder";
-import { variablePlugin } from "@/app/prose/_lib/plugin/variable-menu";
+import { useNodeViewFactory } from "@/components/editor/NodeViewPortal";
+import { ReactNodeView } from "@/components/editor/ReactNodeView";
+import UserConfirmForm from "@/components/editor/UserConfirmForm";
+import { focusAtEnd } from "../commands/tr-command";
+import placeholderPlugin from "../plugin/placeholder";
+import { variablePlugin } from "../plugin/variable-menu";
 
 export const useEditor = (props: {
   schema: Schema;

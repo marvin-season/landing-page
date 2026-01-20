@@ -1,3 +1,5 @@
+"use client";
+
 import type { NodeViewConstructor } from "prosemirror-view";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";

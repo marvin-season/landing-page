@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
-import type { NodeViewProps } from "@/app/prose/_components/NodeViewPortal";
+"use client";
+
+import { type ChangeEvent, type FC, useEffect, useState } from "react";
+import type { NodeViewProps } from "./NodeViewPortal";
 
 /**
  * 用户确认表单组件
  * 用于在编辑器中显示和编辑用户确认信息
  */
-const UserConfirmForm: React.FC<NodeViewProps> = ({
-  node,
-  updateAttributes,
-}) => {
+const UserConfirmForm: FC<NodeViewProps> = ({ node, updateAttributes }) => {
   const [userName, setUserName] = useState(node.attrs.userName || "");
 
   // 当节点属性更新时同步状态
@@ -16,7 +15,7 @@ const UserConfirmForm: React.FC<NodeViewProps> = ({
     setUserName(node.attrs.userName || "");
   }, [node.attrs.userName]);
 
-  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUserNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUserName(value);
   };

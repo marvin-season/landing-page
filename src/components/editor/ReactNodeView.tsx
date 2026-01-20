@@ -1,5 +1,6 @@
 import type { Node as PMNode } from "prosemirror-model";
 import type { EditorView, NodeView } from "prosemirror-view";
+import type React from "react";
 import type { IPMPortalProvider, NodeViewProps } from "./NodeViewPortal";
 
 /**

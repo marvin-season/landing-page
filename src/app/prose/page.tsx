@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 const ProseMirrorEditor = dynamic(
-  () => import("./_components/ProseMirrorEditor"),
+  () => import("@/components/editor/ProseMirrorEditor"),
   {
     ssr: false,
   },

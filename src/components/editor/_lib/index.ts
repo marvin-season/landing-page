@@ -1,5 +1,7 @@
+"use client";
+
 import { DOMParser } from "prosemirror-model";
-import type { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
+import type { createProseMirrorSchema } from "./schema/create-schema";
 
 /**
  * 从 HTML 模板创建 ProseMirror 文档

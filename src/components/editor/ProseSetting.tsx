@@ -1,9 +1,13 @@
+"use client";
+
 import { Lock, Moon } from "lucide-react";
+import type { ReactNode } from "react";
 import { memo, useMemo } from "react";
 import {
   type ProseSettingKey,
   useProseSettingsStore,
-} from "@/app/prose/_lib/store/prose-setting";
+} from "./_lib/store/prose-setting";
+
 export function ProseSettings() {
   const settings = useMemo(() => {
     return [
@@ -27,7 +31,7 @@ export function ProseSettings() {
       },
     ] satisfies {
       settingKey: ProseSettingKey;
-      iconRender: (active: boolean) => React.ReactNode;
+      iconRender: (active: boolean) => ReactNode;
     }[];
   }, []);
   return (
@@ -44,7 +48,7 @@ export function ProseSettings() {
 }
 
 const ButtonSetting = memo(function ButtonSetting(props: {
-  iconRender: (isActive: boolean) => React.ReactNode;
+  iconRender: (isActive: boolean) => ReactNode;
   settingKey: ProseSettingKey;
 }) {
   const { iconRender, settingKey } = props;

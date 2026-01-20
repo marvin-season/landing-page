@@ -9,20 +9,17 @@ import {
 } from "lucide-react";
 import { DOMSerializer } from "prosemirror-model";
 import type { EditorView } from "prosemirror-view";
+import type { ReactNode } from "react";
 import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  insertNode,
-  insertText,
-  toggleMark,
-} from "../_lib/commands/tr-command";
+import { insertNode, insertText, toggleMark } from "./_lib/commands/tr-command";
 import { ProseSettings } from "./ProseSetting";
 
 const ICON_SIZE = 16;
 
 interface Command {
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   onClick: () => void;
 }
 

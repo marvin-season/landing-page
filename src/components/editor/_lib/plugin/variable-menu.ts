@@ -1,3 +1,5 @@
+"use client";
+
 import { Plugin, PluginKey } from "prosemirror-state";
 import { logger } from "@/lib/logger";
 

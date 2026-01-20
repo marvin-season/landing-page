@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
-import { focusAtEnd, insertNode } from "@/app/prose/_lib/commands/tr-command";
-import { initialJson } from "@/app/prose/_lib/data";
-import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
-import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
 import { mockResponse } from "@/lib/response";
 import { SSEMessageGenerator } from "@/lib/stream";
-import { useProseSettingsStore } from "../_lib/store/prose-setting";
+import { focusAtEnd, insertNode } from "./_lib/commands/tr-command";
+import { initialJson } from "./_lib/data";
+import { useEditor } from "./_lib/hooks/use-editor";
+import { createProseMirrorSchema } from "./_lib/schema/create-schema";
+import { useProseSettingsStore } from "./_lib/store/prose-setting";
 import { ProseMirrorCommands } from "./ProsemirrorCommands";
-
-console.log(initialJson.content.flatMap((item) => item.content));
+import { VariablePicker } from "./VariableMenuView";
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);
@@ -22,27 +20,26 @@ export default function ProseMirrorEditor() {
   const editable = useCallback(() => {
     return !isReadonly;
   }, [isReadonly]);
+
   const { editorRef, view, PortalRenderer } = useEditor({
     schema,
     editable,
   });
 
   useEffect(() => {
-    if (view) {
-      const response = mockResponse({
-        data: initialJson.content.flatMap((item) => item.content),
-        delay: 1000,
-      });
+    if (!view) return;
 
-      const messages = SSEMessageGenerator(response.body);
-      Array.fromAsync(messages, (message) => {
-        const data = JSON.parse(message);
-        insertNode(view, view.state.schema.nodeFromJSON(data));
-        focusAtEnd(view);
-      });
+    const response = mockResponse({
+      data: initialJson.content.flatMap((item) => item.content),
+      delay: 1000,
+    });
 
-      // insertNode(view, view.state.schema.text("你好"));
-    }
+    const messages = SSEMessageGenerator(response.body);
+    Array.fromAsync(messages, (message) => {
+      const data = JSON.parse(message);
+      insertNode(view, view.state.schema.nodeFromJSON(data));
+      focusAtEnd(view);
+    });
   }, [view]);
 
   return (
@@ -52,7 +49,6 @@ export default function ProseMirrorEditor() {
         {view && (
           <>
             <ProseMirrorCommands view={view} />
-
             <VariablePicker
               view={view}
               options={["userName", "orderId", "createTime"]}
