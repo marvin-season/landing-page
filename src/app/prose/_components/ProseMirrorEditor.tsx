@@ -1,25 +1,17 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
-import { initialHtml } from "@/app/prose/_lib/data";
+import { focusAtEnd, insertNode } from "@/app/prose/_lib/commands/tr-command";
+import { initialJson } from "@/app/prose/_lib/data";
 import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
 import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
-import { parseHTMLTemplate } from "../_lib";
+import { mockResponse } from "@/lib/response";
+import { SSEMessageGenerator } from "@/lib/stream";
 import { useProseSettingsStore } from "../_lib/store/prose-setting";
 import { ProseMirrorCommands } from "./ProsemirrorCommands";
 
-// const response = mockResponse({
-//   data: [
-//     { id: 1, name: "John Doe" },
-//     { id: 2, name: "Jane Doe" },
-//   ],
-//   abortController: new AbortController(),
-//   delay: 1000,
-// });
-
-// const messages = SSEMessageGenerator(response.body);
-// Array.fromAsync(messages, console.log);
+console.log(initialJson.content.flatMap((item) => item.content));
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);
@@ -33,8 +25,25 @@ export default function ProseMirrorEditor() {
   const { editorRef, view, PortalRenderer } = useEditor({
     schema,
     editable,
-    doc: parseHTMLTemplate(schema, initialHtml),
   });
+
+  useEffect(() => {
+    if (view) {
+      const response = mockResponse({
+        data: initialJson.content.flatMap((item) => item.content),
+        delay: 1000,
+      });
+
+      const messages = SSEMessageGenerator(response.body);
+      Array.fromAsync(messages, (message) => {
+        const data = JSON.parse(message);
+        insertNode(view, view.state.schema.nodeFromJSON(data));
+        focusAtEnd(view);
+      });
+
+      // insertNode(view, view.state.schema.text("你好"));
+    }
+  }, [view]);
 
   return (
     <div className="p-10 bg-gray-50 min-h-screen">

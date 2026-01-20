@@ -70,3 +70,4 @@ export function focusAtEnd(view: EditorView) {
   view.dispatch(tr.scrollIntoView()); // scrollIntoView 确保视图滚动到最下方
   view.focus();
 }
+

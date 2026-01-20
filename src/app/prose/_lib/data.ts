@@ -5,36 +5,48 @@ const initialJson = {
       type: "paragraph",
       content: [
         {
-          type: "text",
-          text: "Hello, world!",
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Introduction: ",
+              marks: [
+                {
+                  type: "my-mark",
+                  attrs: {
+                    color: "red",
+                  },
+                },
+              ],
+            },
+            
+          ],
         },
-      ],
-    },
-    {
-      type: "user-confirm",
-      attrs: {
-        id: "111",
-        status: "pending",
-        userName: "Lisa",
-      },
-    },
-    {
-      type: "paragraph",
-      content: [
         {
           type: "text",
-          text: "Hello, world!",
+          text: "Hello, world! My name is",
         },
+        {
+          type: "variable-node",
+          attrs: {
+            label: "userName",
+          }
+        },
+        {
+          type: "text",
+          text: "I'm a software engineer. I'm from",
+        },
+        {
+          type: "variable-node",
+          attrs: {
+            label: "city",
+          }
+        }
       ],
+      
     },
-    {
-      type: "user-confirm",
-      attrs: {
-        id: "222",
-        status: "pending",
-        userName: "Lisa",
-      },
-    },
+    
+    
   ],
 };
 const initialHtml = `
