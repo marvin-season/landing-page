@@ -12,10 +12,33 @@ const userConfirm: NodeSpec = {
     status: { default: "pending" },
     userName: { default: "Guest" },
   },
-  toDOM() {
-    return ["div", { class: "user-confirm" }];
+  toDOM(node) {
+    return [
+      "div",
+      {
+        class: "user-confirm",
+        contentEditable: "false",
+        "data-user-confirm": "true",
+        "data-id": String(node.attrs.id ?? ""),
+        "data-status": String(node.attrs.status ?? "pending"),
+        "data-user-name": String(node.attrs.userName ?? "Guest"),
+      },
+    ];
   },
-  parseDOM: [{ tag: "div.user-confirm" }],
+  parseDOM: [
+    {
+      tag: "div.user-confirm",
+      getAttrs: (dom) => {
+        if (!(dom instanceof HTMLElement)) return false;
+        const { id, status, userName } = dom.dataset;
+        return {
+          id,
+          status,
+          userName,
+        };
+      },
+    },
+  ],
 };
 
 /**

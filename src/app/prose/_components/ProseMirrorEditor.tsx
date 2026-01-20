@@ -2,27 +2,24 @@
 
 import { useCallback, useMemo } from "react";
 import { VariablePicker } from "@/app/prose/_components/VariableMenuView";
+import { initialHtml } from "@/app/prose/_lib/data";
 import { useEditor } from "@/app/prose/_lib/hooks/use-editor";
 import { createProseMirrorSchema } from "@/app/prose/_lib/schema/create-schema";
-import { mockResponse } from "@/lib/response";
-import { SSEMessageGenerator } from "@/lib/stream";
 import { parseHTMLTemplate } from "../_lib";
 import { useProseSettingsStore } from "../_lib/store/prose-setting";
 import { ProseMirrorCommands } from "./ProsemirrorCommands";
 
-const response = mockResponse({
-  data: [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Doe" },
-  ],
-  abortController: new AbortController(),
-  delay: 1000,
-});
-const template = `
-<p>Hello, world!</p><div class="user-confirm"></div><p>Hello, world!</p><div class="user-confirm"></div>
-`;
-const messages = SSEMessageGenerator(response.body);
-Array.fromAsync(messages, console.log);
+// const response = mockResponse({
+//   data: [
+//     { id: 1, name: "John Doe" },
+//     { id: 2, name: "Jane Doe" },
+//   ],
+//   abortController: new AbortController(),
+//   delay: 1000,
+// });
+
+// const messages = SSEMessageGenerator(response.body);
+// Array.fromAsync(messages, console.log);
 
 export default function ProseMirrorEditor() {
   const schema = useMemo(() => createProseMirrorSchema(), []);
@@ -36,7 +33,7 @@ export default function ProseMirrorEditor() {
   const { editorRef, view, PortalRenderer } = useEditor({
     schema,
     editable,
-    doc: parseHTMLTemplate(schema, template),
+    doc: parseHTMLTemplate(schema, initialHtml),
   });
 
   return (

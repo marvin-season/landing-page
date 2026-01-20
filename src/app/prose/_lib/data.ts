@@ -37,5 +37,10 @@ const initialJson = {
     },
   ],
 };
-
-export default initialJson;
+const initialHtml = `
+<p>Hello, world!</p><div class="user-confirm" contenteditable="false" data-user-confirm="true" data-id="" data-status="pending" data-user-name="Guestass"></div><p>Hello, world!</p><div class="user-confirm" contenteditable="false" data-user-confirm="true" data-id="" data-status="pending" data-user-name="Guesta"></div>
+`;
+export  {
+  initialJson,
+  initialHtml,
+};
