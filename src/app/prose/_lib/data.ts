@@ -19,7 +19,6 @@ const initialJson = {
                 },
               ],
             },
-            
           ],
         },
         {
@@ -30,7 +29,7 @@ const initialJson = {
           type: "variable-node",
           attrs: {
             label: "userName",
-          }
+          },
         },
         {
           type: "text",
@@ -40,19 +39,13 @@ const initialJson = {
           type: "variable-node",
           attrs: {
             label: "city",
-          }
-        }
+          },
+        },
       ],
-      
     },
-    
-    
   ],
 };
 const initialHtml = `
 <p>Hello, world!</p><div class="user-confirm" contenteditable="false" data-user-confirm="true" data-id="" data-status="pending" data-user-name="Guestass"></div><p>Hello, world!</p><div class="user-confirm" contenteditable="false" data-user-confirm="true" data-id="" data-status="pending" data-user-name="Guesta"></div>
 `;
-export  {
-  initialJson,
-  initialHtml,
-};
+export { initialJson, initialHtml };

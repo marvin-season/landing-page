@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import type { z } from "zod";
 
 export const textDecoder = new TextDecoder();
 export const textEncoder = new TextEncoder();
@@ -7,11 +7,13 @@ export const textEncoder = new TextEncoder();
  * @param stream - The readable stream to generate messages from
  * @returns A generator of messages
  */
-export async function* SSEMessageGenerator(stream: ReadableStream<Uint8Array<ArrayBuffer> | string> | null) {
+export async function* SSEMessageGenerator(
+  stream: ReadableStream<Uint8Array<ArrayBuffer> | string> | null,
+) {
   if (!stream) {
     return;
   }
-  let rest_str = '';
+  let rest_str = "";
   const reader = stream.getReader();
   try {
     while (true) {
@@ -22,19 +24,20 @@ export async function* SSEMessageGenerator(stream: ReadableStream<Uint8Array<Arr
           try {
             yield rest_str;
           } catch (e) {
-            console.warn('Failed to parse remaining data:', e);
+            console.warn("Failed to parse remaining data:", e);
           }
         }
         break;
       }
 
-      const sse_chunk = typeof value === 'string' ? value : textDecoder.decode(value);
+      const sse_chunk =
+        typeof value === "string" ? value : textDecoder.decode(value);
       for (const line of sse_chunk.split(/\n+/)) {
-        const json_str = line.replace(/data:\s*/, '').trim();
+        const json_str = line.replace(/data:\s*/, "").trim();
         if (json_str.length > 0) {
           try {
             const full_str = rest_str + json_str;
-            rest_str = '';
+            rest_str = "";
             yield full_str; // 在生成器内yield消息
           } catch (e) {
             rest_str += json_str;
@@ -48,7 +51,10 @@ export async function* SSEMessageGenerator(stream: ReadableStream<Uint8Array<Arr
   }
 }
 
-export function MessageParser<T extends z.ZodSchema>(message: string, schema: T): z.infer<T> | null {
+export function MessageParser<T extends z.ZodSchema>(
+  message: string,
+  schema: T,
+): z.infer<T> | null {
   try {
     const json = JSON.parse(message);
     const result = schema.safeParse(json);

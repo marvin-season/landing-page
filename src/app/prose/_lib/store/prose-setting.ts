@@ -18,7 +18,10 @@ type ProseSettingsState = {
   isSettingEnabled: (key: ProseSettingKey) => boolean;
 };
 
-type ProseSettingsPersistedState = Pick<ProseSettingsState, "enabledSettingKeys">;
+type ProseSettingsPersistedState = Pick<
+  ProseSettingsState,
+  "enabledSettingKeys"
+>;
 
 export const useProseSettingsStore = create<ProseSettingsState>()(
   persist(
