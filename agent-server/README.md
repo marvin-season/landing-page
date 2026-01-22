@@ -9,6 +9,7 @@ export http_proxy=\nexport https_proxy=\nexport all_proxy=\nexport HTTP_PROXY=\n
 uv sync
 ```
 ```bash
+uv venv --python 3.12 
 source .venv/bin/activate
 ```
 
