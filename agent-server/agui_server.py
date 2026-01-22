@@ -21,6 +21,7 @@ from agno.agent import Agent
 from agno.models.ollama import Ollama
 from agno.os import AgentOS
 from agno.os.interfaces.agui import AGUI
+from agno.tools.yfinance import YFinanceTools
 
 # ============================================================================
 # Agent 配置
@@ -34,6 +35,7 @@ You provide clear, concise, and accurate responses to user queries.
 agent = Agent(
     name="Qwen Agent",
     model=Ollama(id="qwen2.5:3b"),
+    tools=[YFinanceTools()],
     instructions=instructions,
     add_datetime_to_context=True,
     markdown=True,
