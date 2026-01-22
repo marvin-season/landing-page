@@ -55,34 +55,13 @@ app = agent_os.get_app()
 # ============================================================================
 # 添加自定义聊天端点
 # ============================================================================
-@app.get("/api/chat")
+@app.get("/api/test")
 async def chat_endpoint():
     """
-    简单的聊天端点，支持流式响应
+    简单的api test端点
     接受格式: {"message": "用户消息", "stream": true}
     """
-    # message = request.get("message", "")
-    # stream = request.get("stream", True)
-    message = "Hello"
-    print("user message: ", message)
-    
-    # 流式响应
-    async def generate_response():
-        response_stream = agent.run(message, stream=True)
-        for chunk in response_stream:
-            if hasattr(chunk, 'content') and chunk.content:
-                yield f"data: {chunk.content}\n\n"
-            elif isinstance(chunk, str):
-                yield f"data: {chunk}\n\n"
-    
-    return StreamingResponse(
-        generate_response(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-        }
-    )
+    return {"status": "ok"}
 
 # ============================================================================
 # 启动服务器
@@ -94,7 +73,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "agui_server:app",
         host="0.0.0.0",
-        port=8000,
+        port=7777,
         log_level="info",
         reload=True
     )
