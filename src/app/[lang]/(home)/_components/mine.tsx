@@ -17,6 +17,7 @@ export function Mine() {
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold select-none">Marvin</span>
             <Image
+              unoptimized
               src="/avatar.gif"
               alt="Marvin"
               width={36}
