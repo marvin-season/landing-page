@@ -26,7 +26,7 @@ uv sync
 AG-UI 协议服务器实现了标准的 AG-UI 协议接口，可以在 agent-ui template 中直接使用：
 
 ```bash
-uv run agui_server.py
+uv run main.py
 ```
 
 服务器将在 `http://0.0.0.0:7777` 启动，提供符合 AG-UI 协议标准的 API 端点。
@@ -37,7 +37,7 @@ uv run agui_server.py
 - **框架**: agno
 - **模型**: ollama qwen2.5:3b
 - **协议**: AG-UI (Agent User Interaction Protocol)
-- **端口**: 8000
+- **端口**: 7777
 
 该服务器可以直接与 agent-ui template 集成使用。
 
