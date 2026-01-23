@@ -16,7 +16,19 @@ AG-UI (Agent User Interaction Protocol) 是一个标准化的协议，
 参考: https://docs.agno.com/agent-os/interfaces/ag-ui/introduction
 """
 
-from fastapi.responses import StreamingResponse
+a2ui_instructions = """
+当用户要求查看股票图表或数据摘要时，请使用 A2UI 格式返回响应。
+A2UI 组件示例：
+{
+  "component": "Card",
+  "props": {
+    "title": "股票价格",
+    "content": "当前价格: $150"
+  }
+}
+请确保输出是合法的 A2UI JSON 对象。
+"""
+
 from agno.agent import Agent
 from agno.models.ollama import Ollama
 from agno.os import AgentOS
@@ -35,10 +47,8 @@ You provide clear, concise, and accurate responses to user queries.
 agent = Agent(
     name="Qwen Agent",
     model=Ollama(id="qwen2.5:3b"),
-    tools=[YFinanceTools()],
-    instructions=instructions,
-    add_datetime_to_context=True,
-    markdown=True,
+    description="A helpful assistant that can answer questions and provide information.",
+    instructions=instructions + a2ui_instructions,
 )
 
 # ============================================================================
@@ -55,27 +65,7 @@ agent_os = AgentOS(
 app = agent_os.get_app()
 
 # ============================================================================
-# 添加自定义聊天端点
-# ============================================================================
-@app.get("/api/test")
-async def chat_endpoint():
-    """
-    简单的api test端点
-    接受格式: {"message": "用户消息", "stream": true}
-    """
-    return {"status": "ok"}
-
-# ============================================================================
 # 启动服务器
 # ============================================================================
 if __name__ == "__main__":
-    import uvicorn
-    
-    # 使用导入字符串以支持 reload 功能
-    uvicorn.run(
-        "agui_server:app",
-        host="0.0.0.0",
-        port=7777,
-        log_level="info",
-        reload=True
-    )
+    agent_os.serve(app="main:app", port=7777, log_level="info",reload=True)
