@@ -1,71 +1,18 @@
 """
-AG-UI Protocol Server
-=====================
-使用 agno 框架和 ollama qwen2.5:3b 模型实现标准的 AG-UI 协议接口
-可以在 agent-ui template 中直接使用
-
-AG-UI (Agent User Interaction Protocol) 是一个标准化的协议，
-用于前端应用和 AI 代理之间的实时双向通信。
-
-使用方法:
-1. 确保已安装依赖: uv sync
-2. 确保 ollama 服务运行，并且已下载 qwen2.5:3b 模型
-3. 运行: uv run agui_server.py
-4. 服务器将在 http://0.0.0.0:8000 启动
-
-参考: https://docs.agno.com/agent-os/interfaces/ag-ui/introduction
+Example for serving you Agno agent as an AG-UI server
 """
 
-a2ui_instructions = """
-当用户要求查看股票图表或数据摘要时，请使用 A2UI 格式返回响应。
-A2UI 组件示例：
-{
-  "component": "Card",
-  "props": {
-    "title": "股票价格",
-    "content": "当前价格: $150"
-  }
-}
-请确保输出是合法的 A2UI JSON 对象。
-"""
-
-from agno.agent import Agent
-from agno.models.ollama import Ollama
+import dotenv
 from agno.os import AgentOS
 from agno.os.interfaces.agui import AGUI
-from agno.tools.yfinance import YFinanceTools
 
-# ============================================================================
-# Agent 配置
-# ============================================================================
-instructions = """\
-You are a helpful AI assistant powered by qwen2.5:3b model.
-You provide clear, concise, and accurate responses to user queries.
-"""
+from src.agent import agent
 
-# 创建 Agent，使用 ollama qwen2.5:3b 模型
-agent = Agent(
-    name="Qwen Agent",
-    model=Ollama(id="qwen2.5:3b"),
-    description="A helpful assistant that can answer questions and provide information.",
-    instructions=instructions + a2ui_instructions,
-)
+dotenv.load_dotenv()
 
-# ============================================================================
-# 创建 AgentOS 并配置 AG-UI 接口
-# ============================================================================
-# AGUI 接口将 Agent 包装成符合 AG-UI 协议标准的 FastAPI router
-agent_os = AgentOS(
-    agents=[agent],
-    interfaces=[AGUI(agent=agent)],
-)
-
-# 获取 FastAPI 应用
-# AgentOS 会自动创建符合 AG-UI 协议标准的端点
+# Build AgentOS and extract the app for serving
+agent_os = AgentOS(agents=[agent], interfaces=[AGUI(agent=agent)])
 app = agent_os.get_app()
 
-# ============================================================================
-# 启动服务器
-# ============================================================================
 if __name__ == "__main__":
-    agent_os.serve(app="main:app", port=7777, log_level="info",reload=True)
+    agent_os.serve(app="main:app", port=7777, reload=True)
