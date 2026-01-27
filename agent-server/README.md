@@ -1,6 +1,6 @@
 ## Prerequisites
 
-ollama server running and qwen2.5:3b model downloaded
+ollama server running and qwen2.5:3b model downloaded or Your API KEY in .env
 ```bash
 ollama run qwen2.5:3b
 ```
