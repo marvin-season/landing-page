@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev:all": "concurrently \"npm run dev:ui\" \"npm run dev:agent\" --names ui,agent --prefix-colors blue,green --kill-others",
+    "dev:agent": "./scripts/run-agent.sh || scripts\\run-agent.bat",
+    "dev:ui": "next dev -p 3001",
     "build": "next build",
     "analyze": "next experimental-analyze",
     "start": "next start -p 3001",
@@ -74,6 +76,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "@biomejs/biome": "2.2.0",
     "@lingui/cli": "^5.7.0",
     "@lingui/loader": "^5.7.0",
