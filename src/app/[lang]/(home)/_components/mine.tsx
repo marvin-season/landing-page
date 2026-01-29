@@ -32,8 +32,8 @@ export function Mine() {
         </span>
       </Section>
       <Section title="Links" delay={0.05}>
-        <Nav href={"/chat"}>
-          <Trans>Chat with me</Trans>
+        <Nav href={"/agent"}>
+          <Trans>Agent UI</Trans>
         </Nav>
         <Nav href={"/resume"}>
           <Trans>About me in detail</Trans>

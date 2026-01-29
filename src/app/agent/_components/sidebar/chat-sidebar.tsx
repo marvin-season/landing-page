@@ -1,7 +1,7 @@
 import { Home } from "lucide-react";
 import Link from "next/link";
-import { CreateSessionBtn } from "@/app/chat/_components/session/create-session-btn";
-import { SessionList } from "@/app/chat/_components/session/session-list";
+import { CreateSessionBtn } from "@/app/agent/_components/session/create-session-btn";
+import { SessionList } from "@/app/agent/_components/session/session-list";
 import Tooltip from "@/components/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,10 @@ export function ChatSidebar(props: { className?: string }) {
   const { className } = props;
 
   return (
-    <div className={cn("w-[280px] shadow-md flex flex-col h-full", className)}>
+    <div className={cn("w-[280px] flex flex-col h-full border-r", className)}>
       <div className="flex items-center gap-1 p-4 ">
         <Tooltip content="Go to home">
-          <Link href="/chat">
+          <Link href="/agent">
             <Button variant="outline">
               <Home size={16} />
             </Button>

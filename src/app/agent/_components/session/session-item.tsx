@@ -1,7 +1,7 @@
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
-import { DeleteSessionBtn } from "@/app/chat/_components/session/delete-session-btn";
+import { DeleteSessionBtn } from "@/app/agent/_components/session/delete-session-btn";
 import { cn } from "@/lib/utils";
 import type { ISession } from "@/store/session-store";
 
@@ -9,7 +9,7 @@ function SessionItem(props: { session: ISession; isSelected: boolean }) {
   const { session, isSelected } = props;
   return (
     <Link
-      href={`/chat/${session.id}`}
+      href={`/agent/${session.id}`}
       key={session.id}
       className={cn(
         "group relative flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer transition-all duration-200 text-sm",

@@ -2,7 +2,7 @@
 
 import { History, Menu, SlidersHorizontal } from "lucide-react";
 import dynamic from "next/dynamic";
-import { ChatSettings } from "@/app/chat/_components/setting/chat-settings";
+import { ChatSettings } from "@/app/agent/_components/setting/chat-settings";
 import { Drawer } from "@/components/drawer";
 import {
   DropdownMenu,

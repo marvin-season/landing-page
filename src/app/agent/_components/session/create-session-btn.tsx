@@ -28,7 +28,7 @@ export function CreateSessionBtn(props: {
         className={cn("truncate", className)}
         onClick={() => {
           const id = createNewSession({ model: defaultModel });
-          router.push(`/chat/${id}`);
+          router.push(`/agent/${id}`);
         }}
       >
         {children || (

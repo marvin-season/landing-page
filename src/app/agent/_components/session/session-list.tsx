@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import SessionItem from "@/app/chat/_components/session/session-item";
+import SessionItem from "@/app/agent/_components/session/session-item";
 import { useSessionStore } from "@/store/session-store";
 export function SessionList() {
   const { sessions } = useSessionStore();

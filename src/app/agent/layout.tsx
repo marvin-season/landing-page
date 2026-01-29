@@ -1,6 +1,6 @@
 import "@/css/globals.css";
 import type { Metadata } from "next";
-import { ChatSidebar } from "@/app/chat/_components/sidebar/chat-sidebar";
+import { ChatSidebar } from "@/app/agent/_components/sidebar/chat-sidebar";
 import TankQueryClientProvider from "@/components/trpc/provider";
 import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {

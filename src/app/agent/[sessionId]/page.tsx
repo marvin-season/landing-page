@@ -1,6 +1,6 @@
-import { ChatMain } from "@/app/chat/_components/chat-main";
-import { ChatHeader } from "@/app/chat/_components/header/chat-header";
-import { MessageList } from "@/app/chat/_components/message/message-list";
+import { ChatMain } from "@/app/agent/_components/chat-main";
+import { ChatHeader } from "@/app/agent/_components/header/chat-header";
+import { MessageList } from "@/app/agent/_components/message/message-list";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;

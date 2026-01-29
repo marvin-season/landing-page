@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { getUserMessages } from "@/app/chat/_utils";
+import { getUserMessages } from "@/app/agent/_utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import type { IMessageStore } from "@/store/message-store";
 
