@@ -11,6 +11,9 @@ import { weatherAgent } from "./agents/weather-agent";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 
 export const mastra = new Mastra({
+  bundler: {
+    externals: ['@copilotkit/runtime'],
+  },
   workflows: { weatherWorkflow },
   agents: { weatherAgent },
   storage: new LibSQLStore({
