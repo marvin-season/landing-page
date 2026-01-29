@@ -1,8 +1,8 @@
 import { AgnoAgent } from "@ag-ui/agno";
 import {
-    CopilotRuntime,
-    copilotRuntimeNextJSAppRouterEndpoint,
-    ExperimentalEmptyAdapter,
+  CopilotRuntime,
+  copilotRuntimeNextJSAppRouterEndpoint,
+  ExperimentalEmptyAdapter,
 } from "@copilotkit/runtime";
 import type { NextRequest } from "next/server";
 

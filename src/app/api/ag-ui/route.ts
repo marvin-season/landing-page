@@ -25,7 +25,7 @@ export const GET = async (req: NextRequest) => {
     onRunFinishedEvent: ({ messages }) => {
       console.log("\n==========Run finished:==========\n", messages);
     },
-    onTextMessageContentEvent: ({ event,  }) => {
+    onTextMessageContentEvent: ({ event }) => {
       // 不换行输出
       process.stdout.write(event.delta);
     },
