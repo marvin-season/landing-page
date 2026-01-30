@@ -1,7 +1,5 @@
-import { CopilotKit } from "@copilotkit/react-core";
-import "@copilotkit/react-ui/styles.css";
-
-// ...
+import { AgentProvider } from "@/app/agui/_components/AgentProvider";
+import "@/css/globals.css";
 
 export default function RootLayout({
   children,
@@ -11,9 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <CopilotKit runtimeUrl="/api/copilotkit" agent="weatherAgent">
-          {children}
-        </CopilotKit>
+        <AgentProvider>{children}</AgentProvider>
       </body>
     </html>
   );

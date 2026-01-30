@@ -1,4 +1,6 @@
+import { AgnoAgent } from "@ag-ui/agno";
 import { MastraAgent } from "@ag-ui/mastra";
+
 import {
   CopilotRuntime,
   copilotRuntimeNextJSAppRouterEndpoint,
@@ -9,11 +11,14 @@ import type { NextRequest } from "next/server";
 import { mastra } from "@/mastra"; // the path to your Mastra instance
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
-const agents = MastraAgent.getLocalAgents({ mastra })
-console.log("agents", "agents", MastraAgent);
+const mastraAgents = MastraAgent.getLocalAgents({ mastra });
 
 const runtime = new CopilotRuntime({
-  agents,
+  agents: {
+    // @ts-ignore
+    agnoAgent: new AgnoAgent({ url: "http://localhost:7777/agui" }),
+    ...mastraAgents,
+  },
 });
 
 export const POST = async (req: NextRequest) => {
