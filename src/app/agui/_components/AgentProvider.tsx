@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/select";
 import { AgentConstant } from "@/lib/constant/agent";
 
-const AGENT_OPTIONS = [
-  { value: AgentConstant.WEATHER_AGENT, label: "Weather Agent" },
-  { value: AgentConstant.AGNO_AGENT, label: "Agno Agent" },
-];
+const AGENT_OPTIONS = Object.values(AgentConstant).map((agent) => ({
+  value: agent,
+  label: agent,
+}));
 
 export const AgentProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentAgent, setCurrentAgent] = useState(AgentConstant.WEATHER_AGENT);
