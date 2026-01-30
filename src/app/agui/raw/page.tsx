@@ -1,7 +1,8 @@
 "use client";
 
 import { HttpAgent, type Message, randomUUID } from "@ag-ui/client";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { ConversationPanel } from "../_components/ConversationPanel";
 
 // 创建 HttpAgent 实例，直接连接到后端服务器
 const agent = new HttpAgent({
@@ -10,7 +11,21 @@ const agent = new HttpAgent({
 
 export default function Page() {
   const [input, setInput] = useState("");
-  const [currentResponse, setCurrentResponse] = useState("");
+
+  console.log("agent", agent.messages);
+  const messages = useSyncExternalStore(
+    (subscribe) => {
+      const { unsubscribe } = agent.subscribe({
+        onTextMessageContentEvent: ({}) => {
+          subscribe();
+        },
+      });
+      return () => {
+        unsubscribe();
+      };
+    },
+    () => agent.messages,
+  );
 
   const handleSend = async () => {
     if (!input.trim() || agent.isRunning) return;
@@ -23,14 +38,12 @@ export default function Page() {
 
     agent.addMessage(userMessage);
     setInput("");
-    setCurrentResponse("");
 
     try {
       await agent.runAgent(undefined, {
         onTextMessageContentEvent: ({ event }) => {
           console.log("Text message content:", event);
           // 实时更新流式内容
-          setCurrentResponse((prev) => prev + event.delta);
         },
         onTextMessageEndEvent: ({ messages }) => {
           console.log("Text message end:", messages);
@@ -48,13 +61,8 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-        <div className="p-3 rounded-lg bg-gray-100 mr-auto max-w-[80%]">
-          <div className="text-sm font-semibold mb-1">助手</div>
-          <div className="text-gray-800">{currentResponse}</div>
-        </div>
-      </div>
+    <div className="flex flex-col h-[80dvh] max-w-4xl mx-auto p-4">
+      <ConversationPanel messages={messages} />
 
       <div className="flex gap-2">
         <input
