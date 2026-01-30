@@ -14,9 +14,7 @@ export default function RootLayout({
           <Link href="/agui" className="hover:underline">
             Home
           </Link>
-          <Link href="/agui/mastra" className="hover:underline">
-            Mastra Chat
-          </Link>
+
           <Link href="/agui/raw" className="hover:underline">
             Raw AG-UI
           </Link>
