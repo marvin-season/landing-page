@@ -3,7 +3,7 @@
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
 import { Bot } from "lucide-react";
-import { useState } from "react";
+import { createContext, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,10 @@ const AGENT_OPTIONS = Object.values(AgentConstant).map((agent) => ({
   value: agent,
   label: agent,
 }));
+
+export const AgentContext = createContext<{ currentAgent: string }>({
+  currentAgent: AgentConstant.WEATHER_AGENT,
+});
 
 export const AgentProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentAgent, setCurrentAgent] = useState(AgentConstant.WEATHER_AGENT);
@@ -36,7 +40,9 @@ export const AgentProvider = ({ children }: { children: React.ReactNode }) => {
           ))}
         </SelectContent>
       </Select>
-      {children}
+      <AgentContext.Provider value={{ currentAgent }}>
+        {children}
+      </AgentContext.Provider>
     </CopilotKit>
   );
 };

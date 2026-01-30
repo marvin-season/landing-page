@@ -1,20 +1,21 @@
 "use client";
 
 import { randomUUID, useAgent } from "@copilotkit/react-core/v2";
-import { useCallback, useState } from "react";
+import { use, useCallback, useState } from "react";
+import { AgentContext } from "@/app/agui/_components/AgentProvider";
 import {
   PromptInput,
   PromptInputBody,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
-import { AgentConstant } from "@/lib/constant/agent";
 import { ConversationPanel } from "./_components/ConversationPanel";
 
 function Chat() {
   const [input, setInput] = useState<string>("");
+  const { currentAgent } = use(AgentContext);
 
   const { agent } = useAgent({
-    agentId: AgentConstant.AGNO_AGENT,
+    agentId: currentAgent,
   });
 
   const handleSubmit = useCallback(async () => {

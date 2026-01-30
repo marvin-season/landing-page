@@ -16,7 +16,7 @@ export default function Page() {
   const messages = useSyncExternalStore(
     (subscribe) => {
       const { unsubscribe } = agent.subscribe({
-        onTextMessageContentEvent: ({}) => {
+        onTextMessageContentEvent: () => {
           subscribe();
         },
       });
