@@ -1,5 +1,6 @@
 "use client";
 
+import type { Message as AgentMessage, AssistantMessage } from "@ag-ui/core";
 import { randomUUID, useAgent } from "@copilotkit/react-core/v2";
 import { useCallback, useState } from "react";
 import {
@@ -26,26 +27,55 @@ import {
 } from "@/components/ai-elements/tool";
 import { AgentConstant } from "@/lib/constant/agent";
 
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
+// 获取消息文本内容
+function getMessageContent(message: AgentMessage): string {
+  if (message.role === "user") {
+    const content = message.content;
+    if (typeof content === "string") return content;
+    if (Array.isArray(content)) {
+      return content
+        .filter((c) => c.type === "text")
+        .map((c) => c.text)
+        .join("\n");
+    }
+    return "";
+  }
+  if (message.role === "assistant") {
+    return message.content || "";
+  }
+  if (message.role === "tool") {
+    return message.content;
+  }
+  return "";
 }
 
-interface ToolCall {
-  id: string;
-  name: string;
-  state: "streaming" | "output-available" | "error";
-  input?: Record<string, unknown>;
-  output?: unknown;
-  errorText?: string;
+// 检查是否是 AssistantMessage
+function isAssistantMessage(
+  message: AgentMessage,
+): message is AssistantMessage {
+  return message.role === "assistant";
+}
+
+// 获取 tool message 的结果
+function getToolResult(
+  messages: AgentMessage[],
+  toolCallId: string,
+): { output?: string; error?: string } | undefined {
+  const toolMessage = messages.find(
+    (m) => m.role === "tool" && m.toolCallId === toolCallId,
+  );
+  if (toolMessage && toolMessage.role === "tool") {
+    return {
+      output: toolMessage.content,
+      error: toolMessage.error,
+    };
+  }
+  return undefined;
 }
 
 function Chat() {
   const [input, setInput] = useState<string>("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [currentResponse, setCurrentResponse] = useState("");
-  const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
+  const [streamingContent, setStreamingContent] = useState("");
 
   const { agent } = useAgent({
     agentId: AgentConstant.WEATHER_AGENT,
@@ -54,116 +84,91 @@ function Chat() {
   const handleSubmit = useCallback(async () => {
     if (!input.trim() || agent.isRunning) return;
 
-    const userMessage: ChatMessage = {
-      id: randomUUID(),
-      role: "user",
-      content: input,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setCurrentResponse("");
-    setToolCalls([]);
-
     agent.addMessage({
-      id: userMessage.id,
+      id: randomUUID(),
       role: "user",
       content: input,
     });
 
+    setInput("");
+    setStreamingContent("");
+
     await agent.runAgent(undefined, {
       onTextMessageContentEvent: ({ event }) => {
-        setCurrentResponse((prev) => prev + event.delta);
+        setStreamingContent((prev) => prev + event.delta);
       },
       onTextMessageEndEvent: () => {
-        setCurrentResponse((prev) => {
-          if (prev) {
-            setMessages((msgs) => [
-              ...msgs,
-              {
-                id: randomUUID(),
-                role: "assistant",
-                content: prev,
-              },
-            ]);
-          }
-          return "";
-        });
+        setStreamingContent("");
       },
-      onToolCallStartEvent: ({ event }) => {
-        setToolCalls((prev) => [
-          ...prev,
-          {
-            id: event.toolCallId,
-            name: event.toolCallName,
-            state: "streaming",
-            input: {},
-          },
-        ]);
-      },
-      onToolCallArgsEvent: ({ event }) => {
-        setToolCalls((prev) =>
-          prev.map((tc) =>
-            tc.id === event.toolCallId
-              ? { ...tc, input: JSON.parse(event.delta || "{}") }
-              : tc,
-          ),
-        );
-      },
-      onToolCallEndEvent: ({ event }) => {
-        setToolCalls((prev) =>
-          prev.map((tc) =>
-            tc.id === event.toolCallId
-              ? { ...tc, state: "output-available" }
-              : tc,
-          ),
-        );
+      onRunFinishedEvent: () => {
+        console.log("agent", agent);
       },
       onRunErrorEvent: ({ event }) => {
         console.error("Agent error:", event.message);
       },
-      onRunFinishedEvent: () => {
-        setCurrentResponse("");
-      },
     });
   }, [input, agent]);
+
+  console.log("agent.messages", agent.messages, agent.messages.length);
 
   return (
     <div className="w-full p-6 relative size-full h-screen">
       <div className="flex flex-col h-full">
         <Conversation className="h-full">
           <ConversationContent>
-            {messages.map((message) => (
-              <Message key={message.id} from={message.role}>
-                <MessageContent>
-                  <MessageResponse>{message.content}</MessageResponse>
-                </MessageContent>
-              </Message>
-            ))}
+            {agent.messages.map((message) => {
+              // 跳过 tool message，它们会作为工具调用的输出显示
+              if (message.role === "tool") return null;
 
-            {/* 流式响应 */}
-            {agent.isRunning && currentResponse && (
-              <Message from="assistant">
-                <MessageContent>
-                  <MessageResponse>{currentResponse}</MessageResponse>
-                </MessageContent>
-              </Message>
-            )}
+              // 跳过 developer/system message
+              if (message.role === "developer" || message.role === "system")
+                return null;
 
-            {/* 工具调用 */}
-            {toolCalls.map((tool) => (
-              <Tool key={tool.id}>
-                <ToolHeader
-                  type={`tool-invocation`}
-                  state={tool.state as any}
-                  className="cursor-pointer"
-                />
-                <ToolContent>
-                  <ToolInput input={tool.input || {}} />
-                  <ToolOutput output={tool.output} errorText={tool.errorText} />
-                </ToolContent>
-              </Tool>
-            ))}
+              // 跳过 activity message
+              if (message.role === "activity") return null;
+
+              const content = getMessageContent(message);
+
+              return (
+                <div key={message.id}>
+                  {/* 工具调用 */}
+                  {isAssistantMessage(message) &&
+                    message.toolCalls?.map((toolCall) => {
+                      const result = getToolResult(agent.messages, toolCall.id);
+                      const toolArgs = toolCall.function?.arguments
+                        ? JSON.parse(toolCall.function.arguments)
+                        : {};
+
+                      return (
+                        <Tool key={toolCall.id}>
+                          <ToolHeader
+                            type="tool-invocation"
+                            state={
+                              result ? "output-available" : "input-streaming"
+                            }
+                            className="cursor-pointer"
+                          />
+                          <ToolContent>
+                            <ToolInput input={toolArgs} />
+                            <ToolOutput
+                              output={result?.output}
+                              errorText={result?.error}
+                            />
+                          </ToolContent>
+                        </Tool>
+                      );
+                    })}
+                  {/* 消息内容 */}
+                  {content && (
+                    <Message from={message.role}>
+                      <MessageContent>
+                        <MessageResponse>{content}</MessageResponse>
+                      </MessageContent>
+                    </Message>
+                  )}
+                </div>
+              );
+            })}
 
             <ConversationScrollButton />
           </ConversationContent>
