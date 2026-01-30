@@ -1,5 +1,6 @@
 import { AgentProvider } from "@/app/agui/_components/AgentProvider";
 import "@/css/globals.css";
+import Link from "next/link";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="h-dvh overflow-scroll">
+        <Link href="/agui/raw">Try Raw AG-UI</Link>
         <AgentProvider>{children}</AgentProvider>
       </body>
     </html>
