@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
+import { FundChart } from "@/app/[lang]/fund/_components/fund-chart";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
 import { fetchFundData } from "@/app/[lang]/fund/_utils/fund-api";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export default function FundDetail({ code }: { code: string }) {
         isLoading={fundQuery.isFetching}
         error={fundQuery.error?.message}
       />
+      <FundChart code={code} />
     </MotionDiv>
   );
 }
