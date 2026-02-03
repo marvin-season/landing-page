@@ -20,10 +20,12 @@ const CHART_HEIGHT = 240;
 const EMPTY_CHART_DATA: FundChartPoint[] = [];
 
 function toLineData(points: FundChartPoint[]): LineData[] {
-  return points.map((p) => ({
-    time: p.time as UTCTimestamp,
-    value: p.changePercent,
-  }));
+  return points
+    .map((p) => ({
+      time: p.time as UTCTimestamp,
+      value: p.changePercent,
+    }))
+    .sort((a, b) => a.time - b.time);
 }
 
 export function FundChart(props: { code: string }) {
