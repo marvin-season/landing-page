@@ -1,20 +1,17 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { validateFundCode } from "../_utils/fund-types";
 
-interface FundInputProps {
-  onSearch: (code: string) => void;
-  isLoading?: boolean;
-}
-
-export function FundInput({ onSearch, isLoading = false }: FundInputProps) {
+export function FundInput() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +29,7 @@ export function FundInput({ onSearch, isLoading = false }: FundInputProps) {
       return;
     }
 
-    onSearch(trimmedCode);
+    router.push(`/fund/${trimmedCode}`);
   };
 
   return (
@@ -57,11 +54,10 @@ export function FundInput({ onSearch, isLoading = false }: FundInputProps) {
                   setError("");
                 }}
                 maxLength={6}
-                disabled={isLoading}
                 className="flex-1"
                 aria-invalid={!!error}
               />
-              <Button type="submit" disabled={isLoading} size="md">
+              <Button type="submit" size="md">
                 <Search className="size-4" />
                 Search
               </Button>
