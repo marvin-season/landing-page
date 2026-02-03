@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         source: "/api-agent/:path*",
         destination: "http://localhost:7777/:path*",
       },
+      {
+        source: "/api-sina/:path*",
+        destination: "http://hq.sinajs.cn/:path*",
+      }
     ];
   },
 };
