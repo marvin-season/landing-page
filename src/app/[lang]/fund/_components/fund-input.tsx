@@ -50,7 +50,7 @@ export function FundInput({ onSearch, isLoading = false }: FundInputProps) {
               <Input
                 id="fund-code"
                 type="text"
-                placeholder="Enter the 6-digit fund code, e.g., 025209"
+                placeholder="Enter the 6-digit fund code, e.g., 025109"
                 value={code}
                 onChange={(e) => {
                   setCode(e.target.value);
