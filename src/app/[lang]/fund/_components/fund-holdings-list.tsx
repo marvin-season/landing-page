@@ -1,6 +1,7 @@
 "use client";
 
 import { Bookmark, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -9,18 +10,13 @@ import {
   useFundHoldingsStore,
 } from "@/store/fund-holdings-store";
 
-interface FundHoldingsListProps {
-  onSelectFund: (code: string) => void;
-  selectedCode?: string | null;
-}
-
-export function FundHoldingsList({
-  onSelectFund,
-  selectedCode,
-}: FundHoldingsListProps) {
+export function FundHoldingsList() {
   const holdings = useFundHoldings();
   const removeHolding = useFundHoldingsStore((s) => s.removeHolding);
+  const router = useRouter();
 
+  const params = useParams();
+  const selectedCode = params.code as string | null;
   if (holdings.length === 0) return null;
 
   return (
@@ -40,10 +36,12 @@ export function FundHoldingsList({
             >
               <button
                 type="button"
-                onClick={() => onSelectFund(h.code)}
+                onClick={() => {
+                  router.push(`/fund/${h.code}`);
+                }}
                 className={cn(
                   "flex-1 truncate text-left text-sm",
-                  selectedCode === h.code && "font-medium text-foreground",
+                  selectedCode === h.code && "font-medium text-blue-500",
                 )}
               >
                 <span className="text-muted-foreground">{h.code}</span>

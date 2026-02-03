@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { FundHoldingsList } from "@/app/[lang]/fund/_components/fund-holdings-list";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { FundInput } from "./_components/fund-input";
 
@@ -45,10 +46,7 @@ export default function FundLayout({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.15 }}
             >
-              {/* <FundHoldingsList
-              onSelectFund={handleSearch}
-              selectedCode={fundData?.code ?? null}
-            /> */}
+              <FundHoldingsList />
             </MotionDiv>
           </aside>
         </div>

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
 import { fetchFundData } from "@/app/[lang]/fund/_utils/fund-api";
+import { Button } from "@/components/ui/button";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 
 export default function FundPage({
@@ -12,9 +13,10 @@ export default function FundPage({
   params: Promise<{ code: string }>;
 }) {
   const { code } = use(params);
-  const { data, isLoading, error } = useQuery({
+  const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["fund", code],
     queryFn: () => fetchFundData(code),
+    refetchInterval: 3000,
   });
   if (!data) {
     return <div>Fund not found</div>;
@@ -25,7 +27,10 @@ export default function FundPage({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
     >
-      <FundEstimate data={data} isLoading={isLoading} error={error?.message} />
+      <Button size="sm" onClick={() => refetch()}>
+        Refetch
+      </Button>
+      <FundEstimate data={data} isLoading={isFetching} error={error?.message} />
     </MotionDiv>
   );
 }
