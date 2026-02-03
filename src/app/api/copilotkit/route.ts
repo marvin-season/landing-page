@@ -11,7 +11,7 @@ import type { NextRequest } from "next/server";
 import { mastra } from "@/mastra"; // the path to your Mastra instance
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
-const mastraAgents = MastraAgent.getLocalAgents({ mastra, resourceId: '1' });
+const mastraAgents = MastraAgent.getLocalAgents({ mastra, resourceId: "1" });
 
 const runtime = new CopilotRuntime({
   agents: {
