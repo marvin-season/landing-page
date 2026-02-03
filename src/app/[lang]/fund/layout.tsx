@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FundMyHoldingsList } from "@/app/[lang]/fund/_components/fund-my-holdings-list";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
+import { DevTool } from "./_components/devtool";
 import { FundInput } from "./_components/fund-input";
 
 export default function FundLayout({
@@ -47,6 +48,7 @@ export default function FundLayout({
         <footer className="fixed bottom-0 left-0 right-0 text-center text-sm text-muted-foreground">
           仅供学习使用
         </footer>
+        <DevTool />
       </div>
     </QueryClientProvider>
   );

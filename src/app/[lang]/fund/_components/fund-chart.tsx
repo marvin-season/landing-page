@@ -9,6 +9,7 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getIsInTradeTime } from "@/app/[lang]/fund/_utils";
 import type { FundChartPoint } from "@/store/fund-holdings-store";
 import { useFundHoldingsStore } from "@/store/fund-holdings-store";
 import { fetchFundData } from "../_utils/fund-api";
@@ -93,7 +94,8 @@ export function FundChart(props: { code: string }) {
   const fetchAndPush = useCallback(() => {
     if (!code) return;
     fetchFundData(code).then((data) => {
-      if (data != null) pushChartPoint(code, data.changePercent);
+      if (data != null && getIsInTradeTime())
+        pushChartPoint(code, data.changePercent);
     });
   }, [code, pushChartPoint]);
 

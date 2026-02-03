@@ -25,6 +25,7 @@ interface FundHoldingsStore {
   addHolding: (code: string, name: string) => void;
   removeHolding: (code: string) => void;
   hasHolding: (code: string) => boolean;
+  clearPoints: (code?: string) => void;
   /** 追加当前涨幅到某基金的走势数据 */
   pushChartPoint: (code: string, changePercent: number) => void;
   /** 清空某基金或全部走势数据 */
@@ -61,6 +62,15 @@ export const useFundHoldingsStore = create<FundHoldingsStore>()(
         },
         hasHolding: (code) => {
           return get().holdings.some((h) => h.code === code.trim());
+        },
+        clearPoints: (code) => {
+          set((state) => {
+            if (code === undefined) {
+              state.chartDataByCode = {};
+            } else {
+              delete state.chartDataByCode[code.trim()];
+            }
+          });
         },
         pushChartPoint: (code, changePercent) => {
           const normalized = code.trim();

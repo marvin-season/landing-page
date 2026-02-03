@@ -1,23 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import { Loader2Icon } from "lucide-react";
 import { FundChart } from "@/app/[lang]/fund/_components/fund-chart";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
+import { getIsInTradeTime } from "@/app/[lang]/fund/_utils";
 import { fetchFundData } from "@/app/[lang]/fund/_utils/fund-api";
 import { Button } from "@/components/ui/button";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
-
-/** 周一至周五 9:00–11:30、13:00–15:00 为交易时间 */
-function getIsInTradeTime(): boolean {
-  const now = dayjs();
-  const hour = now.hour();
-  const minute = now.minute();
-  const day = now.day(); // 0=周日 6=周六
-  const isWeekday = day >= 1 && day <= 5;
-  const morning = hour >= 9 && (hour < 11 || (hour === 11 && minute < 30));
-  const afternoon = hour >= 13 && (hour < 15 || (hour === 15 && minute < 0));
-  return isWeekday && (morning || afternoon);
-}
 
 export default function FundDetail({ code }: { code: string }) {
   const isInTradeTime = getIsInTradeTime();
