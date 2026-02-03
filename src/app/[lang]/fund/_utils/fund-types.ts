@@ -8,7 +8,6 @@ export interface FundData {
   lastUpdateTime: string;
 }
 
-
 /** 6位数字 = 基金代码 */
 export function validateFundCode(code: string): boolean {
   return /^\d{6}$/.test(code.trim());

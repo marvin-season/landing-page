@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useFundHoldingsStore } from "@/store/fund-holdings-store";
+import { Trend } from "./trend";
 
 export function DevTool() {
   const clearPoints = useFundHoldingsStore((state) => state.clearPoints);
@@ -25,6 +26,9 @@ export function DevTool() {
             >
               clear points
             </Button>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Trend />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

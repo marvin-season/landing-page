@@ -32,10 +32,7 @@ interface FundHoldingsStore {
   clearChartData: (code?: string) => void;
 }
 
-type PersistedState = Pick<
-  FundHoldingsStore,
-  "holdings" | "chartDataByCode"
->;
+type PersistedState = Pick<FundHoldingsStore, "holdings" | "chartDataByCode">;
 
 export const useFundHoldingsStore = create<FundHoldingsStore>()(
   immer(

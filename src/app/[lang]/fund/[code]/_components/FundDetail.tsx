@@ -1,14 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
+import { useEffect } from "react";
 import { FundChart } from "@/app/[lang]/fund/_components/fund-chart";
+import type { FundChartPoint } from "@/store/fund-holdings-store";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
 import { getIsInTradeTime } from "@/app/[lang]/fund/_utils";
 import { fetchFundData } from "@/app/[lang]/fund/_utils/fund-api";
 import { Button } from "@/components/ui/button";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
+import { useFundHoldingsStore } from "@/store/fund-holdings-store";
+
+const EMPTY_CHART_DATA: FundChartPoint[] = [];
 
 export default function FundDetail({ code }: { code: string }) {
   const isInTradeTime = getIsInTradeTime();
+  const pushChartPoint = useFundHoldingsStore((s) => s.pushChartPoint);
+  const chartData =
+    useFundHoldingsStore((s) => s.chartDataByCode[code]) ?? EMPTY_CHART_DATA;
   const {
     data: fundData,
     isFetching,
@@ -21,6 +29,12 @@ export default function FundDetail({ code }: { code: string }) {
     refetchInterval: 10000,
     enabled: isInTradeTime,
   });
+
+  useEffect(() => {
+    if (fundData) {
+      pushChartPoint(code, fundData.changePercent);
+    }
+  }, [fundData, code, pushChartPoint]);
 
   if (!fundData && !isFetching && !error && isInTradeTime) {
     return (
@@ -57,7 +71,7 @@ export default function FundDetail({ code }: { code: string }) {
         isLoading={isFetching}
         error={error?.message}
       />
-      <FundChart code={code} />
+      <FundChart data={chartData} code={code} />
     </MotionDiv>
   );
 }
