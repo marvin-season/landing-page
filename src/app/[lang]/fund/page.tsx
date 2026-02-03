@@ -2,27 +2,13 @@
 
 export default function FundPage() {
   return (
-    <div
-      className="text-center py-8 text-muted-foreground"
-      onClick={() => {
-        const res = fetch("/api-sina/list=sh600519", {});
-        res.then(async (res) => {
-          const body = res.body;
-          const reader = body?.getReader();
-          if (!reader) return;
-          const decoder = new TextDecoder();
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const text = decoder.decode(value, { stream: true });
-            console.log(text);
-          }
-          // console.log(result)
-        });
-      }}
-    >
-      Fund Page
+    <div className="py-8 text-center text-muted-foreground">
+      <p className="text-sm">
+        在上方输入基金代码（6位）或股票代码（如 sh600519、sz000001）进行查询
+      </p>
+      <p className="mt-2 text-xs">
+        基金数据来自东方财富，股票/ETF 数据来自新浪财经
+      </p>
     </div>
   );
 }
