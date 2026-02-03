@@ -40,7 +40,6 @@ export async function fetchFundHoldings(
   return data.holdings ?? [];
 }
 
-/** 基金估算走势（基于持仓股分时） */
 export async function fetchFundTrend(
   code: string,
 ): Promise<{

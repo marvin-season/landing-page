@@ -1,10 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { fetchFundHoldingsFromEastmoney } from "@/app/api/fund/_lib/holdings";
 
-/**
- * 基金估算走势 - 基于持仓股实时行情加权计算
- * 类似养基宝：获取重仓股分时数据，按持仓占比加权得到基金估算走势
- */
+
 const SINA_KLINE_URL =
   "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData";
 

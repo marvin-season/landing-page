@@ -20,10 +20,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useFundHoldingsStore } from "@/store/fund-holdings-store";
-import {
-  fetchFundHoldings,
-  type FundStockHolding,
-} from "../_utils/fund-api";
+import { fetchFundHoldings } from "../_utils/fund-api";
 import type { FundData } from "../_utils/fund-types";
 
 interface FundEstimateProps {
@@ -81,7 +78,7 @@ export function FundEstimate({
             {errorMsg ? (
               <p className="text-destructive">{errorMsg}</p>
             ) : (
-              <p>请输入基金代码查看当日估算净值</p>
+              <p>请输入基金代码</p>
             )}
           </div>
         </CardContent>

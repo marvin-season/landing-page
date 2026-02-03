@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from "next/server";
 /**
  * 东方财富/天天基金 实时净值接口
  * 数据源: http://fundgz.1234567.com.cn/js/{基金代码}.js
- * 返回当日估计净值(gsz)与估计涨幅(gszzl)，基于重仓股实时行情估算
  */
 const EASTMONEY_API = "http://fundgz.1234567.com.cn/js";
 
