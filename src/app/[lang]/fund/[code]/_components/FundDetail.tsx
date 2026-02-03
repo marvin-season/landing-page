@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
-import {
-  fetchFundData,
-  fetchFundTrend,
-} from "@/app/[lang]/fund/_utils/fund-api";
+import { fetchFundData } from "@/app/[lang]/fund/_utils/fund-api";
 import { Button } from "@/components/ui/button";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 
@@ -11,12 +9,8 @@ export default function FundDetail({ code }: { code: string }) {
   const fundQuery = useQuery({
     queryKey: ["fund", code],
     queryFn: () => fetchFundData(code),
+    refetchOnWindowFocus: true,
     refetchInterval: 10000,
-  });
-
-  const trendQuery = useQuery({
-    queryKey: ["fundTrend", code],
-    queryFn: () => fetchFundTrend(code),
   });
 
   const fundData = fundQuery.data;
@@ -39,11 +33,14 @@ export default function FundDetail({ code }: { code: string }) {
           variant="outline"
           onClick={() => {
             fundQuery.refetch();
-            trendQuery.refetch();
           }}
-          disabled={fundQuery.isFetching || trendQuery.isFetching}
+          disabled={fundQuery.isFetching}
         >
-          刷新
+          {fundQuery.isFetching ? (
+            <Loader2Icon className="size-4 animate-spin" />
+          ) : (
+            "刷新"
+          )}
         </Button>
       </div>
       <FundEstimate

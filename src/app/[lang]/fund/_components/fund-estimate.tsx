@@ -1,9 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import {
   Bookmark,
   BookmarkCheck,
+  Loader2Icon,
   Minus,
   TrendingDown,
   TrendingUp,
@@ -20,8 +20,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useFundHoldingsStore } from "@/store/fund-holdings-store";
-import { fetchFundHoldings } from "../_utils/fund-api";
 import type { FundData } from "../_utils/fund-types";
+import { FundKeyHoldingsList } from "./fund-key-holdings-list";
 
 interface FundEstimateProps {
   data: FundData | null;
@@ -37,13 +37,6 @@ export function FundEstimate({
   const addHolding = useFundHoldingsStore((s) => s.addHolding);
   const removeHolding = useFundHoldingsStore((s) => s.removeHolding);
   const hasHolding = useFundHoldingsStore((s) => s.hasHolding);
-
-  const { data: holdingsData } = useQuery({
-    queryKey: ["fundHoldings", data?.code],
-    queryFn: () => fetchFundHoldings(data!.code),
-    enabled: !!data?.code,
-  });
-  const holdings = holdingsData ?? [];
 
   const handleToggleHolding = () => {
     if (!data) return;
@@ -141,6 +134,12 @@ export function FundEstimate({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* 一个遮罩层，在 isLoading 时显示 */}
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <Loader2Icon className="size-8 animate-spin text-blue-500" />
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">估算净值</p>
@@ -175,40 +174,7 @@ export function FundEstimate({
           </div>
         </div>
 
-        {holdings.length > 0 && (
-          <div className="pt-4 border-t">
-            <h4 className="text-sm font-medium mb-2">重仓股</h4>
-            <div className="rounded-md border overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="px-3 py-2 text-left font-medium">#</th>
-                    <th className="px-3 py-2 text-left font-medium">代码</th>
-                    <th className="px-3 py-2 text-left font-medium">名称</th>
-                    <th className="px-3 py-2 text-right font-medium">占比</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {holdings.map((s) => (
-                    <tr key={s.stockCode} className="border-b last:border-0">
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {s.rank}
-                      </td>
-                      <td className="px-3 py-2 font-mono">{s.stockCode}</td>
-                      <td className="px-3 py-2 truncate max-w-[140px]">
-                        {s.stockName}
-                      </td>
-                      <td className="px-3 py-2 text-right">
-                        {s.holdRatio.toFixed(2)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
+        <FundKeyHoldingsList code={data.code} />
         <div className="pt-2">
           <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
             数据来源：东方财富 / 天天基金，基于重仓股实时行情估算，仅供参考
