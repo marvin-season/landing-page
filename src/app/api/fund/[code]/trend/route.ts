@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { fetchFundHoldingsFromEastmoney } from "@/app/api/fund/_lib/holdings";
 
 /**
  * 基金估算走势 - 基于持仓股实时行情加权计算
@@ -6,8 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
  */
 const SINA_KLINE_URL =
   "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData";
-const HOLDINGS_URL =
-  "https://fundf10.eastmoney.com/FundArchivesDatas.aspx";
 
 interface SinaKLineItem {
   day: string;
@@ -16,22 +15,6 @@ interface SinaKLineItem {
   low: string;
   close: string;
   volume: string;
-}
-
-function parseHoldingsFromHtml(html: string): Array<{ code: string; ratio: number }> {
-  const holdings: Array<{ code: string; ratio: number }> = [];
-  const rowRegex =
-    /<tr>[\s\S]*?<td[^>]*>\d+<\/td>[\s\S]*?<td[^>]*>(\d{6})<\/td>[\s\S]*?<td[^>]*>([^<]+)<\/td>[\s\S]*?<td[^>]*>([\d.]+)%?<\/td>/gi;
-  let m: RegExpExecArray | null;
-  while ((m = rowRegex.exec(html)) !== null) {
-    const stockCode = m[1];
-    const holdRatio = Number.parseFloat(m[3]) || 0;
-    if (holdRatio > 0 && holdRatio < 100) {
-      const prefix = stockCode.startsWith("6") ? "sh" : "sz";
-      holdings.push({ code: `${prefix}${stockCode}`, ratio: holdRatio / 100 });
-    }
-  }
-  return holdings;
 }
 
 async function fetchStockKline(
@@ -62,16 +45,11 @@ export async function GET(
   }
 
   try {
-    const [fundRes, holdingsRes] = await Promise.all([
+    const [fundRes, rawHoldings] = await Promise.all([
       fetch(`http://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; FundApp/1.0)" },
       }),
-      fetch(`${HOLDINGS_URL}?code=${code}&topline=10&type=jjcc`, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; FundApp/1.0)",
-          Referer: "https://fund.eastmoney.com/",
-        },
-      }),
+      fetchFundHoldingsFromEastmoney(code),
     ]);
 
     const fundText = await fundRes.text();
@@ -89,8 +67,10 @@ export async function GET(
     };
     const prevNetValue = Number.parseFloat(fundRaw.dwjz) || 0;
 
-    const holdingsHtml = await holdingsRes.text();
-    const holdings = parseHoldingsFromHtml(holdingsHtml);
+    const holdings = rawHoldings.map((item) => ({
+      code: item.stockCode,
+      ratio: item.holdRatio / 100,
+    }));
 
     if (holdings.length === 0) {
       return NextResponse.json({
@@ -127,15 +107,12 @@ export async function GET(
 
     const times = [...new Set(stockKlines.flat().map((k) => k.day))].sort();
     const sinaList = normalized.map((h) => h.code).join(",");
-    const sinaRes = await fetch(
-      `http://hq.sinajs.cn/list=${sinaList}`,
-      {
-        headers: {
-          Referer: "https://finance.sina.com.cn/",
-          "User-Agent": "Mozilla/5.0 (compatible; FundApp/1.0)",
-        },
+    const sinaRes = await fetch(`http://hq.sinajs.cn/list=${sinaList}`, {
+      headers: {
+        Referer: "https://finance.sina.com.cn/",
+        "User-Agent": "Mozilla/5.0 (compatible; FundApp/1.0)",
       },
-    );
+    });
     const sinaText = await sinaRes.text();
     const basePrevCloses = new Map<string, number>();
     const re = /var hq_str_([^=]+)="([^"]*)"/g;

@@ -21,12 +21,7 @@ export default function FundLayout({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
               className="space-y-2"
-            >
-              <h1 className="text-3xl font-bold">基金估算</h1>
-              <p className="text-muted-foreground">
-                输入基金代码，根据持仓股实时行情估算当日净值走势
-              </p>
-            </MotionDiv>
+            ></MotionDiv>
 
             <MotionDiv
               initial={{ opacity: 0, y: 10 }}

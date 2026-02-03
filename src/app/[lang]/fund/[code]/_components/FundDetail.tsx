@@ -22,7 +22,7 @@ export default function FundDetail({ code }: { code: string }) {
 
   const fundData = fundQuery.data;
   const trendData = trendQuery.data;
-
+  console.log("trendData", trendData);
   if (!fundData && !fundQuery.isFetching && !fundQuery.error) {
     return (
       <div className="text-muted-foreground">请输入基金代码查看估算净值</div>
