@@ -10,7 +10,7 @@ import {
   useFundHoldingsStore,
 } from "@/store/fund-holdings-store";
 
-export function FundHoldingsList() {
+export function FundMyHoldingsList() {
   const holdings = useFundHoldings();
   const removeHolding = useFundHoldingsStore((s) => s.removeHolding);
   const router = useRouter();

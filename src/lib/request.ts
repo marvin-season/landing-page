@@ -15,3 +15,16 @@ export const getApiUrl = (path: string) => {
   // 将 /api-remote 替换为真实的远程地址，或者直接拼接
   return `${baseUrl}${path}`;
 };
+
+export async function fetchApi<T>(
+  ...params: Parameters<typeof fetch>
+): Promise<T> {
+  const res = await fetch(...params);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error ?? "Failed to fetch data",
+    );
+  }
+  return res.json() as Promise<T>;
+}

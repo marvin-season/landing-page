@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { fetchFundHoldingsFromEastmoney } from "@/app/api/fund/_lib/holdings";
 
-
 const SINA_KLINE_URL =
   "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData";
 

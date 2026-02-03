@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { FundEstimate } from "@/app/[lang]/fund/_components/fund-estimate";
-import { FundTrendChart } from "@/app/[lang]/fund/_components/fund-trend-chart";
 import {
   fetchFundData,
   fetchFundTrend,
@@ -21,8 +20,6 @@ export default function FundDetail({ code }: { code: string }) {
   });
 
   const fundData = fundQuery.data;
-  const trendData = trendQuery.data;
-  console.log("trendData", trendData);
   if (!fundData && !fundQuery.isFetching && !fundQuery.error) {
     return (
       <div className="text-muted-foreground">请输入基金代码查看估算净值</div>
@@ -33,10 +30,10 @@ export default function FundDetail({ code }: { code: string }) {
     <MotionDiv
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.2 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
       className="space-y-6"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2">
         <Button
           size="sm"
           variant="outline"
@@ -53,14 +50,6 @@ export default function FundDetail({ code }: { code: string }) {
         data={fundData ?? null}
         isLoading={fundQuery.isFetching}
         error={fundQuery.error?.message}
-      />
-      <FundTrendChart
-        data={trendData?.data ?? []}
-        fundName={trendData?.name ?? fundData?.name ?? ""}
-        previousNetValue={
-          fundData?.previousNetValue ?? trendData?.previousNetValue ?? 0
-        }
-        isLoading={trendQuery.isFetching}
       />
     </MotionDiv>
   );

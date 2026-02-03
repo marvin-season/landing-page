@@ -18,3 +18,14 @@ export interface FundTrendPoint {
 export function validateFundCode(code: string): boolean {
   return /^\d{6}$/.test(code.trim());
 }
+
+export interface FundStockHolding {
+  rank: number;
+  stockCode: string;
+  stockName: string;
+  price?: number;
+  changePercent?: number;
+  holdShares?: number;
+  holdValue?: number;
+  holdRatio: number;
+}

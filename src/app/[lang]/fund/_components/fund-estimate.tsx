@@ -54,7 +54,7 @@ export function FundEstimate({
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <Card>
         <CardHeader>

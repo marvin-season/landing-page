@@ -1,5 +1,4 @@
-const HOLDINGS_URL =
-  "https://fundf10.eastmoney.com/FundArchivesDatas.aspx";
+const HOLDINGS_URL = "https://fundf10.eastmoney.com/FundArchivesDatas.aspx";
 
 export interface RawHolding {
   rank: number;
@@ -41,7 +40,8 @@ export async function fetchFundHoldingsFromEastmoney(
 
   const res = await fetch(url, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; FundApp/1.0; +https://github.com)",
+      "User-Agent":
+        "Mozilla/5.0 (compatible; FundApp/1.0; +https://github.com)",
       Referer: "https://fund.eastmoney.com/",
     },
     next: { revalidate: 3600 },
