@@ -1,20 +1,21 @@
 "use client";
 
-import type { IChartApi, ISeriesApi } from "lightweight-charts";
+import type { IChartApi } from "lightweight-charts";
 import {
-  type CandlestickData,
-  CandlestickSeries,
+  type LineData,
+  LineSeries,
   createChart,
   type Time,
 } from "lightweight-charts";
 import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { KLineItem } from "../_utils/fund-types";
+import type { FundTrendPoint } from "../_utils/fund-types";
 
-interface KLineChartProps {
-  data: KLineItem[];
-  code: string;
+interface FundTrendChartProps {
+  data: FundTrendPoint[];
+  fundName: string;
+  previousNetValue: number;
   isLoading?: boolean;
   height?: number;
 }
@@ -26,18 +27,18 @@ function toChartTime(day: string): Time {
   return day as Time;
 }
 
-export function KLineChart({
+export function FundTrendChart({
   data,
-  code,
+  fundName,
+  previousNetValue,
   isLoading = false,
-  height = 320,
-}: KLineChartProps) {
+  height = 280,
+}: FundTrendChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !data.length) return;
+    if (!containerRef.current || !data.length || previousNetValue <= 0) return;
 
     const chart = createChart(containerRef.current, {
       layout: {
@@ -57,30 +58,27 @@ export function KLineChart({
       },
       rightPriceScale: {
         borderColor: "hsl(var(--border))",
-        scaleMargins: { top: 0.1, bottom: 0.2 },
+        scaleMargins: { top: 0.2, bottom: 0.2 },
       },
     });
 
-    const candlestickSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "hsl(142 76% 36%)",
-      downColor: "hsl(0 84% 60%)",
-      borderUpColor: "hsl(142 76% 36%)",
-      borderDownColor: "hsl(0 84% 60%)",
-    });
+    const lastValue = data[data.length - 1]?.value ?? previousNetValue;
+    const isUp = lastValue >= previousNetValue;
 
-    const chartData: CandlestickData[] = data.map((item) => ({
+    const lineData: LineData[] = data.map((item) => ({
       time: toChartTime(item.time),
-      open: item.open,
-      high: item.high,
-      low: item.low,
-      close: item.close,
+      value: item.value,
     }));
 
-    candlestickSeries.setData(chartData);
+    const lineSeries = chart.addSeries(LineSeries, {
+      color: isUp ? "hsl(142 76% 36%)" : "hsl(0 84% 60%)",
+      lineWidth: 2,
+    });
+
+    lineSeries.setData(lineData);
     chart.timeScale().fitContent();
 
     chartRef.current = chart;
-    seriesRef.current = candlestickSeries;
 
     const handleResize = () => {
       if (containerRef.current && chartRef.current) {
@@ -95,15 +93,14 @@ export function KLineChart({
       window.removeEventListener("resize", handleResize);
       chart.remove();
       chartRef.current = null;
-      seriesRef.current = null;
     };
-  }, [data, height]);
+  }, [data, previousNetValue, height]);
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">日K线</CardTitle>
+          <CardTitle className="text-base">估算走势</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="w-full" style={{ height }} />
@@ -112,15 +109,15 @@ export function KLineChart({
     );
   }
 
-  if (!data.length) return null;
+  if (!data.length || previousNetValue <= 0) return null;
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">
-          日K线
+          估算走势
           <span className="ml-2 text-sm font-normal text-muted-foreground">
-            {code}
+            基于持仓股实时行情
           </span>
         </CardTitle>
       </CardHeader>
