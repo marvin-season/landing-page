@@ -1,5 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
+import { ollama } from "ollama-ai-provider-v2";
 import { AgentConstant } from "@/lib/constant/agent";
 import { weatherTool } from "../tools/weather-tool";
 
@@ -20,7 +21,8 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: "deepseek/deepseek-chat",
+  // model: "ollama/qwen2.5:7b",
+  model: ollama("qwen2.5:7b"),
   tools: { weatherTool },
 
   memory: new Memory(),

@@ -11,7 +11,7 @@ import {
 import { ConversationPanel } from "./_components/ConversationPanel";
 
 function Chat() {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>("hi");
   const { currentAgent } = use(AgentContext);
 
   const { agent } = useAgent({
