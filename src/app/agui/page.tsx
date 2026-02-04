@@ -8,10 +8,11 @@ import {
   PromptInputBody,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
+import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import { ConversationPanel } from "./_components/ConversationPanel";
 
 function Chat() {
-  const [input, setInput] = useState<string>("hi");
+  const [input, setInput] = useState<string>("");
   const { currentAgent } = use(AgentContext);
 
   const { agent } = useAgent({
@@ -43,6 +44,17 @@ function Chat() {
     <div className="w-full p-6 relative size-full h-[80dvh]">
       <div className="flex flex-col h-full">
         <ConversationPanel messages={agent.messages} />
+        <Suggestions>
+          <Suggestion
+            suggestion="hello"
+            onClick={() => {
+              setInput("hello");
+              handleSubmit();
+            }}
+          >
+            Hello
+          </Suggestion>
+        </Suggestions>
 
         <PromptInput onSubmit={handleSubmit} className="mt-20">
           <PromptInputBody>
