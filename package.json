@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:all": "concurrently \"npm run dev:ui\" \"npm run dev:agent\" --names ui,agent --prefix-colors blue,green --kill-others",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:agent\" --names ui,agent --prefix-colors blue,green --kill-others",
     "dev:agent": "./scripts/run-agent.sh || scripts\\run-agent.bat",
-    "dev:ui": "next dev -p 3001",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "analyze": "next experimental-analyze",
     "start": "next start -p 3001",
