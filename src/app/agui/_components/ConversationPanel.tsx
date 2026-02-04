@@ -67,8 +67,6 @@ function getToolResult(
 const ConversationPanel = (props: { messages: AgentMessage[] }) => {
   const { messages } = props;
 
-  console.log("messages", messages);
-
   return (
     <Conversation className="h-full">
       <ConversationContent>
