@@ -1,4 +1,5 @@
 import type { Message as AgentMessage, AssistantMessage } from "@ag-ui/core";
+import { memo } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -63,8 +64,10 @@ function getToolResult(
   return undefined;
 }
 
-export const ConversationPanel = (props: { messages: AgentMessage[] }) => {
+const ConversationPanel = (props: { messages: AgentMessage[] }) => {
   const { messages } = props;
+
+  console.log("messages", messages);
 
   return (
     <Conversation className="h-full">
@@ -126,3 +129,5 @@ export const ConversationPanel = (props: { messages: AgentMessage[] }) => {
     </Conversation>
   );
 };
+
+export default memo(ConversationPanel);

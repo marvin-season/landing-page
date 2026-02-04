@@ -2,7 +2,7 @@
 
 import { HttpAgent, type Message, randomUUID } from "@ag-ui/client";
 import { useState, useSyncExternalStore } from "react";
-import { ConversationPanel } from "../_components/ConversationPanel";
+import ConversationPanel from "../_components/ConversationPanel";
 
 // 创建 HttpAgent 实例，直接连接到后端服务器
 const agent = new HttpAgent({
