@@ -9,6 +9,9 @@ import { OverviewCards } from "./_components/overview-cards";
 import { PositionsTable } from "./_components/positions-table";
 import { TransactionModal } from "./_components/transaction-modal";
 
+const disclaimer =
+  "免责声明：本应用仅供学习交流使用。行情数据来源网络，可能存在延迟或误差，不构成任何投资建议。投资有风险，入市需谨慎。";
+
 export default function FundPage() {
   const syncEstimations = useFundStore((s) => s.syncEstimations);
   const positions = useFundStore((s) => s.positions);
@@ -18,8 +21,21 @@ export default function FundPage() {
   const [modalType, setModalType] = useState<"buy" | "sell">("buy");
   const [modalCode, setModalCode] = useState("");
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState(false);
+
   useEffect(() => {
-    if (positions.length > 0) {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("fund_auth") === "true"
+    ) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && positions.length > 0) {
       syncEstimations()
         .then((r) => {
           if (r && !r.ok && r.errors?.length) setSyncError(r.errors[0]);
@@ -27,7 +43,7 @@ export default function FundPage() {
         })
         .catch(() => setSyncError("同步失败"));
     }
-  }, [positions.length, syncEstimations]);
+  }, [isAuthenticated, positions.length, syncEstimations]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -42,6 +58,58 @@ export default function FundPage() {
     setModalCode(code ?? "");
     setModalOpen(true);
   };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const bjDate = new Date(utc + 3600000 * 8);
+
+    const yy = String(bjDate.getFullYear()).slice(-2);
+    const mm = String(bjDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(bjDate.getDate()).padStart(2, "0");
+    const hh = String(bjDate.getHours()).padStart(2, "0");
+
+    const correctPassword = `${yy}${mm}${dd}${hh}`;
+    console.log(disclaimer, correctPassword);
+    if (password === correctPassword) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("fund_auth", "true");
+      setAuthError(false);
+    } else {
+      setAuthError(true);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-background p-4">
+        <form
+          onSubmit={handleLogin}
+          className="w-full max-w-sm space-y-4 text-center"
+        >
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-2">访问验证</h1>
+            <p className="text-sm text-muted-foreground uppercase">
+              display in console (YYMMDDHH)
+            </p>
+          </div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="密码"
+            autoFocus
+          />
+          {authError && <p className="text-sm text-red-500">密码错误</p>}
+          <Button type="submit" className="w-full">
+            进入
+          </Button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -78,7 +146,7 @@ export default function FundPage() {
           <PositionsTable onOpenTransaction={openTransaction} />
         </div>
         <div className="mt-8 text-center text-xs text-muted-foreground">
-          <p>免责声明：本应用仅供学习交流使用。行情数据来源网络，可能存在延迟或误差，不构成任何投资建议。投资有风险，入市需谨慎。</p>
+          <p>{disclaimer}</p>
         </div>
       </div>
 
