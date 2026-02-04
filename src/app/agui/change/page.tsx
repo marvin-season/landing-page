@@ -1,30 +1,33 @@
 "use client";
-import dayjs from "dayjs";
-import { useRef, useSyncExternalStore } from "react";
 
-const useCD = ({
-  interval = 1000,
-  onCD,
-}: {
-  interval?: number;
-  onCD?: (cd: number) => void;
-}) => {
-  const timestamp = useRef<number>(Date.now());
-  return useSyncExternalStore(
-    (callback) => {
-      const intervalId = setInterval(() => {
-        timestamp.current = Date.now();
-        onCD?.(timestamp.current);
-        callback();
-      }, interval);
-      return () => clearInterval(intervalId);
-    },
-    () => timestamp.current,
-    () => timestamp.current,
-  );
-};
+import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { useMeals } from "./store";
+
+function PapaBear() {
+  const papaBear = useMeals((state) => state.papaBear);
+  return <div>{papaBear}</div>;
+}
 
 export default function ChangePage() {
-  const timestamp = useCD({});
-  return <div>{dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss")}</div>;
+  const names = useMeals(useShallow((state) => Object.keys(state)));
+
+  useEffect(() => {
+    const unsubscribe = useMeals.subscribe((state) => {
+      console.log(" changed", state);
+    });
+    return unsubscribe;
+  }, []);
+
+  console.log("names", names);
+  return (
+    <div
+      onClick={() =>
+        useMeals.setState({ papaBear: "large porridge-pot" + Date.now() })
+      }
+    >
+      <div>{names.join(", ")}</div>
+      <PapaBear />
+    </div>
+  );
 }
