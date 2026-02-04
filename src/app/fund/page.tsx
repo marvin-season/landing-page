@@ -77,6 +77,9 @@ export default function FundPage() {
           <OverviewCards />
           <PositionsTable onOpenTransaction={openTransaction} />
         </div>
+        <div className="mt-8 text-center text-xs text-muted-foreground">
+          <p>免责声明：本应用仅供学习交流使用。行情数据来源网络，可能存在延迟或误差，不构成任何投资建议。投资有风险，入市需谨慎。</p>
+        </div>
       </div>
 
       <TransactionModal

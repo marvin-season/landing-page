@@ -178,7 +178,13 @@ export const useFundStore = create<FundState & FundActions>()(
                 }
                 const data = (await res.json()) as FundRealtimeItem;
                 if (data?.code) {
-                  get().setRealtimeItem(code, data);
+                  set((state) => {
+                    state.realtimeData[code] = data;
+                    const pos = state.positions.find((p) => p.fundCode === code);
+                    if (pos && data.name) {
+                      pos.fundName = data.name;
+                    }
+                  });
                 } else {
                   errors.push(`${code}: 无效数据`);
                 }
