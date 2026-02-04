@@ -35,6 +35,7 @@ export function TransactionModal({
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fetchingPrice, setFetchingPrice] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -51,11 +52,36 @@ export function TransactionModal({
     positions.find((p) => p.fundCode === fundCode)?.fundName ??
     (fundCode ? "未知" : "");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchHistoryPrice = async () => {
+    if (!fundCode.trim()) {
+       setError("请先输入基金代码");
+       return null;
+    }
+    setFetchingPrice(true);
+    setError(null);
+    try {
+        const res = await fetch(`/api/proxy?code=${fundCode.trim()}&type=history&date=${date}`);
+        const data = await res.json();
+        if (res.ok && data.dwjz) {
+            setPrice(data.dwjz);
+            return data.dwjz;
+        } else {
+            setError(data.error || "无法获取该日净值，请确认代码和日期，或手动输入");
+            return null;
+        }
+    } catch {
+        setError("查询净值失败，请手动输入");
+        return null;
+    } finally {
+        setFetchingPrice(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     const numAmount = parseFloat(amount);
-    const numPrice = parseFloat(price);
+    let numPrice = parseFloat(price);
 
     if (!fundCode.trim()) {
       setError("请输入基金代码");
@@ -65,13 +91,22 @@ export function TransactionModal({
       setError("请输入有效金额");
       return;
     }
+
+    setLoading(true);
+
+    // If price is missing, try to fetch it automatically
     if (Number.isNaN(numPrice) || numPrice <= 0) {
-      setError("请输入有效单价");
-      return;
+        const fetched = await fetchHistoryPrice();
+        if (fetched) {
+            numPrice = parseFloat(fetched);
+        } else {
+            setLoading(false);
+            return; // Error already set by fetchHistoryPrice
+        }
     }
 
     const shares = numAmount / numPrice;
-    setLoading(true);
+    
     try {
       addTransaction({
         type,
@@ -159,7 +194,17 @@ export function TransactionModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">单价</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium">单价</label>
+                <button
+                  type="button"
+                  onClick={fetchHistoryPrice}
+                  disabled={fetchingPrice || !fundCode}
+                  className="text-xs text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                >
+                  {fetchingPrice ? "查询中..." : "查询净值"}
+                </button>
+              </div>
               <input
                 type="number"
                 step="0.0001"
@@ -167,7 +212,7 @@ export function TransactionModal({
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 className="w-full rounded-md border px-3 py-2 text-sm"
-                placeholder="1.0000"
+                placeholder="留空自动查询"
               />
             </div>
           </div>

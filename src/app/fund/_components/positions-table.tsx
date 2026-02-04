@@ -114,10 +114,14 @@ export function PositionsTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-muted-foreground"
-                        onClick={() => removePosition(pos.fundCode)}
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          if (confirm(`确认删除 ${pos.fundName} (${pos.fundCode}) 吗？此操作不可恢复。`)) {
+                            removePosition(pos.fundCode);
+                          }
+                        }}
                       >
-                        <Trash2 className="size-4" />
+                        <Trash2 className="size-4 mr-1" /> 删除
                       </Button>
                     </div>
                   </td>
