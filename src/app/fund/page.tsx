@@ -28,7 +28,8 @@ export default function FundPage() {
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
-      sessionStorage.getItem("fund_auth") === "true"
+      (sessionStorage.getItem("fund_auth") === "true" ||
+        localStorage.getItem("permanent_auth") === "true")
     ) {
       setIsAuthenticated(true);
     }
@@ -75,6 +76,9 @@ export default function FundPage() {
     if (password === correctPassword) {
       setIsAuthenticated(true);
       sessionStorage.setItem("fund_auth", "true");
+      if (password === "nextjs") {
+        localStorage.setItem("permanent_auth", "true");
+      }
       setAuthError(false);
     } else {
       setAuthError(true);
