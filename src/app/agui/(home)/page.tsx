@@ -8,8 +8,8 @@ import {
   PromptInputBody,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
-import { MessageList } from "./_components/MessageList";
-import { useCurrentAgent } from "./store";
+import { MessageList } from "../_components/MessageList";
+import { useCurrentAgent } from "../store";
 
 function Chat() {
   const agent = useCurrentAgent((state) => state.agent);
