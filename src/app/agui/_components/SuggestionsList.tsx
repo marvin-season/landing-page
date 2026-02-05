@@ -12,7 +12,15 @@ export const SuggestionsList = (props: {
           onSuggestionClick("hello");
         }}
       >
-        Hello
+        hello
+      </Suggestion>
+      <Suggestion
+        suggestion="北京天气"
+        onClick={() => {
+          onSuggestionClick("北京天气");
+        }}
+      >
+        北京天气
       </Suggestion>
     </Suggestions>
   );

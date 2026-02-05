@@ -46,6 +46,18 @@ const getWeather = async (location: string) => {
   const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
 
   if (!geocodingData.results?.[0]) {
+    // 开发环境返回mock数据
+    if(process.env.NODE_ENV === "development") {
+      return {
+        temperature: 100,
+        feelsLike: 1,
+        humidity: 0,
+        windSpeed: 1,
+        windGust: 1,
+        conditions: "Sunny",
+        location: location,
+      };
+    }
     throw new Error(`Location '${location}' not found`);
   }
 
