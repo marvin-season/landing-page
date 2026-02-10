@@ -77,11 +77,10 @@ export const MessageAction = ({
   children,
   label,
   variant = "ghost",
-  size = "icon-sm",
   ...props
 }: MessageActionProps) => {
   const button = (
-    <Button size={size} type="button" variant={variant} {...props}>
+    <Button type="button" variant={variant} {...props}>
       {children}
       <span className="sr-only">{label || tooltip}</span>
     </Button>
@@ -246,7 +245,6 @@ export const MessageBranchPrevious = ({
       aria-label="Previous branch"
       disabled={totalBranches <= 1}
       onClick={goToPrevious}
-      size="icon-sm"
       type="button"
       variant="ghost"
       {...props}
@@ -270,7 +268,6 @@ export const MessageBranchNext = ({
       aria-label="Next branch"
       disabled={totalBranches <= 1}
       onClick={goToNext}
-      size="icon-sm"
       type="button"
       variant="ghost"
       {...props}
@@ -346,6 +343,7 @@ export function MessageAttachment({
     >
       {isImage ? (
         <>
+          {/** biome-ignore lint/performance/noImgElement: <lint> */}
           <img
             alt={filename || "attachment"}
             className="size-full object-cover"

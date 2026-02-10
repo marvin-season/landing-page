@@ -3,13 +3,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { agents } from "../route";
 
 export const GET = async (
-  req: NextRequest,
-  { params }: { params: Promise<{ agentId: keyof typeof agents }> },
+  _: NextRequest,
+  { params }: { params: Promise<{ agentId: string }> },
 ) => {
   // 获取路径参数
   const { agentId } = await params;
 
-  const agent = agents[agentId];
+  const agent = agents[agentId as keyof typeof agents];
   if (!agent) {
     return NextResponse.json(
       { error: `Agent ${agentId} not found` },
