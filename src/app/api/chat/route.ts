@@ -2,36 +2,36 @@ import { handleChatStream } from "@mastra/ai-sdk";
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { NextResponse } from "next/server";
+import { AgentConstant } from "@/lib/constant/agent";
 import { mastra } from "@/mastra";
 
-const THREAD_ID = "example-user-id";
-const RESOURCE_ID = "weather-chat";
 
 export async function POST(req: Request) {
   const params = await req.json();
   const stream = await handleChatStream({
     mastra,
-    agentId: "weather-agent",
+    agentId: AgentConstant.WEATHER_AGENT,
     params: {
       ...params,
       memory: {
         ...params.memory,
-        thread: THREAD_ID,
-        resource: RESOURCE_ID,
+        thread: params.resourceId,
+        resource: params.resourceId,
       },
     },
   });
   return createUIMessageStreamResponse({ stream });
 }
 
-export async function GET() {
-  const memory = await mastra.getAgentById("weather-agent").getMemory();
+export async function GET(_: Request, {params}: { params: Promise<{ resourceId: string }> }) {
+  const { resourceId } = await params;
+  const memory = await mastra.getAgentById(AgentConstant.WEATHER_AGENT).getMemory();
   let response = null;
 
   try {
     response = await memory?.recall({
-      threadId: THREAD_ID,
-      resourceId: RESOURCE_ID,
+      threadId: resourceId,
+      resourceId,
     });
   } catch {
     console.log("No previous messages found.");

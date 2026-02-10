@@ -28,6 +28,9 @@ export function ChatMain() {
   const { messages, setMessages, sendMessage, status, error, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
+      body: {
+        resourceId: sessionId,
+      },
     }),
     id: sessionId,
     onFinish: ({ messages }) => {
