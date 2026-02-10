@@ -4,6 +4,7 @@ import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
+import { useCurrentSession } from "@/store/session-store";
 
 /**
  * 右边侧边栏消息列表，开启分页模式才会有
@@ -14,8 +15,8 @@ export function PaginationMessageList(props: { className?: string }) {
   const paginationDisplay = useChatSettingsStore((s) =>
     s.isSettingEnabled("pagination-display"),
   );
-  const messages = useCurrentMessages();
-
+  const currentSession = useCurrentSession();
+  const { messages } = useCurrentMessages(currentSession?.id!);
   const userMessages = messages.filter((m) => m.role === "user");
 
   const messagePairs = userMessages.map((userMsg) => {

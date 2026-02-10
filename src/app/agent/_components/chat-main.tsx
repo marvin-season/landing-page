@@ -19,12 +19,12 @@ import { ModelSelector } from "./model-selector";
 
 export function ChatMain() {
   const { updateSession } = useSessionStore();
-  const { selectedMessageId, addMessages, setSelectedMessageId } =
-    useMessageStore();
-  const currentMessages = useCurrentMessages();
+  const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
   const currentSession = useCurrentSession();
   const sessionId = currentSession?.id!;
+  const { messages: currentMessages, refetch } = useCurrentMessages(sessionId);
+
   const { messages, setMessages, sendMessage, status, error, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
@@ -35,8 +35,7 @@ export function ChatMain() {
     id: sessionId,
     onFinish: ({ messages }) => {
       console.log("onFinish", messages);
-      // update
-      addMessages(sessionId, messages);
+      refetch();
       const lastUserMessage = getLastUserMessage(messages);
       if (lastUserMessage) {
         setSelectedMessageId(lastUserMessage.id);
