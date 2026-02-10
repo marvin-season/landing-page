@@ -5,7 +5,10 @@ import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 
-export function MessageList(props: { className?: string }) {
+/**
+ * 右边侧边栏消息列表，开启分页模式才会有
+ */
+export function PaginationMessageList(props: { className?: string }) {
   const { className } = props;
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
   const paginationDisplay = useChatSettingsStore((s) =>

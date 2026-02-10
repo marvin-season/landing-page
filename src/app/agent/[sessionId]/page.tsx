@@ -1,6 +1,6 @@
 import { ChatMain } from "@/app/agent/_components/chat-main";
 import { ChatHeader } from "@/app/agent/_components/header/chat-header";
-import { MessageList } from "@/app/agent/_components/message/message-list";
+import { PaginationMessageList } from "@/app/agent/_components/message/pagination-message-list";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -13,7 +13,7 @@ export default function SessionPage({ params: _ }: SessionPageProps) {
         <ChatHeader />
         <ChatMain />
       </div>
-      <MessageList className="hidden lg:flex h-full shrink-0 border-l border-slate-200 p-2" />
+      <PaginationMessageList className="hidden lg:flex h-full shrink-0 border-l border-slate-200 p-2" />
     </div>
   );
 }

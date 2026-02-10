@@ -12,8 +12,11 @@ import {
 import { useChatSettingsStore } from "@/store/chat-settings-store";
 import { useCurrentSession } from "@/store/session-store";
 
-const ChatHistory = dynamic(
-  () => import("../message/message-list").then((mod) => mod.MessageList),
+const PaginationMessageList = dynamic(
+  () =>
+    import("../message/pagination-message-list").then(
+      (mod) => mod.PaginationMessageList,
+    ),
   {
     ssr: false,
   },
@@ -51,7 +54,7 @@ export function ChatHeader() {
             className="px-4"
             trigger={<History size={16} className="lg:hidden" />}
           >
-            <ChatHistory className="max-w-auto" />
+            <PaginationMessageList className="max-w-auto" />
           </Drawer>
         )}
 

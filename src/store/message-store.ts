@@ -1,8 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import type { UIMessage } from "ai";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { useShallow } from "zustand/react/shallow";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 import { useCurrentSession } from "@/store/session-store";
 
@@ -63,9 +63,22 @@ export const useMessageStore = create<IMessageStore>()(
 export function useCurrentMessages() {
   const currentSession = useCurrentSession();
   const sessionId = currentSession?.id;
-  return useMessageStore(
-    useShallow((state) =>
-      sessionId ? state.messagesMap[sessionId] || [] : [],
-    ),
-  );
+  console.log("sessionId", sessionId);
+  const { data: messages } = useQuery({
+    queryKey: ["messages", sessionId],
+    queryFn: () => {
+      return fetch(`/api/chat?resourceId=${sessionId}`).then((res) =>
+        res.json(),
+      );
+    },
+    enabled: !!sessionId,
+  });
+  // const messages = useMessageStore(
+  //   useShallow((state) =>
+  //     sessionId ? state.messagesMap[sessionId] || [] : [],
+  //   ),
+  // );
+
+  console.log("messages", messages);
+  return (messages || []) as UIMessage[];
 }
