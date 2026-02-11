@@ -2,6 +2,8 @@ import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { ollama } from "ollama-ai-provider-v2";
 import { AgentConstant } from "@/lib/constant/agent";
+import { sendEmailTool } from "../tools/email-tool";
+import { stockQuoteTool } from "../tools/stock-tool";
 import { weatherTool } from "../tools/weather-tool";
 
 export const generalAgent = new Agent({
@@ -18,6 +20,8 @@ export const generalAgent = new Agent({
 
       Tool usage:
       - Use weatherTool for weather queries. Ask for a city if missing.
+      - Use stockQuoteTool for stock price queries (Yahoo Finance). Ask for a ticker symbol if missing.
+      - Use sendEmailTool to send emails when explicitly requested. Confirm recipients and subject if missing.
       - Do not guess tool outputs; use the tool and reflect its results.
       - If the tool fails, explain the issue and ask for a different location or retry.
 
@@ -27,7 +31,7 @@ export const generalAgent = new Agent({
 `,
   // model: "ollama/qwen2.5:7b",
   model: ollama("qwen2.5:7b"),
-  tools: { weatherTool },
+  tools: { weatherTool, stockQuoteTool, sendEmailTool },
 
   memory: new Memory(),
 });
