@@ -1,5 +1,6 @@
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
+import { AgentConstant } from "@/lib/constant/agent";
 
 const forecastSchema = z.object({
   date: z.string(),
@@ -100,7 +101,7 @@ const planActivities = createStep({
       throw new Error("Forecast data not found");
     }
 
-    const agent = mastra?.getAgent("weatherAgent");
+    const agent = mastra?.getAgent(AgentConstant.GENERAL_AGENT);
     if (!agent) {
       throw new Error("Weather agent not found");
     }

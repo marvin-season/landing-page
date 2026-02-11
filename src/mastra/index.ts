@@ -8,7 +8,7 @@ import {
   SensitiveDataFilter,
 } from "@mastra/observability";
 import { AgentConstant } from "@/lib/constant/agent";
-import { weatherAgent } from "./agents/weather-agent";
+import { generalAgent } from "./agents/general-agent";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 
 export const mastra = new Mastra({
@@ -16,7 +16,7 @@ export const mastra = new Mastra({
     externals: ["@copilotkit/runtime"],
   },
   workflows: { weatherWorkflow },
-  agents: { [AgentConstant.WEATHER_AGENT]: weatherAgent },
+  agents: { [AgentConstant.GENERAL_AGENT]: generalAgent },
   storage: new LibSQLStore({
     id: "mastra-storage",
     // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db

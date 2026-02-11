@@ -1,4 +1,4 @@
 export const AgentConstant = {
-  WEATHER_AGENT: "weatherAgent",
+  GENERAL_AGENT: "generalAgent",
   AGNO_AGENT: "agnoAgent",
 };

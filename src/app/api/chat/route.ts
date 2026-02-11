@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   const params = await req.json();
   const stream = await handleChatStream({
     mastra,
-    agentId: AgentConstant.WEATHER_AGENT,
+    agentId: AgentConstant.GENERAL_AGENT,
     params: {
       ...params,
       memory: {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     );
   }
   const memory = await mastra
-    .getAgentById(AgentConstant.WEATHER_AGENT)
+    .getAgentById(AgentConstant.GENERAL_AGENT)
     .getMemory();
   let response = null;
 

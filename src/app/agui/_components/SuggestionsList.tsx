@@ -15,6 +15,14 @@ export const SuggestionsList = (props: {
         hello
       </Suggestion>
       <Suggestion
+        suggestion="帮我写一封产品发布邮件"
+        onClick={() => {
+          onSuggestionClick("帮我写一封产品发布邮件");
+        }}
+      >
+        帮我写一封产品发布邮件
+      </Suggestion>
+      <Suggestion
         suggestion="北京天气"
         onClick={() => {
           onSuggestionClick("北京天气");

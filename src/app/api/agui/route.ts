@@ -5,7 +5,7 @@ import { mastra } from "@/mastra";
 
 const mastraAgent = MastraAgent.getLocalAgent({
   mastra,
-  agentId: AgentConstant.WEATHER_AGENT,
+  agentId: AgentConstant.GENERAL_AGENT,
   resourceId: "1",
 });
 

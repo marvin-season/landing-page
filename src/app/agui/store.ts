@@ -9,7 +9,7 @@ interface AgentStore {
 }
 
 export const useAgentStore = create<AgentStore>((set) => ({
-  agentId: AgentConstant.WEATHER_AGENT,
+  agentId: AgentConstant.GENERAL_AGENT,
   setAgentId: (agentId) => set({ agentId }),
 }));
 
