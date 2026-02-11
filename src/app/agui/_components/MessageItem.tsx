@@ -1,5 +1,6 @@
 import type { Message as AgentMessage, Message as TMessage } from "@ag-ui/core";
 import { memo } from "react";
+import { getToolResult } from "@/app/agui/_components/ConversationPanel";
 import {
   Message,
   MessageContent,
@@ -30,14 +31,14 @@ function getMessageContent(message: AgentMessage): string {
 
 interface MessageItemProps {
   message: TMessage;
+  messages: TMessage[];
 }
 
 export const MessageItem = memo(
   (props: MessageItemProps) => {
-    const { message } = props;
+    const { message, messages } = props;
     // 跳过 tool message，它们会作为工具调用的输出显示
-    if (message.role === "tool")
-      return <ToolOutput output={message.content} errorText={message.error} />;
+    if (message.role === "tool") return null;
 
     // 跳过 developer/system message
     if (message.role === "developer" || message.role === "system") return null;
@@ -53,16 +54,24 @@ export const MessageItem = memo(
         {/* 消息内容 */}
         {message.role === "assistant" &&
           message.toolCalls?.map((toolCall, index) => {
+            const result = getToolResult(messages, toolCall.id);
+            const toolArgs = toolCall.function?.arguments
+              ? JSON.parse(toolCall.function.arguments)
+              : {};
+
             return (
               <Tool key={index}>
                 <ToolHeader
                   type="tool-invocation"
-                  state={"input-streaming"}
+                  state={result ? "output-available" : "input-streaming"}
                   className="cursor-pointer"
                 />
                 <ToolContent>
-                  <ToolInput input={toolCall.function.arguments} />
-                  <ToolOutput output={toolCall.function.name} errorText={""} />
+                  <ToolInput input={toolArgs} />
+                  <ToolOutput
+                    output={result?.output}
+                    errorText={result?.error}
+                  />
                 </ToolContent>
               </Tool>
             );

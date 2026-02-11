@@ -14,7 +14,13 @@ export const MessageList = () => {
     <Conversation className="h-full">
       <ConversationContent>
         {messages.map((message) => {
-          return <MessageItem key={message.id} message={message} />;
+          return (
+            <MessageItem
+              key={message.id}
+              message={message}
+              messages={messages}
+            />
+          );
         })}
       </ConversationContent>
     </Conversation>

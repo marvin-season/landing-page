@@ -48,7 +48,7 @@ function isAssistantMessage(
 }
 
 // 获取 tool message 的结果
-function getToolResult(
+export function getToolResult(
   messages: AgentMessage[],
   toolCallId: string,
 ): { output?: string; error?: string } | undefined {
