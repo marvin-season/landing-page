@@ -35,11 +35,11 @@ export const GET = async (
   const customReadable = new ReadableStream({
     start(controller) {
       observable.subscribe({
-        next: event => {
+        next: (event) => {
           const data = JSON.stringify(event);
           controller.enqueue(encoder.encode(`data: ${data}\n\n`));
         },
-        error: err => {
+        error: (err) => {
           console.error("Stream error:", err);
           controller.error(err);
         },
@@ -54,7 +54,7 @@ export const GET = async (
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 };

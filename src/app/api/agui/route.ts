@@ -13,7 +13,6 @@ export const agents = {
   mastraAgent,
 };
 
-
 export const GET = async () => {
   const agentIds = Object.keys(agents);
   return NextResponse.json({ agentIds });

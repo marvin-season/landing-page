@@ -108,7 +108,11 @@ export function reduceChatStreamEvent(
     };
   }
 
-  if (t === "tool-input-start" && "toolCallId" in event && "toolName" in event) {
+  if (
+    t === "tool-input-start" &&
+    "toolCallId" in event &&
+    "toolName" in event
+  ) {
     const nextBlocks = pushTextBlock(
       state.blocks,
       state.currentTextId ?? "",
@@ -127,21 +131,28 @@ export function reduceChatStreamEvent(
     };
   }
 
-  if (t === "tool-input-delta" && "toolCallId" in event && "inputTextDelta" in event) {
+  if (
+    t === "tool-input-delta" &&
+    "toolCallId" in event &&
+    "inputTextDelta" in event
+  ) {
     const prev = state.streamingTool;
     return {
       ...state,
       streamingTool: prev
         ? {
             ...prev,
-            inputStreaming:
-              prev.inputStreaming + String(event.inputTextDelta),
+            inputStreaming: prev.inputStreaming + String(event.inputTextDelta),
           }
         : null,
     };
   }
 
-  if (t === "tool-input-available" && "toolCallId" in event && "input" in event) {
+  if (
+    t === "tool-input-available" &&
+    "toolCallId" in event &&
+    "input" in event
+  ) {
     const prev = state.streamingTool;
     return {
       ...state,
@@ -149,7 +160,11 @@ export function reduceChatStreamEvent(
     };
   }
 
-  if (t === "tool-output-available" && "toolCallId" in event && "output" in event) {
+  if (
+    t === "tool-output-available" &&
+    "toolCallId" in event &&
+    "output" in event
+  ) {
     const prev = state.streamingTool;
     const toolCallId = String(event.toolCallId);
     if (!prev) return state;

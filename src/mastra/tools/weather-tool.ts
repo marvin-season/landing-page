@@ -47,7 +47,7 @@ const getWeather = async (location: string) => {
 
   if (!geocodingData.results?.[0]) {
     // 开发环境返回mock数据
-    if(process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development") {
       return {
         temperature: 100,
         feelsLike: 1,

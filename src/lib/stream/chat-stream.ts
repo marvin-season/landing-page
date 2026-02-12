@@ -8,9 +8,19 @@ export type ChatStreamEvent =
   | { type: "text-delta"; id: string; delta: string }
   | { type: "text-end"; id: string }
   | { type: "text-done"; id?: string }
-  | { type: "tool-input-start"; toolCallId: string; toolName: string; dynamic?: boolean }
+  | {
+      type: "tool-input-start";
+      toolCallId: string;
+      toolName: string;
+      dynamic?: boolean;
+    }
   | { type: "tool-input-delta"; toolCallId: string; inputTextDelta: string }
-  | { type: "tool-input-available"; toolCallId: string; toolName: string; input: unknown }
+  | {
+      type: "tool-input-available";
+      toolCallId: string;
+      toolName: string;
+      input: unknown;
+    }
   | { type: "tool-output-available"; toolCallId: string; output: unknown }
   | { type: "finish-step" }
   | { type: "finish" }

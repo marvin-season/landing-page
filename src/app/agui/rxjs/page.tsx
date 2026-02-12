@@ -85,9 +85,9 @@ export default function RxjsPage() {
               <span className="text-muted-foreground">输入（流式）：</span>
               <pre className="mt-1 overflow-x-auto whitespace-pre-wrap">
                 {streamingTool.input !== undefined
-                  ? (typeof streamingTool.input === "string"
-                      ? streamingTool.input
-                      : JSON.stringify(streamingTool.input, null, 2))
+                  ? typeof streamingTool.input === "string"
+                    ? streamingTool.input
+                    : JSON.stringify(streamingTool.input, null, 2)
                   : streamingTool.inputStreaming || "…"}
               </pre>
               {streamingTool.output !== undefined && (

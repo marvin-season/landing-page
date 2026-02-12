@@ -60,10 +60,9 @@ export const useMessageStore = create<IMessageStore>()(
 );
 
 export function useCurrentMessages(sessionId: string) {
-
   const { data: messages, refetch } = useQuery<UIMessage[]>({
     queryKey: ["messages", sessionId],
-    queryFn: async() => {
+    queryFn: async () => {
       console.log("sessionId", sessionId);
       return fetch(`/api/chat?resourceId=${sessionId}`).then((res) =>
         res.json(),
@@ -71,7 +70,6 @@ export function useCurrentMessages(sessionId: string) {
     },
     enabled: !!sessionId,
   });
-
 
   return { messages: messages || [], refetch };
 }

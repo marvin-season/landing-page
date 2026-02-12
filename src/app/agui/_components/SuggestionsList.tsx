@@ -38,7 +38,8 @@ export const SuggestionsList = (props: {
           );
         }}
       >
-        发送邮件给 alice@example.com，主题是项目进展，内容是本周已完成主要功能开发
+        发送邮件给
+        alice@example.com，主题是项目进展，内容是本周已完成主要功能开发
       </Suggestion>
       <Suggestion
         suggestion="北京天气"

@@ -2,10 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import {
+  type ChatStreamState,
   flushChatStreamState,
   fromChatStreamState,
   initialChatStreamState,
-  type ChatStreamState,
 } from "./chat-stream-state";
 
 /**
