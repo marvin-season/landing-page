@@ -1,6 +1,32 @@
 import type { ChatStatus, UIMessage } from "ai";
+import { isToolOrDynamicToolUIPart } from "ai";
 import { BrainCircuit } from "lucide-react";
+import { ToolBlock } from "@/app/agui/rxjs/components/ToolBlock";
 import Markdown from "@/components/markdown";
+
+type ToolPart = {
+  type: string;
+  toolCallId?: string;
+  toolName?: string;
+  state?: string;
+  input?: unknown;
+  output?: unknown;
+  errorText?: string;
+};
+
+function getToolName(part: ToolPart): string {
+  if (part.type.startsWith("tool-")) return part.type.slice("tool-".length);
+  return part.toolName ?? "tool";
+}
+
+function getStreamingPhase(
+  part: ToolPart,
+): "input-streaming" | "calling" | "done" {
+  const s = part.state;
+  if (s === "output-available" || s === "output-error") return "done";
+  if (s === "input-available") return "calling";
+  return "input-streaming";
+}
 
 export default function AssistantMessageParts(props: {
   m: UIMessage;
@@ -33,6 +59,30 @@ export default function AssistantMessageParts(props: {
           >
             {part.text}
           </Markdown>
+        </div>
+      );
+    }
+    if (isToolOrDynamicToolUIPart(part)) {
+      const toolPart = part as ToolPart;
+      const toolName = getToolName(toolPart);
+      const isStreaming =
+        toolPart.state === "input-streaming" ||
+        toolPart.state === "input-available";
+      const output =
+        toolPart.state === "output-available"
+          ? toolPart.output
+          : toolPart.state === "output-error" && toolPart.errorText
+            ? { error: toolPart.errorText }
+            : undefined;
+      return (
+        <div key={i} className="mt-4 first:mt-0">
+          <ToolBlock
+            toolName={toolName}
+            input={toolPart.input ?? {}}
+            output={output}
+            isStreaming={isStreaming}
+            streamingPhase={getStreamingPhase(toolPart)}
+          />
         </div>
       );
     }

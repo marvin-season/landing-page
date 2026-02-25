@@ -85,3 +85,10 @@
   - **当前轮**：发送时从 body 中解析用户文案 `extractUserText(body)` 存为 `pendingUserMessage`；在历史列表下方、ResponseSection 上方渲染「问题」：当 `pendingUserMessage != null` 且（`loading` 或当前有流式/已完成内容）时展示一条 user 气泡（`Message` + `MessageResponse`）。
   - **流式**：保持原有 `ResponseSection(blocks, streamingTool, streamingText)` 逻辑不变，工具调用等交互未改。
 - **原因/上下文**：用户回滚此前复杂改造，要求历史与正在输出分离；历史直接用接口数据 + MessageItem 渲染（接口与组件已适配），当前轮仅补充缺失的「问题」并保留现有流式输出逻辑。
+
+## agent 助理消息支持工具调用渲染
+- **文件**: [assistant-message-parts.tsx](../../src/app/agent/_components/message/assistant-message-parts.tsx)
+- **修改内容**:
+  - 使用 `ai` 包 `isToolOrDynamicToolUIPart` 识别工具 part；对 `tool-*` / `dynamic-tool` 类型用 agui/rxjs 的 `ToolBlock` 渲染，与 ResponseSection 一致的展开收起、输入/输出、流式阶段（接收参数中 / 正在执行 / 已完成）。
+  - `getToolName`：`tool-${NAME}` 取后缀，dynamic-tool 取 `part.toolName`；`getStreamingPhase` 按 part.state 映射为 input-streaming / calling / done；output-error 时 output 传 `{ error: errorText }`。
+- **原因/上下文**：用户要求扩展 agent 助理消息组件，像 ResponseSection 一样支持工具调用展示。

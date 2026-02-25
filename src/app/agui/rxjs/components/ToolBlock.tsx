@@ -1,12 +1,7 @@
 "use client";
 
 import { ChevronDown, Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -40,10 +35,8 @@ export function ToolBlock({
         ? output
         : JSON.stringify(output, null, 2);
 
-  const isCalling =
-    isStreaming && streamingPhase === "calling";
-  const isReceivingInput =
-    isStreaming && streamingPhase === "input-streaming";
+  const isCalling = isStreaming && streamingPhase === "calling";
+  const isReceivingInput = isStreaming && streamingPhase === "input-streaming";
 
   return (
     <Card
@@ -94,9 +87,16 @@ export function ToolBlock({
                 role="status"
                 aria-live="polite"
               >
-                <Loader2 className="size-4 shrink-0 animate-spin text-primary" aria-hidden />
+                <Loader2
+                  className="size-4 shrink-0 animate-spin text-primary"
+                  aria-hidden
+                />
                 <span className="text-muted-foreground">
-                  正在调用工具 <span className="font-medium text-foreground">{toolName}</span>，请稍候…
+                  正在调用工具{" "}
+                  <span className="font-medium text-foreground">
+                    {toolName}
+                  </span>
+                  ，请稍候…
                 </span>
               </div>
             ) : outputStr !== undefined ? (
