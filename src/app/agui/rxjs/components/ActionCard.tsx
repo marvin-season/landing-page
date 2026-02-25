@@ -20,12 +20,7 @@ type ActionCardProps = {
   onSend: (body: Record<string, unknown>) => void;
 };
 
-export function ActionCard({
-  resourceId,
-  messageId,
-  loading,
-  onSend,
-}: ActionCardProps) {
+export function ActionCard({ resourceId, messageId, loading, onSend }: ActionCardProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleSendText = useCallback(
