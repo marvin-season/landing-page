@@ -45,7 +45,7 @@ export function ToolBlock({
         isStreaming && "ring-1 ring-primary/30 shadow-md",
       )}
     >
-      <Collapsible defaultOpen={true} className="group w-full">
+      <Collapsible defaultOpen={false} className="group w-full">
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer select-none px-6 py-4 transition-colors hover:bg-muted/20">
             <CardTitle className="flex flex-wrap items-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
