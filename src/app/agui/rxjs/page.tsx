@@ -1,36 +1,37 @@
 "use client";
 
+import { MessageSquarePlus } from "lucide-react";
 /**
- * 流式对话示例页：仅消费 useChatStreamState 的 state，不处理底层事件。
+ * 流式对话入口：点击「开始会话」创建新 resourceId 并跳转到 /agui/rxjs/[resourceId]。
  */
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
-import { ActionCard } from "./components/ActionCard";
-import { ResponseSection } from "./components/ResponseSection";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function RxjsPage() {
-  const { state, send, loading, error } = useChatStreamState("/api/chat");
-  const { messageId, blocks, streamingText, streamingTool } = state;
+  const router = useRouter();
+
+  const handleStartSession = () => {
+    const resourceId = crypto.randomUUID();
+    router.push(`/agui/rxjs/${resourceId}`);
+  };
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
-      <ActionCard
-        messageId={messageId}
-        loading={loading}
-        onSend={(body) => send(body)}
-      />
-
-      {error != null ? (
-        <Alert className="border-destructive/50 bg-destructive/10 text-destructive">
-          <AlertDescription>错误: {error}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <ResponseSection
-        blocks={blocks}
-        streamingTool={streamingTool}
-        streamingText={streamingText}
-      />
+    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col items-center justify-center gap-6 px-4 py-12">
+      <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+        流式对话示例
+      </h1>
+      <p className="text-center text-sm text-muted-foreground">
+        点击下方按钮开始新会话，会话 ID 将用于本次对话的请求标识。
+      </p>
+      <Button
+        type="button"
+        size="lg"
+        onClick={handleStartSession}
+        className="gap-2 rounded-full"
+      >
+        <MessageSquarePlus className="size-5" aria-hidden />
+        开始会话
+      </Button>
     </div>
   );
 }

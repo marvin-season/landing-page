@@ -1,11 +1,14 @@
 "use client";
 
-import type { ContentBlock, StreamingToolCall } from "@/lib/stream/chat-stream-state";
 import { Card, CardContent } from "@/components/ui/card";
-import type { ToolStreamingPhase } from "./ToolBlock";
-import { TextBlock } from "./TextBlock";
-import { ToolBlock } from "./ToolBlock";
+import type {
+  ContentBlock,
+  StreamingToolCall,
+} from "@/lib/stream/chat-stream-state";
 import { StreamingCursor } from "./StreamingCursor";
+import { TextBlock } from "./TextBlock";
+import type { ToolStreamingPhase } from "./ToolBlock";
+import { ToolBlock } from "./ToolBlock";
 
 type ResponseSectionProps = {
   blocks: ContentBlock[];
@@ -13,9 +16,7 @@ type ResponseSectionProps = {
   streamingText: string | null;
 };
 
-function getStreamingPhase(
-  tool: StreamingToolCall,
-): ToolStreamingPhase {
+function getStreamingPhase(tool: StreamingToolCall): ToolStreamingPhase {
   if (tool.output !== undefined) return "done";
   if (tool.input !== undefined) return "calling";
   return "input-streaming";
@@ -26,8 +27,7 @@ export function ResponseSection({
   streamingTool,
   streamingText,
 }: ResponseSectionProps) {
-  const hasStreamingText =
-    streamingText != null && streamingText !== "";
+  const hasStreamingText = streamingText != null && streamingText !== "";
   const hasContent =
     blocks.length > 0 || hasStreamingText || streamingTool !== null;
 

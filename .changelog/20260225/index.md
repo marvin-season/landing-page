@@ -68,3 +68,12 @@
   - **ActionCard**：`onSend` 改为接收 `(body: Record<string, unknown>)`；增加预置问题按钮（outline、rounded-full），点击即发送对应文本；增加输入框 + 发送按钮表单，提交时调用 `onSend(buildChatBody(inputValue))` 并清空输入；loading 时禁用预置按钮与输入、发送按钮显示 Loader。
   - **page**：移除对 CHAT_BODY 的引用，`onSend={(body) => send(body)}`。
 - **原因/上下文**：用户需要既可点击预置问题快速测试，也可在输入框输入内容后发送。
+
+## 动态 RESOURCE_ID：开始会话入口与路由参数
+- **文件**: [constants.ts](../../src/app/agui/rxjs/constants.ts)、[ActionCard.tsx](../../src/app/agui/rxjs/components/ActionCard.tsx)、[page.tsx](../../src/app/agui/rxjs/page.tsx)、新建 [agui/rxjs/[resourceId]/page.tsx](../../src/app/agui/rxjs/[resourceId]/page.tsx)
+- **修改内容**:
+  - **路由**：`/agui/rxjs` 改为入口页，仅展示「开始会话」按钮；点击后 `crypto.randomUUID()` 生成 resourceId，`router.push(\`/agui/rxjs/${resourceId}\`)`。新增 `/agui/rxjs/[resourceId]` 为对话页，从 `useParams().resourceId` 读取会话 ID，渲染原有 ActionCard + 错误 Alert + ResponseSection。
+  - **constants**：移除固定 `RESOURCE_ID` 与 `CHAT_BODY`；`buildChatBody(resourceId: string, text: string)` 改为接收动态 resourceId，请求体中的 `resourceId` / `id` 均使用该参数。
+  - **ActionCard**：新增必选 prop `resourceId: string`，调用 `buildChatBody(resourceId, text)` 构建请求体。
+  - 无效或缺失 resourceId 时，对话页展示「无效的会话 ID」提示。
+- **原因/上下文**：用户要求由用户主动创建会话 ID，首页展示开始会话按钮，RESOURCE_ID 放在路由参数中。
