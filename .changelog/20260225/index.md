@@ -1,4 +1,4 @@
-# agui rxjs 页 UI 布局、配色、流式工具状态与组件拆分、ActionCard/ToolBlock 样式修复
+# agui rxjs 页 UI 与状态优化、ActionCard 预置问题与自定义输入
 
 ## 优化 rxjs 页 UI 布局与配色
 - **文件**: `src/app/agui/rxjs/page.tsx`
@@ -60,3 +60,11 @@
   - **ActionCard**：卡片增加 `transition-shadow hover:shadow-md` 与 TextBlock 一致；CardHeader 改为显式 `px-6 py-4` 避免与默认 `p-6` 覆盖导致 padding 不统一；增加 `flex-wrap` / `sm:flex-nowrap` 与 `min-w-0 flex-1` 改善小屏布局与截断；描述使用 `truncate sm:whitespace-normal` 避免长 messageId 撑破布局。
   - **ToolBlock**：展开箭头旋转改为基于 `group` + `group-data-[state=open]:rotate-180` 施加在 ChevronDown 上，修复此前选择器导致旋转未正确作用在图标上的问题；CardHeader 使用显式 `px-6 py-4`；标题行增加 `flex-wrap` 防止状态文案换行错位；内容区 `CardContent` 使用 `px-6 pb-6 pt-0`，输入/输出块统一为 `rounded-lg`、`py-2.5`，长文本使用 `wrap-break-word` 替代 `wrap-anywhere`；「正在调用工具」占位块去掉 `font-mono` 以符合说明文案样式。
 - **原因/上下文**：用户反馈 ActionCard 与工具调用组件存在样式问题，统一内边距、修正箭头旋转目标并与其他卡片风格一致。
+
+## ActionCard 支持预置问题与自定义输入发送
+- **文件**: [constants.ts](../../src/app/agui/rxjs/constants.ts)、[ActionCard.tsx](../../src/app/agui/rxjs/components/ActionCard.tsx)、[page.tsx](../../src/app/agui/rxjs/page.tsx)
+- **修改内容**:
+  - **constants**：抽出 `RESOURCE_ID`；新增 `PRESET_QUESTIONS`（北京天气、上海天气、今天日期）；新增 `buildChatBody(text)`，根据用户输入文本构建与 CHAT_BODY 同结构的请求体（使用 nanoid 生成 message id）。
+  - **ActionCard**：`onSend` 改为接收 `(body: Record<string, unknown>)`；增加预置问题按钮（outline、rounded-full），点击即发送对应文本；增加输入框 + 发送按钮表单，提交时调用 `onSend(buildChatBody(inputValue))` 并清空输入；loading 时禁用预置按钮与输入、发送按钮显示 Loader。
+  - **page**：移除对 CHAT_BODY 的引用，`onSend={(body) => send(body)}`。
+- **原因/上下文**：用户需要既可点击预置问题快速测试，也可在输入框输入内容后发送。

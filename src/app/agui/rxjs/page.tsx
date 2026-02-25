@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { ActionCard } from "./components/ActionCard";
 import { ResponseSection } from "./components/ResponseSection";
-import { CHAT_BODY } from "./constants";
 
 export default function RxjsPage() {
   const { state, send, loading, error } = useChatStreamState("/api/chat");
@@ -18,7 +17,7 @@ export default function RxjsPage() {
       <ActionCard
         messageId={messageId}
         loading={loading}
-        onSend={() => send(CHAT_BODY)}
+        onSend={(body) => send(body)}
       />
 
       {error != null ? (
