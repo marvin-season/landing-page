@@ -3,10 +3,14 @@ import { scan } from "rxjs";
 import type { ChatStreamEvent } from "./chat-stream";
 import { fromChatStream } from "./chat-stream";
 
+// ---------------------------------------------------------------------------
+// 内容块类型（用于 state.blocks）
+// ---------------------------------------------------------------------------
+
 /** 已完成的文本块 */
 export type TextBlock = { kind: "text"; id: string; content: string };
 
-/** 工具调用块（含输入与输出） */
+/** 已完成的工具调用 */
 export type ToolCallBlock = {
   kind: "tool-call";
   toolCallId: string;
@@ -15,7 +19,7 @@ export type ToolCallBlock = {
   output?: unknown;
 };
 
-/** 流式中的工具调用（输入可能仍在 delta 中） */
+/** 进行中的工具调用 */
 export type StreamingToolCall = {
   toolCallId: string;
   toolName: string;
@@ -24,20 +28,29 @@ export type StreamingToolCall = {
   output?: unknown;
 };
 
+/** 内容块（文本或工具调用） */
 export type ContentBlock = TextBlock | ToolCallBlock;
 
+// ---------------------------------------------------------------------------
+// 归约状态（ChatStreamState）
+// ---------------------------------------------------------------------------
+
 /**
- * 流式对话的 UI 状态：由事件归约得到，可在任意处订阅使用
+ * 流式对话状态
+ * @property messageId 消息ID
+ * @property blocks 已确定的内容块
+ * @property streamingText 正在生成的文本
+ * @property streamingTool 正在调用的工具
  */
 export type ChatStreamState = {
   messageId: string | null;
   blocks: ContentBlock[];
   streamingText: string;
-  /** 当前文本段 id，仅归约内部使用 */
   currentTextId: string | null;
   streamingTool: StreamingToolCall | null;
 };
 
+/** 初始状态 */
 export const initialChatStreamState: ChatStreamState = {
   messageId: null,
   blocks: [],
@@ -46,6 +59,7 @@ export const initialChatStreamState: ChatStreamState = {
   streamingTool: null,
 };
 
+/** 追加非空文本块 */
 function pushTextBlock(
   blocks: ContentBlock[],
   id: string,
@@ -56,8 +70,7 @@ function pushTextBlock(
 }
 
 /**
- * 纯函数：根据单条流事件归约出下一状态。
- * 可在任意处复用（React、Node、测试等），与 UI 解耦。
+ * 状态归约函数：根据事件更新状态
  */
 export function reduceChatStreamEvent(
   state: ChatStreamState,
@@ -188,9 +201,7 @@ export function reduceChatStreamEvent(
   return state;
 }
 
-/**
- * 流结束时的收尾归约：把未 flush 的当前文本段写入 blocks
- */
+/** 结束时刷新剩余文本到 blocks */
 export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
   if (!state.currentTextId || !state.streamingText.trim())
     return { ...state, streamingText: "" };
@@ -206,10 +217,7 @@ export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
   };
 }
 
-/**
- * 返回「流式状态」的 Observable：每收到一条事件就发出当前归约后的状态。
- * 可在任意处订阅（React、Node、测试等），与 UI 解耦。
- */
+/** 创建状态流 Observable */
 export function fromChatStreamState(
   url: string,
   body: Record<string, unknown>,

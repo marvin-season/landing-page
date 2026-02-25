@@ -9,8 +9,8 @@ import {
 } from "./chat-stream-state";
 
 /**
- * 在 React 中订阅流式对话状态：发请求、归约事件、流结束时做一次 flush。
- * UI 只消费 state，与 fromChatStream / 事件分支解耦。
+ * 流式对话 Hook
+ * @param url 接口地址
  */
 export function useChatStreamState(url: string) {
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);

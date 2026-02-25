@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * 流式对话示例页：仅消费 useChatStreamState 的 state，不处理底层事件。
+ */
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 
 const CHAT_BODY = {
@@ -17,7 +20,12 @@ const CHAT_BODY = {
 
 export default function RxjsPage() {
   const { state, send, loading, error } = useChatStreamState("/api/chat");
-  const { messageId, blocks, streamingText, streamingTool } = state;
+  const {
+    messageId,
+    blocks,        // 已确定的内容块
+    streamingText, // 正在生成的文本
+    streamingTool, // 正在调用的工具
+  } = state;
 
   return (
     <div className="flex max-w-2xl flex-col gap-4 p-4">

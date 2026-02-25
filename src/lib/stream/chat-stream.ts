@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 
-/** 流式事件类型（与 API 返回的 data 一致） */
+/** 流式事件类型 */
 export type ChatStreamEvent =
   | { type: "start"; messageId: string }
   | { type: "start-step" }
@@ -26,9 +26,7 @@ export type ChatStreamEvent =
   | { type: "finish" }
   | { type: string; [key: string]: unknown };
 
-/**
- * 将 fetch 的 SSE 流转换为 RxJS Observable，逐条解析 data: {...} 并发出
- */
+/** 将 SSE 流转换为 Observable */
 export function fromChatStream(
   url: string,
   body: Record<string, unknown>,
