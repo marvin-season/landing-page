@@ -17,3 +17,11 @@
   - 正在执行（已有 input、尚无 output）：标题旁显示「正在执行…」+ Loader2 旋转图标；输出区显示占位块「正在调用工具 xxx，请稍候…」+ 旋转图标，使用 `role="status"` 与 `aria-live="polite"` 便于无障碍。
   - 根据 `streamingTool.input` / `streamingTool.output` 在页面中计算并传入 `streamingPhase`。
 - **原因/上下文**：用户希望在调用工具时显示明确的调用中状态，提升交互反馈。
+
+## 工具块增加展开/收起交互
+- **文件**: `src/app/agui/rxjs/page.tsx`
+- **修改内容**:
+  - 使用 `Collapsible` 包裹工具块：标题行（CardHeader）为 `CollapsibleTrigger`，输入/输出内容为 `CollapsibleContent`。
+  - 标题左侧增加 `ChevronDown` 图标，展开时旋转 180°，默认 `defaultOpen={true}`。
+  - 触发器区域增加 `cursor-pointer`、`hover:bg-muted/20`、`select-none`，便于点击与反馈。
+- **原因/上下文**：用户要求工具展示支持展开收起，便于在内容较多时折叠查看。
