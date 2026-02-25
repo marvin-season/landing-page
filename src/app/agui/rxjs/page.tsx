@@ -111,8 +111,10 @@ export default function RxjsPage() {
   const { state, send, loading, error } = useChatStreamState("/api/chat");
   const { messageId, blocks, streamingText, streamingTool } = state;
 
+  const hasStreamingText =
+    streamingText != null && streamingText !== "";
   const hasContent =
-    blocks.length > 0 || streamingText !== null || streamingTool !== null;
+    blocks.length > 0 || hasStreamingText || streamingTool !== null;
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 p-6">
@@ -178,16 +180,6 @@ export default function RxjsPage() {
                 />
               ),
             )}
-            {streamingText !== null ? (
-              <Card className="border-primary/20 bg-primary/5 shadow-sm">
-                <CardContent className="p-4">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                    {streamingText}
-                    <StreamingCursor />
-                  </p>
-                </CardContent>
-              </Card>
-            ) : null}
             {streamingTool !== null ? (
               <ToolBlock
                 toolName={streamingTool.toolName}
@@ -199,6 +191,16 @@ export default function RxjsPage() {
                 output={streamingTool.output}
                 isStreaming
               />
+            ) : null}
+            {streamingText != null && streamingText !== "" ? (
+              <Card className="border-primary/20 bg-primary/5 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                    {streamingText}
+                    <StreamingCursor />
+                  </p>
+                </CardContent>
+              </Card>
             ) : null}
           </div>
         </section>
