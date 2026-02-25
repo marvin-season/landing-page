@@ -1,3 +1,0 @@
-- **文件**: `.cursor/rules/code-change-history.mdc`，`.changelog/README.md`，目录 `.history` → `.changelog`
-- **修改内容**: 将变更历史目录由 `.history` 重命名为 `.changelog`；规则与 README 中所有 `.history` 引用改为 `.changelog`；README 同步为当前「每会话单文件」的目录与用途说明。
-- **原因/上下文**: 用户计划将 `.history` 变更为 `.changelog` 文件夹。
