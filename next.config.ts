@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         // 转发到目标 HTTP 地址
         destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
       },
+      {
+        source: "/api-agent/:path*",
+        destination: "http://localhost:7777/:path*",
+      },
     ];
   },
 };

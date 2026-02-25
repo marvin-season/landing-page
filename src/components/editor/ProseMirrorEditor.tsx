@@ -1,10 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { mockResponse } from "@/lib/response";
 import { SSEMessageGenerator } from "@/lib/stream";
 import { focusAtEnd, insertNode } from "./_lib/commands/tr-command";
-import { initialJson } from "./_lib/data";
 import { useEditor } from "./_lib/hooks/use-editor";
 import { createProseMirrorSchema } from "./_lib/schema/create-schema";
 import { useProseSettingsStore } from "./_lib/store/prose-setting";
@@ -29,17 +27,24 @@ export default function ProseMirrorEditor() {
   useEffect(() => {
     if (!view) return;
 
-    const response = mockResponse({
-      data: initialJson.content.flatMap((item) => item.content),
-      delay: 1000,
-    });
-
-    const messages = SSEMessageGenerator(response.body);
-    Array.fromAsync(messages, (message) => {
-      const data = JSON.parse(message);
-      insertNode(view, view.state.schema.nodeFromJSON(data));
-      focusAtEnd(view);
-    });
+    const formData = new FormData();
+    formData.append("message", "hello");
+    formData.append("stream", "true");
+    formData.append("session_id", "82e5f822-667c-4e18-b637-417b46eab243");
+    fetch("/api-agent/agents/prosemirror-agent/runs", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.body)
+      .then((body) => {
+        const messages = SSEMessageGenerator(body);
+        Array.fromAsync(messages, (message) => {
+          const data = JSON.parse(message);
+          console.log(data);
+          insertNode(view, view.state.schema.nodeFromJSON(data));
+          focusAtEnd(view);
+        });
+      });
   }, [view]);
 
   return (

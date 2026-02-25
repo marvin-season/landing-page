@@ -1,10 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import type { UIMessage } from "ai";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { useShallow } from "zustand/react/shallow";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
-import { useCurrentSession } from "@/store/session-store";
 
 export type IMessageStore = {
   /**
@@ -47,7 +46,7 @@ export const useMessageStore = create<IMessageStore>()(
         },
       }),
       {
-        name: "message-storage",
+        name: "message-storage", // 该持久化作为备选方案，当前使用mastra 集成的 memory
         storage: createIdbPersistStorage<MessagePersistedState>({
           prefix: "pcai",
         }),
@@ -60,12 +59,17 @@ export const useMessageStore = create<IMessageStore>()(
   ),
 );
 
-export function useCurrentMessages() {
-  const currentSession = useCurrentSession();
-  const sessionId = currentSession?.id;
-  return useMessageStore(
-    useShallow((state) =>
-      sessionId ? state.messagesMap[sessionId] || [] : [],
-    ),
-  );
+export function useCurrentMessages(sessionId: string) {
+  const { data: messages, refetch } = useQuery<UIMessage[]>({
+    queryKey: ["messages", sessionId],
+    queryFn: async () => {
+      console.log("sessionId", sessionId);
+      return fetch(`/api/chat?resourceId=${sessionId}`).then((res) =>
+        res.json(),
+      );
+    },
+    enabled: !!sessionId,
+  });
+
+  return { messages: messages || [], refetch };
 }
