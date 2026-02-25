@@ -77,3 +77,23 @@
   - **ActionCard**：新增必选 prop `resourceId: string`，调用 `buildChatBody(resourceId, text)` 构建请求体。
   - 无效或缺失 resourceId 时，对话页展示「无效的会话 ID」提示。
 - **原因/上下文**：用户要求由用户主动创建会话 ID，首页展示开始会话按钮，RESOURCE_ID 放在路由参数中。
+
+## 历史对话与主流智能问答式页面改造
+- **文件**: [use-chat-stream-state.ts](../../src/lib/stream/use-chat-stream-state.ts)、新建 [use-chat-history.ts](../../src/app/agui/rxjs/hooks/use-chat-history.ts)、[AssistantBubbleContent.tsx](../../src/app/agui/rxjs/components/AssistantBubbleContent.tsx)、[ChatMessageBubble.tsx](../../src/app/agui/rxjs/components/ChatMessageBubble.tsx)、[ChatMessageList.tsx](../../src/app/agui/rxjs/components/ChatMessageList.tsx)、[ChatInput.tsx](../../src/app/agui/rxjs/components/ChatInput.tsx)、[agui/rxjs/[resourceId]/page.tsx](../../src/app/agui/rxjs/[resourceId]/page.tsx)
+- **修改内容**:
+  - **useChatStreamState**：`send(body, options?)` 支持可选 `onComplete(flushedState)`，在流结束并 flush 后调用，便于页面将会话回合追加到列表。
+  - **useChatHistory**：新建 Hook，GET `/api/chat?resourceId=xxx` 拉取历史，将返回的 `toAISdkV5Messages` 格式规范为 `ChatDisplayMessage[]`（user/assistant，含 content 或 blocks）。
+  - **AssistantBubbleContent**：抽取与 ResponseSection 一致的助理内容渲染（TextBlock + ToolBlock + 流式文本/工具），供单条助理气泡复用。
+  - **ChatMessageBubble**：单条消息气泡，支持 user（右侧文案）、assistant（左侧，纯文案或 AssistantBubbleContent）、以及流式 assistant（传入 streaming state）。
+  - **ChatMessageList**：可滚动列表，展示历史 + 本会话消息，末尾可接当前流式回复；加载历史时占位「加载历史消息…」，空列表时占位「暂无消息」；自动滚动到底。
+  - **ChatInput**：底部输入区（预置问题 + 输入框 + 发送），无卡片包裹，与主流问答布局一致。
+  - **[resourceId] 对话页**：进入时拉取历史；展示 ChatMessageList + ChatInput；发送时先追加 user 到 sessionMessages，流结束后在 onComplete 中追加 assistant（由 flushed.blocks 等构成）；displayMessages = historyMessages + sessionMessages，流式回复作为列表最后一项展示。
+- **原因/上下文**：接口已提供 GET /api/chat?resourceId=xxx 获取历史，需展示历史聊天记录并在发送后以问答形式展示消息，类似主流智能问答系统。
+
+## 历史消息中工具调用回显与类型扩展
+- **文件**: [use-chat-history.ts](../../src/app/agui/rxjs/hooks/use-chat-history.ts)
+- **修改内容**:
+  - 扩展 API 消息 part 类型：`ApiTextPart`（type "text", text）、`ApiToolPart`（type "tool-xxx", toolCallId, input, output, state），与 GET 返回的 toAISdkV5Messages 结构一致。
+  - 新增 `partsToBlocks(parts, messageId)`：遍历 assistant 的 parts，将 `type === "text"` 转为 `TextBlock`，将 `type.startsWith("tool-")` 转为 `ToolCallBlock`（toolName 取 type 去掉 "tool-" 前缀），忽略 step-start 等；保证历史助理消息与流式回复使用同一套 ContentBlock 结构。
+  - 助理历史消息优先使用 `blocks`（由 parts 生成），无 blocks 时仍用 `content`；流式交互（ToolBlock 展开/收起、输入输出展示）不变，历史中的工具调用以相同 ToolBlock 组件回显。
+- **原因/上下文**：保留原有工具调用交互，并对历史记录中的 tool-* parts 进行回显（与示例消息中 type: "tool-weatherTool"、input/output 等结构对齐）。
