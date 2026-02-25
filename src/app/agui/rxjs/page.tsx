@@ -3,7 +3,18 @@
 /**
  * 流式对话示例页：仅消费 useChatStreamState 的 state，不处理底层事件。
  */
+import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
+import { cn } from "@/lib/utils";
 
 const CHAT_BODY = {
   resourceId: "29bdf526-2fd1-4dd1-b301-a3812f267931",
@@ -18,103 +29,180 @@ const CHAT_BODY = {
   trigger: "submit-message",
 } as const;
 
-export default function RxjsPage() {
-  const { state, send, loading, error } = useChatStreamState("/api/chat");
-  const {
-    messageId,
-    blocks,        // 已确定的内容块
-    streamingText, // 正在生成的文本
-    streamingTool, // 正在调用的工具
-  } = state;
+function TextBlock({ content }: { content: string }) {
+  return (
+    <Card className="border-border/80 bg-muted/15 shadow-sm">
+      <CardContent className="p-4">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+          {content}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ToolBlock({
+  toolName,
+  input,
+  output,
+  isStreaming,
+}: {
+  toolName: string;
+  input: unknown;
+  output?: unknown;
+  isStreaming?: boolean;
+}) {
+  const inputStr =
+    typeof input === "string" ? input : JSON.stringify(input, null, 2);
+  const outputStr =
+    output === undefined
+      ? undefined
+      : typeof output === "string"
+        ? output
+        : JSON.stringify(output, null, 2);
 
   return (
-    <div className="flex max-w-2xl flex-col gap-4 p-4">
-      <button
-        type="button"
-        onClick={() => send(CHAT_BODY)}
-        disabled={loading}
-        className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
-      >
-        {loading ? "请求中…" : "查询北京天气"}
-      </button>
-      {messageId != null && (
-        <p className="text-muted-foreground text-sm">messageId: {messageId}</p>
+    <Card
+      className={cn(
+        "border-amber-500/30 bg-amber-500/5 shadow-sm",
+        isStreaming && "ring-1 ring-amber-500/20",
       )}
-      <div className="flex flex-col gap-3">
-        {blocks.map((block, i) =>
-          block.kind === "text" ? (
-            <div
-              key={`${block.id}-${i}`}
-              className="rounded border border-border bg-muted/20 p-3"
-            >
-              <p className="whitespace-pre-wrap text-sm">{block.content}</p>
-            </div>
-          ) : (
-            <div
-              key={block.toolCallId}
-              className="rounded border border-amber-500/40 bg-amber-500/5 p-3"
-            >
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                工具调用 · {block.toolName}
-              </p>
-              <div className="mb-2 rounded bg-muted/50 p-2 font-mono text-xs">
-                <span className="text-muted-foreground">输入：</span>
-                <pre className="mt-1 overflow-x-auto whitespace-pre-wrap">
-                  {typeof block.input === "string"
-                    ? block.input
-                    : JSON.stringify(block.input, null, 2)}
-                </pre>
-              </div>
-              {block.output !== undefined && (
-                <div className="rounded bg-muted/50 p-2 font-mono text-xs">
-                  <span className="text-muted-foreground">输出：</span>
-                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap">
-                    {typeof block.output === "string"
-                      ? block.output
-                      : JSON.stringify(block.output, null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
-          ),
-        )}
-        {streamingText && (
-          <div className="rounded border border-border bg-muted/20 p-3">
-            <p className="whitespace-pre-wrap text-sm">{streamingText}</p>
-            <span className="inline-block h-4 w-0.5 animate-pulse bg-current align-middle" />
+    >
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
+          {isStreaming ? (
+            <span className="flex size-2 animate-pulse rounded-full bg-amber-500" />
+          ) : null}
+          工具调用 · {toolName}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 pt-0">
+        <div className="rounded-lg bg-muted/50 px-3 py-2 font-mono text-xs">
+          <span className="text-muted-foreground">
+            {isStreaming ? "输入（流式）：" : "输入："}
+          </span>
+          <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap text-foreground/90 wrap-anywhere">
+            {inputStr || "…"}
+          </pre>
+        </div>
+        {outputStr !== undefined ? (
+          <div className="rounded-lg bg-muted/50 px-3 py-2 font-mono text-xs">
+            <span className="text-muted-foreground">输出：</span>
+            <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap text-foreground/90 wrap-anywhere">
+              {outputStr}
+            </pre>
           </div>
-        )}
-        {streamingTool && (
-          <div className="rounded border border-amber-500/40 bg-amber-500/5 p-3">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
-              工具调用中 · {streamingTool.toolName}
-            </p>
-            <div className="rounded bg-muted/50 p-2 font-mono text-xs">
-              <span className="text-muted-foreground">输入（流式）：</span>
-              <pre className="mt-1 overflow-x-auto whitespace-pre-wrap">
-                {streamingTool.input !== undefined
-                  ? typeof streamingTool.input === "string"
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function StreamingCursor() {
+  return (
+    <span
+      className="inline-block h-4 w-0.5 animate-pulse rounded-full bg-primary align-middle"
+      aria-hidden
+    />
+  );
+}
+
+export default function RxjsPage() {
+  const { state, send, loading, error } = useChatStreamState("/api/chat");
+  const { messageId, blocks, streamingText, streamingTool } = state;
+
+  const hasContent =
+    blocks.length > 0 || streamingText !== null || streamingTool !== null;
+
+  return (
+    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 p-6">
+      <header className="space-y-1">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          流式对话示例
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          使用 useChatStreamState 消费流式 state，不处理底层事件。
+        </p>
+      </header>
+
+      <Card className="border-border/80">
+        <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
+          <div className="space-y-1.5">
+            <CardTitle className="text-base">操作</CardTitle>
+            <CardDescription className="text-xs">
+              {messageId != null
+                ? `当前 messageId: ${messageId}`
+                : "点击按钮发送示例请求"}
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            onClick={() => send(CHAT_BODY)}
+            disabled={loading}
+            size="md"
+            className="shrink-0"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                请求中…
+              </>
+            ) : (
+              "查询北京天气"
+            )}
+          </Button>
+        </CardHeader>
+      </Card>
+
+      {error != null ? (
+        <Alert className="border-destructive/50 bg-destructive/10 text-destructive">
+          <AlertDescription>错误: {error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {hasContent ? (
+        <section className="space-y-4">
+          <h2 className="text-sm font-medium text-muted-foreground">
+            响应内容
+          </h2>
+          <div className="flex flex-col gap-3">
+            {blocks.map((block, i) =>
+              block.kind === "text" ? (
+                <TextBlock key={`${block.id}-${i}`} content={block.content} />
+              ) : (
+                <ToolBlock
+                  key={block.toolCallId}
+                  toolName={block.toolName}
+                  input={block.input}
+                  output={block.output}
+                />
+              ),
+            )}
+            {streamingText !== null ? (
+              <Card className="border-primary/20 bg-primary/5 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                    {streamingText}
+                    <StreamingCursor />
+                  </p>
+                </CardContent>
+              </Card>
+            ) : null}
+            {streamingTool !== null ? (
+              <ToolBlock
+                toolName={streamingTool.toolName}
+                input={
+                  streamingTool.input !== undefined
                     ? streamingTool.input
-                    : JSON.stringify(streamingTool.input, null, 2)
-                  : streamingTool.inputStreaming || "…"}
-              </pre>
-              {streamingTool.output !== undefined && (
-                <>
-                  <span className="text-muted-foreground">输出：</span>
-                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap">
-                    {typeof streamingTool.output === "string"
-                      ? streamingTool.output
-                      : JSON.stringify(streamingTool.output, null, 2)}
-                  </pre>
-                </>
-              )}
-            </div>
+                    : (streamingTool.inputStreaming ?? "…")
+                }
+                output={streamingTool.output}
+                isStreaming
+              />
+            ) : null}
           </div>
-        )}
-      </div>
-      {error != null && (
-        <p className="text-destructive text-sm">错误: {error}</p>
-      )}
+        </section>
+      ) : null}
     </div>
   );
 }
