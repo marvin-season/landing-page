@@ -77,3 +77,11 @@
   - **ActionCard**：新增必选 prop `resourceId: string`，调用 `buildChatBody(resourceId, text)` 构建请求体。
   - 无效或缺失 resourceId 时，对话页展示「无效的会话 ID」提示。
 - **原因/上下文**：用户要求由用户主动创建会话 ID，首页展示开始会话按钮，RESOURCE_ID 放在路由参数中。
+
+## 历史与当前轮分离：接口数据用 MessageItem，当前轮补问题 + ResponseSection
+- **文件**: [agui/rxjs/[resourceId]/page.tsx](../../src/app/agui/rxjs/[resourceId]/page.tsx)
+- **修改内容**:
+  - **历史**：进入页后 GET `/api/chat?resourceId=xxx` 拉取历史，结果直接作为 `Message[]` 使用，用现有 `MessageItem`（含 `messages` 传整列表供 getToolResult）在 `Conversation` / `ConversationContent` 内逐条渲染，不做格式转换；加载中显示「加载历史…」。
+  - **当前轮**：发送时从 body 中解析用户文案 `extractUserText(body)` 存为 `pendingUserMessage`；在历史列表下方、ResponseSection 上方渲染「问题」：当 `pendingUserMessage != null` 且（`loading` 或当前有流式/已完成内容）时展示一条 user 气泡（`Message` + `MessageResponse`）。
+  - **流式**：保持原有 `ResponseSection(blocks, streamingTool, streamingText)` 逻辑不变，工具调用等交互未改。
+- **原因/上下文**：用户回滚此前复杂改造，要求历史与正在输出分离；历史直接用接口数据 + MessageItem 渲染（接口与组件已适配），当前轮仅补充缺失的「问题」并保留现有流式输出逻辑。
