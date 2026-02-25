@@ -1,4 +1,4 @@
-# agui rxjs 页 UI 布局、配色与流式工具状态优化
+# agui rxjs 页 UI 布局、配色、流式工具状态与组件拆分
 
 ## 优化 rxjs 页 UI 布局与配色
 - **文件**: `src/app/agui/rxjs/page.tsx`
@@ -25,3 +25,13 @@
   - 标题左侧增加 `ChevronDown` 图标，展开时旋转 180°，默认 `defaultOpen={true}`。
   - 触发器区域增加 `cursor-pointer`、`hover:bg-muted/20`、`select-none`，便于点击与反馈。
 - **原因/上下文**：用户要求工具展示支持展开收起，便于在内容较多时折叠查看。
+
+## 拆分 rxjs 页为多文件组件
+- **文件**: `src/app/agui/rxjs/page.tsx`、新增 `constants.ts`、`components/TextBlock.tsx`、`components/ToolBlock.tsx`、`components/StreamingCursor.tsx`、`components/ActionCard.tsx`、`components/ResponseSection.tsx`
+- **修改内容**:
+  - 将 `CHAT_BODY` 抽到 `constants.ts`。
+  - 新增 `TextBlock`、`ToolBlock`（含 `ToolStreamingPhase` 类型）、`StreamingCursor` 为独立组件。
+  - 新增 `ActionCard`：操作卡片（messageId、loading、onSend）。
+  - 新增 `ResponseSection`：响应内容区（blocks、streamingTool、streamingText），内部复用 TextBlock/ToolBlock/StreamingCursor，并封装 `getStreamingPhase`。
+  - 首页 `page.tsx` 仅保留布局、header、ActionCard、错误 Alert、ResponseSection，行数由 271 行缩减至约 55 行。
+- **原因/上下文**：首页代码过多，需拆分为合适组件以优化可维护性。
