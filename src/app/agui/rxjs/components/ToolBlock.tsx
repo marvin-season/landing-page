@@ -52,13 +52,12 @@ export function ToolBlock({
         isStreaming && "ring-1 ring-primary/30 shadow-md",
       )}
     >
-      <Collapsible defaultOpen={true} className="w-full [&[data-state=open]_[data-tool-chevron]]:rotate-180">
+      <Collapsible defaultOpen={true} className="group w-full">
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer select-none pb-2 transition-colors hover:bg-muted/20">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
+          <CardHeader className="cursor-pointer select-none px-6 py-4 transition-colors hover:bg-muted/20">
+            <CardTitle className="flex flex-wrap items-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
               <ChevronDown
-                data-tool-chevron
-                className="size-4 shrink-0 transition-transform duration-200"
+                className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
                 aria-hidden
               />
               {isStreaming ? (
@@ -80,18 +79,18 @@ export function ToolBlock({
           </CardHeader>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent className="space-y-3 pt-0">
-            <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 font-mono text-xs">
+          <CardContent className="space-y-3 px-6 pb-6 pt-0">
+            <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5 font-mono text-xs">
               <span className="text-muted-foreground">
                 {isStreaming && !outputStr ? "输入（流式）：" : "输入："}
               </span>
-              <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap text-foreground/90 wrap-anywhere">
+              <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap wrap-break-word text-foreground/90">
                 {inputStr || "…"}
               </pre>
             </div>
             {isCalling ? (
               <div
-                className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-3 font-mono text-xs"
+                className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3 text-xs"
                 role="status"
                 aria-live="polite"
               >
@@ -101,9 +100,9 @@ export function ToolBlock({
                 </span>
               </div>
             ) : outputStr !== undefined ? (
-              <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2 font-mono text-xs">
+              <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5 font-mono text-xs">
                 <span className="text-muted-foreground">输出：</span>
-                <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap text-foreground/90 wrap-anywhere">
+                <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap wrap-break-word text-foreground/90">
                   {outputStr}
                 </pre>
               </div>

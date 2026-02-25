@@ -17,11 +17,11 @@ type ActionCardProps = {
 
 export function ActionCard({ messageId, loading, onSend }: ActionCardProps) {
   return (
-    <Card className="border-border/80 bg-card shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2 pt-6 sm:pt-6">
-        <div className="space-y-1.5 min-w-0">
+    <Card className="border-border/80 bg-card shadow-sm transition-shadow hover:shadow-md">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 px-6 py-4 sm:flex-nowrap">
+        <div className="min-w-0 flex-1 space-y-1.5">
           <CardTitle className="text-base font-medium">操作</CardTitle>
-          <CardDescription className="text-xs text-muted-foreground">
+          <CardDescription className="truncate text-xs text-muted-foreground sm:whitespace-normal">
             {messageId != null
               ? `当前 messageId: ${messageId}`
               : "点击按钮发送示例请求"}

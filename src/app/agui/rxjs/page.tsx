@@ -15,15 +15,6 @@ export default function RxjsPage() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          流式对话示例
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          使用 useChatStreamState 消费流式 state，不处理底层事件。
-        </p>
-      </header>
-
       <ActionCard
         messageId={messageId}
         loading={loading}

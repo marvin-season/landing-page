@@ -1,4 +1,4 @@
-# agui rxjs 页 UI 布局、配色、流式工具状态与组件拆分
+# agui rxjs 页 UI 布局、配色、流式工具状态与组件拆分、ActionCard/ToolBlock 样式修复
 
 ## 优化 rxjs 页 UI 布局与配色
 - **文件**: `src/app/agui/rxjs/page.tsx`
@@ -53,3 +53,10 @@
   - `fromChatStream` 返回类型改为 `Observable<UIMessageChunk>`；`reduceChatStreamEvent` 的 event 参数类型改为 `UIMessageChunk`。
   - README 中所有对 `ChatStreamEvent` 的引用改为 `UIMessageChunk`，并注明事件类型与 ai 包一致。
 - **原因/上下文**：API 使用 `createUIMessageStreamResponse` 返回的流格式即 UIMessageChunk，与 ai 包类型一致，无需维护重复类型定义。
+
+## ActionCard 与工具调用组件样式修复
+- **文件**: [ActionCard.tsx](../../src/app/agui/rxjs/components/ActionCard.tsx)、[ToolBlock.tsx](../../src/app/agui/rxjs/components/ToolBlock.tsx)
+- **修改内容**:
+  - **ActionCard**：卡片增加 `transition-shadow hover:shadow-md` 与 TextBlock 一致；CardHeader 改为显式 `px-6 py-4` 避免与默认 `p-6` 覆盖导致 padding 不统一；增加 `flex-wrap` / `sm:flex-nowrap` 与 `min-w-0 flex-1` 改善小屏布局与截断；描述使用 `truncate sm:whitespace-normal` 避免长 messageId 撑破布局。
+  - **ToolBlock**：展开箭头旋转改为基于 `group` + `group-data-[state=open]:rotate-180` 施加在 ChevronDown 上，修复此前选择器导致旋转未正确作用在图标上的问题；CardHeader 使用显式 `px-6 py-4`；标题行增加 `flex-wrap` 防止状态文案换行错位；内容区 `CardContent` 使用 `px-6 pb-6 pt-0`，输入/输出块统一为 `rounded-lg`、`py-2.5`，长文本使用 `wrap-break-word` 替代 `wrap-anywhere`；「正在调用工具」占位块去掉 `font-mono` 以符合说明文案样式。
+- **原因/上下文**：用户反馈 ActionCard 与工具调用组件存在样式问题，统一内边距、修正箭头旋转目标并与其他卡片风格一致。
