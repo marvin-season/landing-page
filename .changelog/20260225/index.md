@@ -1,4 +1,4 @@
-# agui rxjs 页 UI 与状态优化、ActionCard 预置问题与自定义输入
+# agui rxjs 页 UI 与状态优化、ActionCard 预置问题与自定义输入、Mastra serverless 存储适配
 
 ## 优化 rxjs 页 UI 布局与配色
 - **文件**: `src/app/agui/rxjs/page.tsx`
@@ -92,3 +92,11 @@
   - 使用 `ai` 包 `isToolOrDynamicToolUIPart` 识别工具 part；对 `tool-*` / `dynamic-tool` 类型用 agui/rxjs 的 `ToolBlock` 渲染，与 ResponseSection 一致的展开收起、输入/输出、流式阶段（接收参数中 / 正在执行 / 已完成）。
   - `getToolName`：`tool-${NAME}` 取后缀，dynamic-tool 取 `part.toolName`；`getStreamingPhase` 按 part.state 映射为 input-streaming / calling / done；output-error 时 output 传 `{ error: errorText }`。
 - **原因/上下文**：用户要求扩展 agent 助理消息组件，像 ResponseSection 一样支持工具调用展示。
+
+## Mastra 存储适配 serverless 部署
+- **文件**: [src/mastra/index.ts](../../src/mastra/index.ts)、[.env.example](../../.env.example)
+- **修改内容**:
+  - Mastra 的 LibSQLStore 不再写死 `file:./db/mastra.db`。在 Vercel（`VERCEL=1`）或 AWS Lambda 环境下自动使用 `:memory:`，避免「Unable to open connection to local database」的 ConnectionFailed 错误。
+  - 若配置了 `TURSO_DATABASE_URL`（及可选 `TURSO_AUTH_TOKEN`），则使用 Turso 远程库以在 serverless 下持久化存储。
+  - 本地开发未设 TURSO_* 时仍使用 `file:./db/mastra.db`。在 .env.example 中补充 TURSO 相关可选变量说明。
+- **原因/上下文**：服务器（如 Vercel）部署报错 ConnectionFailed，因 serverless 无持久化文件系统，无法创建/写入本地 SQLite 文件。

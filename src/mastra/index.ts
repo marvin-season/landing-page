@@ -17,11 +17,21 @@ export const mastra = new Mastra({
   },
   workflows: { weatherWorkflow },
   agents: { [AgentConstant.GENERAL_AGENT]: generalAgent },
-  storage: new LibSQLStore({
-    id: "mastra-storage",
-    // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
-    url: "file:./db/mastra.db",
-  }),
+  storage: (() => {
+    // Serverless (Vercel/Lambda) 无持久化文件系统，用内存或远程 Turso
+    const isServerless =
+      process.env.VERCEL === "1" || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+    const url =
+      process.env.TURSO_DATABASE_URL ??
+      (isServerless ? ":memory:" : "file:./db/mastra.db");
+    return new LibSQLStore({
+      id: "mastra-storage",
+      url,
+      ...(process.env.TURSO_AUTH_TOKEN && {
+        authToken: process.env.TURSO_AUTH_TOKEN,
+      }),
+    });
+  })(),
   logger: new PinoLogger({
     name: "Mastra",
     level: "info",
