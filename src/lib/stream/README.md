@@ -6,16 +6,13 @@
 
 | 文件 | 职责 |
 |------|------|
-| `chat-stream-store.ts` | Zustand store：`state` / `loading` / `error` / `send(url, body)`，统一管理流式状态与订阅 |
-| `use-chat-stream-state.ts` | React Hook：基于 store 的薄封装，按 `url` 绑定 `send(body)`，对外 API 不变 |
+| `use-chat-stream-state.ts` | React Hook，封装订阅与 `state / send / loading / error` |
 | `chat-stream-state.ts` | 状态类型、归约函数、`fromChatStreamState`、`flushChatStreamState` |
 | `chat-stream.ts` | 底层 SSE → `Observable<UIMessageChunk>`（ai 包类型） |
 
 ---
 
-## 1. 状态管理：Zustand Store + Hook
-
-### useChatStreamState（React Hook）
+## 1. useChatStreamState（React Hook）
 
 ### 签名
 
@@ -60,33 +57,9 @@ function ChatPage() {
 
 ### 行为说明
 
-- 每次调用 `send(body)` 会先取消上一次未完成订阅，再创建新订阅，因此同一时刻只会有一个请求在跑。
+- 每次调用 `send(body)` 会先执行 `subscriptionRef.current?.unsubscribe()`，再创建新订阅，因此同一时刻只会有一个请求在跑。
 - 请求开始时状态会被重置为 `initialChatStreamState`，便于新对话展示。
 - 流 **complete** 时会对当前 state 执行一次 `flushChatStreamState`，把尚未写入 `blocks` 的 `streamingText` 追加为文本块。
-
-### useChatStreamStore（Zustand Store）
-
-状态由 `chat-stream-store.ts` 中的 Zustand store 统一管理，便于：
-
-- **单一数据源**：`state` / `loading` / `error` 集中在一处，避免多处 useState 分散。
-- **跨组件消费**：任意组件可通过 `useChatStreamStore(selector)` 或 `useChatStreamStore.getState()` 读取/派发，不依赖 props 或 Hook 层级。
-- **选择性订阅**：使用 `useShallow` 或自定义 selector 可减少不必要的重渲染。
-
-Store 接口：
-
-```ts
-type ChatStreamStore = {
-  state: ChatStreamState;
-  loading: boolean;
-  error: string | null;
-  send: (url: string, body: Record<string, unknown>) => void;
-};
-
-const useChatStreamStore = create<ChatStreamStore>(...);
-```
-
-- **Hook 层**：`useChatStreamState(url)` 内部使用 `useChatStreamStore(useShallow(...))` 取出 `state` / `loading` / `error` / `send`，并将 `send` 绑定为 `(body) => send(url, body)`，对外 API 与迁移前一致。
-- **订阅生命周期**：当前活跃订阅保存在模块级变量中，`send` 被调用时会先 `unsubscribe` 再创建新订阅，逻辑与原先 `useRef` 方案一致。
 
 ---
 
@@ -201,7 +174,7 @@ function flushChatStreamState(state: ChatStreamState): ChatStreamState;
 
 - 若存在 `currentTextId` 且 `streamingText` 非空，则将当前 `streamingText` 作为一块文本追加到 `blocks`，并清空 `streamingText` 与 `currentTextId`。
 - 否则仅做浅拷贝并可选地清空 `streamingText`（保证不变性）。
-- **使用场景**：流 `complete` 时对最后一条 state 调用一次，避免最后一段流式文本残留在 `streamingText` 而未进入 `blocks`。Store 的 `send` 在订阅的 `complete` 回调中会执行 `set({ state: flushChatStreamState(current) })`。
+- **使用场景**：流 `complete` 时对最后一条 state 调用一次，避免最后一段流式文本残留在 `streamingText` 而未进入 `blocks`。`useChatStreamState` 在 `complete` 回调中会执行 `setState((s) => flushChatStreamState(s))`。
 
 ---
 
@@ -217,7 +190,7 @@ const initialChatStreamState: ChatStreamState = {
 };
 ```
 
-用作 `scan` 的初始值，以及 store 在每次 `send` 时的重置状态。
+用作 `scan` 的初始值，以及 `useChatStreamState` 在每次 `send` 时的重置状态。
 
 ---
 
@@ -227,10 +200,10 @@ const initialChatStreamState: ChatStreamState = {
 POST /api/chat (body)
   → fromChatStream(url, body)     → Observable<UIMessageChunk>
   → scan(reduceChatStreamEvent)   → Observable<ChatStreamState>
-  → useChatStreamStore.send 内 subscribe
-      → next: set({ state })
-      → complete: set({ state: flushChatStreamState(current), loading: false })
-      → error: set({ error, loading: false })
+  → useChatStreamState 内 subscribe
+      → next: setState
+      → complete: setState(flushChatStreamState(s)), setLoading(false)
+      → error: setError(...), setLoading(false)
 ```
 
 上层只需消费 `state`（及 `loading` / `error`），无需直接处理 `UIMessageChunk`。
@@ -296,7 +269,7 @@ POST /api/chat (body)
   - **api/agui/[agentId]/route.ts**：将 Observable 转成 SSE，在 `next` 里往 ReadableStream 写数据，`complete` 时关闭流，`error` 时 controller.error。
 - **返回值**：**Subscription** 对象，常用方法：
   - `subscription.unsubscribe()`：取消订阅，停止接收并触发创建 Observable 时返回的清理函数（如取消 fetch、reader.cancel()）。
-- 本项目在 `chat-stream-store` 的 `send` 中用模块级 `activeSubscription?.unsubscribe()` 在下次 `send` 时取消上一次请求，避免重复订阅。
+- 本项目在 `useChatStreamState` 中用 `subscriptionRef.current?.unsubscribe()` 在下次 `send` 时取消上一次请求，避免重复订阅。
 
 ### 小结（与本目录的对应关系）
 
@@ -306,5 +279,5 @@ POST /api/chat (body)
 | `Observable<T>` 类型        | `chat-stream-state.ts` 等            | 标注事件流 / 状态流的类型 |
 | `.pipe(scan(...))`          | `chat-stream-state.ts` 的 `fromChatStreamState` | 把事件流归约为状态流 |
 | `scan(accumulator, seed)`   | 同上                                  | 用 `reduceChatStreamEvent` 做状态归约 |
-| `.subscribe({ next, error, complete })` | `chat-stream-store.ts`、`route.ts` | 消费状态流 / 事件流并更新 store 或写出 SSE |
+| `.subscribe({ next, error, complete })` | `use-chat-stream-state.ts`、`route.ts` | 消费状态流 / 事件流并更新 UI 或写出 SSE |
 | `subscription.unsubscribe()`| `use-chat-stream-state.ts`           | 取消上一次请求，释放资源 |

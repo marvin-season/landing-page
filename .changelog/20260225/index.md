@@ -1,4 +1,4 @@
-# agui rxjs 页 UI 布局与流式状态 Zustand 迁移、ActionCard/ToolBlock 样式修复
+# agui rxjs 页 UI 布局、配色、流式工具状态与组件拆分、ActionCard/ToolBlock 样式修复
 
 ## 优化 rxjs 页 UI 布局与配色
 - **文件**: `src/app/agui/rxjs/page.tsx`
@@ -60,11 +60,3 @@
   - **ActionCard**：卡片增加 `transition-shadow hover:shadow-md` 与 TextBlock 一致；CardHeader 改为显式 `px-6 py-4` 避免与默认 `p-6` 覆盖导致 padding 不统一；增加 `flex-wrap` / `sm:flex-nowrap` 与 `min-w-0 flex-1` 改善小屏布局与截断；描述使用 `truncate sm:whitespace-normal` 避免长 messageId 撑破布局。
   - **ToolBlock**：展开箭头旋转改为基于 `group` + `group-data-[state=open]:rotate-180` 施加在 ChevronDown 上，修复此前选择器导致旋转未正确作用在图标上的问题；CardHeader 使用显式 `px-6 py-4`；标题行增加 `flex-wrap` 防止状态文案换行错位；内容区 `CardContent` 使用 `px-6 pb-6 pt-0`，输入/输出块统一为 `rounded-lg`、`py-2.5`，长文本使用 `wrap-break-word` 替代 `wrap-anywhere`；「正在调用工具」占位块去掉 `font-mono` 以符合说明文案样式。
 - **原因/上下文**：用户反馈 ActionCard 与工具调用组件存在样式问题，统一内边距、修正箭头旋转目标并与其他卡片风格一致。
-
-## useChatStreamState 迁移至 Zustand 最佳实践
-- **文件**: 新增 `src/lib/stream/chat-stream-store.ts`，重写 `src/lib/stream/use-chat-stream-state.ts`，更新 `src/lib/stream/README.md`
-- **修改内容**:
-  - **Store**：新增 `chat-stream-store.ts`，使用 Zustand `create` 维护 `state` / `loading` / `error` 与 `send(url, body)`；订阅生命周期用模块级 `activeSubscription` 管理，`send` 时先 `unsubscribe` 再创建新订阅。
-  - **Hook**：`useChatStreamState(url)` 改为基于 store 的薄封装，通过 `useChatStreamStore(useShallow(...))` 取状态与 `send`，并将 `send` 绑定为 `(body) => send(url, body)`，对外 API 不变（`state` / `send` / `loading` / `error`）。
-  - **README**：目录结构增加 store 说明，新增「useChatStreamStore（Zustand Store）」小节，数据流与 RxJS 小结表改为指向 store。
-- **原因/上下文**：用户要求将 useChatStreamState 相关处理迁移到 Zustand 最佳实践，便于更好的状态管理（单一数据源、跨组件消费、选择性订阅）。
