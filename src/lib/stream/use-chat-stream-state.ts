@@ -1,47 +1,28 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import {
-  type ChatStreamState,
-  flushChatStreamState,
-  fromChatStreamState,
-  initialChatStreamState,
-} from "./chat-stream-state";
+import { useCallback } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { useChatStreamStore } from "./chat-stream-store";
 
 /**
- * 流式对话 Hook
+ * 流式对话 Hook（基于 Zustand store）
  * @param url 接口地址
  */
 export function useChatStreamState(url: string) {
-  const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const { state, loading, error, send: sendFromStore } = useChatStreamStore(
+    useShallow((s) => ({
+      state: s.state,
+      loading: s.loading,
+      error: s.error,
+      send: s.send,
+    })),
+  );
 
   const send = useCallback(
     (body: Record<string, unknown>) => {
-      subscriptionRef.current?.unsubscribe();
-      subscriptionRef.current = null;
-
-      setError(null);
-      setState(initialChatStreamState);
-      setLoading(true);
-
-      const sub = fromChatStreamState(url, body).subscribe({
-        next: setState,
-        error: (err) => {
-          setError(err instanceof Error ? err.message : String(err));
-          setLoading(false);
-        },
-        complete: () => {
-          setState((s) => flushChatStreamState(s));
-          setLoading(false);
-          subscriptionRef.current = null;
-        },
-      });
-      subscriptionRef.current = sub;
+      sendFromStore(url, body);
     },
-    [url],
+    [url, sendFromStore],
   );
 
   return { state, send, loading, error };
