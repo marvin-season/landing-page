@@ -45,3 +45,11 @@
 - **文件**: `src/lib/stream/README.md`
 - **修改内容**: 在文档末尾新增「RxJS API 使用说明（本目录所用）」章节，说明本项目中用到的：Observable（含义、`new Observable(subscriber)` 与 next/error/complete、清理函数）、`.pipe(...operators)`、`scan(accumulator, seed)`、`subscribe(observer)` 与 Subscription / `unsubscribe()`，并附与各文件的对应关系小结表。
 - **原因/上下文**：用户要求整理一份代码中使用到的 RxJS 相关 API 使用说明（如 Observable、pipe 参数、scan、subscribe 等）。
+
+## 使用 ai 包 UIMessageChunk 替代本地 ChatStreamEvent
+- **文件**: `src/lib/stream/chat-stream.ts`、`src/lib/stream/chat-stream-state.ts`、`src/lib/stream/README.md`
+- **修改内容**:
+  - 移除 `ChatStreamEvent` 的二次类型定义，改为直接从 `ai` 包导入并使用 `UIMessageChunk`。
+  - `fromChatStream` 返回类型改为 `Observable<UIMessageChunk>`；`reduceChatStreamEvent` 的 event 参数类型改为 `UIMessageChunk`。
+  - README 中所有对 `ChatStreamEvent` 的引用改为 `UIMessageChunk`，并注明事件类型与 ai 包一致。
+- **原因/上下文**：API 使用 `createUIMessageStreamResponse` 返回的流格式即 UIMessageChunk，与 ai 包类型一致，无需维护重复类型定义。

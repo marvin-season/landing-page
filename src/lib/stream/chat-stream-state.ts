@@ -1,6 +1,6 @@
+import type { UIMessageChunk } from "ai";
 import type { Observable } from "rxjs";
 import { scan } from "rxjs";
-import type { ChatStreamEvent } from "./chat-stream";
 import { fromChatStream } from "./chat-stream";
 
 // ---------------------------------------------------------------------------
@@ -74,7 +74,7 @@ function pushTextBlock(
  */
 export function reduceChatStreamEvent(
   state: ChatStreamState,
-  event: ChatStreamEvent,
+  event: UIMessageChunk,
 ): ChatStreamState {
   const t = event.type;
 

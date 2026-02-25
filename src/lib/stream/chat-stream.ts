@@ -1,36 +1,11 @@
+import type { UIMessageChunk } from "ai";
 import { Observable } from "rxjs";
 
-/** 流式事件类型 */
-export type ChatStreamEvent =
-  | { type: "start"; messageId: string }
-  | { type: "start-step" }
-  | { type: "text-start"; id: string }
-  | { type: "text-delta"; id: string; delta: string }
-  | { type: "text-end"; id: string }
-  | { type: "text-done"; id?: string }
-  | {
-      type: "tool-input-start";
-      toolCallId: string;
-      toolName: string;
-      dynamic?: boolean;
-    }
-  | { type: "tool-input-delta"; toolCallId: string; inputTextDelta: string }
-  | {
-      type: "tool-input-available";
-      toolCallId: string;
-      toolName: string;
-      input: unknown;
-    }
-  | { type: "tool-output-available"; toolCallId: string; output: unknown }
-  | { type: "finish-step" }
-  | { type: "finish" }
-  | { type: string; [key: string]: unknown };
-
-/** 将 SSE 流转换为 Observable */
+/** 将 SSE 流转换为 Observable（事件类型与 ai 包 UIMessageChunk 一致） */
 export function fromChatStream(
   url: string,
   body: Record<string, unknown>,
-): Observable<ChatStreamEvent> {
+): Observable<UIMessageChunk> {
   return new Observable((subscriber) => {
     let cancelled = false;
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -60,7 +35,7 @@ export function fromChatStream(
             const raw = match[1].trim();
             if (!raw) continue;
             try {
-              const event = JSON.parse(raw) as ChatStreamEvent;
+              const event = JSON.parse(raw) as UIMessageChunk;
               subscriber.next(event);
             } catch {
               // 忽略非 JSON 行（如 data: [DONE]）

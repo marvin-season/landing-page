@@ -8,7 +8,7 @@
 |------|------|
 | `use-chat-stream-state.ts` | React Hook，封装订阅与 `state / send / loading / error` |
 | `chat-stream-state.ts` | 状态类型、归约函数、`fromChatStreamState`、`flushChatStreamState` |
-| `chat-stream.ts` | 底层 SSE → `Observable<ChatStreamEvent>` |
+| `chat-stream.ts` | 底层 SSE → `Observable<UIMessageChunk>`（ai 包类型） |
 
 ---
 
@@ -128,7 +128,7 @@ function fromChatStreamState(
 
 ### 说明
 
-- 内部使用 `fromChatStream(url, body)` 得到 `Observable<ChatStreamEvent>`，再通过 `pipe(scan(reduceChatStreamEvent, initialChatStreamState))` 归约为 `Observable<ChatStreamState>`。
+- 内部使用 `fromChatStream(url, body)` 得到 `Observable<UIMessageChunk>`，再通过 `pipe(scan(reduceChatStreamEvent, initialChatStreamState))` 归约为 `Observable<ChatStreamState>`。
 - 每次事件会调用 `reduceChatStreamEvent(prevState, event)` 得到新状态并下发。
 - 仅订阅时才会发起请求；取消订阅会中止底层 SSE 读取。
 
@@ -141,7 +141,7 @@ function fromChatStreamState(
 ```ts
 function reduceChatStreamEvent(
   state: ChatStreamState,
-  event: ChatStreamEvent,
+  event: UIMessageChunk,
 ): ChatStreamState;
 ```
 
@@ -198,7 +198,7 @@ const initialChatStreamState: ChatStreamState = {
 
 ```
 POST /api/chat (body)
-  → fromChatStream(url, body)     → Observable<ChatStreamEvent>
+  → fromChatStream(url, body)     → Observable<UIMessageChunk>
   → scan(reduceChatStreamEvent)   → Observable<ChatStreamState>
   → useChatStreamState 内 subscribe
       → next: setState
@@ -206,7 +206,7 @@ POST /api/chat (body)
       → error: setError(...), setLoading(false)
 ```
 
-上层只需消费 `state`（及 `loading` / `error`），无需直接处理 `ChatStreamEvent`。
+上层只需消费 `state`（及 `loading` / `error`），无需直接处理 `UIMessageChunk`。
 
 ---
 
@@ -223,7 +223,7 @@ POST /api/chat (body)
     - `subscriber.error(err)`：发出错误并结束；
     - `subscriber.complete()`：正常结束，不再发值。
   - 若该函数返回一个函数，则该返回函数会在**取消订阅或 complete/error 时**被调用，用于清理（如取消 fetch、关闭 reader）。本项目里用其设置 `cancelled = true` 并 `reader?.cancel()`。
-- **类型**：`Observable<T>` 表示该流会发出类型为 `T` 的值，例如 `Observable<ChatStreamEvent>`、`Observable<ChatStreamState>`。
+- **类型**：`Observable<T>` 表示该流会发出类型为 `T` 的值，例如 `Observable<UIMessageChunk>`、`Observable<ChatStreamState>`。
 
 ### .pipe(...operators)（管道与操作符）
 
@@ -235,7 +235,7 @@ POST /api/chat (body)
     scan(reduceChatStreamEvent, initialChatStreamState),
   );
   ```
-  含义：上游是 `Observable<ChatStreamEvent>`，经过 `scan` 后变成 `Observable<ChatStreamState>`。
+  含义：上游是 `Observable<UIMessageChunk>`，经过 `scan` 后变成 `Observable<ChatStreamState>`。
 
 ### scan(accumulator, seed)（累积归约）
 
@@ -248,7 +248,7 @@ POST /api/chat (body)
   ```
   - **seed**：`initialChatStreamState`。`scan` 会先向下游发出一次 seed，之后每收到一个上游事件就调用 `accumulator(当前状态, 事件)` 并发出新的状态。
   - **accumulator**：`reduceChatStreamEvent(state, event)`，即「当前状态 + 新事件 → 新状态」。
-- **效果**：把「事件流」归约成「状态流」：先发出初始状态，再每来一个 `ChatStreamEvent` 就发出更新后的 `ChatStreamState`，实现状态机。
+  - **效果**：把「事件流」归约成「状态流」：先发出初始状态，再每来一个 `UIMessageChunk` 就发出更新后的 `ChatStreamState`，实现状态机。
 
 ### subscribe(observer)（订阅）
 
