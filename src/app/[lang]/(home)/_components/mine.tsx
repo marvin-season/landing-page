@@ -38,7 +38,9 @@ export function Mine() {
     {
       href: "/admin/ppt",
       title: <Trans>A Simple PPT Generator</Trans>,
-      description: <Trans>Generate slide content in a structured workflow</Trans>,
+      description: (
+        <Trans>Generate slide content in a structured workflow</Trans>
+      ),
       badge: "Tool",
     },
     {
@@ -71,8 +73,8 @@ export function Mine() {
           <Trans>Software Engineer</Trans>
           <span className="mx-2">·</span>
           <Trans>
-            Building practical AI products with a strong focus on iteration speed
-            and developer experience.
+            Building practical AI products with a strong focus on iteration
+            speed and developer experience.
           </Trans>
         </p>
       </Section>
@@ -127,7 +129,9 @@ function NavCard(props: {
           {badge}
         </span>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {description}
+      </p>
     </Link>
   );
 }
@@ -144,7 +148,9 @@ function Section({
   className?: string;
 }) {
   return (
-    <section className={`mb-8 flex flex-col gap-3 rounded-md ${className ?? ""}`}>
+    <section
+      className={`mb-8 flex flex-col gap-3 rounded-md ${className ?? ""}`}
+    >
       <MotionDiv
         className="select-none text-xl font-bold"
         {...getMotionProps(delay)}

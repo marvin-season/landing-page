@@ -1,7 +1,6 @@
 import { Bot, Menu } from "lucide-react";
 import dynamic from "next/dynamic";
 import { CreateSessionBtn } from "@/app/agent/_components/session/create-session-btn";
-import { ChatModeTabs } from "@/components/chat/chat-mode-tabs";
 import { Drawer } from "@/components/drawer";
 
 const ChatSidebar = dynamic(
@@ -14,7 +13,6 @@ const ChatSidebar = dynamic(
 export default function ChatPage() {
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-white">
-      <ChatModeTabs />
       <Drawer
         side="left"
         className="px-4"

@@ -52,3 +52,20 @@
   - 在拼装 `messages` 时增加去重保护：若 `currentMessages` 已存在与 `streamingAssistant` 相同 `id` 的消息，则不再追加流式临时消息。
   - 解决流结束后历史回写与流式临时消息短暂并存导致的双份回答显示问题。
 - **原因/上下文**: 用户反馈 `agent` 页面流式输出期间出现两份回答，历史数据本身正确。
+
+## 调整 ChatModeTabs 位置与层级（17:47:50）
+- **文件**: `src/components/chat/chat-mode-tabs.tsx`，`src/app/agent/page.tsx`，`src/app/agent/[sessionId]/page.tsx`，`src/app/agui/(home)/page.tsx`，`src/app/agui/rxjs/page.tsx`，`src/app/agui/rxjs/[resourceId]/page.tsx`
+- **修改内容**:
+  - `ChatModeTabs` 从“整行分割条”调整为“嵌入式切换卡片”，新增 `Chat Playground` 标签，视觉更轻量，避免抢主页面层级。
+  - 在入口页移除 tabs：`/agent` 与 `/agui/rxjs` 不再显示切换条，避免与首页导航和页面主 CTA 重复。
+  - 在对话页保留 tabs 并加内边距嵌入：`/agent/[sessionId]`、`/agui`、`/agui/rxjs/[resourceId]`，减少顶栏压迫感并与首页卡片化风格保持一致。
+- **原因/上下文**: 用户反馈 tabs 位置不合理；结合已改造首页的导航职责，切换条应聚焦对话页测试场景而非所有入口页。
+
+## 模式切换改为父容器悬浮下拉（17:52:36）
+- **文件**: `src/components/chat/chat-mode-switcher.tsx`，`src/app/agent/layout.tsx`，`src/app/agui/(home)/layout.tsx`，`src/app/agui/rxjs/layout.tsx`，`src/app/agent/[sessionId]/page.tsx`，`src/app/agui/(home)/page.tsx`，`src/app/agui/rxjs/[resourceId]/page.tsx`
+- **修改内容**:
+  - 新增 `ChatModeSwitcher` 悬浮下拉组件（fixed 右上角），使用 `Select` 在 `agent / copilot / rxjs` 三种模式间切换。
+  - 切换时根据当前路径自动复用可共享会话 ID（`/agent/:sessionId` 与 `/agui/rxjs/:resourceId` 互转）。
+  - 将切换组件上移到三个模块的父布局（layout）中统一渲染，不再在各 page 内部分别放置。
+  - 移除各页面中原有的 `ChatModeTabs` 嵌入逻辑，避免重复布局和页面内层级干扰。
+- **原因/上下文**: 用户要求切换控件放在三模块父容器，并采用悬浮下拉方式统一切换模式。

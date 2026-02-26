@@ -43,7 +43,9 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: NextRequest) {
-  const resourceId = resolveResourceId(req.nextUrl.searchParams.get("resourceId"));
+  const resourceId = resolveResourceId(
+    req.nextUrl.searchParams.get("resourceId"),
+  );
   if (!resourceId) {
     return NextResponse.json(
       { error: "Resource ID is required" },
@@ -52,9 +54,7 @@ export async function GET(req: NextRequest) {
   }
   const agentId = resolveAgentId(req.nextUrl.searchParams.get("agentId"));
 
-  const memory = await mastra
-    .getAgentById(agentId)
-    .getMemory();
+  const memory = await mastra.getAgentById(agentId).getMemory();
   let response = null;
 
   try {

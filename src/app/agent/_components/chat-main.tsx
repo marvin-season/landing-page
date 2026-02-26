@@ -30,12 +30,18 @@ export function ChatMain() {
   const currentSession = useCurrentSession();
   const sessionId = currentSession?.id ?? "";
   const { messages: currentMessages, refetch } = useCurrentMessages(sessionId);
-  const { state: streamState, send, loading: isLoading, error, stop } =
-    useChatStreamState("/api/chat");
+  const {
+    state: streamState,
+    send,
+    loading: isLoading,
+    error,
+    stop,
+  } = useChatStreamState("/api/chat");
 
-  const [pendingUser, setPendingUser] = useState<{ id: string; text: string } | null>(
-    null,
-  );
+  const [pendingUser, setPendingUser] = useState<{
+    id: string;
+    text: string;
+  } | null>(null);
   const [needRefreshAfterStream, setNeedRefreshAfterStream] = useState(false);
 
   const status: ChatStatus = isLoading ? "streaming" : "ready";
@@ -46,7 +52,9 @@ export function ChatMain() {
   );
   const pendingUserMessage = useMemo(
     () =>
-      pendingUser ? buildPendingUserMessage(pendingUser.text, pendingUser.id) : null,
+      pendingUser
+        ? buildPendingUserMessage(pendingUser.text, pendingUser.id)
+        : null,
     [pendingUser],
   );
 

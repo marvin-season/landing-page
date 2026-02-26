@@ -3,7 +3,6 @@
 import { randomUUID } from "@copilotkit/react-core/v2";
 import { useCallback } from "react";
 import { SuggestionsList } from "@/app/agui/_components/SuggestionsList";
-import { ChatModeTabs } from "@/components/chat/chat-mode-tabs";
 import {
   PromptInput,
   PromptInputBody,
@@ -39,7 +38,6 @@ function Chat() {
 
   return (
     <div className="size-full h-[80dvh] w-full">
-      <ChatModeTabs className="px-6" />
       <div className="relative flex h-full flex-col p-6">
         <MessageList />
         <SuggestionsList onSuggestionClick={handleSubmit} />

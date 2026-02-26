@@ -1,4 +1,5 @@
 import "@/css/globals.css";
+import { ChatModeSwitcher } from "@/components/chat/chat-mode-switcher";
 
 export default function RootLayout({
   children,
@@ -7,7 +8,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="h-dvh overflow-scroll">{children}</body>
+      <body className="h-dvh overflow-scroll">
+        <ChatModeSwitcher />
+        {children}
+      </body>
     </html>
   );
 }

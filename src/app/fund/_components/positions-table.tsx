@@ -116,7 +116,11 @@ export function PositionsTable({
                         size="sm"
                         className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         onClick={() => {
-                          if (confirm(`确认删除 ${pos.fundName} (${pos.fundCode}) 吗？此操作不可恢复。`)) {
+                          if (
+                            confirm(
+                              `确认删除 ${pos.fundName} (${pos.fundCode}) 吗？此操作不可恢复。`,
+                            )
+                          ) {
                             removePosition(pos.fundCode);
                           }
                         }}

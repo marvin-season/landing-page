@@ -51,7 +51,9 @@ type FundActions = {
     shares: number;
     date: string;
   }) => void;
-  syncEstimations: (codes?: string[]) => Promise<{ ok: boolean; errors?: string[] }>;
+  syncEstimations: (
+    codes?: string[],
+  ) => Promise<{ ok: boolean; errors?: string[] }>;
   removePosition: (fundCode: string) => void;
   setRealtimeItem: (code: string, item: FundRealtimeItem | null) => void;
 };
@@ -180,7 +182,9 @@ export const useFundStore = create<FundState & FundActions>()(
                 if (data?.code) {
                   set((state) => {
                     state.realtimeData[code] = data;
-                    const pos = state.positions.find((p) => p.fundCode === code);
+                    const pos = state.positions.find(
+                      (p) => p.fundCode === code,
+                    );
                     if (pos && data.name) {
                       pos.fundName = data.name;
                     }
@@ -205,7 +209,9 @@ export const useFundStore = create<FundState & FundActions>()(
       },
       removePosition(fundCode) {
         set((state) => {
-          state.positions = state.positions.filter((p) => p.fundCode !== fundCode);
+          state.positions = state.positions.filter(
+            (p) => p.fundCode !== fundCode,
+          );
           delete state.realtimeData[fundCode];
         });
       },

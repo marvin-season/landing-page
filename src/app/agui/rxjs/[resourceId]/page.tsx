@@ -7,7 +7,6 @@ import type { UIMessage } from "ai";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import MessageItem from "@/app/agent/_components/message/message-item";
-import { ChatModeTabs } from "@/components/chat/chat-mode-tabs";
 import {
   Conversation,
   ConversationContent,
@@ -79,7 +78,6 @@ export default function RxjsResourcePage() {
   if (!resourceId) {
     return (
       <div className="flex min-h-dvh flex-col">
-        <ChatModeTabs />
         <div className="mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
           <p className="text-sm text-muted-foreground">无效的会话 ID</p>
         </div>
@@ -89,44 +87,43 @@ export default function RxjsResourcePage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <ChatModeTabs resourceId={resourceId} />
       <div className="mx-auto flex min-h-0 w-full max-w-4/5 flex-1 flex-col px-4 sm:px-6 2xl:max-w-3/5 4xl:max-w-2/5">
         <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
-        {error != null ? (
-          <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
-            <AlertDescription>错误: {error}</AlertDescription>
-          </Alert>
-        ) : null}
+          {error != null ? (
+            <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
+              <AlertDescription>错误: {error}</AlertDescription>
+            </Alert>
+          ) : null}
 
-        <Conversation className="h-full">
-          <ConversationContent>
-            {historyLoading ? (
-              <p className="py-4 text-sm text-muted-foreground">加载历史…</p>
-            ) : (
-              historyMessages.map((message) => (
-                <MessageItem
-                  key={message.id}
-                  m={message}
-                  status={loading ? "streaming" : "ready"}
-                />
-              ))
-            )}
+          <Conversation className="h-full">
+            <ConversationContent>
+              {historyLoading ? (
+                <p className="py-4 text-sm text-muted-foreground">加载历史…</p>
+              ) : (
+                historyMessages.map((message) => (
+                  <MessageItem
+                    key={message.id}
+                    m={message}
+                    status={loading ? "streaming" : "ready"}
+                  />
+                ))
+              )}
 
-            {pendingUserMessage != null && (loading || hasCurrentOutput) ? (
-              <MessageBubble from="user">
-                <MessageContent>
-                  <MessageResponse>{pendingUserMessage}</MessageResponse>
-                </MessageContent>
-              </MessageBubble>
-            ) : null}
+              {pendingUserMessage != null && (loading || hasCurrentOutput) ? (
+                <MessageBubble from="user">
+                  <MessageContent>
+                    <MessageResponse>{pendingUserMessage}</MessageResponse>
+                  </MessageContent>
+                </MessageBubble>
+              ) : null}
 
-            <ResponseSection
-              blocks={blocks}
-              streamingTool={streamingTool}
-              streamingText={streamingText}
-            />
-          </ConversationContent>
-        </Conversation>
+              <ResponseSection
+                blocks={blocks}
+                streamingTool={streamingTool}
+                streamingText={streamingText}
+              />
+            </ConversationContent>
+          </Conversation>
         </div>
 
         <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">

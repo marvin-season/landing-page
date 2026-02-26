@@ -1,4 +1,5 @@
 import { AgentProvider } from "@/app/agui/_components/AgentProvider";
+import { ChatModeSwitcher } from "@/components/chat/chat-mode-switcher";
 import "@/css/globals.css";
 
 export default function RootLayout({
@@ -9,7 +10,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="h-dvh overflow-scroll">
-        <AgentProvider>{children}</AgentProvider>
+        <AgentProvider>
+          <ChatModeSwitcher />
+          {children}
+        </AgentProvider>
       </body>
     </html>
   );

@@ -1,19 +1,15 @@
 import { ChatMain } from "@/app/agent/_components/chat-main";
 import { ChatHeader } from "@/app/agent/_components/header/chat-header";
 import { PaginationMessageList } from "@/app/agent/_components/message/pagination-message-list";
-import { ChatModeTabs } from "@/components/chat/chat-mode-tabs";
 
 interface SessionPageProps {
   params: Promise<{ sessionId: string }>;
 }
 
-export default async function SessionPage({ params }: SessionPageProps) {
-  const { sessionId } = await params;
-
+export default async function SessionPage({ params: _ }: SessionPageProps) {
   return (
     <div className="flex-1 flex min-w-0 min-h-0 h-full">
       <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col">
-        <ChatModeTabs sessionId={sessionId} />
         <ChatHeader />
         <ChatMain />
       </div>

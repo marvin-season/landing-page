@@ -1,6 +1,7 @@
 import "@/css/globals.css";
 import type { Metadata } from "next";
 import { ChatSidebar } from "@/app/agent/_components/sidebar/chat-sidebar";
+import { ChatModeSwitcher } from "@/components/chat/chat-mode-switcher";
 import TankQueryClientProvider from "@/components/trpc/provider";
 import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function ChatLayout({
       <body>
         <TankQueryClientProvider>
           <Toaster position="top-center" duration={5000} />
+          <ChatModeSwitcher />
           <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
             {/* Desktop sidebar */}
             <div className="hidden lg:flex h-full shrink-0">

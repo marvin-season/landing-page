@@ -19,7 +19,11 @@ function mapStreamingToolState(tool: StreamingToolCall): ToolPartState {
 
 function blockToPart(block: ContentBlock) {
   if (block.kind === "text") {
-    return { type: "text" as const, text: block.content, state: "done" as const };
+    return {
+      type: "text" as const,
+      text: block.content,
+      state: "done" as const,
+    };
   }
   return {
     type: toToolPartType(block.toolName),
@@ -70,10 +74,7 @@ export function buildStreamingAssistantMessage(
   } as UIMessage;
 }
 
-export function buildPendingUserMessage(
-  text: string,
-  id: string,
-): UIMessage {
+export function buildPendingUserMessage(text: string, id: string): UIMessage {
   return {
     id,
     role: "user",
