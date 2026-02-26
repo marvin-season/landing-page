@@ -69,3 +69,12 @@
   - 将切换组件上移到三个模块的父布局（layout）中统一渲染，不再在各 page 内部分别放置。
   - 移除各页面中原有的 `ChatModeTabs` 嵌入逻辑，避免重复布局和页面内层级干扰。
 - **原因/上下文**: 用户要求切换控件放在三模块父容器，并采用悬浮下拉方式统一切换模式。
+
+## 移除 prose 与 fund 模块及相关依赖配置（17:59:47）
+- **文件**: `src/app/prose/layout.tsx`，`src/app/prose/page.tsx`，`src/app/fund/layout.tsx`，`src/app/fund/page.tsx`，`src/app/fund/_components/*`，`src/app/fund/_constants/popular-funds.ts`，`src/components/editor/**`，`src/store/useFundStore.ts`，`src/app/api/proxy/route.ts`，`src/proxy.ts`，`package.json`，`pnpm-lock.yaml`
+- **修改内容**:
+  - 删除 `prose` 与 `fund` 路由页面及其私有实现代码（基金页面组件、ProseMirror 编辑器全量组件与相关 store）。
+  - 删除仅供 `fund` 使用的 `/api/proxy` 接口。
+  - 清理 i18n proxy matcher 中对 `fund` 与 `prose` 的特殊排除项。
+  - 从依赖中移除已不再使用的 `dayjs` 与 `prosemirror-*` 相关包，并同步更新锁文件。
+- **原因/上下文**: 用户要求移除 `src/app/prose/`、`src/app/fund/` 及其相关依赖与配置，避免保留无效路由和冗余依赖。
