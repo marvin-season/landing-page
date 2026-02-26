@@ -13,6 +13,7 @@ import { useMessagesPagination } from "@/app/agent/_hooks/use-messages-paginatio
 import { getLastUserMessage } from "@/app/agent/_utils";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AgentConstant } from "@/lib/constant/agent";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 import { ModelSelector } from "./model-selector";
@@ -30,6 +31,7 @@ export function ChatMain() {
       api: "/api/chat",
       body: {
         resourceId: sessionId,
+        agentId: AgentConstant.GENERAL_AGENT,
       },
     }),
     id: sessionId,

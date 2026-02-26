@@ -3,6 +3,7 @@ import type { UIMessage } from "ai";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { fetchChatHistory } from "@/lib/chat/api";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
 export type IMessageStore = {
@@ -62,12 +63,7 @@ export const useMessageStore = create<IMessageStore>()(
 export function useCurrentMessages(sessionId: string) {
   const { data: messages, refetch } = useQuery<UIMessage[]>({
     queryKey: ["messages", sessionId],
-    queryFn: async () => {
-      console.log("sessionId", sessionId);
-      return fetch(`/api/chat?resourceId=${sessionId}`).then((res) =>
-        res.json(),
-      );
-    },
+    queryFn: async () => fetchChatHistory({ resourceId: sessionId }),
     enabled: !!sessionId,
   });
 

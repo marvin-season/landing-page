@@ -7,6 +7,7 @@ import type { UIMessage } from "ai";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import MessageItem from "@/app/agent/_components/message/message-item";
+import { ChatModeTabs } from "@/components/chat/chat-mode-tabs";
 import {
   Conversation,
   ConversationContent,
@@ -17,6 +18,7 @@ import {
   MessageResponse,
 } from "@/components/ai-elements/message";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { fetchChatHistory } from "@/lib/chat/api";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { ActionCard } from "../components/ActionCard";
 import { ResponseSection } from "../components/ResponseSection";
@@ -60,14 +62,8 @@ export default function RxjsResourcePage() {
       return;
     }
     setHistoryLoading(true);
-    fetch(`/api/chat?resourceId=${encodeURIComponent(resourceId)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-      })
-      .then((data) => {
-        setHistoryMessages(Array.isArray(data) ? (data as UIMessage[]) : []);
-      })
+    fetchChatHistory({ resourceId })
+      .then((data) => setHistoryMessages(data))
       .catch(() => setHistoryMessages([]))
       .finally(() => setHistoryLoading(false));
   }, [resourceId]);
@@ -82,15 +78,20 @@ export default function RxjsResourcePage() {
 
   if (!resourceId) {
     return (
-      <div className="mx-auto flex min-h-dvh max-w-4xl flex-col items-center justify-center gap-4 px-4 py-8">
-        <p className="text-sm text-muted-foreground">无效的会话 ID</p>
+      <div className="flex min-h-dvh flex-col">
+        <ChatModeTabs />
+        <div className="mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
+          <p className="text-sm text-muted-foreground">无效的会话 ID</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-4/5 2xl:max-w-3/5 4xl:max-w-2/5 flex-col px-4 sm:px-6">
-      <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
+    <div className="flex min-h-dvh flex-col">
+      <ChatModeTabs resourceId={resourceId} />
+      <div className="mx-auto flex min-h-0 w-full max-w-4/5 flex-1 flex-col px-4 sm:px-6 2xl:max-w-3/5 4xl:max-w-2/5">
+        <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
         {error != null ? (
           <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
             <AlertDescription>错误: {error}</AlertDescription>
@@ -126,15 +127,16 @@ export default function RxjsResourcePage() {
             />
           </ConversationContent>
         </Conversation>
-      </div>
+        </div>
 
-      <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
-        <ActionCard
-          resourceId={resourceId}
-          messageId={messageId}
-          loading={loading}
-          onSend={handleSend}
-        />
+        <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
+          <ActionCard
+            resourceId={resourceId}
+            messageId={messageId}
+            loading={loading}
+            onSend={handleSend}
+          />
+        </div>
       </div>
     </div>
   );

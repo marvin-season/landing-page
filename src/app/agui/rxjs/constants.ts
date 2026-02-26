@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { buildSubmitMessageBody } from "@/lib/chat/api";
 
 /** 预置问题：点击即可发送 */
 export const PRESET_QUESTIONS = [
@@ -15,16 +15,5 @@ export function buildChatBody(
   resourceId: string,
   text: string,
 ): Record<string, unknown> {
-  return {
-    resourceId,
-    id: resourceId,
-    messages: [
-      {
-        parts: [{ type: "text", text: text.trim() || " " }],
-        id: nanoid(),
-        role: "user",
-      },
-    ],
-    trigger: "submit-message",
-  };
+  return buildSubmitMessageBody({ resourceId, text });
 }
