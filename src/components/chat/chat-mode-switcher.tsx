@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Select,
@@ -32,7 +33,8 @@ export function ChatModeSwitcher() {
   const mode = getCurrentMode(pathname);
   const resourceId = getSharedResourceId(pathname);
 
-  const handleModeChange = (nextMode: string) => {
+  const handleModeChange = useCallback((nextMode: string) => {
+    if (nextMode === mode) return;
     if (nextMode === "home") {
       router.push("/");
       return;
@@ -46,7 +48,7 @@ export function ChatModeSwitcher() {
       return;
     }
     router.push(resourceId ? `/agui/rxjs/${resourceId}` : "/agui/rxjs");
-  };
+  }, [mode, resourceId, router]);
 
   return (
     <div className="fixed right-4 top-4 z-50">

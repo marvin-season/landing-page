@@ -78,3 +78,19 @@
   - 清理 i18n proxy matcher 中对 `fund` 与 `prose` 的特殊排除项。
   - 从依赖中移除已不再使用的 `dayjs` 与 `prosemirror-*` 相关包，并同步更新锁文件。
 - **原因/上下文**: 用户要求移除 `src/app/prose/`、`src/app/fund/` 及其相关依赖与配置，避免保留无效路由和冗余依赖。
+
+## agent 聊天链路渲染与分页计算优化（18:07:40）
+- **文件**: `src/app/agent/_components/chat-main.tsx`，`src/app/agent/_hooks/use-messages-pagination.tsx`，`src/app/agent/_components/message/pagination-message-list.tsx`，`src/store/message-store.ts`
+- **修改内容**:
+  - `chat-main`：将 `onSubmit`/`onStop` 抽为 `useCallback` 稳定回调，减少 `memo(ChatInputForm)` 的无效重渲染；将两次 `updateSession` 合并为一次，减少 store 更新次数。
+  - `use-messages-pagination`：对 user 消息列表做 `useMemo`，并将分页函数改为 `useCallback`，避免重复构建函数与重复过滤。
+  - `pagination-message-list`：消息配对逻辑从 `map + findIndex`（O(n^2)）改为单次遍历（O(n)）并 `useMemo` 缓存；同时去掉 `currentSession?.id!` 非空断言，改为安全 `sessionId` 回退值。
+  - `message-store`：为 `useCurrentMessages` 增加 `staleTime` 与 `gcTime`，降低短时间重复挂载导致的历史请求抖动。
+- **原因/上下文**: 用户要求检查并优化项目代码，优先先落地不改变业务行为的性能优化项。
+
+## 模式切换器减少无效路由跳转（18:09:02）
+- **文件**: `src/components/chat/chat-mode-switcher.tsx`
+- **修改内容**:
+  - 将 `handleModeChange` 改为 `useCallback`，稳定传给 `Select` 的回调引用。
+  - 当选择项与当前模式一致时直接 `return`，避免触发重复 `router.push`。
+- **原因/上下文**: 减少交互中的无效导航与不必要的组件更新。

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatStatus, UIMessage } from "ai";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChatError } from "@/app/agent/_components/chat-error";
 import ChatInputForm from "@/app/agent/_components/chat-input-form";
 import { ChatLoading } from "@/app/agent/_components/chat-loading";
@@ -95,6 +95,38 @@ export function ChatMain() {
     setSelectedMessageId,
   });
 
+  const handleSubmit = useCallback(
+    async (data: { input: string }) => {
+      const text = data.input.trim();
+      if (!text || !sessionId) return;
+
+      const pendingId = crypto.randomUUID();
+      setPendingUser({ id: pendingId, text });
+      setSelectedMessageId(pendingId);
+      setNeedRefreshAfterStream(true);
+
+      send(
+        buildSubmitMessageBody({
+          resourceId: sessionId,
+          text,
+          agentId: AgentConstant.GENERAL_AGENT,
+        }),
+      );
+
+      updateSession(sessionId, {
+        hasMessages: true,
+        ...(currentSession?.title === "New Conversation"
+          ? { title: text.slice(0, 30) }
+          : {}),
+      });
+    },
+    [sessionId, setSelectedMessageId, send, updateSession, currentSession?.title],
+  );
+
+  const handleStop = useCallback(() => {
+    stop();
+  }, [stop]);
+
   if (!currentSession) {
     return <EmptySession />;
   }
@@ -146,28 +178,8 @@ export function ChatMain() {
 
         <ChatInputForm
           className="sticky bottom-0 z-20 w-full lg:max-w-3xl mx-auto shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]"
-          onSubmit={async (data) => {
-            const text = data.input.trim();
-            if (!text || !sessionId) return;
-            const pendingId = crypto.randomUUID();
-            setPendingUser({ id: pendingId, text });
-            setSelectedMessageId(pendingId);
-            setNeedRefreshAfterStream(true);
-            send(
-              buildSubmitMessageBody({
-                resourceId: sessionId,
-                text,
-                agentId: AgentConstant.GENERAL_AGENT,
-              }),
-            );
-            updateSession(sessionId, { hasMessages: true });
-            if (currentSession?.title === "New Conversation") {
-              updateSession(sessionId, { title: text.slice(0, 30) });
-            }
-          }}
-          onStop={() => {
-            stop();
-          }}
+          onSubmit={handleSubmit}
+          onStop={handleStop}
           isLoading={isLoading}
         />
       </MotionDiv>

@@ -65,6 +65,8 @@ export function useCurrentMessages(sessionId: string) {
     queryKey: ["messages", sessionId],
     queryFn: async () => fetchChatHistory({ resourceId: sessionId }),
     enabled: !!sessionId,
+    staleTime: 15_000,
+    gcTime: 5 * 60_000,
   });
 
   return { messages: messages || [], refetch };

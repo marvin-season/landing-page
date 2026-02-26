@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { cn } from "@/lib/utils";
 import { useChatSettingsStore } from "@/store/chat-settings-store";
@@ -16,17 +17,25 @@ export function PaginationMessageList(props: { className?: string }) {
     s.isSettingEnabled("pagination-display"),
   );
   const currentSession = useCurrentSession();
-  const { messages } = useCurrentMessages(currentSession?.id!);
-  const userMessages = messages.filter((m) => m.role === "user");
+  const sessionId = currentSession?.id ?? "";
+  const { messages } = useCurrentMessages(sessionId);
 
-  const messagePairs = userMessages.map((userMsg) => {
-    const userIndex = messages.findIndex((m) => m.id === userMsg.id);
-    const assistantMsg =
-      userIndex !== -1 && messages[userIndex + 1]?.role === "assistant"
-        ? messages[userIndex + 1]
-        : null;
-    return { userMsg, assistantMsg };
-  });
+  const messagePairs = useMemo(() => {
+    const pairs: Array<{
+      userMsg: (typeof messages)[number];
+      assistantMsg: (typeof messages)[number] | null;
+    }> = [];
+    for (let i = 0; i < messages.length; i += 1) {
+      const current = messages[i];
+      if (current?.role !== "user") continue;
+      const next = messages[i + 1];
+      pairs.push({
+        userMsg: current,
+        assistantMsg: next?.role === "assistant" ? next : null,
+      });
+    }
+    return pairs;
+  }, [messages]);
 
   if (messagePairs.length === 0 || !paginationDisplay) {
     return null;
