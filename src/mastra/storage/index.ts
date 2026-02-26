@@ -14,7 +14,7 @@ function getLibSQLStore() {
   return new LibSQLStore({
     id: "libsql-storage",
     url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.DATABASE_AUTH_TOKEN,
+    authToken: process.env.TURSO_DATABASE_AUTH_TOKEN,
   });
 }
 
