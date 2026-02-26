@@ -20,3 +20,35 @@
   - `rxjs` 的 `buildChatBody` 改为复用 `buildSubmitMessageBody`，避免重复维护请求体结构。
   - `message-store` 与 `rxjs/[resourceId]` 历史拉取改为统一调用 `fetchChatHistory`，收敛 `/api/chat` 查询参数拼装与响应解析逻辑。
 - **原因/上下文**: 继续以 `api/chat` 为中心做规约，先消除多处重复实现，为后续将 `agent` 聊天流处理进一步统一到同一套核心接口打基础。
+
+## agent 主线切换到自定义流式解析（17:33:04）
+- **文件**: `src/app/agent/_components/chat-main.tsx`，`src/lib/stream/use-chat-stream-state.ts`，`src/lib/chat/streaming-message.ts`
+- **修改内容**:
+  - `ChatMain` 从 `useChat` 切换为 `useChatStreamState`：发送时复用 `buildSubmitMessageBody`，流式显示由 `ChatStreamState` 驱动。
+  - 新增 `streaming-message` 适配层：将 `ChatStreamState` 映射为可复用的 `UIMessage`（含文本与工具调用 part），并补充 pending user message 构建，保持现有 `MessageItem` 渲染链路不变。
+  - `useChatStreamState` 新增 `stop()`，支持在输入区中断流式请求。
+  - `ChatMain` 现在渲染“历史消息 + 当前轮用户消息 + 当前轮流式助手消息”，流结束后自动 `refetch()` 同步服务端历史。
+- **原因/上下文**: 按用户需求保留 `useChat` 思路但优先采用 `rxjs` 风格自定义流解析能力，提升流式状态控制与可扩展性。
+
+## 首页布局升级并保留现有导航（17:33:04）
+- **文件**: `src/app/[lang]/(home)/_components/mine.tsx`
+- **修改内容**:
+  - 主页改为更清晰的信息架构：顶部 Hero 卡片 + Navigation 卡片网格 + Sentences 引语区。
+  - 保留原有入口并扩展为结构化导航卡片，新增 `CopilotKit`、`RxJS` 对话入口，保留 `agent`、`resume`、`ppt`、外部设计系统链接。
+  - 内外链行为优化：仅外部链接使用新标签页打开。
+  - 统一视觉风格（卡片边框、hover、间距与字体层级），保持现有导航语义不变。
+- **原因/上下文**: 用户要求在保留当前导航能力前提下，对首页进行自由发挥优化。
+
+## 流式消息适配层类型修正（17:33:57）
+- **文件**: `src/lib/chat/streaming-message.ts`
+- **修改内容**:
+  - 调整流式消息 `parts` 的中间构建类型，避免与 `UIMessage` 强类型在 `streaming` / `input-streaming` 阶段的字面量约束冲突。
+  - 保留最终 `UIMessage` 输出结构不变，确保 `assistant-message-parts` 渲染工具调用与流式文本逻辑可继续复用。
+- **原因/上下文**: `pnpm exec tsc --noEmit` 发现状态字面量类型不兼容，需修复以保证类型检查通过。
+
+## 修复 agent 流式阶段重复回答（17:38:40）
+- **文件**: `src/app/agent/_components/chat-main.tsx`
+- **修改内容**:
+  - 在拼装 `messages` 时增加去重保护：若 `currentMessages` 已存在与 `streamingAssistant` 相同 `id` 的消息，则不再追加流式临时消息。
+  - 解决流结束后历史回写与流式临时消息短暂并存导致的双份回答显示问题。
+- **原因/上下文**: 用户反馈 `agent` 页面流式输出期间出现两份回答，历史数据本身正确。

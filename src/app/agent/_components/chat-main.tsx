@@ -1,8 +1,7 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useEffect } from "react";
+import type { ChatStatus, UIMessage } from "ai";
+import { useEffect, useMemo, useState } from "react";
 import { ChatError } from "@/app/agent/_components/chat-error";
 import ChatInputForm from "@/app/agent/_components/chat-input-form";
 import { ChatLoading } from "@/app/agent/_components/chat-loading";
@@ -13,7 +12,13 @@ import { useMessagesPagination } from "@/app/agent/_hooks/use-messages-paginatio
 import { getLastUserMessage } from "@/app/agent/_utils";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { buildSubmitMessageBody } from "@/lib/chat/api";
+import {
+  buildPendingUserMessage,
+  buildStreamingAssistantMessage,
+} from "@/lib/chat/streaming-message";
 import { AgentConstant } from "@/lib/constant/agent";
+import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
 import { ModelSelector } from "./model-selector";
@@ -23,54 +28,58 @@ export function ChatMain() {
   const { selectedMessageId, setSelectedMessageId } = useMessageStore();
 
   const currentSession = useCurrentSession();
-  const sessionId = currentSession?.id!;
+  const sessionId = currentSession?.id ?? "";
   const { messages: currentMessages, refetch } = useCurrentMessages(sessionId);
+  const { state: streamState, send, loading: isLoading, error, stop } =
+    useChatStreamState("/api/chat");
 
-  const { messages, setMessages, sendMessage, status, error, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: {
-        resourceId: sessionId,
-        agentId: AgentConstant.GENERAL_AGENT,
-      },
-    }),
-    id: sessionId,
-    onFinish: ({ messages }) => {
-      console.log("onFinish", messages);
-      refetch();
-      const lastUserMessage = getLastUserMessage(messages);
-      if (lastUserMessage) {
-        setSelectedMessageId(lastUserMessage.id);
-      }
+  const [pendingUser, setPendingUser] = useState<{ id: string; text: string } | null>(
+    null,
+  );
+  const [needRefreshAfterStream, setNeedRefreshAfterStream] = useState(false);
 
-      if (currentSession?.title === "New Conversation") {
-        // Find the first user message text
-        const firstUserText = messages
-          .find((m) => m.role === "user")
-          ?.parts.find((p) => p.type === "text")?.text;
+  const status: ChatStatus = isLoading ? "streaming" : "ready";
 
-        if (firstUserText) {
-          updateSession(sessionId, {
-            title: firstUserText.slice(0, 30),
-          });
-        }
-      }
-    },
-  });
+  const streamingAssistant = useMemo(
+    () => buildStreamingAssistantMessage(streamState, sessionId),
+    [streamState, sessionId],
+  );
+  const pendingUserMessage = useMemo(
+    () =>
+      pendingUser ? buildPendingUserMessage(pendingUser.text, pendingUser.id) : null,
+    [pendingUser],
+  );
 
-  const isLoading = status === "submitted" || status === "streaming";
+  const messages = useMemo(() => {
+    const merged: UIMessage[] = [...currentMessages];
+    if (pendingUserMessage && (isLoading || streamingAssistant)) {
+      merged.push(pendingUserMessage);
+    }
+    const hasSameAssistantInHistory =
+      streamingAssistant != null &&
+      currentMessages.some((m) => m.id === streamingAssistant.id);
+    if (streamingAssistant && !hasSameAssistantInHistory) {
+      merged.push(streamingAssistant);
+    }
+    return merged;
+  }, [currentMessages, pendingUserMessage, isLoading, streamingAssistant]);
 
   useEffect(() => {
-    setMessages(currentMessages);
-    const lastUserMessage = getLastUserMessage(currentMessages);
-    if (lastUserMessage) {
+    const lastUserMessage = getLastUserMessage(messages);
+    if (lastUserMessage && !pendingUser) {
       setSelectedMessageId(lastUserMessage.id);
     }
-  }, [currentMessages, setMessages, setSelectedMessageId]);
+  }, [messages, pendingUser, setSelectedMessageId]);
+
+  useEffect(() => {
+    if (!needRefreshAfterStream || isLoading) return;
+    setNeedRefreshAfterStream(false);
+    setPendingUser(null);
+    void refetch();
+  }, [needRefreshAfterStream, isLoading, refetch]);
 
   const displayMessages = useDisplayMessages(messages, selectedMessageId);
-
-  const isNewSession = !currentSession?.hasMessages;
+  const isNewSession = displayMessages.length === 0;
 
   const { onPagination } = useMessagesPagination({
     messages,
@@ -105,19 +114,20 @@ export function ChatMain() {
                   delay: 0.15 * ((index + 1) / displayMessages.length),
                 }}
               >
-                <MessageItem key={m.id} m={m} status={status} />
+                <MessageItem m={m} status={status} />
               </MotionDiv>
             );
           })}
 
           {isLoading &&
-            displayMessages[displayMessages.length - 1].role === "user" && (
+            displayMessages[displayMessages.length - 1]?.role === "user" && (
               <ChatLoading />
             )}
 
-          {error && <ChatError message={error.message} />}
+          {error && <ChatError message={error} />}
         </ScrollArea>
       )}
+
       <MotionDiv
         layout="position"
         initial={{ y: 10, opacity: 0, scale: 0.9 }}
@@ -129,9 +139,23 @@ export function ChatMain() {
         <ChatInputForm
           className="sticky bottom-0 z-20 w-full lg:max-w-3xl mx-auto shrink-0 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]"
           onSubmit={async (data) => {
-            setSelectedMessageId(undefined);
-            sendMessage({ text: data.input });
+            const text = data.input.trim();
+            if (!text || !sessionId) return;
+            const pendingId = crypto.randomUUID();
+            setPendingUser({ id: pendingId, text });
+            setSelectedMessageId(pendingId);
+            setNeedRefreshAfterStream(true);
+            send(
+              buildSubmitMessageBody({
+                resourceId: sessionId,
+                text,
+                agentId: AgentConstant.GENERAL_AGENT,
+              }),
+            );
             updateSession(sessionId, { hasMessages: true });
+            if (currentSession?.title === "New Conversation") {
+              updateSession(sessionId, { title: text.slice(0, 30) });
+            }
           }}
           onStop={() => {
             stop();

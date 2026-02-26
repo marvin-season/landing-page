@@ -44,5 +44,11 @@ export function useChatStreamState(url: string) {
     [url],
   );
 
-  return { state, send, loading, error };
+  const stop = useCallback(() => {
+    subscriptionRef.current?.unsubscribe();
+    subscriptionRef.current = null;
+    setLoading(false);
+  }, []);
+
+  return { state, send, loading, error, stop };
 }
