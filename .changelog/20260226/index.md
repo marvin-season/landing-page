@@ -67,3 +67,11 @@
   - 删除 `createNewSession` 中按标题 `New Conversation` 复用历史会话的逻辑。
   - 调整后每次点击新建都会生成并写入新的 `sessionId`，不会再选中旧会话。
 - **原因/上下文**: 用户反馈点击侧边栏新建会话时没有创建新会话，而是跳到第一个 `New Conversation`。
+
+## 清理迁移后无关 Next.js 配置 (16:57:29)
+- **文件**: `package.json`、`next.config.mjs`
+- **修改内容**:
+  - 删除仅用于旧 Next 运行方式的脚本：`analyze`、`dev:next`、`build:next`、`start:next`。
+  - 删除 `next.config.mjs` 中仅 Turbopack 使用的 `turbopack.rules`（Lingui `*.po` loader），保留 vinext 仍会读取的 `rewrites` 与 `experimental.swcPlugins`。
+  - 运行 `pnpm run build`（vinext）验证通过。
+- **原因/上下文**: 用户要求在迁移到 vinext 后删除旧的、无关的 Next.js 配置，降低配置噪音与维护成本。

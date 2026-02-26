@@ -1,18 +1,8 @@
-const rules = {
-  "*.po": {
-    loaders: ["@lingui/loader"],
-    as: "*.js",
-  },
-};
-
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   reactCompiler: true,
   experimental: {
     swcPlugins: [["@lingui/swc-plugin", {}]],
-  },
-  turbopack: {
-    rules,
   },
   async rewrites() {
     return [
