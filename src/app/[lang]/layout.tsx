@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
-import { Lora } from "next/font/google";
+import GoogleFonts from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -13,7 +13,7 @@ import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";
 
-const lora = Lora({
+const lora = GoogleFonts.Lora({
   weight: "400",
   style: "normal",
 });

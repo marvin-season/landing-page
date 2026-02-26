@@ -1,7 +1,7 @@
 import { handleChatStream } from "@mastra/ai-sdk";
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { AgentConstant } from "@/lib/constant/agent";
 import { mastra } from "@/mastra";
 
@@ -22,8 +22,8 @@ export async function POST(req: Request) {
   return createUIMessageStreamResponse({ stream });
 }
 
-export async function GET(req: NextRequest) {
-  const resourceId = req.nextUrl.searchParams.get("resourceId");
+export async function GET(req: Request) {
+  const resourceId = new URL(req.url).searchParams.get("resourceId");
   if (!resourceId) {
     return NextResponse.json(
       { error: "Resource ID is required" },

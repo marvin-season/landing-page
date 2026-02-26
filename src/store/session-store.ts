@@ -59,12 +59,6 @@ export const useSessionStore = create<ISessionStore>()(
         },
         createNewSession: (session) => {
           const newSessionId = crypto.randomUUID();
-          const existingSession = get().sessions.find(
-            (s) => s.id === newSessionId || s.title === "New Conversation",
-          );
-          if (existingSession) {
-            return existingSession.id;
-          }
           set((state) => {
             state.sessions.push({
               id: newSessionId,

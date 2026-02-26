@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 
 const getMotionProps = (delay: number = 0) => ({
-  initial: { opacity: 0 },
+  initial: false,
   animate: { opacity: 1 },
   transition: { duration: 0.5, delay },
 });

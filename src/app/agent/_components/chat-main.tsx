@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ChatError } from "@/app/agent/_components/chat-error";
 import ChatInputForm from "@/app/agent/_components/chat-input-form";
 import { ChatLoading } from "@/app/agent/_components/chat-loading";
@@ -25,13 +25,19 @@ export function ChatMain() {
   const sessionId = currentSession?.id!;
   const { messages: currentMessages, refetch } = useCurrentMessages(sessionId);
 
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: {
+          resourceId: sessionId,
+        },
+      }),
+    [sessionId],
+  );
+
   const { messages, setMessages, sendMessage, status, error, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: {
-        resourceId: sessionId,
-      },
-    }),
+    transport,
     id: sessionId,
     onFinish: ({ messages }) => {
       console.log("onFinish", messages);
@@ -59,12 +65,24 @@ export function ChatMain() {
   const isLoading = status === "submitted" || status === "streaming";
 
   useEffect(() => {
-    setMessages(currentMessages);
+    // Avoid overriding optimistic/streaming messages while chat is active.
+    // During streaming, useChat owns the in-memory messages.
+    if (isLoading) {
+      return;
+    }
+
+    const hasSameMessages =
+      currentMessages.length === messages.length &&
+      currentMessages.every((m, idx) => m.id === messages[idx]?.id);
+    if (!hasSameMessages) {
+      setMessages(currentMessages);
+    }
+
     const lastUserMessage = getLastUserMessage(currentMessages);
     if (lastUserMessage) {
       setSelectedMessageId(lastUserMessage.id);
     }
-  }, [currentMessages, setMessages, setSelectedMessageId]);
+  }, [currentMessages, isLoading, messages, setMessages, setSelectedMessageId]);
 
   const displayMessages = useDisplayMessages(messages, selectedMessageId);
 
@@ -109,6 +127,7 @@ export function ChatMain() {
           })}
 
           {isLoading &&
+            displayMessages.length > 0 &&
             displayMessages[displayMessages.length - 1].role === "user" && (
               <ChatLoading />
             )}

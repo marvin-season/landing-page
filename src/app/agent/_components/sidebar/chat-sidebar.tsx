@@ -1,3 +1,5 @@
+"use client";
+
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { CreateSessionBtn } from "@/app/agent/_components/session/create-session-btn";
