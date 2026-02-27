@@ -12,8 +12,8 @@ import {
   Conversation,
   ConversationContent,
 } from "@/components/ai-elements/conversation";
-import Markdown from "@/components/markdown";
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
+import Markdown from "@/components/markdown";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { fetchChatHistory } from "@/lib/chat/api";

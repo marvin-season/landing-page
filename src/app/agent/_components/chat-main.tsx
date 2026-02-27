@@ -120,7 +120,13 @@ export function ChatMain() {
           : {}),
       });
     },
-    [sessionId, setSelectedMessageId, send, updateSession, currentSession?.title],
+    [
+      sessionId,
+      setSelectedMessageId,
+      send,
+      updateSession,
+      currentSession?.title,
+    ],
   );
 
   const handleStop = useCallback(() => {

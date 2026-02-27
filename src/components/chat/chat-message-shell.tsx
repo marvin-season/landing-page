@@ -15,7 +15,8 @@ const ROLE_STYLES: Record<
 > = {
   user: {
     row: "justify-end",
-    bubble: "max-w-[85%] rounded-2xl border border-border/50 bg-primary/10 px-4 py-3 text-sm leading-relaxed text-foreground shadow-sm",
+    bubble:
+      "max-w-[85%] rounded-2xl border border-border/50 bg-primary/10 px-4 py-3 text-sm leading-relaxed text-foreground shadow-sm",
     avatar:
       "flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary",
     icon: <User className="size-4" />,

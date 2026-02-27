@@ -131,7 +131,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ thread: normalized }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create thread" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to create thread",
+      },
       { status: 500 },
     );
   }
@@ -139,7 +142,9 @@ export async function POST(req: Request) {
 
 export async function GET(req: NextRequest) {
   const agentId = resolveAgentId(req.nextUrl.searchParams.get("agentId"));
-  const threadId = resolveNonEmptyString(req.nextUrl.searchParams.get("threadId"));
+  const threadId = resolveNonEmptyString(
+    req.nextUrl.searchParams.get("threadId"),
+  );
   const resourceId = resolveNonEmptyString(
     req.nextUrl.searchParams.get("resourceId"),
   );
@@ -156,7 +161,10 @@ export async function GET(req: NextRequest) {
     if (threadId) {
       const thread = await getThread(memory, threadId);
       if (!thread) {
-        return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Thread not found" },
+          { status: 404 },
+        );
       }
 
       const detail =
@@ -197,10 +205,15 @@ export async function GET(req: NextRequest) {
       ...(perPage !== undefined ? { perPage } : {}),
     });
 
-    return NextResponse.json(list ?? { threads: [], total: 0, page: 0, hasMore: false });
+    return NextResponse.json(
+      list ?? { threads: [], total: 0, page: 0, hasMore: false },
+    );
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to list threads" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to list threads",
+      },
       { status: 500 },
     );
   }
@@ -257,7 +270,10 @@ export async function PUT(req: Request) {
     return NextResponse.json({ thread: normalizeThread(updated) });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update thread" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to update thread",
+      },
       { status: 500 },
     );
   }
@@ -295,7 +311,10 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete thread" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to delete thread",
+      },
       { status: 500 },
     );
   }

@@ -123,7 +123,8 @@ export default function RxjsPage() {
         typeof data.thread?.resourceId === "string" &&
         data.thread.resourceId.trim().length > 0
           ? data.thread.resourceId
-          : typeof data.thread?.id === "string" && data.thread.id.trim().length > 0
+          : typeof data.thread?.id === "string" &&
+              data.thread.id.trim().length > 0
             ? data.thread.id
             : resourceId;
       await fetchThreads();
@@ -204,7 +205,7 @@ export default function RxjsPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10 pt-4">
       <Card className="sticky top-4 z-20 border-border/80 bg-background/95 shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80">
         <CardHeader className="space-y-2">
           <CardTitle className="text-xl sm:text-2xl">RxJS 会话管理</CardTitle>
@@ -255,9 +256,7 @@ export default function RxjsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {error ? (
-            <p className="text-sm text-destructive">{error}</p>
-          ) : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           {loading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -286,10 +285,15 @@ export default function RxjsPage() {
                       <Button
                         size="sm"
                         onClick={() => handleRename(thread.id)}
-                        disabled={updatingId === thread.id || !editingTitle.trim()}
+                        disabled={
+                          updatingId === thread.id || !editingTitle.trim()
+                        }
                       >
                         {updatingId === thread.id ? (
-                          <Loader2 className="size-4 animate-spin" aria-hidden />
+                          <Loader2
+                            className="size-4 animate-spin"
+                            aria-hidden
+                          />
                         ) : (
                           "保存"
                         )}
@@ -343,7 +347,10 @@ export default function RxjsPage() {
                         aria-label="删除会话"
                       >
                         {deletingId === thread.id ? (
-                          <Loader2 className="size-4 animate-spin" aria-hidden />
+                          <Loader2
+                            className="size-4 animate-spin"
+                            aria-hidden
+                          />
                         ) : (
                           <Trash2 className="size-4" aria-hidden />
                         )}
