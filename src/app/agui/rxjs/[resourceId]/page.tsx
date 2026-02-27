@@ -4,7 +4,8 @@
  * 流式对话页：历史记录用接口数据 + MessageItem 渲染；当前轮补充「问题」并保留 ResponseSection 流式输出。
  */
 import type { UIMessage } from "ai";
-import { useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import MessageItem from "@/app/agent/_components/message/message-item";
 import {
@@ -14,6 +15,7 @@ import {
 import Markdown from "@/components/markdown";
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { fetchChatHistory } from "@/lib/chat/api";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { ActionCard } from "../components/ActionCard";
@@ -35,6 +37,7 @@ function extractUserText(body: Record<string, unknown>): string {
 
 export default function RxjsResourcePage() {
   const params = useParams();
+  const router = useRouter();
   const resourceId =
     typeof params.resourceId === "string" ? params.resourceId : "";
 
@@ -85,6 +88,18 @@ export default function RxjsResourcePage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="mx-auto flex min-h-0 w-full max-w-4/5 flex-1 flex-col px-4 sm:px-6 2xl:max-w-3/5 4xl:max-w-2/5">
+        <div className="sticky top-4 z-20 mb-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1.5 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
+            onClick={() => router.push("/agui/rxjs")}
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            返回会话列表
+          </Button>
+        </div>
         <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
           {error != null ? (
             <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
