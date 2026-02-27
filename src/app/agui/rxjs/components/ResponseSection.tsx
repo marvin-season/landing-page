@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import type {
   ContentBlock,
@@ -14,6 +15,7 @@ type ResponseSectionProps = {
   blocks: ContentBlock[];
   streamingTool: StreamingToolCall | null;
   streamingText: string | null;
+  layout?: "section" | "message";
 };
 
 function getStreamingPhase(tool: StreamingToolCall): ToolStreamingPhase {
@@ -26,12 +28,61 @@ export function ResponseSection({
   blocks,
   streamingTool,
   streamingText,
+  layout = "section",
 }: ResponseSectionProps) {
   const hasStreamingText = streamingText != null && streamingText !== "";
   const hasContent =
     blocks.length > 0 || hasStreamingText || streamingTool !== null;
 
   if (!hasContent) return null;
+
+  const content = (
+    <div className="flex flex-col gap-4">
+      {blocks.map((block, i) =>
+        block.kind === "text" ? (
+          <TextBlock key={`${block.id}-${i}`} content={block.content} />
+        ) : (
+          <ToolBlock
+            key={block.toolCallId}
+            toolName={block.toolName}
+            input={block.input}
+            output={block.output}
+          />
+        ),
+      )}
+      {streamingTool !== null ? (
+        <ToolBlock
+          toolName={streamingTool.toolName}
+          input={
+            streamingTool.input !== undefined
+              ? streamingTool.input
+              : (streamingTool.inputStreaming ?? "…")
+          }
+          output={streamingTool.output}
+          isStreaming
+          streamingPhase={getStreamingPhase(streamingTool)}
+        />
+      ) : null}
+      {streamingText != null && streamingText !== "" ? (
+        <Card className="border-primary/20 bg-primary/5 shadow-sm transition-shadow">
+          <CardContent className="p-4">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+              {streamingText}
+              <StreamingCursor />
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+
+  if (layout === "message") {
+    return (
+      <ChatMessageShell role="assistant" bubbleClassName="space-y-4">
+        {content}
+      </ChatMessageShell>
+    );
+  }
 
   return (
     <section className="space-y-4">
@@ -42,43 +93,7 @@ export function ResponseSection({
         </h2>
         <div className="h-px flex-1 bg-border/80" aria-hidden />
       </div>
-      <div className="flex flex-col gap-4">
-        {blocks.map((block, i) =>
-          block.kind === "text" ? (
-            <TextBlock key={`${block.id}-${i}`} content={block.content} />
-          ) : (
-            <ToolBlock
-              key={block.toolCallId}
-              toolName={block.toolName}
-              input={block.input}
-              output={block.output}
-            />
-          ),
-        )}
-        {streamingTool !== null ? (
-          <ToolBlock
-            toolName={streamingTool.toolName}
-            input={
-              streamingTool.input !== undefined
-                ? streamingTool.input
-                : (streamingTool.inputStreaming ?? "…")
-            }
-            output={streamingTool.output}
-            isStreaming
-            streamingPhase={getStreamingPhase(streamingTool)}
-          />
-        ) : null}
-        {streamingText != null && streamingText !== "" ? (
-          <Card className="border-primary/20 bg-primary/5 shadow-sm transition-shadow">
-            <CardContent className="p-4">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                {streamingText}
-                <StreamingCursor />
-              </p>
-            </CardContent>
-          </Card>
-        ) : null}
-      </div>
+      {content}
     </section>
   );
 }

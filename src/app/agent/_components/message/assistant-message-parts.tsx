@@ -34,7 +34,7 @@ export default function AssistantMessageParts(props: {
 }) {
   const { m } = props;
   return (
-    <div className="space-y-3 wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+    <div className="space-y-4 wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
       {m.parts.map((part, i) => {
         if (part.type === "text") {
           return (
@@ -77,10 +77,10 @@ export default function AssistantMessageParts(props: {
                 ? { error: toolPart.errorText }
                 : undefined;
           return (
-            <div key={i} className="first:mt-0 w-fit">
+            <div key={i} className="first:mt-0 w-full max-w-full">
               <ToolBlock
                 toolName={toolName}
-                input={toolPart.input ?? {}}
+                input={toolPart.input ?? "…"}
                 output={output}
                 isStreaming={isStreaming}
                 streamingPhase={getStreamingPhase(toolPart)}

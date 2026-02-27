@@ -11,11 +11,8 @@ import {
   Conversation,
   ConversationContent,
 } from "@/components/ai-elements/conversation";
-import {
-  Message as MessageBubble,
-  MessageContent,
-  MessageResponse,
-} from "@/components/ai-elements/message";
+import Markdown from "@/components/markdown";
+import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { fetchChatHistory } from "@/lib/chat/api";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
@@ -110,17 +107,18 @@ export default function RxjsResourcePage() {
               )}
 
               {pendingUserMessage != null && (loading || hasCurrentOutput) ? (
-                <MessageBubble from="user">
-                  <MessageContent>
-                    <MessageResponse>{pendingUserMessage}</MessageResponse>
-                  </MessageContent>
-                </MessageBubble>
+                <ChatMessageShell role="user">
+                  <div className="wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                    <Markdown>{pendingUserMessage}</Markdown>
+                  </div>
+                </ChatMessageShell>
               ) : null}
 
               <ResponseSection
                 blocks={blocks}
                 streamingTool={streamingTool}
                 streamingText={streamingText}
+                layout="message"
               />
             </ConversationContent>
           </Conversation>
