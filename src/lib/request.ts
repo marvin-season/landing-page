@@ -15,7 +15,7 @@ export function getBaseUrl(): string {
 }
 
 export function getApiUrl(path: string): string {
-  if(path.includes("/api/")) {
+  if (path.includes("/api/")) {
     return path;
   }
   const base = getBaseUrl();
@@ -38,7 +38,9 @@ export async function request<T>(
 
   if (!res.ok && throwOnError) {
     const errText = await res.text().catch(() => "");
-    throw new Error(`Request failed (${res.status}): ${errText || res.statusText}`);
+    throw new Error(
+      `Request failed (${res.status}): ${errText || res.statusText}`,
+    );
   }
 
   const contentType = res.headers.get("content-type");

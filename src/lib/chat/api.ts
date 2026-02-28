@@ -1,7 +1,6 @@
 import type { UIMessage } from "ai";
 import { nanoid } from "nanoid";
 
-
 type BuildSubmitMessageBodyOptions = {
   text: string;
 };
