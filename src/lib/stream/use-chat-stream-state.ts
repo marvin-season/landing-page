@@ -38,13 +38,11 @@ export function useChatStreamState(url: string) {
         error: (err) => {
           setError(err instanceof Error ? err.message : String(err));
           setLoading(false);
-          setPendingUserMessage(null);
         },
         complete: () => {
           setState((s) => flushChatStreamState(s));
           setLoading(false);
           subscriptionRef.current = null;
-          setPendingUserMessage(null);
         },
       });
       subscriptionRef.current = sub;
