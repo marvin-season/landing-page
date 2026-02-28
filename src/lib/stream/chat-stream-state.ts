@@ -70,7 +70,7 @@ function pushTextBlock(
 }
 
 /**
- * 状态归约函数：根据事件更新状态
+ * 状态归约函数：根据事件更新状态， 初始值 initialChatStreamState
  */
 export function reduceChatStreamEvent(
   state: ChatStreamState,

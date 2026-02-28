@@ -85,7 +85,6 @@ export default function AgentThreadPage() {
                 blocks={blocks}
                 streamingTool={streamingTool}
                 streamingText={streamingText}
-                layout="message"
               />
             </ConversationContent>
           </Conversation>
