@@ -24,12 +24,6 @@ export function Mine() {
       badge: "Copilot",
     },
     {
-      href: "/agui/rxjs",
-      title: <Trans>RxJS Streaming Playground</Trans>,
-      description: <Trans>Manual stream parsing and tool-call rendering</Trans>,
-      badge: "Stream",
-    },
-    {
       href: "/resume",
       title: <Trans>About me in detail</Trans>,
       description: <Trans>Experience, projects, and personal profile</Trans>,

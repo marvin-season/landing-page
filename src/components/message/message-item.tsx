@@ -1,8 +1,8 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { memo } from "react";
-import AssistantMessageParts from "@/app/agent/_components/message/assistant-message-parts";
-import UserMessageParts from "@/app/agent/_components/message/user-message-parts";
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
+import AssistantMessageParts from "./assistant-message-parts";
+import UserMessageParts from "./user-message-parts";
 
 export function MessageItem(props: { m: UIMessage; status: ChatStatus }) {
   const { m, status } = props;

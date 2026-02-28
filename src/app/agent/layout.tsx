@@ -1,38 +1,24 @@
 import "@/css/globals.css";
-import type { Metadata } from "next";
-import { ChatSidebar } from "@/app/agent/_components/sidebar/chat-sidebar";
+import { AgentSidebar } from "@/app/agent/_components/AgentSidebar";
 import { ChatModeSwitcher } from "@/components/chat/chat-mode-switcher";
 import TankQueryClientProvider from "@/components/trpc/provider";
-import { Toaster } from "@/components/ui/sonner";
-export const metadata: Metadata = {
-  icons: {
-    icon: [{ url: "/bot.svg", type: "image/svg+xml" }],
-    shortcut: ["/bot.svg"],
-  },
-};
 
-export default function ChatLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="h-dvh overflow-hidden">
         <TankQueryClientProvider>
-          <Toaster position="top-center" duration={5000} />
           <ChatModeSwitcher />
-          <main className="flex h-dvh min-h-dvh bg-white overflow-hidden">
-            {/* Desktop sidebar */}
-            <div className="hidden lg:flex h-full shrink-0">
-              <ChatSidebar />
-            </div>
-
-            {/* Main content */}
-            <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full">
+          <div className="flex h-full flex-col md:flex-row">
+            <AgentSidebar />
+            <main className="min-h-0 min-w-0 flex-1 overflow-auto md:flex-1">
               {children}
-            </div>
-          </main>
+            </main>
+          </div>
         </TankQueryClientProvider>
       </body>
     </html>

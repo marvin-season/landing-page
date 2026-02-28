@@ -1,35 +1,76 @@
-import { Bot, Menu } from "lucide-react";
-import dynamic from "next/dynamic";
-import { CreateSessionBtn } from "@/app/agent/_components/session/create-session-btn";
-import { Drawer } from "@/components/drawer";
+"use client";
 
-const ChatSidebar = dynamic(
-  () =>
-    import("@/app/agent/_components/sidebar/chat-sidebar").then(
-      (mod) => mod.ChatSidebar,
-    ),
-  {},
-);
-export default function ChatPage() {
+import { useMutation } from "@tanstack/react-query";
+import { Loader2, MessageSquarePlus, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/lib/trpc";
+
+export default function AgentPage() {
+  const router = useRouter();
+  const trpc = useTRPC();
+
+  const createMutation = useMutation({
+    ...trpc.thread.create.mutationOptions(),
+    onSuccess: (data) => {
+      const threadId = data.thread?.id;
+      if (threadId) router.push(`/agent/${threadId}`);
+    },
+  });
+
+  const handleNewChat = useCallback(() => {
+    createMutation.mutate(undefined);
+  }, [createMutation]);
+
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-white">
-      <Drawer
-        side="left"
-        className="px-4"
-        trigger={<Menu className="size-5 lg:hidden m-4" />}
-      >
-        <ChatSidebar className="w-full border-r-0" />
-      </Drawer>
-      <div className="flex flex-1 min-h-0 flex-col items-center justify-center px-6 text-slate-400">
-        <div className="w-20 h-20 bg-linear-to-br from-white to-slate-50 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-center">
-          <Bot className="w-10 h-10 opacity-10" />
-        </div>
-        <div className="my-6 text-center space-y-2">
-          <p className="text-lg font-medium text-slate-500">
-            Select a session or start a new conversation
+    <div className="flex min-h-full flex-col items-center justify-center px-4 py-12 md:py-16">
+      <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-8 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Sparkles className="size-7" aria-hidden />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+            开始新对话
+          </h1>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            与 AI 助手交流，获取天气、查询数据或发送邮件，随时开始。
           </p>
         </div>
-        <CreateSessionBtn className="text-slate-500" />
+
+        <Button
+          size="lg"
+          onClick={handleNewChat}
+          disabled={createMutation.isPending}
+          className="gap-2 rounded-xl px-8"
+        >
+          {createMutation.isPending ? (
+            <Loader2 className="size-5 animate-spin" />
+          ) : (
+            <MessageSquarePlus className="size-5" />
+          )}
+          新建对话
+        </Button>
+
+        {/* <div className="w-full space-y-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            试试这些
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {PRESET_QUESTIONS.map((preset) => (
+              <Button
+                key={preset.text}
+                type="button"
+                variant="outline"
+                size="sm"
+                className="rounded-full text-xs"
+                onClick={handleNewChat}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+        </div> */}
       </div>
     </div>
   );
