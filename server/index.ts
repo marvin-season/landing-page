@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { modelRouter } from "~/server/model";
-import { threadRouter } from "~/server/model/thread";
+import { threadRouter } from "~/server/thread";
 import { userRouter } from "~/server/user";
 import { createCallerFactory, createTRPCContext, router } from "./trpc";
 
