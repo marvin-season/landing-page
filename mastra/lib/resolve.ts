@@ -1,5 +1,3 @@
-
-
 export function resolveStr(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const str = value.trim();

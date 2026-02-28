@@ -1,5 +1,5 @@
 import { LibSQLStore } from "@mastra/libsql";
-import { isDevelopment } from "$/lib/env";
+import { isDevelopment } from "@/lib/constants";
 
 function getLibSQLStore() {
   if (isDevelopment) {
