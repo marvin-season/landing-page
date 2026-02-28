@@ -11,84 +11,72 @@ import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { request } from "@/lib/request";
 
-type ThreadItem = {
+type Thread = {
   id: string;
-  title: string | null;
   resourceId: string;
+  title: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 };
 
-type ThreadListResponse = {
-  threads?: unknown[];
-};
+function parseError(res: Response, fallback: string): Promise<string> {
+  return res
+    .json()
+    .then((d: { error?: string }) =>
+      typeof d?.error === "string" && d.error
+        ? d.error
+        : `${fallback} (${res.status})`,
+    )
+    .catch(() => `${fallback} (${res.status})`);
+}
 
-async function getErrorMessage(
-  response: Response,
-  fallback: string,
-): Promise<string> {
-  try {
-    const data = (await response.json()) as { error?: unknown };
-    if (typeof data.error === "string" && data.error.trim().length > 0) {
-      return data.error;
-    }
-  } catch {
-    // ignore json parse failure and fall back
-  }
-  return `${fallback} (${response.status})`;
+function fmtTime(s: string | null): string {
+  if (!s) return "—";
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? s : d.toLocaleString();
 }
 
 export default function RxjsPage() {
   const router = useRouter();
-  const [threads, setThreads] = useState<ThreadItem[]>([]);
+  const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState("");
+  const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
 
-  const fetchThreads = useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/thread?perPage=false");
-      if (!response.ok) {
-        throw new Error(await getErrorMessage(response, "加载会话列表失败"));
-      }
-      const data = (await response.json()) as ThreadListResponse;
-      const list = Array.isArray(data.threads) ? data.threads : [];
+      const res = await fetch("/api/thread?perPage=false");
+      if (!res.ok) throw new Error(await parseError(res, "加载失败"));
+      const data = (await res.json()) as { threads?: unknown[] };
+      const arr = Array.isArray(data.threads) ? data.threads : [];
       setThreads(
-        list
-          .map((item) => {
-            const t = item as Partial<ThreadItem>;
-            if (!t.id || typeof t.id !== "string") return null;
-            const resolvedResourceId =
-              typeof t.resourceId === "string" && t.resourceId.trim().length > 0
-                ? t.resourceId
-                : t.id;
-            return {
-              id: t.id,
-              title: typeof t.title === "string" ? t.title : null,
-              resourceId: resolvedResourceId,
-              createdAt: typeof t.createdAt === "string" ? t.createdAt : null,
-              updatedAt: typeof t.updatedAt === "string" ? t.updatedAt : null,
-            } satisfies ThreadItem;
-          })
-          .filter((item): item is ThreadItem => item !== null),
+        arr.map((t) => {
+          const x = t as Record<string, unknown>;
+          const id = typeof x.id === "string" ? x.id : "";
+          const rid =
+            typeof x.resourceId === "string" && x.resourceId
+              ? x.resourceId
+              : id;
+          return {
+            id,
+            resourceId: rid,
+            title: typeof x.title === "string" ? x.title : null,
+            createdAt: typeof x.createdAt === "string" ? x.createdAt : null,
+            updatedAt: typeof x.updatedAt === "string" ? x.updatedAt : null,
+          };
+        }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "加载会话列表失败");
+      setError(e instanceof Error ? e.message : "加载失败");
       setThreads([]);
     } finally {
       setLoading(false);
@@ -96,273 +84,250 @@ export default function RxjsPage() {
   }, []);
 
   useEffect(() => {
-    fetchThreads();
-  }, [fetchThreads]);
+    load();
+  }, [load]);
 
-  const handleStartSession = useCallback(async () => {
+  const create = useCallback(async () => {
     if (creating) return;
     setCreating(true);
     setError(null);
     const resourceId = crypto.randomUUID();
-    const threadId = resourceId;
     const title = `会话-${nanoid(6)}`;
-
     try {
-      const response = await fetch("/api/thread", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resourceId, threadId, title }),
-      });
-      if (!response.ok) {
-        throw new Error(await getErrorMessage(response, "创建会话失败"));
-      }
-      const data = (await response.json()) as {
-        thread?: { resourceId?: unknown; id?: unknown };
-      };
-      const createdResourceId =
-        typeof data.thread?.resourceId === "string" &&
-        data.thread.resourceId.trim().length > 0
-          ? data.thread.resourceId
-          : typeof data.thread?.id === "string" &&
-              data.thread.id.trim().length > 0
-            ? data.thread.id
-            : resourceId;
-      await fetchThreads();
-      router.push(`/agui/rxjs/${createdResourceId}`);
+      const data = await request<{ thread?: { resourceId?: string } }>(
+        "/api/thread",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resourceId, threadId: resourceId, title }),
+        },
+      );
+      const rid = data.thread?.resourceId ?? resourceId;
+      await load();
+      router.push(`/agui/rxjs/${rid}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "创建会话失败");
+      setError(e instanceof Error ? e.message : "创建失败");
     } finally {
       setCreating(false);
     }
-  }, [creating, fetchThreads, router]);
+  }, [creating, load, router]);
 
-  const handleRename = useCallback(
-    async (threadId: string) => {
-      const title = editingTitle.trim();
-      if (!title) return;
-      setUpdatingId(threadId);
+  const rename = useCallback(
+    async (thread: Thread) => {
+      const t = editTitle.trim();
+      if (!t) return;
+      setUpdating(thread.id);
       setError(null);
       try {
-        const response = await fetch("/api/thread", {
+        await request<{ thread?: { resourceId?: string } }>("/api/thread", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ threadId, title }),
+          body: JSON.stringify({
+            threadId: thread.id,
+            resourceId: thread.resourceId,
+            title: t,
+          }),
         });
-        if (!response.ok) {
-          throw new Error(await getErrorMessage(response, "重命名失败"));
-        }
-        setEditingId(null);
-        setEditingTitle("");
-        await fetchThreads();
+        setEditing(null);
+        setEditTitle("");
+        await load();
       } catch (e) {
         setError(e instanceof Error ? e.message : "重命名失败");
       } finally {
-        setUpdatingId(null);
+        setUpdating(null);
       }
     },
-    [editingTitle, fetchThreads],
+    [editTitle, load],
   );
 
-  const handleDelete = useCallback(
-    async (threadId: string) => {
-      setDeletingId(threadId);
+  const remove = useCallback(
+    async (thread: Thread) => {
+      setDeleting(thread.id);
       setError(null);
       try {
-        const response = await fetch("/api/thread", {
+        await request<{ thread?: { resourceId?: string } }>("/api/thread", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ threadId }),
+          body: JSON.stringify({
+            threadId: thread.id,
+            resourceId: thread.resourceId,
+          }),
         });
-        if (!response.ok) {
-          throw new Error(await getErrorMessage(response, "删除会话失败"));
+        if (editing === thread.id) {
+          setEditing(null);
+          setEditTitle("");
         }
-        if (editingId === threadId) {
-          setEditingId(null);
-          setEditingTitle("");
-        }
-        await fetchThreads();
+        await load();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "删除会话失败");
+        setError(e instanceof Error ? e.message : "删除失败");
       } finally {
-        setDeletingId(null);
+        setDeleting(null);
       }
     },
-    [editingId, fetchThreads],
+    [editing, load],
   );
 
-  const handleSwitch = useCallback(
-    (thread: ThreadItem) => {
-      router.push(`/agui/rxjs/${thread.resourceId}`);
-    },
+  const goTo = useCallback(
+    (t: Thread) => router.push(`/agui/rxjs/${t.resourceId}`),
     [router],
   );
 
-  const renderTime = (value: string | null) => {
-    if (!value) return "未知时间";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleString();
-  };
-
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10 pt-4">
-      <Card className="sticky top-4 z-20 border-border/80 bg-background/95 shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80">
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-xl sm:text-2xl">RxJS 会话管理</CardTitle>
-          <CardDescription>
-            支持会话的创建、查询、重命名、删除，并可切换进入指定会话。
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="flex min-h-dvh flex-col">
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/80">
+        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 sm:px-6">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            RxJS 会话管理
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            创建、查看、重命名或删除会话，点击「进入」开始对话
+          </p>
           <div className="flex flex-wrap gap-2">
             <Button
-              type="button"
               size="lg"
-              onClick={handleStartSession}
+              onClick={create}
               disabled={creating}
-              className="gap-2 rounded-full"
+              className="gap-2"
             >
               {creating ? (
-                <Loader2 className="size-5 animate-spin" aria-hidden />
+                <Loader2 className="size-4 animate-spin" />
               ) : (
-                <MessageSquarePlus className="size-5" aria-hidden />
+                <MessageSquarePlus className="size-4" />
               )}
               新建会话
             </Button>
             <Button
-              type="button"
               size="lg"
               variant="outline"
-              onClick={fetchThreads}
+              onClick={load}
               disabled={loading}
-              className="gap-2 rounded-full"
+              className="gap-2"
             >
               {loading ? (
-                <Loader2 className="size-5 animate-spin" aria-hidden />
+                <Loader2 className="size-4 animate-spin" />
               ) : (
-                <RefreshCw className="size-5" aria-hidden />
+                <RefreshCw className="size-4" />
               )}
-              刷新列表
+              刷新
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </header>
 
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-base">会话列表</CardTitle>
-          <CardDescription>
-            {loading ? "加载中…" : `共 ${threads.length} 条会话`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-muted-foreground">
+              {loading ? "加载中…" : `共 ${threads.length} 条`}
+            </h2>
+          </div>
+
+          {error && (
+            <p
+              className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
 
           {loading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-              正在加载会话列表…
+            <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+              加载会话列表…
             </div>
           ) : threads.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              暂无会话，点击上方“新建会话”开始。
-            </p>
+            <div className="rounded-xl border border-dashed border-border/70 py-12 text-center text-sm text-muted-foreground">
+              暂无会话，点击上方「新建会话」开始
+            </div>
           ) : (
-            threads.map((thread) => (
-              <div
-                key={thread.id}
-                className="rounded-xl border border-border/70 bg-muted/20 p-3"
-              >
-                {editingId === thread.id ? (
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Input
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      placeholder="输入会话标题"
-                      className="min-w-0 flex-1"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleRename(thread.id)}
-                        disabled={
-                          updatingId === thread.id || !editingTitle.trim()
-                        }
-                      >
-                        {updatingId === thread.id ? (
-                          <Loader2
-                            className="size-4 animate-spin"
-                            aria-hidden
-                          />
-                        ) : (
-                          "保存"
-                        )}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditingTitle("");
-                        }}
-                      >
-                        取消
-                      </Button>
+            <ul className="space-y-3">
+              {threads.map((t) => (
+                <li
+                  key={t.id}
+                  className="rounded-xl border border-border/70 bg-muted/30 p-4 transition-colors hover:bg-muted/50"
+                >
+                  {editing === t.id ? (
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <Input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        placeholder="会话标题"
+                        className="flex-1"
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => rename(t)}
+                          disabled={updating === t.id || !editTitle.trim()}
+                        >
+                          {updating === t.id ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            "保存"
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditing(null);
+                            setEditTitle("");
+                          }}
+                        >
+                          取消
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {thread.title ?? thread.id}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        resourceId: {thread.resourceId}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        更新于 {renderTime(thread.updatedAt)}
-                      </p>
+                  ) : (
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">
+                          {t.title ?? t.id}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          更新于 {fmtTime(t.updatedAt)}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Button size="sm" onClick={() => goTo(t)}>
+                          进入
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditing(t.id);
+                            setEditTitle(t.title ?? "");
+                          }}
+                          aria-label="重命名"
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => remove(t)}
+                          disabled={deleting === t.id}
+                          aria-label="删除"
+                        >
+                          {deleting === t.id ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="size-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex shrink-0 gap-2">
-                      <Button size="sm" onClick={() => handleSwitch(thread)}>
-                        进入会话
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingId(thread.id);
-                          setEditingTitle(thread.title ?? "");
-                        }}
-                        aria-label="重命名会话"
-                      >
-                        <Pencil className="size-4" aria-hidden />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => handleDelete(thread.id)}
-                        disabled={deletingId === thread.id}
-                        className="text-destructive hover:text-destructive"
-                        aria-label="删除会话"
-                      >
-                        {deletingId === thread.id ? (
-                          <Loader2
-                            className="size-4 animate-spin"
-                            aria-hidden
-                          />
-                        ) : (
-                          <Trash2 className="size-4" aria-hidden />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))
+                  )}
+                </li>
+              ))}
+            </ul>
           )}
-        </CardContent>
-      </Card>
+        </section>
+      </main>
     </div>
   );
 }
