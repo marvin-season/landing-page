@@ -1,7 +1,7 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { isToolOrDynamicToolUIPart } from "ai";
 import { BrainCircuit } from "lucide-react";
-import { ToolBlock } from "@/app/agui/rxjs/components/ToolBlock";
+import { ToolBlock } from "@/app/rxjs/components/ToolBlock";
 import Markdown from "@/components/markdown";
 
 type ToolPart = {
