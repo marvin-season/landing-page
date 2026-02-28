@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback } from "react";
 import {
   Select,
   SelectContent,
@@ -10,58 +9,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type Mode = "agent" | "copilot";
-
-function getCurrentMode(pathname: string): Mode {
-  if (pathname.startsWith("/agui")) return "copilot";
-  return "agent";
-}
-
-function getSharedResourceId(pathname: string): string | null {
-  const segments = pathname.split("/").filter(Boolean);
-  if (segments[0] === "agent" && segments[1]) return segments[1];
-  if (segments[0] === "agui" && segments[1] === "rxjs" && segments[2]) {
-    return segments[2];
-  }
-  return null;
-}
+const navs = [
+  {
+    label: "home",
+    href: "/",
+  },
+  {
+    label: "agent",
+    href: "/agent",
+  },
+  {
+    label: "copilot",
+    href: "/agui",
+  },
+];
 
 export function ChatModeSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
-  const mode = getCurrentMode(pathname);
-  const resourceId = getSharedResourceId(pathname);
+  const currentNav = navs.find((nav) => nav.href === pathname);
 
-  const handleModeChange = useCallback(
-    (nextMode: string) => {
-      if (nextMode === mode) return;
-      if (nextMode === "home") {
-        router.push("/");
-        return;
-      }
-      if (nextMode === "agent") {
-        router.push(resourceId ? `/agent/${resourceId}` : "/agent");
-        return;
-      }
-      if (nextMode === "copilot") {
-        router.push("/agui");
-        return;
-      }
-      router.push(resourceId ? `/agui/rxjs/${resourceId}` : "/agui/rxjs");
-    },
-    [mode, resourceId, router],
-  );
-
+  if (!currentNav) return null;
   return (
-    <div className="fixed left-4 bottom-4 z-50">
-      <Select value={mode} onValueChange={handleModeChange}>
+    <div className="fixed right-4 top-4 z-50">
+      <Select
+        value={currentNav?.href}
+        onValueChange={(value) => {
+          router.push(value);
+        }}
+      >
         <SelectTrigger className="w-[190px] rounded-full border-border/80 bg-background/90 shadow-sm backdrop-blur">
           <SelectValue placeholder="选择模式" />
         </SelectTrigger>
         <SelectContent align="end">
-          <SelectItem value="home">Home</SelectItem>
-          <SelectItem value="agent">AISDK (Agent 主线)</SelectItem>
-          <SelectItem value="copilot">CopilotKit</SelectItem>
+          {navs.map((nav) => (
+            <SelectItem key={nav.href} value={nav.href}>
+              {nav.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
