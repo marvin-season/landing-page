@@ -4,26 +4,6 @@ import { mastra } from "@/mastra";
 
 const AGENT_ID = AgentConstant.GENERAL_AGENT;
 
-type Memory = {
-  createThread?: (p: {
-    resourceId: string;
-    threadId?: string;
-    title?: string;
-  }) => Promise<{ id: string; resourceId: string; title?: string } | unknown>;
-  listThreads?: (p?: { perPage?: false }) => Promise<{
-    threads?: Array<{
-      id: string;
-      resourceId?: string;
-      title?: string;
-      createdAt?: string;
-      updatedAt?: string;
-    }>;
-  }>;
-  getThreadById?: (p: { threadId: string }) => Promise<{
-    update?: (p: { title?: string }) => Promise<unknown>;
-    delete?: () => Promise<void>;
-  } | null>;
-};
 
 function str(v: unknown): string | null {
   if (typeof v !== "string" || !v.trim()) return null;
