@@ -1,4 +1,4 @@
-import type { ChatStatus, UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { isToolOrDynamicToolUIPart } from "ai";
 import { BrainCircuit } from "lucide-react";
 import { ToolBlock } from "@/app/agent/_components/ToolBlock";
@@ -28,10 +28,7 @@ function getStreamingPhase(
   return "input-streaming";
 }
 
-export default function AssistantMessageParts(props: {
-  m: UIMessage;
-  status: ChatStatus;
-}) {
+export default function AssistantMessageParts(props: { m: UIMessage }) {
   const { m } = props;
   return (
     <div className="space-y-4 wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, MessageSquarePlus, Sparkles } from "lucide-react";
+import { Loader2, MessageSquarePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,12 @@ export default function AgentPage() {
     <div className="flex min-h-full flex-col items-center justify-center px-4 py-12 md:py-16">
       <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-8 text-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Sparkles className="size-7" aria-hidden />
-          </div>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            开始新对话
+            Start a new conversation
           </h1>
           <p className="max-w-sm text-sm text-muted-foreground">
-            与 AI 助手交流，获取天气、查询数据或发送邮件，随时开始。
+            Talk to the AI assistant, get weather, query data, or send email,
+            anytime.
           </p>
         </div>
 
@@ -49,7 +47,7 @@ export default function AgentPage() {
           ) : (
             <MessageSquarePlus className="size-5" />
           )}
-          新建对话
+          Start a new conversation
         </Button>
 
         {/* <div className="w-full space-y-3">

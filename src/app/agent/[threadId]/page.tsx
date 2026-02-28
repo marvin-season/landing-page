@@ -5,7 +5,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -19,54 +19,34 @@ import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../_components/ActionCard";
 import { ResponseSection } from "../_components/ResponseSection";
 
-function extractUserText(body: Record<string, unknown>): string {
-  const messages = Array.isArray(body.messages) ? body.messages : [];
-  const first = messages[0];
-  if (!first || typeof first !== "object") return "";
-  const parts = (first as { parts?: Array<{ type?: string; text?: string }> })
-    .parts;
-  if (!Array.isArray(parts)) return "";
-  return parts
-    .filter((p) => p?.type === "text" && p.text)
-    .map((p) => p.text)
-    .join("")
-    .trim();
-}
-
-export default function RxjsResourcePage() {
+export default function AgentThreadPage() {
   const params = useParams();
   const trpc = useTRPC();
-  const threadId = typeof params.threadId === "string" ? params.threadId : "";
-  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
-    null,
-  );
+  const threadId = params.threadId as string;
 
   const { data: historyMessages = [], isLoading: historyLoading } = useQuery({
     ...trpc.thread.detailMessages.queryOptions({ threadId }),
+    staleTime: 0,
+    refetchOnWindowFocus: false,
     enabled: !!threadId,
   });
 
-  const { state, send, loading, error } = useChatStreamState("/api/chat");
+  const { state, send, loading, error, userState } =
+    useChatStreamState("/api/chat");
   const { messageId, blocks, streamingText, streamingTool } = state;
 
-  const hasCurrentOutput =
-    blocks.length > 0 ||
-    (streamingText != null && streamingText !== "") ||
-    streamingTool !== null;
-
   const handleSend = useCallback(
-    (body: Record<string, unknown>) => {
-      setPendingUserMessage(extractUserText(body));
-      send(body);
+    ({ text }: { text: string }) => {
+      send({ text, threadId });
     },
-    [send],
+    [send, threadId],
   );
 
   if (!threadId) {
     return (
       <div className="flex min-h-dvh flex-col">
         <div className="mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
-          <p className="text-sm text-muted-foreground">无效的会话 ID</p>
+          <p className="text-sm text-muted-foreground">Invalid thread ID</p>
         </div>
       </div>
     );
@@ -74,35 +54,32 @@ export default function RxjsResourcePage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col px-4 sm:px-6 2xl:max-w-3xl">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-4 sm:px-6">
         <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
           {error != null ? (
             <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
-              <AlertDescription>错误: {error}</AlertDescription>
+              <AlertDescription>Error: {error}</AlertDescription>
             </Alert>
           ) : null}
 
           <Conversation className="h-full">
             <ConversationContent>
               {historyLoading ? (
-                <p className="py-4 text-sm text-muted-foreground">加载历史…</p>
+                <p className="py-4 text-sm text-muted-foreground">
+                  Loading history...
+                </p>
               ) : (
                 historyMessages.map((message) => (
-                  <MessageItem
-                    key={message.id}
-                    m={message}
-                    status={loading ? "streaming" : "ready"}
-                  />
+                  <MessageItem key={message.id} m={message} />
                 ))
               )}
-
-              {pendingUserMessage != null && (loading || hasCurrentOutput) ? (
+              {userState.pendingUserMessage != null && (
                 <ChatMessageShell role="user">
                   <div className="wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                    <Markdown>{pendingUserMessage}</Markdown>
+                    <Markdown>{userState.pendingUserMessage}</Markdown>
                   </div>
                 </ChatMessageShell>
-              ) : null}
+              )}
 
               <ResponseSection
                 blocks={blocks}
@@ -116,7 +93,6 @@ export default function RxjsResourcePage() {
 
         <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
           <ActionCard
-            threadId={threadId}
             messageId={messageId}
             loading={loading}
             onSend={handleSend}
