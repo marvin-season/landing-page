@@ -1,11 +1,13 @@
 import { headers } from "next/headers";
 import { modelRouter } from "~/server/model";
+import { threadRouter } from "~/server/model/thread";
 import { userRouter } from "~/server/user";
 import { createCallerFactory, createTRPCContext, router } from "./trpc";
 
 export const appRouter = router({
   user: userRouter,
   model: modelRouter,
+  thread: threadRouter,
 });
 // Export type router type signature,
 // NOT the router itself.

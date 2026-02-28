@@ -1,4 +1,12 @@
-# thread API 与 rxjs 会话页完全重写
+# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC
+
+## thread CRUD 迁移至 tRPC
+- **文件**: `server/model/thread/index.ts`，`server/index.ts`，`src/app/agui/rxjs/layout.tsx`，`src/app/agui/rxjs/page.tsx`，删除 `src/app/api/thread/route.ts`
+- **修改内容**:
+  - 将 thread 的 list/create/update/delete 逻辑从 REST API 迁移到 `server/model/thread` tRPC router；注册 `threadRouter` 到 `appRouter`。
+  - 前端 `rxjs/page.tsx` 使用 `useQuery(trpc.thread.list.queryOptions())` 与 `useMutation(trpc.thread.*.mutationOptions())` 替代原 fetch/request 调用。
+  - rxjs layout 增加 `TankQueryClientProvider` 以支持 tRPC；删除 `/api/thread` 路由文件。
+- **原因/上下文**: 用户要求将 thread 相关 API 逻辑迁移到 server/model/thread，前端 CRUD 统一通过 tRPC 调用。
 
 ## 修复重命名/删除 Thread not found
 - **文件**: `src/app/api/thread/route.ts`，`src/app/agui/rxjs/page.tsx`

@@ -7,30 +7,12 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { request } from "@/lib/request";
-
-type Thread = {
-  id: string;
-  resourceId: string;
-  title: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
-
-function parseError(res: Response, fallback: string): Promise<string> {
-  return res
-    .json()
-    .then((d: { error?: string }) =>
-      typeof d?.error === "string" && d.error
-        ? d.error
-        : `${fallback} (${res.status})`,
-    )
-    .catch(() => `${fallback} (${res.status})`);
-}
+import { useTRPC } from "@/lib/trpc";
 
 function fmtTime(s: string | null): string {
   if (!s) return "—";
@@ -40,133 +22,85 @@ function fmtTime(s: string | null): string {
 
 export default function RxjsPage() {
   const router = useRouter();
-  const [threads, setThreads] = useState<Thread[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [updating, setUpdating] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const trpc = useTRPC();
   const [editing, setEditing] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/thread?perPage=false");
-      if (!res.ok) throw new Error(await parseError(res, "加载失败"));
-      const data = (await res.json()) as { threads?: unknown[] };
-      const arr = Array.isArray(data.threads) ? data.threads : [];
-      setThreads(
-        arr.map((t) => {
-          const x = t as Record<string, unknown>;
-          const id = typeof x.id === "string" ? x.id : "";
-          const rid =
-            typeof x.resourceId === "string" && x.resourceId
-              ? x.resourceId
-              : id;
-          return {
-            id,
-            resourceId: rid,
-            title: typeof x.title === "string" ? x.title : null,
-            createdAt: typeof x.createdAt === "string" ? x.createdAt : null,
-            updatedAt: typeof x.updatedAt === "string" ? x.updatedAt : null,
-          };
-        }),
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "加载失败");
-      setThreads([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: threads = [],
+    isLoading: loading,
+    error: listError,
+    refetch,
+  } = useQuery(trpc.thread.list.queryOptions());
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  const createMutation = useMutation({
+    ...trpc.thread.create.mutationOptions(),
+    onSuccess: (data) => {
+      refetch();
+      const threadId = data.thread?.id;
+      if (threadId) router.push(`/agui/rxjs/${threadId}`);
+    },
+  });
 
-  const create = useCallback(async () => {
-    if (creating) return;
-    setCreating(true);
-    setError(null);
-    try {
-      const { thread } = await request<{ thread: { id?: string } }>(
-        "/api/thread",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-      const threadId = thread.id;
-      await load();
-      router.push(`/agui/rxjs/${threadId}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "创建失败");
-    } finally {
-      setCreating(false);
-    }
-  }, [creating, load, router]);
+  const updateMutation = useMutation({
+    ...trpc.thread.update.mutationOptions(),
+    onSuccess: () => {
+      setEditing(null);
+      setEditTitle("");
+      refetch();
+    },
+  });
 
-  const rename = useCallback(
-    async (thread: Thread) => {
-      const t = editTitle.trim();
-      if (!t) return;
-      setUpdating(thread.id);
-      setError(null);
-      try {
-        await request<{ thread?: { resourceId?: string } }>("/api/thread", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            threadId: thread.id,
-            resourceId: thread.resourceId,
-            title: t,
-          }),
-        });
+  const deleteMutation = useMutation({
+    ...trpc.thread.delete.mutationOptions(),
+    onSuccess: (_, variables) => {
+      if (editing === variables.threadId) {
         setEditing(null);
         setEditTitle("");
-        await load();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "重命名失败");
-      } finally {
-        setUpdating(null);
       }
+      refetch();
     },
-    [editTitle, load],
+  });
+
+  const error =
+    listError?.message ??
+    createMutation.error?.message ??
+    updateMutation.error?.message ??
+    deleteMutation.error?.message ??
+    null;
+
+  const create = useCallback(() => {
+    createMutation.mutate(undefined);
+  }, [createMutation]);
+
+  const rename = useCallback(
+    (threadId: string) => {
+      const t = editTitle.trim();
+      if (!t) return;
+      updateMutation.mutate({ threadId, title: t });
+    },
+    [editTitle, updateMutation],
   );
 
   const remove = useCallback(
-    async (thread: Thread) => {
-      setDeleting(thread.id);
-      setError(null);
-      try {
-        await request<{ thread?: { resourceId?: string } }>("/api/thread", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            threadId: thread.id,
-            resourceId: thread.resourceId,
-          }),
-        });
-        if (editing === thread.id) {
-          setEditing(null);
-          setEditTitle("");
-        }
-        await load();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "删除失败");
-      } finally {
-        setDeleting(null);
-      }
+    (threadId: string) => {
+      deleteMutation.mutate({ threadId });
     },
-    [editing, load],
+    [deleteMutation],
   );
 
   const goTo = useCallback(
-    (t: Thread) => router.push(`/agui/rxjs/${t.resourceId}`),
+    (resourceId: string) => router.push(`/agui/rxjs/${resourceId}`),
     [router],
   );
+
+  const threadList = threads.map((t) => ({
+    id: t.id,
+    resourceId: t.resourceId ?? t.id,
+    title: t.title,
+    createdAt: t.createdAt,
+    updatedAt: t.updatedAt,
+  }));
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -182,10 +116,10 @@ export default function RxjsPage() {
             <Button
               size="lg"
               onClick={create}
-              disabled={creating}
+              disabled={createMutation.isPending}
               className="gap-2"
             >
-              {creating ? (
+              {createMutation.isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <MessageSquarePlus className="size-4" />
@@ -195,7 +129,7 @@ export default function RxjsPage() {
             <Button
               size="lg"
               variant="outline"
-              onClick={load}
+              onClick={() => refetch()}
               disabled={loading}
               className="gap-2"
             >
@@ -214,7 +148,7 @@ export default function RxjsPage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-muted-foreground">
-              {loading ? "加载中…" : `共 ${threads.length} 条`}
+              {loading ? "加载中…" : `共 ${threadList.length} 条`}
             </h2>
           </div>
 
@@ -232,13 +166,13 @@ export default function RxjsPage() {
               <Loader2 className="size-4 animate-spin" />
               加载会话列表…
             </div>
-          ) : threads.length === 0 ? (
+          ) : threadList.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border/70 py-12 text-center text-sm text-muted-foreground">
               暂无会话，点击上方「新建会话」开始
             </div>
           ) : (
             <ul className="space-y-3">
-              {threads.map((t) => (
+              {threadList.map((t) => (
                 <li
                   key={t.id}
                   className="rounded-xl border border-border/70 bg-muted/30 p-4 transition-colors hover:bg-muted/50"
@@ -255,10 +189,15 @@ export default function RxjsPage() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          onClick={() => rename(t)}
-                          disabled={updating === t.id || !editTitle.trim()}
+                          onClick={() => rename(t.id)}
+                          disabled={
+                            (updateMutation.isPending &&
+                              updateMutation.variables?.threadId === t.id) ||
+                            !editTitle.trim()
+                          }
                         >
-                          {updating === t.id ? (
+                          {updateMutation.isPending &&
+                          updateMutation.variables?.threadId === t.id ? (
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
                             "保存"
@@ -287,7 +226,7 @@ export default function RxjsPage() {
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
-                        <Button size="sm" onClick={() => goTo(t)}>
+                        <Button size="sm" onClick={() => goTo(t.resourceId)}>
                           进入
                         </Button>
                         <Button
@@ -305,11 +244,15 @@ export default function RxjsPage() {
                           size="icon"
                           variant="ghost"
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => remove(t)}
-                          disabled={deleting === t.id}
+                          onClick={() => remove(t.id)}
+                          disabled={
+                            deleteMutation.isPending &&
+                            deleteMutation.variables?.threadId === t.id
+                          }
                           aria-label="删除"
                         >
-                          {deleting === t.id ? (
+                          {deleteMutation.isPending &&
+                          deleteMutation.variables?.threadId === t.id ? (
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
                             <Trash2 className="size-4" />
