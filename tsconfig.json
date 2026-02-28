@@ -21,7 +21,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"],
-      "@app/*": ["./src/app/[lang]/*"]
+      "@app/*": ["./src/app/[lang]/*"],
+      "$": ["./mastra"],
+      "$/*": ["./mastra/*"]
     }
   },
   "include": [

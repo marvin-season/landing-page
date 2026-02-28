@@ -7,7 +7,7 @@ import {
   SensitiveDataFilter,
 } from "@mastra/observability";
 import { AgentConstant } from "@/lib/constant/agent";
-import { storage } from "@/mastra/storage";
+import { storage } from "$/storage";
 import { generalAgent } from "./agents/general-agent";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 

@@ -131,7 +131,7 @@ const planActivities = createStep({
         Note: [relevant weather consideration]
 
       🏠 INDOOR ALTERNATIVES
-      • [Activity Name] - [Brief description including specific venue]
+      • [Activity Name] - [Brief description including venue]
         Ideal for: [weather condition that would trigger this alternative]
 
       ⚠️ SPECIAL CONSIDERATIONS

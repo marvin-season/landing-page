@@ -1,4 +1,13 @@
-# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、完成 update title
+# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录
+
+## mastra 迁移至项目根目录并配置 $ 别名
+- **文件**: 新建 `mastra/`，`tsconfig.json`，`src/app/api/chat/route.ts`，`src/app/api/agui/route.ts`，`src/app/api/copilotkit/route.ts`，`server/thread/index.ts`；删除 `src/mastra/`
+- **修改内容**:
+  - 将 `src/mastra/` 完整迁移至项目根目录 `mastra/`，包含 index、storage、agents、workflows、tools。
+  - tsconfig 增加路径别名 `$`、`$/*` 指向 `./mastra`、`./mastra/*`。
+  - 所有 `@/mastra` 引用改为 `$`（chat、agui、copilotkit API 与 server/thread）。
+  - mastra/index 内 `@/mastra/storage` 改为 `$/storage`。
+- **原因/上下文**: 用户要求将 mastra 及其功能迁移至项目根目录，并通过 `$` 别名访问。
 
 ## 完成 thread update title 功能
 - **文件**: `server/thread/index.ts`

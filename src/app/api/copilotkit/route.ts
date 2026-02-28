@@ -8,7 +8,7 @@ import {
 } from "@copilotkit/runtime";
 import type { NextRequest } from "next/server";
 
-import { mastra } from "@/mastra"; // the path to your Mastra instance
+import { mastra } from "$";
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
 const mastraAgents = MastraAgent.getLocalAgents({ mastra, resourceId: "1" });
