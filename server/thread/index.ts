@@ -1,11 +1,12 @@
+import { Memory } from "@mastra/memory";
 import { z } from "zod";
 import { AGENT_ID, RESOURCE_ID } from "~/server/helper/constant";
 import { mastra } from "@/mastra";
 import { publicProcedure, router } from "~/server/trpc";
 
-async function getMemory() {
+async function getMemory(): Promise<Memory> {
   const m = await mastra.getAgentById(AGENT_ID).getMemory();
-  return m!;
+  return m as Memory;
 }
 
 export const threadRouter = router({
@@ -43,10 +44,25 @@ export const threadRouter = router({
     )
     .mutation(async ({ input }) => {
       const memory = await getMemory();
-      if (typeof memory.getThreadById !== "function") {
-        throw new Error("getThreadById not supported");
+      const existing = await memory.getThreadById({ threadId: input.threadId });
+
+      if (!existing) {
+        throw new Error("Thread not found");
       }
-      return { thread: { id: input.threadId, title: input.title } };
+
+      const updated = await memory.updateThread({
+        id: input.threadId,
+        title: input.title,
+        metadata: existing.metadata ?? {},
+      });
+      return {
+        thread: {
+          id: updated.id ?? input.threadId,
+          title: updated.title ?? input.title,
+          createdAt: updated.createdAt,
+          updatedAt: updated.updatedAt,
+        },
+      };
     }),
 
   delete: publicProcedure

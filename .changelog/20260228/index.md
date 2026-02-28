@@ -1,4 +1,9 @@
-# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC
+# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、完成 update title
+
+## 完成 thread update title 功能
+- **文件**: `server/thread/index.ts`
+- **修改内容**: update mutation 调用 `memory.updateThread` 实际持久化标题；先 `getThreadById` 取现有 thread 以保留 metadata，再 `updateThread` 更新 title；`getMemory` 增加 `Memory` 类型以支持 `updateThread` 调用。
+- **原因/上下文**: 用户要求完成修改 title 的功能，原先仅检查 getThreadById 存在后返回 input 未实际更新。
 
 ## thread CRUD 迁移至 tRPC
 - **文件**: `server/model/thread/index.ts`，`server/index.ts`，`src/app/agui/rxjs/layout.tsx`，`src/app/agui/rxjs/page.tsx`，删除 `src/app/api/thread/route.ts`
