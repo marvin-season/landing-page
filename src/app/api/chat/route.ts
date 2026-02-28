@@ -2,26 +2,15 @@ import { handleChatStream } from "@mastra/ai-sdk";
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
-import { AgentConstant } from "@/lib/constant/agent";
 import { mastra } from "$";
-import { RESOURCE_ID } from "~/server/helper/constant";
-
-function resolveAgentId(value: unknown): string {
-  if (typeof value === "string" && value.length > 0) return value;
-  return AgentConstant.GENERAL_AGENT;
-}
-
-function resolveResourceId(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const resourceId = value.trim();
-  return resourceId.length > 0 ? resourceId : null;
-}
+import { AGENT_ID, RESOURCE_ID } from "$/constant";
+import { resolveStr } from "$/lib/resolve";
 
 export async function POST(req: Request) {
   const params = await req.json();
   const resourceId = RESOURCE_ID;
 
-  const agentId = resolveAgentId(params.agentId);
+  const agentId = AGENT_ID;
   const stream = await handleChatStream({
     mastra,
     agentId,
@@ -38,16 +27,15 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: NextRequest) {
-  const threadId = resolveResourceId(req.nextUrl.searchParams.get("threadId"));
+  const threadId = resolveStr(req.nextUrl.searchParams.get("threadId"));
   if (!threadId) {
     return NextResponse.json(
       { error: "Thread ID is required" },
       { status: 400 },
     );
   }
-  const agentId = resolveAgentId(req.nextUrl.searchParams.get("agentId"));
 
-  const memory = await mastra.getAgentById(agentId).getMemory();
+  const memory = await mastra.getAgentById(AGENT_ID).getMemory();
   let response = null;
 
   try {

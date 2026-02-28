@@ -1,6 +1,6 @@
 import { Memory } from "@mastra/memory";
 import { z } from "zod";
-import { AGENT_ID, RESOURCE_ID } from "~/server/helper/constant";
+import { AGENT_ID, RESOURCE_ID } from "$/constant";
 import { mastra } from "$";
 import { publicProcedure, router } from "~/server/trpc";
 

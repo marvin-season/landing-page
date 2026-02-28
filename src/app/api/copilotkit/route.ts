@@ -9,9 +9,13 @@ import {
 import type { NextRequest } from "next/server";
 
 import { mastra } from "$";
+import { RESOURCE_ID } from "$/constant";
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
-const mastraAgents = MastraAgent.getLocalAgents({ mastra, resourceId: "1" });
+const mastraAgents = MastraAgent.getLocalAgents({
+  mastra,
+  resourceId: RESOURCE_ID,
+});
 
 const runtime = new CopilotRuntime({
   agents: {

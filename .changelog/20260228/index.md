@@ -1,4 +1,15 @@
-# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录
+# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录与常量整理
+
+## mastra 常量与工具函数整理
+- **文件**: 新建 `mastra/constant.ts`、`mastra/lib/env.ts`、`mastra/lib/resolve.ts`；修改 mastra 内部、API 路由、server 的导入；简化 `server/helper/constant.ts`
+- **修改内容**:
+  - `mastra/constant.ts`：AGENT_ID、RESOURCE_ID、re-export AgentConstant；统一 mastra 相关常量的来源。
+  - `mastra/lib/env.ts`：re-export isDevelopment，供 storage 使用，减少对 @/lib 的直接依赖。
+  - `mastra/lib/resolve.ts`：resolveAgentId、resolveResourceId，从 chat route 抽出的请求参数解析工具。
+  - mastra 内部、API 路由、server/thread 改为从 $/constant、$/lib/resolve、$/lib/env 导入。
+  - agui、copilotkit 的 resourceId 统一为 RESOURCE_ID（原 "1" 改为 "user-1"）。
+  - server/helper/constant 改为 re-export 自 $/constant。
+- **原因/上下文**：用户要求整理 mastra 所用常量与工具函数，便于管理。
 
 ## mastra 迁移至项目根目录并配置 $ 别名
 - **文件**: 新建 `mastra/`，`tsconfig.json`，`src/app/api/chat/route.ts`，`src/app/api/agui/route.ts`，`src/app/api/copilotkit/route.ts`，`server/thread/index.ts`；删除 `src/mastra/`

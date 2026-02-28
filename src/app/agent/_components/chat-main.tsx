@@ -17,7 +17,6 @@ import {
   buildPendingUserMessage,
   buildStreamingAssistantMessage,
 } from "@/lib/chat/streaming-message";
-import { AgentConstant } from "@/lib/constant/agent";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { useCurrentMessages, useMessageStore } from "@/store/message-store";
 import { useCurrentSession, useSessionStore } from "@/store/session-store";
@@ -107,9 +106,7 @@ export function ChatMain() {
 
       send(
         buildSubmitMessageBody({
-          resourceId: sessionId,
           text,
-          agentId: AgentConstant.GENERAL_AGENT,
         }),
       );
 

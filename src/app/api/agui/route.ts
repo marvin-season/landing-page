@@ -1,12 +1,12 @@
 import { MastraAgent } from "@ag-ui/mastra";
 import { NextResponse } from "next/server";
-import { AgentConstant } from "@/lib/constant/agent";
 import { mastra } from "$";
+import { AGENT_ID, RESOURCE_ID } from "$/constant";
 
 const mastraAgent = MastraAgent.getLocalAgent({
   mastra,
-  agentId: AgentConstant.GENERAL_AGENT,
-  resourceId: "1",
+  agentId: AGENT_ID,
+  resourceId: RESOURCE_ID,
 });
 
 export const agents = {
