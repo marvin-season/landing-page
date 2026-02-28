@@ -7,13 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import MessageItem from "@/app/agent/_components/message/message-item";
 import {
   Conversation,
   ConversationContent,
 } from "@/components/ai-elements/conversation";
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
+import { MessageItem } from "@/components/message/message-item";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
