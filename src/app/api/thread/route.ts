@@ -31,18 +31,14 @@ function str(v: unknown): string | null {
 }
 
 async function memory() {
-  return mastra.getAgentById(AGENT_ID).getMemory() as unknown as Memory;
+  const m = await mastra.getAgentById(AGENT_ID).getMemory()
+  return m!;
 }
 
 export async function GET(_req: NextRequest) {
   try {
     const m = await memory();
-    if (typeof m.listThreads !== "function") {
-      return NextResponse.json(
-        { error: "listThreads not supported" },
-        { status: 501 },
-      );
-    }
+
     const res = await m.listThreads({ perPage: false });
     const threads = Array.isArray(res?.threads) ? res.threads : [];
     const list = threads.map((t: Record<string, unknown>) => {
@@ -61,7 +57,7 @@ export async function GET(_req: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "List failed" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -128,11 +124,8 @@ export async function PUT(req: Request) {
         { status: 501 },
       );
     }
-    const thread = await m.getThreadById({ threadId });
-    if (!thread || typeof thread.update !== "function") {
-      return NextResponse.json({ error: "Thread not found" }, { status: 404 });
-    }
-    await thread.update({ title });
+
+
     return NextResponse.json({ thread: { id: threadId, title } });
   } catch (e) {
     return NextResponse.json(
@@ -162,11 +155,8 @@ export async function DELETE(req: Request) {
         { status: 501 },
       );
     }
-    const thread = await m.getThreadById({ threadId });
-    if (!thread || typeof thread.delete !== "function") {
-      return NextResponse.json({ error: "Thread not found" }, { status: 404 });
-    }
-    await thread.delete();
+
+    await m.deleteThread(threadId);
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json(
