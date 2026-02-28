@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AGENT_ID, RESOURCE_ID } from "@/lib/service/helper/contsant";
+import { AGENT_ID, RESOURCE_ID } from "~/server/helper/constant";
 import { mastra } from "@/mastra";
 import { publicProcedure, router } from "~/server/trpc";
 

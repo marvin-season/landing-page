@@ -3,8 +3,8 @@ import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
 import { AgentConstant } from "@/lib/constant/agent";
-import { RESOURCE_ID } from "@/lib/service/helper/contsant";
 import { mastra } from "@/mastra";
+import { RESOURCE_ID } from "~/server/helper/constant";
 
 function resolveAgentId(value: unknown): string {
   if (typeof value === "string" && value.length > 0) return value;
