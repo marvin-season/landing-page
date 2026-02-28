@@ -12,8 +12,7 @@ export const PRESET_QUESTIONS = [
 
 /** 根据会话 resourceId 与用户输入文本构建请求体 */
 export function buildChatBody(
-  resourceId: string,
   text: string,
 ): Record<string, unknown> {
-  return buildSubmitMessageBody({ resourceId, text });
+  return buildSubmitMessageBody({  text });
 }

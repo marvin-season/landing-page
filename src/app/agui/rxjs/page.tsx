@@ -7,7 +7,6 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
-import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -91,20 +90,17 @@ export default function RxjsPage() {
     if (creating) return;
     setCreating(true);
     setError(null);
-    const resourceId = crypto.randomUUID();
-    const title = `会话-${nanoid(6)}`;
     try {
-      const data = await request<{ thread?: { resourceId?: string } }>(
+      const { thread } = await request<{ thread: { id?: string } }>(
         "/api/thread",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ resourceId, threadId: resourceId, title }),
         },
       );
-      const rid = data.thread?.resourceId ?? resourceId;
+      const threadId = thread.id;
       await load();
-      router.push(`/agui/rxjs/${rid}`);
+      router.push(`/agui/rxjs/${threadId}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "创建失败");
     } finally {

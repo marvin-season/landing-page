@@ -3,6 +3,7 @@ import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
 import { AgentConstant } from "@/lib/constant/agent";
+import { RESOURCE_ID } from "@/lib/service/helper/contsant";
 import { mastra } from "@/mastra";
 
 function resolveAgentId(value: unknown): string {
@@ -18,13 +19,7 @@ function resolveResourceId(value: unknown): string | null {
 
 export async function POST(req: Request) {
   const params = await req.json();
-  const resourceId = resolveResourceId(params.resourceId);
-  if (!resourceId) {
-    return NextResponse.json(
-      { error: "resourceId is required in request body" },
-      { status: 400 },
-    );
-  }
+  const resourceId = RESOURCE_ID;
 
   const agentId = resolveAgentId(params.agentId);
   const stream = await handleChatStream({
@@ -43,12 +38,10 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: NextRequest) {
-  const resourceId = resolveResourceId(
-    req.nextUrl.searchParams.get("resourceId"),
-  );
-  if (!resourceId) {
+  const threadId = resolveResourceId(req.nextUrl.searchParams.get("threadId"));
+  if (!threadId) {
     return NextResponse.json(
-      { error: "Resource ID is required" },
+      { error: "Thread ID is required" },
       { status: 400 },
     );
   }
@@ -59,8 +52,8 @@ export async function GET(req: NextRequest) {
 
   try {
     response = await memory?.recall({
-      threadId: resourceId,
-      resourceId,
+      threadId,
+      resourceId: RESOURCE_ID,
     });
   } catch {
     console.log("No previous messages found.");

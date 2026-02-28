@@ -38,9 +38,7 @@ function extractUserText(body: Record<string, unknown>): string {
 export default function RxjsResourcePage() {
   const params = useParams();
   const router = useRouter();
-  const resourceId =
-    typeof params.resourceId === "string" ? params.resourceId : "";
-
+  const threadId = typeof params.threadId === "string" ? params.threadId : "";
   const [historyMessages, setHistoryMessages] = useState<UIMessage[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
@@ -56,16 +54,16 @@ export default function RxjsResourcePage() {
     streamingTool !== null;
 
   useEffect(() => {
-    if (!resourceId) {
+    if (!threadId) {
       setHistoryLoading(false);
       return;
     }
     setHistoryLoading(true);
-    fetchChatHistory({ resourceId })
+    fetchChatHistory({ threadId })
       .then((data) => setHistoryMessages(data))
       .catch(() => setHistoryMessages([]))
       .finally(() => setHistoryLoading(false));
-  }, [resourceId]);
+  }, [threadId]);
 
   const handleSend = useCallback(
     (body: Record<string, unknown>) => {
@@ -75,7 +73,7 @@ export default function RxjsResourcePage() {
     [send],
   );
 
-  if (!resourceId) {
+  if (!threadId) {
     return (
       <div className="flex min-h-dvh flex-col">
         <div className="mx-auto flex max-w-4xl flex-1 flex-col items-center justify-center gap-4 px-4 py-8">
@@ -141,7 +139,7 @@ export default function RxjsResourcePage() {
 
         <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
           <ActionCard
-            resourceId={resourceId}
+            resourceId={threadId}
             messageId={messageId}
             loading={loading}
             onSend={handleSend}

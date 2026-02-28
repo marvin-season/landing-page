@@ -20,21 +20,16 @@ type ActionCardProps = {
   onSend: (body: Record<string, unknown>) => void;
 };
 
-export function ActionCard({
-  resourceId,
-  messageId,
-  loading,
-  onSend,
-}: ActionCardProps) {
+export function ActionCard({ messageId, loading, onSend }: ActionCardProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleSendText = useCallback(
     (text: string) => {
       const t = text.trim();
       if (!t || loading) return;
-      onSend(buildChatBody(resourceId, t));
+      onSend(buildChatBody(t));
     },
-    [resourceId, loading, onSend],
+    [loading, onSend],
   );
 
   const handleSubmit = useCallback(
