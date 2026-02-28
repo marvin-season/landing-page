@@ -1,4 +1,12 @@
-# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录与常量整理
+# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录与常量整理、chat 历史拉取迁移至 detailMessages
+
+## chat 历史拉取迁移至 thread.detailMessages
+- **文件**: `server/thread/index.ts`，`src/app/agui/rxjs/[threadId]/page.tsx`，`src/app/api/chat/route.ts`，`src/store/message-store.ts`，`src/lib/chat/api.ts`
+- **修改内容**:
+  - 将 `/api/chat` GET（threadId 查询历史消息）逻辑迁移到 `server/thread` 的 `detailMessages` query；使用 memory.recall + toAISdkV5Messages 返回 UIMessage 列表。
+  - `[threadId]` 对话页、`useCurrentMessages`（message-store）改用 `trpc.thread.detailMessages.queryOptions` 替代 `fetchChatHistory`；删除 chat route 的 GET 处理器。
+  - 删除 `src/lib/chat/api.ts` 中的 `buildChatHistoryUrl`、`fetchChatHistory` 与 `FetchChatHistoryOptions`。
+- **原因/上下文**: 用户要求将 chat 历史拉取逻辑迁移到对应的 detailMessages 方法，并删除对应调用接口。
 
 ## mastra 常量与工具函数整理
 - **文件**: 新建 `mastra/constant.ts`、`mastra/lib/env.ts`、`mastra/lib/resolve.ts`；修改 mastra 内部、API 路由、server 的导入；简化 `server/helper/constant.ts`

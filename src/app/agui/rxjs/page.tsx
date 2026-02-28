@@ -90,18 +90,12 @@ export default function RxjsPage() {
   );
 
   const goTo = useCallback(
-    (resourceId: string) => router.push(`/agui/rxjs/${resourceId}`),
+    (threadId: string) => router.push(`/agui/rxjs/${threadId}`),
     [router],
   );
 
-  const threadList = threads.map((t) => ({
-    id: t.id,
-    resourceId: t.resourceId ?? t.id,
-    title: t.title,
-    createdAt: t.createdAt,
-    updatedAt: t.updatedAt,
-  }));
-
+  const threadList = threads;
+  console.log(threadList);
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/80">
@@ -226,7 +220,7 @@ export default function RxjsPage() {
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
-                        <Button size="sm" onClick={() => goTo(t.resourceId)}>
+                        <Button size="sm" onClick={() => goTo(t.id)}>
                           进入
                         </Button>
                         <Button

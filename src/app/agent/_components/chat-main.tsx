@@ -107,6 +107,7 @@ export function ChatMain() {
       send(
         buildSubmitMessageBody({
           text,
+          threadId: sessionId,
         }),
       );
 

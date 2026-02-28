@@ -3,7 +3,7 @@ import type { UIMessage } from "ai";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { fetchChatHistory } from "@/lib/chat/api";
+import { useTRPC } from "@/lib/trpc";
 import { createIdbPersistStorage } from "@/store/idb-persist-storage";
 
 export type IMessageStore = {
@@ -61,13 +61,13 @@ export const useMessageStore = create<IMessageStore>()(
 );
 
 export function useCurrentMessages(sessionId: string) {
-  const { data: messages, refetch } = useQuery<UIMessage[]>({
-    queryKey: ["messages", sessionId],
-    queryFn: async () => fetchChatHistory({ threadId: sessionId }),
+  const trpc = useTRPC();
+  const { data: messages, refetch } = useQuery({
+    ...trpc.thread.detailMessages.queryOptions({ threadId: sessionId }),
     enabled: !!sessionId,
     staleTime: 15_000,
     gcTime: 5 * 60_000,
   });
 
-  return { messages: messages || [], refetch };
+  return { messages: (messages ?? []) as UIMessage[], refetch };
 }

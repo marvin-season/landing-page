@@ -3,10 +3,10 @@
 /**
  * 流式对话页：历史记录用接口数据 + MessageItem 渲染；当前轮补充「问题」并保留 ResponseSection 流式输出。
  */
-import type { UIMessage } from "ai";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import MessageItem from "@/app/agent/_components/message/message-item";
 import {
   Conversation,
@@ -16,8 +16,8 @@ import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { fetchChatHistory } from "@/lib/chat/api";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
+import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../components/ActionCard";
 import { ResponseSection } from "../components/ResponseSection";
 
@@ -38,12 +38,16 @@ function extractUserText(body: Record<string, unknown>): string {
 export default function RxjsResourcePage() {
   const params = useParams();
   const router = useRouter();
+  const trpc = useTRPC();
   const threadId = typeof params.threadId === "string" ? params.threadId : "";
-  const [historyMessages, setHistoryMessages] = useState<UIMessage[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
   const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
     null,
   );
+
+  const { data: historyMessages = [], isLoading: historyLoading } = useQuery({
+    ...trpc.thread.detailMessages.queryOptions({ threadId }),
+    enabled: !!threadId,
+  });
 
   const { state, send, loading, error } = useChatStreamState("/api/chat");
   const { messageId, blocks, streamingText, streamingTool } = state;
@@ -52,18 +56,6 @@ export default function RxjsResourcePage() {
     blocks.length > 0 ||
     (streamingText != null && streamingText !== "") ||
     streamingTool !== null;
-
-  useEffect(() => {
-    if (!threadId) {
-      setHistoryLoading(false);
-      return;
-    }
-    setHistoryLoading(true);
-    fetchChatHistory({ threadId })
-      .then((data) => setHistoryMessages(data))
-      .catch(() => setHistoryMessages([]))
-      .finally(() => setHistoryLoading(false));
-  }, [threadId]);
 
   const handleSend = useCallback(
     (body: Record<string, unknown>) => {
@@ -139,7 +131,7 @@ export default function RxjsResourcePage() {
 
         <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
           <ActionCard
-            resourceId={threadId}
+            threadId={threadId}
             messageId={messageId}
             loading={loading}
             onSend={handleSend}

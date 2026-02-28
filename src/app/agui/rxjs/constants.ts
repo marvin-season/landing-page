@@ -1,4 +1,3 @@
-import { buildSubmitMessageBody } from "@/lib/chat/api";
 
 /** 预置问题：点击即可发送 */
 export const PRESET_QUESTIONS = [
@@ -10,7 +9,3 @@ export const PRESET_QUESTIONS = [
   },
 ] as const;
 
-/** 根据会话 resourceId 与用户输入文本构建请求体 */
-export function buildChatBody(text: string): Record<string, unknown> {
-  return buildSubmitMessageBody({ text });
-}

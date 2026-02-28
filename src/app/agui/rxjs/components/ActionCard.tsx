@@ -11,25 +11,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { buildChatBody, PRESET_QUESTIONS } from "../constants";
+import { buildSubmitMessageBody } from "@/lib/chat/api";
+import { PRESET_QUESTIONS } from "../constants";
 
 type ActionCardProps = {
-  resourceId: string;
+  threadId: string;
   messageId: string | null;
   loading: boolean;
   onSend: (body: Record<string, unknown>) => void;
 };
 
-export function ActionCard({ messageId, loading, onSend }: ActionCardProps) {
+export function ActionCard({
+  threadId,
+  messageId,
+  loading,
+  onSend,
+}: ActionCardProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleSendText = useCallback(
     (text: string) => {
       const t = text.trim();
       if (!t || loading) return;
-      onSend(buildChatBody(t));
+      onSend(buildSubmitMessageBody({ threadId, text: t }));
     },
-    [loading, onSend],
+    [loading, onSend, threadId],
   );
 
   const handleSubmit = useCallback(

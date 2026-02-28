@@ -1,3 +1,4 @@
+import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { Memory } from "@mastra/memory";
 import { z } from "zod";
 import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
@@ -13,13 +14,7 @@ export const threadRouter = router({
   list: publicProcedure.query(async () => {
     const memory = await getMemory();
     const { threads } = await memory.listThreads({ perPage: false });
-    return threads.map((t) => ({
-      id: t.id,
-      resourceId: t.resourceId,
-      title: t.title,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt,
-    }));
+    return threads;
   }),
 
   create: publicProcedure.mutation(async () => {
@@ -71,5 +66,22 @@ export const threadRouter = router({
       const memory = await getMemory();
       await memory.deleteThread(input.threadId);
       return { success: true };
+    }),
+
+  detailMessages: publicProcedure
+    .input(z.object({ threadId: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const memory = await getMemory();
+      let response: { messages?: unknown[] } | null = null;
+      try {
+        response = await memory.recall({
+          threadId: input.threadId,
+          resourceId: RESOURCE_ID,
+        });
+      } catch {
+        console.log("No previous messages found.");
+      }
+      const messages = response?.messages ?? [];
+      return toAISdkV5Messages(messages as Parameters<typeof toAISdkV5Messages>[0]);
     }),
 });
