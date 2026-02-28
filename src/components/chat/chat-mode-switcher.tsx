@@ -10,10 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type Mode = "agent" | "copilot" | "rxjs";
+type Mode = "agent" | "copilot";
 
 function getCurrentMode(pathname: string): Mode {
-  if (pathname.startsWith("/agui/rxjs")) return "rxjs";
   if (pathname.startsWith("/agui")) return "copilot";
   return "agent";
 }
@@ -63,7 +62,6 @@ export function ChatModeSwitcher() {
           <SelectItem value="home">Home</SelectItem>
           <SelectItem value="agent">AISDK (Agent 主线)</SelectItem>
           <SelectItem value="copilot">CopilotKit</SelectItem>
-          <SelectItem value="rxjs">RxJS Stream</SelectItem>
         </SelectContent>
       </Select>
     </div>

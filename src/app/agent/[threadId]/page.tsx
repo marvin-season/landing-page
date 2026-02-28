@@ -18,8 +18,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { useTRPC } from "@/lib/trpc";
-import { ActionCard } from "../components/ActionCard";
-import { ResponseSection } from "../components/ResponseSection";
+import { ActionCard } from "../_components/ActionCard";
+import { ResponseSection } from "../_components/ResponseSection";
 
 function extractUserText(body: Record<string, unknown>): string {
   const messages = Array.isArray(body.messages) ? body.messages : [];
@@ -84,7 +84,7 @@ export default function RxjsResourcePage() {
             variant="outline"
             size="sm"
             className="gap-1.5 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
-            onClick={() => router.push("/agui/rxjs")}
+            onClick={() => router.back()}
           >
             <ArrowLeft className="size-4" aria-hidden />
             返回会话列表

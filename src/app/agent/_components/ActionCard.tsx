@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { buildSubmitMessageBody } from "@/lib/chat/api";
-import { PRESET_QUESTIONS } from "../constants";
+import { PRESET_QUESTIONS } from "../_constant/constants";
 
 type ActionCardProps = {
   threadId: string;

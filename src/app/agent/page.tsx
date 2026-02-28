@@ -38,7 +38,7 @@ export default function RxjsPage() {
     onSuccess: (data) => {
       refetch();
       const threadId = data.thread?.id;
-      if (threadId) router.push(`/agui/rxjs/${threadId}`);
+      if (threadId) router.push(`/agent/${threadId}`);
     },
   });
 
@@ -90,7 +90,7 @@ export default function RxjsPage() {
   );
 
   const goTo = useCallback(
-    (threadId: string) => router.push(`/agui/rxjs/${threadId}`),
+    (threadId: string) => router.push(`/agent/${threadId}`),
     [router],
   );
 
