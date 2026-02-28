@@ -63,7 +63,7 @@ export const useMessageStore = create<IMessageStore>()(
 export function useCurrentMessages(sessionId: string) {
   const { data: messages, refetch } = useQuery<UIMessage[]>({
     queryKey: ["messages", sessionId],
-    queryFn: async () => fetchChatHistory({ resourceId: sessionId }),
+    queryFn: async () => fetchChatHistory({ threadId: sessionId }),
     enabled: !!sessionId,
     staleTime: 15_000,
     gcTime: 5 * 60_000,

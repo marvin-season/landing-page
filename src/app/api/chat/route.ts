@@ -2,9 +2,9 @@ import { handleChatStream } from "@mastra/ai-sdk";
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
-import { mastra } from "$";
-import { AGENT_ID, RESOURCE_ID } from "$/constant";
-import { resolveStr } from "$/lib/resolve";
+import { mastra } from "~/mastra-server";
+import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
+import { resolveStr } from "~/mastra-server/lib/resolve";
 
 export async function POST(req: Request) {
   const params = await req.json();

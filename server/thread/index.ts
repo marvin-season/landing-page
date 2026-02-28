@@ -1,7 +1,7 @@
 import { Memory } from "@mastra/memory";
 import { z } from "zod";
-import { AGENT_ID, RESOURCE_ID } from "$/constant";
-import { mastra } from "$";
+import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
+import { mastra } from "~/mastra-server";
 import { publicProcedure, router } from "~/server/trpc";
 
 async function getMemory(): Promise<Memory> {

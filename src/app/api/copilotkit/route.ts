@@ -8,8 +8,8 @@ import {
 } from "@copilotkit/runtime";
 import type { NextRequest } from "next/server";
 
-import { mastra } from "$";
-import { RESOURCE_ID } from "$/constant";
+import { mastra } from "~/mastra-server";
+import { RESOURCE_ID } from "~/mastra-server/constant";
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
 const mastraAgents = MastraAgent.getLocalAgents({

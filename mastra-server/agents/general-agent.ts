@@ -1,6 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
-import { AgentConstant } from "$/constant";
+import { AgentConstant } from "~/mastra-server/constant";
 import { sendEmailTool } from "../tools/email-tool";
 import { stockQuoteTool } from "../tools/stock-tool";
 import { weatherTool } from "../tools/weather-tool";

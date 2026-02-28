@@ -1,6 +1,6 @@
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
-import { AgentConstant } from "$/constant";
+import { AgentConstant } from "~/mastra-server/constant";
 
 const forecastSchema = z.object({
   date: z.string(),

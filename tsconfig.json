@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -22,8 +23,8 @@
       "@/*": ["./src/*"],
       "~/*": ["./*"],
       "@app/*": ["./src/app/[lang]/*"],
-      "$": ["./mastra"],
-      "$/*": ["./mastra/*"]
+      "$": ["mastra-server"],
+      "$/*": ["mastra-server/*"]
     }
   },
   "include": [
