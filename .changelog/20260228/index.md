@@ -1,4 +1,18 @@
-# thread API 与 rxjs 会话页完全重写、thread CRUD 迁移至 tRPC、mastra 迁至根目录与常量整理、chat 历史拉取迁移至 detailMessages
+# thread API 与 rxjs 会话页完全重写、agent 页 UI 重设计、dayjs 时间格式化、thread CRUD 迁移至 tRPC
+
+## AgentSidebar 时间格式化改用 dayjs
+- **文件**: `src/app/agent/_components/AgentSidebar.tsx`，`package.json`
+- **修改内容**: 移除自定义 `fmtRelative`，改为使用 dayjs 的 `relativeTime` 插件与 `zh-cn` 语言包，`dayjs(date).fromNow()` 展示相对时间。
+- **原因/上下文**: 用户要求格式化时间使用 dayjs。
+
+## agent 页 UI 重设计（参考主流 Agent 应用）
+- **文件**: `src/app/agent/page.tsx`，`src/app/agent/layout.tsx`，`src/app/agent/[threadId]/page.tsx`，新建 `src/app/agent/_components/AgentSidebar.tsx`
+- **修改内容**:
+  - 新建 AgentSidebar：侧边栏展示会话列表，支持新建、重命名、删除，桌面端固定左侧，移动端通过 Sheet 抽屉触发；使用 sidebar 主题变量。
+  - 更新 agent layout：侧边栏 + 主内容区域 flex 布局，移动端顶部 header 含菜单按钮打开会话列表。
+  - page.tsx 重设计为 ChatGPT/Claude 风格空态：居中欢迎文案、Sparkles 图标、 prominent「新建对话」按钮、预置问题快捷入口。
+  - [threadId]/page 移除「返回会话列表」按钮，由侧边栏提供导航；主区域布局精简。
+- **原因/上下文**: 用户要求参考主流 agent 应用（ChatGPT、Claude、Cursor）重新设计 agent 页 UI。
 
 ## chat 历史拉取迁移至 thread.detailMessages
 - **文件**: `server/thread/index.ts`，`src/app/agui/rxjs/[threadId]/page.tsx`，`src/app/api/chat/route.ts`，`src/store/message-store.ts`，`src/lib/chat/api.ts`
