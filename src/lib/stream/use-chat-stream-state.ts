@@ -13,7 +13,9 @@ import {
  * 流式对话 Hook
  * @param url 接口地址
  */
-export function useChatStreamState(url: string) {
+export function useChatStreamState(url: string, options : { onComplete?: () => void, onError?: (error: string) => void }) {
+
+  const { onComplete } = options;
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +42,15 @@ export function useChatStreamState(url: string) {
           setLoading(false);
         },
         complete: () => {
-          setState((s) => flushChatStreamState(s));
+          setState(s => flushChatStreamState(s));
           setLoading(false);
           subscriptionRef.current = null;
+          onComplete?.();
         },
       });
       subscriptionRef.current = sub;
     },
-    [url],
+    [url, onComplete],
   );
 
   const stop = useCallback(() => {

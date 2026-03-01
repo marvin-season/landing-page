@@ -107,7 +107,7 @@ function ThreadListContent({
     <div className={cn("flex h-full flex-col", className)}>
       <div className="shrink-0 p-3">
         <Button
-          className="w-full justify-start gap-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+          className="w-full justify-center gap-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
           onClick={handleNewChat}
           disabled={createMutation.isPending}
         >

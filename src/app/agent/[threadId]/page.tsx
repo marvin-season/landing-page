@@ -5,7 +5,6 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useCallback } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -24,23 +23,24 @@ export default function AgentThreadPage() {
   const trpc = useTRPC();
   const threadId = params.threadId as string;
 
-  const { data: historyMessages = [], isLoading: historyLoading } = useQuery({
+  const {
+    data: historyMessages = [],
+    isLoading: historyLoading,
+    refetch: refetchHistory,
+  } = useQuery({
     ...trpc.thread.detailMessages.queryOptions({ threadId }),
     staleTime: 0,
     refetchOnWindowFocus: false,
     enabled: !!threadId,
   });
 
-  const { state, send, loading, error, userState } =
-    useChatStreamState("/api/chat");
-  const { messageId, blocks, streamingText, streamingTool } = state;
-
-  const handleSend = useCallback(
-    ({ text }: { text: string }) => {
-      send({ text, threadId });
+  const { state, send, loading, error, userState } = useChatStreamState(
+    "/api/chat",
+    {
+      onComplete: refetchHistory,
     },
-    [send, threadId],
   );
+  const { messageId, blocks, streamingText, streamingTool } = state;
 
   if (!threadId) {
     return (
@@ -73,19 +73,20 @@ export default function AgentThreadPage() {
                   <MessageItem key={message.id} m={message} />
                 ))
               )}
-              {userState.pendingUserMessage != null && (
+              {loading && userState.pendingUserMessage != null && (
                 <ChatMessageShell role="user">
                   <div className="wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                     <Markdown>{userState.pendingUserMessage}</Markdown>
                   </div>
                 </ChatMessageShell>
               )}
-
-              <ResponseSection
-                blocks={blocks}
-                streamingTool={streamingTool}
-                streamingText={streamingText}
-              />
+              {loading && (
+                <ResponseSection
+                  blocks={blocks}
+                  streamingTool={streamingTool}
+                  streamingText={streamingText}
+                />
+              )}
             </ConversationContent>
           </Conversation>
         </div>
@@ -94,7 +95,7 @@ export default function AgentThreadPage() {
           <ActionCard
             messageId={messageId}
             loading={loading}
-            onSend={handleSend}
+            onSend={({ text }) => send({ text, threadId })}
           />
         </div>
       </div>
