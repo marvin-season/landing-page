@@ -12,10 +12,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="h-dvh overflow-hidden">
         <TankQueryClientProvider>
-          <ChatModeSwitcher />
           <div className="flex h-full flex-col md:flex-row">
             <AgentSidebar />
             <main className="min-h-0 min-w-0 flex-1 overflow-auto md:flex-1">
+              <ChatModeSwitcher />
+
               {children}
             </main>
           </div>

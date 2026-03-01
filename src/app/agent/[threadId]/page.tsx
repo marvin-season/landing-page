@@ -91,7 +91,7 @@ export default function AgentThreadPage() {
           </Conversation>
         </div>
 
-        <div className="sticky bottom-0 shrink-0 border-t border-border/80 bg-background/95 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
+        <div className="sticky bottom-0 shrink-0 bg-background/95 pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
           <ActionCard
             messageId={messageId}
             loading={loading}

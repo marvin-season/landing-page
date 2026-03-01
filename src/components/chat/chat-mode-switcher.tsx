@@ -30,7 +30,7 @@ export function ChatModeSwitcher() {
   const currentNav = navs.find((nav) => pathname.startsWith(nav.href));
   if (!currentNav) return null;
   return (
-    <div className="fixed right-4 top-4 z-50">
+    <div className="">
       <Select
         defaultValue={currentNav?.href}
         onValueChange={(value) => {
