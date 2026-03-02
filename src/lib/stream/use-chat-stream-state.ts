@@ -9,7 +9,6 @@ import {
   initialChatStreamState,
 } from "./chat-stream-state";
 
-
 export function useChatStreamState(options: {
   onComplete?: () => void;
   onError?: (error: string) => void;
