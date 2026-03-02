@@ -13,3 +13,8 @@
   - Chat API POST：从 session 取 resourceId（session.user.id），未登录返回 401。
   - Agent 区域：layout 内服务端 auth() 鉴权，未登录重定向到 `/auth/signin?callbackUrl=/agent`；auth 布局用 SessionProvider 包裹，登录页使用 credentials 输入 userId 登录。
 - **原因/上下文**: 用户要求集成 Auth.js，并用当前用户的 userId 替代 RESOURCE_ID；仅针对 `src/app/agent` 与相关 API（chat、thread），未改动 agui 与 copilotkit。
+
+## 修复 /auth/signin 的 useSearchParams Suspense 报错
+- **文件**: [src/app/auth/signin/page.tsx](../../src/app/auth/signin/page.tsx)
+- **修改内容**: 将使用 `useSearchParams()` 的 UI 抽成 `SignInContent`，新增 `SignInFallback` 作为加载态；默认导出 `SignInPage` 用 `<Suspense fallback={<SignInFallback />}>` 包裹 `<SignInContent />`。
+- **原因/上下文**: Next.js 静态生成时要求 `useSearchParams()` 必须在 Suspense 边界内，否则会报错并导致 build 失败。

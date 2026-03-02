@@ -2,11 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function SignInPage() {
+function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl =
     searchParams.get("callbackUrl") ?? searchParams.get("from") ?? "/agent";
@@ -84,5 +84,26 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function SignInFallback() {
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center px-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">登录</h1>
+          <p className="mt-2 text-sm text-muted-foreground">加载中…</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<SignInFallback />}>
+      <SignInContent />
+    </Suspense>
   );
 }
