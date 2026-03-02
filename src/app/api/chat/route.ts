@@ -1,10 +1,17 @@
 import { handleChatStream } from "@mastra/ai-sdk";
 import { createUIMessageStreamResponse } from "ai";
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { mastra } from "~/mastra-server";
-import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
+import { AGENT_ID } from "~/mastra-server/constant";
 
 export async function POST(req: Request) {
+  const session = await auth();
+  const resourceId = session?.user?.id;
+  if (!resourceId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const params = await req.json();
 
   const { threadId } = params;
@@ -15,7 +22,6 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const resourceId = RESOURCE_ID;
 
   const agentId = AGENT_ID;
   const stream = await handleChatStream({

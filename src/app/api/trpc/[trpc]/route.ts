@@ -7,7 +7,8 @@ function handler(req: Request) {
     endpoint: "/api/trpc",
     req,
     router: appRouter,
-    createContext: async () => await createTRPCContext(req),
+    createContext: async () =>
+      await createTRPCContext({ headers: req.headers }),
     onError: ({ path, error }) => {
       console.error(
         `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,

@@ -2,8 +2,8 @@ import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import type { Memory } from "@mastra/memory";
 import { z } from "zod";
 import { mastra } from "~/mastra-server";
-import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
-import { publicProcedure, router } from "~/server/trpc";
+import { AGENT_ID } from "~/mastra-server/constant";
+import { protectedProcedure, router } from "~/server/trpc";
 
 async function getMemory(): Promise<Memory> {
   const m = await mastra.getAgentById(AGENT_ID).getMemory();
@@ -11,18 +11,21 @@ async function getMemory(): Promise<Memory> {
 }
 
 export const threadRouter = router({
-  list: publicProcedure.query(async () => {
+  list: protectedProcedure.query(async ({ ctx }) => {
     const memory = await getMemory();
-    const { threads } = await memory.listThreads({ perPage: false, filter: { resourceId: RESOURCE_ID } });
+    const { threads } = await memory.listThreads({
+      perPage: false,
+      filter: { resourceId: ctx.userId },
+    });
     return threads;
   }),
 
-  create: publicProcedure.mutation(async () => {
+  create: protectedProcedure.mutation(async ({ ctx }) => {
     const memory = await getMemory();
     const threadId = crypto.randomUUID();
     const title = "会话";
     const created = await memory.createThread({
-      resourceId: RESOURCE_ID,
+      resourceId: ctx.userId,
       threadId,
       title,
     });
@@ -30,7 +33,7 @@ export const threadRouter = router({
     return { thread: { ...created, id } };
   }),
 
-  update: publicProcedure
+  update: protectedProcedure
     .input(
       z.object({
         threadId: z.string().min(1),
@@ -60,7 +63,7 @@ export const threadRouter = router({
       };
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ threadId: z.string().min(1) }))
     .mutation(async ({ input }) => {
       const memory = await getMemory();
@@ -68,15 +71,15 @@ export const threadRouter = router({
       return { success: true };
     }),
 
-  detailMessages: publicProcedure
+  detailMessages: protectedProcedure
     .input(z.object({ threadId: z.string().min(1) }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const memory = await getMemory();
       let response: { messages?: unknown[] } | null = null;
       try {
         response = await memory.recall({
           threadId: input.threadId,
-          resourceId: RESOURCE_ID,
+          resourceId: ctx.userId,
         });
       } catch {
         console.log("No previous messages found.");

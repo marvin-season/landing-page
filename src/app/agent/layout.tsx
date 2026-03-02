@@ -1,13 +1,19 @@
+import { redirect } from "next/navigation";
 import "@/css/globals.css";
 import { AgentSidebar } from "@/app/agent/_components/AgentSidebar";
+import { auth } from "@/auth";
 import { ChatModeSwitcher } from "@/components/chat/chat-mode-switcher";
 import TankQueryClientProvider from "@/components/trpc/provider";
 
-export default function RootLayout({
+export default async function AgentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/auth/signin?callbackUrl=/agent");
+  }
   return (
     <html lang="en">
       <body className="h-dvh overflow-hidden">
