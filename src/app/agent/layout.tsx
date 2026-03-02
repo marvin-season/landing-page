@@ -15,7 +15,6 @@ export default async function AgentLayout({
     redirect("/auth/signin?callbackUrl=/agent");
   }
 
-  console.log(session);
   return (
     <html lang="en">
       <body className="h-dvh overflow-hidden">

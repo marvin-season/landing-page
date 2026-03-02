@@ -51,12 +51,17 @@ export default function SignInPage() {
         </div>
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-2">
-            <label htmlFor="userId">User ID</label>
+            <label
+              htmlFor="userId"
+              className="text-sm font-medium text-gray-400"
+            >
+              User ID
+            </label>
             <Input
               id="userId"
               name="userId"
               type="text"
-              placeholder="例如: user-1"
+              placeholder="例如: user-xxx (仅供测试)"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               disabled={isLoading}
@@ -70,7 +75,12 @@ export default function SignInPage() {
           </Button>
         </form>
         <p className="text-center text-xs text-muted-foreground">
-          登录后将以该 User ID 作为会话与记忆范围
+          * 注意：本 User ID 将作为资源 ID
+          用于会话与记忆范围，全系统可见并共享，仅供测试与开发用途，请勿输入真实身份、敏感或机密信息。
+          <br />
+          <span className="text-destructive">
+            数据不会加密存储，使用过程产生的数据也可能被用于调试分析。请严格避免泄露私密内容。
+          </span>
         </p>
       </div>
     </div>
