@@ -39,7 +39,7 @@ export default function AgentThreadPage() {
     null,
   );
 
-  const { state, send, loading, error } = useChatStreamState("/api/chat", {
+  const { state, send, loading, error } = useChatStreamState({
     onComplete: () => {
       setPendingUserMessage(null);
       refetchHistory();
@@ -102,7 +102,7 @@ export default function AgentThreadPage() {
             loading={loading}
             onSend={({ text }) => {
               setPendingUserMessage(text);
-              send({ text, threadId });
+              send({ text, threadId, url: "/api/chat" });
             }}
           />
         </div>

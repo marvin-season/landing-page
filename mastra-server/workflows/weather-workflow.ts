@@ -3,7 +3,6 @@ import { z } from "zod";
 import { AgentConstant } from "~/mastra-server/constant";
 import { weatherTool } from "~/mastra-server/tools/weather-tool";
 
-
 const fetchWeather = createStep(weatherTool);
 
 const planActivities = createStep({
@@ -98,6 +97,5 @@ const weatherWorkflow = createWorkflow({
   .then(fetchWeather)
   .then(planActivities)
   .commit();
-
 
 export { weatherWorkflow };

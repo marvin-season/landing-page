@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { buildSubmitMessageBody } from "@/lib/chat/api";
+import type { TInputParams } from "@/lib/stream/chat-stream";
 import {
   type ChatStreamState,
+  createChatStreamState,
   flushChatStreamState,
-  fromChatStreamState,
   initialChatStreamState,
 } from "./chat-stream-state";
 
@@ -13,10 +13,10 @@ import {
  * 流式对话 Hook
  * @param url 接口地址
  */
-export function useChatStreamState(
-  url: string,
-  options: { onComplete?: () => void; onError?: (error: string) => void },
-) {
+export function useChatStreamState(options: {
+  onComplete?: () => void;
+  onError?: (error: string) => void;
+}) {
   const { onComplete } = options;
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
@@ -24,17 +24,14 @@ export function useChatStreamState(
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
 
   const send = useCallback(
-    ({ text, threadId }: { text: string; threadId: string }) => {
+    (input: TInputParams) => {
       subscriptionRef.current?.unsubscribe();
       subscriptionRef.current = null;
 
       setError(null);
       setState(initialChatStreamState);
       setLoading(true);
-      const sub = fromChatStreamState(
-        url,
-        buildSubmitMessageBody({ threadId, text: text }),
-      ).subscribe({
+      const sub = createChatStreamState(input).subscribe({
         next: setState,
         error: (err) => {
           setError(err instanceof Error ? err.message : String(err));
@@ -49,7 +46,7 @@ export function useChatStreamState(
       });
       subscriptionRef.current = sub;
     },
-    [url, onComplete],
+    [onComplete],
   );
 
   const stop = useCallback(() => {

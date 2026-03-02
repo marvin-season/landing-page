@@ -1,7 +1,7 @@
 import type { UIMessageChunk } from "ai";
 import type { Observable } from "rxjs";
 import { scan } from "rxjs";
-import { fromChatStream } from "./chat-stream";
+import { createObservableStream, type TInputParams } from "./chat-stream";
 
 // ---------------------------------------------------------------------------
 // 内容块类型（用于 state.blocks）
@@ -218,13 +218,10 @@ export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
 }
 
 /** 创建状态流 Observable */
-export function fromChatStreamState(
-  url: string,
-  body: Record<string, unknown>,
+export function createChatStreamState(
+  input: TInputParams,
 ): Observable<ChatStreamState> {
-  return fromChatStream(url, body).pipe(
+  return createObservableStream(input).pipe(
     scan(reduceChatStreamEvent, initialChatStreamState),
   );
 }
-
-export { fromChatStream };
