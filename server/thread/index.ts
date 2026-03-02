@@ -13,7 +13,7 @@ async function getMemory(): Promise<Memory> {
 export const threadRouter = router({
   list: publicProcedure.query(async () => {
     const memory = await getMemory();
-    const { threads } = await memory.listThreads({ perPage: false });
+    const { threads } = await memory.listThreads({ perPage: false, filter: { resourceId: RESOURCE_ID } });
     return threads;
   }),
 
