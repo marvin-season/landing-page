@@ -10,33 +10,32 @@
 - ✅ [Biome](https://biomejs.dev/) for linting and formatting
 - ✅ [Lingui](https://lingui.dev/) for i18n and internationalization
 - ✅ [TRPC](https://trpc.io/) for API and data fetching
+- ✅ [React Query](https://tanstack.com/query/latest) for data fetching
+- ✅ [Mastra](https://mastra.ai/) for agent management [./mastra-server/README.md](./mastra-server/README.md)
+- ✅ [Agno](https://agno.ai/) for agent management [./agent/README.md](./agent/README.md)
+- ✅ [RXJS](https://rxjs.dev/) for reactive programming
 - ✅ [Zustand](https://zustand-demo.pmnd.rs/) for state management
 - ✅ [`@antfu/ni@25.0.0`](https://github.com/antfu/ni) & `corepack enable` for package manager
 
-## Example
+## i18n support
 
-## i18n 
+[i18n support](./src/locales/README.md)
 
-i18n code example:
 
-```tsx
-import { Trans } from "@lingui/react/macro";
+## Quick Start
 
-<Trans>Hello, world!</Trans>
-```
-extract i18n messages:
 
+environment variables
 ```bash
-nr lingui:extract
-```
-manage i18n messages:
-```js
-// @src/locales/xx.po
-msgid "Hello, world!"
-msgstr "你好，世界！"
+cp .env.example .env.local
 ```
 
-for production, compile i18n messages:
+install dependencies
 ```bash
-nr lingui:compile
+nvm use v22.16.0 && corepack enable && npm install -g @antfu/ni@25.0.0 && ni
+```
+
+start the server
+```bash
+nr
 ```
