@@ -40,10 +40,7 @@ export default function AgentThreadPage() {
   );
 
   const { state, send, loading, error } = useChatStreamState({
-    onComplete: () => {
-      setPendingUserMessage(null);
-      refetchHistory();
-    },
+    onComplete: refetchHistory,
   });
   const { messageId, blocks, streamingText, streamingTool } = state;
 
