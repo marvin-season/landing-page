@@ -11,10 +11,6 @@ import {
 
 const navs = [
   {
-    label: "home",
-    href: "/",
-  },
-  {
     label: "agent",
     href: "/agent",
   },
@@ -22,23 +18,26 @@ const navs = [
     label: "copilot",
     href: "/agui",
   },
+  {
+    label: "home",
+    href: "/",
+  },
 ];
 
 export function ChatModeSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
-  const currentNav = navs.find((nav) => nav.href === pathname);
-
+  const currentNav = navs.find((nav) => pathname.startsWith(nav.href));
   if (!currentNav) return null;
   return (
-    <div className="fixed right-4 top-4 z-50">
+    <div className="">
       <Select
-        value={currentNav?.href}
+        defaultValue={currentNav?.href}
         onValueChange={(value) => {
           router.push(value);
         }}
       >
-        <SelectTrigger className="w-[190px] rounded-full border-border/80 bg-background/90 shadow-sm backdrop-blur">
+        <SelectTrigger className="w-[190px] border-border/80 bg-background/90 shadow-sm backdrop-blur">
           <SelectValue placeholder="选择模式" />
         </SelectTrigger>
         <SelectContent align="end">

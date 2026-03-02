@@ -82,6 +82,8 @@ export const threadRouter = router({
         console.log("No previous messages found.");
       }
       const messages = response?.messages ?? [];
-      return toAISdkV5Messages(messages as Parameters<typeof toAISdkV5Messages>[0]);
+      return toAISdkV5Messages(
+        messages as Parameters<typeof toAISdkV5Messages>[0],
+      );
     }),
 });

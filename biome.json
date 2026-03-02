@@ -7,7 +7,10 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["src/**/*.{ts,tsx,js,jsx,json,css}"]
+    "includes": [
+      "src/**/*.{ts,tsx,js,jsx,json,css}",
+      "{server,mastra-server}/**/*.{ts,js}"
+    ]
   },
   "formatter": {
     "enabled": true,

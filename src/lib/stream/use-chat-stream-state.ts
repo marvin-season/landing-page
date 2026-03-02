@@ -13,14 +13,16 @@ import {
  * 流式对话 Hook
  * @param url 接口地址
  */
-export function useChatStreamState(url: string) {
+export function useChatStreamState(
+  url: string,
+  options: { onComplete?: () => void; onError?: (error: string) => void },
+) {
+  const { onComplete } = options;
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
-  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
-    null,
-  );
+
   const send = useCallback(
     ({ text, threadId }: { text: string; threadId: string }) => {
       subscriptionRef.current?.unsubscribe();
@@ -29,7 +31,6 @@ export function useChatStreamState(url: string) {
       setError(null);
       setState(initialChatStreamState);
       setLoading(true);
-      setPendingUserMessage(text);
       const sub = fromChatStreamState(
         url,
         buildSubmitMessageBody({ threadId, text: text }),
@@ -43,11 +44,12 @@ export function useChatStreamState(url: string) {
           setState((s) => flushChatStreamState(s));
           setLoading(false);
           subscriptionRef.current = null;
+          onComplete?.();
         },
       });
       subscriptionRef.current = sub;
     },
-    [url],
+    [url, onComplete],
   );
 
   const stop = useCallback(() => {
@@ -56,5 +58,5 @@ export function useChatStreamState(url: string) {
     setLoading(false);
   }, []);
 
-  return { state, send, loading, error, stop, userState: { pendingUserMessage } };
+  return { state, send, loading, error, stop };
 }
