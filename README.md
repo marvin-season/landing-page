@@ -8,7 +8,7 @@
 - ✅ [React](https://react.dev/) 19.2 for UI
 - ✅ [TypeScript](https://www.typescriptlang.org/) 5 for type safety
 - ✅ [Biome](https://biomejs.dev/) for linting and formatting
-- ✅ [Lingui](https://lingui.dev/) for i18n and internationalization [i18n support](./src/locales/README.md)
+- ✅ [Lingui](https://lingui.dev/) for i18n and internationalization [i18n support](./docs/i18n.md)
 - ✅ [TRPC](https://trpc.io/) for API and data fetching
 - ✅ [React Query](https://tanstack.com/query/latest) for data fetching
 - ✅ [Mastra](https://mastra.ai/) for agent management [./mastra-server/README.md](./mastra-server/README.md)
