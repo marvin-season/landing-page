@@ -1,8 +1,8 @@
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
-import { Memory } from "@mastra/memory";
+import type { Memory } from "@mastra/memory";
 import { z } from "zod";
-import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
 import { mastra } from "~/mastra-server";
+import { AGENT_ID, RESOURCE_ID } from "~/mastra-server/constant";
 import { publicProcedure, router } from "~/server/trpc";
 
 async function getMemory(): Promise<Memory> {
