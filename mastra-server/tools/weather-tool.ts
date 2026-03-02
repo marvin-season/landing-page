@@ -49,11 +49,11 @@ const getWeather = async (location: string) => {
     // 开发环境返回mock数据
     if (process.env.NODE_ENV === "development") {
       return {
-        temperature: 100,
-        feelsLike: 1,
-        humidity: 0,
-        windSpeed: 1,
-        windGust: 1,
+        temperature: 26,
+        feelsLike: 28,
+        humidity: 40,
+        windSpeed: 10,
+        windGust: 15,
         conditions: "Sunny",
         location: location,
       };
