@@ -1,20 +1,11 @@
 import type { UIMessageChunk } from "ai";
 import { Observable } from "rxjs";
-import { buildSubmitMessageBody } from "@/lib/chat/api";
-
-export type TInputParams = {
-  url: string;
-  text: string;
-  threadId: string;
-};
 
 /** 将 SSE 流转换为 Observable（事件类型与 ai 包 UIMessageChunk 一致） */
-export function createObservableStream({
-  url,
-  text,
-  threadId,
-}: TInputParams): Observable<UIMessageChunk> {
-  const body = buildSubmitMessageBody({ threadId, text });
+export function createObservableStream(
+  url: string,
+  body: any,
+): Observable<UIMessageChunk> {
   return new Observable((subscriber) => {
     let cancelled = false;
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;

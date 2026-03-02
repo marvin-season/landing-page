@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { TInputParams } from "@/lib/stream/chat-stream";
+import type { TInputParams } from "@/lib/stream/chat-stream-state";
 import {
   type ChatStreamState,
   createChatStreamState,
