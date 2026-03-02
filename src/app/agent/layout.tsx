@@ -14,12 +14,14 @@ export default async function AgentLayout({
   if (!session?.user?.id) {
     redirect("/auth/signin?callbackUrl=/agent");
   }
+
+  console.log(session);
   return (
     <html lang="en">
       <body className="h-dvh overflow-hidden">
         <TankQueryClientProvider>
           <div className="flex h-full flex-col md:flex-row">
-            <AgentSidebar />
+            <AgentSidebar user={session.user} />
             <main className="min-h-0 min-w-0 flex-1 overflow-auto md:flex-1">
               <ChatModeSwitcher />
 

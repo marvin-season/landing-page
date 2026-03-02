@@ -17,6 +17,11 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTRPC } from "@/lib/trpc";
@@ -257,7 +262,53 @@ function ThreadListContent({
   );
 }
 
-export function AgentSidebar() {
+type AgentSidebarProps = {
+  user?: { id: string; name?: string | null; email?: string | null };
+};
+
+function UserFooter({
+  user,
+  className,
+}: {
+  user: { id: string; name?: string | null; email?: string | null };
+  className?: string;
+}) {
+  const displayName = user.name || user.email || user.id || "用户";
+  return (
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground",
+            className,
+          )}
+        >
+          <span className="min-w-0 flex-1 truncate">{displayName}</span>
+        </button>
+      </HoverCardTrigger>
+      <HoverCardContent side="top" align="start" className="w-56">
+        <div className="space-y-2">
+          <p className="text-sm font-medium leading-none">{displayName}</p>
+          {user.email ? (
+            <p className="text-xs text-muted-foreground">{user.email}</p>
+          ) : null}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          >
+            <LogOut className="size-4" />
+            退出登录
+          </Button>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+export function AgentSidebar({ user }: AgentSidebarProps) {
   const pathname = usePathname();
   const isAgentRoute = pathname.startsWith("/agent");
   const [open, setOpen] = useState(false);
@@ -268,14 +319,18 @@ export function AgentSidebar() {
         <ThreadListContent className="flex-1" />
       </div>
       <div className="shrink-0 border-t border-sidebar-border p-2">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-        >
-          <LogOut className="size-4" />
-          退出登录
-        </Button>
+        {user ? (
+          <UserFooter user={user} />
+        ) : (
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          >
+            <LogOut className="size-4" />
+            退出登录
+          </Button>
+        )}
       </div>
     </aside>
   );
@@ -296,14 +351,18 @@ export function AgentSidebar() {
             <ThreadListContent onItemClick={() => setOpen(false)} />
           </div>
           <div className="shrink-0 border-t border-sidebar-border p-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-              onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-            >
-              <LogOut className="size-4" />
-              退出登录
-            </Button>
+            {user ? (
+              <UserFooter user={user} />
+            ) : (
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+              >
+                <LogOut className="size-4" />
+                退出登录
+              </Button>
+            )}
           </div>
         </SheetContent>
       </Sheet>
