@@ -4,9 +4,17 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2, Menu, MessageSquarePlus, Pencil, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  LogOut,
+  Menu,
+  MessageSquarePlus,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,7 +112,7 @@ function ThreadListContent({
     null;
 
   return (
-    <div className={cn("flex h-full flex-col", className)}>
+    <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <div className="shrink-0 p-3">
         <Button
           className="w-full justify-center gap-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
@@ -256,7 +264,19 @@ export function AgentSidebar() {
 
   const sidebarContent = (
     <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
-      <ThreadListContent />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <ThreadListContent className="flex-1" />
+      </div>
+      <div className="shrink-0 border-t border-sidebar-border p-2">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+        >
+          <LogOut className="size-4" />
+          退出登录
+        </Button>
+      </div>
     </aside>
   );
 
@@ -270,9 +290,21 @@ export function AgentSidebar() {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="w-72 border-sidebar-border bg-sidebar p-0"
+          className="flex w-72 flex-col border-sidebar-border bg-sidebar p-0"
         >
-          <ThreadListContent onItemClick={() => setOpen(false)} />
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <ThreadListContent onItemClick={() => setOpen(false)} />
+          </div>
+          <div className="shrink-0 border-t border-sidebar-border p-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+              onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+            >
+              <LogOut className="size-4" />
+              退出登录
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
       <span className="ml-2 text-sm font-medium">Agent</span>
