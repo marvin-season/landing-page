@@ -9,10 +9,7 @@ import {
   initialChatStreamState,
 } from "./chat-stream-state";
 
-/**
- * 流式对话 Hook
- * @param url 接口地址
- */
+
 export function useChatStreamState(options: {
   onComplete?: () => void;
   onError?: (error: string) => void;
