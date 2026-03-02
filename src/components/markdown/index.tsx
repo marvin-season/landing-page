@@ -12,7 +12,7 @@ export default function Markdown(props: {
   return (
     <UnifiedMarkdown
       content={children}
-      className={cn("", className)}
+      className={cn("text-sm lg:text-base", className)}
       hasNextChunk={hasNextChunk}
     />
   );

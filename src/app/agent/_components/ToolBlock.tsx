@@ -41,14 +41,14 @@ export function ToolBlock({
   return (
     <Card
       className={cn(
-        "border-primary/20 bg-primary/5 shadow-sm transition-shadow",
-        isStreaming && "ring-1 ring-primary/30 shadow-md",
+        "border-primary/10 bg-primary/5 shadow-xs transition-shadow",
+        isStreaming && "ring-1 ring-primary/30 shadow-sm",
       )}
     >
       <Collapsible defaultOpen={false} className="group w-full">
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer select-none px-6 py-4 transition-colors hover:bg-muted/20">
-            <CardTitle className="flex flex-wrap items-center gap-2 text-sm font-medium uppercase tracking-wide text-primary">
+          <CardHeader className="cursor-pointer select-none px-5 py-3 transition-colors hover:bg-muted/20">
+            <CardTitle className="flex flex-wrap items-center gap-2 text-xs lg:text-sm font-medium uppercase tracking-wide text-primary">
               <ChevronDown
                 className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
                 aria-hidden

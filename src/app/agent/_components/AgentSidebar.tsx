@@ -142,7 +142,7 @@ function ThreadListContent({
               <li key={t.id}>
                 {editing === t.id ? (
                   <div
-                    className="flex items-center gap-1 rounded-lg bg-sidebar-accent/50 p-1.5"
+                    className="flex items-center gap-1 rounded-lg bg-sidebar-accent/50 py-1 px-1.5"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Input
