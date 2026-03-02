@@ -20,9 +20,7 @@ export function useChatStreamState(url: string, options : { onComplete?: () => v
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
-  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
-    null,
-  );
+
   const send = useCallback(
     ({ text, threadId }: { text: string; threadId: string }) => {
       subscriptionRef.current?.unsubscribe();
@@ -31,7 +29,6 @@ export function useChatStreamState(url: string, options : { onComplete?: () => v
       setError(null);
       setState(initialChatStreamState);
       setLoading(true);
-      setPendingUserMessage(text);
       const sub = fromChatStreamState(
         url,
         buildSubmitMessageBody({ threadId, text: text }),
@@ -59,5 +56,5 @@ export function useChatStreamState(url: string, options : { onComplete?: () => v
     setLoading(false);
   }, []);
 
-  return { state, send, loading, error, stop, userState: { pendingUserMessage } };
+  return { state, send, loading, error, stop};
 }

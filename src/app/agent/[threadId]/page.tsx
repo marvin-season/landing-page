@@ -5,6 +5,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -34,12 +35,16 @@ export default function AgentThreadPage() {
     enabled: !!threadId,
   });
 
-  const { state, send, loading, error, userState } = useChatStreamState(
-    "/api/chat",
-    {
-      onComplete: refetchHistory,
-    },
+  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(
+    null,
   );
+
+  const { state, send, loading, error } = useChatStreamState("/api/chat", {
+    onComplete: () => {
+      setPendingUserMessage(null);
+      refetchHistory();
+    },
+  });
   const { messageId, blocks, streamingText, streamingTool } = state;
 
   if (!threadId) {
@@ -73,10 +78,10 @@ export default function AgentThreadPage() {
                   <MessageItem key={message.id} m={message} />
                 ))
               )}
-              {loading && userState.pendingUserMessage != null && (
+              {loading && pendingUserMessage != null && (
                 <ChatMessageShell role="user">
                   <div className="wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                    <Markdown>{userState.pendingUserMessage}</Markdown>
+                    <Markdown>{pendingUserMessage}</Markdown>
                   </div>
                 </ChatMessageShell>
               )}
@@ -95,7 +100,10 @@ export default function AgentThreadPage() {
           <ActionCard
             messageId={messageId}
             loading={loading}
-            onSend={({ text }) => send({ text, threadId })}
+            onSend={({ text }) => {
+              setPendingUserMessage(text);
+              send({ text, threadId });
+            }}
           />
         </div>
       </div>
