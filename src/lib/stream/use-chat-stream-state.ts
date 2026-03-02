@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { TInputParams } from "@/lib/stream/chat-stream-state";
 import {
   type ChatStreamState,
-  createChatStreamState,
+  createObservableState,
   flushChatStreamState,
   initialChatStreamState,
 } from "./chat-stream-state";
@@ -31,7 +31,7 @@ export function useChatStreamState(options: {
       setError(null);
       setState(initialChatStreamState);
       setLoading(true);
-      const sub = createChatStreamState(input).subscribe({
+      const sub = createObservableState(input).subscribe({
         next: setState,
         error: (err) => {
           setError(err instanceof Error ? err.message : String(err));

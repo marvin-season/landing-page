@@ -225,7 +225,7 @@ export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
 }
 
 /** 创建状态流 Observable */
-export function createChatStreamState({
+export function createObservableState({
   url,
   text,
   threadId,
