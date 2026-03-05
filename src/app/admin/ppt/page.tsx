@@ -1,6 +1,5 @@
 "use client";
 
-import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { useMemo, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import { PptToolbar } from "./_components/ppt-toolbar";
 import SLIDES_DATA from "./data";
 import {
   type FabricSlideJSON,
-  fabricSlidesDocumentSchema,
   normalizeFabricSlideJSON,
 } from "./fabric-slide-schema";
 
@@ -26,27 +24,8 @@ export default function SimplePPTPlayer() {
     setActiveGeneratedPptId,
   } = usePptStore();
 
-  const {
-    object: streamedObject,
-    submit,
-    isLoading: isGenerating,
-    error,
-  } = useObject({
-    api: "/api/ppt",
-    schema: fabricSlidesDocumentSchema,
-    onFinish: ({ object }) => {
-      if (object?.slides) {
-        const preset = PRESETS.find((p) => p.id === presetId);
-        const slides = object.slides.map(normalizeFabricSlideJSON);
-        addGeneratedPpt({
-          slides,
-          presetId: preset?.id ?? "custom",
-          title: preset?.label ?? "未命名 PPT",
-        });
-        setDataSource("generated");
-      }
-    },
-  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const activeGeneratedPpt =
     activeGeneratedPptId == null
@@ -61,26 +40,62 @@ export default function SimplePPTPlayer() {
   }, [activeGeneratedPptId, dataSource, isGenerating]);
 
   const activeSlides = useMemo(() => {
-    if (isGenerating && streamedObject?.slides) {
-      // 过滤掉不完整的 slide（至少要有 objects 数组）
-      return streamedObject.slides
-        .filter((s) => s && Array.isArray(s.objects) && s.objects.length > 0)
-        .map((s) => normalizeFabricSlideJSON(s as FabricSlideJSON));
-    }
     return dataSource === "generated" && activeGeneratedPpt
       ? activeGeneratedPpt.slides
       : SLIDES_DATA;
-  }, [isGenerating, streamedObject, dataSource, activeGeneratedPpt]);
+  }, [dataSource, activeGeneratedPpt]);
 
   const onGenerate = async () => {
     const preset = PRESETS.find((p) => p.id === presetId);
     if (!preset) return;
 
-    submit({
-      topic: preset.topic,
-      slideCount: preset.slideCount,
-      tone: preset.tone,
-    });
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/ppt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topic: preset.topic,
+          slideCount: preset.slideCount,
+          tone: preset.tone,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        const message = data?.error ?? "生成 PPT 失败，请稍后重试。";
+        throw new Error(message);
+      }
+
+      const object = (await res.json()) as {
+        slides?: FabricSlideJSON[];
+      };
+
+      if (object?.slides) {
+        const presetConfig = PRESETS.find((p) => p.id === presetId);
+        const slides = object.slides.map(normalizeFabricSlideJSON);
+        addGeneratedPpt({
+          slides,
+          presetId: presetConfig?.id ?? "custom",
+          title: presetConfig?.label ?? "未命名 PPT",
+        });
+        setDataSource("generated");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("生成 PPT 失败，请稍后重试。"),
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
