@@ -12,9 +12,6 @@ import { pptAgent } from "./agents/ppt-agent";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 
 export const mastra = new Mastra({
-  bundler: {
-    externals: ["@copilotkit/runtime"],
-  },
   workflows: { weatherWorkflow },
   agents: {
     [AgentConstant.GENERAL_AGENT]: generalAgent,

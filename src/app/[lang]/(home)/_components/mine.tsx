@@ -18,12 +18,6 @@ export function Mine() {
       badge: "Core",
     },
     {
-      href: "/agui",
-      title: <Trans>CopilotKit Playground</Trans>,
-      description: <Trans>Copilot runtime route for agent chat testing</Trans>,
-      badge: "Copilot",
-    },
-    {
       href: "/resume",
       title: <Trans>About me in detail</Trans>,
       description: <Trans>Experience, projects, and personal profile</Trans>,

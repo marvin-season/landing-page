@@ -15,10 +15,6 @@ const navs = [
     href: "/agent",
   },
   {
-    label: "copilot",
-    href: "/agui",
-  },
-  {
     label: "home",
     href: "/",
   },
