@@ -45,14 +45,6 @@ msgstr "Building practical AI products with a strong focus on iteration speed an
 msgid "Career"
 msgstr "Career"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:23
-#~ msgid "Copilot runtime route for agent chat testing"
-#~ msgstr "Copilot runtime route for agent chat testing"
-
-#: src/app/[lang]/(home)/_components/mine.tsx:22
-#~ msgid "CopilotKit Playground"
-#~ msgstr "CopilotKit Playground"
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Created internationalization solution based on Vite and Babel"
@@ -257,6 +249,10 @@ msgstr "May 2025 - Present"
 msgid "My professional experience and skills"
 msgstr "My professional experience and skills"
 
+#: src/app/[lang]/(home)/_components/home-content.tsx:34
+msgid "Navigation"
+msgstr "Navigation"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
@@ -280,6 +276,10 @@ msgstr "Resume"
 #: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:48
+msgid "Sentences"
+msgstr "Sentences"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"

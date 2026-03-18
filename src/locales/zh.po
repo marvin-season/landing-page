@@ -45,14 +45,6 @@ msgstr "构建实用 AI 产品，专注于迭代速度和开发者体验。"
 msgid "Career"
 msgstr "职业经历"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:23
-#~ msgid "Copilot runtime route for agent chat testing"
-#~ msgstr "Copilot 运行时路由，用于智能体聊天测试"
-
-#: src/app/[lang]/(home)/_components/mine.tsx:22
-#~ msgid "CopilotKit Playground"
-#~ msgstr "CopilotKit 游乐场"
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
@@ -257,6 +249,10 @@ msgstr "2025 年 5 月 - 至今"
 msgid "My professional experience and skills"
 msgstr "我的专业经验和技术技能"
 
+#: src/app/[lang]/(home)/_components/home-content.tsx:34
+msgid "Navigation"
+msgstr "导航"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
@@ -280,6 +276,10 @@ msgstr "简历"
 #: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:48
+msgid "Sentences"
+msgstr "座右铭"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"

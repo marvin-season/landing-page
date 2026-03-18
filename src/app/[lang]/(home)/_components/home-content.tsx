@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import Image from "next/image";
 import { navLinks, profile, quotes } from "../data/home-data";
 import { NavCard, Quote, Section } from "./index";
@@ -30,7 +31,7 @@ export function HomeContent() {
         </p>
       </Section>
 
-      <Section title="Navigation" delay={0.1}>
+      <Section title={<Trans>Navigation</Trans>} delay={0.1}>
         <div className="grid gap-3 sm:grid-cols-2">
           {navLinks.map((item) => (
             <NavCard
@@ -44,7 +45,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section title="Sentences" delay={0.15}>
+      <Section title={<Trans>Sentences</Trans>} delay={0.15}>
         {quotes.map((quote, i) => (
           <Quote key={i}>{quote}</Quote>
         ))}
