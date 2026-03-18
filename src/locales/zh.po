@@ -21,15 +21,15 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:34
+#: src/app/[lang]/(home)/data/home-data.tsx:31
 msgid "A Simple PPT Generator"
 msgstr "一个简单的 PPT 生成器"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:28
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "About me in detail"
 msgstr "关于我的详细信息"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:19
 msgid "Agent UI"
 msgstr "智能体交互界面"
 
@@ -37,7 +37,7 @@ msgstr "智能体交互界面"
 msgid "AI PC"
 msgstr "AIPC"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:9
 msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
 msgstr "构建实用 AI 产品，专注于迭代速度和开发者体验。"
 
@@ -46,22 +46,22 @@ msgid "Career"
 msgstr "职业经历"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:23
-msgid "Copilot runtime route for agent chat testing"
-msgstr "Copilot 运行时路由，用于智能体聊天测试"
+#~ msgid "Copilot runtime route for agent chat testing"
+#~ msgstr "Copilot 运行时路由，用于智能体聊天测试"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:22
-msgid "CopilotKit Playground"
-msgstr "CopilotKit 游乐场"
+#~ msgid "CopilotKit Playground"
+#~ msgstr "CopilotKit 游乐场"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:95
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "设计不仅仅是外观，设计是功能。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:42
+#: src/app/[lang]/(home)/data/home-data.tsx:37
 msgid "Design System & Component Libs"
 msgstr "设计系统 & 组件库"
 
@@ -137,7 +137,7 @@ msgstr "高效"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "企业级 AI 应用一站式建设和管理平台，完全集成模型、数据、应用和计算能力。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:26
 msgid "Experience, projects, and personal profile"
 msgstr "工作经验、项目和个人简介"
 
@@ -145,7 +145,7 @@ msgstr "工作经验、项目和个人简介"
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:36
+#: src/app/[lang]/(home)/data/home-data.tsx:32
 msgid "Generate slide content in a structured workflow"
 msgstr "在结构化工作流中生成幻灯片内容"
 
@@ -241,11 +241,11 @@ msgstr "聚实惠"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:44
 msgid "Leveraging less data to generate greater insights."
 msgstr "利用更少的数据生成更大的洞察。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "Main chat flow powered by Mastra"
 msgstr "主要聊天流由 Mastra 提供支持"
 
@@ -277,11 +277,11 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:43
+#: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"
 msgstr "软件工程师"
 

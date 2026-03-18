@@ -21,15 +21,15 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:34
+#: src/app/[lang]/(home)/data/home-data.tsx:31
 msgid "A Simple PPT Generator"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:28
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "About me in detail"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:19
 msgid "Agent UI"
 msgstr ""
 
@@ -37,7 +37,7 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:9
 msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
 msgstr ""
 
@@ -46,22 +46,22 @@ msgid "Career"
 msgstr ""
 
 #: src/app/[lang]/(home)/_components/mine.tsx:23
-msgid "Copilot runtime route for agent chat testing"
-msgstr ""
+#~ msgid "Copilot runtime route for agent chat testing"
+#~ msgstr ""
 
 #: src/app/[lang]/(home)/_components/mine.tsx:22
-msgid "CopilotKit Playground"
-msgstr ""
+#~ msgid "CopilotKit Playground"
+#~ msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:95
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:42
+#: src/app/[lang]/(home)/data/home-data.tsx:37
 msgid "Design System & Component Libs"
 msgstr ""
 
@@ -137,7 +137,7 @@ msgstr ""
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:26
 msgid "Experience, projects, and personal profile"
 msgstr ""
 
@@ -145,7 +145,7 @@ msgstr ""
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:36
+#: src/app/[lang]/(home)/data/home-data.tsx:32
 msgid "Generate slide content in a structured workflow"
 msgstr ""
 
@@ -241,11 +241,11 @@ msgstr ""
 msgid "Key Responsibilities"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:44
 msgid "Leveraging less data to generate greater insights."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "Main chat flow powered by Mastra"
 msgstr ""
 
@@ -277,11 +277,11 @@ msgstr ""
 msgid "Resume"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:43
+#: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"
 msgstr ""
 

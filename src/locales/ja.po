@@ -21,15 +21,15 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/mine.tsx:34
+#: src/app/[lang]/(home)/data/home-data.tsx:31
 msgid "A Simple PPT Generator"
 msgstr "シンプルなPPTジェネレーター"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:28
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "About me in detail"
 msgstr "詳細な自己紹介"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:19
 msgid "Agent UI"
 msgstr "エージェントUI"
 
@@ -37,7 +37,7 @@ msgstr "エージェントUI"
 msgid "AI PC"
 msgstr "AI PC"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:9
 msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
 msgstr "反復速度と開発者体験に重点を置いた実用的なAI製品の構築。"
 
@@ -46,22 +46,22 @@ msgid "Career"
 msgstr "キャリア"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:23
-msgid "Copilot runtime route for agent chat testing"
-msgstr "エージェントチャットテストのためのCopilotランタイムルート"
+#~ msgid "Copilot runtime route for agent chat testing"
+#~ msgstr "エージェントチャットテストのためのCopilotランタイムルート"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:22
-msgid "CopilotKit Playground"
-msgstr "CopilotKitプレイグラウンド"
+#~ msgid "CopilotKit Playground"
+#~ msgstr "CopilotKitプレイグラウンド"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:95
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "デザインは見た目だけではありません。デザインはどのように機能するかです。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:42
+#: src/app/[lang]/(home)/data/home-data.tsx:37
 msgid "Design System & Component Libs"
 msgstr "デザインシステムとコンポーネントライブラリ"
 
@@ -137,7 +137,7 @@ msgstr "有効"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:26
 msgid "Experience, projects, and personal profile"
 msgstr "経験、プロジェクト、および個人プロフィール"
 
@@ -145,7 +145,7 @@ msgstr "経験、プロジェクト、および個人プロフィール"
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:36
+#: src/app/[lang]/(home)/data/home-data.tsx:32
 msgid "Generate slide content in a structured workflow"
 msgstr "構造化ワークフローでスライドコンテンツを生成"
 
@@ -241,11 +241,11 @@ msgstr "Jushihui"
 msgid "Key Responsibilities"
 msgstr "主要責任"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:44
 msgid "Leveraging less data to generate greater insights."
 msgstr "より少ないデータでより大きな洞察を生成する。"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastraによるメインチャットフロー"
 
@@ -277,11 +277,11 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 msgid "Resume"
 msgstr "履歴書"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:43
+#: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"
 msgstr "ソフトウェアエンジニア"
 

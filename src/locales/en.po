@@ -21,15 +21,15 @@ msgstr ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadc
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "A comprehensive overview of my work experience, projects, and technical expertise."
 
-#: src/app/[lang]/(home)/_components/mine.tsx:34
+#: src/app/[lang]/(home)/data/home-data.tsx:31
 msgid "A Simple PPT Generator"
 msgstr "A Simple PPT Generator"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:28
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "About me in detail"
 msgstr "About me in detail"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:19
 msgid "Agent UI"
 msgstr "Agent UI"
 
@@ -37,7 +37,7 @@ msgstr "Agent UI"
 msgid "AI PC"
 msgstr "AI PC"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:9
 msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
 msgstr "Building practical AI products with a strong focus on iteration speed and developer experience."
 
@@ -46,22 +46,22 @@ msgid "Career"
 msgstr "Career"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:23
-msgid "Copilot runtime route for agent chat testing"
-msgstr "Copilot runtime route for agent chat testing"
+#~ msgid "Copilot runtime route for agent chat testing"
+#~ msgstr "Copilot runtime route for agent chat testing"
 
 #: src/app/[lang]/(home)/_components/mine.tsx:22
-msgid "CopilotKit Playground"
-msgstr "CopilotKit Playground"
+#~ msgid "CopilotKit Playground"
+#~ msgstr "CopilotKit Playground"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Created internationalization solution based on Vite and Babel"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:95
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "Design is not just what it looks like. Design is how it works."
 
-#: src/app/[lang]/(home)/_components/mine.tsx:42
+#: src/app/[lang]/(home)/data/home-data.tsx:37
 msgid "Design System & Component Libs"
 msgstr "Design System & Component Libs"
 
@@ -137,7 +137,7 @@ msgstr "effective"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
-#: src/app/[lang]/(home)/_components/mine.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:26
 msgid "Experience, projects, and personal profile"
 msgstr "Experience, projects, and personal profile"
 
@@ -145,7 +145,7 @@ msgstr "Experience, projects, and personal profile"
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:36
+#: src/app/[lang]/(home)/data/home-data.tsx:32
 msgid "Generate slide content in a structured workflow"
 msgstr "Generate slide content in a structured workflow"
 
@@ -241,11 +241,11 @@ msgstr "Jushihui"
 msgid "Key Responsibilities"
 msgstr "Key Responsibilities"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:44
 msgid "Leveraging less data to generate greater insights."
 msgstr "Leveraging less data to generate greater insights."
 
-#: src/app/[lang]/(home)/_components/mine.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "Main chat flow powered by Mastra"
 msgstr "Main chat flow powered by Mastra"
 
@@ -277,11 +277,11 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 msgid "Resume"
 msgstr "Resume"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:43
+#: src/app/[lang]/(home)/data/home-data.tsx:38
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
-#: src/app/[lang]/(home)/_components/mine.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:7
 msgid "Software Engineer"
 msgstr "Software Engineer"
 
