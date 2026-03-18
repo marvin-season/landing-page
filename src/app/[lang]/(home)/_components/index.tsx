@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
+import { MotionSection } from "@/components/ui/motion/motion-section";
 
 const getMotionProps = (delay: number = 0) => ({
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  initial: { opacity: 0, y: 2 },
+  animate: { opacity: 1, y: 0 },
   transition: { duration: 0.5, delay },
 });
 
@@ -39,7 +40,7 @@ export function NavCard(props: {
 export function Section({
   children,
   title,
-  delay = 0,
+  delay = 0.05,
   className,
 }: {
   children: React.ReactNode;
@@ -48,8 +49,9 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section
+    <MotionSection
       className={`mb-8 flex flex-col gap-3 rounded-md ${className ?? ""}`}
+      {...getMotionProps(delay - 0.05)}
     >
       <MotionDiv
         className="select-none text-xl font-bold"
@@ -63,7 +65,7 @@ export function Section({
       >
         {children}
       </MotionDiv>
-    </section>
+    </MotionSection>
   );
 }
 

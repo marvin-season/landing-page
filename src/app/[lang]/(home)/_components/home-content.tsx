@@ -8,7 +8,9 @@ export function HomeContent() {
       <Section
         title={
           <div className="flex items-center gap-3">
-            <span className="select-none text-2xl font-bold">{profile.name}</span>
+            <span className="select-none text-2xl font-bold">
+              {profile.name}
+            </span>
             <Image
               unoptimized
               src={profile.avatar}
@@ -19,7 +21,7 @@ export function HomeContent() {
             />
           </div>
         }
-        className="rounded-2xl border border-border/70 bg-card/70 p-6 shadow-sm"
+        className="bg-card/70 p-6 shadow-sm"
       >
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
           {profile.title}
@@ -28,7 +30,7 @@ export function HomeContent() {
         </p>
       </Section>
 
-      <Section title="Navigation" delay={0.05}>
+      <Section title="Navigation" delay={0.1}>
         <div className="grid gap-3 sm:grid-cols-2">
           {navLinks.map((item) => (
             <NavCard
@@ -42,7 +44,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section title="Sentences" delay={0.1}>
+      <Section title="Sentences" delay={0.15}>
         {quotes.map((quote, i) => (
           <Quote key={i}>{quote}</Quote>
         ))}
