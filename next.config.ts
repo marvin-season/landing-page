@@ -1,13 +1,12 @@
 import type { NextConfig } from "next";
 import type { TurbopackRuleConfigCollection } from "next/dist/server/config-shared";
 
-
 const rules: Record<string, TurbopackRuleConfigCollection> = {
   "*.po": {
-      loaders: ["@lingui/loader"],
-      as: "*.js",
-    }
-}
+    loaders: ["@lingui/loader"],
+    as: "*.js",
+  },
+};
 
 const nextConfig: NextConfig = {
   /* config options here */

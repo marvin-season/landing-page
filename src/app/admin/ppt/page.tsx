@@ -66,9 +66,9 @@ export default function SimplePPTPlayer() {
       });
 
       if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as
-          | { error?: string }
-          | null;
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
         const message = data?.error ?? "生成 PPT 失败，请稍后重试。";
         throw new Error(message);
       }
@@ -89,9 +89,7 @@ export default function SimplePPTPlayer() {
       }
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err
-          : new Error("生成 PPT 失败，请稍后重试。"),
+        err instanceof Error ? err : new Error("生成 PPT 失败，请稍后重试。"),
       );
     } finally {
       setIsGenerating(false);

@@ -9,7 +9,8 @@
     "ignoreUnknown": true,
     "includes": [
       "src/**/*.{ts,tsx,js,jsx,json,css}",
-      "{server,mastra-server}/**/*.{ts,js}"
+      "{server,mastra-server}/**/*.{ts,js}",
+      "next.config.ts"
     ]
   },
   "formatter": {

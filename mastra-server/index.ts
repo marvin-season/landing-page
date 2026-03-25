@@ -3,7 +3,7 @@ import { PinoLogger } from "@mastra/loggers";
 import {
   DefaultExporter,
   Observability,
-  SensitiveDataFilter
+  SensitiveDataFilter,
 } from "@mastra/observability";
 import { AgentConstant } from "~/mastra-server/constant";
 import { storage } from "~/mastra-server/storage";

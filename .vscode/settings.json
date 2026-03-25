@@ -1,10 +1,12 @@
 {
   "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.removeUnusedImports": "explicit",
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
-  
+  "biome.enabled": true,
+  "biome.requireConfiguration": true,
   "editor.defaultFormatter": "biomejs.biome",
   "cSpell.words": [
     "deepseek",
@@ -16,7 +18,22 @@
     "prosemirror",
     "shiki"
   ],
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "i18n-ally.localesPaths": [
