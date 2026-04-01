@@ -14,9 +14,6 @@ importers:
       '@ai-sdk/react':
         specifier: ^2.0.111
         version: 2.0.111(react@19.2.3)(zod@4.1.13)
-      '@chenglou/pretext':
-        specifier: ^0.0.3
-        version: 0.0.3
       '@gsap/react':
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.13.0)(react@19.2.3)
@@ -228,6 +225,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.2.0
         version: 2.2.0
+      '@chenglou/pretext':
+        specifier: ^0.0.3
+        version: 0.0.3
       '@lingui/cli':
         specifier: ^5.7.0
         version: 5.7.0(typescript@5.9.3)

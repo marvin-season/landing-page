@@ -16,7 +16,6 @@
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.31",
     "@ai-sdk/react": "^2.0.111",
-    "@chenglou/pretext": "^0.0.3",
     "@gsap/react": "^2.1.2",
     "@lingui/core": "^5.7.0",
     "@lingui/react": "^5.7.0",
@@ -88,6 +87,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@chenglou/pretext": "^0.0.3",
     "@biomejs/biome": "2.2.0",
     "@lingui/cli": "^5.7.0",
     "@lingui/loader": "^5.7.0",
