@@ -17,6 +17,11 @@
 - ✅ [Zustand](https://zustand-demo.pmnd.rs/) for state management
 - ✅ [`@antfu/ni@25.0.0`](https://github.com/antfu/ni) & `corepack enable` for package manager
 
+## Architecture
+
+- [架构说明（目录、路由、API、Mastra）](./docs/architecture.md)
+- [Cursor Agent 导航（规则、Skills、文档索引）](./AGENTS.md)
+
 ## Quick Start
 environment variables
 ```bash

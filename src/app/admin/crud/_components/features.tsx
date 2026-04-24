@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocalStorageState } from "ahooks";
 import { use } from "react";
 import LandLink from "@/components/link/land-link";
 
@@ -7,6 +8,35 @@ export interface IFeature {
   id: number;
   title: string;
   body: string;
+}
+
+function BlockA() {
+  const [count, setCount] = useLocalStorageState<number>("count", {
+    defaultValue: 0,
+    listenStorageChange: true,
+  });
+  return (
+    <div>
+      <h1>Block A</h1>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+      <button onClick={() => localStorage.setItem("count", "1")}>Reset</button>
+    </div>
+  );
+}
+
+function BlockB() {
+  const [count, setCount] = useLocalStorageState<number>("count", {
+    defaultValue: 0,
+    listenStorageChange: true,
+  });
+  return (
+    <div>
+      <h1>Block B</h1>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
 }
 
 export const FeaturesContent = ({
@@ -18,6 +48,8 @@ export const FeaturesContent = ({
 
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <BlockA />
+      <BlockB />
       {features.slice(0, 3).map((feature) => (
         <LandLink
           href={`/admin/crud/${feature.id}`}
