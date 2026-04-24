@@ -1,0 +1,23 @@
+---
+description: When to create Cursor rules and how to write them
+alwaysApply: true
+---
+
+# Rule Authoring
+
+- Create or update a rule when the user asks the agent to "remember" a convention, process, standard, or recurring preference for future sessions.
+- Create or update a rule when the same instruction is likely to matter across many tasks, not just the current edit.
+- Do not create a rule for one-off implementation details, temporary experiments, or instructions that only apply to a single file change.
+- If scope is unclear, ask whether the rule should always apply or only apply to specific files.
+- If the rule is file-specific, ask for concrete glob patterns such as `**/*.tsx` or `src/app/admin/**/*.ts`.
+- Save rules as `.cursor/rules/*.mdc` with YAML frontmatter.
+- Use `alwaysApply: true` for repository-wide guidance; otherwise use `alwaysApply: false` plus `globs`.
+- Keep each rule focused on one concern, concise, and actionable.
+- Prefer short bullet points over long prose.
+- Include a concrete example when it helps remove ambiguity.
+
+## Quick Examples
+
+- Good trigger: "以后都按这个方式写 rule" -> create or update a persistent rule.
+- Good trigger: "React 组件都遵循这套约定" -> create a file-scoped rule for `**/*.tsx`.
+- Not a rule: "这次把按钮改成蓝色" -> handle in code only.
