@@ -1,33 +1,48 @@
-# 本仓库 Agent 导航（Cursor）
+# Repository Guidelines
 
-面向在本项目中使用 Cursor Agent / Composer 时的快速入口：规则、技能、文档与子系统说明。
+## Project Structure & Module Organization
 
-## 项目约定（非 Cursor Rule）
+This is a Next.js 16 app using React 19, TypeScript, Tailwind CSS 4, Lingui, tRPC, and Mastra. Main app code lives in `src/`: routes in `src/app`, shared UI in `src/components`, stores in `src/store`, hooks in `src/hooks`, utilities/API helpers in `src/lib`, styles in `src/css`, and translations in `src/locales`. Static assets are in `public/`. Mastra code is in `mastra-server/`; the standalone Python agent service is in `agent-server/`. Database/config assets live in `db/`, and documentation is in `docs/`.
 
-- **代码变更与 `.changelog`**：约定见 [`.changelog/README.md`](.changelog/README.md)（按日 `YYYYMMDD/index.md`、何时追加与何时先读近期记录）。不再使用 `alwaysApply` 的 Project Rule；若希望 Agent 严格执行，可在任务说明中明确要求。
+## Build, Test, and Development Commands
 
-## 本仓库 Skills（按需读取 SKILL.md）
+Use `ni` from `@antfu/ni` instead of invoking `pnpm` directly. `ni` detects the correct package manager from `packageManager` and lockfiles, then delegates to pnpm for this project. Run `npm list -g --depth=0` when you need to inspect globally installed tooling.
 
-| 路径 | 适用场景 |
-|------|----------|
-| [`.cursor/skills/pretext/SKILL.md`](.cursor/skills/pretext/SKILL.md) | 集成 `@chenglou/pretext`、多行文本测量、预测段落高度、换行、canvas/SVG/WebGL 文本排版或绕几何排版 |
-| [`.cursor/skills/vercel-react-best-practices/SKILL.md`](.cursor/skills/vercel-react-best-practices/SKILL.md) | 编写/审查/重构 React 与 Next.js、数据获取、包体与性能优化；细则见同目录 `rules/*.md` |
+- `ni`: install dependencies, equivalent to `pnpm install` in this project.
+- `nci`: perform a frozen clean install, equivalent to `pnpm install --frozen-lockfile`.
+- `nr dev`: run the Next.js dev server on `http://localhost:3001`.
+- `nr build`: create a production build.
+- `nr start`: serve the production build on port `3001`.
+- `nr check`: run Biome checks.
+- `nr lint`: run `biome check --write` to lint, format, and organize imports.
+- `nr format`: format supported files with Biome.
+- `nr lingui:extract` / `nr lingui:compile`: update and compile i18n catalogs.
+- `ni <pkg>` / `ni -D <pkg>`: add runtime or dev dependencies.
+- `nun <pkg>`: remove dependencies.
+- `nup`: update dependencies.
+- `nlx <pkg>`: download and execute a package, replacing direct `pnpm dlx` usage.
 
-## 人类文档（docs）
+Copy `.env.example` to `.env.local` before running locally.
 
-- [docs/README.md](docs/README.md)：项目内 Markdown 文档地图
-- [docs/architecture.md](docs/architecture.md)：架构（路由、API、tRPC、Mastra、状态等）
-- [docs/tech-stack.md](docs/tech-stack.md)：技术栈清单（版本以 `package.json` 为准）
-- [docs/i18n.md](docs/i18n.md)：Lingui / 国际化
-- [README.md](README.md)：快速开始与 Stack 列表
+## Dependency & Lockfile Workflow
 
-## 子系统 README
+Do not read or manually edit generated lockfiles such as `pnpm-lock.yaml`.
+When dependencies are missing or need to be refreshed, use `ni` commands so the package manager updates install artifacts and lockfiles automatically. Do not run `pnpm` directly for routine install, script, update, remove, or dlx-style commands; use `ni`, `nr`, `nci`, `nup`, `nun`, or `nlx` instead.
 
-- [mastra-server/README.md](mastra-server/README.md)：Mastra 实例、agents、tools、workflows、与 Chat API 的关系
-- [agent-server/README.md](agent-server/README.md) 及 [agent-server/docs/](agent-server/docs/)：独立 agent 服务与 AgUI 相关说明
-- [src/lib/stream/README.md](src/lib/stream/README.md)：流式聊天相关模块说明
-- [src/app/admin/README.md](src/app/admin/README.md)：Admin 区域说明
+## Coding Style & Naming Conventions
 
-## Cursor 配置目录
+Biome is the source of truth for formatting and linting. It uses 2-space indentation, recommended React/Next rules, and automatic import organization. Prefer TypeScript for app code, `tsx` for React components, and kebab-case file names when matching existing patterns, for example `chat-mode-switcher.tsx`. Keep shared primitives in `src/components/ui`; feature-specific components should stay near their route in `_components`.
 
-- [`.cursor/README.md`](.cursor/README.md)：`rules/` 与 `skills/` 分工说明
+## Testing Guidelines
+
+No JavaScript test runner is currently configured in `package.json`. For now, run `nr check` before submitting changes. Do not run `nr build` unless it is specifically requested, required to verify high-risk changes, or needed to diagnose a build-only failure, because production builds are time-consuming in this project. If adding tests, colocate them near the module or use a clear `*.test.ts` / `*.test.tsx` naming pattern, and add the runner command to `package.json`. For the Python agent service, see `agent-server/README.md` and `agent-server/test.py`.
+
+## Commit & Pull Request Guidelines
+
+Recent commits use Conventional Commit prefixes such as `feat:`, `fix:`, `chore:`, and `refactor:`. Keep subjects short and imperative, for example `feat: add chat transcript export`. Pull requests should include a concise description, linked issue, screenshots or recordings for UI changes, environment notes, and verification commands.
+
+## Architecture & Agent Notes
+
+Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or stream behavior. See `docs/i18n.md` before editing localized copy. Stream chat, admin, Mastra, and Python agent details are documented in `src/lib/stream/README.md`, `src/app/admin/README.md`, `mastra-server/README.md`, and `agent-server/README.md`.
+
+When asked to record changes, follow `.changelog/README.md`: use `.changelog/YYYYMMDD/index.md` and append a timestamped entry.
