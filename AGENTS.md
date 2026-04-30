@@ -35,7 +35,7 @@ Biome is the source of truth for formatting and linting. It uses 2-space indenta
 
 ## Testing Guidelines
 
-No JavaScript test runner is currently configured in `package.json`. For now, run `nr check` and `nr build` before submitting changes. If adding tests, colocate them near the module or use a clear `*.test.ts` / `*.test.tsx` naming pattern, and add the runner command to `package.json`. For the Python agent service, see `agent-server/README.md` and `agent-server/test.py`.
+No JavaScript test runner is currently configured in `package.json`. For now, run `nr check` before submitting changes. Do not run `nr build` unless it is specifically requested, required to verify high-risk changes, or needed to diagnose a build-only failure, because production builds are time-consuming in this project. If adding tests, colocate them near the module or use a clear `*.test.ts` / `*.test.tsx` naming pattern, and add the runner command to `package.json`. For the Python agent service, see `agent-server/README.md` and `agent-server/test.py`.
 
 ## Commit & Pull Request Guidelines
 
