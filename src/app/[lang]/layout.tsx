@@ -11,6 +11,7 @@ import {
 } from "@/lib/i18n/appRouterI18n";
 import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
+import { LocatorRuntime } from "@/components/locator-runtime";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";
 
 const lora = Lora({
@@ -54,6 +55,7 @@ export default async function RootLayout({
           initialMessages={allMessages[lang]}
         >
           <ThemeProvider>
+            <LocatorRuntime />
             <SettingsMenu currentLang={lang} />
             {children}
           </ThemeProvider>

@@ -6,6 +6,16 @@ const rules: Record<string, TurbopackRuleConfigCollection> = {
     loaders: ["@lingui/loader"],
     as: "*.js",
   },
+  "**/*.{tsx,jsx}": {
+    loaders: [
+      {
+        loader: "@locator/webpack-loader",
+        options: {
+          env: "development",
+        },
+      },
+    ],
+  },
 };
 
 const nextConfig: NextConfig = {
