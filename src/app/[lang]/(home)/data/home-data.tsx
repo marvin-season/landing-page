@@ -30,6 +30,7 @@ export const profile = {
 
 export type HomeNavLink = {
   href: string;
+  analyticsId: string;
   title: ReactNode;
   description: ReactNode;
   badge: string;
@@ -39,6 +40,7 @@ export type HomeNavLink = {
 export const navLinks: HomeNavLink[] = [
   {
     href: "/agent",
+    analyticsId: "agent",
     title: <Trans>Agent UI</Trans>,
     description: <Trans>Main chat flow powered by Mastra</Trans>,
     badge: "Core",
@@ -46,6 +48,7 @@ export const navLinks: HomeNavLink[] = [
   },
   {
     href: "/resume",
+    analyticsId: "resume",
     title: <Trans>About me in detail</Trans>,
     description: <Trans>Experience, projects, and personal profile</Trans>,
     badge: "Profile",
@@ -53,6 +56,7 @@ export const navLinks: HomeNavLink[] = [
   },
   {
     href: "/admin/ppt",
+    analyticsId: "admin_ppt",
     title: <Trans>A Simple PPT Generator</Trans>,
     description: <Trans>Generate slide content in a structured workflow</Trans>,
     badge: "Tool",
@@ -60,6 +64,7 @@ export const navLinks: HomeNavLink[] = [
   },
   {
     href: "https://marvin-season.github.io/registry-template/",
+    analyticsId: "registry_template",
     title: <Trans>Design System & Component Libs</Trans>,
     description: <Trans>Reusable UI components and design references</Trans>,
     badge: "External",

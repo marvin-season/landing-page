@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { navLinks, profile, quotes } from "../data/home-data";
 import { NavCard, Quote, Section } from "./index";
 
@@ -27,8 +27,10 @@ export function HomeContent() {
               {profile.summary}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
+              <TrackedLink
                 href="/agent"
+                eventName="Home Hero CTA Click"
+                eventProperties={{ target: "agent", location: "hero" }}
                 className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Trans>Try Agent UI</Trans>
@@ -36,13 +38,15 @@ export function HomeContent() {
                   className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   aria-hidden="true"
                 />
-              </Link>
-              <Link
+              </TrackedLink>
+              <TrackedLink
                 href="/resume"
+                eventName="Home Hero CTA Click"
+                eventProperties={{ target: "resume", location: "hero" }}
                 className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Trans>View profile</Trans>
-              </Link>
+              </TrackedLink>
             </div>
           </div>
 

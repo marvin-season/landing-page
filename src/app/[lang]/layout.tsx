@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
+import { Analytics } from "@vercel/analytics/next";
 import { Lora } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
@@ -58,6 +59,7 @@ export default async function RootLayout({
             <LocatorRuntime />
             <SettingsMenu currentLang={lang} />
             {children}
+            <Analytics />
           </ThemeProvider>
         </LinguiClientProvider>
       </body>

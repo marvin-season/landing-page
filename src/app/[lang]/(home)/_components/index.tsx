@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
-import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { cn } from "@/lib/utils";
 import type { HomeNavLink } from "../data/home-data";
 
@@ -38,6 +38,7 @@ export function HomeSection({
 
 export function NavCard({
   href,
+  analyticsId,
   title,
   description,
   badge,
@@ -46,8 +47,15 @@ export function NavCard({
   const external = href.startsWith("http");
 
   return (
-    <Link
+    <TrackedLink
       href={href}
+      eventName="Home Navigation Click"
+      eventProperties={{
+        target: analyticsId,
+        href,
+        location: "home_navigation",
+        external,
+      }}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
       className="group relative overflow-hidden rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/45 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -70,7 +78,7 @@ export function NavCard({
       <span className="mt-4 block text-xs font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
         {external ? <Trans>Open reference</Trans> : <Trans>Open page</Trans>}
       </span>
-    </Link>
+    </TrackedLink>
   );
 }
 
