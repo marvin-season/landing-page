@@ -13,7 +13,7 @@
     "check:staged": "npm run format && npm run check && git update-index --again",
     "lingui:extract": "lingui extract --clean",
     "lingui:compile": "lingui compile",
-    "postinstall": "pnpm lingui:compile",
+    "postinstall": "pnpm lingui:extract && pnpm lingui:compile",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
