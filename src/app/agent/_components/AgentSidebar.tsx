@@ -6,6 +6,8 @@ import "dayjs/locale/zh-cn";
 import { cn } from "@landing-page/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  ChevronsLeft,
+  ChevronsRight,
   Loader2,
   LogOut,
   Menu,
@@ -25,10 +27,31 @@ import {
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useTRPC } from "@/lib/trpc";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
+
+function useCreateThread(onCreated?: () => void) {
+  const router = useRouter();
+  const trpc = useTRPC();
+
+  return useMutation({
+    ...trpc.thread.create.mutationOptions(),
+    onSuccess: (data) => {
+      const threadId = data.thread?.id;
+      if (threadId) {
+        onCreated?.();
+        router.push(`/agent/${threadId}`);
+      }
+    },
+  });
+}
 
 function ThreadListContent({
   onItemClick,
@@ -51,17 +74,14 @@ function ThreadListContent({
     refetch,
   } = useQuery(trpc.thread.list.queryOptions());
 
-  const createMutation = useMutation({
-    ...trpc.thread.create.mutationOptions(),
-    onSuccess: (data) => {
-      refetch();
-      const tid = data.thread?.id;
-      if (tid) {
-        onItemClick?.();
-        router.push(`/agent/${tid}`);
-      }
-    },
+  const createMutation = useCreateThread(() => {
+    refetch();
+    onItemClick?.();
   });
+
+  const handleNewChat = useCallback(() => {
+    createMutation.mutate(undefined);
+  }, [createMutation]);
 
   const updateMutation = useMutation({
     ...trpc.thread.update.mutationOptions(),
@@ -86,10 +106,6 @@ function ThreadListContent({
       }
     },
   });
-
-  const handleNewChat = useCallback(() => {
-    createMutation.mutate(undefined);
-  }, [createMutation]);
 
   const handleRename = useCallback(
     (id: string) => {
@@ -262,6 +278,118 @@ function ThreadListContent({
   );
 }
 
+type DesktopRailButtonProps = {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+  className?: string;
+};
+
+function DesktopRailButton({
+  label,
+  onClick,
+  children,
+  disabled,
+  className,
+}: DesktopRailButtonProps) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn("size-10 rounded-xl", className)}
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={label}
+        >
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={8}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function DesktopCollapsedContent({
+  user,
+  onExpand,
+}: {
+  user?: { id: string; name?: string | null; email?: string | null };
+  onExpand: () => void;
+}) {
+  const createMutation = useCreateThread();
+
+  return (
+    <div className="flex h-full w-full animate-in fade-in-0 duration-200 flex-col items-center py-3">
+      <div className="flex w-full flex-col items-center gap-2">
+        <DesktopRailButton label="展开侧边栏" onClick={onExpand}>
+          <ChevronsRight className="size-4" />
+        </DesktopRailButton>
+        <DesktopRailButton
+          label="新建对话"
+          onClick={() => createMutation.mutate(undefined)}
+          disabled={createMutation.isPending}
+        >
+          {createMutation.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <MessageSquarePlus className="size-4" />
+          )}
+        </DesktopRailButton>
+      </div>
+
+      <div className="mt-auto flex w-full flex-col items-center">
+        {user ? (
+          <HoverCard openDelay={200} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <button
+                type="button"
+                className="flex size-10 items-center justify-center rounded-xl text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+                aria-label="账户"
+              >
+                {(user.name || user.email || user.id || "用")
+                  .slice(0, 1)
+                  .toUpperCase()}
+              </button>
+            </HoverCardTrigger>
+            <HoverCardContent side="right" align="end" className="w-56">
+              <div className="space-y-2">
+                <p className="text-sm font-medium leading-none">
+                  {user.name || user.email || user.id || "用户"}
+                </p>
+                {user.email ? (
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                ) : null}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                >
+                  <LogOut className="size-4" />
+                  退出登录
+                </Button>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        ) : (
+          <DesktopRailButton
+            label="退出登录"
+            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          >
+            <LogOut className="size-4" />
+          </DesktopRailButton>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type AgentSidebarProps = {
   user?: { id: string; name?: string | null; email?: string | null };
 };
@@ -312,26 +440,54 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   const pathname = usePathname();
   const isAgentRoute = pathname.startsWith("/agent");
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
-  const sidebarContent = (
-    <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
-      <div className="flex min-h-0 flex-1 flex-col">
-        <ThreadListContent className="flex-1" />
-      </div>
-      <div className="shrink-0 border-t border-sidebar-border p-2">
-        {user ? (
-          <UserFooter user={user} />
-        ) : (
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-          >
-            <LogOut className="size-4" />
-            退出登录
-          </Button>
-        )}
-      </div>
+  const desktopSidebar = (
+    <aside
+      className={cn(
+        "hidden h-full shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out md:flex",
+        collapsed ? "w-14" : "w-64",
+      )}
+      data-collapsed={collapsed}
+    >
+      {collapsed ? (
+        <DesktopCollapsedContent
+          user={user}
+          onExpand={() => setCollapsed(false)}
+        />
+      ) : (
+        <div className="flex h-full w-64 animate-in fade-in-0 duration-200 flex-col">
+          <div className="flex h-12 shrink-0 items-center justify-between border-b border-sidebar-border px-3">
+            <span className="text-sm font-medium">Agent</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 rounded-lg"
+              onClick={() => setCollapsed(true)}
+              aria-label="收起侧边栏"
+            >
+              <ChevronsLeft className="size-4" />
+            </Button>
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <ThreadListContent className="flex-1" />
+          </div>
+          <div className="shrink-0 border-t border-sidebar-border p-2">
+            {user ? (
+              <UserFooter user={user} />
+            ) : (
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+              >
+                <LogOut className="size-4" />
+                退出登录
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </aside>
   );
 
@@ -372,7 +528,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
 
   return (
     <>
-      {isAgentRoute && sidebarContent}
+      {isAgentRoute && desktopSidebar}
       {isAgentRoute && mobileHeader}
     </>
   );
