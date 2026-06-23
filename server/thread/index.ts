@@ -1,5 +1,6 @@
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import type { Memory } from "@mastra/memory";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { mastra } from "~/mastra-server";
 import { AGENT_ID } from "~/mastra-server/constant";
@@ -8,6 +9,23 @@ import { protectedProcedure, router } from "~/server/trpc";
 async function getMemory(): Promise<Memory> {
   const m = await mastra.getAgentById(AGENT_ID).getMemory();
   return m as Memory;
+}
+
+async function getUserThread({
+  memory,
+  resourceId,
+  threadId,
+}: {
+  memory: Memory;
+  resourceId: string;
+  threadId: string;
+}) {
+  const { threads } = await memory.listThreads({
+    perPage: false,
+    filter: { resourceId },
+  });
+
+  return threads.find((thread) => thread.id === threadId) ?? null;
 }
 
 export const threadRouter = router({
@@ -32,6 +50,26 @@ export const threadRouter = router({
     const id = (created as { id?: string })?.id ?? threadId;
     return { thread: { ...created, id } };
   }),
+
+  detail: protectedProcedure
+    .input(z.object({ threadId: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const memory = await getMemory();
+      const thread = await getUserThread({
+        memory,
+        resourceId: ctx.userId,
+        threadId: input.threadId,
+      });
+
+      if (!thread) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Thread not found",
+        });
+      }
+
+      return { thread };
+    }),
 
   update: protectedProcedure
     .input(
