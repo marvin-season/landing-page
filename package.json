@@ -19,6 +19,8 @@
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.31",
     "@ai-sdk/react": "^2.0.111",
+    "@landing-page/ui": "workspace:*",
+    "@landing-page/utils": "workspace:*",
     "@lingui/core": "^5.7.0",
     "@lingui/react": "^5.7.0",
     "@mastra/ai-sdk": "^1.0.2",

@@ -1,11 +1,2 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-export const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-export { sleep as delay };
+// biome-ignore lint/performance/noBarrelFile: compatibility re-export for existing app imports.
+export { cn, delay, sleep } from "@landing-page/utils";

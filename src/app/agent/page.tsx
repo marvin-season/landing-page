@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@landing-page/ui";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, MessageSquarePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/lib/trpc";
 
 export default function AgentPage() {

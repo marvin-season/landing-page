@@ -1,0 +1,21 @@
+{
+  "name": "@landing-page/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@landing-page/utils": "workspace:*",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1"
+  },
+  "peerDependencies": {
+    "react": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "typescript": "^5.9.3"
+  }
+}

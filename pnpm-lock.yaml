@@ -14,6 +14,12 @@ importers:
       '@ai-sdk/react':
         specifier: ^2.0.111
         version: 2.0.111(react@19.2.3)(zod@4.1.13)
+      '@landing-page/ui':
+        specifier: workspace:*
+        version: link:packages/ui
+      '@landing-page/utils':
+        specifier: workspace:*
+        version: link:packages/utils
       '@lingui/core':
         specifier: ^5.7.0
         version: 5.7.0(@lingui/babel-plugin-lingui-macro@5.7.0(typescript@5.9.3))
@@ -270,6 +276,41 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/ui:
+    dependencies:
+      '@landing-page/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.7
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/utils:
+    dependencies:
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      tailwind-merge:
+        specifier: ^3.4.0
+        version: 3.4.0
+    devDependencies:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
