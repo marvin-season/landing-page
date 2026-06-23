@@ -10,10 +10,15 @@ type ActionCardProps = {
   messageId: string | null;
   loading: boolean;
   onSend: ({ text }: { text: string }) => void;
+  showPresets?: boolean;
 };
 
-export function ActionCard({ loading, onSend }: ActionCardProps) {
-  const [inputValue, setInputValue] = useState("hello");
+export function ActionCard({
+  loading,
+  onSend,
+  showPresets = true,
+}: ActionCardProps) {
+  const [inputValue, setInputValue] = useState("");
 
   const handleSendText = useCallback(
     (text: string) => {
@@ -36,21 +41,23 @@ export function ActionCard({ loading, onSend }: ActionCardProps) {
 
   return (
     <div className="flex flex-col gap-2 px-4">
-      <div className="flex flex-wrap gap-2">
-        {PRESET_QUESTIONS.map((preset) => (
-          <Button
-            key={preset.text}
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={loading}
-            onClick={() => handleSendText(preset.text)}
-            className="rounded-full text-xs font-medium"
-          >
-            {preset.label}
-          </Button>
-        ))}
-      </div>
+      {showPresets ? (
+        <div className="flex flex-wrap gap-2">
+          {PRESET_QUESTIONS.map((preset) => (
+            <Button
+              key={preset.text}
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={loading}
+              onClick={() => handleSendText(preset.text)}
+              className="rounded-full text-xs font-medium"
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </div>
+      ) : null}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <Input
           type="text"
