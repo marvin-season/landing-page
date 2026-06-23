@@ -1,7 +1,7 @@
 import "server-only";
 
+import { isDevelopment } from "@landing-page/utils";
 import { type I18n, type Messages, setupI18n } from "@lingui/core";
-import { isDevelopment } from "@/lib/constants";
 import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;

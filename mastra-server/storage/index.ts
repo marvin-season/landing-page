@@ -1,5 +1,5 @@
+import { isDevelopment } from "@landing-page/utils";
 import { LibSQLStore } from "@mastra/libsql";
-import { isDevelopment } from "@/lib/constants";
 
 function getLibSQLStore() {
   if (isDevelopment) {
