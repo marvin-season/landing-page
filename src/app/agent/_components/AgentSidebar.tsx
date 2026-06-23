@@ -136,7 +136,7 @@ function ThreadListContent({
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <div className="shrink-0 p-3">
         <Button
-          className="w-full justify-center gap-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+          className="agent-sketched-button w-full justify-center gap-3 font-bold"
           onClick={handleNewChat}
           disabled={createMutation.isPending}
         >
@@ -150,19 +150,19 @@ function ThreadListContent({
       </div>
 
       {error && (
-        <div className="mx-3 mb-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+        <div className="agent-hand-border-soft mx-3 mb-2 bg-white/70 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2">
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-2 py-8 text-sm text-[var(--agent-muted-ink)]">
             <Loader2 className="size-4 animate-spin" />
             加载中…
           </div>
         ) : threads.length === 0 ? (
-          <div className="py-6 text-center text-xs text-muted-foreground">
+          <div className="py-6 text-center text-xs text-[var(--agent-muted-ink)]">
             暂无会话
           </div>
         ) : (
@@ -171,14 +171,14 @@ function ThreadListContent({
               <li key={t.id}>
                 {editing === t.id ? (
                   <div
-                    className="flex items-center gap-1 rounded-lg bg-sidebar-accent/50 py-1 px-1.5"
+                    className="agent-hand-border-soft agent-yellow-fill flex items-center gap-1 px-1.5 py-1"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       placeholder="会话标题"
-                      className="h-8 flex-1 text-sm"
+                      className="agent-sketched-input h-8 flex-1 text-sm"
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleRename(t.id);
@@ -190,7 +190,7 @@ function ThreadListContent({
                     />
                     <Button
                       size="sm"
-                      className="h-8 px-2"
+                      className="agent-sketched-button h-8 px-2"
                       onClick={() => handleRename(t.id)}
                       disabled={
                         (updateMutation.isPending &&
@@ -208,7 +208,7 @@ function ThreadListContent({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 px-2"
+                      className="h-8 rounded-full px-2 hover:bg-black/5"
                       onClick={() => {
                         setEditing(null);
                         setEditTitle("");
@@ -222,23 +222,23 @@ function ThreadListContent({
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
                     className={cn(
-                      "group flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-3 py-2.5 text-sm transition-all",
                       threadId === t.id
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "hover:bg-sidebar-accent/60",
+                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)]"
+                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">
                       {t.title ?? "新对话"}
                     </span>
-                    <span className="shrink-0 text-xs text-muted-foreground">
+                    <span className="shrink-0 text-xs text-[var(--agent-muted-ink)]">
                       {dayjs(t.updatedAt).fromNow()}
                     </span>
                     <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-7"
+                        className="size-7 rounded-full hover:bg-white/70"
                         onClick={(e) => {
                           e.preventDefault();
                           setEditing(t.id);
@@ -251,7 +251,7 @@ function ThreadListContent({
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        className="size-7 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={(e) => handleDelete(t.id, e)}
                         disabled={
                           deleteMutation.isPending &&
@@ -300,7 +300,10 @@ function DesktopRailButton({
           type="button"
           variant="ghost"
           size="icon"
-          className={cn("size-10 rounded-xl", className)}
+          className={cn(
+            "agent-hand-border-soft size-10 bg-white/55 hover:bg-white/80",
+            className,
+          )}
           onClick={onClick}
           disabled={disabled}
           aria-label={label}
@@ -325,7 +328,7 @@ function DesktopCollapsedContent({
   const createMutation = useCreateThread();
 
   return (
-    <div className="flex h-full w-full animate-in fade-in-0 duration-200 flex-col items-center py-3">
+    <div className="agent-doodle-grid flex h-full w-full animate-in fade-in-0 flex-col items-center py-3 duration-200">
       <div className="flex w-full flex-col items-center gap-2">
         <DesktopRailButton label="展开侧边栏" onClick={onExpand}>
           <ChevronsRight className="size-4" />
@@ -349,7 +352,7 @@ function DesktopCollapsedContent({
             <HoverCardTrigger asChild>
               <button
                 type="button"
-                className="flex size-10 items-center justify-center rounded-xl text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+                className="agent-hand-border-soft flex size-10 items-center justify-center bg-white/60 text-sm font-bold text-[var(--agent-ink)] transition-colors hover:bg-white/85"
                 aria-label="账户"
               >
                 {(user.name || user.email || user.id || "用")
@@ -408,7 +411,7 @@ function UserFooter({
         <button
           type="button"
           className={cn(
-            "flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground",
+            "agent-hand-border-soft flex w-full items-center gap-2 bg-white/45 px-2 py-2 text-left text-sm text-[var(--agent-muted-ink)] transition-colors hover:bg-white/75 hover:text-[var(--agent-ink)]",
             className,
           )}
         >
@@ -445,7 +448,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   const desktopSidebar = (
     <aside
       className={cn(
-        "hidden h-full shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out md:flex",
+        "agent-doodle-grid hidden h-full shrink-0 overflow-hidden border-r border-[rgba(34,32,26,0.18)] bg-[rgba(248,241,223,0.72)] text-[var(--agent-ink)] transition-[width] duration-200 ease-out md:flex",
         collapsed ? "w-14" : "w-64",
       )}
       data-collapsed={collapsed}
@@ -457,12 +460,14 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
         />
       ) : (
         <div className="flex h-full w-64 animate-in fade-in-0 duration-200 flex-col">
-          <div className="flex h-12 shrink-0 items-center justify-between border-b border-sidebar-border px-3">
-            <span className="text-sm font-medium">Agent</span>
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-[rgba(34,32,26,0.16)] px-3">
+            <span className="agent-scribble-title text-sm font-black">
+              Agent
+            </span>
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 rounded-lg"
+              className="agent-hand-border-soft size-8 bg-white/45 hover:bg-white/75"
               onClick={() => setCollapsed(true)}
               aria-label="收起侧边栏"
             >
@@ -472,13 +477,13 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           <div className="flex min-h-0 flex-1 flex-col">
             <ThreadListContent className="flex-1" />
           </div>
-          <div className="shrink-0 border-t border-sidebar-border p-2">
+          <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
             {user ? (
               <UserFooter user={user} />
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
                 onClick={() => signOut({ callbackUrl: "/auth/signin" })}
               >
                 <LogOut className="size-4" />
@@ -492,27 +497,32 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   );
 
   const mobileHeader = (
-    <header className="flex h-14 shrink-0 items-center border-b border-border/60 bg-background/95 px-4 backdrop-blur md:hidden">
+    <header className="agent-doodle-grid flex h-14 shrink-0 items-center border-b border-[rgba(34,32,26,0.18)] bg-[rgba(255,253,244,0.92)] px-4 backdrop-blur md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="打开会话列表">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="agent-hand-border-soft size-9 bg-white/60"
+            aria-label="打开会话列表"
+          >
             <Menu className="size-5" />
           </Button>
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="flex w-72 flex-col border-sidebar-border bg-sidebar p-0"
+          className="agent-sketch agent-doodle-grid flex w-72 flex-col border-[var(--agent-border)] bg-[var(--agent-paper)] p-0"
         >
           <div className="min-h-0 flex-1 overflow-hidden">
             <ThreadListContent onItemClick={() => setOpen(false)} />
           </div>
-          <div className="shrink-0 border-t border-sidebar-border p-2">
+          <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
             {user ? (
               <UserFooter user={user} />
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
                 onClick={() => signOut({ callbackUrl: "/auth/signin" })}
               >
                 <LogOut className="size-4" />
@@ -522,7 +532,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           </div>
         </SheetContent>
       </Sheet>
-      <span className="ml-2 text-sm font-medium">Agent</span>
+      <span className="agent-scribble-title ml-2 text-sm font-black">
+        Agent
+      </span>
     </header>
   );
 

@@ -1,0 +1,173 @@
+@layer components {
+  .agent-sketch {
+    --agent-ink: #22201a;
+    --agent-muted-ink: #6d675b;
+    --agent-paper: #fffdf4;
+    --agent-paper-soft: #f8f1df;
+    --agent-crayon-blue: #7eb6d9;
+    --agent-crayon-green: #9ccf98;
+    --agent-crayon-yellow: #f3d36a;
+    --agent-crayon-red: #e9877f;
+    --agent-border: color-mix(in srgb, var(--agent-ink) 38%, transparent);
+    color: var(--agent-ink);
+    background:
+      radial-gradient(
+        circle at 18% 18%,
+        rgba(243, 211, 106, 0.2),
+        transparent 26rem
+      ),
+      radial-gradient(
+        circle at 88% 8%,
+        rgba(126, 182, 217, 0.18),
+        transparent 24rem
+      ), linear-gradient(rgba(34, 32, 26, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 32, 26, 0.025) 1px, transparent 1px),
+      var(--agent-paper);
+    background-size:
+      auto,
+      auto,
+      34px 34px,
+      34px 34px,
+      auto;
+  }
+
+  .agent-sketch .agent-doodle-grid {
+    background-image:
+      linear-gradient(rgba(34, 32, 26, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 32, 26, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .agent-sketch .agent-hand-border {
+    border: 1.25px solid var(--agent-border);
+    border-radius: 18px 15px 20px 16px;
+    box-shadow: 0 10px 28px rgba(34, 32, 26, 0.08);
+  }
+
+  .agent-sketch .agent-hand-border-soft {
+    border: 1px solid rgba(34, 32, 26, 0.22);
+    border-radius: 16px 20px 14px 18px;
+    box-shadow: 0 4px 14px rgba(34, 32, 26, 0.055);
+  }
+
+  .agent-sketch .agent-crayon-fill {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(243, 211, 106, 0.34),
+        rgba(156, 207, 152, 0.26)
+      ), var(--agent-paper-soft);
+  }
+
+  .agent-sketch .agent-blue-fill {
+    background:
+      repeating-linear-gradient(
+        -12deg,
+        rgba(126, 182, 217, 0.23) 0 8px,
+        rgba(126, 182, 217, 0.08) 8px 14px
+      ), var(--agent-paper);
+  }
+
+  .agent-sketch .agent-yellow-fill {
+    background:
+      repeating-linear-gradient(
+        10deg,
+        rgba(243, 211, 106, 0.32) 0 10px,
+        rgba(243, 211, 106, 0.1) 10px 17px
+      ), var(--agent-paper);
+  }
+
+  .agent-sketch .agent-green-fill {
+    background:
+      repeating-linear-gradient(
+        -8deg,
+        rgba(156, 207, 152, 0.28) 0 9px,
+        rgba(156, 207, 152, 0.1) 9px 16px
+      ), var(--agent-paper);
+  }
+
+  .agent-sketch .agent-red-fill {
+    background:
+      repeating-linear-gradient(
+        8deg,
+        rgba(233, 135, 127, 0.26) 0 8px,
+        rgba(233, 135, 127, 0.08) 8px 15px
+      ), var(--agent-paper);
+  }
+
+  .agent-sketch .agent-scribble-title {
+    text-decoration: underline;
+    text-decoration-color: var(--agent-crayon-yellow);
+    text-decoration-thickness: 0.34em;
+    text-underline-offset: -0.13em;
+    text-decoration-skip-ink: none;
+  }
+
+  .agent-sketch .agent-doodle-chip {
+    border: 1px solid rgba(34, 32, 26, 0.2);
+    border-radius: 999px 900px 999px 840px;
+    background: rgba(255, 253, 244, 0.74);
+    box-shadow: 0 3px 10px rgba(34, 32, 26, 0.045);
+  }
+
+  .agent-sketch .agent-sketched-button {
+    border: 1px solid rgba(34, 32, 26, 0.3);
+    border-radius: 999px 860px 999px 900px;
+    background:
+      repeating-linear-gradient(
+        -9deg,
+        rgba(126, 182, 217, 0.22) 0 8px,
+        rgba(126, 182, 217, 0.1) 8px 14px
+      ), #fefbf0;
+    color: var(--agent-ink);
+    box-shadow: 0 6px 18px rgba(34, 32, 26, 0.09);
+  }
+
+  .agent-sketch .agent-sketched-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 22px rgba(34, 32, 26, 0.11);
+  }
+
+  .agent-sketch .agent-sketched-input {
+    border: 1px solid rgba(34, 32, 26, 0.24);
+    border-radius: 18px 20px 16px 19px;
+    background: rgba(255, 253, 244, 0.82);
+    box-shadow: inset 0 1px 4px rgba(34, 32, 26, 0.04);
+  }
+
+  .agent-sketch .agent-paper-panel {
+    position: relative;
+    background: rgba(255, 253, 244, 0.84);
+  }
+
+  .agent-sketch .agent-paper-panel::before,
+  .agent-sketch .agent-paper-panel::after {
+    position: absolute;
+    z-index: -1;
+    width: 72px;
+    height: 18px;
+    border: 1px solid rgba(34, 32, 26, 0.12);
+    background: rgba(243, 211, 106, 0.36);
+    content: "";
+    transform: rotate(-6deg);
+  }
+
+  .agent-sketch .agent-paper-panel::before {
+    top: -12px;
+    left: 24px;
+  }
+
+  .agent-sketch .agent-paper-panel::after {
+    right: 34px;
+    bottom: -10px;
+    transform: rotate(5deg);
+  }
+
+  .agent-sketch .agent-doodle-corner {
+    position: absolute;
+    color: rgba(34, 32, 26, 0.2);
+    font-family: var(--font-mono), monospace;
+    font-size: 22px;
+    pointer-events: none;
+  }
+}

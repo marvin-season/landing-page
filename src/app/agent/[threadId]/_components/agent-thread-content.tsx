@@ -1,8 +1,6 @@
 "use client";
 
-/**
- * 流式对话页：历史记录用接口数据 + MessageItem 渲染；当前轮补充「问题」并保留 ResponseSection 流式输出。
- */
+import { cn } from "@landing-page/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bot,
@@ -28,6 +26,10 @@ import { ActionCard } from "../../_components/ActionCard";
 import { ResponseSection } from "../../_components/ResponseSection";
 import { PRESET_QUESTIONS } from "../../constants";
 
+/**
+ * 流式对话页：历史记录用接口数据 + MessageItem 渲染；当前轮补充「问题」并保留 ResponseSection 流式输出。
+ */
+
 type AgentThreadContentProps = {
   threadId: string;
 };
@@ -37,16 +39,19 @@ const capabilityItems = [
     icon: CloudSun,
     title: "实时查询",
     description: "天气、指数、数据检索",
+    className: "agent-blue-fill rotate-[-0.8deg]",
   },
   {
     icon: WandSparkles,
     title: "内容生成",
     description: "拆解问题、整理方案",
+    className: "agent-yellow-fill rotate-[0.7deg]",
   },
   {
     icon: Mail,
     title: "工具调用",
     description: "按需执行邮件等任务",
+    className: "agent-green-fill rotate-[-0.4deg]",
   },
 ] as const;
 
@@ -85,11 +90,14 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
     pendingUserMessage == null;
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="relative flex min-h-dvh flex-col">
+      <span className="agent-doodle-corner right-8 top-6 hidden rotate-[7deg] md:block">
+        stream notes
+      </span>
       <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-4 sm:px-6">
         <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
           {error != null ? (
-            <Alert className="mb-4 border-destructive/50 bg-destructive/10 text-destructive">
+            <Alert className="agent-hand-border-soft mb-4 bg-white/80 text-destructive">
               <AlertDescription>Error: {error}</AlertDescription>
             </Alert>
           ) : null}
@@ -102,18 +110,18 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
                 </p>
               ) : showEmptyState ? (
                 <div className="flex min-h-full items-center justify-center py-8">
-                  <div className="w-full max-w-3xl space-y-6">
+                  <div className="agent-paper-panel agent-hand-border w-full max-w-3xl space-y-6 px-5 py-6 sm:px-7">
                     <div className="text-center">
-                      <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <div className="agent-hand-border-soft agent-crayon-fill mx-auto mb-4 flex size-14 rotate-[-2deg] items-center justify-center">
                         <Bot className="size-6" />
                       </div>
-                      <p className="text-sm font-medium text-muted-foreground">
+                      <p className="agent-doodle-chip mx-auto inline-flex px-3 py-1 text-sm font-bold text-[var(--agent-muted-ink)]">
                         New conversation
                       </p>
-                      <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
+                      <h1 className="mt-3 text-2xl font-black tracking-tight md:text-4xl">
                         What can I help you work through?
                       </h1>
-                      <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
+                      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[var(--agent-muted-ink)]">
                         Ask a question, request a lookup, or start from one of
                         the examples below.
                       </p>
@@ -123,19 +131,22 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
                       {capabilityItems.map((item) => (
                         <div
                           key={item.title}
-                          className="rounded-lg border border-border/70 bg-card/70 p-4"
+                          className={cn(
+                            "agent-hand-border-soft p-4 transition-transform hover:rotate-0",
+                            item.className,
+                          )}
                         >
-                          <item.icon className="mb-3 size-5 text-primary" />
-                          <h2 className="text-sm font-medium">{item.title}</h2>
-                          <p className="mt-1 text-xs text-muted-foreground">
+                          <item.icon className="mb-3 size-5" />
+                          <h2 className="text-sm font-black">{item.title}</h2>
+                          <p className="mt-1 text-xs text-[var(--agent-muted-ink)]">
                             {item.description}
                           </p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="rounded-lg border border-border/70 bg-background/80 p-3">
-                      <div className="mb-2 flex items-center gap-2 px-1 text-xs font-medium text-muted-foreground">
+                    <div className="agent-hand-border-soft bg-white/55 p-3">
+                      <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold text-[var(--agent-muted-ink)]">
                         <Sparkles className="size-3.5" />
                         Try a prompt
                       </div>
@@ -149,9 +160,9 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
                               variant="ghost"
                               disabled={loading}
                               onClick={() => handleSendText(preset.text)}
-                              className="h-auto justify-start rounded-lg px-3 py-3 text-left text-xs"
+                              className="agent-doodle-chip h-auto justify-start px-3 py-3 text-left text-xs hover:bg-white"
                             >
-                              <Icon className="size-4 shrink-0 text-primary" />
+                              <Icon className="size-4 shrink-0" />
                               <span className="min-w-0 whitespace-normal">
                                 {preset.label}
                               </span>
@@ -185,7 +196,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
           </Conversation>
         </div>
 
-        <div className="sticky bottom-0 shrink-0 bg-background/95 pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-background/80 sm:py-6">
+        <div className="sticky bottom-0 shrink-0 bg-[linear-gradient(to_top,var(--agent-paper)_70%,transparent)] pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-[rgba(255,253,244,0.82)] sm:py-6">
           <ActionCard
             messageId={messageId}
             loading={loading}

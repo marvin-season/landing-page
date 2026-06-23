@@ -40,7 +40,7 @@ export function ActionCard({
   );
 
   return (
-    <div className="flex flex-col gap-2 px-4">
+    <div className="agent-hand-border agent-paper-panel z-10 flex flex-col gap-3 px-4 py-4">
       {showPresets ? (
         <div className="flex flex-wrap gap-2">
           {PRESET_QUESTIONS.map((preset) => (
@@ -51,7 +51,7 @@ export function ActionCard({
               size="sm"
               disabled={loading}
               onClick={() => handleSendText(preset.text)}
-              className="rounded-full text-xs font-medium"
+              className="agent-doodle-chip text-xs font-bold hover:bg-white"
             >
               {preset.label}
             </Button>
@@ -65,14 +65,14 @@ export function ActionCard({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           disabled={loading}
-          className="min-w-0 flex-1"
+          className="agent-sketched-input min-w-0 flex-1"
           aria-label="输入消息"
         />
         <Button
           type="submit"
           disabled={loading || !inputValue.trim()}
           size="md"
-          className="shrink-0"
+          className="agent-sketched-button shrink-0 font-bold"
         >
           {loading ? (
             <Loader2 className="size-4 animate-spin" aria-hidden />
