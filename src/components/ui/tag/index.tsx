@@ -1,9 +1,9 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { useMemo } from "react";
-import { cn } from "@/lib/utils";
 
 // 预定义的颜色调色板 - 简约淡雅的配色方案（十六进制格式）
 const colorPalette = [

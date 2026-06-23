@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { languageNames, useLanguage } from "@/hooks/use-language";
-import { cn } from "@/lib/utils";
 
 type LanguageSwitcherProps = {
   currentLang?: string;

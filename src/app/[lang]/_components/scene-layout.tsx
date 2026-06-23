@@ -1,7 +1,7 @@
+import { cn } from "@landing-page/utils";
 import type { ReactNode } from "react";
 import { MotionH1 } from "@/components/ui/motion/motion-h1";
 import { ShimmeringText } from "@/components/ui/shadcn-io/shimmering-text";
-import { cn } from "@/lib/utils";
 
 type SceneLayoutProps = {
   badge?: string;

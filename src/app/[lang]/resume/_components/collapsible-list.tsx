@@ -1,9 +1,9 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
-import { cn } from "@/lib/utils";
 
 interface CollapsibleListProps {
   title: React.ReactNode;

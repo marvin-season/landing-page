@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { themeNames, useTheme } from "@/hooks/use-theme";
-import { cn } from "@/lib/utils";
 
 type ThemeSwitcherProps = {
   className?: string;

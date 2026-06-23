@@ -1,8 +1,7 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import type * as React from "react";
-
-import { cn } from "@/lib/utils";
 
 type DivProps = React.HTMLAttributes<HTMLDivElement>;
 

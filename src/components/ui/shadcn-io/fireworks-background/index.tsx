@@ -1,8 +1,7 @@
 "use client";
 
+import { cn } from "@landing-page/utils";
 import * as React from "react";
-
-import { cn } from "@/lib/utils";
 
 const rand = (min: number, max: number): number =>
   Math.random() * (max - min) + min;

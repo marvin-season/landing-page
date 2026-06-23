@@ -3,6 +3,7 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
+import { cn } from "@landing-page/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Loader2,
@@ -25,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTRPC } from "@/lib/trpc";
-import { cn } from "@/lib/utils";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");

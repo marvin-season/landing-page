@@ -1,5 +1,5 @@
+import { cn } from "@landing-page/utils";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 
 interface GradientTextProps {
   children: ReactNode;

@@ -1,7 +1,7 @@
+import { cn } from "@landing-page/utils";
 import { Trans } from "@lingui/react/macro";
 import type { CSSProperties, ReactNode } from "react";
 import { TrackedLink } from "@/components/analytics/tracked-link";
-import { cn } from "@/lib/utils";
 import type { HomeNavLink } from "../data/home-data";
 
 const getRevealStyle = (delay: number): CSSProperties =>

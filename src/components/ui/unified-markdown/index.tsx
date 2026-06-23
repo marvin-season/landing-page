@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@landing-page/utils";
 import { useIncrementalMarkdown } from "./use-incremental-markdown";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";

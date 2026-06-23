@@ -2,10 +2,9 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <ignore> */
 "use client";
 
+import { cn } from "@landing-page/utils";
 import { AnimatePresence, motion, type Transition } from "motion/react";
 import * as React from "react";
-
-import { cn } from "@/lib/utils";
 
 type MotionHighlightMode = "children" | "parent";
 

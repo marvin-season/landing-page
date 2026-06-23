@@ -1,6 +1,6 @@
+import { cn } from "@landing-page/utils";
 import { Bot, User } from "lucide-react";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 
 type ChatMessageRole = "user" | "assistant";
 

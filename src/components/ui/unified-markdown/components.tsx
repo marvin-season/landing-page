@@ -1,5 +1,5 @@
+import { cn } from "@landing-page/utils";
 import { memo } from "react";
-import { cn } from "@/lib/utils";
 
 // 1. 使用 memo 封装自定义组件，防止因父组件重绘导致的无效 render
 const MemoizedStrong = memo(({ className, children, ...props }: any) => {
