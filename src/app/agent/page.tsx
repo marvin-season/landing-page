@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@landing-page/ui";
+import { Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { useMutation } from "@tanstack/react-query";
 import {

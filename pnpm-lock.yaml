@@ -14,9 +14,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^2.0.111
         version: 2.0.111(react@19.2.3)(zod@4.1.13)
-      '@landing-page/ui':
+      '@landing-page/design-system':
         specifier: workspace:*
-        version: link:packages/ui
+        version: link:packages/design-system
       '@landing-page/utils':
         specifier: workspace:*
         version: link:packages/utils
@@ -283,7 +283,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/ui:
+  packages/design-system:
     dependencies:
       '@landing-page/utils':
         specifier: workspace:*
@@ -9662,11 +9662,11 @@ snapshots:
   '@types/eslint-scope@3.7.7':
     dependencies:
       '@types/eslint': 9.6.1
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
 
   '@types/eslint@9.6.1':
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
 
   '@types/estree-jsx@1.0.5':
@@ -13702,7 +13702,7 @@ snapshots:
   webpack@5.103.0(esbuild@0.28.2):
     dependencies:
       '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.14.1

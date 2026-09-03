@@ -20,7 +20,7 @@
       }
     ],
     "paths": {
-      "@landing-page/ui": ["./packages/ui/src/index.ts"],
+      "@landing-page/design-system": ["./packages/design-system/src/index.ts"],
       "@landing-page/utils": ["./packages/utils/src/index.ts"],
       "@/*": ["./src/*"],
       "~/*": ["./*"],
