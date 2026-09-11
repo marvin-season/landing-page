@@ -50,11 +50,13 @@ export const config = {
      * - api/trpc (tRPC files)
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - pdfjs (PDF.js worker, character maps, fonts, and Wasm)
+     * - knowledge/examples (sample documents)
      * - favicon.ico (favicon file)
      * - manifest.json, robots.txt, sitemap.xml (SEO files)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|api|auth|agent|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|auth|agent|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };

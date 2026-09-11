@@ -21,6 +21,10 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:137
+msgid "A conversation with your document"
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr ""
@@ -29,7 +33,7 @@ msgstr ""
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr ""
 
-#: src/app/[lang]/knowledge/page.tsx:8
+#: src/app/[lang]/knowledge/page.tsx:9
 msgid "A personal knowledge base for frontend development, AI applications, and engineering practices, with notes on React, Next.js, and building web products."
 msgstr ""
 
@@ -49,12 +53,40 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
-#: src/app/[lang]/knowledge/page.tsx:38
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:195
+msgid "AI replies are not connected yet. Messages and quotes stay in this workspace until you leave the page."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:140
+msgid "Ask a question, or select a passage on the left and quote it here."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:249
+msgid "Ask about this passage…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:249
+msgid "Ask about your document…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:162
+msgid "Assistant"
+msgstr ""
+
+#: src/app/[lang]/knowledge/page.tsx:39
 msgid "Back to home"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:424
+msgid "Bring a document. Start a conversation."
 msgstr ""
 
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:337
+msgid "Chat"
 msgstr ""
 
 #: src/app/[lang]/(home)/data/home-data.tsx:13
@@ -63,6 +95,11 @@ msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:188
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
+msgid "Default workspace"
 msgstr ""
 
 #: src/app/[lang]/(home)/data/home-data.tsx:91
@@ -133,25 +170,45 @@ msgstr ""
 msgid "Digital China Smart Vision"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:160
+msgid "Dismiss selection"
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:77
-#: src/app/[lang]/knowledge/page.tsx:44
+#: src/app/[lang]/knowledge/page.tsx:45
 msgid "Docs"
 msgstr ""
 
-#: src/app/[lang]/knowledge/page.tsx:47
+#: src/app/[lang]/knowledge/page.tsx:48
 msgid "Docs & Knowledge"
 msgstr ""
 
-#: src/app/[lang]/knowledge/page.tsx:7
+#: src/app/[lang]/knowledge/page.tsx:8
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr ""
 
-#: src/app/[lang]/knowledge/page.tsx:56
-msgid "Documentation is being organized. Check back for new notes and guides."
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:335
+msgid "Document"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:122
+msgid "Document chat"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:115
+msgid "Document preview"
 msgstr ""
 
 #: src/app/[lang]/(home)/data/home-data.tsx:79
 msgid "Documentation on frontend development, AI applications, and engineering practices"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:427
+msgid "Drop a PDF or Markdown file here, or click to browse."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:462
+msgid "Drop to open this document"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:76
@@ -160,6 +217,10 @@ msgstr ""
 
 #: src/app/[lang]/layout.tsx:33
 msgid "effective"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:269
+msgid "Enter to send · Shift + Enter for a new line"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:43
@@ -172,6 +233,10 @@ msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:166
+msgid "Fit to width"
 msgstr ""
 
 #: src/app/[lang]/(home)/data/home-data.tsx:62
@@ -226,6 +291,10 @@ msgstr ""
 msgid "Implemented streaming chat interface with real-time message push"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:205
+msgid "Incorrect password. Please try again."
+msgstr ""
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:64
 msgid "Integrated Ollama for local large model deployment"
 msgstr ""
@@ -274,6 +343,14 @@ msgstr ""
 msgid "Leveraging less data to generate greater insights."
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:90
+msgid "Loading PDF…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:23
+msgid "Loading preview…"
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:46
 msgid "Main chat flow powered by Mastra"
 msgstr ""
@@ -286,6 +363,10 @@ msgstr ""
 msgid "Meet Shin-chan"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:251
+msgid "Message"
+msgstr ""
+
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
 msgstr ""
@@ -294,8 +375,20 @@ msgstr ""
 msgid "Navigation"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:142
+msgid "Next page"
+msgstr ""
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:235
+msgid "No account needed · PDF & Markdown"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:181
+msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr ""
 
 #: src/app/[lang]/(home)/_components/index.tsx:113
@@ -310,20 +403,101 @@ msgstr ""
 msgid "Optimized performance with lazy loading and data virtualization"
 msgstr ""
 
+#. placeholder {0}: quote.pageNumber
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:65
+msgid "Page {0}"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:111
+msgid "Page number"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:91
+msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:433
+msgid "PDF up to 20 MB · Markdown up to 1 MB"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:76
+msgid "Please choose one document at a time."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:82
+msgid "Please upload a PDF or Markdown file."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:179
+msgid "Preparing document text…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:103
+msgid "Previous page"
+msgstr ""
+
 #: src/app/[lang]/resume/layout.tsx:28
 msgid "Professional Experience & Skills"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:194
+msgid "Quote in chat"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:45
 msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 msgstr ""
 
+#: src/app/[lang]/knowledge/page.tsx:52
+msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:472
+msgid "Reading document…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:265
+msgid "Remove document"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:237
+msgid "Remove quote"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:258
+msgid "Replace"
+msgstr ""
+
 #: src/app/[lang]/resume/layout.tsx:12
 msgid "Resume"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:213
+msgid "Retry"
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:39
+msgid "Scroll to latest message"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:171
+msgid "Select a shorter passage (up to 4,000 characters)."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:118
+msgid "Select text to quote"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:148
+msgid "Selected text"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:286
+msgid "Send message"
 msgstr ""
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:78
@@ -334,12 +508,67 @@ msgstr ""
 msgid "Shinnosuke Nohara"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:276
+msgid "Stop response"
+msgstr ""
+
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:78
+msgid "Text could not be extracted. You can still preview this document."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:166
+msgid "The sample could not be loaded. Please try again."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:187
+msgid "Thinking…"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:123
+msgid "This file could not be read. Use a valid UTF-8 Markdown file."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:86
+msgid "This file is empty. Please choose another file."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:183
+msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:268
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:277
+msgid "This page could not be rendered."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:228
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:233
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:236
+msgid "This PDF could not be opened. Try another file."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:201
+msgid "This PDF is password protected."
+msgstr ""
+
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
 msgid "Try Agent UI"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:449
+msgid "Try the sample PDF"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:217
+msgid "Unlock PDF"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:218
+msgid "Upload document"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
@@ -356,6 +585,10 @@ msgstr ""
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:299
+msgid "Workspace view"
+msgstr ""
+
 #: src/app/[lang]/resume/_components/intro.tsx:34
 msgid "Wuhan University of Science and Technology."
 msgstr ""
@@ -364,6 +597,18 @@ msgstr ""
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:158
+msgid "You"
+msgstr ""
+
 #: src/app/[lang]/resume/_components/intro.tsx:53
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:176
+msgid "Zoom in"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:155
+msgid "Zoom out"
 msgstr ""

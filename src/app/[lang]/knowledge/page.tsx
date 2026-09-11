@@ -3,6 +3,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
+import { KnowledgeWorkspace } from "./_components/knowledge-workspace";
 
 const pageTitle = msg`Docs & Knowledge | Frontend Development & AI`;
 const pageDescription = msg`A personal knowledge base for frontend development, AI applications, and engineering practices, with notes on React, Next.js, and building web products.`;
@@ -29,7 +30,7 @@ export default async function KnowledgePage({ params }: PageLangParam) {
 
   return (
     <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
         <Link
           href={`/${lang}`}
           className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -47,15 +48,13 @@ export default async function KnowledgePage({ params }: PageLangParam) {
             {i18n._(msg`Docs & Knowledge`)}
           </h1>
           <p className="max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-            {i18n._(pageDescription)}
+            {i18n._(
+              msg`Read, explore, and ask questions. Your documents and ideas, side by side.`,
+            )}
           </p>
         </header>
 
-        <p className="rounded-xl border border-border/60 bg-card/70 p-6 text-sm leading-7 text-muted-foreground shinchan:matte-surface">
-          {i18n._(
-            msg`Documentation is being organized. Check back for new notes and guides.`,
-          )}
-        </p>
+        <KnowledgeWorkspace />
       </div>
     </main>
   );
