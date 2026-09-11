@@ -40,7 +40,7 @@ export function PptToolbar({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700">提示词</span>
+          <span className="text-sm text-foreground">提示词</span>
           <Select value={presetId} onValueChange={onPresetChange}>
             <SelectTrigger className="w-[260px]">
               <SelectValue placeholder="选择一个内置提示词" />
@@ -61,7 +61,7 @@ export function PptToolbar({
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-700">数据源</span>
+        <span className="text-sm text-foreground">数据源</span>
         <Select value={dataSourceValue} onValueChange={onDataSourceValueChange}>
           <SelectTrigger className="w-[240px]">
             <SelectValue placeholder="选择数据源" />

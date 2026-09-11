@@ -2,6 +2,7 @@
 
 import { cn } from "@landing-page/utils";
 import { type HTMLMotionProps, motion, type Transition } from "motion/react";
+import { useTheme } from "next-themes";
 import type * as React from "react";
 
 type ShimmeringTextProps = {
@@ -23,6 +24,19 @@ function ShimmeringText({
   shimmeringColor = "var(--color-neutral-300)",
   ...props
 }: ShimmeringTextProps) {
+  const { resolvedTheme } = useTheme();
+
+  if (resolvedTheme === "shinchan") {
+    return (
+      <motion.span
+        className={cn("relative inline-block perspective-normal", className)}
+        {...props}
+      >
+        {text}
+      </motion.span>
+    );
+  }
+
   return (
     <motion.span
       className={cn("relative inline-block perspective-normal", className)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@landing-page/utils";
+import { useTheme } from "next-themes";
 import * as React from "react";
 
 const rand = (min: number, max: number): number =>
@@ -222,11 +223,13 @@ function FireworksBackground({
   children,
   ...props
 }: FireworksBackgroundProps) {
+  const { resolvedTheme } = useTheme();
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   React.useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
   React.useEffect(() => {
+    if (resolvedTheme === "shinchan") return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -255,6 +258,7 @@ function FireworksBackground({
       explosions.push(...particles);
     };
 
+    let launchTimeout: ReturnType<typeof setTimeout>;
     const launchFirework = () => {
       const x = rand(maxX * 0.1, maxX * 0.9);
       const y = maxY;
@@ -276,7 +280,7 @@ function FireworksBackground({
         ),
       );
       const timeout = rand(300, 800) / population;
-      setTimeout(launchFirework, timeout);
+      launchTimeout = setTimeout(launchFirework, timeout);
     };
 
     launchFirework();
@@ -337,8 +341,10 @@ function FireworksBackground({
       window.removeEventListener("resize", setCanvasSize);
       container.removeEventListener("click", handleClick);
       cancelAnimationFrame(animationFrameId);
+      clearTimeout(launchTimeout);
     };
   }, [
+    resolvedTheme,
     population,
     color,
     fireworkSpeed,
@@ -357,7 +363,10 @@ function FireworksBackground({
       <canvas
         {...canvasProps}
         ref={canvasRef}
-        className={cn("absolute inset-0 size-full", canvasProps?.className)}
+        className={cn(
+          "absolute inset-0 size-full shinchan:hidden",
+          canvasProps?.className,
+        )}
       />
       {children}
     </div>

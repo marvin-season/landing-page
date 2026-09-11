@@ -18,7 +18,7 @@ export default function AgentNotFound() {
 
         <Link
           href="/agent"
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-medium text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-slate-800"
+          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
         >
           <MessageSquarePlus className="size-4" />
           Start a new conversation

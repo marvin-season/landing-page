@@ -42,7 +42,7 @@ function SignInContent() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm space-y-6 shinchan:matte-surface shinchan:rounded-2xl shinchan:border shinchan:p-6">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">登录</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -53,7 +53,7 @@ function SignInContent() {
           <div className="space-y-2">
             <label
               htmlFor="userId"
-              className="text-sm font-medium text-gray-400"
+              className="text-sm font-medium text-muted-foreground"
             >
               User ID
             </label>
@@ -90,7 +90,7 @@ function SignInContent() {
 function SignInFallback() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm space-y-6 shinchan:matte-surface shinchan:rounded-2xl shinchan:border shinchan:p-6">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">登录</h1>
           <p className="mt-2 text-sm text-muted-foreground">加载中…</p>

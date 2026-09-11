@@ -97,7 +97,7 @@ export default function SimplePPTPlayer() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
+    <div className="bg-background min-h-screen p-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
         <Card>
           <CardHeader className="gap-3">
@@ -131,7 +131,7 @@ export default function SimplePPTPlayer() {
 
           <CardContent className="flex flex-col items-center gap-4">
             {error ? (
-              <Alert className="border-red-200 bg-red-50">
+              <Alert className="border-destructive/20 bg-destructive/5">
                 <AlertTitle>生成失败</AlertTitle>
                 <AlertDescription>{error.message}</AlertDescription>
               </Alert>
@@ -143,16 +143,16 @@ export default function SimplePPTPlayer() {
                   正在流式生成中，已获取 {activeSlides.length} 页...
                 </div>
               ) : dataSource === "generated" && activeGeneratedPpt ? (
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-muted-foreground">
                   当前使用生成数据：{activeGeneratedPpt.title}（
                   {activeGeneratedPpt.slides.length} 页）
-                  <span className="ml-2 text-slate-500">
+                  <span className="ml-2 text-muted-foreground">
                     生成时间：
                     {new Date(activeGeneratedPpt.createdAt).toLocaleString()}
                   </span>
                 </div>
               ) : (
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-muted-foreground">
                   当前使用 Mock 数据（{SLIDES_DATA.length} 页）
                 </div>
               )}
@@ -163,7 +163,7 @@ export default function SimplePPTPlayer() {
               slidesKey={dataSourceSelectValue}
             />
 
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               提示：数据由 AI 生成，仅供参考。
             </p>
           </CardContent>

@@ -102,37 +102,39 @@ export default function AdminTradesPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-4 py-8 md:px-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <p className="text-sm text-slate-500">Admin / Trades</p>
+          <p className="text-sm text-muted-foreground">Admin / Trades</p>
           <div>
-            <h1 className="text-3xl font-semibold text-slate-900">
+            <h1 className="text-3xl font-semibold text-foreground">
               炒股交易记录
             </h1>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               极简版本，仅保存在当前浏览器本地。
             </p>
           </div>
         </div>
         <Link
           href="/admin"
-          className="text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           返回 admin
         </Link>
       </div>
 
-      <section className="rounded-3xl border border-amber-300 bg-amber-50 p-5 shadow-sm">
-        <p className="text-sm font-medium text-amber-900">纪律提醒</p>
-        <p className="mt-2 text-sm leading-6 text-amber-800">
+      <section className="rounded-3xl border border-secondary bg-secondary/50 p-5 shadow-sm">
+        <p className="text-sm font-medium text-secondary-foreground">
+          纪律提醒
+        </p>
+        <p className="mt-2 text-sm leading-6 text-secondary-foreground">
           贪婪会随着资金一起放大，今天的盈利也可能因为贪念全部亏回去。每次下单前先问自己：
           这是按计划执行，还是被贪欲推动？
         </p>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm shinchan:matte-surface shinchan:rounded-xl">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">日期</span>
+              <span className="text-sm font-medium text-foreground">日期</span>
               <Input
                 type="date"
                 value={draft.date}
@@ -146,7 +148,7 @@ export default function AdminTradesPage() {
             </label>
 
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">
+              <span className="text-sm font-medium text-foreground">
                 股票代码
               </span>
               <Input
@@ -162,7 +164,7 @@ export default function AdminTradesPage() {
             </label>
 
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">方向</span>
+              <span className="text-sm font-medium text-foreground">方向</span>
               <select
                 className={fieldClassName}
                 value={draft.action}
@@ -179,7 +181,7 @@ export default function AdminTradesPage() {
             </label>
 
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">价格</span>
+              <span className="text-sm font-medium text-foreground">价格</span>
               <Input
                 type="number"
                 min="0"
@@ -196,7 +198,7 @@ export default function AdminTradesPage() {
             </label>
 
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">数量</span>
+              <span className="text-sm font-medium text-foreground">数量</span>
               <Input
                 type="number"
                 min="1"
@@ -214,9 +216,9 @@ export default function AdminTradesPage() {
           </div>
 
           <label className="block space-y-2">
-            <span className="text-sm font-medium text-slate-700">备注</span>
+            <span className="text-sm font-medium text-foreground">备注</span>
             <textarea
-              className="min-h-24 w-full rounded-2xl border border-slate-200 bg-transparent px-3 py-2 text-sm outline-none transition focus-visible:border-slate-400"
+              className="min-h-24 w-full rounded-2xl border border-border bg-transparent px-3 py-2 text-sm outline-none transition focus-visible:border-ring"
               placeholder="可选，记录策略、原因、复盘点。"
               value={draft.note}
               onChange={(event) =>
@@ -229,7 +231,7 @@ export default function AdminTradesPage() {
           </label>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               已记录 {sortedRecords.length} 笔，累计成交额{" "}
               {totalAmount.toFixed(2)}
             </p>
@@ -240,7 +242,7 @@ export default function AdminTradesPage() {
 
       <section className="space-y-3">
         {sortedRecords.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center text-sm text-slate-500">
+          <div className="rounded-3xl border border-dashed border-border bg-muted/50 px-6 py-12 text-center text-sm text-muted-foreground">
             还没有交易记录，先录入第一笔吧。
           </div>
         ) : (
@@ -250,12 +252,12 @@ export default function AdminTradesPage() {
             return (
               <article
                 key={record.id}
-                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-3xl border border-border bg-card p-5 shadow-sm shinchan:matte-surface shinchan:rounded-xl"
               >
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="text-xl font-semibold text-slate-900">
+                      <h2 className="text-xl font-semibold text-foreground">
                         {record.symbol}
                       </h2>
                       <span
@@ -267,19 +269,19 @@ export default function AdminTradesPage() {
                       >
                         {record.action === "buy" ? "买入" : "卖出"}
                       </span>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-muted-foreground">
                         {record.date}
                       </span>
                     </div>
 
-                    <div className="grid gap-2 text-sm text-slate-600 md:grid-cols-3">
+                    <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
                       <p>价格: {record.price}</p>
                       <p>数量: {record.quantity}</p>
                       <p>成交额: {amount.toFixed(2)}</p>
                     </div>
 
                     {record.note ? (
-                      <p className="text-sm leading-6 text-slate-600">
+                      <p className="text-sm leading-6 text-muted-foreground">
                         {record.note}
                       </p>
                     ) : null}

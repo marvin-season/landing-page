@@ -7,7 +7,7 @@ import { NavigationCarousel, Quote, Section } from "./index";
 
 export function HomeContent() {
   return (
-    <main className="min-h-dvh bg-background text-foreground">
+    <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <section className="grid min-h-[62dvh] items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.75fr)]">
           <div className="home-reveal flex flex-col items-start">
@@ -31,7 +31,7 @@ export function HomeContent() {
                 href="/agent"
                 eventName="Home Hero CTA Click"
                 eventProperties={{ target: "agent", location: "hero" }}
-                className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
               >
                 <Trans>Try Agent UI</Trans>
                 <ArrowRight
@@ -45,7 +45,7 @@ export function HomeContent() {
                 eventProperties={{ target: "shinchan", location: "hero" }}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
               >
                 <Trans>Meet Shin-chan</Trans>
               </TrackedLink>
@@ -56,7 +56,7 @@ export function HomeContent() {
             className="home-reveal relative mx-auto flex aspect-square w-full max-w-[340px] items-center justify-center md:ml-auto"
             style={{ "--home-reveal-delay": "120ms" } as React.CSSProperties}
           >
-            <div className="absolute inset-6 rounded-full border border-border/60 bg-card/70 shadow-2xl shadow-primary/10" />
+            <div className="absolute inset-6 rounded-full border border-border/60 bg-card/70 shadow-2xl shadow-primary/10 shinchan:matte-surface" />
             <div className="absolute inset-0 rounded-full border border-border/40" />
             <div className="absolute inset-12 rounded-full border border-primary/15" />
             <Image
@@ -66,7 +66,7 @@ export function HomeContent() {
               alt={profile.avatarAlt}
               width={184}
               height={184}
-              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl"
+              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl shinchan:shadow-sm"
             />
           </div>
         </section>

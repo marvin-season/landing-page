@@ -19,6 +19,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { Button } from "@/components/ui/button";
 import {
   HoverCard,
@@ -478,6 +479,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             <ThreadListContent className="flex-1" />
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+            <div className="mb-2">
+              <ThemeSwitcher hideLabel />
+            </div>
             {user ? (
               <UserFooter user={user} />
             ) : (
@@ -517,6 +521,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             <ThreadListContent onItemClick={() => setOpen(false)} />
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+            <div className="mb-2">
+              <ThemeSwitcher hideLabel />
+            </div>
             {user ? (
               <UserFooter user={user} />
             ) : (

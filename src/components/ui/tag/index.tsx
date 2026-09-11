@@ -71,7 +71,11 @@ export function Tag({ children, size, className, ...props }: TagProps) {
 
   return (
     <span
-      className={cn(tagVariants({ size }), "bg-transparent", className)}
+      className={cn(
+        tagVariants({ size }),
+        "bg-transparent shinchan:text-secondary-foreground! shinchan:border-border! shinchan:bg-secondary/40",
+        className,
+      )}
       style={{
         color: colors.text,
         borderColor: colors.border,

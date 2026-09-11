@@ -18,17 +18,17 @@ const sketchNotes = [
   {
     title: "Ask",
     text: "Start from a rough question.",
-    className: "agent-yellow-fill rotate-[-1.2deg]",
+    className: "agent-yellow-fill rotate-[-1.2deg] shinchan:rotate-0",
   },
   {
     title: "Think",
     text: "Let tools and context join in.",
-    className: "agent-green-fill rotate-[0.8deg]",
+    className: "agent-green-fill rotate-[0.8deg] shinchan:rotate-0",
   },
   {
     title: "Act",
     text: "Turn the answer into the next move.",
-    className: "agent-blue-fill rotate-[-0.6deg]",
+    className: "agent-blue-fill rotate-[-0.6deg] shinchan:rotate-0",
   },
 ] as const;
 
@@ -50,16 +50,16 @@ export default function AgentPage() {
 
   return (
     <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-4 py-10 md:py-16">
-      <span className="agent-doodle-corner left-8 top-8 hidden rotate-[-12deg] md:block">
+      <span className="agent-doodle-corner left-8 top-8 hidden rotate-[-12deg] md:block shinchan:hidden">
         * idea board
       </span>
-      <span className="agent-doodle-corner bottom-10 right-10 hidden rotate-[9deg] md:block">
+      <span className="agent-doodle-corner bottom-10 right-10 hidden rotate-[9deg] md:block shinchan:hidden">
         {"{ } -> !"}
       </span>
 
       <div className="agent-paper-panel agent-hand-border mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-5 py-8 text-center sm:px-10 md:py-10">
         <div className="flex flex-col items-center gap-5">
-          <div className="agent-hand-border-soft agent-crayon-fill flex size-16 rotate-[-2deg] items-center justify-center">
+          <div className="agent-hand-border-soft agent-crayon-fill flex size-16 rotate-[-2deg] items-center justify-center shinchan:rotate-0">
             <Bot className="size-8" />
           </div>
           <div className="space-y-3">
