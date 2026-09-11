@@ -157,7 +157,7 @@ export function KnowledgeWorkspace() {
       const blob = await response.blob();
       if (uploadVersion.current !== version) return;
       await upload([
-        new File([blob], "灯塔来信_Letters_to_the_Lighthouse.pdf", {
+        new File([blob], "灯塔来信_5000字扩写版.pdf", {
           type: "application/pdf",
         }),
       ]);
