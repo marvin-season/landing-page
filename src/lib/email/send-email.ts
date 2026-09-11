@@ -92,7 +92,12 @@ export async function sendEmail(
 
   const text = input.text?.trim();
   const html = input.html?.trim();
-  if (!text && !html) {
+  const body = text
+    ? { text, ...(html ? { html } : {}) }
+    : html
+      ? { html }
+      : null;
+  if (!body) {
     throw new EmailSendError(
       "Email body is required (text or html)",
       "validation",
@@ -120,8 +125,7 @@ export async function sendEmail(
     from,
     to: recipients,
     subject,
-    ...(text ? { text } : {}),
-    ...(html ? { html } : {}),
+    ...body,
   });
 
   if (error || !data?.id) {
