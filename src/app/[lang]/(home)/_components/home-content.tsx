@@ -66,7 +66,7 @@ export function HomeContent() {
               alt={profile.avatarAlt}
               width={184}
               height={184}
-              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl shinchan:shadow-sm"
+              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl shinchan:shadow-sm origin-bottom motion-safe:animate-home-avatar-walk"
             />
           </div>
         </section>
