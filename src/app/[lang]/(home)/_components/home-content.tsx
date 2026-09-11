@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import { navLinks, profile, quotes } from "../data/home-data";
-import { NavCard, Quote, Section } from "./index";
+import { NavigationCarousel, Quote, Section } from "./index";
 
 export function HomeContent() {
   return (
@@ -40,12 +40,14 @@ export function HomeContent() {
                 />
               </TrackedLink>
               <TrackedLink
-                href="/resume"
+                href="https://www.tv-asahi.co.jp/shinchan/character/"
                 eventName="Home Hero CTA Click"
-                eventProperties={{ target: "resume", location: "hero" }}
+                eventProperties={{ target: "shinchan", location: "hero" }}
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Trans>View profile</Trans>
+                <Trans>Meet Shin-chan</Trans>
               </TrackedLink>
             </div>
           </div>
@@ -70,11 +72,7 @@ export function HomeContent() {
         </section>
 
         <Section title={<Trans>Navigation</Trans>} delay={180}>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {navLinks.map((item) => (
-              <NavCard key={item.href} {...item} />
-            ))}
-          </div>
+          <NavigationCarousel items={navLinks} />
         </Section>
 
         <Section title={<Trans>Sentences</Trans>} delay={260}>

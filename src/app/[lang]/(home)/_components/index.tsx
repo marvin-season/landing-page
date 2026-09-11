@@ -36,6 +36,39 @@ export function HomeSection({
   );
 }
 
+export function NavigationCarousel({ items }: { items: HomeNavLink[] }) {
+  return (
+    <div className="relative isolate">
+      <div className="group/navigation -mx-2 overflow-x-auto px-2 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex w-max animate-[home-navigation-scroll_48s_linear_infinite] group-hover/navigation:[animation-play-state:paused] group-focus-within/navigation:[animation-play-state:paused] motion-reduce:animate-none">
+          {[false, true].map((duplicate) => (
+            <div
+              key={String(duplicate)}
+              aria-hidden={duplicate || undefined}
+              className={cn(
+                "flex shrink-0 gap-4 pr-4",
+                duplicate && "motion-reduce:hidden",
+              )}
+            >
+              {items.map((item) => (
+                <NavCard key={item.href} {...item} duplicate={duplicate} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 -left-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_right,black,transparent)] sm:w-16"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 -right-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_left,black,transparent)] sm:w-16"
+      />
+    </div>
+  );
+}
+
 export function NavCard({
   href,
   analyticsId,
@@ -43,7 +76,8 @@ export function NavCard({
   description,
   badge,
   icon: Icon,
-}: HomeNavLink) {
+  duplicate = false,
+}: HomeNavLink & { duplicate?: boolean }) {
   const external = href.startsWith("http");
 
   return (
@@ -58,24 +92,24 @@ export function NavCard({
       }}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      className="group relative overflow-hidden rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/45 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      tabIndex={duplicate ? -1 : undefined}
+      className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10"
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-primary/0 transition-colors duration-300 group-hover:bg-primary/60" />
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-background/80 text-foreground transition-colors duration-300 group-hover:border-primary/35 group-hover:text-primary">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/5 text-primary transition-colors duration-300 group-hover:text-primary group-hover:bg-primary/10">
           <Icon className="size-4" aria-hidden="true" />
         </span>
         <span className="rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[10px] font-medium uppercase text-muted-foreground tracking-[0.16em]">
           {badge}
         </span>
       </div>
-      <h3 className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
+      <h3 className="text-sm font-semibold text-foreground transition-colors duration-300 group-hover:text-primary leading-snug">
         {title}
       </h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
         {description}
       </p>
-      <span className="mt-4 block text-xs font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
+      <span className="mt-auto block text-xs font-medium text-primary opacity-60 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 pt-3 group-focus-visible:opacity-100">
         {external ? <Trans>Open reference</Trans> : <Trans>Open page</Trans>}
       </span>
     </TrackedLink>

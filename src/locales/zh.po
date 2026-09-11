@@ -21,6 +21,14 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:16
+msgid "A little mischief, a lot of joy"
+msgstr "一点调皮，满满欢乐"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:19
+msgid "A mischievous five-year-old who turns everyday life into an adventure."
+msgstr "一个调皮的五岁小孩，把平凡的日子过成有趣的冒险。"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "A Simple PPT Generator"
 msgstr "一个简单的 PPT 生成器"
@@ -37,13 +45,13 @@ msgstr "智能体交互界面"
 msgid "AI PC"
 msgstr "AIPC"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
-msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
-msgstr "构建实用 AI 产品，专注于迭代速度和开发者体验。"
-
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr "职业经历"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:12
+msgid "Crayon Shin-chan"
+msgstr "蜡笔小新"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
@@ -173,10 +181,6 @@ msgstr "HIX.AI 是一个基于 AI 的医疗解决方案平台。"
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr "曾在四家公司工作，包括北京健康星球、深圳兆日科技、神州数码.武汉产研中心和深圳九瓴科技。拥有有丰富的 Web开发和性能优化经验。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:24
-msgid "I turn rough product ideas into working AI interfaces, internal tools, and systems that are fast to try, easy to revise, and pleasant to use."
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
 msgid "Implemented member information statistics functionality"
 msgstr "实现会员信息统计功能"
@@ -192,10 +196,6 @@ msgstr "实现 RAG 检索增强和工具调用功能 "
 #: src/app/[lang]/resume/hooks/use-experience.ts:47
 msgid "Implemented streaming chat interface with real-time message push"
 msgstr "实现实时消息推送的流式聊天接口"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:15
-msgid "Independent builder"
-msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:64
 msgid "Integrated Ollama for local large model deployment"
@@ -253,11 +253,15 @@ msgstr "主要聊天流由 Mastra 提供支持"
 msgid "May 2025 - Present"
 msgstr "2025 年 5 月 - 至今"
 
+#: src/app/[lang]/(home)/_components/home-content.tsx:50
+msgid "Meet Shin-chan"
+msgstr "认识小新"
+
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
 msgstr "我的专业经验和技术技能"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:72
+#: src/app/[lang]/(home)/_components/home-content.tsx:74
 msgid "Navigation"
 msgstr "导航"
 
@@ -265,11 +269,11 @@ msgstr "导航"
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
-#: src/app/[lang]/(home)/_components/index.tsx:79
+#: src/app/[lang]/(home)/_components/index.tsx:113
 msgid "Open page"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/index.tsx:79
+#: src/app/[lang]/(home)/_components/index.tsx:113
 msgid "Open reference"
 msgstr ""
 
@@ -293,13 +297,13 @@ msgstr "简历"
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:80
+#: src/app/[lang]/(home)/_components/home-content.tsx:78
 msgid "Sentences"
 msgstr "座右铭"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:16
-msgid "Software Engineer"
-msgstr "软件工程师"
+#: src/app/[lang]/(home)/data/home-data.tsx:17
+msgid "Shinnosuke Nohara"
+msgstr "野原新之助"
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
@@ -307,10 +311,6 @@ msgstr "技术栈"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
 msgid "Try Agent UI"
-msgstr ""
-
-#: src/app/[lang]/(home)/_components/home-content.tsx:48
-msgid "View profile"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
@@ -322,6 +322,10 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 #: src/app/[lang]/resume/hooks/use-experience.ts:71
 msgid "Web Developer"
 msgstr "Web 开发工程师"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:24
+msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
+msgstr "和家人、朋友在一起，小新总能用天马行空的想法和调皮捣蛋，把日常变成充满惊喜与欢笑的小故事。"
 
 #: src/app/[lang]/resume/_components/intro.tsx:34
 msgid "Wuhan University of Science and Technology."

@@ -21,6 +21,14 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
+#: src/app/[lang]/(home)/data/home-data.tsx:16
+msgid "A little mischief, a lot of joy"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:19
+msgid "A mischievous five-year-old who turns everyday life into an adventure."
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "A Simple PPT Generator"
 msgstr ""
@@ -37,12 +45,12 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
-msgid "Building practical AI products with a strong focus on iteration speed and developer experience."
-msgstr ""
-
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:12
+msgid "Crayon Shin-chan"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
@@ -173,10 +181,6 @@ msgstr ""
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:24
-msgid "I turn rough product ideas into working AI interfaces, internal tools, and systems that are fast to try, easy to revise, and pleasant to use."
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
 msgid "Implemented member information statistics functionality"
 msgstr ""
@@ -191,10 +195,6 @@ msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:47
 msgid "Implemented streaming chat interface with real-time message push"
-msgstr ""
-
-#: src/app/[lang]/(home)/data/home-data.tsx:15
-msgid "Independent builder"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:64
@@ -253,11 +253,15 @@ msgstr ""
 msgid "May 2025 - Present"
 msgstr ""
 
+#: src/app/[lang]/(home)/_components/home-content.tsx:50
+msgid "Meet Shin-chan"
+msgstr ""
+
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:72
+#: src/app/[lang]/(home)/_components/home-content.tsx:74
 msgid "Navigation"
 msgstr ""
 
@@ -265,11 +269,11 @@ msgstr ""
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/index.tsx:79
+#: src/app/[lang]/(home)/_components/index.tsx:113
 msgid "Open page"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/index.tsx:79
+#: src/app/[lang]/(home)/_components/index.tsx:113
 msgid "Open reference"
 msgstr ""
 
@@ -293,12 +297,12 @@ msgstr ""
 msgid "Reusable UI components and design references"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:80
+#: src/app/[lang]/(home)/_components/home-content.tsx:78
 msgid "Sentences"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:16
-msgid "Software Engineer"
+#: src/app/[lang]/(home)/data/home-data.tsx:17
+msgid "Shinnosuke Nohara"
 msgstr ""
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
@@ -309,10 +313,6 @@ msgstr ""
 msgid "Try Agent UI"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:48
-msgid "View profile"
-msgstr ""
-
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr ""
@@ -321,6 +321,10 @@ msgstr ""
 #: src/app/[lang]/resume/hooks/use-experience.ts:38
 #: src/app/[lang]/resume/hooks/use-experience.ts:71
 msgid "Web Developer"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:24
+msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr ""
 
 #: src/app/[lang]/resume/_components/intro.tsx:34

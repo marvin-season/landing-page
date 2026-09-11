@@ -3,6 +3,12 @@
 /* BookClient 子元素样式 - 使用 Tailwind 工具类定义可复用样式 */
 
 @layer components {
+  @keyframes home-navigation-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
   @keyframes home-reveal {
     from {
       opacity: 0;

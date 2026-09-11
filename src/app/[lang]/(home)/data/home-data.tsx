@@ -9,21 +9,21 @@ import {
 import type { ReactNode } from "react";
 
 export const profile = {
-  name: "Marvin",
-  avatar: "/avatar.gif",
-  avatarAlt: "Marvin",
-  eyebrow: <Trans>Independent builder</Trans>,
-  title: <Trans>Software Engineer</Trans>,
+  name: <Trans>Crayon Shin-chan</Trans>,
+  // Character artwork: https://manga-shinchan.com/character/shinchan
+  avatar: "/shinchan.png",
+  avatarAlt: "Crayon Shin-chan",
+  eyebrow: <Trans>A little mischief, a lot of joy</Trans>,
+  title: <Trans>Shinnosuke Nohara</Trans>,
   subtitle: (
     <Trans>
-      Building practical AI products with a strong focus on iteration speed and
-      developer experience.
+      A mischievous five-year-old who turns everyday life into an adventure.
     </Trans>
   ),
   summary: (
     <Trans>
-      I turn rough product ideas into working AI interfaces, internal tools, and
-      systems that are fast to try, easy to revise, and pleasant to use.
+      With his family and friends, Shin-chan fills ordinary days with playful
+      antics, unexpected surprises, and plenty of laughter.
     </Trans>
   ),
 };
