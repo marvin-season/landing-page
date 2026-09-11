@@ -24,6 +24,7 @@ import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../../_components/ActionCard";
 import { ResponseSection } from "../../_components/ResponseSection";
+import { ThreadHistoryLoading } from "../../_components/ThreadHistoryLoading";
 import { PRESET_QUESTIONS } from "../../constants";
 
 /**
@@ -105,9 +106,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
           <Conversation className="h-full">
             <ConversationContent>
               {historyLoading ? (
-                <p className="py-4 text-sm text-muted-foreground">
-                  Loading history...
-                </p>
+                <ThreadHistoryLoading />
               ) : showEmptyState ? (
                 <div className="flex min-h-full items-center justify-center py-8">
                   <div className="agent-paper-panel agent-hand-border w-full max-w-3xl space-y-6 px-5 py-6 sm:px-7">
@@ -199,8 +198,8 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
         <div className="sticky bottom-0 shrink-0 bg-[linear-gradient(to_top,var(--agent-paper)_70%,transparent)] pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-[rgba(255,253,244,0.82)] sm:py-6">
           <ActionCard
             messageId={messageId}
-            loading={loading}
-            showPresets={!showEmptyState}
+            loading={loading || historyLoading}
+            showPresets={!showEmptyState && !historyLoading}
             onSend={({ text }) => handleSendText(text)}
           />
         </div>

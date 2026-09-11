@@ -49,7 +49,7 @@ export default function AgentPage() {
   }, [createMutation]);
 
   return (
-    <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-4 py-10 md:py-16">
+    <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-4 py-6 md:py-8">
       <span className="agent-doodle-corner left-8 top-8 hidden rotate-[-12deg] md:block shinchan:hidden">
         * idea board
       </span>
@@ -57,21 +57,21 @@ export default function AgentPage() {
         {"{ } -> !"}
       </span>
 
-      <div className="agent-paper-panel agent-hand-border mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-5 py-8 text-center sm:px-10 md:py-10">
-        <div className="flex flex-col items-center gap-5">
-          <div className="agent-hand-border-soft agent-crayon-fill flex size-16 rotate-[-2deg] items-center justify-center shinchan:rotate-0">
-            <Bot className="size-8" />
+      <div className="agent-paper-panel agent-hand-border mx-auto flex w-full max-w-2xl flex-col items-center gap-5 px-4 py-5 text-center sm:px-6 md:py-6">
+        <div className="flex flex-col items-center gap-3">
+          <div className="agent-hand-border-soft agent-crayon-fill flex size-10 rotate-[-2deg] items-center justify-center shinchan:rotate-0">
+            <Bot className="size-5" />
           </div>
-          <div className="space-y-3">
-            <p className="agent-doodle-chip mx-auto inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold uppercase">
-              <PencilLine className="size-3.5" />
+          <div className="space-y-2">
+            <p className="agent-doodle-chip mx-auto inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold uppercase">
+              <PencilLine className="size-3" />
               Sketch-first agent
             </p>
-            <h1 className="max-w-2xl text-3xl font-black leading-tight md:text-5xl">
+            <h1 className="max-w-2xl text-2xl font-semibold leading-tight md:text-3xl">
               Start a{" "}
               <span className="agent-scribble-title">new conversation</span>
             </h1>
-            <p className="mx-auto max-w-xl text-sm leading-6 text-[var(--agent-muted-ink)] md:text-base">
+            <p className="mx-auto max-w-lg text-sm leading-5 text-[var(--agent-muted-ink)] md:text-sm">
               Talk to the AI assistant, get weather, query data, send email, or
               use it as a messy notebook that can actually answer back.
             </p>
@@ -79,30 +79,30 @@ export default function AgentPage() {
         </div>
 
         <Button
-          size="lg"
+          size="md"
           onClick={handleNewChat}
           disabled={createMutation.isPending}
-          className="agent-sketched-button gap-2 px-8 font-bold"
+          className="agent-sketched-button gap-2 px-5 font-medium h-9"
         >
           {createMutation.isPending ? (
-            <Loader2 className="size-5 animate-spin" />
+            <Loader2 className="size-4 animate-spin" />
           ) : (
-            <MessageSquarePlus className="size-5" />
+            <MessageSquarePlus className="size-4" />
           )}
           Start a new conversation
         </Button>
 
-        <div className="grid w-full gap-3 sm:grid-cols-3">
+        <div className="grid w-full gap-2 sm:grid-cols-3">
           {sketchNotes.map((note) => (
             <div
               key={note.title}
               className={cn(
-                "agent-hand-border-soft p-4 text-left transition-transform hover:rotate-0",
+                "agent-hand-border-soft p-3 text-left transition-transform hover:rotate-0",
                 note.className,
               )}
             >
-              <div className="mb-3 flex items-center gap-2 text-sm font-black">
-                <Send className="size-4" />
+              <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
+                <Send className="size-3.5" />
                 {note.title}
               </div>
               <p className="text-xs leading-5 text-[var(--agent-muted-ink)]">
