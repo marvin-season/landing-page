@@ -21,23 +21,27 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "ちょっぴりいたずら、たっぷり笑顔"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の男の子。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/knowledge/page.tsx:8
+msgid "A personal knowledge base for frontend development, AI applications, and engineering practices, with notes on React, Next.js, and building web products."
+msgstr "フロントエンド開発、AIアプリケーション、開発実践のための個人ナレッジベース。React、Next.js、Webプロダクト開発の学びを記録します。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:61
 msgid "A Simple PPT Generator"
 msgstr "シンプルなPPTジェネレーター"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:52
+#: src/app/[lang]/(home)/data/home-data.tsx:53
 msgid "About me in detail"
 msgstr "詳細な自己紹介"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:44
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Agent UI"
 msgstr "エージェントUI"
 
@@ -45,11 +49,15 @@ msgstr "エージェントUI"
 msgid "AI PC"
 msgstr "AI PC"
 
+#: src/app/[lang]/knowledge/page.tsx:38
+msgid "Back to home"
+msgstr "ホームに戻る"
+
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr "キャリア"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:12
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 msgid "Crayon Shin-chan"
 msgstr "クレヨンしんちゃん"
 
@@ -57,11 +65,11 @@ msgstr "クレヨンしんちゃん"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "デザインは見た目だけではありません。デザインはどのように機能するかです。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:69
 msgid "Design System & Component Libs"
 msgstr "デザインシステムとコンポーネントライブラリ"
 
@@ -125,6 +133,27 @@ msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · 
 msgid "Digital China Smart Vision"
 msgstr "Digital China Smart Vision"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/knowledge/page.tsx:44
+msgid "Docs"
+msgstr "Docs"
+
+#: src/app/[lang]/knowledge/page.tsx:47
+msgid "Docs & Knowledge"
+msgstr "ドキュメントとナレッジ"
+
+#: src/app/[lang]/knowledge/page.tsx:7
+msgid "Docs & Knowledge | Frontend Development & AI"
+msgstr "ドキュメントとナレッジ | フロントエンド開発とAI"
+
+#: src/app/[lang]/knowledge/page.tsx:56
+msgid "Documentation is being organized. Check back for new notes and guides."
+msgstr "ドキュメントを整理中です。学習ノートや実践ガイドを順次追加します。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:79
+msgid "Documentation on frontend development, AI applications, and engineering practices"
+msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:76
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
 msgstr "ユーザーに優れたショッピング体験を提供するエネルギッシュなEコマースプラットフォーム。"
@@ -137,7 +166,7 @@ msgstr "有効"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:53
+#: src/app/[lang]/(home)/data/home-data.tsx:54
 msgid "Experience, projects, and personal profile"
 msgstr "経験、プロジェクト、および個人プロフィール"
 
@@ -145,7 +174,7 @@ msgstr "経験、プロジェクト、および個人プロフィール"
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:61
+#: src/app/[lang]/(home)/data/home-data.tsx:62
 msgid "Generate slide content in a structured workflow"
 msgstr "構造化ワークフローでスライドコンテンツを生成"
 
@@ -241,11 +270,11 @@ msgstr "Jushihui"
 msgid "Key Responsibilities"
 msgstr "主要責任"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:76
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "より少ないデータでより大きな洞察を生成する。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:45
+#: src/app/[lang]/(home)/data/home-data.tsx:46
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastraによるメインチャットフロー"
 
@@ -293,7 +322,7 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 msgid "Resume"
 msgstr "履歴書"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
@@ -301,7 +330,7 @@ msgstr "再利用可能なUIコンポーネントとデザインリファレン�
 msgid "Sentences"
 msgstr "座右銘"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "野原しんのすけ"
 
@@ -323,7 +352,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web開発者"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:24
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "家族や友だちと過ごすしんちゃんの毎日は、いたずらや思いがけない出来事、そしてたくさんの笑いでいっぱいです。"
 

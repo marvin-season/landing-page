@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import {
+  BookOpen,
   Bot,
   FileUser,
   type LucideIcon,
@@ -69,6 +70,19 @@ export const navLinks: HomeNavLink[] = [
     description: <Trans>Reusable UI components and design references</Trans>,
     badge: "External",
     icon: Shapes,
+  },
+  {
+    href: "/knowledge",
+    analyticsId: "knowledge",
+    title: <Trans>Docs</Trans>,
+    description: (
+      <Trans>
+        Documentation on frontend development, AI applications, and engineering
+        practices
+      </Trans>
+    ),
+    badge: "Knowledge",
+    icon: BookOpen,
   },
 ];
 
