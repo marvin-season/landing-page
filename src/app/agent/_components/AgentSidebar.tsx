@@ -15,10 +15,11 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { Button } from "@/components/ui/button";
 import {
   HoverCard,
@@ -36,6 +37,22 @@ import { useTRPC } from "@/lib/trpc";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
+
+function HistoryLinkStatus({ children }: { children: React.ReactNode }) {
+  const { pending } = useLinkStatus();
+
+  if (!pending) return children;
+
+  return (
+    <span className="flex items-center gap-1 text-primary" role="status">
+      <Loader2
+        className="size-3 animate-spin motion-reduce:animate-none"
+        aria-hidden="true"
+      />
+      正在打开…
+    </span>
+  );
+}
 
 function useCreateThread(onCreated?: () => void) {
   const router = useRouter();
@@ -134,9 +151,9 @@ function ThreadListContent({
 
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
-      <div className="shrink-0 p-3">
+      <div className="shrink-0 p-2">
         <Button
-          className="agent-sketched-button w-full justify-center gap-3 font-bold"
+          className="agent-sketched-button w-full justify-center gap-2 font-medium h-9"
           onClick={handleNewChat}
           disabled={createMutation.isPending}
         >
@@ -222,17 +239,21 @@ function ThreadListContent({
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
                     className={cn(
-                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-3 py-2.5 text-sm transition-all",
+                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg",
                       threadId === t.id
                         ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)]"
                         : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">
-                      {t.title ?? "新对话"}
-                    </span>
-                    <span className="shrink-0 text-xs text-[var(--agent-muted-ink)]">
-                      {dayjs(t.updatedAt).fromNow()}
+                      <span className="block truncate leading-5">
+                        {t.title ?? "新对话"}
+                      </span>
+                      <span className="block text-[11px] leading-4 text-[var(--agent-muted-ink)]">
+                        <HistoryLinkStatus>
+                          {dayjs(t.updatedAt).fromNow()}
+                        </HistoryLinkStatus>
+                      </span>
                     </span>
                     <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <Button
@@ -449,7 +470,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
     <aside
       className={cn(
         "agent-doodle-grid hidden h-full shrink-0 overflow-hidden border-r border-[rgba(34,32,26,0.18)] bg-[rgba(248,241,223,0.72)] text-[var(--agent-ink)] transition-[width] duration-200 ease-out md:flex",
-        collapsed ? "w-14" : "w-64",
+        collapsed ? "w-14" : "w-60",
       )}
       data-collapsed={collapsed}
     >
@@ -459,8 +480,8 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           onExpand={() => setCollapsed(false)}
         />
       ) : (
-        <div className="flex h-full w-64 animate-in fade-in-0 duration-200 flex-col">
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-[rgba(34,32,26,0.16)] px-3">
+        <div className="flex h-full w-60 animate-in fade-in-0 duration-200 flex-col">
+          <div className="flex h-12 shrink-0 items-center justify-between border-b border-[rgba(34,32,26,0.16)] px-2">
             <span className="agent-scribble-title text-sm font-black">
               Agent
             </span>
@@ -478,6 +499,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             <ThreadListContent className="flex-1" />
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+            <div className="mb-2">
+              <ThemeSwitcher hideLabel />
+            </div>
             {user ? (
               <UserFooter user={user} />
             ) : (
@@ -497,7 +521,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   );
 
   const mobileHeader = (
-    <header className="agent-doodle-grid flex h-14 shrink-0 items-center border-b border-[rgba(34,32,26,0.18)] bg-[rgba(255,253,244,0.92)] px-4 backdrop-blur md:hidden">
+    <header className="agent-doodle-grid flex h-12 shrink-0 items-center border-b border-[rgba(34,32,26,0.18)] bg-[rgba(255,253,244,0.92)] px-3 backdrop-blur md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
@@ -517,6 +541,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             <ThreadListContent onItemClick={() => setOpen(false)} />
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+            <div className="mb-2">
+              <ThemeSwitcher hideLabel />
+            </div>
             {user ? (
               <UserFooter user={user} />
             ) : (

@@ -129,7 +129,7 @@ export function PptCanvasPlayer({ slides, slidesKey }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="shadow-2xl border-8 border-gray-800 rounded-lg overflow-hidden bg-white">
+      <div className="shadow-2xl border-8 border-gray-800 rounded-lg overflow-hidden bg-white shinchan:border-border shinchan:shadow-sm">
         <canvas ref={canvasEl} />
       </div>
 
@@ -144,7 +144,7 @@ export function PptCanvasPlayer({ slides, slidesKey }: Props) {
             上一页
           </Button>
 
-          <span className="font-mono font-bold text-slate-700">
+          <span className="font-mono font-bold text-foreground">
             {safeSlides.length === 0 ? 0 : currentIndex + 1} /{" "}
             {safeSlides.length}
           </span>

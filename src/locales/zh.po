@@ -21,23 +21,27 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "一点调皮，满满欢乐"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "一个调皮的五岁小孩，把平凡的日子过成有趣的冒险。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/knowledge/page.tsx:8
+msgid "A personal knowledge base for frontend development, AI applications, and engineering practices, with notes on React, Next.js, and building web products."
+msgstr "聚焦前端开发、AI 应用与工程实践的个人知识库，记录 React、Next.js 和 Web 产品开发中的学习笔记与实践心得。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:61
 msgid "A Simple PPT Generator"
 msgstr "一个简单的 PPT 生成器"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:52
+#: src/app/[lang]/(home)/data/home-data.tsx:53
 msgid "About me in detail"
 msgstr "关于我的详细信息"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:44
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Agent UI"
 msgstr "智能体交互界面"
 
@@ -45,11 +49,15 @@ msgstr "智能体交互界面"
 msgid "AI PC"
 msgstr "AIPC"
 
+#: src/app/[lang]/knowledge/page.tsx:38
+msgid "Back to home"
+msgstr "返回首页"
+
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr "职业经历"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:12
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 msgid "Crayon Shin-chan"
 msgstr "蜡笔小新"
 
@@ -57,11 +65,11 @@ msgstr "蜡笔小新"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "设计不仅仅是外观，设计是功能。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:69
 msgid "Design System & Component Libs"
 msgstr "设计系统 & 组件库"
 
@@ -125,6 +133,27 @@ msgstr "神州数码 · 通明湖云和信创研究院 · 产研中心"
 msgid "Digital China Smart Vision"
 msgstr "神州数码"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/knowledge/page.tsx:44
+msgid "Docs"
+msgstr "Docs"
+
+#: src/app/[lang]/knowledge/page.tsx:47
+msgid "Docs & Knowledge"
+msgstr "文档与知识库"
+
+#: src/app/[lang]/knowledge/page.tsx:7
+msgid "Docs & Knowledge | Frontend Development & AI"
+msgstr "文档与知识库 | 前端开发与 AI 应用"
+
+#: src/app/[lang]/knowledge/page.tsx:56
+msgid "Documentation is being organized. Check back for new notes and guides."
+msgstr "文档正在整理中，学习笔记与实践指南将陆续更新。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:79
+msgid "Documentation on frontend development, AI applications, and engineering practices"
+msgstr "前端开发、AI 应用与工程实践文档"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:76
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
 msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
@@ -137,7 +166,7 @@ msgstr "高效"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "企业级 AI 应用一站式建设和管理平台，完全集成模型、数据、应用和计算能力。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:53
+#: src/app/[lang]/(home)/data/home-data.tsx:54
 msgid "Experience, projects, and personal profile"
 msgstr "工作经验、项目和个人简介"
 
@@ -145,7 +174,7 @@ msgstr "工作经验、项目和个人简介"
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:61
+#: src/app/[lang]/(home)/data/home-data.tsx:62
 msgid "Generate slide content in a structured workflow"
 msgstr "在结构化工作流中生成幻灯片内容"
 
@@ -241,11 +270,11 @@ msgstr "聚实惠"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:76
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "利用更少的数据生成更大的洞察。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:45
+#: src/app/[lang]/(home)/data/home-data.tsx:46
 msgid "Main chat flow powered by Mastra"
 msgstr "主要聊天流由 Mastra 提供支持"
 
@@ -293,7 +322,7 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
@@ -301,7 +330,7 @@ msgstr "可重用 UI 组件和设计参考"
 msgid "Sentences"
 msgstr "座右铭"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "野原新之助"
 
@@ -323,7 +352,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web 开发工程师"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:24
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "和家人、朋友在一起，小新总能用天马行空的想法和调皮捣蛋，把日常变成充满惊喜与欢笑的小故事。"
 

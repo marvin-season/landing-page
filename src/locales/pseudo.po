@@ -21,23 +21,27 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:16
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/knowledge/page.tsx:8
+msgid "A personal knowledge base for frontend development, AI applications, and engineering practices, with notes on React, Next.js, and building web products."
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:61
 msgid "A Simple PPT Generator"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:52
+#: src/app/[lang]/(home)/data/home-data.tsx:53
 msgid "About me in detail"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:44
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Agent UI"
 msgstr ""
 
@@ -45,11 +49,15 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
+#: src/app/[lang]/knowledge/page.tsx:38
+msgid "Back to home"
+msgstr ""
+
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:12
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 msgid "Crayon Shin-chan"
 msgstr ""
 
@@ -57,11 +65,11 @@ msgstr ""
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:69
 msgid "Design System & Component Libs"
 msgstr ""
 
@@ -125,6 +133,27 @@ msgstr ""
 msgid "Digital China Smart Vision"
 msgstr ""
 
+#: src/app/[lang]/(home)/data/home-data.tsx:77
+#: src/app/[lang]/knowledge/page.tsx:44
+msgid "Docs"
+msgstr ""
+
+#: src/app/[lang]/knowledge/page.tsx:47
+msgid "Docs & Knowledge"
+msgstr ""
+
+#: src/app/[lang]/knowledge/page.tsx:7
+msgid "Docs & Knowledge | Frontend Development & AI"
+msgstr ""
+
+#: src/app/[lang]/knowledge/page.tsx:56
+msgid "Documentation is being organized. Check back for new notes and guides."
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:79
+msgid "Documentation on frontend development, AI applications, and engineering practices"
+msgstr ""
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:76
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
 msgstr ""
@@ -137,7 +166,7 @@ msgstr ""
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:53
+#: src/app/[lang]/(home)/data/home-data.tsx:54
 msgid "Experience, projects, and personal profile"
 msgstr ""
 
@@ -145,7 +174,7 @@ msgstr ""
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:61
+#: src/app/[lang]/(home)/data/home-data.tsx:62
 msgid "Generate slide content in a structured workflow"
 msgstr ""
 
@@ -241,11 +270,11 @@ msgstr ""
 msgid "Key Responsibilities"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:76
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:45
+#: src/app/[lang]/(home)/data/home-data.tsx:46
 msgid "Main chat flow powered by Mastra"
 msgstr ""
 
@@ -293,7 +322,7 @@ msgstr ""
 msgid "Resume"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:69
+#: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
 msgstr ""
 
@@ -301,7 +330,7 @@ msgstr ""
 msgid "Sentences"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr ""
 
@@ -323,7 +352,7 @@ msgstr ""
 msgid "Web Developer"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:24
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr ""
 

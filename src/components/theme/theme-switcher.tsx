@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@landing-page/utils";
+import { useId } from "react";
 import {
   Select,
   SelectContent,
@@ -20,12 +21,13 @@ export const ThemeSwitcher = ({
   hideLabel = false,
 }: ThemeSwitcherProps) => {
   const { theme, themes, setTheme } = useTheme();
+  const selectId = useId();
 
   return (
     <div className={cn("flex items-center justify-between gap-2", className)}>
       {!hideLabel && (
         <label
-          htmlFor="theme-select"
+          htmlFor={selectId}
           className="hidden sm:inline text-muted-foreground font-bold text-sm"
         >
           Theme
@@ -33,8 +35,9 @@ export const ThemeSwitcher = ({
       )}
       <Select value={theme} onValueChange={setTheme}>
         <SelectTrigger
-          id="theme-select"
-          className={cn("w-32 sm:w-40", hideLabel && "w-full")}
+          id={selectId}
+          aria-label="Theme"
+          className={cn("w-44 sm:w-48", hideLabel && "w-full")}
         >
           <SelectValue placeholder="System" />
         </SelectTrigger>

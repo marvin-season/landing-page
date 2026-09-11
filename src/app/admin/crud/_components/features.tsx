@@ -54,10 +54,10 @@ export const FeaturesContent = ({
         <LandLink
           href={`/admin/crud/${feature.id}`}
           key={feature.id}
-          className="text-left p-4 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors"
+          className="text-left p-4 border border-border rounded-md hover:bg-background transition-colors"
         >
-          <div className="text-sm text-gray-700 mb-2">{feature.title}</div>
-          <div className="text-sm text-gray-500">{feature.body}</div>
+          <div className="text-sm text-foreground mb-2">{feature.title}</div>
+          <div className="text-sm text-muted-foreground">{feature.body}</div>
         </LandLink>
       ))}
     </div>
