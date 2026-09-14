@@ -8,14 +8,14 @@ import { NavigationCarousel, Quote, Section } from "./index";
 export function HomeContent() {
   return (
     <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <section className="grid min-h-[62dvh] items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.75fr)]">
           <div className="home-reveal flex flex-col items-start">
             <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
               <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
               {profile.eyebrow}
             </span>
-            <h1 className="max-w-3xl text-5xl font-semibold leading-none tracking-normal text-foreground sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-3xl text-xl font-semibold leading-none tracking-normal text-foreground sm:text-6xl lg:text-7xl">
               {profile.name}
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
