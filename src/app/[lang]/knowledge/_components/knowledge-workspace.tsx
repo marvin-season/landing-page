@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
-import { cn } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -41,7 +40,6 @@ export function KnowledgeWorkspace() {
   const [reading, setReading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
-  const [mobileTab, setMobileTab] = useState<"document" | "chat">("document");
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
   const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
 
@@ -114,7 +112,6 @@ export function KnowledgeWorkspace() {
       );
       setDocumentError(null);
       setPageNumber(1);
-      setMobileTab("document");
       setQuote(null);
       setMessages([]);
     } catch {
@@ -293,61 +290,10 @@ export function KnowledgeWorkspace() {
             }}
             className="overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface"
           >
-            <div
-              className="flex gap-2 border-b border-border/60 p-2 lg:hidden"
-              role="tablist"
-              aria-label={t`Workspace view`}
-            >
-              {(["document", "chat"] as const).map((tab) => (
-                <Button
-                  key={tab}
-                  id={`knowledge-tab-${tab}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={mobileTab === tab}
-                  aria-controls={`knowledge-panel-${tab}`}
-                  tabIndex={mobileTab === tab ? 0 : -1}
-                  variant={mobileTab === tab ? "soft" : "ghost"}
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => setMobileTab(tab)}
-                  onKeyDown={(event) => {
-                    if (
-                      ["ArrowLeft", "ArrowRight", "Home", "End"].includes(
-                        event.key,
-                      )
-                    ) {
-                      event.preventDefault();
-                      const next =
-                        event.key === "Home"
-                          ? "document"
-                          : event.key === "End"
-                            ? "chat"
-                            : tab === "document"
-                              ? "chat"
-                              : "document";
-                      setMobileTab(next);
-                      document.getElementById(`knowledge-tab-${next}`)?.focus();
-                    }
-                  }}
-                >
-                  {tab === "document" ? (
-                    <Trans>Document</Trans>
-                  ) : (
-                    <Trans>Chat</Trans>
-                  )}
-                </Button>
-              ))}
-            </div>
-            <div className="grid h-[75dvh] min-h-[520px] max-h-[1000px] grid-cols-1 lg:grid-cols-2">
+            <div className="grid lg:h-[75dvh] lg:min-h-[520px] lg:max-h-[1000px] grid-cols-1 lg:grid-cols-2">
               <div
                 id="knowledge-panel-document"
-                role="tabpanel"
-                aria-labelledby="knowledge-tab-document"
-                className={cn(
-                  "min-h-0 min-w-0 flex-col lg:flex lg:border-r lg:border-border/60",
-                  mobileTab === "document" ? "flex" : "hidden",
-                )}
+                className="min-h-[420px] min-w-0 flex-col flex border-b border-border/60 lg:border-r lg:border-border/60 h-[65dvh] lg:h-auto lg:min-h-0 lg:border-b-0"
               >
                 <DocumentPreview
                   document={source}
@@ -355,20 +301,12 @@ export function KnowledgeWorkspace() {
                   onPageChange={setPageNumber}
                   onContent={onContent}
                   onError={onDocumentError}
-                  onQuote={(next) => {
-                    setQuote(next);
-                    setMobileTab("chat");
-                  }}
+                  onQuote={setQuote}
                 />
               </div>
               <div
                 id="knowledge-panel-chat"
-                role="tabpanel"
-                aria-labelledby="knowledge-tab-chat"
-                className={cn(
-                  "min-h-0 min-w-0 flex-col lg:flex",
-                  mobileTab === "chat" ? "flex" : "hidden",
-                )}
+                className="min-h-[420px] min-w-0 flex-col flex h-[65dvh] lg:h-auto lg:min-h-0"
               >
                 <DocumentChat
                   quote={quote}
@@ -393,7 +331,6 @@ export function KnowledgeWorkspace() {
                   onLocate={(selectedQuote) => {
                     if (selectedQuote.pageNumber)
                       setPageNumber(selectedQuote.pageNumber);
-                    setMobileTab("document");
                   }}
                 />
               </div>
