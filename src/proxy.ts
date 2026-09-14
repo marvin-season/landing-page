@@ -5,12 +5,35 @@
 
 import Negotiator from "negotiator";
 import { type NextRequest, NextResponse } from "next/server";
+import {
+  getResumeAuthorizationUrl,
+  hasResumeAccess,
+  isResumePath,
+  resumeCookieName,
+} from "@/lib/resume-access";
 import linguiConfig from "~/lingui.config";
 
 const { locales } = linguiConfig;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (isResumePath(pathname)) {
+    let response: NextResponse;
+    if (!hasResumeAccess(request.cookies.get(resumeCookieName)?.value)) {
+      response = NextResponse.redirect(
+        new URL(getResumeAuthorizationUrl(pathname), request.url),
+      );
+    } else if (pathname === "/resume" || pathname.startsWith("/resume/")) {
+      request.nextUrl.pathname = `/${getRequestLocale(request.headers)}${pathname}`;
+      response = NextResponse.redirect(request.nextUrl);
+    } else {
+      response = NextResponse.next();
+    }
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    return response;
+  }
 
   // Skip i18n routing for SEO files
   const seoFiles = ["/manifest.json", "/robots.txt", "/sitemap.xml"];

@@ -11,6 +11,7 @@ export async function generateMetadata(props: PageLangParam) {
   return {
     title: i18n._(msg`Resume`),
     description: i18n._(msg`My professional experience and skills`),
+    robots: { index: false, follow: false, noarchive: true },
   };
 }
 
