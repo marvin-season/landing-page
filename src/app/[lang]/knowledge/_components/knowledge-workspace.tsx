@@ -25,6 +25,23 @@ import {
 } from "./document-model";
 import { DocumentPreview } from "./document-preview";
 
+const sampleDocuments = [
+  {
+    path: "/knowledge/examples/letters-to-the-lighthouse.pdf",
+    name: "灯塔来信_5000字扩写版.pdf",
+    title: "灯塔来信 · Letters to the Lighthouse",
+    format: "PDF",
+    type: "application/pdf",
+  },
+  {
+    path: "/knowledge/examples/reading-notes.md",
+    name: "阅读与知识笔记.md",
+    title: "把阅读变成自己的知识",
+    format: "Markdown",
+    type: "text/markdown",
+  },
+] as const;
+
 export function KnowledgeWorkspace() {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -141,7 +158,7 @@ export function KnowledgeWorkspace() {
     setReading(false);
   }
 
-  async function openSample() {
+  async function openSample(sample: (typeof sampleDocuments)[number]) {
     const version = ++uploadVersion.current;
     sampleRequest.current?.abort();
     const controller = new AbortController();
@@ -149,16 +166,13 @@ export function KnowledgeWorkspace() {
     setUploadError(null);
     setReading(true);
     try {
-      const response = await fetch(
-        "/knowledge/examples/letters-to-the-lighthouse.pdf",
-        { signal: controller.signal },
-      );
+      const response = await fetch(sample.path, { signal: controller.signal });
       if (!response.ok) throw new Error("Sample unavailable");
       const blob = await response.blob();
       if (uploadVersion.current !== version) return;
       await upload([
-        new File([blob], "灯塔来信_5000字扩写版.pdf", {
-          type: "application/pdf",
+        new File([blob], sample.name, {
+          type: sample.type,
         }),
       ]);
     } catch {
@@ -355,7 +369,7 @@ export function KnowledgeWorkspace() {
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={reading}
-              className="group flex min-h-80 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center transition-colors duration-300 hover:border-primary/50 hover:bg-primary/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait motion-reduce:transition-none"
+              className="group flex min-h-100 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center transition-colors duration-300 hover:border-primary/50 hover:bg-primary/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait motion-reduce:transition-none"
             >
               <span className="mb-6 flex size-14 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transform-none motion-reduce:transition-none">
                 {reading ? (
@@ -377,24 +391,40 @@ export function KnowledgeWorkspace() {
                 <Trans>PDF up to 20 MB · Markdown up to 1 MB</Trans>
               </span>
             </button>
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={reading}
-                onClick={() => void openSample()}
-              >
-                {reading ? (
-                  <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />
-                ) : (
-                  <FileText className="size-3.5" />
-                )}
-                <Trans>Try the sample PDF</Trans>
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                灯塔来信 · Letters to the Lighthouse
-              </p>
+            <div className="mt-4 space-y-3">
+              <h3 className="text-xs font-medium text-muted-foreground">
+                <Trans>Try a sample document</Trans>
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {sampleDocuments.map((sample) => (
+                  <button
+                    key={sample.path}
+                    type="button"
+                    disabled={reading}
+                    onClick={() => void openSample(sample)}
+                    className="flex min-w-0 items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-4 text-left transition-colors duration-200 hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-50 motion-reduce:transition-none"
+                  >
+                    <FileText
+                      className="size-5 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 flex-1 space-y-1">
+                      <span
+                        className="block truncate text-sm font-medium"
+                        title={sample.title}
+                      >
+                        {sample.title}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {sample.name}
+                      </span>
+                    </span>
+                    <span className="shrink-0 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">
+                      {sample.format}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}

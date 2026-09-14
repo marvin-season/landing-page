@@ -73,11 +73,11 @@ msgstr "Assistant"
 msgid "Back to home"
 msgstr "Back to home"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:87
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
 msgid "Back to overview"
 msgstr "Back to overview"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:368
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:382
 msgid "Bring a document. Start a conversation."
 msgstr "Bring a document. Start a conversation."
 
@@ -97,9 +97,9 @@ msgstr "Crayon Shin-chan"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Created internationalization solution based on Vite and Babel"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:188
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:202
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:246
 msgid "Default workspace"
 msgstr "Default workspace"
 
@@ -180,7 +180,7 @@ msgstr "Dismiss selection"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:43
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
 msgstr "Docs & Knowledge"
@@ -198,7 +198,7 @@ msgstr "Document chat"
 msgid "Document preview"
 msgstr "Document preview"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:47
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
 msgid "Document reading overview"
 msgstr "Document reading overview"
 
@@ -206,11 +206,11 @@ msgstr "Document reading overview"
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "Documentation on frontend development, AI applications, and engineering practices"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:371
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:385
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr "Drop a PDF or Markdown file here, or click to browse."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:406
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:436
 msgid "Drop to open this document"
 msgstr "Drop to open this document"
 
@@ -394,11 +394,11 @@ msgstr "Next page"
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:235
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:249
 msgid "No account needed · PDF & Markdown"
 msgstr "No account needed · PDF & Markdown"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:181
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:195
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 
@@ -406,7 +406,7 @@ msgstr "No selectable text was found. Scanned PDFs need OCR before text-based qu
 msgid "Open a PDF or Markdown document without an account. Browse PDF pages, adjust the zoom, or read formatted Markdown in one workspace."
 msgstr "Open a PDF or Markdown document without an account. Browse PDF pages, adjust the zoom, or read formatted Markdown in one workspace."
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:60
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
 msgid "Open document workspace"
 msgstr "Open document workspace"
 
@@ -431,23 +431,23 @@ msgstr "Page {0}"
 msgid "Page number"
 msgstr "Page number"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:90
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:107
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF files must be under 20 MB and Markdown files under 1 MB."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:377
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:391
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF up to 20 MB · Markdown up to 1 MB"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:75
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:92
 msgid "Please choose one document at a time."
 msgstr "Please choose one document at a time."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:81
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:98
 msgid "Please upload a PDF or Markdown file."
 msgstr "Please upload a PDF or Markdown file."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:179
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:193
 msgid "Preparing document text…"
 msgstr "Preparing document text…"
 
@@ -483,11 +483,11 @@ msgstr "Read PDF and Markdown files"
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "Read, explore, and ask questions. Your documents and ideas, side by side."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:416
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:446
 msgid "Reading document…"
 msgstr "Reading document…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:265
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:279
 msgid "Remove document"
 msgstr "Remove document"
 
@@ -495,7 +495,7 @@ msgstr "Remove document"
 msgid "Remove quote"
 msgstr "Remove quote"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:258
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:272
 msgid "Replace"
 msgstr "Replace"
 
@@ -511,7 +511,7 @@ msgstr "Retry"
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:64
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
 msgid "Scroll down to read and quote your document"
 msgstr "Scroll down to read and quote your document"
 
@@ -560,7 +560,7 @@ msgstr "Tech Stack"
 msgid "Text could not be extracted. You can still preview this document."
 msgstr "Text could not be extracted. You can still preview this document."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:166
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:180
 msgid "The sample could not be loaded. Please try again."
 msgstr "The sample could not be loaded. Please try again."
 
@@ -568,15 +568,15 @@ msgstr "The sample could not be loaded. Please try again."
 msgid "Thinking…"
 msgstr "Thinking…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:122
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:139
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "This file could not be read. Use a valid UTF-8 Markdown file."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:85
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:102
 msgid "This file is empty. Please choose another file."
 msgstr "This file is empty. Please choose another file."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:183
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:197
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 
@@ -595,6 +595,10 @@ msgstr "This PDF could not be opened. Try another file."
 msgid "This PDF is password protected."
 msgstr "This PDF is password protected."
 
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:396
+msgid "Try a sample document"
+msgstr "Try a sample document"
+
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
 msgid "Try Agent UI"
 msgstr "Try Agent UI"
@@ -603,15 +607,11 @@ msgstr "Try Agent UI"
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 msgstr "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:393
-msgid "Try the sample PDF"
-msgstr "Try the sample PDF"
-
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:274
 msgid "Unlock PDF"
 msgstr "Unlock PDF"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:218
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
 msgid "Upload document"
 msgstr "Upload document"
 

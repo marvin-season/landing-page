@@ -73,11 +73,11 @@ msgstr "アシスタント"
 msgid "Back to home"
 msgstr "ホームに戻る"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:87
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
 msgid "Back to overview"
 msgstr "概要に戻る"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:368
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:382
 msgid "Bring a document. Start a conversation."
 msgstr "ドキュメントを開いて、対話を始めましょう。"
 
@@ -97,9 +97,9 @@ msgstr "クレヨンしんちゃん"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:188
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:202
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:246
 msgid "Default workspace"
 msgstr "デフォルトのワークスペース"
 
@@ -180,7 +180,7 @@ msgstr "選択を解除"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:43
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
 msgstr "ドキュメントとナレッジ"
@@ -198,7 +198,7 @@ msgstr "ドキュメントチャット"
 msgid "Document preview"
 msgstr "ドキュメントのプレビュー"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:47
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
 msgid "Document reading overview"
 msgstr "ドキュメント閲覧の概要"
 
@@ -206,11 +206,11 @@ msgstr "ドキュメント閲覧の概要"
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:371
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:385
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr "PDF または Markdown ファイルをドロップするか、クリックして選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:406
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:436
 msgid "Drop to open this document"
 msgstr "ドロップして開く"
 
@@ -394,11 +394,11 @@ msgstr "次のページ"
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:235
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:249
 msgid "No account needed · PDF & Markdown"
 msgstr "ログイン不要 · PDF・Markdown 対応"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:181
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:195
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr "選択可能なテキストがありません。スキャンした PDF には、テキストに関する質問の前に OCR が必要です。"
 
@@ -406,7 +406,7 @@ msgstr "選択可能なテキストがありません。スキャンした PDF �
 msgid "Open a PDF or Markdown document without an account. Browse PDF pages, adjust the zoom, or read formatted Markdown in one workspace."
 msgstr "ログインなしで PDF や Markdown を開けます。同じワークスペースで PDF のページ移動や拡大縮小、整形された Markdown の閲覧ができます。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:60
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
 msgid "Open document workspace"
 msgstr "ドキュメントワークスペースを開く"
 
@@ -431,23 +431,23 @@ msgstr "{0} ページ"
 msgid "Page number"
 msgstr "ページ番号"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:90
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:107
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF は 20 MB 以下、Markdown は 1 MB 以下にしてください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:377
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:391
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:75
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:92
 msgid "Please choose one document at a time."
 msgstr "一度に 1 つのドキュメントを選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:81
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:98
 msgid "Please upload a PDF or Markdown file."
 msgstr "PDF または Markdown ファイルをアップロードしてください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:179
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:193
 msgid "Preparing document text…"
 msgstr "ドキュメントのテキストを準備中…"
 
@@ -483,11 +483,11 @@ msgstr "PDF と Markdown を読む"
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "読み、探り、質問する。ドキュメントと思考を並べて。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:416
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:446
 msgid "Reading document…"
 msgstr "ドキュメントを読み込み中…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:265
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:279
 msgid "Remove document"
 msgstr "ドキュメントを削除"
 
@@ -495,7 +495,7 @@ msgstr "ドキュメントを削除"
 msgid "Remove quote"
 msgstr "引用を削除"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:258
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:272
 msgid "Replace"
 msgstr "変更"
 
@@ -511,7 +511,7 @@ msgstr "再試行"
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:64
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
 msgid "Scroll down to read and quote your document"
 msgstr "下にスクロールして閲覧と引用を始める"
 
@@ -560,7 +560,7 @@ msgstr "技術スタック"
 msgid "Text could not be extracted. You can still preview this document."
 msgstr "テキストを抽出できませんでした。プレビューは引き続き利用できます。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:166
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:180
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
 
@@ -568,15 +568,15 @@ msgstr "サンプルを読み込めませんでした。もう一度お試しく
 msgid "Thinking…"
 msgstr "考え中…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:122
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:139
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "読み込めませんでした。有効な UTF-8 の Markdown ファイルを使用してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:85
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:102
 msgid "This file is empty. Please choose another file."
 msgstr "ファイルが空です。別のファイルを選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:183
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:197
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr "長いドキュメントのため、先頭 60,000 文字をチャット用に準備しました。それ以降の文章は引用して追加できます。"
 
@@ -595,6 +595,10 @@ msgstr "この PDF を開けませんでした。別のファイルをお試し�
 msgid "This PDF is password protected."
 msgstr "この PDF はパスワードで保護されています。"
 
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:396
+msgid "Try a sample document"
+msgstr "サンプルドキュメントを試す"
+
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
 msgid "Try Agent UI"
 msgstr ""
@@ -603,15 +607,11 @@ msgstr ""
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 msgstr "サンプルや自分のファイルを開いてお試しください。ドキュメントとメモは現在のページでのみ保持されます。AI の応答とスキャン文書の OCR はまだ利用できません。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:393
-msgid "Try the sample PDF"
-msgstr "サンプル PDF を開く"
-
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:274
 msgid "Unlock PDF"
 msgstr "PDF を開く"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:218
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
 msgid "Upload document"
 msgstr "ドキュメントをアップロード"
 
