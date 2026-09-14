@@ -11,6 +11,7 @@ import {
   type DocumentQuote,
   type KnowledgeDocument,
   MAX_QUOTE_CHARACTERS,
+  normalizeQuoteRects,
 } from "./document-model";
 
 function PreviewLoading() {
@@ -40,6 +41,7 @@ export function DocumentPreview({
   onContent,
   onError,
   onQuote,
+  activeQuote,
 }: {
   document: KnowledgeDocument;
   pageNumber: number;
@@ -47,6 +49,7 @@ export function DocumentPreview({
   onContent: (content: DocumentContent) => void;
   onError: (message: string) => void;
   onQuote: (quote: DocumentQuote) => void;
+  activeQuote: DocumentQuote | null;
 }) {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -54,6 +57,7 @@ export function DocumentPreview({
   const [selection, setSelection] = useState<{
     text: string;
     pageNumber?: number;
+    rects?: DocumentQuote["rects"];
   } | null>(null);
 
   useEffect(() => {
@@ -93,10 +97,18 @@ export function DocumentPreview({
           return;
         }
         const text = selected.toString().trim();
-        const page =
-          start.closest<HTMLElement>("[data-page-number]")?.dataset.pageNumber;
+        const pageElement = start.closest<HTMLElement>("[data-page-number]");
+        const page = pageElement?.dataset.pageNumber;
+        const rects = pageElement
+          ? normalizeQuoteRects(
+              range.getClientRects(),
+              pageElement.getBoundingClientRect(),
+            )
+          : undefined;
         setSelection(
-          text ? { text, pageNumber: page ? Number(page) : undefined } : null,
+          text
+            ? { text, pageNumber: page ? Number(page) : undefined, rects }
+            : null,
         );
       });
     };
@@ -109,15 +121,17 @@ export function DocumentPreview({
 
   return (
     <div ref={rootRef} className="relative flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-2 border-b border-border/60 px-4 py-4">
-        <FileText className="size-4 shrink-0 text-primary" />
-        <h2 className="text-sm font-medium">
-          <Trans>Document preview</Trans>
-        </h2>
-        <span className="ml-auto text-xs text-muted-foreground">
-          <Trans>Select text to quote</Trans>
-        </span>
-      </div>
+      {source.kind !== "pdf" ? (
+        <div className="flex items-center gap-2 border-b border-border/60 px-4 py-4">
+          <FileText className="size-4 shrink-0 text-primary" />
+          <h2 className="text-sm font-medium">
+            <Trans>Document preview</Trans>
+          </h2>
+          <span className="ml-auto text-xs text-muted-foreground">
+            <Trans>Select text to quote</Trans>
+          </span>
+        </div>
+      ) : null}
       {source.kind === "pdf" ? (
         <PdfPreview
           file={source.file}
@@ -125,6 +139,9 @@ export function DocumentPreview({
           onPageChange={onPageChange}
           onContent={onContent}
           onError={onError}
+          activeQuote={
+            activeQuote?.documentId === source.id ? activeQuote : null
+          }
         />
       ) : (
         <div className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20 p-4 sm:p-6">

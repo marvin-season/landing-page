@@ -2,9 +2,11 @@
 
 import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useReducedMotion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
+  FileText,
   Loader2,
   LockKeyhole,
   Minus,
@@ -15,7 +17,11 @@ import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { type DocumentContent, extractPdfContent } from "./document-model";
+import {
+  type DocumentContent,
+  type DocumentQuote,
+  extractPdfContent,
+} from "./document-model";
 
 const assetPath = `/pdfjs/${pdfjs.version}/`;
 pdfjs.GlobalWorkerOptions.workerSrc = `${assetPath}pdf.worker.min.mjs`;
@@ -33,7 +39,46 @@ type PdfPreviewProps = {
   onPageChange: (page: number) => void;
   onContent: (content: DocumentContent) => void;
   onError: (message: string) => void;
+  activeQuote: DocumentQuote | null;
 };
+
+function PdfQuoteHighlight({ quote }: { quote: DocumentQuote }) {
+  const firstRectRef = useRef<HTMLSpanElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!quote.rects?.length) return;
+    const frame = requestAnimationFrame(() => {
+      firstRectRef.current?.scrollIntoView({
+        behavior: reducedMotion ? "instant" : "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [quote, reducedMotion]);
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-20"
+      aria-hidden="true"
+    >
+      {quote.rects?.map((rect, index) => (
+        <span
+          key={`${rect.left}-${rect.top}-${rect.width}-${rect.height}`}
+          ref={index === 0 ? firstRectRef : undefined}
+          className="absolute rounded-sm bg-amber-300/40 mix-blend-multiply motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+          style={{
+            left: `${rect.left * 100}%`,
+            top: `${rect.top * 100}%`,
+            width: `${rect.width * 100}%`,
+            height: `${rect.height * 100}%`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function PdfPreview({
   file,
@@ -41,6 +86,7 @@ export default function PdfPreview({
   onPageChange,
   onContent,
   onError,
+  activeQuote,
 }: PdfPreviewProps) {
   const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +99,8 @@ export default function PdfPreview({
   } | null>(null);
   const [password, setPassword] = useState("");
   const [renderError, setRenderError] = useState(false);
+  const [renderedPage, setRenderedPage] = useState<string | null>(null);
+  const renderKey = `${pageNumber}:${width}:${zoom}`;
 
   useEffect(() => {
     const element = containerRef.current;
@@ -93,8 +141,17 @@ export default function PdfPreview({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 bg-card/60 px-3 py-2">
-        <div className="flex items-center gap-1">
+      <div className="flex items-center justify-between gap-2 border-b border-border/60 bg-card/60 px-3 py-2 overflow-x-auto">
+        <div
+          className="flex min-w-0 items-center gap-2"
+          title={t`Select text to quote`}
+        >
+          <FileText className="size-4 shrink-0 text-primary" />
+          <h2 className="sr-only text-sm font-medium sm:not-sr-only sm:truncate">
+            <Trans>Document preview</Trans>
+          </h2>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
           <Button
             type="button"
             size="icon"
@@ -146,7 +203,7 @@ export default function PdfPreview({
             <ChevronRight className="size-4" />
           </Button>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <Button
             type="button"
             size="icon"
@@ -252,7 +309,7 @@ export default function PdfPreview({
               key={pageNumber}
               data-document-content
               data-page-number={pageNumber}
-              className="mx-auto w-fit shadow-sm"
+              className="mx-auto w-fit shadow-sm relative"
             >
               <Page
                 pageNumber={pageNumber}
@@ -261,7 +318,10 @@ export default function PdfPreview({
                 renderTextLayer
                 renderAnnotationLayer
                 loading={loading}
-                onRenderSuccess={() => setRenderError(false)}
+                onRenderSuccess={() => {
+                  setRenderError(false);
+                  setRenderedPage(renderKey);
+                }}
                 onRenderError={() => setRenderError(true)}
                 error={
                   <p className="p-6 text-sm text-destructive">
@@ -269,6 +329,10 @@ export default function PdfPreview({
                   </p>
                 }
               />
+              {activeQuote?.pageNumber === pageNumber &&
+              renderedPage === renderKey ? (
+                <PdfQuoteHighlight quote={activeQuote} />
+              ) : null}
             </div>
           ) : null}
         </Document>

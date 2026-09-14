@@ -55,20 +55,22 @@ function QuoteBlock({
     <blockquote className="rounded-r-lg border-l-2 border-primary/60 bg-primary/5 px-3 py-2 text-xs leading-5">
       <button
         type="button"
-        className="mb-1 flex max-w-full items-center gap-1.5 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="block w-full text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onLocate(quote)}
       >
-        <Quote className="size-3 shrink-0" />
-        <span className="truncate">{quote.documentName}</span>
-        {quote.pageNumber ? (
-          <span className="shrink-0">
-            · <Trans>Page {quote.pageNumber}</Trans>
-          </span>
-        ) : null}
+        <span className="mb-1 flex max-w-full items-center gap-1.5 text-primary hover:underline">
+          <Quote className="size-3 shrink-0" />
+          <span className="truncate">{quote.documentName}</span>
+          {quote.pageNumber ? (
+            <span className="shrink-0">
+              · <Trans>Page {quote.pageNumber}</Trans>
+            </span>
+          ) : null}
+        </span>
+        <span className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words text-muted-foreground block">
+          {quote.text}
+        </span>
       </button>
-      <p className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words text-muted-foreground">
-        {quote.text}
-      </p>
     </blockquote>
   );
 }

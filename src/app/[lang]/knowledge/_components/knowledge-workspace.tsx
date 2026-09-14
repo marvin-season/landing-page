@@ -41,6 +41,7 @@ export function KnowledgeWorkspace() {
   const [dragging, setDragging] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
+  const [activeQuote, setActiveQuote] = useState<DocumentQuote | null>(null);
   const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
 
   useEffect(
@@ -113,6 +114,7 @@ export function KnowledgeWorkspace() {
       setDocumentError(null);
       setPageNumber(1);
       setQuote(null);
+      setActiveQuote(null);
       setMessages([]);
     } catch {
       if (uploadVersion.current === version)
@@ -132,6 +134,7 @@ export function KnowledgeWorkspace() {
     setSource(null);
     setContent(null);
     setQuote(null);
+    setActiveQuote(null);
     setMessages([]);
     setUploadError(null);
     setDocumentError(null);
@@ -183,7 +186,7 @@ export function KnowledgeWorkspace() {
   return (
     <section
       aria-label={t`Default workspace`}
-      className="relative"
+      className="relative flex min-h-0 flex-1 flex-col"
       onDragEnter={(event) => {
         if (!event.dataTransfer.types.includes("Files")) return;
         event.preventDefault();
@@ -219,7 +222,7 @@ export function KnowledgeWorkspace() {
           if (files.length) void upload(files);
         }}
       />
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-card/70">
             <FolderOpen className="size-4 text-primary" />
@@ -270,7 +273,7 @@ export function KnowledgeWorkspace() {
 
       {uploadError ? (
         <p
-          className="mb-4 rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          className="mb-4 rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive shrink-0 max-h-24 overflow-y-auto"
           role="alert"
         >
           {uploadError}
@@ -288,9 +291,9 @@ export function KnowledgeWorkspace() {
               duration: reducedMotion ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface"
+            className="overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface min-h-0 flex-1"
           >
-            <div className="grid lg:h-[75dvh] lg:min-h-[520px] lg:max-h-[1000px] grid-cols-1 lg:grid-cols-2">
+            <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-2 overflow-y-auto">
               <div
                 id="knowledge-panel-document"
                 className="min-h-[420px] min-w-0 flex-col flex border-b border-border/60 lg:border-r lg:border-border/60 h-[65dvh] lg:h-auto lg:min-h-0 lg:border-b-0"
@@ -302,6 +305,7 @@ export function KnowledgeWorkspace() {
                   onContent={onContent}
                   onError={onDocumentError}
                   onQuote={setQuote}
+                  activeQuote={activeQuote}
                 />
               </div>
               <div
@@ -329,8 +333,10 @@ export function KnowledgeWorkspace() {
                   onStop={() => {}}
                   onRetry={() => {}}
                   onLocate={(selectedQuote) => {
+                    if (selectedQuote.documentId !== source.id) return;
                     if (selectedQuote.pageNumber)
                       setPageNumber(selectedQuote.pageNumber);
+                    setActiveQuote({ ...selectedQuote });
                   }}
                 />
               </div>
@@ -343,6 +349,7 @@ export function KnowledgeWorkspace() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : -6 }}
             transition={{ duration: reducedMotion ? 0 : 0.2 }}
+            className="min-h-0 flex-1 overflow-y-auto"
           >
             <button
               type="button"
@@ -402,7 +409,7 @@ export function KnowledgeWorkspace() {
       ) : null}
       {reading && source ? (
         <p
-          className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"
+          className="mt-3 flex items-center gap-2 text-xs text-muted-foreground shrink-0"
           role="status"
         >
           <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />

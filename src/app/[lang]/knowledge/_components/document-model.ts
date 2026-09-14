@@ -23,7 +23,44 @@ export type DocumentQuote = {
   documentName: string;
   text: string;
   pageNumber?: number;
+  rects?: QuoteRect[];
 };
+
+export type QuoteRect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+// Page-relative coordinates survive zooming and responsive preview resizing.
+export function normalizeQuoteRects(
+  rects: Iterable<Pick<DOMRect, "left" | "top" | "right" | "bottom">>,
+  page: Pick<DOMRect, "left" | "top" | "width" | "height">,
+): QuoteRect[] {
+  if (page.width <= 0 || page.height <= 0) return [];
+  const result: QuoteRect[] = [];
+  const seen = new Set<string>();
+  for (const rect of rects) {
+    const left = Math.max(0, rect.left - page.left);
+    const top = Math.max(0, rect.top - page.top);
+    const right = Math.min(page.width, rect.right - page.left);
+    const bottom = Math.min(page.height, rect.bottom - page.top);
+    if (right <= left || bottom <= top) continue;
+    const normalized = {
+      left: left / page.width,
+      top: top / page.height,
+      width: (right - left) / page.width,
+      height: (bottom - top) / page.height,
+    };
+    const key = JSON.stringify(normalized);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(normalized);
+    }
+  }
+  return result;
+}
 
 export function getDocumentKind(name: string) {
   if (/\.pdf$/i.test(name)) return "pdf";
