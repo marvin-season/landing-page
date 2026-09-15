@@ -75,7 +75,9 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
   );
 
   const { state, send, loading, error } = useChatStreamState({
-    onComplete: refetchHistory,
+    onComplete: () => {
+      void refetchHistory();
+    },
   });
   const { messageId, blocks, streamingText, streamingTool } = state;
 
