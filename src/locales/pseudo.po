@@ -21,7 +21,7 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:139
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:141
 msgid "A conversation with your document"
 msgstr ""
 
@@ -49,23 +49,20 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:197
-msgid "AI replies are not connected yet. Messages and quotes stay in this workspace until you leave the page."
-msgstr ""
-
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:142
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:144
 msgid "Ask a question, or select a passage on the left and quote it here."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:251
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:262
 msgid "Ask about this passage…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:251
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:262
 msgid "Ask about your document…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:164
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:166
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:190
 msgid "Assistant"
 msgstr ""
 
@@ -77,7 +74,7 @@ msgstr ""
 msgid "Back to overview"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:415
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:455
 msgid "Bring a document. Start a conversation."
 msgstr ""
 
@@ -85,7 +82,7 @@ msgstr ""
 msgid "Career"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:222
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:226
 msgid "Chat"
 msgstr ""
 
@@ -102,8 +99,8 @@ msgid "Created internationalization solution based on Vite and Babel"
 msgstr ""
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:224
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:268
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:277
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:321
 msgid "Default workspace"
 msgstr ""
 
@@ -175,7 +172,7 @@ msgstr ""
 msgid "Digital China Smart Vision"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:191
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:193
 msgid "Dismiss selection"
 msgstr ""
 
@@ -193,11 +190,11 @@ msgstr ""
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:124
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:126
 msgid "Document chat"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:142
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:144
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:139
 msgid "Document preview"
 msgstr ""
@@ -210,11 +207,11 @@ msgstr ""
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:418
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:458
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:469
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:509
 msgid "Drop to open this document"
 msgstr ""
 
@@ -226,7 +223,7 @@ msgstr ""
 msgid "effective"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:271
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:282
 msgid "Enter to send · Shift + Enter for a new line"
 msgstr ""
 
@@ -286,7 +283,7 @@ msgstr ""
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:91
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:142
 msgid "I pulled a passage from this document. Click it to highlight the original text."
 msgstr ""
 
@@ -382,7 +379,7 @@ msgstr ""
 msgid "Meet Shin-chan"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:253
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:264
 msgid "Message"
 msgstr ""
 
@@ -402,11 +399,11 @@ msgstr ""
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:271
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:324
 msgid "No account needed · PDF & Markdown"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:217
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:270
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr ""
 
@@ -439,19 +436,19 @@ msgstr ""
 msgid "Page number"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:131
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:182
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:424
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:464
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:116
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:167
 msgid "Please choose one document at a time."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:122
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:173
 msgid "Please upload a PDF or Markdown file."
 msgstr ""
 
@@ -483,19 +480,19 @@ msgstr ""
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:479
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:519
 msgid "Reading document…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:301
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:354
 msgid "Remove document"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:239
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:250
 msgid "Remove quote"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:294
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:347
 msgid "Replace"
 msgstr ""
 
@@ -503,7 +500,7 @@ msgstr ""
 msgid "Resume"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:215
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:226
 msgid "Retry"
 msgstr ""
 
@@ -523,20 +520,20 @@ msgstr ""
 msgid "Select a passage and add it to your conversation as a quote. Keep the document name and page number alongside your questions and notes."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:202
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:204
 msgid "Select a shorter passage (up to 4,000 characters)."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:145
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:147
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:135
 msgid "Select text to quote"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:179
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:181
 msgid "Selected text"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:288
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:299
 msgid "Send message"
 msgstr ""
 
@@ -548,15 +545,15 @@ msgstr ""
 msgid "Shinnosuke Nohara"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:278
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:289
 msgid "Stop response"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:256
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:264
 msgid "Summarize"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:251
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:259
 msgid "Summarize this passage."
 msgstr ""
 
@@ -564,23 +561,27 @@ msgstr ""
 msgid "Tech Stack"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:204
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:209
+msgid "The assistant only receives the quoted passage and your instruction."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:257
 msgid "The sample could not be loaded. Please try again."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:189
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:200
 msgid "Thinking…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:163
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:215
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:126
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:177
 msgid "This file is empty. Please choose another file."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:219
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:272
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr ""
 
@@ -599,15 +600,15 @@ msgstr ""
 msgid "This PDF is password protected."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:239
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:245
 msgid "Translate"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:234
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:240
 msgid "Translate this passage."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:429
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:469
 msgid "Try a sample document"
 msgstr ""
 
@@ -623,7 +624,7 @@ msgstr ""
 msgid "Unlock PDF"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:254
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:307
 msgid "Upload document"
 msgstr ""
 
@@ -649,7 +650,7 @@ msgstr ""
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:160
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:162
 msgid "You"
 msgstr ""
 

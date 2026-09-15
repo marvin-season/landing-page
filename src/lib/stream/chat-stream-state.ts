@@ -224,6 +224,15 @@ export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
   };
 }
 
+/** Concatenate completed text blocks with the in-flight delta. */
+export function chatStreamText(state: ChatStreamState) {
+  const fromBlocks = state.blocks
+    .filter((block): block is TextBlock => block.kind === "text")
+    .map((block) => block.content)
+    .join("");
+  return `${fromBlocks}${state.streamingText}`;
+}
+
 /** 创建状态流 Observable */
 export function createObservableState({
   url,

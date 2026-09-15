@@ -86,6 +86,7 @@ export function DocumentChat({
   onRetry,
   onLocate,
   notice,
+  streamingText,
 }: {
   quote: DocumentQuote | null;
   onQuoteChange: (quote: DocumentQuote | null) => void;
@@ -97,6 +98,7 @@ export function DocumentChat({
   onRetry: () => void;
   onLocate: (quote: DocumentQuote) => void;
   notice?: string;
+  streamingText?: string;
 }) {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -181,13 +183,23 @@ export function DocumentChat({
             ))
           )}
           {busy ? (
-            <p
-              className="flex items-center gap-2 text-xs text-muted-foreground"
-              role="status"
-            >
-              <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />
-              <Trans>Thinking…</Trans>
-            </p>
+            streamingText ? (
+              <div className="mr-auto w-full space-y-3 py-2">
+                <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <Bot className="size-3.5" />
+                  <Trans>Assistant</Trans>
+                </p>
+                <DocumentMarkdown content={streamingText} />
+              </div>
+            ) : (
+              <p
+                className="flex items-center gap-2 text-xs text-muted-foreground"
+                role="status"
+              >
+                <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />
+                <Trans>Thinking…</Trans>
+              </p>
+            )
           ) : null}
         </StickToBottom.Content>
         <ScrollToLatest />
@@ -195,8 +207,7 @@ export function DocumentChat({
       <div className="space-y-3 border-t border-border/60 p-4">
         <p className="text-xs leading-5 text-muted-foreground">
           <Trans>
-            AI replies are not connected yet. Messages and quotes stay in this
-            workspace until you leave the page.
+            The assistant only receives the quoted passage and your instruction.
           </Trans>
         </p>
         {error ? (

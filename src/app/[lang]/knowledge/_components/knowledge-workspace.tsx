@@ -12,6 +12,12 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type ChatStreamState,
+  chatStreamText,
+  type TInputParams,
+} from "@/lib/stream/chat-stream-state";
+import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { DocumentChat, type KnowledgeMessage } from "./document-chat";
 import {
   type DocumentContent,
@@ -24,6 +30,7 @@ import {
   MAX_PDF_BYTES,
 } from "./document-model";
 import { DocumentPreview } from "./document-preview";
+import { buildKnowledgePrompt } from "./knowledge-prompt";
 
 const sampleDocuments = [
   {
@@ -69,13 +76,57 @@ export function KnowledgeWorkspace() {
   const [activeQuote, setActiveQuote] = useState<DocumentQuote | null>(null);
   const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
   const seededQuoteDocumentId = useRef<string | null>(null);
+  const threadIdRef = useRef(crypto.randomUUID());
+  const lastSendRef = useRef<TInputParams | null>(null);
+
+  const onStreamComplete = useCallback((flushed: ChatStreamState) => {
+    const text = chatStreamText(flushed).trim();
+    if (!text) return;
+    setMessages((previous) => [
+      ...previous,
+      { id: crypto.randomUUID(), role: "assistant", text },
+    ]);
+  }, []);
+
+  const { state, send, loading, error, stop } = useChatStreamState({
+    onComplete: onStreamComplete,
+  });
+
+  function resetThread() {
+    stop();
+    threadIdRef.current = crypto.randomUUID();
+    lastSendRef.current = null;
+  }
+
+  function ask(instruction: string, selectedQuote: DocumentQuote | null) {
+    const text = buildKnowledgePrompt(instruction, selectedQuote?.text);
+    if (!text || loading) return;
+    setQuote(null);
+    setMessages((previous) => [
+      ...previous,
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        text: instruction,
+        quote: selectedQuote ?? undefined,
+      },
+    ]);
+    const input = {
+      url: "/api/knowledge/chat",
+      threadId: threadIdRef.current,
+      text,
+    };
+    lastSendRef.current = input;
+    send(input);
+  }
 
   useEffect(
     () => () => {
       uploadVersion.current++;
       sampleRequest.current?.abort();
+      stop();
     },
-    [],
+    [stop],
   );
 
   useEffect(() => {
@@ -157,6 +208,7 @@ export function KnowledgeWorkspace() {
       setQuote(null);
       setActiveQuote(null);
       setMessages([]);
+      resetThread();
     } catch {
       if (uploadVersion.current === version)
         setUploadError(
@@ -177,6 +229,7 @@ export function KnowledgeWorkspace() {
     setQuote(null);
     setActiveQuote(null);
     setMessages([]);
+    resetThread();
     setUploadError(null);
     setDocumentError(null);
     setReading(false);
@@ -340,19 +393,9 @@ export function KnowledgeWorkspace() {
                   onPageChange={setPageNumber}
                   onError={onDocumentError}
                   onQuote={setQuote}
-                  onPrompt={(selectedQuote, text) => {
-                    setQuote(null);
-                    setMessages((previous) => [
-                      ...previous,
-                      {
-                        id: crypto.randomUUID(),
-                        role: "user",
-                        text,
-                        quote: selectedQuote,
-                      },
-                    ]);
-                  }}
+                  onPrompt={(selectedQuote, text) => ask(text, selectedQuote)}
                   activeQuote={activeQuote}
+                  busy={loading}
                 />
               </div>
               <div
@@ -363,22 +406,15 @@ export function KnowledgeWorkspace() {
                   quote={quote}
                   onQuoteChange={setQuote}
                   messages={messages}
-                  busy={false}
-                  error={null}
+                  busy={loading}
+                  error={error}
                   notice={notice}
-                  onSubmit={(text, selectedQuote) =>
-                    setMessages((previous) => [
-                      ...previous,
-                      {
-                        id: crypto.randomUUID(),
-                        role: "user",
-                        text,
-                        quote: selectedQuote ?? undefined,
-                      },
-                    ])
-                  }
-                  onStop={() => {}}
-                  onRetry={() => {}}
+                  streamingText={loading ? chatStreamText(state) : undefined}
+                  onSubmit={(text, selectedQuote) => ask(text, selectedQuote)}
+                  onStop={stop}
+                  onRetry={() => {
+                    if (lastSendRef.current) send(lastSendRef.current);
+                  }}
                   onLocate={(selectedQuote) => {
                     if (selectedQuote.documentId !== source.id) return;
                     if (selectedQuote.pageNumber)

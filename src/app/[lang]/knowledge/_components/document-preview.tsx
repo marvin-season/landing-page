@@ -41,6 +41,7 @@ export function DocumentPreview({
   onQuote,
   onPrompt,
   activeQuote,
+  busy = false,
 }: {
   document: KnowledgeDocument;
   pageNumber: number;
@@ -49,6 +50,7 @@ export function DocumentPreview({
   onQuote: (quote: DocumentQuote) => void;
   onPrompt: (quote: DocumentQuote, text: string) => void;
   activeQuote: DocumentQuote | null;
+  busy?: boolean;
 }) {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -209,7 +211,7 @@ export function DocumentPreview({
                 type="button"
                 size="sm"
                 className="min-w-0 flex-1"
-                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                disabled={busy || selection.text.length > MAX_QUOTE_CHARACTERS}
                 onPointerDown={(event) => event.preventDefault()}
                 onClick={() => {
                   const quote = quoteFromSelection();
@@ -226,7 +228,7 @@ export function DocumentPreview({
                 size="sm"
                 variant="outline"
                 className="min-w-0 flex-1"
-                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                disabled={busy || selection.text.length > MAX_QUOTE_CHARACTERS}
                 onPointerDown={(event) => event.preventDefault()}
                 onClick={() => {
                   const quote = quoteFromSelection();
@@ -243,7 +245,7 @@ export function DocumentPreview({
                 size="sm"
                 variant="outline"
                 className="min-w-0 flex-1"
-                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                disabled={busy || selection.text.length > MAX_QUOTE_CHARACTERS}
                 onPointerDown={(event) => event.preventDefault()}
                 onClick={() => {
                   const quote = quoteFromSelection();

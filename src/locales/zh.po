@@ -21,7 +21,7 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:139
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:141
 msgid "A conversation with your document"
 msgstr "与文档展开对话"
 
@@ -49,23 +49,20 @@ msgstr "智能体交互界面"
 msgid "AI PC"
 msgstr "AIPC"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:197
-msgid "AI replies are not connected yet. Messages and quotes stay in this workspace until you leave the page."
-msgstr "AI 回复暂未接通。消息与引文仅保留在当前页面，离开后不会保存。"
-
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:142
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:144
 msgid "Ask a question, or select a passage on the left and quote it here."
 msgstr "提出问题，或在左侧选中文字，将其作为引文发送到这里。"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:251
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:262
 msgid "Ask about this passage…"
 msgstr "针对这段引文提问…"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:251
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:262
 msgid "Ask about your document…"
 msgstr "针对文档提问…"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:164
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:166
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:190
 msgid "Assistant"
 msgstr "助手"
 
@@ -77,7 +74,7 @@ msgstr "返回首页"
 msgid "Back to overview"
 msgstr "返回概览"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:415
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:455
 msgid "Bring a document. Start a conversation."
 msgstr "上传一份文档，开启一段对话。"
 
@@ -85,7 +82,7 @@ msgstr "上传一份文档，开启一段对话。"
 msgid "Career"
 msgstr "职业经历"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:222
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:226
 msgid "Chat"
 msgstr "对话"
 
@@ -102,8 +99,8 @@ msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:224
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:268
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:277
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:321
 msgid "Default workspace"
 msgstr "默认工作区"
 
@@ -175,7 +172,7 @@ msgstr "神州数码 · 通明湖云和信创研究院 · 产研中心"
 msgid "Digital China Smart Vision"
 msgstr "神州数码"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:191
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:193
 msgid "Dismiss selection"
 msgstr "取消选中"
 
@@ -193,11 +190,11 @@ msgstr "文档与知识库"
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr "文档与知识库 | 前端开发与 AI 应用"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:124
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:126
 msgid "Document chat"
 msgstr "文档对话"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:142
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:144
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:139
 msgid "Document preview"
 msgstr "文档预览"
@@ -210,11 +207,11 @@ msgstr "文档阅读概览"
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "前端开发、AI 应用与工程实践文档"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:418
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:458
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr "拖入 PDF 或 Markdown 文件，或点击选择文件。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:469
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:509
 msgid "Drop to open this document"
 msgstr "松开以打开文档"
 
@@ -226,7 +223,7 @@ msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
 msgid "effective"
 msgstr "高效"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:271
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:282
 msgid "Enter to send · Shift + Enter for a new line"
 msgstr "Enter 发送 · Shift + Enter 换行"
 
@@ -286,7 +283,7 @@ msgstr "HIX.AI 是一个基于 AI 的医疗解决方案平台。"
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr "曾在四家公司工作，包括北京健康星球、深圳兆日科技、神州数码.武汉产研中心和深圳九瓴科技。拥有有丰富的 Web开发和性能优化经验。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:91
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:142
 msgid "I pulled a passage from this document. Click it to highlight the original text."
 msgstr "我从这份文档里摘了一段原文。点击引用即可高亮到 PDF 中的位置。"
 
@@ -382,7 +379,7 @@ msgstr "2025 年 5 月 - 至今"
 msgid "Meet Shin-chan"
 msgstr "认识小新"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:253
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:264
 msgid "Message"
 msgstr "消息"
 
@@ -402,11 +399,11 @@ msgstr "下一页"
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:271
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:324
 msgid "No account needed · PDF & Markdown"
 msgstr "无需登录 · 支持 PDF 与 Markdown"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:217
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:270
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr "未识别到可选文字。扫描版 PDF 需要先进行 OCR 识别，才能根据文字内容回答问题。"
 
@@ -439,19 +436,19 @@ msgstr "第 {0} 页"
 msgid "Page number"
 msgstr "页码"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:131
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:182
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF 文件不能超过 20 MB，Markdown 文件不能超过 1 MB。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:424
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:464
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:116
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:167
 msgid "Please choose one document at a time."
 msgstr "每次请选择一份文档。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:122
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:173
 msgid "Please upload a PDF or Markdown file."
 msgstr "请上传 PDF 或 Markdown 文件。"
 
@@ -483,19 +480,19 @@ msgstr "阅读 PDF 与 Markdown 文件"
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "阅读、探索、提问，让文档与思考并肩展开。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:479
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:519
 msgid "Reading document…"
 msgstr "正在读取文档…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:301
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:354
 msgid "Remove document"
 msgstr "移除文档"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:239
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:250
 msgid "Remove quote"
 msgstr "移除引文"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:294
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:347
 msgid "Replace"
 msgstr "更换"
 
@@ -503,7 +500,7 @@ msgstr "更换"
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:215
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:226
 msgid "Retry"
 msgstr "重试"
 
@@ -523,20 +520,20 @@ msgstr "滚动到最新消息"
 msgid "Select a passage and add it to your conversation as a quote. Keep the document name and page number alongside your questions and notes."
 msgstr "选中一段文字，将它作为引文加入对话。文档名称和页码会与问题、笔记一起保留，方便随时查阅。"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:202
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:204
 msgid "Select a shorter passage (up to 4,000 characters)."
 msgstr "请选择更短的段落（最多 4,000 个字符）。"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:145
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:147
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:135
 msgid "Select text to quote"
 msgstr "选中文字即可引用"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:179
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:181
 msgid "Selected text"
 msgstr "选中的文字"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:288
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:299
 msgid "Send message"
 msgstr "发送消息"
 
@@ -548,15 +545,15 @@ msgstr "座右铭"
 msgid "Shinnosuke Nohara"
 msgstr "野原新之助"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:278
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:289
 msgid "Stop response"
 msgstr "停止回复"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:256
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:264
 msgid "Summarize"
 msgstr "总结"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:251
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:259
 msgid "Summarize this passage."
 msgstr "请简明总结这段文字。"
 
@@ -564,23 +561,27 @@ msgstr "请简明总结这段文字。"
 msgid "Tech Stack"
 msgstr "技术栈"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:204
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:209
+msgid "The assistant only receives the quoted passage and your instruction."
+msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档。"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:257
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:189
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:200
 msgid "Thinking…"
 msgstr "正在思考…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:163
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:215
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "无法读取此文件，请使用有效的 UTF-8 编码 Markdown 文件。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:126
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:177
 msgid "This file is empty. Please choose another file."
 msgstr "文件内容为空，请选择其他文件。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:219
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:272
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr "文档较长，已为对话准备前 60,000 个字符。后续页面的内容可通过划词引用加入对话。"
 
@@ -599,15 +600,15 @@ msgstr "无法打开此 PDF，请尝试其他文件。"
 msgid "This PDF is password protected."
 msgstr "此 PDF 受密码保护。"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:239
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:245
 msgid "Translate"
 msgstr "翻译"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:234
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:240
 msgid "Translate this passage."
 msgstr "请将这段文字翻译成中文。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:429
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:469
 msgid "Try a sample document"
 msgstr "体验示例文档"
 
@@ -623,7 +624,7 @@ msgstr "可以体验示例文档，或打开自己的文件。文档和笔记仅
 msgid "Unlock PDF"
 msgstr "解锁 PDF"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:254
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:307
 msgid "Upload document"
 msgstr "上传文档"
 
@@ -649,7 +650,7 @@ msgstr "武汉科技大学"
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr "武汉兆日科技有限责任公司"
 
-#: src/app/[lang]/knowledge/_components/document-chat.tsx:160
+#: src/app/[lang]/knowledge/_components/document-chat.tsx:162
 msgid "You"
 msgstr "你"
 

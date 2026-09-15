@@ -10,7 +10,7 @@ import {
 } from "./chat-stream-state";
 
 export function useChatStreamState(options: {
-  onComplete?: () => void;
+  onComplete?: (state: ChatStreamState) => void;
   onError?: (error: string) => void;
 }) {
   const { onComplete } = options;
@@ -18,6 +18,7 @@ export function useChatStreamState(options: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const latestRef = useRef(initialChatStreamState);
 
   const send = useCallback(
     (input: TInputParams) => {
@@ -25,19 +26,25 @@ export function useChatStreamState(options: {
       subscriptionRef.current = null;
 
       setError(null);
+      latestRef.current = initialChatStreamState;
       setState(initialChatStreamState);
       setLoading(true);
       const sub = createObservableState(input).subscribe({
-        next: setState,
+        next: (nextState) => {
+          latestRef.current = nextState;
+          setState(nextState);
+        },
         error: (err) => {
           setError(err instanceof Error ? err.message : String(err));
           setLoading(false);
         },
         complete: () => {
-          setState((s) => flushChatStreamState(s));
+          const flushed = flushChatStreamState(latestRef.current);
+          latestRef.current = flushed;
+          setState(flushed);
           setLoading(false);
           subscriptionRef.current = null;
-          onComplete?.();
+          onComplete?.(flushed);
         },
       });
       subscriptionRef.current = sub;
