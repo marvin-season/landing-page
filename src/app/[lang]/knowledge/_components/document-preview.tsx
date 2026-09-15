@@ -12,6 +12,12 @@ import {
   MAX_QUOTE_CHARACTERS,
   normalizeQuoteRects,
 } from "./document-model";
+import {
+  TRANSLATION_INSTRUCTIONS,
+  TRANSLATION_LANGUAGE_OPTIONS,
+  type TranslationLanguage,
+  useTranslationLanguage,
+} from "./translation-language";
 
 function PreviewLoading() {
   return (
@@ -33,6 +39,45 @@ const DocumentMarkdown = dynamic(() => import("./document-markdown"), {
   loading: PreviewLoading,
 });
 
+function TranslationLanguagePicker({
+  value,
+  onChange,
+}: {
+  value: TranslationLanguage;
+  onChange: (value: TranslationLanguage) => void;
+}) {
+  const { t } = useLingui();
+  return (
+    <div className="mb-2">
+      <p className="mb-1 text-[11px] text-muted-foreground">
+        <Trans>Translate to</Trans>
+      </p>
+      <div
+        className="grid grid-cols-4 gap-1"
+        role="radiogroup"
+        aria-label={t`Translate to`}
+      >
+        {TRANSLATION_LANGUAGE_OPTIONS.map((option) => (
+          <Button
+            key={option.value}
+            type="button"
+            size="sm"
+            variant={value === option.value ? "subtle" : "ghost"}
+            className="h-7 min-w-0 px-1 text-[11px] truncate"
+            role="radio"
+            aria-checked={value === option.value}
+            aria-label={option.label}
+            onPointerDown={(event) => event.preventDefault()}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function DocumentPreview({
   document: source,
   pageNumber,
@@ -52,9 +97,10 @@ export function DocumentPreview({
   activeQuote: DocumentQuote | null;
   busy?: boolean;
 }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const { language, setLanguage } = useTranslationLanguage();
   const [selection, setSelection] = useState<{
     text: string;
     pageNumber?: number;
@@ -206,6 +252,10 @@ export function DocumentPreview({
                 </Trans>
               </p>
             ) : null}
+            <TranslationLanguagePicker
+              value={language}
+              onChange={setLanguage}
+            />
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -233,7 +283,7 @@ export function DocumentPreview({
                 onClick={() => {
                   const quote = quoteFromSelection();
                   if (!quote) return;
-                  onPrompt(quote, t`Translate this passage.`);
+                  onPrompt(quote, i18n._(TRANSLATION_INSTRUCTIONS[language]));
                   finishSelection();
                 }}
               >
