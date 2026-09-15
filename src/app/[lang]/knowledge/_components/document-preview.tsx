@@ -3,7 +3,7 @@
 import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FileText, Languages, Loader2, Quote, Text, X } from "lucide-react";
+import { Languages, Loader2, Quote, Text, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -35,9 +35,41 @@ const PdfPreview = dynamic(() => import("./pdf-preview"), {
   ssr: false,
   loading: PreviewLoading,
 });
-const DocumentMarkdown = dynamic(() => import("./document-markdown"), {
+const MarkdownPreview = dynamic(() => import("./markdown-preview"), {
   loading: PreviewLoading,
 });
+
+function DocumentKindPreview({
+  source,
+  pageNumber,
+  onPageChange,
+  onError,
+  activeQuote,
+}: {
+  source: KnowledgeDocument;
+  pageNumber: number;
+  onPageChange: (page: number) => void;
+  onError: (message: string) => void;
+  activeQuote: DocumentQuote | null;
+}) {
+  switch (source.kind) {
+    case "pdf":
+      return (
+        <PdfPreview
+          file={source.file}
+          documentId={source.id}
+          pageNumber={pageNumber}
+          onPageChange={onPageChange}
+          onError={onError}
+          activeQuote={
+            activeQuote?.documentId === source.id ? activeQuote : null
+          }
+        />
+      );
+    case "markdown":
+      return <MarkdownPreview content={source.markdown} />;
+  }
+}
 
 function TranslationLanguagePicker({
   value,
@@ -183,38 +215,13 @@ export function DocumentPreview({
 
   return (
     <div ref={rootRef} className="relative flex min-h-0 flex-1 flex-col">
-      {source.kind !== "pdf" ? (
-        <div className="flex items-center gap-2 border-b border-border/60 px-4 py-4">
-          <FileText className="size-4 shrink-0 text-primary" />
-          <h2 className="text-sm font-medium">
-            <Trans>Document preview</Trans>
-          </h2>
-          <span className="ml-auto text-xs text-muted-foreground">
-            <Trans>Select text to quote</Trans>
-          </span>
-        </div>
-      ) : null}
-      {source.kind === "pdf" ? (
-        <PdfPreview
-          file={source.file}
-          documentId={source.id}
-          pageNumber={pageNumber}
-          onPageChange={onPageChange}
-          onError={onError}
-          activeQuote={
-            activeQuote?.documentId === source.id ? activeQuote : null
-          }
-        />
-      ) : (
-        <div className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20 p-4 sm:p-6">
-          <article
-            data-document-content
-            className="min-h-full rounded-lg border border-border/40 bg-card p-5 shadow-sm sm:p-8"
-          >
-            <DocumentMarkdown content={source.markdown ?? ""} />
-          </article>
-        </div>
-      )}
+      <DocumentKindPreview
+        source={source}
+        pageNumber={pageNumber}
+        onPageChange={onPageChange}
+        onError={onError}
+        activeQuote={activeQuote}
+      />
       <AnimatePresence>
         {selection ? (
           <motion.div

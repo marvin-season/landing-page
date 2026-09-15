@@ -20,45 +20,30 @@ import {
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { DocumentChat, type KnowledgeMessage } from "./document-chat";
 import {
+  createKnowledgeDocument,
+  DOCUMENT_FILE_ACCEPT,
   type DocumentContent,
   type DocumentQuote,
+  type DocumentSourcePayload,
+  documentContentFromSource,
   formatFileSize,
   getDocumentKind,
+  isDocumentTooLarge,
   type KnowledgeDocument,
-  limitDocumentContent,
-  MAX_MARKDOWN_BYTES,
-  MAX_PDF_BYTES,
+  readMarkdownSource,
 } from "./document-model";
 import { DocumentPreview } from "./document-preview";
 import {
   buildKnowledgePrompt,
   toKnowledgeChatMessages,
 } from "./knowledge-prompt";
-
-const sampleDocuments = [
-  {
-    path: "/knowledge/examples/letters-to-the-lighthouse.pdf",
-    name: "灯塔来信_5000字扩写版.pdf",
-    title: "灯塔来信 · Letters to the Lighthouse",
-    format: "PDF",
-    type: "application/pdf",
-  },
-  {
-    path: "/knowledge/examples/reading-notes.md",
-    name: "阅读与知识笔记.md",
-    title: "把阅读变成自己的知识",
-    format: "Markdown",
-    type: "text/markdown",
-  },
-] as const;
-
-const MOCK_PDF_QUOTE = {
-  pageNumber: 1,
-  text: `外婆学英文的样子忽然浮上心头。她会把 breakfast 念得像两块饼干掉在桌上，却坚持每天记五个
-词，说码头来的外国船员越来越多，总不能只会摆手。小时候的林夏嫌她发音奇怪，后来出国旅行
-，收到她的消息，也总是匆忙回复一个表情。如今那本卷边的单词簿还摊着，铅笔横在页缝里，仿
-佛主人只是出去买了一袋盐。`,
-} as const;
+import {
+  createSeededPdfQuote,
+  SAMPLE_DOCUMENTS,
+  type SampleDocument,
+  sampleFileType,
+  sampleFormatLabel,
+} from "./sample-documents";
 
 export function KnowledgeWorkspace() {
   const { t } = useLingui();
@@ -144,13 +129,7 @@ export function KnowledgeWorkspace() {
           id: crypto.randomUUID(),
           role: "assistant",
           text: t`I pulled a passage from this document. Click it to highlight the original text.`,
-          quote: {
-            id: crypto.randomUUID(),
-            documentId: source.id,
-            documentName: source.file.name,
-            text: MOCK_PDF_QUOTE.text,
-            pageNumber: MOCK_PDF_QUOTE.pageNumber,
-          },
+          quote: createSeededPdfQuote(source),
         },
       ];
     });
@@ -181,7 +160,7 @@ export function KnowledgeWorkspace() {
       setUploadError(t`This file is empty. Please choose another file.`);
       return;
     }
-    if (file.size > (kind === "pdf" ? MAX_PDF_BYTES : MAX_MARKDOWN_BYTES)) {
+    if (isDocumentTooLarge(file, kind)) {
       setUploadError(
         t`PDF files must be under 20 MB and Markdown files under 1 MB.`,
       );
@@ -193,20 +172,15 @@ export function KnowledgeWorkspace() {
     setUploadError(null);
     setReading(true);
     try {
-      let markdown: string | undefined;
-      if (kind === "markdown") {
-        const bytes = await file.arrayBuffer();
-        markdown = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-        if (!markdown.trim()) throw new Error("empty");
-        if (markdown.includes("\0")) throw new Error("binary");
-      }
+      const payload: DocumentSourcePayload =
+        kind === "markdown"
+          ? { kind, markdown: await readMarkdownSource(file) }
+          : { kind };
       if (uploadVersion.current !== version) return;
-      const id = crypto.randomUUID();
-      activeDocumentId.current = id;
-      setSource({ id, file, kind, markdown });
-      setContent(
-        markdown === undefined ? null : limitDocumentContent(markdown),
-      );
+      const next = createKnowledgeDocument(crypto.randomUUID(), file, payload);
+      activeDocumentId.current = next.id;
+      setSource(next);
+      setContent(documentContentFromSource(next));
       setDocumentError(null);
       setPageNumber(1);
       setQuote(null);
@@ -239,7 +213,7 @@ export function KnowledgeWorkspace() {
     setReading(false);
   }
 
-  async function openSample(sample: (typeof sampleDocuments)[number]) {
+  async function openSample(sample: SampleDocument) {
     const version = ++uploadVersion.current;
     sampleRequest.current?.abort();
     const controller = new AbortController();
@@ -253,7 +227,7 @@ export function KnowledgeWorkspace() {
       if (uploadVersion.current !== version) return;
       await upload([
         new File([blob], sample.name, {
-          type: sample.type,
+          type: sampleFileType(sample.kind),
         }),
       ]);
     } catch {
@@ -305,7 +279,7 @@ export function KnowledgeWorkspace() {
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.md,.markdown,application/pdf,text/markdown"
+        accept={DOCUMENT_FILE_ACCEPT}
         className="sr-only"
         tabIndex={-1}
         aria-label={t`Upload document`}
@@ -471,7 +445,7 @@ export function KnowledgeWorkspace() {
                 <Trans>Try a sample document</Trans>
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
-                {sampleDocuments.map((sample) => (
+                {SAMPLE_DOCUMENTS.map((sample) => (
                   <button
                     key={sample.path}
                     type="button"
@@ -495,7 +469,7 @@ export function KnowledgeWorkspace() {
                       </span>
                     </span>
                     <span className="shrink-0 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">
-                      {sample.format}
+                      {sampleFormatLabel(sample.kind)}
                     </span>
                   </button>
                 ))}
