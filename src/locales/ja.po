@@ -17,7 +17,7 @@ msgstr ""
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ""
 
-#: src/app/[lang]/resume/layout.tsx:30
+#: src/app/[lang]/resume/layout.tsx:31
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
@@ -37,6 +37,10 @@ msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の�
 msgid "A Simple PPT Generator"
 msgstr "シンプルなPPTジェネレーター"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:22
+msgid "A workspace for ongoing conversations"
+msgstr "対話を続けるワークスペース"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:53
 msgid "About me in detail"
 msgstr "詳細な自己紹介"
@@ -44,6 +48,10 @@ msgstr "詳細な自己紹介"
 #: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Agent UI"
 msgstr "エージェントUI"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:12
+msgid "AI conversations, with room to think."
+msgstr "考える余白のある、AIとの対話。"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
@@ -73,6 +81,10 @@ msgstr "アシスタント"
 msgid "Back to home"
 msgstr "ホームに戻る"
 
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:127
+msgid "Back to introduction"
+msgstr "紹介に戻る"
+
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
 msgid "Back to overview"
 msgstr "概要に戻る"
@@ -88,6 +100,10 @@ msgstr "キャリア"
 #: src/app/[lang]/knowledge/page.tsx:91
 msgid "Click a PDF quote to return to its page and highlight the original passage. Read surrounding paragraphs without losing your place in the conversation."
 msgstr "PDF の引用をクリックすると、該当ページに移動し、原文がハイライトされます。会話を残したまま前後の段落を確認できます。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:159
+msgid "Click a PDF quote to return to its page and highlight the passage. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
+msgstr "PDFの引用をクリックすると該当ページに戻り、原文がハイライトされます。文書とメモは現在のページセッション内で保持され、AIの回答とスキャン文書のOCRにはまだ対応していません。"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:13
 msgid "Crayon Shin-chan"
@@ -171,6 +187,10 @@ msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · 
 msgid "Digital China Smart Vision"
 msgstr "Digital China Smart Vision"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:55
+msgid "Discover a frontend toolkit spanning React, Next.js, TypeScript, Tailwind CSS, and shadcn/ui, with attention to usability and web performance."
+msgstr "React、Next.js、TypeScript、Tailwind CSS、shadcn/uiにわたる技術スタックと、使いやすさやWebパフォーマンスへの取り組みをご覧ください。"
+
 #: src/app/[lang]/knowledge/_components/document-preview.tsx:177
 msgid "Dismiss selection"
 msgstr "選択を解除"
@@ -230,9 +250,37 @@ msgstr "Enter で送信 · Shift + Enter で改行"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:63
+msgid "Experience with context"
+msgstr "背景まで伝わる職務経験"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:54
 msgid "Experience, projects, and personal profile"
 msgstr "経験、プロジェクト、および個人プロフィール"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:14
+msgid "Explore a conversational workspace built with Mastra. Start a chat, revisit a thread, and follow responses as they arrive in an interface designed for ongoing work."
+msgstr "Mastraで構築された対話ワークスペース。チャットを始め、過去のスレッドを振り返り、届いた回答を読みながら作業を進められます。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:108
+msgid "Explore a separate collection of UI components and design references. Find inspiration for consistent interfaces and reusable building blocks for frontend projects."
+msgstr "UIコンポーネントとデザインの参考資料を集めた別サイト。統一感のあるインターフェースや、再利用できる部品づくりのヒントを探せます。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:77
+msgid "Explore a web presentation tool that pairs structured slide generation with a canvas preview. Choose a topic preset, generate slide content, and review the result in your browser."
+msgstr "構造化されたスライド生成とキャンバスプレビューを組み合わせたWebツール。テーマのプリセットを選び、内容を生成してブラウザで確認できます。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:126
+msgid "Explore the full collection"
+msgstr "コレクション全体を見る"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:75
+msgid "Explore the homepage"
+msgstr "ホームページを探索"
+
+#: src/app/[lang]/(home)/_components/index.tsx:112
+msgid "Explore this page"
+msgstr "ページの概要を見る"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
@@ -246,6 +294,14 @@ msgstr "引用の前後を確認する"
 msgid "Fit to width"
 msgstr "幅に合わせる"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:32
+msgid "Follow answers as they unfold"
+msgstr "回答が届くそばから読む"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:53
+msgid "From interface to implementation"
+msgstr "インターフェースから実装まで"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:62
 msgid "Generate slide content in a structured workflow"
 msgstr "構造化ワークフローでスライドコンテンツを生成"
@@ -253,6 +309,10 @@ msgstr "構造化ワークフローでスライドコンテンツを生成"
 #: src/app/[lang]/layout.tsx:34
 msgid "Generated by create next app"
 msgstr "create next app によって生成"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:106
+msgid "Good interfaces start with shared foundations."
+msgstr "良いインターフェースは、共通の土台から。"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -310,6 +370,7 @@ msgstr "Ollamaを使用してローカルで大規模モデルをデプロイ"
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr "大規模言語モデルに基づくインテリジェントQ&Aシステム、クラウドベースのDeepSeek無料完全機能版またはローカルのDeepSeek軽量版をサポート。"
 
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:80
 #: src/app/[lang]/resume/_components/intro.tsx:72
 msgid "Introduction"
 msgstr "紹介"
@@ -342,6 +403,10 @@ msgstr "2023年6月 - 2025年4月"
 msgid "Jushihui"
 msgstr "Jushihui"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:24
+msgid "Keep separate topics in separate threads and return to previous discussions. The Agent UI brings conversation history and the current chat into one place."
+msgstr "話題ごとにスレッドを分け、以前の議論に戻れます。Agent UIは会話履歴と現在のチャットを一つの場所にまとめます。"
+
 #: src/app/[lang]/knowledge/page.tsx:76
 msgid "Keep the passages that matter"
 msgstr "大切な文章を残す"
@@ -370,7 +435,11 @@ msgstr "Mastraによるメインチャットフロー"
 msgid "May 2025 - Present"
 msgstr "2025年5月 - 現在"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:50
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:45
+msgid "Meet Marvin, a web developer focused on functional, thoughtful interfaces. Explore the experience and engineering work behind projects built with React, Next.js, and TypeScript."
+msgstr "機能と使い心地を大切にするWeb開発者、Marvin。React、Next.js、TypeScriptを使ったプロジェクトの背景にある経験と開発の取り組みをご紹介します。"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:51
 msgid "Meet Shin-chan"
 msgstr "しんちゃんを知る"
 
@@ -378,17 +447,26 @@ msgstr "しんちゃんを知る"
 msgid "Message"
 msgstr "メッセージ"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:96
+msgid "Move through the canvas presentation and switch between sample content and generated decks. Inspect the slide sequence before taking your ideas further."
+msgstr "キャンバスでスライドを順に確認し、サンプルと生成した資料を切り替えられます。アイデアを発展させる前に、全体の流れを確認しましょう。"
+
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
 msgstr "私の専門的な経験とスキル"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:74
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:123
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:134
 msgid "Navigation"
 msgstr "ナビゲーション"
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:199
 msgid "Next page"
 msgstr "次のページ"
+
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:152
+msgid "Next page preview"
+msgstr "次のページ概要"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
@@ -410,13 +488,23 @@ msgstr "ログインなしで PDF や Markdown を開けます。同じワーク
 msgid "Open document workspace"
 msgstr "ドキュメントワークスペースを開く"
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:184
+#: src/app/[lang]/(home)/_components/index.tsx:109
 msgid "Open page"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:182
+#: src/app/[lang]/(home)/_components/index.tsx:107
 msgid "Open reference"
 msgstr ""
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:128
+msgid "Open the external design system site in a new tab to browse its components and references alongside your current project."
+msgstr "外部のデザインシステムサイトを新しいタブで開き、現在のプロジェクトと並べてコンポーネントや参考資料を確認できます。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:149
+msgid "Open your own file or try the sample. Browse PDF pages, adjust the zoom, read formatted Markdown, and collect selected passages with document names and page references."
+msgstr "自分のファイルを開くか、サンプルを試せます。PDFのページ閲覧やズーム調整、整形されたMarkdownの閲覧、文書名とページ番号付きの引用収集ができます。"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:52
 msgid "Optimized performance with lazy loading and data virtualization"
@@ -430,6 +518,10 @@ msgstr "{0} ページ"
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:168
 msgid "Page number"
 msgstr "ページ番号"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:111
+msgid "Page preview"
+msgstr "ページの概要"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:107
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
@@ -455,7 +547,11 @@ msgstr "ドキュメントのテキストを準備中…"
 msgid "Previous page"
 msgstr "前のページ"
 
-#: src/app/[lang]/resume/layout.tsx:28
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:142
+msgid "Previous page preview"
+msgstr "前のページ概要"
+
+#: src/app/[lang]/resume/layout.tsx:29
 msgid "Professional Experience & Skills"
 msgstr "専門的な経験とスキル"
 
@@ -467,9 +563,17 @@ msgstr "チャットに引用"
 msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:65
+msgid "Read about professional roles, project work, and technical responsibilities in the full profile. The resume page requires access authorization."
+msgstr "詳しいプロフィールで職歴、プロジェクト、技術的な役割をご確認いただけます。履歴書ページの閲覧にはアクセス認証が必要です。"
+
 #: src/app/[lang]/knowledge/page.tsx:60
 msgid "Read and explore documents"
 msgstr "ドキュメントを読んで理解する"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:139
+msgid "Read PDF and Markdown documents in a dedicated workspace without creating an account. Keep useful passages close, preserve their source, and return to the original context."
+msgstr "アカウントを作成せずに、専用ワークスペースでPDFやMarkdownを読めます。役立つ文章を出典とともに残し、いつでも元の文脈に戻れます。"
 
 #: src/app/[lang]/knowledge/page.tsx:9
 msgid "Read PDF and Markdown documents without an account. Select passages, collect quotes with page references, and return to highlighted PDF text in a dedicated document workspace."
@@ -482,6 +586,10 @@ msgstr "PDF と Markdown を読む"
 #: src/app/[lang]/knowledge/page.tsx:53
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "読み、探り、質問する。ドキュメントと思考を並べて。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:147
+msgid "Read, select, and collect"
+msgstr "読んで、選んで、集める"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:446
 msgid "Reading document…"
@@ -507,13 +615,25 @@ msgstr "履歴書"
 msgid "Retry"
 msgstr "再試行"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:157
+msgid "Return to the source"
+msgstr "原文に戻る"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:94
+msgid "Review slides in one place"
+msgstr "スライドをひとつの場所で確認"
+
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
 msgid "Scroll down to read and quote your document"
 msgstr "下にスクロールして閲覧と引用を始める"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:103
+msgid "Scroll to explore the selected page"
+msgstr "スクロールして選択中のページを詳しく見る"
 
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:39
 msgid "Scroll to latest message"
@@ -540,7 +660,7 @@ msgstr "選択したテキスト"
 msgid "Send message"
 msgstr "メッセージを送信"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:78
+#: src/app/[lang]/(home)/_components/home-content.tsx:76
 msgid "Sentences"
 msgstr "座右銘"
 
@@ -548,9 +668,17 @@ msgstr "座右銘"
 msgid "Shinnosuke Nohara"
 msgstr "野原しんのすけ"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:85
+msgid "Start with a structured brief"
+msgstr "構成の決まった設定から始める"
+
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:278
 msgid "Stop response"
 msgstr "応答を停止"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:34
+msgid "Streaming responses let you read while an answer is being generated. Sign in to enter the agent workspace and explore its chat modes."
+msgstr "ストリーミング表示により、回答の生成中から読み進められます。ログインしてエージェントのワークスペースとチャットモードをお試しください。"
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
@@ -560,9 +688,17 @@ msgstr "技術スタック"
 msgid "Text could not be extracted. You can still preview this document."
 msgstr "テキストを抽出できませんでした。プレビューは引き続き利用できます。"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:43
+msgid "The developer behind the details."
+msgstr "細部をつくる、開発者の素顔。"
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:180
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:116
+msgid "Think in reusable components"
+msgstr "再利用できるコンポーネントで考える"
 
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:189
 msgid "Thinking…"
@@ -595,17 +731,25 @@ msgstr "この PDF を開けませんでした。別のファイルをお試し�
 msgid "This PDF is password protected."
 msgstr "この PDF はパスワードで保護されています。"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:87
+msgid "Topic presets define the subject, tone, and slide count. Generate a presentation from a preset or explore the included sample slides."
+msgstr "プリセットでテーマ、トーン、スライド数を指定します。プリセットから生成するほか、付属のサンプルスライドも閲覧できます。"
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:396
 msgid "Try a sample document"
 msgstr "サンプルドキュメントを試す"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:36
+#: src/app/[lang]/(home)/_components/home-content.tsx:37
 msgid "Try Agent UI"
 msgstr ""
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 msgstr "サンプルや自分のファイルを開いてお試しください。ドキュメントとメモは現在のページでのみ保持されます。AI の応答とスキャン文書の OCR はまだ利用できません。"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:75
+msgid "Turn a topic into a presentation."
+msgstr "ひとつのテーマを、プレゼンテーションに。"
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:274
 msgid "Unlock PDF"
@@ -614,6 +758,10 @@ msgstr "PDF を開く"
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
 msgid "Upload document"
 msgstr "ドキュメントをアップロード"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:118
+msgid "Use the component library as a reference when considering common UI patterns, visual consistency, and the building blocks of a design system."
+msgstr "よく使われるUIパターン、見た目の一貫性、デザインシステムの基本要素を考える際に、コンポーネントライブラリを参考にできます。"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
@@ -644,6 +792,10 @@ msgstr "あなた"
 #: src/app/[lang]/resume/_components/intro.tsx:53
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr "私に連絡することができます:<0><1>mrvnseason@gmail.com</1><2>または電話: +86 15623192717</2></0>"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:137
+msgid "Your documents. A clearer perspective."
+msgstr "文書から、もっと明確な視点へ。"
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:233
 msgid "Zoom in"

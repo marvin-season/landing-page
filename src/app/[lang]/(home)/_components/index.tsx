@@ -1,6 +1,6 @@
 import { cn } from "@landing-page/utils";
 import { Trans } from "@lingui/react/macro";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import type { HomeNavLink } from "../data/home-data";
 
@@ -36,39 +36,6 @@ export function HomeSection({
   );
 }
 
-export function NavigationCarousel({ items }: { items: HomeNavLink[] }) {
-  return (
-    <div className="relative isolate">
-      <div className="group/navigation -mx-2 overflow-x-auto px-2 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex w-max animate-[home-navigation-scroll_48s_linear_infinite] group-hover/navigation:[animation-play-state:paused] group-focus-within/navigation:[animation-play-state:paused] motion-reduce:animate-none">
-          {[false, true].map((duplicate) => (
-            <div
-              key={String(duplicate)}
-              aria-hidden={duplicate || undefined}
-              className={cn(
-                "flex shrink-0 gap-4 pr-4",
-                duplicate && "motion-reduce:hidden",
-              )}
-            >
-              {items.map((item) => (
-                <NavCard key={item.href} {...item} duplicate={duplicate} />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -left-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_right,black,transparent)] sm:w-16"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -right-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_left,black,transparent)] sm:w-16"
-      />
-    </div>
-  );
-}
-
 export function NavCard({
   href,
   analyticsId,
@@ -77,9 +44,17 @@ export function NavCard({
   badge,
   icon: Icon,
   duplicate = false,
-}: HomeNavLink & { duplicate?: boolean }) {
+  active = false,
+  previewOpen = false,
+  onClick,
+}: HomeNavLink & {
+  duplicate?: boolean;
+  active?: boolean;
+  previewOpen?: boolean;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+}) {
   const external = href.startsWith("http");
-  const featured = href === "/knowledge";
+  const featured = analyticsId === "knowledge";
 
   return (
     <TrackedLink
@@ -93,9 +68,14 @@ export function NavCard({
       }}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
+      onClick={onClick}
       tabIndex={duplicate ? -1 : undefined}
+      aria-hidden={duplicate || undefined}
+      aria-current={active ? "true" : undefined}
+      aria-controls="home-preview"
+      data-active={active || undefined}
       data-featured={featured || undefined}
-      className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10 shinchan:matte-surface shinchan:hover:shadow-sm data-[featured=true]:isolate data-[featured=true]:border-0 data-[featured=true]:p-[17px] data-[featured=true]:shadow-primary/15"
+      className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10 shinchan:matte-surface shinchan:hover:shadow-sm data-[featured=true]:isolate data-[featured=true]:border-0 data-[featured=true]:p-[17px] data-[featured=true]:shadow-primary/15 snap-center data-[active=true]:ring-2 data-[active=true]:ring-primary/50 data-[active=true]:ring-offset-2 data-[active=true]:ring-offset-background"
     >
       {featured && (
         <>
@@ -126,7 +106,15 @@ export function NavCard({
         {description}
       </p>
       <span className="mt-auto block text-xs font-medium text-primary opacity-60 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 pt-3 group-focus-visible:opacity-100">
-        {external ? <Trans>Open reference</Trans> : <Trans>Open page</Trans>}
+        {active && previewOpen ? (
+          external ? (
+            <Trans>Open reference</Trans>
+          ) : (
+            <Trans>Open page</Trans>
+          )
+        ) : (
+          <Trans>Explore this page</Trans>
+        )}
       </span>
     </TrackedLink>
   );

@@ -17,7 +17,7 @@ msgstr ""
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 
-#: src/app/[lang]/resume/layout.tsx:30
+#: src/app/[lang]/resume/layout.tsx:31
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "A comprehensive overview of my work experience, projects, and technical expertise."
 
@@ -37,6 +37,10 @@ msgstr "A mischievous five-year-old who turns everyday life into an adventure."
 msgid "A Simple PPT Generator"
 msgstr "A Simple PPT Generator"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:22
+msgid "A workspace for ongoing conversations"
+msgstr "A workspace for ongoing conversations"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:53
 msgid "About me in detail"
 msgstr "About me in detail"
@@ -44,6 +48,10 @@ msgstr "About me in detail"
 #: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Agent UI"
 msgstr "Agent UI"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:12
+msgid "AI conversations, with room to think."
+msgstr "AI conversations, with room to think."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
@@ -73,6 +81,10 @@ msgstr "Assistant"
 msgid "Back to home"
 msgstr "Back to home"
 
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:127
+msgid "Back to introduction"
+msgstr "Back to introduction"
+
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
 msgid "Back to overview"
 msgstr "Back to overview"
@@ -88,6 +100,10 @@ msgstr "Career"
 #: src/app/[lang]/knowledge/page.tsx:91
 msgid "Click a PDF quote to return to its page and highlight the original passage. Read surrounding paragraphs without losing your place in the conversation."
 msgstr "Click a PDF quote to return to its page and highlight the original passage. Read surrounding paragraphs without losing your place in the conversation."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:159
+msgid "Click a PDF quote to return to its page and highlight the passage. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
+msgstr "Click a PDF quote to return to its page and highlight the passage. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:13
 msgid "Crayon Shin-chan"
@@ -171,6 +187,10 @@ msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · 
 msgid "Digital China Smart Vision"
 msgstr "Digital China Smart Vision"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:55
+msgid "Discover a frontend toolkit spanning React, Next.js, TypeScript, Tailwind CSS, and shadcn/ui, with attention to usability and web performance."
+msgstr "Discover a frontend toolkit spanning React, Next.js, TypeScript, Tailwind CSS, and shadcn/ui, with attention to usability and web performance."
+
 #: src/app/[lang]/knowledge/_components/document-preview.tsx:177
 msgid "Dismiss selection"
 msgstr "Dismiss selection"
@@ -230,9 +250,37 @@ msgstr "Enter to send · Shift + Enter for a new line"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:63
+msgid "Experience with context"
+msgstr "Experience with context"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:54
 msgid "Experience, projects, and personal profile"
 msgstr "Experience, projects, and personal profile"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:14
+msgid "Explore a conversational workspace built with Mastra. Start a chat, revisit a thread, and follow responses as they arrive in an interface designed for ongoing work."
+msgstr "Explore a conversational workspace built with Mastra. Start a chat, revisit a thread, and follow responses as they arrive in an interface designed for ongoing work."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:108
+msgid "Explore a separate collection of UI components and design references. Find inspiration for consistent interfaces and reusable building blocks for frontend projects."
+msgstr "Explore a separate collection of UI components and design references. Find inspiration for consistent interfaces and reusable building blocks for frontend projects."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:77
+msgid "Explore a web presentation tool that pairs structured slide generation with a canvas preview. Choose a topic preset, generate slide content, and review the result in your browser."
+msgstr "Explore a web presentation tool that pairs structured slide generation with a canvas preview. Choose a topic preset, generate slide content, and review the result in your browser."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:126
+msgid "Explore the full collection"
+msgstr "Explore the full collection"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:75
+msgid "Explore the homepage"
+msgstr "Explore the homepage"
+
+#: src/app/[lang]/(home)/_components/index.tsx:112
+msgid "Explore this page"
+msgstr "Explore this page"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
@@ -246,6 +294,14 @@ msgstr "Find every quote in context"
 msgid "Fit to width"
 msgstr "Fit to width"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:32
+msgid "Follow answers as they unfold"
+msgstr "Follow answers as they unfold"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:53
+msgid "From interface to implementation"
+msgstr "From interface to implementation"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:62
 msgid "Generate slide content in a structured workflow"
 msgstr "Generate slide content in a structured workflow"
@@ -253,6 +309,10 @@ msgstr "Generate slide content in a structured workflow"
 #: src/app/[lang]/layout.tsx:34
 msgid "Generated by create next app"
 msgstr "Generated by create next app"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:106
+msgid "Good interfaces start with shared foundations."
+msgstr "Good interfaces start with shared foundations."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -310,6 +370,7 @@ msgstr "Integrated Ollama for local large model deployment"
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 msgstr "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
 
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:80
 #: src/app/[lang]/resume/_components/intro.tsx:72
 msgid "Introduction"
 msgstr "Introduction"
@@ -342,6 +403,10 @@ msgstr "June 2023 - April 2025"
 msgid "Jushihui"
 msgstr "Jushihui"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:24
+msgid "Keep separate topics in separate threads and return to previous discussions. The Agent UI brings conversation history and the current chat into one place."
+msgstr "Keep separate topics in separate threads and return to previous discussions. The Agent UI brings conversation history and the current chat into one place."
+
 #: src/app/[lang]/knowledge/page.tsx:76
 msgid "Keep the passages that matter"
 msgstr "Keep the passages that matter"
@@ -370,7 +435,11 @@ msgstr "Main chat flow powered by Mastra"
 msgid "May 2025 - Present"
 msgstr "May 2025 - Present"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:50
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:45
+msgid "Meet Marvin, a web developer focused on functional, thoughtful interfaces. Explore the experience and engineering work behind projects built with React, Next.js, and TypeScript."
+msgstr "Meet Marvin, a web developer focused on functional, thoughtful interfaces. Explore the experience and engineering work behind projects built with React, Next.js, and TypeScript."
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:51
 msgid "Meet Shin-chan"
 msgstr "Meet Shin-chan"
 
@@ -378,17 +447,26 @@ msgstr "Meet Shin-chan"
 msgid "Message"
 msgstr "Message"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:96
+msgid "Move through the canvas presentation and switch between sample content and generated decks. Inspect the slide sequence before taking your ideas further."
+msgstr "Move through the canvas presentation and switch between sample content and generated decks. Inspect the slide sequence before taking your ideas further."
+
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
 msgstr "My professional experience and skills"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:74
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:123
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:134
 msgid "Navigation"
 msgstr "Navigation"
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:199
 msgid "Next page"
 msgstr "Next page"
+
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:152
+msgid "Next page preview"
+msgstr "Next page preview"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
@@ -410,13 +488,23 @@ msgstr "Open a PDF or Markdown document without an account. Browse PDF pages, ad
 msgid "Open document workspace"
 msgstr "Open document workspace"
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:184
+#: src/app/[lang]/(home)/_components/index.tsx:109
 msgid "Open page"
 msgstr "Open page"
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:182
+#: src/app/[lang]/(home)/_components/index.tsx:107
 msgid "Open reference"
 msgstr "Open reference"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:128
+msgid "Open the external design system site in a new tab to browse its components and references alongside your current project."
+msgstr "Open the external design system site in a new tab to browse its components and references alongside your current project."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:149
+msgid "Open your own file or try the sample. Browse PDF pages, adjust the zoom, read formatted Markdown, and collect selected passages with document names and page references."
+msgstr "Open your own file or try the sample. Browse PDF pages, adjust the zoom, read formatted Markdown, and collect selected passages with document names and page references."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:52
 msgid "Optimized performance with lazy loading and data virtualization"
@@ -430,6 +518,10 @@ msgstr "Page {0}"
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:168
 msgid "Page number"
 msgstr "Page number"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:111
+msgid "Page preview"
+msgstr "Page preview"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:107
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
@@ -455,7 +547,11 @@ msgstr "Preparing document text…"
 msgid "Previous page"
 msgstr "Previous page"
 
-#: src/app/[lang]/resume/layout.tsx:28
+#: src/app/[lang]/(home)/_components/navigation-carousel.tsx:142
+msgid "Previous page preview"
+msgstr "Previous page preview"
+
+#: src/app/[lang]/resume/layout.tsx:29
 msgid "Professional Experience & Skills"
 msgstr "Professional Experience & Skills"
 
@@ -467,9 +563,17 @@ msgstr "Quote in chat"
 msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:65
+msgid "Read about professional roles, project work, and technical responsibilities in the full profile. The resume page requires access authorization."
+msgstr "Read about professional roles, project work, and technical responsibilities in the full profile. The resume page requires access authorization."
+
 #: src/app/[lang]/knowledge/page.tsx:60
 msgid "Read and explore documents"
 msgstr "Read and explore documents"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:139
+msgid "Read PDF and Markdown documents in a dedicated workspace without creating an account. Keep useful passages close, preserve their source, and return to the original context."
+msgstr "Read PDF and Markdown documents in a dedicated workspace without creating an account. Keep useful passages close, preserve their source, and return to the original context."
 
 #: src/app/[lang]/knowledge/page.tsx:9
 msgid "Read PDF and Markdown documents without an account. Select passages, collect quotes with page references, and return to highlighted PDF text in a dedicated document workspace."
@@ -482,6 +586,10 @@ msgstr "Read PDF and Markdown files"
 #: src/app/[lang]/knowledge/page.tsx:53
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "Read, explore, and ask questions. Your documents and ideas, side by side."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:147
+msgid "Read, select, and collect"
+msgstr "Read, select, and collect"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:446
 msgid "Reading document…"
@@ -507,13 +615,25 @@ msgstr "Resume"
 msgid "Retry"
 msgstr "Retry"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:157
+msgid "Return to the source"
+msgstr "Return to the source"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:94
+msgid "Review slides in one place"
+msgstr "Review slides in one place"
+
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
 msgid "Scroll down to read and quote your document"
 msgstr "Scroll down to read and quote your document"
+
+#: src/app/[lang]/(home)/_components/home-scenes.tsx:103
+msgid "Scroll to explore the selected page"
+msgstr "Scroll to explore the selected page"
 
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:39
 msgid "Scroll to latest message"
@@ -540,7 +660,7 @@ msgstr "Selected text"
 msgid "Send message"
 msgstr "Send message"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:78
+#: src/app/[lang]/(home)/_components/home-content.tsx:76
 msgid "Sentences"
 msgstr "Sentences"
 
@@ -548,9 +668,17 @@ msgstr "Sentences"
 msgid "Shinnosuke Nohara"
 msgstr "Shinnosuke Nohara"
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:85
+msgid "Start with a structured brief"
+msgstr "Start with a structured brief"
+
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:278
 msgid "Stop response"
 msgstr "Stop response"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:34
+msgid "Streaming responses let you read while an answer is being generated. Sign in to enter the agent workspace and explore its chat modes."
+msgstr "Streaming responses let you read while an answer is being generated. Sign in to enter the agent workspace and explore its chat modes."
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
@@ -560,9 +688,17 @@ msgstr "Tech Stack"
 msgid "Text could not be extracted. You can still preview this document."
 msgstr "Text could not be extracted. You can still preview this document."
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:43
+msgid "The developer behind the details."
+msgstr "The developer behind the details."
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:180
 msgid "The sample could not be loaded. Please try again."
 msgstr "The sample could not be loaded. Please try again."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:116
+msgid "Think in reusable components"
+msgstr "Think in reusable components"
 
 #: src/app/[lang]/knowledge/_components/document-chat.tsx:189
 msgid "Thinking…"
@@ -595,17 +731,25 @@ msgstr "This PDF could not be opened. Try another file."
 msgid "This PDF is password protected."
 msgstr "This PDF is password protected."
 
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:87
+msgid "Topic presets define the subject, tone, and slide count. Generate a presentation from a preset or explore the included sample slides."
+msgstr "Topic presets define the subject, tone, and slide count. Generate a presentation from a preset or explore the included sample slides."
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:396
 msgid "Try a sample document"
 msgstr "Try a sample document"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:36
+#: src/app/[lang]/(home)/_components/home-content.tsx:37
 msgid "Try Agent UI"
 msgstr "Try Agent UI"
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 msgstr "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:75
+msgid "Turn a topic into a presentation."
+msgstr "Turn a topic into a presentation."
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:274
 msgid "Unlock PDF"
@@ -614,6 +758,10 @@ msgstr "Unlock PDF"
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
 msgid "Upload document"
 msgstr "Upload document"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:118
+msgid "Use the component library as a reference when considering common UI patterns, visual consistency, and the building blocks of a design system."
+msgstr "Use the component library as a reference when considering common UI patterns, visual consistency, and the building blocks of a design system."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
@@ -644,6 +792,10 @@ msgstr "You"
 #: src/app/[lang]/resume/_components/intro.tsx:53
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
+
+#: src/app/[lang]/(home)/data/home-preview-data.tsx:137
+msgid "Your documents. A clearer perspective."
+msgstr "Your documents. A clearer perspective."
 
 #: src/app/[lang]/knowledge/_components/pdf-preview.tsx:233
 msgid "Zoom in"
