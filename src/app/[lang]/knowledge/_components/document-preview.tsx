@@ -7,7 +7,6 @@ import { FileText, Loader2, Quote, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import {
-  type DocumentContent,
   type DocumentQuote,
   type KnowledgeDocument,
   MAX_QUOTE_CHARACTERS,
@@ -38,7 +37,6 @@ export function DocumentPreview({
   document: source,
   pageNumber,
   onPageChange,
-  onContent,
   onError,
   onQuote,
   activeQuote,
@@ -46,7 +44,6 @@ export function DocumentPreview({
   document: KnowledgeDocument;
   pageNumber: number;
   onPageChange: (page: number) => void;
-  onContent: (content: DocumentContent) => void;
   onError: (message: string) => void;
   onQuote: (quote: DocumentQuote) => void;
   activeQuote: DocumentQuote | null;
@@ -138,7 +135,6 @@ export function DocumentPreview({
           documentId={source.id}
           pageNumber={pageNumber}
           onPageChange={onPageChange}
-          onContent={onContent}
           onError={onError}
           activeQuote={
             activeQuote?.documentId === source.id ? activeQuote : null

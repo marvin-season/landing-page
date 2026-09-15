@@ -16,7 +16,6 @@ import { DocumentChat, type KnowledgeMessage } from "./document-chat";
 import {
   type DocumentContent,
   type DocumentQuote,
-  findSeedQuotePassage,
   formatFileSize,
   getDocumentKind,
   type KnowledgeDocument,
@@ -42,6 +41,14 @@ const sampleDocuments = [
     type: "text/markdown",
   },
 ] as const;
+
+const MOCK_PDF_QUOTE = {
+  pageNumber: 1,
+  text: `外婆学英文的样子忽然浮上心头。她会把 breakfast 念得像两块饼干掉在桌上，却坚持每天记五个
+词，说码头来的外国船员越来越多，总不能只会摆手。小时候的林夏嫌她发音奇怪，后来出国旅行
+，收到她的消息，也总是匆忙回复一个表情。如今那本卷边的单词簿还摊着，铅笔横在页缝里，仿
+佛主人只是出去买了一袋盐。`,
+} as const;
 
 export function KnowledgeWorkspace() {
   const { t } = useLingui();
@@ -72,10 +79,8 @@ export function KnowledgeWorkspace() {
   );
 
   useEffect(() => {
-    if (!source || source.kind !== "pdf" || !content?.text) return;
+    if (!source || source.kind !== "pdf") return;
     if (seededQuoteDocumentId.current === source.id) return;
-    const passage = findSeedQuotePassage(content.text);
-    if (!passage) return;
     seededQuoteDocumentId.current = source.id;
     setMessages((current) => {
       if (current.length > 0) return current;
@@ -88,23 +93,15 @@ export function KnowledgeWorkspace() {
             id: crypto.randomUUID(),
             documentId: source.id,
             documentName: source.file.name,
-            text: passage.quote,
-            pageNumber: passage.pageNumber,
+            text: MOCK_PDF_QUOTE.text,
+            pageNumber: MOCK_PDF_QUOTE.pageNumber,
           },
         },
       ];
     });
-  }, [source, content, t]);
+  }, [source, t]);
 
   const sourceId = source?.id;
-  const onContent = useCallback(
-    (next: DocumentContent) => {
-      if (activeDocumentId.current !== sourceId) return;
-      setContent(next);
-      setDocumentError(null);
-    },
-    [sourceId],
-  );
   const onDocumentError = useCallback(
     (message: string) => {
       if (activeDocumentId.current === sourceId) setDocumentError(message);
@@ -216,13 +213,11 @@ export function KnowledgeWorkspace() {
 
   const notice =
     documentError ??
-    (source && !content
-      ? t`Preparing document text…`
-      : content && !content.text
-        ? t`No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered.`
-        : content?.truncated
-          ? t`This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages.`
-          : undefined);
+    (content && !content.text
+      ? t`No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered.`
+      : content?.truncated
+        ? t`This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages.`
+        : undefined);
 
   return (
     <section
@@ -343,7 +338,6 @@ export function KnowledgeWorkspace() {
                   document={source}
                   pageNumber={pageNumber}
                   onPageChange={setPageNumber}
-                  onContent={onContent}
                   onError={onDocumentError}
                   onQuote={setQuote}
                   activeQuote={activeQuote}

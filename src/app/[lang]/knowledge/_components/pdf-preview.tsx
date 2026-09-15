@@ -16,11 +16,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import {
-  type DocumentContent,
-  type DocumentQuote,
-  extractPdfContent,
-} from "./document-model";
+import type { DocumentQuote } from "./document-model";
 import { usePdfCitationHighlight } from "./pdf-citation-highlight/use-pdf-citation-highlight";
 import {
   type CitationQuery,
@@ -42,7 +38,6 @@ type PdfPreviewProps = {
   documentId: string;
   pageNumber: number;
   onPageChange: (page: number) => void;
-  onContent: (content: DocumentContent) => void;
   onError: (message: string) => void;
   activeQuote: DocumentQuote | null;
 };
@@ -52,7 +47,6 @@ export default function PdfPreview({
   documentId,
   pageNumber,
   onPageChange,
-  onContent,
   onError,
   activeQuote,
 }: PdfPreviewProps) {
@@ -122,22 +116,6 @@ export default function PdfPreview({
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (!pdf) return;
-    const controller = new AbortController();
-    void extractPdfContent(pdf, controller.signal)
-      .then((content) => {
-        if (!controller.signal.aborted) onContent(content);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted)
-          onError(
-            t`Text could not be extracted. You can still preview this document.`,
-          );
-      });
-    return () => controller.abort();
-  }, [pdf, onContent, onError, t]);
 
   const loading = (
     <div
