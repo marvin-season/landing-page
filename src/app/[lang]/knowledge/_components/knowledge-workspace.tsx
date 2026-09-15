@@ -18,7 +18,7 @@ import {
   type TInputParams,
 } from "@/lib/stream/chat-stream-state";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
-import { DocumentChat, type KnowledgeMessage } from "./document-chat";
+import { DocumentChat, type KnowledgeMessage } from "./document/chat";
 import {
   createKnowledgeDocument,
   DOCUMENT_FILE_ACCEPT,
@@ -31,19 +31,19 @@ import {
   isDocumentTooLarge,
   type KnowledgeDocument,
   readMarkdownSource,
-} from "./document-model";
-import { DocumentPreview } from "./document-preview";
-import {
-  buildKnowledgePrompt,
-  toKnowledgeChatMessages,
-} from "./knowledge-prompt";
+} from "./document/model";
+import { DocumentPreview } from "./document/preview";
 import {
   createSeededPdfQuote,
   SAMPLE_DOCUMENTS,
   type SampleDocument,
   sampleFileType,
   sampleFormatLabel,
-} from "./sample-documents";
+} from "./document/samples";
+import {
+  buildKnowledgePrompt,
+  toKnowledgeChatMessages,
+} from "./knowledge-prompt";
 
 export function KnowledgeWorkspace() {
   const { t } = useLingui();

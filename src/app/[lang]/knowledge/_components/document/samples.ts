@@ -3,7 +3,7 @@ import {
   type DocumentKind,
   type DocumentQuote,
   type PdfKnowledgeDocument,
-} from "./document-model";
+} from "./model";
 
 export type SampleDocument = {
   path: string;

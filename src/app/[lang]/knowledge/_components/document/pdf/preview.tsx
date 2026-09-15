@@ -16,12 +16,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import type { DocumentQuote } from "./document-model";
-import { usePdfCitationHighlight } from "./pdf-citation-highlight/use-pdf-citation-highlight";
+import type { DocumentQuote } from "../model";
+import { usePdfCitationHighlight } from "./citation-highlight/use-pdf-citation-highlight";
 import {
   type CitationQuery,
   createReactPdfCitationViewer,
-} from "./pdf-citation-highlight/viewer";
+} from "./citation-highlight/viewer";
 
 const assetPath = `/pdfjs/${pdfjs.version}/`;
 pdfjs.GlobalWorkerOptions.workerSrc = `${assetPath}pdf.worker.min.mjs`;

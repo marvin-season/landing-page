@@ -2,7 +2,7 @@
 
 import { Trans } from "@lingui/react/macro";
 import { FileText } from "lucide-react";
-import DocumentMarkdown from "./document-markdown";
+import DocumentMarkdown from "./renderer";
 
 export default function MarkdownPreview({ content }: { content: string }) {
   return (

@@ -11,7 +11,7 @@ import {
   type KnowledgeDocument,
   MAX_QUOTE_CHARACTERS,
   normalizeQuoteRects,
-} from "./document-model";
+} from "./model";
 import {
   TRANSLATION_INSTRUCTIONS,
   TRANSLATION_LANGUAGE_OPTIONS,
@@ -31,11 +31,11 @@ function PreviewLoading() {
   );
 }
 
-const PdfPreview = dynamic(() => import("./pdf-preview"), {
+const PdfPreview = dynamic(() => import("./pdf/preview"), {
   ssr: false,
   loading: PreviewLoading,
 });
-const MarkdownPreview = dynamic(() => import("./markdown-preview"), {
+const MarkdownPreview = dynamic(() => import("./markdown/preview"), {
   loading: PreviewLoading,
 });
 
