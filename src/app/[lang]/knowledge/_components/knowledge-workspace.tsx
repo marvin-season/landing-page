@@ -340,6 +340,18 @@ export function KnowledgeWorkspace() {
                   onPageChange={setPageNumber}
                   onError={onDocumentError}
                   onQuote={setQuote}
+                  onPrompt={(selectedQuote, text) => {
+                    setQuote(null);
+                    setMessages((previous) => [
+                      ...previous,
+                      {
+                        id: crypto.randomUUID(),
+                        role: "user",
+                        text,
+                        quote: selectedQuote,
+                      },
+                    ]);
+                  }}
                   activeQuote={activeQuote}
                 />
               </div>

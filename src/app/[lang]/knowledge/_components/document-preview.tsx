@@ -3,7 +3,7 @@
 import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FileText, Loader2, Quote, X } from "lucide-react";
+import { FileText, Languages, Loader2, Quote, Text, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -39,6 +39,7 @@ export function DocumentPreview({
   onPageChange,
   onError,
   onQuote,
+  onPrompt,
   activeQuote,
 }: {
   document: KnowledgeDocument;
@@ -46,6 +47,7 @@ export function DocumentPreview({
   onPageChange: (page: number) => void;
   onError: (message: string) => void;
   onQuote: (quote: DocumentQuote) => void;
+  onPrompt: (quote: DocumentQuote, text: string) => void;
   activeQuote: DocumentQuote | null;
 }) {
   const { t } = useLingui();
@@ -115,6 +117,21 @@ export function DocumentPreview({
       document.removeEventListener("selectionchange", updateSelection);
     };
   }, []);
+
+  function quoteFromSelection() {
+    if (!selection) return null;
+    return {
+      id: crypto.randomUUID(),
+      documentId: source.id,
+      documentName: source.file.name,
+      ...selection,
+    };
+  }
+
+  function finishSelection() {
+    window.getSelection()?.removeAllRanges();
+    setSelection(null);
+  }
 
   return (
     <div ref={rootRef} className="relative flex min-h-0 flex-1 flex-col">
@@ -187,26 +204,58 @@ export function DocumentPreview({
                 </Trans>
               </p>
             ) : null}
-            <Button
-              type="button"
-              size="sm"
-              className="w-full"
-              disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
-              onPointerDown={(event) => event.preventDefault()}
-              onClick={() => {
-                onQuote({
-                  id: crypto.randomUUID(),
-                  documentId: source.id,
-                  documentName: source.file.name,
-                  ...selection,
-                });
-                window.getSelection()?.removeAllRanges();
-                setSelection(null);
-              }}
-            >
-              <Quote className="size-3.5" />
-              <Trans>Quote in chat</Trans>
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                className="min-w-0 flex-1"
+                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  const quote = quoteFromSelection();
+                  if (!quote) return;
+                  onQuote(quote);
+                  finishSelection();
+                }}
+              >
+                <Quote className="size-3.5" />
+                <Trans>Chat</Trans>
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="min-w-0 flex-1"
+                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  const quote = quoteFromSelection();
+                  if (!quote) return;
+                  onPrompt(quote, t`Translate this passage.`);
+                  finishSelection();
+                }}
+              >
+                <Languages className="size-3.5" />
+                <Trans>Translate</Trans>
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="min-w-0 flex-1"
+                disabled={selection.text.length > MAX_QUOTE_CHARACTERS}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  const quote = quoteFromSelection();
+                  if (!quote) return;
+                  onPrompt(quote, t`Summarize this passage.`);
+                  finishSelection();
+                }}
+              >
+                <Text className="size-3.5" />
+                <Trans>Summarize</Trans>
+              </Button>
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
