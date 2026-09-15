@@ -50,6 +50,10 @@ const MOCK_PDF_QUOTE = {
 佛主人只是出去买了一袋盐。`,
 } as const;
 
+const MOCK_MARKDOWN_QUOTE = {
+  text: "读完一篇文章，并不代表真正理解了它。比起保存越来越多的链接，更有价值的习惯是：留下一个问题、一段引文和一条自己的解释。",
+} as const;
+
 export function KnowledgeWorkspace() {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -79,8 +83,15 @@ export function KnowledgeWorkspace() {
   );
 
   useEffect(() => {
-    if (!source || source.kind !== "pdf") return;
+    if (!source) return;
     if (seededQuoteDocumentId.current === source.id) return;
+    const quoteText =
+      source.kind === "pdf"
+        ? MOCK_PDF_QUOTE.text
+        : source.kind === "markdown"
+          ? MOCK_MARKDOWN_QUOTE.text
+          : null;
+    if (!quoteText) return;
     seededQuoteDocumentId.current = source.id;
     setMessages((current) => {
       if (current.length > 0) return current;
@@ -93,8 +104,9 @@ export function KnowledgeWorkspace() {
             id: crypto.randomUUID(),
             documentId: source.id,
             documentName: source.file.name,
-            text: MOCK_PDF_QUOTE.text,
-            pageNumber: MOCK_PDF_QUOTE.pageNumber,
+            text: quoteText,
+            pageNumber:
+              source.kind === "pdf" ? MOCK_PDF_QUOTE.pageNumber : undefined,
           },
         },
       ];

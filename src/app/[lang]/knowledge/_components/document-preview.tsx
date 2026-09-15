@@ -5,13 +5,14 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FileText, Loader2, Quote, X } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type DocumentQuote,
   type KnowledgeDocument,
   MAX_QUOTE_CHARACTERS,
   normalizeQuoteRects,
 } from "./document-model";
+import { useMarkdownCitationHighlight } from "./markdown-citation-highlight/use-markdown-citation-highlight";
 
 function PreviewLoading() {
   return (
@@ -51,11 +52,32 @@ export function DocumentPreview({
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [article, setArticle] = useState<HTMLElement | null>(null);
+  const [markdownReady, setMarkdownReady] = useState(false);
   const [selection, setSelection] = useState<{
     text: string;
     pageNumber?: number;
     rects?: DocumentQuote["rects"];
   } | null>(null);
+  const onMarkdownRendered = useCallback(() => setMarkdownReady(true), []);
+  const citationQuote =
+    activeQuote?.documentId === source.id ? activeQuote : null;
+  const markdownQuery = useMemo(() => {
+    if (source.kind !== "markdown" || !citationQuote) return null;
+    const quote = citationQuote.text;
+    if (!quote.trim()) return null;
+    return { documentId: citationQuote.documentId, quote };
+  }, [source.kind, citationQuote]);
+
+  useMarkdownCitationHighlight({
+    article: markdownReady ? article : null,
+    container: scrollContainer,
+    query: markdownQuery,
+    currentDocumentId: source.id,
+  });
 
   useEffect(() => {
     let frame = 0;
@@ -136,17 +158,22 @@ export function DocumentPreview({
           pageNumber={pageNumber}
           onPageChange={onPageChange}
           onError={onError}
-          activeQuote={
-            activeQuote?.documentId === source.id ? activeQuote : null
-          }
+          activeQuote={citationQuote}
         />
       ) : (
-        <div className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20 p-4 sm:p-6">
+        <div
+          ref={setScrollContainer}
+          className="min-h-0 flex-1 overflow-auto overscroll-contain bg-muted/20 p-4 sm:p-6"
+        >
           <article
+            ref={setArticle}
             data-document-content
-            className="min-h-full rounded-lg border border-border/40 bg-card p-5 shadow-sm sm:p-8"
+            className="relative min-h-full rounded-lg border border-border/40 bg-card p-5 shadow-sm sm:p-8"
           >
-            <DocumentMarkdown content={source.markdown ?? ""} />
+            <DocumentMarkdown
+              content={source.markdown ?? ""}
+              onRendered={onMarkdownRendered}
+            />
           </article>
         </div>
       )}

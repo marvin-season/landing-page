@@ -1,8 +1,19 @@
 "use client";
 
+import { useLayoutEffect } from "react";
 import { Streamdown } from "streamdown";
 
-export default function DocumentMarkdown({ content }: { content: string }) {
+export default function DocumentMarkdown({
+  content,
+  onRendered,
+}: {
+  content: string;
+  onRendered?: () => void;
+}) {
+  useLayoutEffect(() => {
+    onRendered?.();
+  }, [onRendered]);
+
   return (
     <Streamdown
       mode="static"
