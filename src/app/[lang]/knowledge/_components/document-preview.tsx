@@ -135,6 +135,7 @@ export function DocumentPreview({
       {source.kind === "pdf" ? (
         <PdfPreview
           file={source.file}
+          documentId={source.id}
           pageNumber={pageNumber}
           onPageChange={onPageChange}
           onContent={onContent}

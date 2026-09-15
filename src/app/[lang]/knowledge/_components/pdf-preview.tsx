@@ -2,7 +2,6 @@
 
 import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useReducedMotion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,7 +12,7 @@ import {
   Plus,
 } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -22,6 +21,11 @@ import {
   type DocumentQuote,
   extractPdfContent,
 } from "./document-model";
+import { usePdfCitationHighlight } from "./pdf-citation-highlight/use-pdf-citation-highlight";
+import {
+  type CitationQuery,
+  createReactPdfCitationViewer,
+} from "./pdf-citation-highlight/viewer";
 
 const assetPath = `/pdfjs/${pdfjs.version}/`;
 pdfjs.GlobalWorkerOptions.workerSrc = `${assetPath}pdf.worker.min.mjs`;
@@ -35,6 +39,7 @@ const pdfOptions = {
 
 type PdfPreviewProps = {
   file: File;
+  documentId: string;
   pageNumber: number;
   onPageChange: (page: number) => void;
   onContent: (content: DocumentContent) => void;
@@ -42,46 +47,9 @@ type PdfPreviewProps = {
   activeQuote: DocumentQuote | null;
 };
 
-function PdfQuoteHighlight({ quote }: { quote: DocumentQuote }) {
-  const firstRectRef = useRef<HTMLSpanElement>(null);
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (!quote.rects?.length) return;
-    const frame = requestAnimationFrame(() => {
-      firstRectRef.current?.scrollIntoView({
-        behavior: reducedMotion ? "instant" : "smooth",
-        block: "center",
-        inline: "nearest",
-      });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [quote, reducedMotion]);
-
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 z-20"
-      aria-hidden="true"
-    >
-      {quote.rects?.map((rect, index) => (
-        <span
-          key={`${rect.left}-${rect.top}-${rect.width}-${rect.height}`}
-          ref={index === 0 ? firstRectRef : undefined}
-          className="absolute rounded-sm bg-amber-300/40 mix-blend-multiply motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
-          style={{
-            left: `${rect.left * 100}%`,
-            top: `${rect.top * 100}%`,
-            width: `${rect.width * 100}%`,
-            height: `${rect.height * 100}%`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default function PdfPreview({
   file,
+  documentId,
   pageNumber,
   onPageChange,
   onContent,
@@ -93,14 +61,56 @@ export default function PdfPreview({
   const [width, setWidth] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
+  const [pageHost, setPageHost] = useState<HTMLDivElement | null>(null);
   const [passwordRequest, setPasswordRequest] = useState<{
     submit: (password: string) => void;
     incorrect: boolean;
   } | null>(null);
   const [password, setPassword] = useState("");
   const [renderError, setRenderError] = useState(false);
-  const [renderedPage, setRenderedPage] = useState<string | null>(null);
-  const renderKey = `${pageNumber}:${width}:${zoom}`;
+  const pdfRef = useRef(pdf);
+  pdfRef.current = pdf;
+  const pageHostRef = useRef(pageHost);
+  pageHostRef.current = pageHost;
+  const onPageChangeRef = useRef(onPageChange);
+  onPageChangeRef.current = onPageChange;
+
+  const viewer = useMemo(
+    () =>
+      createReactPdfCitationViewer({
+        getDocument: () => pdfRef.current,
+        getPageHost: () => pageHostRef.current,
+        getScrollContainer: () => containerRef.current,
+        goToPage: (page1) => onPageChangeRef.current(page1),
+      }),
+    [],
+  );
+
+  const query = useMemo((): CitationQuery | null => {
+    if (!activeQuote) return null;
+    const page = activeQuote.pageNumber;
+    const quote = activeQuote.text;
+    if (
+      !quote.trim() ||
+      typeof page !== "number" ||
+      !Number.isInteger(page) ||
+      page < 1
+    )
+      return null;
+    return {
+      documentId: activeQuote.documentId,
+      page,
+      quote,
+    };
+  }, [activeQuote]);
+
+  usePdfCitationHighlight({
+    viewer,
+    query,
+    currentDocumentId: documentId,
+    enabled: query !== null,
+    pageElement: pageHost,
+  });
 
   useEffect(() => {
     const element = containerRef.current;
@@ -307,6 +317,7 @@ export default function PdfPreview({
           {pdf && width > 0 ? (
             <div
               key={pageNumber}
+              ref={setPageHost}
               data-document-content
               data-page-number={pageNumber}
               className="mx-auto w-fit shadow-sm relative"
@@ -320,7 +331,10 @@ export default function PdfPreview({
                 loading={loading}
                 onRenderSuccess={() => {
                   setRenderError(false);
-                  setRenderedPage(renderKey);
+                  viewer.notifyRendered(pageNumber);
+                }}
+                onRenderTextLayerSuccess={() => {
+                  viewer.notifyRendered(pageNumber);
                 }}
                 onRenderError={() => setRenderError(true)}
                 error={
@@ -329,10 +343,6 @@ export default function PdfPreview({
                   </p>
                 }
               />
-              {activeQuote?.pageNumber === pageNumber &&
-              renderedPage === renderKey ? (
-                <PdfQuoteHighlight quote={activeQuote} />
-              ) : null}
             </div>
           ) : null}
         </Document>
