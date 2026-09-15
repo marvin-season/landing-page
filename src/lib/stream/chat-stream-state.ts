@@ -1,13 +1,14 @@
 import type { UIMessageChunk } from "ai";
 import type { Observable } from "rxjs";
 import { scan } from "rxjs";
-import { buildSubmitMessageBody } from "@/lib/chat/api";
+import { buildSubmitMessageBody, type ChatSubmitMessage } from "@/lib/chat/api";
 import { createObservableStream } from "./chat-stream";
 
 export type TInputParams = {
   url: string;
   text: string;
   threadId: string;
+  messages?: ChatSubmitMessage[];
 };
 
 // ---------------------------------------------------------------------------
@@ -238,8 +239,9 @@ export function createObservableState({
   url,
   text,
   threadId,
+  messages,
 }: TInputParams): Observable<ChatStreamState> {
-  const body = buildSubmitMessageBody({ threadId, text });
+  const body = buildSubmitMessageBody({ threadId, text, messages });
   return createObservableStream(url, body).pipe(
     scan(reduceChatStreamEvent, initialChatStreamState),
   );

@@ -7,6 +7,7 @@ import {
   ArrowDown,
   ArrowUp,
   Bot,
+  Gauge,
   Loader2,
   MessageSquare,
   Quote,
@@ -87,6 +88,8 @@ export function DocumentChat({
   onLocate,
   notice,
   streamingText,
+  throttle,
+  onThrottleChange,
 }: {
   quote: DocumentQuote | null;
   onQuoteChange: (quote: DocumentQuote | null) => void;
@@ -99,6 +102,8 @@ export function DocumentChat({
   onLocate: (quote: DocumentQuote) => void;
   notice?: string;
   streamingText?: string;
+  throttle: boolean;
+  onThrottleChange: (throttle: boolean) => void;
 }) {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
@@ -125,6 +130,24 @@ export function DocumentChat({
         <h2 className="text-sm font-medium">
           <Trans>Document chat</Trans>
         </h2>
+        <Button
+          disabled
+          title={t`Default throttle mode, cannot be changed`}
+          type="button"
+          size="sm"
+          variant={throttle ? "subtle" : "outline"}
+          className="ml-auto"
+          aria-pressed={throttle}
+          aria-label={
+            throttle
+              ? t`Throttle on. Only the current question is sent.`
+              : t`Throttle off. The full conversation is sent.`
+          }
+          onClick={() => onThrottleChange(!throttle)}
+        >
+          <Gauge className="size-3.5" />
+          <Trans>Throttle</Trans>
+        </Button>
       </div>
       <StickToBottom
         className="relative min-h-0 flex-1 overflow-hidden"

@@ -30,7 +30,10 @@ import {
   MAX_PDF_BYTES,
 } from "./document-model";
 import { DocumentPreview } from "./document-preview";
-import { buildKnowledgePrompt } from "./knowledge-prompt";
+import {
+  buildKnowledgePrompt,
+  toKnowledgeChatMessages,
+} from "./knowledge-prompt";
 
 const sampleDocuments = [
   {
@@ -75,6 +78,7 @@ export function KnowledgeWorkspace() {
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
   const [activeQuote, setActiveQuote] = useState<DocumentQuote | null>(null);
   const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
+  const [throttle, setThrottle] = useState(true);
   const seededQuoteDocumentId = useRef<string | null>(null);
   const threadIdRef = useRef(crypto.randomUUID());
   const lastSendRef = useRef<TInputParams | null>(null);
@@ -101,20 +105,20 @@ export function KnowledgeWorkspace() {
   function ask(instruction: string, selectedQuote: DocumentQuote | null) {
     const text = buildKnowledgePrompt(instruction, selectedQuote?.text);
     if (!text || loading) return;
+    const userMessage: KnowledgeMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      text: instruction,
+      quote: selectedQuote ?? undefined,
+    };
+    const nextMessages = [...messages, userMessage];
     setQuote(null);
-    setMessages((previous) => [
-      ...previous,
-      {
-        id: crypto.randomUUID(),
-        role: "user",
-        text: instruction,
-        quote: selectedQuote ?? undefined,
-      },
-    ]);
+    setMessages(nextMessages);
     const input = {
       url: "/api/knowledge/chat",
       threadId: threadIdRef.current,
       text,
+      messages: throttle ? undefined : toKnowledgeChatMessages(nextMessages),
     };
     lastSendRef.current = input;
     send(input);
@@ -410,6 +414,8 @@ export function KnowledgeWorkspace() {
                   error={error}
                   notice={notice}
                   streamingText={loading ? chatStreamText(state) : undefined}
+                  throttle={throttle}
+                  onThrottleChange={setThrottle}
                   onSubmit={(text, selectedQuote) => ask(text, selectedQuote)}
                   onStop={stop}
                   onRetry={() => {
