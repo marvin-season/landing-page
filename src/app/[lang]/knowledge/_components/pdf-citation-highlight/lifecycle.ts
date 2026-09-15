@@ -25,8 +25,6 @@ export function attachCitationLifecycle(options: {
     return () => {};
   }
 
-  viewer.goToPage(query.page);
-
   const page = viewer.getPageElement(query.page - 1);
   const container = viewer.getScrollContainer();
   if (!page || !container) return () => {};
@@ -68,7 +66,6 @@ export function attachCitationLifecycle(options: {
   const unsubscribe = viewer.onPageOrTextLayerRendered((page1) => {
     if (page1 === query.page) scheduleHighlight();
   });
-  viewer.goToPage(query.page);
   scheduleHighlight();
 
   return () => {

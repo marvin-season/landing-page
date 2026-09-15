@@ -68,6 +68,30 @@ export function getDocumentKind(name: string) {
   return null;
 }
 
+const PAGE_BLOCK = /\[Page (\d+)\]\n([\s\S]*?)(?=\n\[Page |\s*$)/;
+
+function pickQuoteSnippet(pageText: string) {
+  const compact = pageText.replace(/\s+/g, " ").trim();
+  const chinese = compact.match(
+    /[\u4e00-\u9fff]{6,}[^。！？.!?]{0,40}[。！？]/,
+  );
+  if (chinese) return chinese[0].trim();
+  const english = compact.match(/[A-Za-z][^。！？.!?]{15,80}[.!?]/);
+  if (english) return english[0].trim();
+  if (compact.length < 12) return null;
+  return compact.length <= 220 ? compact : compact.slice(0, 220).trim();
+}
+
+export function findSeedQuotePassage(text: string) {
+  const match = PAGE_BLOCK.exec(text);
+  if (!match) return null;
+  const pageNumber = Number(match[1]);
+  if (!Number.isInteger(pageNumber) || pageNumber < 1) return null;
+  const quote = pickQuoteSnippet(match[2]);
+  if (!quote) return null;
+  return { pageNumber, quote };
+}
+
 export function limitDocumentContent(text: string): DocumentContent {
   return {
     text: text.slice(0, MAX_CONTEXT_CHARACTERS),

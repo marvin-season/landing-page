@@ -16,6 +16,7 @@ import { DocumentChat, type KnowledgeMessage } from "./document-chat";
 import {
   type DocumentContent,
   type DocumentQuote,
+  findSeedQuotePassage,
   formatFileSize,
   getDocumentKind,
   type KnowledgeDocument,
@@ -60,6 +61,7 @@ export function KnowledgeWorkspace() {
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
   const [activeQuote, setActiveQuote] = useState<DocumentQuote | null>(null);
   const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
+  const seededQuoteDocumentId = useRef<string | null>(null);
 
   useEffect(
     () => () => {
@@ -68,6 +70,31 @@ export function KnowledgeWorkspace() {
     },
     [],
   );
+
+  useEffect(() => {
+    if (!source || source.kind !== "pdf" || !content?.text) return;
+    if (seededQuoteDocumentId.current === source.id) return;
+    const passage = findSeedQuotePassage(content.text);
+    if (!passage) return;
+    seededQuoteDocumentId.current = source.id;
+    setMessages((current) => {
+      if (current.length > 0) return current;
+      return [
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          text: t`I pulled a passage from this document. Click it to highlight the original text.`,
+          quote: {
+            id: crypto.randomUUID(),
+            documentId: source.id,
+            documentName: source.file.name,
+            text: passage.quote,
+            pageNumber: passage.pageNumber,
+          },
+        },
+      ];
+    });
+  }, [source, content, t]);
 
   const sourceId = source?.id;
   const onContent = useCallback(

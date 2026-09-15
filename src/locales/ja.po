@@ -17,7 +17,7 @@ msgstr ""
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ""
 
-#: src/app/[lang]/resume/layout.tsx:30
+#: src/app/[lang]/resume/layout.tsx:31
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
@@ -77,7 +77,7 @@ msgstr "ホームに戻る"
 msgid "Back to overview"
 msgstr "概要に戻る"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:382
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:409
 msgid "Bring a document. Start a conversation."
 msgstr "ドキュメントを開いて、対話を始めましょう。"
 
@@ -98,8 +98,8 @@ msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:202
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:246
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:229
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:273
 msgid "Default workspace"
 msgstr "デフォルトのワークスペース"
 
@@ -171,7 +171,7 @@ msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · 
 msgid "Digital China Smart Vision"
 msgstr "Digital China Smart Vision"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:177
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:178
 msgid "Dismiss selection"
 msgstr "選択を解除"
 
@@ -194,7 +194,7 @@ msgid "Document chat"
 msgstr "ドキュメントチャット"
 
 #: src/app/[lang]/knowledge/_components/document-preview.tsx:128
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:151
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:161
 msgid "Document preview"
 msgstr "ドキュメントのプレビュー"
 
@@ -206,11 +206,11 @@ msgstr "ドキュメント閲覧の概要"
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:385
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:412
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr "PDF または Markdown ファイルをドロップするか、クリックして選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:436
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:463
 msgid "Drop to open this document"
 msgstr "ドロップして開く"
 
@@ -242,7 +242,7 @@ msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 msgid "Find every quote in context"
 msgstr "引用の前後を確認する"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:223
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:233
 msgid "Fit to width"
 msgstr "幅に合わせる"
 
@@ -282,6 +282,10 @@ msgstr "HIX.AI は、AI パワーを使用した健康ソリューションの�
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
 msgstr "私は4つの会社で働いてきました。北京 Health Planet、深圳 Zhaori Technology、Digital China Tongminghu Wuhan R&D Center、および深圳 Jiuling Technology。私はWeb開発とパフォーマンス最適化の豊富な経験を持っています。"
 
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:86
+msgid "I pulled a passage from this document. Click it to highlight the original text."
+msgstr "この文書から一節を抜き出しました。クリックすると原文がハイライトされます。"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
 msgid "Implemented member information statistics functionality"
 msgstr "メンバー情報統計機能を実装"
@@ -298,7 +302,7 @@ msgstr "RAG検索拡張とツール呼び出し機能を実装"
 msgid "Implemented streaming chat interface with real-time message push"
 msgstr "リアルタイムメッセージプッシュを使用したストリーミングチャットインターフェースを実装"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:262
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:272
 msgid "Incorrect password. Please try again."
 msgstr "パスワードが正しくありません。もう一度お試しください。"
 
@@ -354,7 +358,7 @@ msgstr "主要責任"
 msgid "Leveraging less data to generate greater insights."
 msgstr "より少ないデータでより大きな洞察を生成する。"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:138
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:148
 msgid "Loading PDF…"
 msgstr "PDF を読み込み中…"
 
@@ -386,7 +390,7 @@ msgstr "私の専門的な経験とスキル"
 msgid "Navigation"
 msgstr "ナビゲーション"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:199
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:209
 msgid "Next page"
 msgstr "次のページ"
 
@@ -394,11 +398,11 @@ msgstr "次のページ"
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:249
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:276
 msgid "No account needed · PDF & Markdown"
 msgstr "ログイン不要 · PDF・Markdown 対応"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:195
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:222
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr "選択可能なテキストがありません。スキャンした PDF には、テキストに関する質問の前に OCR が必要です。"
 
@@ -410,11 +414,11 @@ msgstr "ログインなしで PDF や Markdown を開けます。同じワーク
 msgid "Open document workspace"
 msgstr "ドキュメントワークスペースを開く"
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
 msgstr ""
 
-#: src/app/[lang]/(home)/_components/index.tsx:113
+#: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open reference"
 msgstr ""
 
@@ -427,39 +431,39 @@ msgstr "遅延読み込みとデータ仮想化によるパフォーマンス最
 msgid "Page {0}"
 msgstr "{0} ページ"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:168
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:178
 msgid "Page number"
 msgstr "ページ番号"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:107
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF は 20 MB 以下、Markdown は 1 MB 以下にしてください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:391
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:418
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:92
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:119
 msgid "Please choose one document at a time."
 msgstr "一度に 1 つのドキュメントを選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:98
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:125
 msgid "Please upload a PDF or Markdown file."
 msgstr "PDF または Markdown ファイルをアップロードしてください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:193
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:220
 msgid "Preparing document text…"
 msgstr "ドキュメントのテキストを準備中…"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:160
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:170
 msgid "Previous page"
 msgstr "前のページ"
 
-#: src/app/[lang]/resume/layout.tsx:28
+#: src/app/[lang]/resume/layout.tsx:29
 msgid "Professional Experience & Skills"
 msgstr "専門的な経験とスキル"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:211
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:212
 msgid "Quote in chat"
 msgstr "チャットに引用"
 
@@ -483,11 +487,11 @@ msgstr "PDF と Markdown を読む"
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr "読み、探り、質問する。ドキュメントと思考を並べて。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:446
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:473
 msgid "Reading document…"
 msgstr "ドキュメントを読み込み中…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:279
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:306
 msgid "Remove document"
 msgstr "ドキュメントを削除"
 
@@ -495,7 +499,7 @@ msgstr "ドキュメントを削除"
 msgid "Remove quote"
 msgstr "引用を削除"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:272
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:299
 msgid "Replace"
 msgstr "変更"
 
@@ -523,16 +527,16 @@ msgstr "最新のメッセージへ"
 msgid "Select a passage and add it to your conversation as a quote. Keep the document name and page number alongside your questions and notes."
 msgstr "文章を選択して会話に引用できます。質問やメモとともに、ドキュメント名とページ番号を残せます。"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:188
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:189
 msgid "Select a shorter passage (up to 4,000 characters)."
 msgstr "短い文章を選択してください（最大 4,000 文字）。"
 
 #: src/app/[lang]/knowledge/_components/document-preview.tsx:131
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:147
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:157
 msgid "Select text to quote"
 msgstr "テキストを選択して引用"
 
-#: src/app/[lang]/knowledge/_components/document-preview.tsx:165
+#: src/app/[lang]/knowledge/_components/document-preview.tsx:166
 msgid "Selected text"
 msgstr "選択したテキスト"
 
@@ -556,11 +560,11 @@ msgstr "応答を停止"
 msgid "Tech Stack"
 msgstr "技術スタック"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:126
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:136
 msgid "Text could not be extracted. You can still preview this document."
 msgstr "テキストを抽出できませんでした。プレビューは引き続き利用できます。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:180
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:207
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
 
@@ -568,34 +572,34 @@ msgstr "サンプルを読み込めませんでした。もう一度お試しく
 msgid "Thinking…"
 msgstr "考え中…"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:139
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:166
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "読み込めませんでした。有効な UTF-8 の Markdown ファイルを使用してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:102
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:129
 msgid "This file is empty. Please choose another file."
 msgstr "ファイルが空です。別のファイルを選択してください。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:197
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:224
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr "長いドキュメントのため、先頭 60,000 文字をチャット用に準備しました。それ以降の文章は引用して追加できます。"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:328
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:341
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:342
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:351
 msgid "This page could not be rendered."
 msgstr "このページを表示できませんでした。"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:285
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:290
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:293
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:295
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:300
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:303
 msgid "This PDF could not be opened. Try another file."
 msgstr "この PDF を開けませんでした。別のファイルをお試しください。"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:258
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:268
 msgid "This PDF is password protected."
 msgstr "この PDF はパスワードで保護されています。"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:396
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:423
 msgid "Try a sample document"
 msgstr "サンプルドキュメントを試す"
 
@@ -607,11 +611,11 @@ msgstr ""
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
 msgstr "サンプルや自分のファイルを開いてお試しください。ドキュメントとメモは現在のページでのみ保持されます。AI の応答とスキャン文書の OCR はまだ利用できません。"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:274
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:284
 msgid "Unlock PDF"
 msgstr "PDF を開く"
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:232
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:259
 msgid "Upload document"
 msgstr "ドキュメントをアップロード"
 
@@ -645,10 +649,10 @@ msgstr "あなた"
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr "私に連絡することができます:<0><1>mrvnseason@gmail.com</1><2>または電話: +86 15623192717</2></0>"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:233
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:243
 msgid "Zoom in"
 msgstr "拡大"
 
-#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:212
+#: src/app/[lang]/knowledge/_components/pdf-preview.tsx:222
 msgid "Zoom out"
 msgstr "縮小"

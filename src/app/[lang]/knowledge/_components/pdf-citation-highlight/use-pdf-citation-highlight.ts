@@ -17,7 +17,13 @@ export function usePdfCitationHighlight({
   pageElement: HTMLDivElement | null;
 }) {
   useEffect(() => {
+    if (!query) return;
+    viewer.goToPage(query.page);
+  }, [viewer, query]);
+
+  useEffect(() => {
     if (!query || !pageElement) return;
+    if (Number(pageElement.dataset.pageNumber) !== query.page) return;
     return attachCitationLifecycle({
       viewer,
       query,
