@@ -3,6 +3,7 @@ import {
   BookOpen,
   Bot,
   FileUser,
+  History,
   type LucideIcon,
   Presentation,
   Shapes,
@@ -83,6 +84,14 @@ export const navLinks: HomeNavLink[] = [
     ),
     badge: "Knowledge",
     icon: BookOpen,
+  },
+  {
+    href: "/changelog",
+    analyticsId: "changelog",
+    title: <Trans>Product updates</Trans>,
+    description: <Trans>Three iterations of the Docs workspace</Trans>,
+    badge: "Changelog",
+    icon: History,
   },
 ];
 

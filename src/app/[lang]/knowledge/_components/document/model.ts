@@ -1,16 +1,66 @@
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
-export const MAX_PDF_BYTES = 20 * 1024 * 1024;
-export const MAX_MARKDOWN_BYTES = 1024 * 1024;
+export const DOCUMENT_KINDS = ["pdf", "markdown"] as const;
+export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+
+type DocumentFormat = {
+  kind: DocumentKind;
+  label: "PDF" | "Markdown";
+  mimeType: string;
+  extensions: readonly string[];
+  maxBytes: number;
+};
+
+export const DOCUMENT_FORMATS = {
+  pdf: {
+    kind: "pdf",
+    label: "PDF",
+    mimeType: "application/pdf",
+    extensions: [".pdf"],
+    maxBytes: 20 * 1024 * 1024,
+  },
+  markdown: {
+    kind: "markdown",
+    label: "Markdown",
+    mimeType: "text/markdown",
+    extensions: [".md", ".markdown"],
+    maxBytes: 1024 * 1024,
+  },
+} as const satisfies Record<DocumentKind, DocumentFormat>;
+
+export const MAX_PDF_BYTES = DOCUMENT_FORMATS.pdf.maxBytes;
+export const MAX_MARKDOWN_BYTES = DOCUMENT_FORMATS.markdown.maxBytes;
 export const MAX_CONTEXT_CHARACTERS = 60_000;
 export const MAX_QUOTE_CHARACTERS = 4_000;
 
-export type KnowledgeDocument = {
+export const DOCUMENT_FILE_ACCEPT = [
+  ...DOCUMENT_FORMATS.pdf.extensions,
+  ...DOCUMENT_FORMATS.markdown.extensions,
+  DOCUMENT_FORMATS.pdf.mimeType,
+  DOCUMENT_FORMATS.markdown.mimeType,
+].join(",");
+
+type KnowledgeDocumentBase = {
   id: string;
   file: File;
-  kind: "pdf" | "markdown";
-  markdown?: string;
 };
+
+export type PdfKnowledgeDocument = KnowledgeDocumentBase & {
+  kind: "pdf";
+};
+
+export type MarkdownKnowledgeDocument = KnowledgeDocumentBase & {
+  kind: "markdown";
+  markdown: string;
+};
+
+export type KnowledgeDocument =
+  | PdfKnowledgeDocument
+  | MarkdownKnowledgeDocument;
+
+export type DocumentSourcePayload =
+  | { kind: "pdf" }
+  | { kind: "markdown"; markdown: string };
 
 export type DocumentContent = {
   text: string;
@@ -62,10 +112,51 @@ export function normalizeQuoteRects(
   return result;
 }
 
-export function getDocumentKind(name: string) {
-  if (/\.pdf$/i.test(name)) return "pdf";
-  if (/\.(md|markdown)$/i.test(name)) return "markdown";
+export function getDocumentKind(name: string): DocumentKind | null {
+  const lower = name.toLowerCase();
+  for (const kind of DOCUMENT_KINDS) {
+    if (
+      DOCUMENT_FORMATS[kind].extensions.some((extension) =>
+        lower.endsWith(extension),
+      )
+    ) {
+      return kind;
+    }
+  }
   return null;
+}
+
+export function isDocumentTooLarge(file: File, kind: DocumentKind) {
+  return file.size > DOCUMENT_FORMATS[kind].maxBytes;
+}
+
+export function decodeMarkdownBytes(bytes: ArrayBuffer): string {
+  const markdown = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  if (!markdown.trim()) throw new Error("empty");
+  if (markdown.includes("\0")) throw new Error("binary");
+  return markdown;
+}
+
+export async function readMarkdownSource(file: File) {
+  return decodeMarkdownBytes(await file.arrayBuffer());
+}
+
+export function createKnowledgeDocument(
+  id: string,
+  file: File,
+  payload: DocumentSourcePayload,
+): KnowledgeDocument {
+  return payload.kind === "markdown"
+    ? { id, file, kind: "markdown", markdown: payload.markdown }
+    : { id, file, kind: "pdf" };
+}
+
+export function documentContentFromSource(
+  source: KnowledgeDocument,
+): DocumentContent | null {
+  return source.kind === "markdown"
+    ? limitDocumentContent(source.markdown)
+    : null;
 }
 
 export function limitDocumentContent(text: string): DocumentContent {

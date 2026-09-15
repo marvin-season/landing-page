@@ -17,9 +17,9 @@ import {
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
-import type { DocumentQuote } from "./document-model";
+import type { DocumentQuote } from "./model";
 
-const DocumentMarkdown = dynamic(() => import("./document-markdown"));
+const DocumentMarkdown = dynamic(() => import("./markdown/renderer"));
 
 export type KnowledgeMessage = {
   id: string;
