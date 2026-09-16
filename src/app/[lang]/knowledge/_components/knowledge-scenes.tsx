@@ -66,7 +66,7 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
       tabIndex={0}
       aria-label={t`Docs & Knowledge`}
       data-workspace-locked={workspaceLocked}
-      className="h-dvh bg-background text-foreground shinchan:bg-transparent overflow-x-hidden overflow-y-auto overscroll-y-none snap-y snap-mandatory scroll-smooth motion-reduce:scroll-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[workspace-locked=true]:overflow-y-hidden [scrollbar-gutter:stable]"
+      className="h-dvh bg-background text-foreground shinchan:bg-transparent overflow-x-hidden overflow-y-auto overscroll-y-none snap-y snap-mandatory scroll-smooth motion-reduce:scroll-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[workspace-locked=true]:overflow-y-hidden scrollbar-gutter-stable"
     >
       <section
         aria-label={t`Document reading overview`}

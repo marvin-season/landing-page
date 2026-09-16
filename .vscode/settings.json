@@ -3,7 +3,8 @@
   "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit",
-    "source.organizeImports.biome": "explicit"
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.tailwindcss": "explicit"
   },
   "biome.enabled": true,
   "biome.requireConfiguration": true,

@@ -76,6 +76,13 @@ export type DocumentQuote = {
   rects?: QuoteRect[];
 };
 
+export type KnowledgeMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  quote?: DocumentQuote;
+};
+
 export type QuoteRect = {
   left: number;
   top: number;
