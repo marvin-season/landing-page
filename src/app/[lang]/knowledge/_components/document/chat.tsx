@@ -23,6 +23,7 @@ import {
   useState,
 } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
+import { Switch } from "@/components/ui/switch";
 import {
   type KnowledgeChatHandle,
   useKnowledgeChat,
@@ -103,6 +104,8 @@ export function DocumentChat({
     messages,
     quote,
     setQuote,
+    aiReply,
+    setAiReply,
     ask,
     retry,
     stop,
@@ -137,23 +140,32 @@ export function DocumentChat({
         <h2 className="text-sm font-medium">
           <Trans>Document chat</Trans>
         </h2>
-        <Button
-          disabled
-          title={t`Default throttle mode, cannot be changed`}
-          type="button"
-          size="sm"
-          variant={throttle ? "subtle" : "outline"}
-          className="ml-auto"
-          aria-pressed={throttle}
-          aria-label={
-            throttle
-              ? t`Throttle on. Only the current question is sent.`
-              : t`Throttle off. The full conversation is sent.`
-          }
-        >
-          <Gauge className="size-3.5" />
-          <Trans>Throttle</Trans>
-        </Button>
+        <div className="ml-auto flex h-8 items-center gap-2">
+          {aiReply ? (
+            <Button
+              disabled
+              title={t`Default throttle mode, cannot be changed`}
+              type="button"
+              size="sm"
+              variant={throttle ? "subtle" : "outline"}
+              aria-pressed={throttle}
+              aria-label={
+                throttle
+                  ? t`Throttle on. Only the current question is sent.`
+                  : t`Throttle off. The full conversation is sent.`
+              }
+            >
+              <Gauge className="size-3.5" />
+              <Trans>Throttle</Trans>
+            </Button>
+          ) : null}
+          <label className="flex h-8 shrink-0 cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+            <span>
+              <Trans>AI reply</Trans>
+            </span>
+            <Switch checked={aiReply} onCheckedChange={setAiReply} />
+          </label>
+        </div>
       </div>
       <StickToBottom
         className="relative min-h-0 flex-1 overflow-hidden"

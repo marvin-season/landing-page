@@ -50,6 +50,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
     ),
   );
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
+  const [aiReply, setAiReply] = useState(false);
   const threadIdRef = useRef(crypto.randomUUID());
   const lastSendRef = useRef<TInputParams | null>(null);
   const messagesRef = useRef(messages);
@@ -85,6 +86,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
       const nextMessages = [...messagesRef.current, userMessage];
       setQuote(null);
       setMessages(nextMessages);
+      if (!aiReply) return;
       const input = {
         url: "/api/knowledge/chat",
         threadId: threadIdRef.current,
@@ -94,7 +96,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
       lastSendRef.current = input;
       send(input);
     },
-    [send],
+    [aiReply, send],
   );
 
   const retry = useCallback(() => {
@@ -105,6 +107,8 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
     messages,
     quote,
     setQuote,
+    aiReply,
+    setAiReply,
     ask,
     retry,
     stop,
