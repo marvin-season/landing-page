@@ -13,42 +13,28 @@ import { themeNames, useTheme } from "@/hooks/use-theme";
 
 type ThemeSwitcherProps = {
   className?: string;
-  hideLabel?: boolean;
 };
 
-export const ThemeSwitcher = ({
-  className,
-  hideLabel = false,
-}: ThemeSwitcherProps) => {
+export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
   const { theme, themes, setTheme } = useTheme();
   const selectId = useId();
 
   return (
-    <div className={cn("flex items-center justify-between gap-2", className)}>
-      {!hideLabel && (
-        <label
-          htmlFor={selectId}
-          className="hidden sm:inline text-muted-foreground font-bold text-sm"
-        >
-          Theme
-        </label>
-      )}
-      <Select value={theme} onValueChange={setTheme}>
-        <SelectTrigger
-          id={selectId}
-          aria-label="Theme"
-          className={cn("w-44 sm:w-48", hideLabel && "w-full")}
-        >
-          <SelectValue placeholder="System" />
-        </SelectTrigger>
-        <SelectContent>
-          {themes.map((themeValue) => (
-            <SelectItem key={themeValue} value={themeValue}>
-              {themeNames[themeValue] || themeValue}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={theme} onValueChange={setTheme}>
+      <SelectTrigger
+        id={selectId}
+        aria-label="Theme"
+        className={cn("flex items-center justify-between gap-2", className)}
+      >
+        <SelectValue placeholder="System" />
+      </SelectTrigger>
+      <SelectContent>
+        {themes.map((themeValue) => (
+          <SelectItem key={themeValue} value={themeValue}>
+            {themeNames[themeValue] || themeValue}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };

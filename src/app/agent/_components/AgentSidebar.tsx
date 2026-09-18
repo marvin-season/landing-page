@@ -15,6 +15,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import Image from "next/image";
 import Link, { useLinkStatus } from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -339,11 +340,114 @@ function DesktopRailButton({
   );
 }
 
+type AgentUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+};
+
+function UserAvatar({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "relative block shrink-0 overflow-hidden bg-white",
+        className,
+      )}
+    >
+      <Image
+        unoptimized
+        src="/shinchan.png"
+        alt=""
+        fill
+        sizes="40px"
+        className="object-cover object-[center_22%]"
+        aria-hidden
+      />
+    </span>
+  );
+}
+
+function UserFooter({
+  user,
+  compact = false,
+  className,
+}: {
+  user: AgentUser;
+  compact?: boolean;
+  className?: string;
+}) {
+  const displayName = user.name || user.email || user.id || "用户";
+  const showEmail = Boolean(user.email && user.email !== displayName);
+
+  return (
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "agent-hand-border-soft flex items-center overflow-hidden transition-colors",
+            compact
+              ? "size-10 justify-center p-0"
+              : "w-full gap-2 px-2 py-1.5 text-left",
+            className,
+          )}
+          aria-label={compact ? "账户" : undefined}
+        >
+          <UserAvatar
+            className={compact ? "size-full" : "agent-hand-border-soft size-8"}
+          />
+          {compact ? null : (
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-medium text-(--agent-ink)">
+                {displayName}
+              </span>
+              {showEmail ? (
+                <span className="block truncate text-[11px] leading-4 text-(--agent-muted-ink)">
+                  {user.email}
+                </span>
+              ) : null}
+            </span>
+          )}
+        </button>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side={compact ? "right" : "top"}
+        align={compact ? "end" : "start"}
+        sideOffset={8}
+        className="w-56"
+      >
+        <div className="flex items-center gap-2.5">
+          <UserAvatar className="agent-hand-border-soft size-10" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium leading-none">
+              {displayName}
+            </p>
+            {user.email ? (
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {user.email}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-3 w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+        >
+          <LogOut className="size-4" />
+          退出登录
+        </Button>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
 function DesktopCollapsedContent({
   user,
   onExpand,
 }: {
-  user?: { id: string; name?: string | null; email?: string | null };
+  user?: AgentUser;
   onExpand: () => void;
 }) {
   const createMutation = useCreateThread();
@@ -369,38 +473,7 @@ function DesktopCollapsedContent({
 
       <div className="mt-auto flex w-full flex-col items-center">
         {user ? (
-          <HoverCard openDelay={200} closeDelay={100}>
-            <HoverCardTrigger asChild>
-              <button
-                type="button"
-                className="agent-hand-border-soft flex size-10 items-center justify-center bg-white/60 text-sm font-bold text-[var(--agent-ink)] transition-colors hover:bg-white/85"
-                aria-label="账户"
-              >
-                {(user.name || user.email || user.id || "用")
-                  .slice(0, 1)
-                  .toUpperCase()}
-              </button>
-            </HoverCardTrigger>
-            <HoverCardContent side="right" align="end" className="w-56">
-              <div className="space-y-2">
-                <p className="text-sm font-medium leading-none">
-                  {user.name || user.email || user.id || "用户"}
-                </p>
-                {user.email ? (
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                ) : null}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
-                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-                >
-                  <LogOut className="size-4" />
-                  退出登录
-                </Button>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+          <UserFooter user={user} compact />
         ) : (
           <DesktopRailButton
             label="退出登录"
@@ -415,50 +488,8 @@ function DesktopCollapsedContent({
 }
 
 type AgentSidebarProps = {
-  user?: { id: string; name?: string | null; email?: string | null };
+  user?: AgentUser;
 };
-
-function UserFooter({
-  user,
-  className,
-}: {
-  user: { id: string; name?: string | null; email?: string | null };
-  className?: string;
-}) {
-  const displayName = user.name || user.email || user.id || "用户";
-  return (
-    <HoverCard openDelay={200} closeDelay={100}>
-      <HoverCardTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            "agent-hand-border-soft flex w-full items-center gap-2 bg-white/45 px-2 py-2 text-left text-sm text-[var(--agent-muted-ink)] transition-colors hover:bg-white/75 hover:text-[var(--agent-ink)]",
-            className,
-          )}
-        >
-          <span className="min-w-0 flex-1 truncate">{displayName}</span>
-        </button>
-      </HoverCardTrigger>
-      <HoverCardContent side="top" align="start" className="w-56">
-        <div className="space-y-2">
-          <p className="text-sm font-medium leading-none">{displayName}</p>
-          {user.email ? (
-            <p className="text-xs text-muted-foreground">{user.email}</p>
-          ) : null}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
-            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-          >
-            <LogOut className="size-4" />
-            退出登录
-          </Button>
-        </div>
-      </HoverCardContent>
-    </HoverCard>
-  );
-}
 
 export function AgentSidebar({ user }: AgentSidebarProps) {
   const pathname = usePathname();
@@ -500,7 +531,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
             <div className="mb-2">
-              <ThemeSwitcher hideLabel />
+              <ThemeSwitcher className="w-full" />
             </div>
             {user ? (
               <UserFooter user={user} />
@@ -542,7 +573,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           </div>
           <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
             <div className="mb-2">
-              <ThemeSwitcher hideLabel />
+              <ThemeSwitcher />
             </div>
             {user ? (
               <UserFooter user={user} />
