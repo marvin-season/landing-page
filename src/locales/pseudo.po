@@ -41,15 +41,15 @@ msgstr ""
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:62
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "A Simple PPT Generator"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:54
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "About me in detail"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Agent UI"
 msgstr ""
 
@@ -141,7 +141,7 @@ msgstr ""
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:70
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Design System & Component Libs"
 msgstr ""
 
@@ -209,7 +209,6 @@ msgstr ""
 msgid "Dismiss selection"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:78
 #: src/app/[lang]/knowledge/page.tsx:46
 msgid "Docs"
 msgstr ""
@@ -240,7 +239,7 @@ msgstr ""
 msgid "Document workspace"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:80
+#: src/app/[lang]/(home)/data/home-data.tsx:48
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr ""
 
@@ -268,7 +267,7 @@ msgstr ""
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:55
+#: src/app/[lang]/(home)/data/home-data.tsx:68
 msgid "Experience, projects, and personal profile"
 msgstr ""
 
@@ -284,7 +283,7 @@ msgstr ""
 msgid "Fit to width"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:63
+#: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Generate slide content in a structured workflow"
 msgstr ""
 
@@ -404,6 +403,10 @@ msgstr ""
 msgid "Key Responsibilities"
 msgstr ""
 
+#: src/app/[lang]/(home)/data/home-data.tsx:46
+msgid "Knowledge"
+msgstr ""
+
 #: src/app/[lang]/(home)/data/home-data.tsx:99
 msgid "Leveraging less data to generate greater insights."
 msgstr ""
@@ -420,7 +423,7 @@ msgstr ""
 msgid "Locate a quote without storing selection geometry"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:47
+#: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "Main chat flow powered by Mastra"
 msgstr ""
 
@@ -590,7 +593,7 @@ msgstr ""
 msgid "Retry"
 msgstr ""
 
-#: src/app/[lang]/(home)/data/home-data.tsx:71
+#: src/app/[lang]/(home)/data/home-data.tsx:84
 msgid "Reusable UI components and design references"
 msgstr ""
 
@@ -745,7 +748,7 @@ msgid "Try a sample document"
 msgstr ""
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
-msgid "Try Agent UI"
+msgid "Try Knowledge"
 msgstr ""
 
 #: src/app/[lang]/knowledge/page.tsx:98

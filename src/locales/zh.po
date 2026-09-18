@@ -41,15 +41,15 @@ msgstr "一个调皮的五岁小孩，把平凡的日子过成有趣的冒险。
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "选中文字后可直接翻译或总结，不必先引用到输入框。知识助手只会收到摘录和指令。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:62
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "A Simple PPT Generator"
 msgstr "一个简单的 PPT 生成器"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:54
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "About me in detail"
 msgstr "关于我的详细信息"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Agent UI"
 msgstr "智能体交互界面"
 
@@ -141,7 +141,7 @@ msgstr "默认工作区"
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "设计不仅仅是外观，设计是功能。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:70
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Design System & Component Libs"
 msgstr "设计系统 & 组件库"
 
@@ -209,7 +209,6 @@ msgstr "神州数码"
 msgid "Dismiss selection"
 msgstr "取消选中"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:78
 #: src/app/[lang]/knowledge/page.tsx:46
 msgid "Docs"
 msgstr "Docs"
@@ -240,7 +239,7 @@ msgstr "文档阅读概览"
 msgid "Document workspace"
 msgstr "文档工作区"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:80
+#: src/app/[lang]/(home)/data/home-data.tsx:48
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "前端开发、AI 应用与工程实践文档"
 
@@ -268,7 +267,7 @@ msgstr "Enter 发送 · Shift + Enter 换行"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "企业级 AI 应用一站式建设和管理平台，完全集成模型、数据、应用和计算能力。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:55
+#: src/app/[lang]/(home)/data/home-data.tsx:68
 msgid "Experience, projects, and personal profile"
 msgstr "工作经验、项目和个人简介"
 
@@ -284,7 +283,7 @@ msgstr "回到引文所在的原文"
 msgid "Fit to width"
 msgstr "适应宽度"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:63
+#: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Generate slide content in a structured workflow"
 msgstr "在结构化工作流中生成幻灯片内容"
 
@@ -404,6 +403,10 @@ msgstr "留住值得关注的段落"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:46
+msgid "Knowledge"
+msgstr "知识库"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:99
 msgid "Leveraging less data to generate greater insights."
 msgstr "利用更少的数据生成更大的洞察。"
@@ -420,7 +423,7 @@ msgstr "正在加载预览…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "无需保存选区坐标即可定位引文"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:47
+#: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "Main chat flow powered by Mastra"
 msgstr "主要聊天流由 Mastra 提供支持"
 
@@ -590,7 +593,7 @@ msgstr "简历"
 msgid "Retry"
 msgstr "重试"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:71
+#: src/app/[lang]/(home)/data/home-data.tsx:84
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
@@ -745,8 +748,8 @@ msgid "Try a sample document"
 msgstr "体验示例文档"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
-msgid "Try Agent UI"
-msgstr ""
+msgid "Try Knowledge"
+msgstr "体验知识库"
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."

@@ -41,15 +41,15 @@ msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の�
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "引用を入力欄に入れなくても、選択した文章を翻訳・要約できます。ナレッジエージェントは抜粋と指示だけを受け取ります。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:62
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "A Simple PPT Generator"
 msgstr "シンプルなPPTジェネレーター"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:54
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "About me in detail"
 msgstr "詳細な自己紹介"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Agent UI"
 msgstr "エージェントUI"
 
@@ -141,7 +141,7 @@ msgstr "デフォルトのワークスペース"
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "デザインは見た目だけではありません。デザインはどのように機能するかです。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:70
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Design System & Component Libs"
 msgstr "デザインシステムとコンポーネントライブラリ"
 
@@ -209,7 +209,6 @@ msgstr "Digital China Smart Vision"
 msgid "Dismiss selection"
 msgstr "選択を解除"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:78
 #: src/app/[lang]/knowledge/page.tsx:46
 msgid "Docs"
 msgstr "Docs"
@@ -240,7 +239,7 @@ msgstr "ドキュメント閲覧の概要"
 msgid "Document workspace"
 msgstr "ドキュメントワークスペース"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:80
+#: src/app/[lang]/(home)/data/home-data.tsx:48
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
 
@@ -268,7 +267,7 @@ msgstr "Enter で送信 · Shift + Enter で改行"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:55
+#: src/app/[lang]/(home)/data/home-data.tsx:68
 msgid "Experience, projects, and personal profile"
 msgstr "経験、プロジェクト、および個人プロフィール"
 
@@ -284,7 +283,7 @@ msgstr "引用の前後を確認する"
 msgid "Fit to width"
 msgstr "幅に合わせる"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:63
+#: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Generate slide content in a structured workflow"
 msgstr "構造化ワークフローでスライドコンテンツを生成"
 
@@ -404,6 +403,10 @@ msgstr "大切な文章を残す"
 msgid "Key Responsibilities"
 msgstr "主要責任"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:46
+msgid "Knowledge"
+msgstr "ナレッジ"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:99
 msgid "Leveraging less data to generate greater insights."
 msgstr "より少ないデータでより大きな洞察を生成する。"
@@ -420,7 +423,7 @@ msgstr "プレビューを読み込み中…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "選択範囲の座標を保存せずに引用を特定"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:47
+#: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastraによるメインチャットフロー"
 
@@ -590,7 +593,7 @@ msgstr "履歴書"
 msgid "Retry"
 msgstr "再試行"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:71
+#: src/app/[lang]/(home)/data/home-data.tsx:84
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
@@ -745,8 +748,8 @@ msgid "Try a sample document"
 msgstr "サンプルドキュメントを試す"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
-msgid "Try Agent UI"
-msgstr ""
+msgid "Try Knowledge"
+msgstr "ナレッジを試す"
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."

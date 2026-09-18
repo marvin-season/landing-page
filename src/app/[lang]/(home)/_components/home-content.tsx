@@ -28,12 +28,12 @@ export function HomeContent() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <TrackedLink
-                href="/agent"
+                href="/knowledge"
                 eventName="Home Hero CTA Click"
-                eventProperties={{ target: "agent", location: "hero" }}
+                eventProperties={{ target: "knowledge", location: "hero" }}
                 className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
               >
-                <Trans>Try Agent UI</Trans>
+                <Trans>Try Knowledge</Trans>
                 <ArrowRight
                   className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   aria-hidden="true"

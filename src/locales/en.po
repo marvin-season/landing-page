@@ -41,15 +41,15 @@ msgstr "A mischievous five-year-old who turns everyday life into an adventure."
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:62
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "A Simple PPT Generator"
 msgstr "A Simple PPT Generator"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:54
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "About me in detail"
 msgstr "About me in detail"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Agent UI"
 msgstr "Agent UI"
 
@@ -141,7 +141,7 @@ msgstr "Default workspace"
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "Design is not just what it looks like. Design is how it works."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:70
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Design System & Component Libs"
 msgstr "Design System & Component Libs"
 
@@ -209,7 +209,6 @@ msgstr "Digital China Smart Vision"
 msgid "Dismiss selection"
 msgstr "Dismiss selection"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:78
 #: src/app/[lang]/knowledge/page.tsx:46
 msgid "Docs"
 msgstr "Docs"
@@ -240,7 +239,7 @@ msgstr "Document reading overview"
 msgid "Document workspace"
 msgstr "Document workspace"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:80
+#: src/app/[lang]/(home)/data/home-data.tsx:48
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "Documentation on frontend development, AI applications, and engineering practices"
 
@@ -268,7 +267,7 @@ msgstr "Enter to send · Shift + Enter for a new line"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:55
+#: src/app/[lang]/(home)/data/home-data.tsx:68
 msgid "Experience, projects, and personal profile"
 msgstr "Experience, projects, and personal profile"
 
@@ -284,7 +283,7 @@ msgstr "Find every quote in context"
 msgid "Fit to width"
 msgstr "Fit to width"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:63
+#: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Generate slide content in a structured workflow"
 msgstr "Generate slide content in a structured workflow"
 
@@ -404,6 +403,10 @@ msgstr "Keep the passages that matter"
 msgid "Key Responsibilities"
 msgstr "Key Responsibilities"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:46
+msgid "Knowledge"
+msgstr "Knowledge"
+
 #: src/app/[lang]/(home)/data/home-data.tsx:99
 msgid "Leveraging less data to generate greater insights."
 msgstr "Leveraging less data to generate greater insights."
@@ -420,7 +423,7 @@ msgstr "Loading preview…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "Locate a quote without storing selection geometry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:47
+#: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "Main chat flow powered by Mastra"
 msgstr "Main chat flow powered by Mastra"
 
@@ -590,7 +593,7 @@ msgstr "Resume"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:71
+#: src/app/[lang]/(home)/data/home-data.tsx:84
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
@@ -745,8 +748,8 @@ msgid "Try a sample document"
 msgstr "Try a sample document"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
-msgid "Try Agent UI"
-msgstr "Try Agent UI"
+msgid "Try Knowledge"
+msgstr "Try Knowledge"
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
