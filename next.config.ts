@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@landing-page/design-system", "@landing-page/utils"],
   experimental: {
     swcPlugins: [["@lingui/swc-plugin", {}]],
+    useTypeScriptCli: true,
   },
   turbopack: {
     rules,
