@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -14,6 +13,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "types": ["node"],
     "plugins": [
       {
         "name": "next"
@@ -25,8 +25,8 @@
       "@/*": ["./src/*"],
       "~/*": ["./*"],
       "@app/*": ["./src/app/[lang]/*"],
-      "$": ["mastra-server"],
-      "$/*": ["mastra-server/*"]
+      "$": ["./mastra-server"],
+      "$/*": ["./mastra-server/*"]
     }
   },
   "include": [

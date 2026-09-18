@@ -41,11 +41,24 @@ export type HomeNavLink = {
 
 export const navLinks: HomeNavLink[] = [
   {
+    href: "/knowledge",
+    analyticsId: "knowledge",
+    title: <Trans>Knowledge</Trans>,
+    description: (
+      <Trans>
+        Documentation on frontend development, AI applications, and engineering
+        practices
+      </Trans>
+    ),
+    badge: "Core",
+    icon: BookOpen,
+  },
+  {
     href: "/agent",
     analyticsId: "agent",
     title: <Trans>Agent UI</Trans>,
     description: <Trans>Main chat flow powered by Mastra</Trans>,
-    badge: "Core",
+    badge: "Chat",
     icon: Bot,
   },
   {
@@ -71,19 +84,6 @@ export const navLinks: HomeNavLink[] = [
     description: <Trans>Reusable UI components and design references</Trans>,
     badge: "External",
     icon: Shapes,
-  },
-  {
-    href: "/knowledge",
-    analyticsId: "knowledge",
-    title: <Trans>Docs</Trans>,
-    description: (
-      <Trans>
-        Documentation on frontend development, AI applications, and engineering
-        practices
-      </Trans>
-    ),
-    badge: "Knowledge",
-    icon: BookOpen,
   },
   {
     href: "/changelog",

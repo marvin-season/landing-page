@@ -112,32 +112,37 @@ function TranslationLanguagePicker({
 
 export function DocumentPreview({
   document: source,
-  pageNumber,
-  onPageChange,
   onError,
   onQuote,
   onPrompt,
-  activeQuote,
+  locateQuote,
   busy = false,
 }: {
   document: KnowledgeDocument;
-  pageNumber: number;
-  onPageChange: (page: number) => void;
   onError: (message: string) => void;
   onQuote: (quote: DocumentQuote) => void;
   onPrompt: (quote: DocumentQuote, text: string) => void;
-  activeQuote: DocumentQuote | null;
+  locateQuote: DocumentQuote | null;
   busy?: boolean;
 }) {
   const { t, i18n } = useLingui();
   const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const { language, setLanguage } = useTranslationLanguage();
+  const [pageNumber, setPageNumber] = useState(1);
   const [selection, setSelection] = useState<{
     text: string;
     pageNumber?: number;
     rects?: DocumentQuote["rects"];
   } | null>(null);
+  const activeQuote =
+    locateQuote?.documentId === source.id ? locateQuote : null;
+
+  useEffect(() => {
+    if (!locateQuote?.pageNumber) return;
+    if (locateQuote.documentId !== source.id) return;
+    setPageNumber(locateQuote.pageNumber);
+  }, [locateQuote, source.id]);
 
   useEffect(() => {
     let frame = 0;
@@ -218,7 +223,7 @@ export function DocumentPreview({
       <DocumentKindPreview
         source={source}
         pageNumber={pageNumber}
-        onPageChange={onPageChange}
+        onPageChange={setPageNumber}
         onError={onError}
         activeQuote={activeQuote}
       />

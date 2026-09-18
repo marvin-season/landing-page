@@ -11,237 +11,90 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { DocumentChat } from "./document/chat";
 import {
-  type ChatStreamState,
-  chatStreamText,
-  type TInputParams,
-} from "@/lib/stream/chat-stream-state";
-import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
-import { DocumentChat, type KnowledgeMessage } from "./document/chat";
-import {
-  createKnowledgeDocument,
   DOCUMENT_FILE_ACCEPT,
-  type DocumentContent,
   type DocumentQuote,
-  type DocumentSourcePayload,
   documentContentFromSource,
   formatFileSize,
-  getDocumentKind,
-  isDocumentTooLarge,
   type KnowledgeDocument,
-  readMarkdownSource,
 } from "./document/model";
 import { DocumentPreview } from "./document/preview";
-import {
-  createSeededPdfQuote,
-  SAMPLE_DOCUMENTS,
-  type SampleDocument,
-  sampleFileType,
-  sampleFormatLabel,
-} from "./document/samples";
-import {
-  buildKnowledgePrompt,
-  toKnowledgeChatMessages,
-} from "./knowledge-prompt";
+import { SAMPLE_DOCUMENTS, sampleFormatLabel } from "./document/samples";
+import { useDocumentSession } from "./use-document-session";
+import type { KnowledgeChatHandle } from "./use-knowledge-chat";
+
+function KnowledgeDocumentPanes({
+  source,
+  notice,
+  onDocumentError,
+}: {
+  source: KnowledgeDocument;
+  notice?: string;
+  onDocumentError: (message: string) => void;
+}) {
+  const [locateQuote, setLocateQuote] = useState<DocumentQuote | null>(null);
+  const [busy, setBusy] = useState(false);
+  const chatRef = useRef<KnowledgeChatHandle>(null);
+  const onQuote = useCallback((quote: DocumentQuote) => {
+    chatRef.current?.setQuote(quote);
+  }, []);
+  const onPrompt = useCallback((quote: DocumentQuote, text: string) => {
+    chatRef.current?.ask(text, quote);
+  }, []);
+  const onLocate = useCallback((quote: DocumentQuote) => {
+    setLocateQuote({ ...quote });
+  }, []);
+
+  return (
+    <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-2 overflow-y-auto">
+      <div
+        id="knowledge-panel-document"
+        className="min-h-105 min-w-0 flex-col flex border-b border-border/60 lg:border-r lg:border-border/60 h-[65dvh] lg:h-auto lg:min-h-0 lg:border-b-0"
+      >
+        <DocumentPreview
+          document={source}
+          onError={onDocumentError}
+          onQuote={onQuote}
+          onPrompt={onPrompt}
+          locateQuote={locateQuote}
+          busy={busy}
+        />
+      </div>
+      <div
+        id="knowledge-panel-chat"
+        className="min-h-105 min-w-0 flex-col flex h-[65dvh] lg:h-auto lg:min-h-0"
+      >
+        <DocumentChat
+          ref={chatRef}
+          document={source}
+          notice={notice}
+          onLocate={onLocate}
+          onBusyChange={setBusy}
+        />
+      </div>
+    </div>
+  );
+}
 
 export function KnowledgeWorkspace() {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const uploadVersion = useRef(0);
-  const sampleRequest = useRef<AbortController | null>(null);
-  const activeDocumentId = useRef<string | null>(null);
-  const dragDepth = useRef(0);
-  const [source, setSource] = useState<KnowledgeDocument | null>(null);
-  const [content, setContent] = useState<DocumentContent | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [documentError, setDocumentError] = useState<string | null>(null);
-  const [reading, setReading] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [quote, setQuote] = useState<DocumentQuote | null>(null);
-  const [activeQuote, setActiveQuote] = useState<DocumentQuote | null>(null);
-  const [messages, setMessages] = useState<KnowledgeMessage[]>([]);
-  const [throttle, setThrottle] = useState(true);
-  const seededQuoteDocumentId = useRef<string | null>(null);
-  const threadIdRef = useRef(crypto.randomUUID());
-  const lastSendRef = useRef<TInputParams | null>(null);
-
-  const onStreamComplete = useCallback((flushed: ChatStreamState) => {
-    const text = chatStreamText(flushed).trim();
-    if (!text) return;
-    setMessages((previous) => [
-      ...previous,
-      { id: crypto.randomUUID(), role: "assistant", text },
-    ]);
-  }, []);
-
-  const { state, send, loading, error, stop } = useChatStreamState({
-    onComplete: onStreamComplete,
-  });
-
-  function resetThread() {
-    stop();
-    threadIdRef.current = crypto.randomUUID();
-    lastSendRef.current = null;
-  }
-
-  function ask(instruction: string, selectedQuote: DocumentQuote | null) {
-    const text = buildKnowledgePrompt(instruction, selectedQuote?.text);
-    if (!text || loading) return;
-    const userMessage: KnowledgeMessage = {
-      id: crypto.randomUUID(),
-      role: "user",
-      text: instruction,
-      quote: selectedQuote ?? undefined,
-    };
-    const nextMessages = [...messages, userMessage];
-    setQuote(null);
-    setMessages(nextMessages);
-    const input = {
-      url: "/api/knowledge/chat",
-      threadId: threadIdRef.current,
-      text,
-      messages: throttle ? undefined : toKnowledgeChatMessages(nextMessages),
-    };
-    lastSendRef.current = input;
-    send(input);
-  }
-
-  useEffect(
-    () => () => {
-      uploadVersion.current++;
-      sampleRequest.current?.abort();
-      stop();
-    },
-    [stop],
-  );
-
-  useEffect(() => {
-    if (!source || source.kind !== "pdf") return;
-    if (seededQuoteDocumentId.current === source.id) return;
-    seededQuoteDocumentId.current = source.id;
-    setMessages((current) => {
-      if (current.length > 0) return current;
-      return [
-        {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          text: t`I pulled a passage from this document. Click it to highlight the original text.`,
-          quote: createSeededPdfQuote(source),
-        },
-      ];
-    });
-  }, [source, t]);
-
-  const sourceId = source?.id;
-  const onDocumentError = useCallback(
-    (message: string) => {
-      if (activeDocumentId.current === sourceId) setDocumentError(message);
-    },
-    [sourceId],
-  );
-
-  async function upload(files: FileList | File[]) {
-    setDragging(false);
-    dragDepth.current = 0;
-    if (files.length !== 1) {
-      setUploadError(t`Please choose one document at a time.`);
-      return;
-    }
-    const file = files[0];
-    const kind = getDocumentKind(file.name);
-    if (!kind) {
-      setUploadError(t`Please upload a PDF or Markdown file.`);
-      return;
-    }
-    if (!file.size) {
-      setUploadError(t`This file is empty. Please choose another file.`);
-      return;
-    }
-    if (isDocumentTooLarge(file, kind)) {
-      setUploadError(
-        t`PDF files must be under 20 MB and Markdown files under 1 MB.`,
-      );
-      return;
-    }
-    const version = ++uploadVersion.current;
-    sampleRequest.current?.abort();
-    sampleRequest.current = null;
-    setUploadError(null);
-    setReading(true);
-    try {
-      const payload: DocumentSourcePayload =
-        kind === "markdown"
-          ? { kind, markdown: await readMarkdownSource(file) }
-          : { kind };
-      if (uploadVersion.current !== version) return;
-      const next = createKnowledgeDocument(crypto.randomUUID(), file, payload);
-      activeDocumentId.current = next.id;
-      setSource(next);
-      setContent(documentContentFromSource(next));
-      setDocumentError(null);
-      setPageNumber(1);
-      setQuote(null);
-      setActiveQuote(null);
-      setMessages([]);
-      resetThread();
-    } catch {
-      if (uploadVersion.current === version)
-        setUploadError(
-          t`This file could not be read. Use a valid UTF-8 Markdown file.`,
-        );
-    } finally {
-      if (uploadVersion.current === version) setReading(false);
-    }
-  }
-
-  function removeDocument() {
-    uploadVersion.current++;
-    sampleRequest.current?.abort();
-    sampleRequest.current = null;
-    activeDocumentId.current = null;
-    setSource(null);
-    setContent(null);
-    setQuote(null);
-    setActiveQuote(null);
-    setMessages([]);
-    resetThread();
-    setUploadError(null);
-    setDocumentError(null);
-    setReading(false);
-  }
-
-  async function openSample(sample: SampleDocument) {
-    const version = ++uploadVersion.current;
-    sampleRequest.current?.abort();
-    const controller = new AbortController();
-    sampleRequest.current = controller;
-    setUploadError(null);
-    setReading(true);
-    try {
-      const response = await fetch(sample.path, { signal: controller.signal });
-      if (!response.ok) throw new Error("Sample unavailable");
-      const blob = await response.blob();
-      if (uploadVersion.current !== version) return;
-      await upload([
-        new File([blob], sample.name, {
-          type: sampleFileType(sample.kind),
-        }),
-      ]);
-    } catch {
-      if (uploadVersion.current === version && !controller.signal.aborted) {
-        setUploadError(t`The sample could not be loaded. Please try again.`);
-      }
-    } finally {
-      if (uploadVersion.current === version) {
-        sampleRequest.current = null;
-        setReading(false);
-      }
-    }
-  }
-
+  const {
+    source,
+    uploadError,
+    documentError,
+    reading,
+    dragging,
+    inputRef,
+    onDocumentError,
+    upload,
+    openSample,
+    removeDocument,
+    dropTargetProps,
+  } = useDocumentSession();
+  const content = source ? documentContentFromSource(source) : null;
   const notice =
     documentError ??
     (content && !content.text
@@ -254,27 +107,7 @@ export function KnowledgeWorkspace() {
     <section
       aria-label={t`Default workspace`}
       className="relative flex min-h-0 flex-1 flex-col"
-      onDragEnter={(event) => {
-        if (!event.dataTransfer.types.includes("Files")) return;
-        event.preventDefault();
-        dragDepth.current++;
-        setDragging(true);
-      }}
-      onDragOver={(event) => {
-        if (event.dataTransfer.types.includes("Files")) {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "copy";
-        }
-      }}
-      onDragLeave={(event) => {
-        event.preventDefault();
-        dragDepth.current = Math.max(0, dragDepth.current - 1);
-        if (dragDepth.current === 0) setDragging(false);
-      }}
-      onDrop={(event) => {
-        event.preventDefault();
-        void upload(event.dataTransfer.files);
-      }}
+      {...dropTargetProps}
     >
       <input
         ref={inputRef}
@@ -360,50 +193,11 @@ export function KnowledgeWorkspace() {
             }}
             className="overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface min-h-0 flex-1"
           >
-            <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-2 overflow-y-auto">
-              <div
-                id="knowledge-panel-document"
-                className="min-h-[420px] min-w-0 flex-col flex border-b border-border/60 lg:border-r lg:border-border/60 h-[65dvh] lg:h-auto lg:min-h-0 lg:border-b-0"
-              >
-                <DocumentPreview
-                  document={source}
-                  pageNumber={pageNumber}
-                  onPageChange={setPageNumber}
-                  onError={onDocumentError}
-                  onQuote={setQuote}
-                  onPrompt={(selectedQuote, text) => ask(text, selectedQuote)}
-                  activeQuote={activeQuote}
-                  busy={loading}
-                />
-              </div>
-              <div
-                id="knowledge-panel-chat"
-                className="min-h-[420px] min-w-0 flex-col flex h-[65dvh] lg:h-auto lg:min-h-0"
-              >
-                <DocumentChat
-                  quote={quote}
-                  onQuoteChange={setQuote}
-                  messages={messages}
-                  busy={loading}
-                  error={error}
-                  notice={notice}
-                  streamingText={loading ? chatStreamText(state) : undefined}
-                  throttle={throttle}
-                  onThrottleChange={setThrottle}
-                  onSubmit={(text, selectedQuote) => ask(text, selectedQuote)}
-                  onStop={stop}
-                  onRetry={() => {
-                    if (lastSendRef.current) send(lastSendRef.current);
-                  }}
-                  onLocate={(selectedQuote) => {
-                    if (selectedQuote.documentId !== source.id) return;
-                    if (selectedQuote.pageNumber)
-                      setPageNumber(selectedQuote.pageNumber);
-                    setActiveQuote({ ...selectedQuote });
-                  }}
-                />
-              </div>
-            </div>
+            <KnowledgeDocumentPanes
+              source={source}
+              notice={notice}
+              onDocumentError={onDocumentError}
+            />
           </motion.div>
         ) : (
           <motion.div

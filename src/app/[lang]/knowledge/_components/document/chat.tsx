@@ -15,18 +15,25 @@ import {
   X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import {
+  type Ref,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
-import type { DocumentQuote } from "./model";
+import { Switch } from "@/components/ui/switch";
+import {
+  type KnowledgeChatHandle,
+  useKnowledgeChat,
+} from "../use-knowledge-chat";
+import type { DocumentQuote, KnowledgeDocument } from "./model";
+
+export type { KnowledgeMessage } from "./model";
+export type { KnowledgeChatHandle };
 
 const DocumentMarkdown = dynamic(() => import("./markdown/renderer"));
-
-export type KnowledgeMessage = {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-  quote?: DocumentQuote;
-};
 
 function ScrollToLatest() {
   const { t } = useLingui();
@@ -77,39 +84,43 @@ function QuoteBlock({
 }
 
 export function DocumentChat({
-  quote,
-  onQuoteChange,
-  messages,
-  busy,
-  error,
-  onSubmit,
-  onStop,
-  onRetry,
-  onLocate,
+  ref,
+  document: source,
   notice,
-  streamingText,
-  throttle,
-  onThrottleChange,
+  onLocate,
+  onBusyChange,
 }: {
-  quote: DocumentQuote | null;
-  onQuoteChange: (quote: DocumentQuote | null) => void;
-  messages: KnowledgeMessage[];
-  busy: boolean;
-  error: string | null;
-  onSubmit: (text: string, quote: DocumentQuote | null) => void;
-  onStop: () => void;
-  onRetry: () => void;
-  onLocate: (quote: DocumentQuote) => void;
+  ref?: Ref<KnowledgeChatHandle>;
+  document: KnowledgeDocument;
   notice?: string;
-  streamingText?: string;
-  throttle: boolean;
-  onThrottleChange: (throttle: boolean) => void;
+  onLocate: (quote: DocumentQuote) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const {
+    messages,
+    quote,
+    setQuote,
+    aiReply,
+    setAiReply,
+    ask,
+    retry,
+    stop,
+    loading: busy,
+    error,
+    streamingText,
+    throttle,
+  } = useKnowledgeChat(source);
   const quoteId = quote?.id;
+
+  useImperativeHandle(ref, () => ({ ask, setQuote }), [ask, setQuote]);
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
 
   useEffect(() => {
     if (quoteId) inputRef.current?.focus({ preventScroll: true });
@@ -118,9 +129,8 @@ export function DocumentChat({
   function submit() {
     const text = input.trim();
     if ((!text && !quote) || busy) return;
-    onSubmit(text, quote);
+    ask(text, quote);
     setInput("");
-    onQuoteChange(null);
   }
 
   return (
@@ -130,24 +140,32 @@ export function DocumentChat({
         <h2 className="text-sm font-medium">
           <Trans>Document chat</Trans>
         </h2>
-        <Button
-          disabled
-          title={t`Default throttle mode, cannot be changed`}
-          type="button"
-          size="sm"
-          variant={throttle ? "subtle" : "outline"}
-          className="ml-auto"
-          aria-pressed={throttle}
-          aria-label={
-            throttle
-              ? t`Throttle on. Only the current question is sent.`
-              : t`Throttle off. The full conversation is sent.`
-          }
-          onClick={() => onThrottleChange(!throttle)}
-        >
-          <Gauge className="size-3.5" />
-          <Trans>Throttle</Trans>
-        </Button>
+        <div className="ml-auto flex h-8 items-center gap-2">
+          {aiReply ? (
+            <Button
+              disabled
+              title={t`Default throttle mode, cannot be changed`}
+              type="button"
+              size="sm"
+              variant={throttle ? "subtle" : "outline"}
+              aria-pressed={throttle}
+              aria-label={
+                throttle
+                  ? t`Throttle on. Only the current question is sent.`
+                  : t`Throttle off. The full conversation is sent.`
+              }
+            >
+              <Gauge className="size-3.5" />
+              <Trans>Throttle</Trans>
+            </Button>
+          ) : null}
+          <label className="flex h-8 shrink-0 cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+            <span>
+              <Trans>AI reply</Trans>
+            </span>
+            <Switch checked={aiReply} onCheckedChange={setAiReply} />
+          </label>
+        </div>
       </div>
       <StickToBottom
         className="relative min-h-0 flex-1 overflow-hidden"
@@ -244,7 +262,7 @@ export function DocumentChat({
               size="sm"
               variant="ghost"
               disabled={busy}
-              onClick={onRetry}
+              onClick={retry}
             >
               <Trans>Retry</Trans>
             </Button>
@@ -271,7 +289,7 @@ export function DocumentChat({
                 variant="ghost"
                 className="absolute right-0 top-0 size-6"
                 aria-label={t`Remove quote`}
-                onClick={() => onQuoteChange(null)}
+                onClick={() => setQuote(null)}
               >
                 <X className="size-3.5" />
               </Button>
@@ -310,7 +328,7 @@ export function DocumentChat({
                 size="icon"
                 className="size-8 shrink-0"
                 aria-label={t`Stop response`}
-                onClick={onStop}
+                onClick={stop}
               >
                 <Square className="size-3.5" />
               </Button>

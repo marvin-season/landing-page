@@ -19,7 +19,7 @@ export function ThemeMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56 p-3">
-          <ThemeSwitcher hideLabel />
+          <ThemeSwitcher />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
