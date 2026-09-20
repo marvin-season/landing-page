@@ -1,5 +1,4 @@
 import { cn } from "@landing-page/utils";
-import type { KeyboardEvent } from "react";
 import type { AiMentionItem } from "./types";
 
 export function MentionMenu<T>({
@@ -70,7 +69,7 @@ export function MentionMenu<T>({
 }
 
 export function mentionMenuKey(
-  event: KeyboardEvent,
+  event: { key: string },
   itemCount: number,
 ): "up" | "down" | "select" | "close" | null {
   if (event.key === "Escape") return "close";

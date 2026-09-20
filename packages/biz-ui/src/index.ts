@@ -6,6 +6,7 @@ export {
   getActiveMention,
 } from "./ai-input/mention-query";
 export type {
+  AiInputHandle,
   AiInputSubmitValue,
   AiMentionItem,
   MentionRange,

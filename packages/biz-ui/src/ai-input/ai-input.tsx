@@ -2,24 +2,11 @@
 
 import { Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import {
-  type FormEvent,
-  type KeyboardEvent,
-  type ReactNode,
-  type Ref,
-  useCallback,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { MentionMenu, mentionMenuKey, nextMentionIndex } from "./mention-menu";
-import {
-  consumeMentionQuery,
-  filterMentionItems,
-  getActiveMention,
-} from "./mention-query";
-import type { AiInputSubmitValue, AiMentionItem } from "./types";
+import { Tiptap } from "@tiptap/react";
+import type { ReactNode, Ref } from "react";
+import { MentionMenu } from "./mention-menu";
+import type { AiInputHandle, AiInputSubmitValue, AiMentionItem } from "./types";
+import { useAiInput } from "./use-ai-input";
 
 function IconArrowUp() {
   return (
@@ -96,193 +83,48 @@ export type AiInputProps<T = unknown> = {
   className?: string;
   onSubmit?: (value: AiInputSubmitValue<T>) => void;
   onStop?: () => void;
-  ref?: Ref<HTMLTextAreaElement>;
+  ref?: Ref<AiInputHandle | null>;
 };
 
+const editorCls = cn(
+  "max-h-40 min-h-20 w-full bg-transparent",
+  "[&_.tiptap]:min-h-20 [&_.tiptap]:max-h-40 [&_.tiptap]:overflow-y-auto [&_.tiptap]:bg-transparent [&_.tiptap]:text-sm [&_.tiptap]:leading-6 [&_.tiptap]:outline-none",
+  "[&_.tiptap_p]:m-0",
+  "[&_.tiptap_.is-editor-empty:first-child::before]:pointer-events-none [&_.tiptap_.is-editor-empty:first-child::before]:float-left [&_.tiptap_.is-editor-empty:first-child::before]:h-0 [&_.tiptap_.is-editor-empty:first-child::before]:text-muted-foreground [&_.tiptap_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]",
+);
+
 export function AiInput<T = unknown>({
-  value: valueProp,
-  defaultValue = "",
-  onValueChange,
-  mentions: mentionsProp,
-  defaultMentions,
-  onMentionsChange,
-  mentionItems,
-  mentionTrigger = "@",
-  placeholder,
-  label,
-  disabled = false,
-  loading = false,
-  canSubmit,
-  maxLength = 8000,
-  rows = 3,
   header,
   footer,
-  emptyMentionLabel = "No matches",
-  sendLabel = "Send message",
-  stopLabel = "Stop response",
-  removeMentionLabel = "Remove",
   hint,
   className,
-  onSubmit,
-  onStop,
-  ref,
+  rows = 3,
+  ...props
 }: AiInputProps<T>) {
-  const listId = useId();
-  const innerRef = useRef<HTMLTextAreaElement>(null);
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
-  const [uncontrolledMentions, setUncontrolledMentions] = useState<
-    AiMentionItem<T>[]
-  >(() => defaultMentions ?? []);
-  const [caret, setCaret] = useState(0);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [dismissedStart, setDismissedStart] = useState<number | null>(null);
-
-  const value = valueProp ?? uncontrolledValue;
-  const mentions = mentionsProp ?? uncontrolledMentions;
-  const setTextareaRef = useCallback(
-    (node: HTMLTextAreaElement | null) => {
-      innerRef.current = node;
-      if (typeof ref === "function") ref(node);
-      else if (ref) ref.current = node;
-    },
-    [ref],
-  );
-
-  const selectedIds = useMemo(
-    () => new Set(mentions.map((item) => item.id)),
-    [mentions],
-  );
-  const mentionRange = mentionItems
-    ? getActiveMention(value, caret, mentionTrigger)
-    : null;
-  const mentionOpen =
-    mentionRange !== null &&
-    Boolean(mentionItems) &&
-    dismissedStart !== mentionRange.start;
-  const filteredItems = useMemo(
-    () =>
-      mentionOpen && mentionRange
-        ? filterMentionItems(
-            mentionItems ?? [],
-            mentionRange.query,
-            selectedIds,
-          )
-        : [],
-    [mentionItems, mentionOpen, mentionRange, selectedIds],
-  );
-  const submitEnabled =
-    canSubmit ?? Boolean(value.trim() || mentions.length > 0);
-
-  const setValue = useCallback(
-    (next: string) => {
-      if (valueProp === undefined) setUncontrolledValue(next);
-      onValueChange?.(next);
-    },
-    [onValueChange, valueProp],
-  );
-
-  const setMentions = useCallback(
-    (next: AiMentionItem<T>[]) => {
-      if (mentionsProp === undefined) setUncontrolledMentions(next);
-      onMentionsChange?.(next);
-    },
-    [mentionsProp, onMentionsChange],
-  );
-
-  const syncCaret = useCallback((textarea: HTMLTextAreaElement | null) => {
-    if (!textarea) return;
-    setCaret(textarea.selectionStart);
-  }, []);
-
-  const selectMention = useCallback(
-    (item: AiMentionItem<T>) => {
-      const textarea = innerRef.current;
-      const range = getActiveMention(
-        value,
-        textarea?.selectionStart ?? caret,
-        mentionTrigger,
-      );
-      if (!range) return;
-      setDismissedStart(null);
-      const next = consumeMentionQuery(value, range);
-      setValue(next.value);
-      setMentions(selectedIds.has(item.id) ? mentions : [...mentions, item]);
-      setActiveIndex(0);
-      requestAnimationFrame(() => {
-        const node = innerRef.current;
-        if (!node) return;
-        node.focus();
-        node.setSelectionRange(next.caret, next.caret);
-        setCaret(next.caret);
-      });
-    },
-    [
-      caret,
-      mentionTrigger,
-      mentions,
-      selectedIds,
-      setMentions,
-      setValue,
-      value,
-    ],
-  );
-
-  const submit = useCallback(() => {
-    if (disabled || loading || !submitEnabled) return;
-    onSubmit?.({ text: value.trim(), mentions });
-    if (valueProp === undefined) setUncontrolledValue("");
-    if (mentionsProp === undefined) setUncontrolledMentions([]);
-  }, [
+  const {
+    editor,
+    mentions,
+    mentionOpen,
+    filteredItems,
+    activeIndex,
+    listId,
     submitEnabled,
     disabled,
     loading,
-    mentions,
-    mentionsProp,
-    onSubmit,
-    value,
-    valueProp,
-  ]);
-
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (mentionOpen) {
-      const action = mentionMenuKey(event, filteredItems.length);
-      if (action) {
-        event.preventDefault();
-        if (action === "close") {
-          setDismissedStart(mentionRange?.start ?? null);
-          return;
-        }
-        if (action === "up" || action === "down") {
-          setActiveIndex((current) =>
-            nextMentionIndex(current, filteredItems.length, action),
-          );
-          return;
-        }
-        const item = filteredItems[activeIndex];
-        if (item) selectMention(item);
-        return;
-      }
-    }
-
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey &&
-      !event.nativeEvent.isComposing &&
-      event.nativeEvent.keyCode !== 229
-    ) {
-      event.preventDefault();
-      submit();
-    }
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    submit();
-  }
+    emptyMentionLabel,
+    sendLabel,
+    stopLabel,
+    removeMentionLabel,
+    formProps,
+    setActiveIndex,
+    selectMention,
+    removeMention,
+    onStop,
+  } = useAiInput(props);
 
   return (
     <form
-      onSubmit={handleSubmit}
+      {...formProps}
       className={cn(
         "relative rounded-2xl border border-border bg-background p-3 shadow-sm transition-shadow duration-300 focus-within:ring-2 focus-within:ring-ring/30 motion-reduce:transition-none",
         className,
@@ -322,9 +164,7 @@ export function AiInput<T = unknown>({
                 className="size-5"
                 disabled={disabled}
                 aria-label={`${removeMentionLabel} ${mention.label}`}
-                onClick={() =>
-                  setMentions(mentions.filter((item) => item.id !== mention.id))
-                }
+                onClick={() => removeMention(mention.id)}
               >
                 <IconClose />
               </Button>
@@ -332,40 +172,23 @@ export function AiInput<T = unknown>({
           ))}
         </div>
       ) : null}
-      <textarea
-        ref={setTextareaRef}
-        value={value}
-        disabled={disabled}
-        placeholder={placeholder}
-        aria-label={label ?? placeholder}
-        maxLength={maxLength}
-        rows={rows}
-        role="combobox"
-        aria-expanded={mentionOpen}
-        aria-controls={mentionOpen ? listId : undefined}
-        aria-activedescendant={
-          mentionOpen && filteredItems[activeIndex]
-            ? `${listId}-${filteredItems[activeIndex].id}`
-            : undefined
-        }
-        aria-autocomplete="list"
-        className="block max-h-40 min-h-20 w-full resize-none bg-transparent text-sm leading-6 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-        onChange={(event) => {
-          const next = event.target.value;
-          const nextCaret = event.target.selectionStart;
-          const nextRange = getActiveMention(next, nextCaret, mentionTrigger);
-          if (!nextRange || nextRange.start !== dismissedStart) {
-            setDismissedStart(null);
-          }
-          setValue(next);
-          setCaret(nextCaret);
-          setActiveIndex(0);
-        }}
-        onClick={(event) => syncCaret(event.currentTarget)}
-        onKeyUp={(event) => syncCaret(event.currentTarget)}
-        onSelect={(event) => syncCaret(event.currentTarget)}
-        onKeyDown={handleKeyDown}
-      />
+      {editor ? (
+        <Tiptap editor={editor}>
+          <Tiptap.Content
+            className={cn(
+              editorCls,
+              disabled && "cursor-not-allowed opacity-50",
+            )}
+            style={{ minHeight: `${Math.max(rows, 1) * 1.5}rem` }}
+          />
+        </Tiptap>
+      ) : (
+        <div
+          aria-hidden
+          className={editorCls}
+          style={{ minHeight: `${Math.max(rows, 1) * 1.5}rem` }}
+        />
+      )}
       <div className="mt-2 flex items-center justify-between gap-3">
         <div className="min-w-0 text-[11px] text-muted-foreground">
           {footer ?? hint}

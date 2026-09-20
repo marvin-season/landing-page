@@ -2,6 +2,7 @@
 
 import {
   AiInput,
+  type AiInputHandle,
   type AiInputSubmitValue,
   type AiMentionItem,
 } from "@landing-page/biz-ui";
@@ -111,7 +112,7 @@ export function DocumentChat({
   const [mentions, setMentions] = useState<AiMentionItem<KnowledgeMention>[]>(
     [],
   );
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<AiInputHandle>(null);
   const {
     messages,
     quote,

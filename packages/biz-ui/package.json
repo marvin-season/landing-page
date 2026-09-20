@@ -7,11 +7,19 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.8.0",
     "@landing-page/design-system": "workspace:*",
-    "@landing-page/utils": "workspace:*"
+    "@landing-page/utils": "workspace:*",
+    "@tiptap/core": "^3.31.3",
+    "@tiptap/extensions": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "@tiptap/suggestion": "^3.31.3"
   },
   "peerDependencies": {
-    "react": "19.3.0"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

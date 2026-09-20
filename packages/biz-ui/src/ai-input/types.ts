@@ -18,3 +18,7 @@ export type MentionRange = {
   end: number;
   query: string;
 };
+
+export type AiInputHandle = {
+  focus: (options?: FocusOptions) => void;
+};

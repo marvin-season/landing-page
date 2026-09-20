@@ -21,7 +21,7 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:222
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:223
 msgid "A conversation with your document"
 msgstr "ドキュメントと対話する"
 
@@ -57,24 +57,24 @@ msgstr "エージェントUI"
 msgid "AI PC"
 msgstr "AI PC"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:204
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:205
 msgid "AI reply"
 msgstr "AI返信"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:225
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:226
 msgid "Ask a question, or select a passage on the left and quote it here."
 msgstr "質問を入力するか、左の文章を選択してここに引用してください。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:337
 msgid "Ask about this passage…"
 msgstr "この引用について質問…"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:337
 msgid "Ask about your document…"
 msgstr "ドキュメントについて質問…"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:247
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:271
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:248
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:272
 msgid "Assistant"
 msgstr "アシスタント"
 
@@ -127,7 +127,7 @@ msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 msgid "Current"
 msgstr "現行"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:187
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:188
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
@@ -222,7 +222,7 @@ msgstr "ドキュメントとナレッジ"
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr "ドキュメントとナレッジ | フロントエンド開発とAI"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:181
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:182
 msgid "Document chat"
 msgstr "ドキュメントチャット"
 
@@ -259,7 +259,7 @@ msgstr "ユーザーに優れたショッピング体験を提供するエネル
 msgid "effective"
 msgstr "有効"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:365
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:366
 msgid "Enter to send · Shift + Enter for a new line · @ to mention"
 msgstr "Enter で送信 · Shift + Enter で改行 · @ でメンション"
 
@@ -435,7 +435,7 @@ msgstr "2025年5月 - 現在"
 msgid "Meet Shin-chan"
 msgstr "しんちゃんを知る"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:338
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
 msgid "Message"
 msgstr "メッセージ"
 
@@ -459,7 +459,7 @@ msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR,
 msgid "No account needed · PDF & Markdown"
 msgstr "ログイン不要 · PDF・Markdown 対応"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:340
 msgid "No matches"
 msgstr "一致する項目がありません"
 
@@ -497,8 +497,8 @@ msgstr "遅延読み込みとデータ仮想化によるパフォーマンス最
 
 #. placeholder {0}: cited.pageNumber
 #. placeholder {0}: quote.pageNumber
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:83
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:160
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:84
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:161
 msgid "Page {0}"
 msgstr "{0} ページ"
 
@@ -579,7 +579,7 @@ msgstr "ドキュメントを読み込み中…"
 msgid "Release versions"
 msgstr "リリース一覧"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:342
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:343
 msgid "Remove"
 msgstr "削除"
 
@@ -587,7 +587,7 @@ msgstr "削除"
 msgid "Remove document"
 msgstr "ドキュメントを削除"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:356
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:357
 msgid "Remove quote"
 msgstr "引用を削除"
 
@@ -599,7 +599,7 @@ msgstr "変更"
 msgid "Resume"
 msgstr "履歴書"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:307
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:308
 msgid "Retry"
 msgstr "再試行"
 
@@ -611,7 +611,7 @@ msgstr "再利用可能なUIコンポーネントとデザインリファレン�
 msgid "Scroll down to read and quote your document"
 msgstr "下にスクロールして閲覧と引用を始める"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:56
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:57
 msgid "Scroll to latest message"
 msgstr "最新のメッセージへ"
 
@@ -636,7 +636,7 @@ msgstr "選択したテキスト"
 msgid "Selection-aware AI"
 msgstr "選択テキスト向け AI"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:340
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:341
 msgid "Send message"
 msgstr "メッセージを送信"
 
@@ -648,7 +648,7 @@ msgstr "座右銘"
 msgid "Shinnosuke Nohara"
 msgstr "野原しんのすけ"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:341
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:342
 msgid "Stop response"
 msgstr "応答を停止"
 
@@ -664,7 +664,7 @@ msgstr "この文章を簡潔に要約してください。"
 msgid "Tech Stack"
 msgstr "技術スタック"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:290
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:291
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr "アシスタントが受け取るのは引用箇所と指示のみです。"
 
@@ -672,7 +672,7 @@ msgstr "アシスタントが受け取るのは引用箇所と指示のみです
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:281
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "考え中…"
 
@@ -712,15 +712,15 @@ msgstr "Docs ワークスペースの3回のイテレーション"
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Docs ワークスペースは3バージョンを公開済み。ファイル閲覧から PDF 原文の引用、選択テキストの AI まで。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:199
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:200
 msgid "Throttle"
 msgstr "節流"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:195
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:196
 msgid "Throttle off. The full conversation is sent."
 msgstr "節流オフ。会話全体を送信します。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:194
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:195
 msgid "Throttle on. Only the current question is sent."
 msgstr "節流オン。現在の質問のみ送信します。"
 
@@ -795,7 +795,7 @@ msgstr "武漢科学技術大学"
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr "武漢 Zhaori Technology Co., Ltd."
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:243
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:244
 msgid "You"
 msgstr "あなた"
 
