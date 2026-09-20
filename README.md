@@ -29,6 +29,8 @@ Next.js 全栈落地页与 Agent 演示项目。版本以根目录 `package.json
 - `packages/biz-ui` — 可复用业务组合件（`@landing-page/biz-ui`），按需抽取
 - `packages/utils` — 共享工具（`@landing-page/utils`）
 
+查看包依赖图：`nr graph`（Nx 会在浏览器里打开）。
+
 ## Editor
 
 打开仓库后按提示安装 [`.vscode/extensions.json`](./.vscode/extensions.json) 中的推荐扩展。

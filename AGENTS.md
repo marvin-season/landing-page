@@ -13,6 +13,7 @@ Use `ni` from `@antfu/ni` instead of invoking `pnpm` directly. `ni` detects the 
 - `nr dev`: run the Next.js dev server on `http://localhost:3001`.
 - `nr build`: create a production build.
 - `nr start`: serve the production build on port `3001`.
+- `nr graph`: open the Nx project dependency graph in the browser.
 - `nr check`: run Biome checks.
 - `nr lint`: run `biome check --write` to lint, format, and organize imports.
 - `nr format`: format supported files with Biome.

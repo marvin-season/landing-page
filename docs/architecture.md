@@ -71,7 +71,7 @@ flowchart TB
 - **biz-ui**：原子之上、页面之下的可复用组合件；数据、路由、鉴权全部通过 props/slots 注入。允许依赖 `design-system`、`utils`、`react`。禁止依赖 `next`、Lingui、tRPC、Zustand、NextAuth、`@/`、`~/server`、`mastra-server`。
 - **src**：路由、tRPC、Zustand、Lingui、NextAuth，以及只服务单个页面的组件（`src/app/.../_components`）。
 
-新的可复用组合件直接写在 `packages/biz-ui`。从 `src` 抽取时：去掉 `@/` 依赖，把 hook/store/i18n 改成 props，再改 import。不要批量搬家。
+新的可复用组合件直接写在 `packages/biz-ui`。从 `src` 抽取时：去掉 `@/` 依赖，把 hook/store/i18n 改成 props，再改 import。不要批量搬家。查看工作区包依赖：`nr graph`。
 
 ## 3. 路由结构
 
