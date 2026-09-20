@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -18,8 +19,6 @@ import {
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
 import { MessageItem } from "@/components/message/message-item";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../../_components/ActionCard";

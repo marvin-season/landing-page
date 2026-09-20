@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   transpilePackages: ["@landing-page/design-system", "@landing-page/utils"],
   experimental: {
+    optimizePackageImports: ["@landing-page/design-system"],
     swcPlugins: [["@lingui/swc-plugin", {}]],
     useTypeScriptCli: true,
   },

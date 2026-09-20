@@ -1,14 +1,14 @@
 "use client";
 
-import { cn } from "@landing-page/utils";
-import { useId } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
+import { useId } from "react";
 import { themeNames, useTheme } from "@/hooks/use-theme";
 
 type ThemeSwitcherProps = {

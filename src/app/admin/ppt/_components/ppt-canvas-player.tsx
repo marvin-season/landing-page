@@ -1,15 +1,15 @@
 "use client";
 
-import { Canvas, StaticCanvas } from "fabric";
-import { ChevronDown, Download } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@landing-page/design-system";
+import { Canvas, StaticCanvas } from "fabric";
+import { ChevronDown, Download } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FabricSlideJSON } from "../fabric-slide-schema";
 import {
   fabricSlideSchema,

@@ -1,8 +1,7 @@
+import { Button, Input } from "@landing-page/design-system";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   createResumeSession,
   getResumeAuthorizationUrl,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import { Button, Switch } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useReducedMotion } from "framer-motion";
 import {
@@ -23,7 +23,6 @@ import {
   useState,
 } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
-import { Switch } from "@/components/ui/switch";
 import {
   type KnowledgeChatHandle,
   useKnowledgeChat,

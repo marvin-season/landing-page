@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Select,
   SelectContent,
   SelectGroup,
@@ -10,7 +10,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@landing-page/design-system";
 import type { GeneratedPptItem } from "@/store/ppt-store";
 import type { Preset } from "./ppt-presets";
 

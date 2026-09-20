@@ -3,6 +3,19 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
+import {
+  Button,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  Input,
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -21,19 +34,6 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
-import { Button } from "@/components/ui/button";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useTRPC } from "@/lib/trpc";
 
 dayjs.extend(relativeTime);

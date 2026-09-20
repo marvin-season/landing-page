@@ -1,9 +1,8 @@
 "use client";
 
+import { Button, Input } from "@landing-page/design-system";
 import { Loader2, Send } from "lucide-react";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PRESET_QUESTIONS } from "../constants";
 
 type ActionCardProps = {

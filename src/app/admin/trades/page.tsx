@@ -1,10 +1,9 @@
 "use client";
 
+import { Button, Input } from "@landing-page/design-system";
 import { useLocalStorageState } from "ahooks";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 type TradeAction = "buy" | "sell";
 
