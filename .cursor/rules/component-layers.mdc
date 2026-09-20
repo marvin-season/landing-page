@@ -1,0 +1,34 @@
+---
+description: Frontend component layers for design-system, biz-ui, and src
+alwaysApply: true
+---
+
+# Component Layers
+
+Three layers, one-way dependencies: `src` → `biz-ui` → `design-system` → `utils`. `src` may also import `design-system` and `utils` directly.
+
+- `packages/design-system` (`@landing-page/design-system`): atomic UI with no business meaning (Button, Input, Card).
+- `packages/biz-ui` (`@landing-page/biz-ui`): reusable composed UI above atoms, below page logic. Data, routing, and auth come in via props/slots.
+- `src/`: routes, tRPC, Zustand, Lingui, NextAuth, and page-only components (`src/app/.../_components`).
+
+## biz-ui may depend on
+
+- `@landing-page/design-system`
+- `@landing-page/utils`
+- `react` (peer)
+
+## biz-ui must not depend on
+
+- `next` / `next-themes` / `next-auth`
+- Lingui, tRPC, Zustand
+- `@/`, `~/server`, `mastra-server`
+- Vercel Analytics or other app infrastructure
+
+## Extraction
+
+- Put new reusable composed components in `packages/biz-ui` directly.
+- Extract from `src` only when a second use appears: drop `@/` imports, convert hooks/store/i18n to props, then switch the import.
+- Leave single-route UI in `src/app/.../_components`.
+- Do not bulk-migrate existing `src/components`.
+
+Example: a chat bubble shell that only takes `role` and `children` belongs in `biz-ui`. A `ThemeSwitcher` that calls `useTheme()` stays in `src` until it accepts `theme` / `onThemeChange`.

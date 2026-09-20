@@ -1,6 +1,6 @@
 # 架构说明
 
-本文描述 `landing-page` 仓库的整体结构、运行时边界与主要数据流，便于新成员与后续迭代时对齐上下文。
+本文描述仓库的整体结构、运行时边界与主要数据流，便于新成员与后续迭代时对齐上下文。
 
 ## 1. 总览
 
@@ -43,7 +43,10 @@ flowchart TB
 | 路径 | 职责 |
 |------|------|
 | `src/app/` | App Router 页面、`layout.tsx`、`error.tsx`、API Routes |
-| `src/components/` | 可复用 UI（含 shadcn、ai-elements、markdown 等） |
+| `src/components/` | 应用级 UI（路由壳、尚未抽到 `biz-ui` 的组合件等） |
+| `packages/design-system` | 原子组件（`@landing-page/design-system`） |
+| `packages/biz-ui` | 可复用业务组合件（`@landing-page/biz-ui`）；按需抽取，不批量迁移 |
+| `packages/utils` | 共享工具（`@landing-page/utils`） |
 | `src/lib/` | 工具函数、i18n 封装、chat/stream、tRPC 客户端封装等 |
 | `src/store/` | Zustand 状态（消息、会话、PPT、IndexedDB 持久化等） |
 | `src/locales/` | Lingui 编译产物与 `.po` 源（按语言分文件） |
@@ -53,9 +56,22 @@ flowchart TB
 
 ### 路径别名（`tsconfig.json`）
 
+- `@landing-page/design-system` → `packages/design-system`
+- `@landing-page/biz-ui` → `packages/biz-ui`
+- `@landing-page/utils` → `packages/utils`
 - `@/*` → `src/*`
 - `~/*` → 仓库根目录（用于引用 `server/`、`lingui.config` 等）
 - `$` / `$/*` → `mastra-server`（Mastra 专用短别名）
+
+### 前端组件分层
+
+单向依赖：`src` → `biz-ui` → `design-system` → `utils`。`src` 也可以直接用 `design-system` 与 `utils`。
+
+- **design-system**：无业务语义的原子组件（Button、Input、Card）。
+- **biz-ui**：原子之上、页面之下的可复用组合件；数据、路由、鉴权全部通过 props/slots 注入。允许依赖 `design-system`、`utils`、`react`。禁止依赖 `next`、Lingui、tRPC、Zustand、NextAuth、`@/`、`~/server`、`mastra-server`。
+- **src**：路由、tRPC、Zustand、Lingui、NextAuth，以及只服务单个页面的组件（`src/app/.../_components`）。
+
+新的可复用组合件直接写在 `packages/biz-ui`。从 `src` 抽取时：去掉 `@/` 依赖，把 hook/store/i18n 改成 props，再改 import。不要批量搬家。查看工作区包依赖：`nr graph`。
 
 ## 3. 路由结构
 

@@ -1,6 +1,6 @@
+import { Tag } from "@landing-page/design-system";
 import { useMemo } from "react";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
-import { Tag } from "@/components/ui/tag";
 
 interface StackItem {
   name: string;

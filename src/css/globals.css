@@ -4,6 +4,8 @@
 @import "./component.css";
 @import "./base.css";
 @import "./shinchan.css";
+@source "../../packages/design-system/src";
+@source "../../packages/biz-ui/src";
 @custom-variant dark (&:is(.dark *));
 @custom-variant shinchan (&:is(.shinchan *));
 

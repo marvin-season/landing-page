@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { KnowledgeScenes } from "./_components/knowledge-scenes";
 
-const pageTitle = msg`Docs & Knowledge | Frontend Development & AI`;
+const pageTitle = msg`Docs & Knowledge`;
 const pageDescription = msg`Read PDF and Markdown documents without an account. Select passages, collect quotes with page references, and return to highlighted PDF text in a dedicated document workspace.`;
 
 export async function generateMetadata({

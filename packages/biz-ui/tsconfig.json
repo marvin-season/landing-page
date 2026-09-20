@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "@landing-page/biz-ui": ["./src/index.ts"],
+      "@landing-page/design-system": ["../design-system/src/index.ts"],
+      "@landing-page/utils": ["../utils/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

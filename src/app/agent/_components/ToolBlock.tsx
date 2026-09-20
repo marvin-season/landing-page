@@ -1,13 +1,16 @@
 "use client";
 
-import { cn } from "@landing-page/utils";
-import { ChevronDown, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 /** 流式工具调用的阶段：接收参数中 | 正在执行 | 已完成 */
 export type ToolStreamingPhase = "input-streaming" | "calling" | "done";

@@ -1,13 +1,13 @@
 "use client";
 
-import { cn } from "@landing-page/utils";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { languageNames, useLanguage } from "@/hooks/use-language";
 
 type LanguageSwitcherProps = {

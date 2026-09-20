@@ -1,12 +1,12 @@
 "use client";
 
-import { Palette } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@landing-page/design-system";
+import { Palette } from "lucide-react";
 import { ThemeSwitcher } from "./theme-switcher";
 
 export function ThemeMenu() {

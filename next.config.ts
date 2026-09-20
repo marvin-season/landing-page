@@ -21,8 +21,16 @@ const rules: Record<string, TurbopackRuleConfigCollection> = {
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  transpilePackages: ["@landing-page/design-system", "@landing-page/utils"],
+  transpilePackages: [
+    "@landing-page/biz-ui",
+    "@landing-page/design-system",
+    "@landing-page/utils",
+  ],
   experimental: {
+    optimizePackageImports: [
+      "@landing-page/biz-ui",
+      "@landing-page/design-system",
+    ],
     swcPlugins: [["@lingui/swc-plugin", {}]],
     useTypeScriptCli: true,
   },

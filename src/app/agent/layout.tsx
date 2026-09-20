@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import "@/css/globals.css";
 import "@/css/agent-sketch.css";
@@ -6,6 +7,12 @@ import { auth } from "@/auth";
 import { LocatorRuntime } from "@/components/locator-runtime";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import TankQueryClientProvider from "@/components/trpc/provider";
+import { brandedTitle, SITE_NAME } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: brandedTitle(`Agent · ${SITE_NAME}`),
+  description: "Ask, think, and act",
+};
 
 export default async function AgentLayout({
   children,

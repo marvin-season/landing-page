@@ -1,10 +1,9 @@
 "use client";
 
+import { Button, Input } from "@landing-page/design-system";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Suspense, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 function SignInContent() {
   const searchParams = useSearchParams();

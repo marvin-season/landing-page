@@ -1,15 +1,15 @@
 "use client";
 
-import { SettingsIcon } from "lucide-react";
-import { LanguageSwitcher } from "@/components/language/language-switcher";
-import { ThemeSwitcher } from "@/components/theme/theme-switcher";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@landing-page/design-system";
+import { SettingsIcon } from "lucide-react";
+import { LanguageSwitcher } from "@/components/language/language-switcher";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import type { SettingsMenuProps } from "./type";
 
 export const SettingsMenu = ({ currentLang }: SettingsMenuProps) => {

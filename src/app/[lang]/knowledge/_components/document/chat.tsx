@@ -1,17 +1,22 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import {
+  AiInput,
+  type AiInputHandle,
+  type AiInputSubmitValue,
+  type AiMentionItem,
+} from "@landing-page/biz-ui";
+import { Button, Switch } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useReducedMotion } from "framer-motion";
 import {
   ArrowDown,
-  ArrowUp,
   Bot,
+  FileText,
   Gauge,
   Loader2,
   MessageSquare,
   Quote,
-  Square,
   X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -19,19 +24,24 @@ import {
   type Ref,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
-import { Switch } from "@/components/ui/switch";
 import {
   type KnowledgeChatHandle,
   useKnowledgeChat,
 } from "../use-knowledge-chat";
 import type { DocumentQuote, KnowledgeDocument } from "./model";
+import { sampleFormatLabel } from "./samples";
 
 export type { KnowledgeMessage } from "./model";
 export type { KnowledgeChatHandle };
+
+type KnowledgeMention =
+  | { kind: "document"; documentId: string }
+  | { kind: "quote"; quote: DocumentQuote };
 
 const DocumentMarkdown = dynamic(() => import("./markdown/renderer"));
 
@@ -99,7 +109,10 @@ export function DocumentChat({
   const { t } = useLingui();
   const reducedMotion = useReducedMotion();
   const [input, setInput] = useState("");
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [mentions, setMentions] = useState<AiMentionItem<KnowledgeMention>[]>(
+    [],
+  );
+  const inputRef = useRef<AiInputHandle>(null);
   const {
     messages,
     quote,
@@ -126,11 +139,39 @@ export function DocumentChat({
     if (quoteId) inputRef.current?.focus({ preventScroll: true });
   }, [quoteId]);
 
-  function submit() {
-    const text = input.trim();
+  const mentionItems = useMemo(() => {
+    const items: AiMentionItem<KnowledgeMention>[] = [
+      {
+        id: `document:${source.id}`,
+        label: source.file.name,
+        description: sampleFormatLabel(source.kind),
+        icon: <FileText />,
+        data: { kind: "document", documentId: source.id },
+      },
+    ];
+    const seen = new Set<string>();
+    for (const message of messages) {
+      const cited = message.quote;
+      if (!cited || seen.has(cited.id) || cited.id === quoteId) continue;
+      seen.add(cited.id);
+      items.push({
+        id: `quote:${cited.id}`,
+        label: cited.documentName,
+        description: cited.pageNumber
+          ? `${t`Page ${cited.pageNumber}`} · ${cited.text.slice(0, 48)}`
+          : cited.text.slice(0, 64),
+        icon: <Quote />,
+        data: { kind: "quote", quote: cited },
+      });
+    }
+    return items;
+  }, [messages, quoteId, source, t]);
+
+  function submitComposer({ text }: AiInputSubmitValue<KnowledgeMention>) {
     if ((!text && !quote) || busy) return;
     ask(text, quote);
     setInput("");
+    setMentions([]);
   }
 
   return (
@@ -273,78 +314,60 @@ export function DocumentChat({
             {notice}
           </p>
         ) : null}
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            submit();
-          }}
-          className="rounded-2xl border border-border bg-background p-3 shadow-sm transition-shadow duration-300 focus-within:ring-2 focus-within:ring-ring/30 motion-reduce:transition-none"
-        >
-          {quote ? (
-            <div className="relative mb-3 pr-6">
-              <QuoteBlock quote={quote} onLocate={onLocate} />
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="absolute right-0 top-0 size-6"
-                aria-label={t`Remove quote`}
-                onClick={() => setQuote(null)}
-              >
-                <X className="size-3.5" />
-              </Button>
-            </div>
-          ) : null}
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder={
-              quote ? t`Ask about this passage…` : t`Ask about your document…`
+        <AiInput
+          ref={inputRef}
+          value={input}
+          onValueChange={setInput}
+          mentions={mentions}
+          onMentionsChange={(next) => {
+            const quoteMention = next.find(
+              (mention) => mention.data?.kind === "quote",
+            )?.data;
+            if (quoteMention?.kind === "quote") {
+              setQuote(quoteMention.quote);
+              setMentions(
+                next.filter((mention) => mention.data?.kind !== "quote"),
+              );
+              return;
             }
-            aria-label={t`Message`}
-            maxLength={8000}
-            rows={3}
-            className="block max-h-40 min-h-20 w-full resize-none bg-transparent text-sm leading-6 outline-none placeholder:text-muted-foreground"
-            onKeyDown={(event) => {
-              if (
-                event.key === "Enter" &&
-                !event.shiftKey &&
-                !event.nativeEvent.isComposing &&
-                event.nativeEvent.keyCode !== 229
-              ) {
-                event.preventDefault();
-                submit();
-              }
-            }}
-          />
-          <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="text-[11px] text-muted-foreground">
-              <Trans>Enter to send · Shift + Enter for a new line</Trans>
-            </p>
-            {busy ? (
-              <Button
-                type="button"
-                size="icon"
-                className="size-8 shrink-0"
-                aria-label={t`Stop response`}
-                onClick={stop}
-              >
-                <Square className="size-3.5" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                size="icon"
-                className="size-8 shrink-0"
-                aria-label={t`Send message`}
-                disabled={!input.trim() && !quote}
-              >
-                <ArrowUp className="size-4" />
-              </Button>
-            )}
-          </div>
-        </form>
+            setMentions(next);
+          }}
+          mentionItems={mentionItems}
+          placeholder={
+            quote ? t`Ask about this passage…` : t`Ask about your document…`
+          }
+          label={t`Message`}
+          emptyMentionLabel={t`No matches`}
+          sendLabel={t`Send message`}
+          stopLabel={t`Stop response`}
+          removeMentionLabel={t`Remove`}
+          loading={busy}
+          canSubmit={Boolean(input.trim() || quote)}
+          onStop={stop}
+          onSubmit={submitComposer}
+          header={
+            quote ? (
+              <div className="relative mb-3 pr-6">
+                <QuoteBlock quote={quote} onLocate={onLocate} />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-0 top-0 size-6"
+                  aria-label={t`Remove quote`}
+                  onClick={() => setQuote(null)}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+            ) : null
+          }
+          footer={
+            <Trans>
+              Enter to send · Shift + Enter for a new line · @ to mention
+            </Trans>
+          }
+        />
       </div>
     </div>
   );

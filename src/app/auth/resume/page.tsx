@@ -1,8 +1,7 @@
+import { Button, Input } from "@landing-page/design-system";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   createResumeSession,
   getResumeAuthorizationUrl,
@@ -14,7 +13,9 @@ import {
 } from "@/lib/resume-access";
 
 export const metadata: Metadata = {
-  title: "个人简历授权",
+  title: {
+    absolute: "个人简历授权 · 蜡笔小新",
+  },
   robots: { index: false, follow: false, noarchive: true },
 };
 
