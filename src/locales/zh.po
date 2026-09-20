@@ -21,7 +21,7 @@ msgstr "，擅长<0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI."
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr "我的工作经历、项目和技术专长的综合概述。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:181
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:222
 msgid "A conversation with your document"
 msgstr "与文档展开对话"
 
@@ -57,24 +57,24 @@ msgstr "智能体交互界面"
 msgid "AI PC"
 msgstr "AIPC"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:163
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:204
 msgid "AI reply"
 msgstr "AI 回复"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:184
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:225
 msgid "Ask a question, or select a passage on the left and quote it here."
 msgstr "提出问题，或在左侧选中文字，将其作为引文发送到这里。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:302
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
 msgid "Ask about this passage…"
 msgstr "针对这段引文提问…"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:302
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
 msgid "Ask about your document…"
 msgstr "针对文档提问…"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:206
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:230
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:247
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:271
 msgid "Assistant"
 msgstr "助手"
 
@@ -127,7 +127,7 @@ msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 msgid "Current"
 msgstr "当前"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:146
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:187
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
@@ -222,7 +222,7 @@ msgstr "文档与知识库"
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr "文档与知识库 | 前端开发与 AI 应用"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:140
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:181
 msgid "Document chat"
 msgstr "文档对话"
 
@@ -259,9 +259,9 @@ msgstr "专注于为用户提供卓越购物体验的电子商务平台。"
 msgid "effective"
 msgstr "高效"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:322
-msgid "Enter to send · Shift + Enter for a new line"
-msgstr "Enter 发送 · Shift + Enter 换行"
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:365
+msgid "Enter to send · Shift + Enter for a new line · @ to mention"
+msgstr "Enter 发送 · Shift + Enter 换行 · @ 引用"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:43
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
@@ -435,7 +435,7 @@ msgstr "2025 年 5 月 - 至今"
 msgid "Meet Shin-chan"
 msgstr "认识小新"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:304
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:338
 msgid "Message"
 msgstr "消息"
 
@@ -458,6 +458,10 @@ msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR,
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:135
 msgid "No account needed · PDF & Markdown"
 msgstr "无需登录 · 支持 PDF 与 Markdown"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+msgid "No matches"
+msgstr "无匹配项"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:101
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
@@ -491,8 +495,10 @@ msgstr ""
 msgid "Optimized performance with lazy loading and data virtualization"
 msgstr "优化性能，支持懒加载和数据虚拟化"
 
+#. placeholder {0}: cited.pageNumber
 #. placeholder {0}: quote.pageNumber
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:73
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:83
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:160
 msgid "Page {0}"
 msgstr "第 {0} 页"
 
@@ -573,11 +579,15 @@ msgstr "正在读取文档…"
 msgid "Release versions"
 msgstr "版本列表"
 
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:342
+msgid "Remove"
+msgstr "移除"
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:165
 msgid "Remove document"
 msgstr "移除文档"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:290
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:356
 msgid "Remove quote"
 msgstr "移除引文"
 
@@ -589,7 +599,7 @@ msgstr "更换"
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:266
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:307
 msgid "Retry"
 msgstr "重试"
 
@@ -601,7 +611,7 @@ msgstr "可重用 UI 组件和设计参考"
 msgid "Scroll down to read and quote your document"
 msgstr "向下滚动，开始阅读与引用"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:46
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:56
 msgid "Scroll to latest message"
 msgstr "滚动到最新消息"
 
@@ -626,7 +636,7 @@ msgstr "选中的文字"
 msgid "Selection-aware AI"
 msgstr "划词 AI"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:340
 msgid "Send message"
 msgstr "发送消息"
 
@@ -638,7 +648,7 @@ msgstr "座右铭"
 msgid "Shinnosuke Nohara"
 msgstr "野原新之助"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:329
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:341
 msgid "Stop response"
 msgstr "停止回复"
 
@@ -654,7 +664,7 @@ msgstr "请简明总结这段文字。"
 msgid "Tech Stack"
 msgstr "技术栈"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:249
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:290
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档。"
 
@@ -662,7 +672,7 @@ msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:240
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:281
 msgid "Thinking…"
 msgstr "正在思考…"
 
@@ -702,15 +712,15 @@ msgstr "Docs 工作区的三次迭代"
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Docs 工作区已发布三个版本：从阅读文档，到定位 PDF 原文，再到划词即可调用 AI。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:158
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:199
 msgid "Throttle"
 msgstr "节流"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:154
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:195
 msgid "Throttle off. The full conversation is sent."
 msgstr "节流已关闭。将发送整段会话上下文。"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:153
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:194
 msgid "Throttle on. Only the current question is sent."
 msgstr "节流已开启。只发送当前问题。"
 
@@ -785,7 +795,7 @@ msgstr "武汉科技大学"
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr "武汉兆日科技有限责任公司"
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:202
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:243
 msgid "You"
 msgstr "你"
 

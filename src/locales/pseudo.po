@@ -21,7 +21,7 @@ msgstr ""
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:181
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:222
 msgid "A conversation with your document"
 msgstr ""
 
@@ -57,24 +57,24 @@ msgstr ""
 msgid "AI PC"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:163
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:204
 msgid "AI reply"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:184
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:225
 msgid "Ask a question, or select a passage on the left and quote it here."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:302
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
 msgid "Ask about this passage…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:302
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:336
 msgid "Ask about your document…"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:206
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:230
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:247
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:271
 msgid "Assistant"
 msgstr ""
 
@@ -127,7 +127,7 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:146
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:187
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
@@ -222,7 +222,7 @@ msgstr ""
 msgid "Docs & Knowledge | Frontend Development & AI"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:140
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:181
 msgid "Document chat"
 msgstr ""
 
@@ -259,8 +259,8 @@ msgstr ""
 msgid "effective"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:322
-msgid "Enter to send · Shift + Enter for a new line"
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:365
+msgid "Enter to send · Shift + Enter for a new line · @ to mention"
 msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:43
@@ -435,7 +435,7 @@ msgstr ""
 msgid "Meet Shin-chan"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:304
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:338
 msgid "Message"
 msgstr ""
 
@@ -457,6 +457,10 @@ msgstr ""
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:135
 msgid "No account needed · PDF & Markdown"
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+msgid "No matches"
 msgstr ""
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:101
@@ -491,8 +495,10 @@ msgstr ""
 msgid "Optimized performance with lazy loading and data virtualization"
 msgstr ""
 
+#. placeholder {0}: cited.pageNumber
 #. placeholder {0}: quote.pageNumber
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:73
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:83
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:160
 msgid "Page {0}"
 msgstr ""
 
@@ -573,11 +579,15 @@ msgstr ""
 msgid "Release versions"
 msgstr ""
 
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:342
+msgid "Remove"
+msgstr ""
+
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:165
 msgid "Remove document"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:290
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:356
 msgid "Remove quote"
 msgstr ""
 
@@ -589,7 +599,7 @@ msgstr ""
 msgid "Resume"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:266
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:307
 msgid "Retry"
 msgstr ""
 
@@ -601,7 +611,7 @@ msgstr ""
 msgid "Scroll down to read and quote your document"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:46
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:56
 msgid "Scroll to latest message"
 msgstr ""
 
@@ -626,7 +636,7 @@ msgstr ""
 msgid "Selection-aware AI"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:340
 msgid "Send message"
 msgstr ""
 
@@ -638,7 +648,7 @@ msgstr ""
 msgid "Shinnosuke Nohara"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:329
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:341
 msgid "Stop response"
 msgstr ""
 
@@ -654,7 +664,7 @@ msgstr ""
 msgid "Tech Stack"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:249
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:290
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr ""
 
@@ -662,7 +672,7 @@ msgstr ""
 msgid "The sample could not be loaded. Please try again."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:240
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:281
 msgid "Thinking…"
 msgstr ""
 
@@ -702,15 +712,15 @@ msgstr ""
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:158
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:199
 msgid "Throttle"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:154
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:195
 msgid "Throttle off. The full conversation is sent."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:153
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:194
 msgid "Throttle on. Only the current question is sent."
 msgstr ""
 
@@ -785,7 +795,7 @@ msgstr ""
 msgid "Wuhan Zhaori Technology Co., Ltd."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/chat.tsx:202
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:243
 msgid "You"
 msgstr ""
 

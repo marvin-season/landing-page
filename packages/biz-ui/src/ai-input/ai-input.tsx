@@ -83,6 +83,7 @@ export type AiInputProps<T = unknown> = {
   label?: string;
   disabled?: boolean;
   loading?: boolean;
+  canSubmit?: boolean;
   maxLength?: number;
   rows?: number;
   header?: ReactNode;
@@ -111,6 +112,7 @@ export function AiInput<T = unknown>({
   label,
   disabled = false,
   loading = false,
+  canSubmit,
   maxLength = 8000,
   rows = 3,
   header,
@@ -168,7 +170,8 @@ export function AiInput<T = unknown>({
         : [],
     [mentionItems, mentionOpen, mentionRange, selectedIds],
   );
-  const canSubmit = Boolean(value.trim() || mentions.length > 0);
+  const submitEnabled =
+    canSubmit ?? Boolean(value.trim() || mentions.length > 0);
 
   const setValue = useCallback(
     (next: string) => {
@@ -225,12 +228,12 @@ export function AiInput<T = unknown>({
   );
 
   const submit = useCallback(() => {
-    if (disabled || loading || !canSubmit) return;
+    if (disabled || loading || !submitEnabled) return;
     onSubmit?.({ text: value.trim(), mentions });
     if (valueProp === undefined) setUncontrolledValue("");
     if (mentionsProp === undefined) setUncontrolledMentions([]);
   }, [
-    canSubmit,
+    submitEnabled,
     disabled,
     loading,
     mentions,
@@ -383,7 +386,7 @@ export function AiInput<T = unknown>({
             size="icon"
             className="size-8 shrink-0"
             aria-label={sendLabel}
-            disabled={disabled || loading || !canSubmit}
+            disabled={disabled || loading || !submitEnabled}
           >
             <IconArrowUp />
           </Button>
