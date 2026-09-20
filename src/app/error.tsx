@@ -10,6 +10,11 @@ export default function GlobalError({
 }) {
   return (
     <html lang="zh-CN">
+      <head>
+        <title>出错了 · 蜡笔小新</title>
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body>
         <div className="flex h-dvh w-full items-center justify-center ">
           <div className="bg-white border border-red-200 text-red-800 rounded-lg shadow p-6 max-w-md w-full flex flex-col items-center">

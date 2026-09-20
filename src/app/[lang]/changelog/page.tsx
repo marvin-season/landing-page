@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { ChangelogContent } from "./_components/changelog-content";
 
-const pageTitle = msg`Product updates | Docs workspace`;
+const pageTitle = msg`Product updates`;
 const pageDescription = msg`Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI.`;
 
 export async function generateMetadata({

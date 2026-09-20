@@ -13,7 +13,9 @@ import {
 } from "@/lib/resume-access";
 
 export const metadata: Metadata = {
-  title: "个人简历授权",
+  title: {
+    absolute: "个人简历授权 · 蜡笔小新",
+  },
   robots: { index: false, follow: false, noarchive: true },
 };
 
