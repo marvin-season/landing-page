@@ -17,6 +17,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^2.0.258
         version: 2.0.258(react@19.3.0)(zod@4.6.2)
+      '@landing-page/biz-ui':
+        specifier: workspace:*
+        version: link:packages/biz-ui
       '@landing-page/design-system':
         specifier: workspace:*
         version: link:packages/design-system
@@ -291,6 +294,25 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+
+  packages/biz-ui:
+    dependencies:
+      '@landing-page/design-system':
+        specifier: workspace:*
+        version: link:../design-system
+      '@landing-page/utils':
+        specifier: workspace:*
+        version: link:../utils
+      react:
+        specifier: 19.3.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
       typescript:
         specifier: ^7.0.2
         version: 7.0.2

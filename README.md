@@ -26,6 +26,7 @@ Next.js 全栈落地页与 Agent 演示项目。版本以根目录 `package.json
 工作区包：
 
 - `packages/design-system` — 共享 UI 原语（`@landing-page/design-system`）
+- `packages/biz-ui` — 可复用业务组合件（`@landing-page/biz-ui`），按需抽取
 - `packages/utils` — 共享工具（`@landing-page/utils`）
 
 ## Editor

@@ -19,6 +19,7 @@
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.56",
     "@ai-sdk/react": "^2.0.258",
+    "@landing-page/biz-ui": "workspace:*",
     "@landing-page/design-system": "workspace:*",
     "@landing-page/utils": "workspace:*",
     "@lingui/core": "^5.9.5",

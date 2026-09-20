@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Next.js 16 app using React 19, TypeScript, Tailwind CSS 4, Lingui, tRPC, and Mastra. Main app code lives in `src/`: routes in `src/app`, shared UI in `src/components`, stores in `src/store`, hooks in `src/hooks`, utilities/API helpers in `src/lib`, styles in `src/css`, and translations in `src/locales`. Static assets are in `public/`. Mastra code is in `mastra-server/`; the standalone Python agent service is in `agent-server/`. Database/config assets live in `db/`, and documentation is in `docs/`.
+This is a Next.js 16 app using React 19, TypeScript, Tailwind CSS 4, Lingui, tRPC, and Mastra. Main app code lives in `src/`: routes in `src/app`, app-level UI in `src/components`, stores in `src/store`, hooks in `src/hooks`, utilities/API helpers in `src/lib`, styles in `src/css`, and translations in `src/locales`. Shared packages live in `packages/`: `design-system` (atomic UI), `biz-ui` (reusable composed business UI), and `utils`. Static assets are in `public/`. Mastra code is in `mastra-server/`; the standalone Python agent service is in `agent-server/`. Database/config assets live in `db/`, and documentation is in `docs/`.
 
 ## Build, Test, and Development Commands
 
@@ -31,7 +31,7 @@ When dependencies are missing or need to be refreshed, use `ni` commands so the 
 
 ## Coding Style & Naming Conventions
 
-Biome is the source of truth for formatting and linting. It uses 2-space indentation, recommended React/Next rules, and automatic import organization. Prefer TypeScript for app code, `tsx` for React components, and kebab-case file names when matching existing patterns, for example `chat-mode-switcher.tsx`. Keep shared primitives in `src/components/ui`; feature-specific components should stay near their route in `_components`.
+Biome is the source of truth for formatting and linting. It uses 2-space indentation, recommended React/Next rules, and automatic import organization. Prefer TypeScript for app code, `tsx` for React components, and kebab-case file names when matching existing patterns, for example `chat-mode-switcher.tsx`. Keep atomic UI in `packages/design-system`, reusable composed business UI in `packages/biz-ui`, and page-only components near their route in `_components`. See `.cursor/rules/component-layers.mdc`.
 
 ## Testing Guidelines
 
