@@ -14,6 +14,7 @@ import {
 import linguiConfig from "~/lingui.config";
 import "@/css/globals.css";
 import { LocatorRuntime } from "@/components/locator-runtime";
+import { PageFade } from "@/components/page-transition/page-fade";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";
 
 const lora = Lora({
@@ -64,7 +65,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <LocatorRuntime />
             <SettingsMenu currentLang={lang} />
-            {children}
+            <PageFade>{children}</PageFade>
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>

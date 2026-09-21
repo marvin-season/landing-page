@@ -85,7 +85,7 @@ function QuoteBlock({
             </span>
           ) : null}
         </span>
-        <span className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words text-muted-foreground block">
+        <span className="max-h-32 overflow-y-auto whitespace-pre-wrap wrap-break-word text-muted-foreground block">
           {quote.text}
         </span>
       </button>
@@ -254,7 +254,7 @@ export function DocumentChat({
                 ) : null}
                 {message.text ? (
                   message.role === "user" ? (
-                    <p className="whitespace-pre-wrap break-words text-sm leading-7">
+                    <p className="whitespace-pre-wrap wrap-break-word text-sm leading-7">
                       {message.text}
                     </p>
                   ) : (

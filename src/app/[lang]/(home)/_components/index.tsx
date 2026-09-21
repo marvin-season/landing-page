@@ -7,7 +7,7 @@ import type { HomeNavLink } from "../data/home-data";
 const getRevealStyle = (delay: number): CSSProperties =>
   ({ "--home-reveal-delay": `${delay}ms` }) as CSSProperties;
 
-export function HomeSection({
+export function Section({
   children,
   title,
   delay = 80,
@@ -39,8 +39,8 @@ export function HomeSection({
 export function NavigationCarousel({ items }: { items: HomeNavLink[] }) {
   return (
     <div className="relative isolate">
-      <div className="group/navigation -mx-2 overflow-x-auto px-2 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex w-max animate-[home-navigation-scroll_48s_linear_infinite] group-hover/navigation:[animation-play-state:paused] group-focus-within/navigation:[animation-play-state:paused] motion-reduce:animate-none">
+      <div className="group/navigation -mx-2 overflow-x-auto px-2 py-3 scrollbar-none [&::-webkit-scrollbar]:hidden">
+        <div className="flex w-max animate-[home-navigation-scroll_48s_linear_infinite] group-hover/navigation:paused group-focus-within/navigation:paused motion-reduce:animate-none">
           {[false, true].map((duplicate) => (
             <div
               key={String(duplicate)}
@@ -59,11 +59,11 @@ export function NavigationCarousel({ items }: { items: HomeNavLink[] }) {
       </div>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -left-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_right,black,transparent)] sm:w-16"
+        className="pointer-events-none absolute inset-y-0 -left-2 z-20 w-8 bg-background/60 backdrop-blur-md mask-[linear-gradient(to_right,black,transparent)] sm:w-16"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -right-2 z-20 w-8 bg-background/60 backdrop-blur-md [mask-image:linear-gradient(to_left,black,transparent)] sm:w-16"
+        className="pointer-events-none absolute inset-y-0 -right-2 z-20 w-8 bg-background/60 backdrop-blur-md mask-[linear-gradient(to_left,black,transparent)] sm:w-16"
       />
     </div>
   );
@@ -95,7 +95,7 @@ export function NavCard({
       rel={external ? "noreferrer" : undefined}
       tabIndex={duplicate ? -1 : undefined}
       data-featured={featured || undefined}
-      className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10 shinchan:matte-surface shinchan:hover:shadow-sm data-[featured=true]:isolate data-[featured=true]:border-0 data-[featured=true]:p-[17px] data-[featured=true]:shadow-primary/15"
+      className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10 shinchan:matte-surface shinchan:hover:shadow-sm data-[featured=true]:isolate data-[featured=true]:border-0 data-[featured=true]:p-4.25 data-[featured=true]:shadow-primary/15"
     >
       {featured && (
         <>
@@ -105,7 +105,7 @@ export function NavCard({
           />
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-[inherit] p-[1.5px] [mask-image:linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)] [mask-clip:content-box,border-box] [mask-composite:exclude]"
+            className="pointer-events-none absolute inset-0 rounded-[inherit] p-[1.5px] mask-[linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)] [mask-clip:content-box,border-box] mask-exclude"
           >
             <span className="absolute -inset-full bg-[conic-gradient(from_0deg,transparent_0deg,var(--primary)_90deg,transparent_150deg,transparent_240deg,var(--chart-2)_300deg,transparent_360deg)] motion-safe:animate-[spin_6s_linear_infinite]" />
           </span>
@@ -148,5 +148,3 @@ export function Quote({
     </div>
   );
 }
-
-export { HomeSection as Section };
