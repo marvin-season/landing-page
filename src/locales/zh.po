@@ -720,21 +720,37 @@ msgstr "翻译"
 msgid "Translate or summarize from the selection toolbar"
 msgstr "在划词工具条中翻译或总结"
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:26
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:39
 msgid "Translate this passage into American English."
 msgstr "请将这段文字翻译成英语（美式）。"
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:27
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:45
+msgid "Translate this passage into Arabic."
+msgstr "请将这段文字翻译成阿拉伯语。"
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:44
+msgid "Translate this passage into French."
+msgstr "请将这段文字翻译成法语。"
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:40
 msgid "Translate this passage into Japanese."
 msgstr "请将这段文字翻译成日语。"
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:28
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:41
 msgid "Translate this passage into Korean."
 msgstr "请将这段文字翻译成韩语。"
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:29
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:43
+msgid "Translate this passage into Russian."
+msgstr "请将这段文字翻译成俄语。"
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:42
 msgid "Translate this passage into Simplified Chinese."
 msgstr "请将这段文字翻译成简体中文。"
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:46
+msgid "Translate this passage into Uyghur."
+msgstr "请将这段文字翻译成维吾尔语。"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:85
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:90

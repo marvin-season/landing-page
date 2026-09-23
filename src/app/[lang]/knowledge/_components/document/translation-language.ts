@@ -5,7 +5,16 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 
-export const TRANSLATION_LANGUAGES = ["en", "ja", "ko", "zh-Hans"] as const;
+export const TRANSLATION_LANGUAGES = [
+  "en",
+  "ja",
+  "ko",
+  "zh-Hans",
+  "ru",
+  "fr",
+  "ar",
+  "ug",
+] as const;
 
 export type TranslationLanguage = (typeof TRANSLATION_LANGUAGES)[number];
 
@@ -17,6 +26,10 @@ export const TRANSLATION_LANGUAGE_OPTIONS: Array<{
   { value: "ja", label: "日本語" },
   { value: "ko", label: "한국어" },
   { value: "zh-Hans", label: "简体中文" },
+  { value: "ru", label: "Русский" },
+  { value: "fr", label: "Français" },
+  { value: "ar", label: "العربية" },
+  { value: "ug", label: "ئۇيغۇرچە" },
 ];
 
 export const TRANSLATION_INSTRUCTIONS: Record<
@@ -27,6 +40,10 @@ export const TRANSLATION_INSTRUCTIONS: Record<
   ja: msg`Translate this passage into Japanese.`,
   ko: msg`Translate this passage into Korean.`,
   "zh-Hans": msg`Translate this passage into Simplified Chinese.`,
+  ru: msg`Translate this passage into Russian.`,
+  fr: msg`Translate this passage into French.`,
+  ar: msg`Translate this passage into Arabic.`,
+  ug: msg`Translate this passage into Uyghur.`,
 };
 
 const STORAGE_KEY = "knowledge:translate-language";
@@ -40,14 +57,22 @@ export function isTranslationLanguage(
   return TRANSLATION_LANGUAGE_SET.has(value);
 }
 
+const UI_TO_TRANSLATION_LANGUAGE: Partial<Record<string, TranslationLanguage>> =
+  {
+    en: "en",
+    ja: "ja",
+    ko: "ko",
+    zh: "zh-Hans",
+    ru: "ru",
+    fr: "fr",
+    ar: "ar",
+    ug: "ug",
+  };
+
 export function defaultTranslationLanguage(
   uiLocale: string,
 ): TranslationLanguage {
-  if (uiLocale === "ja") return "ja";
-  if (uiLocale === "ko") return "ko";
-  if (uiLocale === "zh") return "zh-Hans";
-  if (uiLocale === "en") return "en";
-  return "zh-Hans";
+  return UI_TO_TRANSLATION_LANGUAGE[uiLocale] ?? "zh-Hans";
 }
 
 export function readStoredTranslationLanguage(): TranslationLanguage | null {

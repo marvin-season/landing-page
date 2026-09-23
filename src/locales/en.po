@@ -720,21 +720,37 @@ msgstr "Translate"
 msgid "Translate or summarize from the selection toolbar"
 msgstr "Translate or summarize from the selection toolbar"
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:26
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:39
 msgid "Translate this passage into American English."
 msgstr "Translate this passage into American English."
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:27
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:45
+msgid "Translate this passage into Arabic."
+msgstr "Translate this passage into Arabic."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:44
+msgid "Translate this passage into French."
+msgstr "Translate this passage into French."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:40
 msgid "Translate this passage into Japanese."
 msgstr "Translate this passage into Japanese."
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:28
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:41
 msgid "Translate this passage into Korean."
 msgstr "Translate this passage into Korean."
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:29
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:43
+msgid "Translate this passage into Russian."
+msgstr "Translate this passage into Russian."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:42
 msgid "Translate this passage into Simplified Chinese."
 msgstr "Translate this passage into Simplified Chinese."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:46
+msgid "Translate this passage into Uyghur."
+msgstr "Translate this passage into Uyghur."
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:85
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:90
