@@ -5,15 +5,13 @@
 
 import Negotiator from "negotiator";
 import { type NextRequest, NextResponse } from "next/server";
+import { locales } from "@/lib/i18n/locales";
 import {
   getResumeAuthorizationUrl,
   hasResumeAccess,
   isResumePath,
   resumeCookieName,
 } from "@/lib/resume-access";
-import linguiConfig from "~/lingui.config";
-
-const { locales } = linguiConfig;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

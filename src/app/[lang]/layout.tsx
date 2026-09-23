@@ -11,7 +11,7 @@ import {
   getI18nInstance,
   type PageLangParam,
 } from "@/lib/i18n/appRouterI18n";
-import linguiConfig from "~/lingui.config";
+import { locales } from "@/lib/i18n/locales";
 import "@/css/globals.css";
 import { LocatorRuntime } from "@/components/locator-runtime";
 import { PageFade } from "@/components/page-transition/page-fade";
@@ -23,7 +23,7 @@ const lora = Lora({
 });
 
 export async function generateStaticParams() {
-  return linguiConfig.locales.map((lang) => ({ lang }));
+  return locales.map((lang) => ({ lang }));
 }
 
 export async function generateMetadata(props: PageLangParam) {

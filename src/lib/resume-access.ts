@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-import linguiConfig from "~/lingui.config";
+import { locales } from "@/lib/i18n/locales";
 
 export const resumeCookieName = "resume-access";
 export const resumeSessionMaxAge = 8 * 60 * 60;
@@ -53,7 +53,7 @@ export function getResumeReturnTo(value: unknown) {
   const pathname = value.replace(/\/$/, "");
   if (
     pathname === "/resume" ||
-    linguiConfig.locales.some((locale) => pathname === `/${locale}/resume`)
+    locales.some((locale) => pathname === `/${locale}/resume`)
   ) {
     return pathname;
   }

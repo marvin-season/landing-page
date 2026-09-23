@@ -8,7 +8,8 @@ import {
   SelectValue,
 } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { languageNames, useLanguage } from "@/hooks/use-language";
+import { useLanguage } from "@/hooks/use-language";
+import { languageNames } from "@/lib/i18n/locales";
 
 type LanguageSwitcherProps = {
   currentLang?: string;

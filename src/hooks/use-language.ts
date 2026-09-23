@@ -1,16 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import linguiConfig from "~/lingui.config";
-
-const { locales } = linguiConfig;
-
-// 语言显示名称映射
-export const languageNames: Record<string, string> = {
-  en: "English",
-  zh: "中文",
-  ja: "日本語",
-};
+import { availableLocales, locales } from "@/lib/i18n/locales";
 
 /**
  * 语言切换 Hook
@@ -21,9 +12,6 @@ export const useLanguage = (currentLang?: string) => {
   const router = useRouter();
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathLocale = currentLang || pathSegments[0] || locales[0];
-
-  // 过滤掉 pseudo 语言（伪本地化语言，用于测试）
-  const availableLocales = locales.filter((locale) => locale !== "pseudo");
 
   /**
    * 构建指定语言的新路径
