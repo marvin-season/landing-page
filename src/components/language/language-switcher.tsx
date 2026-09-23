@@ -1,53 +1,60 @@
 "use client";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
 } from "@landing-page/design-system";
-import { cn } from "@landing-page/utils";
 import { useLanguage } from "@/hooks/use-language";
-import { languageNames } from "@/lib/i18n/locales";
+import {
+  type AppLocale,
+  languageNames,
+  languageShortNames,
+} from "@/lib/i18n/locales";
 
 type LanguageSwitcherProps = {
   currentLang?: string;
-  hideLabel?: boolean;
 };
 
-export const LanguageSwitcher = ({
-  currentLang,
-  hideLabel = false,
-}: LanguageSwitcherProps = {}) => {
+function isAppLocale(value: string): value is AppLocale {
+  return value in languageShortNames;
+}
+
+export const LanguageSwitcher = ({ currentLang }: LanguageSwitcherProps) => {
   const { currentLanguage, availableLanguages, setLanguage } =
     useLanguage(currentLang);
+  const shortName = isAppLocale(currentLanguage)
+    ? languageShortNames[currentLanguage]
+    : currentLanguage.toUpperCase();
 
   return (
-    <div className="flex items-center justify-between gap-2">
-      {!hideLabel && (
-        <label
-          htmlFor="language-select"
-          className="hidden sm:inline text-muted-foreground font-bold text-sm"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Language"
+          className="cursor-pointer bg-transparent p-0 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none"
         >
-          Language
-        </label>
-      )}
-      <Select value={currentLanguage} onValueChange={setLanguage}>
-        <SelectTrigger
-          id="language-select"
-          className={cn("w-32 sm:w-40", hideLabel && "w-full")}
+          {shortName}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-40">
+        <DropdownMenuRadioGroup
+          value={currentLanguage}
+          onValueChange={setLanguage}
         >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
           {availableLanguages.map((locale) => (
-            <SelectItem key={locale} value={locale}>
-              {languageNames[locale] || locale}
-            </SelectItem>
+            <DropdownMenuRadioItem key={locale} value={locale}>
+              <span className="w-6 text-xs text-muted-foreground">
+                {languageShortNames[locale]}
+              </span>
+              {languageNames[locale]}
+            </DropdownMenuRadioItem>
           ))}
-        </SelectContent>
-      </Select>
-    </div>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

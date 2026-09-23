@@ -16,6 +16,13 @@ export const languageNames: Record<AppLocale, string> = {
   ko: "한국어",
 };
 
+export const languageShortNames: Record<AppLocale, string> = {
+  en: "EN",
+  zh: "中",
+  ja: "日",
+  ko: "한",
+};
+
 export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
