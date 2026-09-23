@@ -44,6 +44,7 @@ export function defaultTranslationLanguage(
   uiLocale: string,
 ): TranslationLanguage {
   if (uiLocale === "ja") return "ja";
+  if (uiLocale === "ko") return "ko";
   if (uiLocale === "zh") return "zh-Hans";
   if (uiLocale === "en") return "en";
   return "zh-Hans";

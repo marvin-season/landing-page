@@ -1,0 +1,800 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-09-23 14:31+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ko\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/app/[lang]/resume/_components/intro.tsx:38
+msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
+msgstr ", <0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI에 능숙합니다."
+
+#: src/app/[lang]/resume/layout.tsx:31
+msgid "A comprehensive overview of my work experience, projects, and technical expertise."
+msgstr "경력, 프로젝트, 기술 역량을 한눈에 볼 수 있는 소개입니다."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:223
+msgid "A conversation with your document"
+msgstr "문서와 대화하기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:18
+msgid "A little mischief, a lot of joy"
+msgstr "약간의 장난, 가득한 즐거움"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:44
+msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
+msgstr "Mastra 지식 에이전트가 스트리밍으로 답변합니다. 스로틀 모드로 대화가 겹치지 않게 합니다"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/layout.tsx:40
+msgid "A mischievous five-year-old who turns everyday life into an adventure."
+msgstr "평범한 하루를 모험으로 바꾸는 장난기 가득한 다섯 살."
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:30
+msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
+msgstr "선택한 문장을 입력창에 먼저 인용하지 않아도 번역하거나 요약할 수 있습니다. 지식 에이전트는 발췌문과 지시만 받습니다."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:75
+msgid "A Simple PPT Generator"
+msgstr "간단한 PPT 생성기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "About me in detail"
+msgstr "자세한 소개"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:59
+msgid "Agent UI"
+msgstr "에이전트 UI"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:56
+msgid "AI PC"
+msgstr "AI PC"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:205
+msgid "AI reply"
+msgstr "AI 답변"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:226
+msgid "Ask a question, or select a passage on the left and quote it here."
+msgstr "질문을 입력하거나, 왼쪽에서 문장을 선택해 여기에 인용하세요."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:337
+msgid "Ask about this passage…"
+msgstr "이 인용문에 대해 질문하기…"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:337
+msgid "Ask about your document…"
+msgstr "문서에 대해 질문하기…"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:248
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:272
+msgid "Assistant"
+msgstr "어시스턴트"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/knowledge/page.tsx:40
+msgid "Back to home"
+msgstr "홈으로"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
+msgid "Back to overview"
+msgstr "개요로"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:227
+msgid "Bring a document. Start a conversation."
+msgstr "문서를 열고 대화를 시작하세요."
+
+#: src/app/[lang]/resume/_components/experience.tsx:99
+msgid "Career"
+msgstr "경력"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+msgid "Changelog"
+msgstr "업데이트 기록"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:286
+msgid "Chat"
+msgstr "채팅"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:40
+msgid "Choose English, Japanese, Korean, or Simplified Chinese as the translation target"
+msgstr "번역 대상으로 영어, 일본어, 한국어, 간체 중국어를 선택할 수 있습니다"
+
+#: src/app/[lang]/knowledge/page.tsx:91
+msgid "Click a PDF quote to return to its page and highlight the original passage. Read surrounding paragraphs without losing your place in the conversation."
+msgstr "PDF 인용을 클릭하면 해당 페이지로 돌아가 원문이 강조됩니다. 대화 위치를 잃지 않고 앞뒤 문단을 읽을 수 있습니다."
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:69
+msgid "Conversations can start with a sample citation for demos"
+msgstr "데모용 샘플 인용으로 대화를 시작할 수 있습니다"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/layout.tsx:32
+msgid "Crayon Shin-chan"
+msgstr "짱구는 못말려"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:49
+msgid "Created internationalization solution based on Vite and Babel"
+msgstr "Vite와 Babel 기반 국제화 솔루션을 구축했습니다"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+msgid "Current"
+msgstr "현재"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:188
+msgid "Default throttle mode, cannot be changed"
+msgstr "기본 스로틀 모드이며 변경할 수 없습니다"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
+msgid "Default workspace"
+msgstr "기본 작업 공간"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:100
+msgid "Design is not just what it looks like. Design is how it works."
+msgstr "디자인은 겉모습만이 아닙니다. 디자인은 작동 방식입니다."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:83
+msgid "Design System & Component Libs"
+msgstr "디자인 시스템 & 컴포넌트 라이브러리"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:61
+msgid "Designed and implemented frontend-backend separation architecture"
+msgstr "프론트엔드·백엔드 분리 아키텍처를 설계하고 구현했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:50
+msgid "Designed and implemented new user onboarding system"
+msgstr "신규 사용자 온보딩 시스템을 설계하고 구현했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:98
+msgid "Developed coupon module APIs supporting coupon creation and distribution"
+msgstr "쿠폰 생성과 배포를 지원하는 쿠폰 모듈 API를 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:48
+msgid "Developed document processing system with PDF, Excel, and Markdown support"
+msgstr "PDF, Excel, Markdown을 지원하는 문서 처리 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:31
+msgid "Developed HIX.AI platform with NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
+msgstr "NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS로 HIX.AI 플랫폼을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:82
+msgid "Developed homepage decoration system (low-code)"
+msgstr "홈페이지 꾸미기 시스템(로우코드)을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:100
+msgid "Developed member management system with Vue2"
+msgstr "Vue2로 회원 관리 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:97
+msgid "Developed member module APIs for member information management"
+msgstr "회원 정보 관리를 위한 회원 모듈 API를 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:62
+msgid "Developed rich text editor and AI intelligent writing system"
+msgstr "리치 텍스트 에디터와 AI 지능형 작성 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:80
+msgid "Developed shopping cart and order system"
+msgstr "장바구니와 주문 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:81
+msgid "Developed user management system"
+msgstr "사용자 관리 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:101
+msgid "Developed user personal center page with UniApp"
+msgstr "UniApp으로 사용자 개인 센터 페이지를 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:51
+msgid "Developed workflow system with visual process editing"
+msgstr "시각적 프로세스 편집이 가능한 워크플로 시스템을 개발했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:37
+msgid "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+msgstr "디지털차이나 · 통밍후 클라우드·신창 연구소 · AI 연구개발 센터"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:42
+msgid "Digital China Smart Vision"
+msgstr "디지털차이나"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:251
+msgid "Dismiss selection"
+msgstr "선택 해제"
+
+#: src/app/[lang]/knowledge/page.tsx:46
+msgid "Docs"
+msgstr "Docs"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
+#: src/app/[lang]/knowledge/page.tsx:8
+#: src/app/[lang]/knowledge/page.tsx:49
+msgid "Docs & Knowledge"
+msgstr "문서와 지식 베이스"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:182
+msgid "Document chat"
+msgstr "문서 대화"
+
+#: src/app/[lang]/knowledge/_components/document/markdown/preview.tsx:13
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:139
+msgid "Document preview"
+msgstr "문서 미리보기"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
+msgid "Document reading overview"
+msgstr "문서 읽기 개요"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:79
+msgid "Document workspace"
+msgstr "문서 작업 공간"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Documentation on frontend development, AI applications, and engineering practices"
+msgstr "프론트엔드 개발, AI 애플리케이션, 엔지니어링 실천에 대한 문서"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:230
+msgid "Drop a PDF or Markdown file here, or click to browse."
+msgstr "PDF 또는 Markdown 파일을 여기에 놓거나 클릭해서 선택하세요."
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:281
+msgid "Drop to open this document"
+msgstr "놓아서 이 문서 열기"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:76
+msgid "E-commerce platform focused on providing users with excellent shopping experience."
+msgstr "뛰어난 쇼핑 경험을 제공하는 데 집중한 이커머스 플랫폼."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:366
+msgid "Enter to send · Shift + Enter for a new line · @ to mention"
+msgstr "Enter로 전송 · Shift + Enter로 줄바꿈 · @로 인용"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:43
+msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
+msgstr "모델, 데이터, 애플리케이션, 컴퓨팅 파워를 통합한 엔터프라이즈 AI 애플리케이션 구축·관리 플랫폼."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Experience, projects, and personal profile"
+msgstr "경력, 프로젝트, 개인 프로필"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:59
+msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
+
+#: src/app/[lang]/knowledge/page.tsx:87
+msgid "Find every quote in context"
+msgstr "모든 인용을 원문 맥락에서 찾기"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
+msgid "Fit to width"
+msgstr "너비에 맞추기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:76
+msgid "Generate slide content in a structured workflow"
+msgstr "구조화된 워크플로로 슬라이드 콘텐츠 생성"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:94
+msgid "Health management software providing health management services for users."
+msgstr "사용자에게 건강 관리 서비스를 제공하는 소프트웨어."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:93
+msgid "Health Planet"
+msgstr "헬스 플래닛"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:88
+msgid "Health Planet International Technology Co., Ltd."
+msgstr "헬스 플래닛 인터내셔널 테크놀로지"
+
+#: src/app/[lang]/resume/_components/intro.tsx:20
+msgid "Hello, My name is <0>Marvin</0> and I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
+msgstr "안녕하세요, 저는 <0>Marvin</0>입니다. 기능적이고 아름다운 웹 애플리케이션을 만드는 웹 개발자이며, 컴퓨터과학을 전공했습니다. 졸업 대학은"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:66
+msgid "Highlight the matching passage on the PDF page"
+msgstr "PDF 페이지에서 해당 원문을 강조 표시"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:27
+msgid "HIX.AI"
+msgstr "HIX.AI"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:28
+msgid "HIX.AI is a platform for AI-powered healthcare solutions."
+msgstr "HIX.AI는 AI 기반 헬스케어 솔루션 플랫폼입니다."
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:90
+msgid "Homepage Docs entry and a built-in sample file"
+msgstr "홈페이지 Docs 진입점과 내장 샘플 파일"
+
+#: src/app/[lang]/resume/_components/intro.tsx:45
+msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
+msgstr "베이징 헬스 플래닛, 선전 자오리 테크놀로지, 디지털차이나 통밍후 우한 연구개발 센터, 선전 주링 테크놀로지 등 네 곳에서 일했습니다. 웹 개발과 성능 최적화 경험이 풍부합니다."
+
+#: src/app/[lang]/knowledge/_components/use-knowledge-chat.ts:49
+msgid "I pulled a passage from this document. Click it to highlight the original text."
+msgstr "이 문서에서 한 구절을 가져왔습니다. 클릭하면 원문이 강조됩니다."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:99
+msgid "Implemented member information statistics functionality"
+msgstr "회원 정보 통계 기능을 구현했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:79
+msgid "Implemented product management system supporting CRUD operations"
+msgstr "CRUD를 지원하는 상품 관리 시스템을 구현했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:63
+msgid "Implemented RAG retrieval augmentation and tool calling features"
+msgstr "RAG 검색 증강과 도구 호출 기능을 구현했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:47
+msgid "Implemented streaming chat interface with real-time message push"
+msgstr "실시간 메시지 푸시가 있는 스트리밍 채팅 인터페이스를 구현했습니다"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:250
+msgid "Incorrect password. Please try again."
+msgstr "비밀번호가 올바르지 않습니다. 다시 시도하세요."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:64
+msgid "Integrated Ollama for local large model deployment"
+msgstr "로컬 대형 모델 배포를 위해 Ollama를 연동했습니다"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:57
+msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
+msgstr "대규모 언어 모델 기반 지능형 Q&A 시스템으로, 클라우드 DeepSeek 무료 풀기능 버전 또는 로컬 DeepSeek 경량 버전을 지원합니다."
+
+#: src/app/[lang]/resume/_components/intro.tsx:72
+msgid "Introduction"
+msgstr "소개"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:89
+msgid "Java Developer"
+msgstr "Java 개발자"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:95
+msgid "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+msgstr "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:22
+msgid "Jiuling Technology"
+msgstr "주링 테크놀로지"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:72
+msgid "July 2022 - June 2023"
+msgstr "2022년 7월 - 2023년 6월"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:90
+msgid "June 2021 - May 2022"
+msgstr "2021년 6월 - 2022년 5월"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:39
+msgid "June 2023 - April 2025"
+msgstr "2023년 6월 - 2025년 4월"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:75
+msgid "Jushihui"
+msgstr "주시후이"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:89
+msgid "Keep quotes next to your notes"
+msgstr "인용과 노트를 나란히 두기"
+
+#: src/app/[lang]/knowledge/page.tsx:76
+msgid "Keep the passages that matter"
+msgstr "중요한 문장을 남겨 두기"
+
+#: src/app/[lang]/resume/_components/experience.tsx:56
+msgid "Key Responsibilities"
+msgstr "주요 업무"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:46
+msgid "Knowledge"
+msgstr "지식 베이스"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:99
+msgid "Leveraging less data to generate greater insights."
+msgstr "더 적은 데이터로 더 큰 통찰을 만듭니다."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:126
+msgid "Loading PDF…"
+msgstr "PDF 불러오는 중…"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:29
+msgid "Loading preview…"
+msgstr "미리보기 불러오는 중…"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:63
+msgid "Locate a quote without storing selection geometry"
+msgstr "선택 영역 좌표를 저장하지 않고 인용 위치 찾기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:60
+msgid "Main chat flow powered by Mastra"
+msgstr "Mastra가 구동하는 주요 채팅 흐름"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:24
+msgid "May 2025 - Present"
+msgstr "2025년 5월 - 현재"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:50
+msgid "Meet Shin-chan"
+msgstr "짱구를 만나보세요"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:339
+msgid "Message"
+msgstr "메시지"
+
+#: src/app/[lang]/resume/layout.tsx:13
+msgid "My professional experience and skills"
+msgstr "전문 경력과 기술"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:74
+msgid "Navigation"
+msgstr "탐색"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:187
+msgid "Next page"
+msgstr "다음 페이지"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:29
+msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
+msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:137
+msgid "No account needed · PDF & Markdown"
+msgstr "계정 없이 이용 · PDF & Markdown"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:340
+msgid "No matches"
+msgstr "일치 항목 없음"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:103
+msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
+msgstr "선택할 수 있는 텍스트가 없습니다. 스캔 PDF는 OCR 후에 텍스트 기반 질문에 답할 수 있습니다."
+
+#: src/app/[lang]/knowledge/page.tsx:69
+msgid "Open a PDF or Markdown document without an account. Browse PDF pages, adjust the zoom, or read formatted Markdown in one workspace."
+msgstr "계정 없이 PDF 또는 Markdown 문서를 여세요. 한 작업 공간에서 PDF 페이지를 넘기고, 확대·축소하거나, 서식 있는 Markdown을 읽을 수 있습니다."
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:81
+msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
+msgstr "계정 없이 PDF 또는 Markdown을 여세요. 문장을 선택해 문서 이름과 페이지 번호가 있는 인용으로 남기고, 샘플 문서부터 시작할 수도 있습니다."
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+msgid "Open Docs workspace"
+msgstr "문서 작업 공간 열기"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
+msgid "Open document workspace"
+msgstr "문서 작업 공간 열기"
+
+#: src/app/[lang]/(home)/_components/index.tsx:129
+msgid "Open page"
+msgstr "페이지 열기"
+
+#: src/app/[lang]/(home)/_components/index.tsx:129
+msgid "Open reference"
+msgstr "참고 자료 열기"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:52
+msgid "Optimized performance with lazy loading and data virtualization"
+msgstr "지연 로딩과 데이터 가상화로 성능을 최적화했습니다"
+
+#. placeholder {0}: cited.pageNumber
+#. placeholder {0}: quote.pageNumber
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:84
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:161
+msgid "Page {0}"
+msgstr "{0}페이지"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:156
+msgid "Page number"
+msgstr "페이지 번호"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:55
+msgid "PDF citation highlight"
+msgstr "PDF 원문 강조"
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:91
+msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
+msgstr "PDF는 20MB, Markdown은 1MB를 넘을 수 없습니다."
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:236
+msgid "PDF up to 20 MB · Markdown up to 1 MB"
+msgstr "PDF 최대 20MB · Markdown 최대 1MB"
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:76
+msgid "Please choose one document at a time."
+msgstr "한 번에 문서 하나만 선택하세요."
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:82
+msgid "Please upload a PDF or Markdown file."
+msgstr "PDF 또는 Markdown 파일을 업로드하세요."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:148
+msgid "Previous page"
+msgstr "이전 페이지"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:91
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/changelog/page.tsx:7
+msgid "Product updates"
+msgstr "제품 업데이트"
+
+#: src/app/[lang]/resume/layout.tsx:29
+msgid "Professional Experience & Skills"
+msgstr "전문 경력과 기술"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:57
+msgid "Quotes connect back to the PDF. Click a citation to open that page and highlight the original sentence by searching the text layer."
+msgstr "인용은 PDF로 다시 연결됩니다. 인용을 클릭하면 해당 페이지가 열리고, 텍스트 레이어에서 원문을 찾아 강조합니다."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:45
+msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
+msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
+
+#: src/app/[lang]/knowledge/page.tsx:60
+msgid "Read and explore documents"
+msgstr "문서를 읽고 탐색하기"
+
+#: src/app/[lang]/knowledge/page.tsx:9
+msgid "Read PDF and Markdown documents without an account. Select passages, collect quotes with page references, and return to highlighted PDF text in a dedicated document workspace."
+msgstr "계정 없이 PDF와 Markdown 문서를 읽으세요. 문장을 선택하고 페이지 참조가 있는 인용을 모은 뒤, 전용 문서 작업 공간에서 강조된 PDF 원문으로 돌아갈 수 있습니다."
+
+#: src/app/[lang]/knowledge/page.tsx:65
+msgid "Read PDF and Markdown files"
+msgstr "PDF와 Markdown 파일 읽기"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:88
+msgid "Read PDF and Markdown in one workspace"
+msgstr "한 작업 공간에서 PDF와 Markdown 읽기"
+
+#: src/app/[lang]/knowledge/page.tsx:53
+msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
+msgstr "읽고, 탐색하고, 질문하세요. 문서와 생각이 나란히 펼쳐집니다."
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:291
+msgid "Reading document…"
+msgstr "문서를 읽는 중…"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+msgid "Release versions"
+msgstr "버전 목록"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:343
+msgid "Remove"
+msgstr "제거"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:167
+msgid "Remove document"
+msgstr "문서 제거"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:357
+msgid "Remove quote"
+msgstr "인용 제거"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:160
+msgid "Replace"
+msgstr "교체"
+
+#: src/app/[lang]/resume/layout.tsx:12
+msgid "Resume"
+msgstr "이력서"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:308
+msgid "Retry"
+msgstr "다시 시도"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:84
+msgid "Reusable UI components and design references"
+msgstr "재사용 가능한 UI 컴포넌트와 디자인 참고"
+
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
+msgid "Scroll down to read and quote your document"
+msgstr "아래로 스크롤해 문서를 읽고 인용하세요"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:57
+msgid "Scroll to latest message"
+msgstr "최신 메시지로 스크롤"
+
+#: src/app/[lang]/knowledge/page.tsx:80
+msgid "Select a passage and add it to your conversation as a quote. Keep the document name and page number alongside your questions and notes."
+msgstr "문장을 선택해 인용으로 대화에 추가하세요. 문서 이름과 페이지 번호가 질문·노트와 함께 남습니다."
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:262
+msgid "Select a shorter passage (up to 4,000 characters)."
+msgstr "더 짧은 문장을 선택하세요(최대 4,000자)."
+
+#: src/app/[lang]/knowledge/_components/document/markdown/preview.tsx:16
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:135
+msgid "Select text to quote"
+msgstr "인용할 텍스트를 선택하세요"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:239
+msgid "Selected text"
+msgstr "선택한 텍스트"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:28
+msgid "Selection-aware AI"
+msgstr "선택 인식 AI"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:341
+msgid "Send message"
+msgstr "메시지 보내기"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:78
+msgid "Sentences"
+msgstr "문장"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:19
+msgid "Shinnosuke Nohara"
+msgstr "노하라 신노스케"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:342
+msgid "Stop response"
+msgstr "응답 중지"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:320
+msgid "Summarize"
+msgstr "요약"
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:315
+msgid "Summarize this passage."
+msgstr "이 문장을 간결하게 요약하세요."
+
+#: src/app/[lang]/resume/_components/experience.tsx:42
+msgid "Tech Stack"
+msgstr "기술 스택"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:291
+msgid "The assistant only receives the quoted passage and your instruction."
+msgstr "어시스턴트는 인용문과 지시만 받으며, 전체 문서는 보내지 않습니다."
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:136
+msgid "The sample could not be loaded. Please try again."
+msgstr "샘플을 불러오지 못했습니다. 다시 시도하세요."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:282
+msgid "Thinking…"
+msgstr "생각 중…"
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:101
+msgid "This file could not be read. Use a valid UTF-8 Markdown file."
+msgstr "이 파일을 읽을 수 없습니다. 유효한 UTF-8 Markdown 파일을 사용하세요."
+
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:86
+msgid "This file is empty. Please choose another file."
+msgstr "파일이 비어 있습니다. 다른 파일을 선택하세요."
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:105
+msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
+msgstr "문서가 깁니다. 처음 60,000자는 채팅용으로 준비됩니다. 이후 페이지 내용은 해당 문장을 인용해 추가하세요."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:320
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:329
+msgid "This page could not be rendered."
+msgstr "이 페이지를 표시할 수 없습니다."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:273
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:278
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:281
+msgid "This PDF could not be opened. Try another file."
+msgstr "이 PDF를 열 수 없습니다. 다른 파일을 시도하세요."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:246
+msgid "This PDF is password protected."
+msgstr "이 PDF는 비밀번호로 보호되어 있습니다."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:92
+msgid "Three iterations of the Docs workspace"
+msgstr "Docs 작업 공간의 세 차례 업데이트"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/page.tsx:8
+msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
+msgstr "Docs 작업 공간의 세 가지 출시: 파일 읽기, PDF 원문 인용, 선택 인식 AI."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:200
+msgid "Throttle"
+msgstr "스로틀"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:196
+msgid "Throttle off. The full conversation is sent."
+msgstr "스로틀이 꺼져 있습니다. 전체 대화가 전송됩니다."
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:195
+msgid "Throttle on. Only the current question is sent."
+msgstr "스로틀이 켜져 있습니다. 현재 질문만 전송됩니다."
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:303
+msgid "Translate"
+msgstr "번역"
+
+#: src/app/[lang]/changelog/_components/changelog-data.tsx:37
+msgid "Translate or summarize from the selection toolbar"
+msgstr "선택 도구 모음에서 번역하거나 요약하기"
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:26
+msgid "Translate this passage into American English."
+msgstr "이 문장을 미국 영어로 번역하세요."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:27
+msgid "Translate this passage into Japanese."
+msgstr "이 문장을 일본어로 번역하세요."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:28
+msgid "Translate this passage into Korean."
+msgstr "이 문장을 한국어로 번역하세요."
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:29
+msgid "Translate this passage into Simplified Chinese."
+msgstr "이 문장을 간체 중국어로 번역하세요."
+
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:85
+#: src/app/[lang]/knowledge/_components/document/preview.tsx:90
+msgid "Translate to"
+msgstr "번역 대상"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:241
+msgid "Try a sample document"
+msgstr "샘플 문서 체험하기"
+
+#: src/app/[lang]/(home)/_components/home-content.tsx:36
+msgid "Try Knowledge"
+msgstr "지식 베이스 체험하기"
+
+#: src/app/[lang]/knowledge/page.tsx:98
+msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
+msgstr "포함된 샘플을 체험하거나 직접 파일을 여세요. 문서와 노트는 현재 페이지 세션에만 유지되며, AI 답변과 스캔 문서 OCR은 아직 사용할 수 없습니다."
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:262
+msgid "Unlock PDF"
+msgstr "PDF 잠금 해제"
+
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
+msgid "Upload document"
+msgstr "문서 업로드"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:77
+msgid "Vue2, UniApp, Vuex, VantUI"
+msgstr "Vue2, UniApp, Vuex, VantUI"
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:23
+#: src/app/[lang]/resume/hooks/use-experience.ts:38
+#: src/app/[lang]/resume/hooks/use-experience.ts:71
+msgid "Web Developer"
+msgstr "웹 개발자"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:26
+msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
+msgstr "가족과 친구들과 함께, 짱구는 장난과 뜻밖의 놀라움, 웃음으로 평범한 하루를 채웁니다."
+
+#: src/app/[lang]/resume/_components/intro.tsx:34
+msgid "Wuhan University of Science and Technology."
+msgstr "우한과학기술대학교."
+
+#: src/app/[lang]/resume/hooks/use-experience.ts:70
+msgid "Wuhan Zhaori Technology Co., Ltd."
+msgstr "우한 자오리 테크놀로지"
+
+#: src/app/[lang]/knowledge/_components/document/chat.tsx:244
+msgid "You"
+msgstr "나"
+
+#: src/app/[lang]/resume/_components/intro.tsx:53
+msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
+msgstr "연락처:<0><1>mrvnseason@gmail.com</1><2>또는 전화: +86 15623192717</2></0>"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:221
+msgid "Zoom in"
+msgstr "확대"
+
+#: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:200
+msgid "Zoom out"
+msgstr "축소"
