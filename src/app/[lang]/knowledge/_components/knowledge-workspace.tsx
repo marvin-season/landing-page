@@ -48,23 +48,25 @@ function KnowledgeDocumentPanes({
   }, []);
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-2 overflow-y-auto">
+    <div className="flex min-h-0 w-full flex-auto flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
       <div
         id="knowledge-panel-document"
-        className="min-h-105 min-w-0 flex-col flex border-b border-border/60 lg:border-r lg:border-border/60 h-[65dvh] lg:h-auto lg:min-h-0 lg:border-b-0"
+        className="relative h-[65dvh] w-full shrink-0 border-b border-border/60 lg:h-auto lg:min-h-0 lg:w-1/2 lg:border-r lg:border-b-0 lg:border-border/60"
       >
-        <DocumentPreview
-          document={source}
-          onError={onDocumentError}
-          onQuote={onQuote}
-          onPrompt={onPrompt}
-          locateQuote={locateQuote}
-          busy={busy}
-        />
+        <div className="absolute inset-0 flex flex-col">
+          <DocumentPreview
+            document={source}
+            onError={onDocumentError}
+            onQuote={onQuote}
+            onPrompt={onPrompt}
+            locateQuote={locateQuote}
+            busy={busy}
+          />
+        </div>
       </div>
       <div
         id="knowledge-panel-chat"
-        className="min-h-105 min-w-0 flex-col flex h-[65dvh] lg:h-auto lg:min-h-0"
+        className="flex min-h-125 w-full flex-col lg:min-h-0 lg:w-1/2"
       >
         <DocumentChat
           ref={chatRef}
@@ -191,7 +193,7 @@ export function KnowledgeWorkspace() {
               duration: reducedMotion ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface min-h-0 flex-1"
+            className="flex min-h-125 max-h-full w-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface"
           >
             <KnowledgeDocumentPanes
               source={source}

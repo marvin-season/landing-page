@@ -33,6 +33,16 @@ export {
 } from "./dropdown-menu";
 export { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
 export { Input } from "./input";
+export {
+  Layout,
+  LayoutContent,
+  type LayoutDirection,
+  LayoutFooter,
+  LayoutHeader,
+  type LayoutProps,
+  LayoutSider,
+  type LayoutSiderProps,
+} from "./layout";
 export { Progress } from "./progress";
 export {
   Select,

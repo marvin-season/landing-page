@@ -53,7 +53,7 @@ export function HomeContent() {
           </div>
 
           <div
-            className="home-reveal relative mx-auto flex aspect-square w-full max-w-[340px] items-center justify-center md:ml-auto"
+            className="home-reveal relative mx-auto flex aspect-square w-full max-w-85 items-center justify-center md:ml-auto"
             style={{ "--home-reveal-delay": "120ms" } as React.CSSProperties}
           >
             <div className="absolute inset-6 rounded-full border border-border/60 bg-card/70 shadow-2xl shadow-primary/10 shinchan:matte-surface" />

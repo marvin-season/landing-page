@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-11-18 21:18+0800\n"
+"POT-Creation-Date: 2026-09-23 14:56+0800\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: ja\n"
+"Language: ru\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: \n"
@@ -15,44 +15,44 @@ msgstr ""
 
 #: src/app/[lang]/resume/_components/intro.tsx:38
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
-msgstr ""
+msgstr ", владею <0>React и Next.js</0>, TypeScript, Tailwind CSS, Shadcn UI."
 
 #: src/app/[lang]/resume/layout.tsx:31
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
-msgstr ""
+msgstr "Обзор моего опыта работы, проектов и технических навыков."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:223
 msgid "A conversation with your document"
-msgstr "ドキュメントと対話する"
+msgstr "Разговор с вашим документом"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "A little mischief, a lot of joy"
-msgstr "ちょっぴりいたずら、たっぷり笑顔"
+msgstr "Немного озорства и много радости"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:44
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
-msgstr "Mastra のナレッジエージェントがストリーミングで返信。スロットルモードで会話の重なりを防ぎます"
+msgstr "Агент знаний Mastra отвечает потоком; режим ограничения не даёт диалогам пересекаться"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:21
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
-msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の男の子。"
+msgstr "Озорной пятилетка, который превращает обычный день в приключение."
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:30
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
-msgstr "引用を入力欄に入れなくても、選択した文章を翻訳・要約できます。ナレッジエージェントは抜粋と指示だけを受け取ります。"
+msgstr "Выделенный фрагмент можно перевести или кратко пересказать, не вставляя его в поле ввода. Агент знаний получает только отрывок и инструкцию."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "A Simple PPT Generator"
-msgstr "シンプルなPPTジェネレーター"
+msgstr "Простой генератор презентаций"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "About me in detail"
-msgstr "詳細な自己紹介"
+msgstr "Подробнее обо мне"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Agent UI"
-msgstr "エージェントUI"
+msgstr "Интерфейс агента"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:56
 msgid "AI PC"
@@ -60,148 +60,148 @@ msgstr "AI PC"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:205
 msgid "AI reply"
-msgstr "AI返信"
+msgstr "Ответ ИИ"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:226
 msgid "Ask a question, or select a passage on the left and quote it here."
-msgstr "質問を入力するか、左の文章を選択してここに引用してください。"
+msgstr "Задайте вопрос или выделите фрагмент слева и процитируйте его здесь."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:337
 msgid "Ask about this passage…"
-msgstr "この引用について質問…"
+msgstr "Спросите об этом фрагменте…"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:337
 msgid "Ask about your document…"
-msgstr "ドキュメントについて質問…"
+msgstr "Спросите о документе…"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:248
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:272
 msgid "Assistant"
-msgstr "アシスタント"
+msgstr "Ассистент"
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:16
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
-msgstr "ホームに戻る"
+msgstr "На главную"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
 msgid "Back to overview"
-msgstr "概要に戻る"
+msgstr "К обзору"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:227
 msgid "Bring a document. Start a conversation."
-msgstr "ドキュメントを開いて、対話を始めましょう。"
+msgstr "Откройте документ. Начните разговор."
 
 #: src/app/[lang]/resume/_components/experience.tsx:99
 msgid "Career"
-msgstr "キャリア"
+msgstr "Карьера"
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:22
 msgid "Changelog"
-msgstr "更新履歴"
+msgstr "История изменений"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:286
 msgid "Chat"
-msgstr "チャット"
+msgstr "Чат"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:40
 msgid "Choose English, Japanese, Korean, or Simplified Chinese as the translation target"
-msgstr "翻訳先は英語・日本語・韓国語・簡体字中国語から選択できます"
+msgstr "Выберите английский, японский, корейский или упрощённый китайский как язык перевода"
 
 #: src/app/[lang]/knowledge/page.tsx:91
 msgid "Click a PDF quote to return to its page and highlight the original passage. Read surrounding paragraphs without losing your place in the conversation."
-msgstr "PDF の引用をクリックすると、該当ページに移動し、原文がハイライトされます。会話を残したまま前後の段落を確認できます。"
+msgstr "Нажмите цитату из PDF, чтобы вернуться на страницу и подсветить исходный фрагмент. Читайте соседние абзацы, не теряя место в диалоге."
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:69
 msgid "Conversations can start with a sample citation for demos"
-msgstr "デモ用のサンプル引用から会話を開始できます"
+msgstr "Диалог можно начать с демонстрационной цитаты"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:14
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
-msgstr "クレヨンしんちゃん"
+msgstr "Crayon Shin-chan"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:49
 msgid "Created internationalization solution based on Vite and Babel"
-msgstr "Vite と Babel に基づく国際化ソリューションを作成"
+msgstr "Создал решение интернационализации на базе Vite и Babel"
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:76
 msgid "Current"
-msgstr "現行"
+msgstr "Сейчас"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:188
 msgid "Default throttle mode, cannot be changed"
-msgstr ""
+msgstr "Режим ограничения по умолчанию, изменить нельзя"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
-msgstr "デフォルトのワークスペース"
+msgstr "Рабочее пространство по умолчанию"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:100
 msgid "Design is not just what it looks like. Design is how it works."
-msgstr "デザインは見た目だけではありません。デザインはどのように機能するかです。"
+msgstr "Дизайн — это не только внешний вид. Дизайн — это то, как это работает."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Design System & Component Libs"
-msgstr "デザインシステムとコンポーネントライブラリ"
+msgstr "Дизайн-система и библиотеки компонентов"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:61
 msgid "Designed and implemented frontend-backend separation architecture"
-msgstr "フロントエンドとバックエンドの分離アーキテクチャを設計し実装"
+msgstr "Спроектировал и внедрил архитектуру с разделением фронтенда и бэкенда"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:50
 msgid "Designed and implemented new user onboarding system"
-msgstr "新しいユーザー登録システムを設計し実装"
+msgstr "Спроектировал и внедрил систему онбординга новых пользователей"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:98
 msgid "Developed coupon module APIs supporting coupon creation and distribution"
-msgstr "クーポンモジュールのAPIを開発し、クーポンの作成と配布をサポート"
+msgstr "Разработал API модуля купонов: создание и распространение"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:48
 msgid "Developed document processing system with PDF, Excel, and Markdown support"
-msgstr "PDF、Excel、Markdownをサポートするドキュメント処理システムを開発"
+msgstr "Разработал систему обработки документов с поддержкой PDF, Excel и Markdown"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:31
 msgid "Developed HIX.AI platform with NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
-msgstr "NextJS、tRPC、TailwindCSS、TanStack Query、SSR、ISR、Strapi-CMSを使用してHIX.AIプラットフォームを開発"
+msgstr "Разработал платформу HIX.AI на NextJS, tRPC, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:82
 msgid "Developed homepage decoration system (low-code)"
-msgstr "ホームページのデコレーションシステムを開発（ローコード）"
+msgstr "Разработал low-code систему оформления главной страницы"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:100
 msgid "Developed member management system with Vue2"
-msgstr "Vue2を使用してメンバー管理システムを開発"
+msgstr "Разработал систему управления участниками на Vue2"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:97
 msgid "Developed member module APIs for member information management"
-msgstr "メンバー情報管理のためのメンバーモジュールのAPIを開発"
+msgstr "Разработал API модуля участников для управления данными"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:62
 msgid "Developed rich text editor and AI intelligent writing system"
-msgstr "リッチテキストエディタとAIインテリジェントな書き込みシステムを開発"
+msgstr "Разработал редактор форматированного текста и систему ИИ-письма"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:80
 msgid "Developed shopping cart and order system"
-msgstr "ショッピングカートと注文システムを開発"
+msgstr "Разработал корзину и систему заказов"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:81
 msgid "Developed user management system"
-msgstr "ユーザー管理システムを開発"
+msgstr "Разработал систему управления пользователями"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:101
 msgid "Developed user personal center page with UniApp"
-msgstr "UniAppを使用してユーザーの個人センターページを開発"
+msgstr "Разработал личный кабинет пользователя на UniApp"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:51
 msgid "Developed workflow system with visual process editing"
-msgstr "ビジュアルプロセス編集を使用してワークフローシステムを開発"
+msgstr "Разработал систему рабочих процессов с визуальным редактором"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:37
 msgid "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
-msgstr "Digital China · Tongming Lake Cloud & Innovation Research Institute · AI R&D Center"
+msgstr "Digital China · Научный институт облака и инноваций Тунминху · Центр ИИ-разработок"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:42
 msgid "Digital China Smart Vision"
@@ -209,62 +209,62 @@ msgstr "Digital China Smart Vision"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:251
 msgid "Dismiss selection"
-msgstr "選択を解除"
+msgstr "Снять выделение"
 
 #: src/app/[lang]/knowledge/page.tsx:46
 msgid "Docs"
-msgstr "Docs"
+msgstr "Документы"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
 #: src/app/[lang]/knowledge/page.tsx:8
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
-msgstr "ドキュメントとナレッジ"
+msgstr "Документы и знания"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:182
 msgid "Document chat"
-msgstr "ドキュメントチャット"
+msgstr "Чат по документу"
 
 #: src/app/[lang]/knowledge/_components/document/markdown/preview.tsx:13
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:139
 msgid "Document preview"
-msgstr "ドキュメントのプレビュー"
+msgstr "Предпросмотр документа"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
 msgid "Document reading overview"
-msgstr "ドキュメント閲覧の概要"
+msgstr "Обзор чтения документов"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:79
 msgid "Document workspace"
-msgstr "ドキュメントワークスペース"
+msgstr "Рабочее пространство документов"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:48
 msgid "Documentation on frontend development, AI applications, and engineering practices"
-msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
+msgstr "Материалы о фронтенде, ИИ-приложениях и инженерных практиках"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:230
 msgid "Drop a PDF or Markdown file here, or click to browse."
-msgstr "PDF または Markdown ファイルをドロップするか、クリックして選択してください。"
+msgstr "Перетащите PDF или Markdown сюда или нажмите, чтобы выбрать."
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:281
 msgid "Drop to open this document"
-msgstr "ドロップして開く"
+msgstr "Отпустите, чтобы открыть документ"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:76
 msgid "E-commerce platform focused on providing users with excellent shopping experience."
-msgstr "ユーザーに優れたショッピング体験を提供するエネルギッシュなEコマースプラットフォーム。"
+msgstr "Платформа электронной коммерции с акцентом на удобство покупок."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:366
 msgid "Enter to send · Shift + Enter for a new line · @ to mention"
-msgstr "Enter で送信 · Shift + Enter で改行 · @ でメンション"
+msgstr "Enter — отправить · Shift + Enter — новая строка · @ — упомянуть"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:43
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
-msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
+msgstr "Корпоративная платформа для создания и управления ИИ-приложениями: модели, данные, приложения и вычислительные ресурсы."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:68
 msgid "Experience, projects, and personal profile"
-msgstr "経験、プロジェクト、および個人プロフィール"
+msgstr "Опыт, проекты и профиль"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
@@ -272,19 +272,19 @@ msgstr "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
 
 #: src/app/[lang]/knowledge/page.tsx:87
 msgid "Find every quote in context"
-msgstr "引用の前後を確認する"
+msgstr "Находите каждую цитату в контексте"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
-msgstr "幅に合わせる"
+msgstr "По ширине"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Generate slide content in a structured workflow"
-msgstr "構造化ワークフローでスライドコンテンツを生成"
+msgstr "Создавайте слайды по структурированному сценарию"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
-msgstr "ユーザーに健康管理サービスを提供する健康管理ソフトウェア。"
+msgstr "ПО для управления здоровьем пользователей."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:93
 msgid "Health Planet"
@@ -296,11 +296,11 @@ msgstr "Health Planet International Technology Co., Ltd."
 
 #: src/app/[lang]/resume/_components/intro.tsx:20
 msgid "Hello, My name is <0>Marvin</0> and I am a web developer passionate about building functional and beautiful web applications, with a Bachelor of Science in Computer Science from the University of"
-msgstr "こんにちは、私の名前は <0>Marvin</0> で、機能性と美しさのあるウェブアプリケーションを構築するウェブ開発者で、コンピュータサイエンスの学士号をUniversity of から取得しました。"
+msgstr "Здравствуйте, меня зовут <0>Marvin</0>, я веб-разработчик и увлечён созданием удобных и красивых веб-приложений. Бакалавр компьютерных наук,"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:66
 msgid "Highlight the matching passage on the PDF page"
-msgstr "PDF ページ上で一致する原文をハイライト"
+msgstr "Подсветить соответствующий фрагмент на странице PDF"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:27
 msgid "HIX.AI"
@@ -308,55 +308,55 @@ msgstr "HIX.AI"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:28
 msgid "HIX.AI is a platform for AI-powered healthcare solutions."
-msgstr "HIX.AI は、AI パワーを使用した健康ソリューションのプラットフォームです。"
+msgstr "HIX.AI — платформа решений для здравоохранения на базе ИИ."
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:90
 msgid "Homepage Docs entry and a built-in sample file"
-msgstr "ホームページに Docs 入口を追加し、サンプルファイルを同梱"
+msgstr "Вход в Docs с главной и встроенный образец файла"
 
 #: src/app/[lang]/resume/_components/intro.tsx:45
 msgid "I have worked at four companies, including Beijing Health Planet, Shenzhen Zhaori Technology, Digital China Tongminghu Wuhan R&D Center, and Shenzhen Jiuling Technology. I have rich experience in Web development and performance optimization."
-msgstr "私は4つの会社で働いてきました。北京 Health Planet、深圳 Zhaori Technology、Digital China Tongminghu Wuhan R&D Center、および深圳 Jiuling Technology。私はWeb開発とパフォーマンス最適化の豊富な経験を持っています。"
+msgstr "Я работал в четырёх компаниях: Beijing Health Planet, Shenzhen Zhaori Technology, центр разработок Digital China Tongminghu в Ухане и Shenzhen Jiuling Technology. Есть большой опыт веб-разработки и оптимизации производительности."
 
 #: src/app/[lang]/knowledge/_components/use-knowledge-chat.ts:49
 msgid "I pulled a passage from this document. Click it to highlight the original text."
-msgstr "この文書から一節を抜き出しました。クリックすると原文がハイライトされます。"
+msgstr "Я взял фрагмент из этого документа. Нажмите, чтобы подсветить исходный текст."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
 msgid "Implemented member information statistics functionality"
-msgstr "メンバー情報統計機能を実装"
+msgstr "Реализовал статистику по данным участников"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:79
 msgid "Implemented product management system supporting CRUD operations"
-msgstr "CRUD操作をサポートする製品管理システムを実装"
+msgstr "Реализовал систему управления товарами с CRUD"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:63
 msgid "Implemented RAG retrieval augmentation and tool calling features"
-msgstr "RAG検索拡張とツール呼び出し機能を実装"
+msgstr "Реализовал RAG-поиск и вызов инструментов"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:47
 msgid "Implemented streaming chat interface with real-time message push"
-msgstr "リアルタイムメッセージプッシュを使用したストリーミングチャットインターフェースを実装"
+msgstr "Реализовал потоковый чат с мгновенной доставкой сообщений"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:250
 msgid "Incorrect password. Please try again."
-msgstr "パスワードが正しくありません。もう一度お試しください。"
+msgstr "Неверный пароль. Попробуйте ещё раз."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:64
 msgid "Integrated Ollama for local large model deployment"
-msgstr "Ollamaを使用してローカルで大規模モデルをデプロイ"
+msgstr "Интегрировал Ollama для локального развёртывания больших моделей"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:57
 msgid "Intelligent Q&A system based on large language models, supporting cloud-based DeepSeek free full-featured version or local DeepSeek lightweight version."
-msgstr "大規模言語モデルに基づくインテリジェントQ&Aシステム、クラウドベースのDeepSeek無料完全機能版またはローカルのDeepSeek軽量版をサポート。"
+msgstr "Интеллектуальная система вопросов и ответов на больших языковых моделях: облачный DeepSeek с полным функционалом или локальная облегчённая версия."
 
 #: src/app/[lang]/resume/_components/intro.tsx:72
 msgid "Introduction"
-msgstr "紹介"
+msgstr "Введение"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:89
 msgid "Java Developer"
-msgstr "Java開発者"
+msgstr "Java-разработчик"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:95
 msgid "Java, SpringBoot, Mybatis, MySQL, Vue2, UniApp"
@@ -368,15 +368,15 @@ msgstr "Jiuling Technology"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:72
 msgid "July 2022 - June 2023"
-msgstr "2022年7月 - 2023年6月"
+msgstr "Июль 2022 — июнь 2023"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:90
 msgid "June 2021 - May 2022"
-msgstr "2021年6月 - 2022年5月"
+msgstr "Июнь 2021 — май 2022"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:39
 msgid "June 2023 - April 2025"
-msgstr "2023年6月 - 2025年4月"
+msgstr "Июнь 2023 — апрель 2025"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:75
 msgid "Jushihui"
@@ -384,63 +384,63 @@ msgstr "Jushihui"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:89
 msgid "Keep quotes next to your notes"
-msgstr "引用をメモの横に残す"
+msgstr "Держите цитаты рядом с заметками"
 
 #: src/app/[lang]/knowledge/page.tsx:76
 msgid "Keep the passages that matter"
-msgstr "大切な文章を残す"
+msgstr "Сохраняйте важные фрагменты"
 
 #: src/app/[lang]/resume/_components/experience.tsx:56
 msgid "Key Responsibilities"
-msgstr "主要責任"
+msgstr "Основные обязанности"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:46
 msgid "Knowledge"
-msgstr "ナレッジ"
+msgstr "Знания"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:99
 msgid "Leveraging less data to generate greater insights."
-msgstr "より少ないデータでより大きな洞察を生成する。"
+msgstr "Меньше данных — больше смысла."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:126
 msgid "Loading PDF…"
-msgstr "PDF を読み込み中…"
+msgstr "Загрузка PDF…"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:29
 msgid "Loading preview…"
-msgstr "プレビューを読み込み中…"
+msgstr "Загрузка предпросмотра…"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:63
 msgid "Locate a quote without storing selection geometry"
-msgstr "選択範囲の座標を保存せずに引用を特定"
+msgstr "Находить цитату без сохранения геометрии выделения"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:60
 msgid "Main chat flow powered by Mastra"
-msgstr "Mastraによるメインチャットフロー"
+msgstr "Основной чат на базе Mastra"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:24
 msgid "May 2025 - Present"
-msgstr "2025年5月 - 現在"
+msgstr "Май 2025 — н.в."
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:50
 msgid "Meet Shin-chan"
-msgstr "しんちゃんを知る"
+msgstr "Знакомьтесь, Син-тян"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:339
 msgid "Message"
-msgstr "メッセージ"
+msgstr "Сообщение"
 
 #: src/app/[lang]/resume/layout.tsx:13
 msgid "My professional experience and skills"
-msgstr "私の専門的な経験とスキル"
+msgstr "Мой профессиональный опыт и навыки"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:74
 msgid "Navigation"
-msgstr "ナビゲーション"
+msgstr "Навигация"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:187
 msgid "Next page"
-msgstr "次のページ"
+msgstr "Следующая страница"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:29
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
@@ -448,92 +448,92 @@ msgstr "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR,
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:137
 msgid "No account needed · PDF & Markdown"
-msgstr "ログイン不要 · PDF・Markdown 対応"
+msgstr "Без аккаунта · PDF и Markdown"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:340
 msgid "No matches"
-msgstr "一致する項目がありません"
+msgstr "Нет совпадений"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:103
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
-msgstr "選択可能なテキストがありません。スキャンした PDF には、テキストに関する質問の前に OCR が必要です。"
+msgstr "Выделяемый текст не найден. Для сканов PDF сначала нужен OCR."
 
 #: src/app/[lang]/knowledge/page.tsx:69
 msgid "Open a PDF or Markdown document without an account. Browse PDF pages, adjust the zoom, or read formatted Markdown in one workspace."
-msgstr "ログインなしで PDF や Markdown を開けます。同じワークスペースで PDF のページ移動や拡大縮小、整形された Markdown の閲覧ができます。"
+msgstr "Открывайте PDF или Markdown без аккаунта. Листайте страницы, меняйте масштаб или читайте оформленный Markdown в одном пространстве."
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:81
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
-msgstr "アカウントなしで PDF または Markdown を開けます。段落を引用として文書名とページ番号付きで残し、サンプルから始められます。"
+msgstr "Открывайте PDF или Markdown без аккаунта. Выделяйте фрагменты, сохраняйте их как цитаты с названием и номером страницы, начинайте с образца."
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:121
 msgid "Open Docs workspace"
-msgstr "ドキュメントワークスペースを開く"
+msgstr "Открыть пространство Docs"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
 msgid "Open document workspace"
-msgstr "ドキュメントワークスペースを開く"
+msgstr "Открыть пространство документа"
 
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
-msgstr ""
+msgstr "Открыть страницу"
 
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open reference"
-msgstr ""
+msgstr "Открыть ссылку"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:52
 msgid "Optimized performance with lazy loading and data virtualization"
-msgstr "遅延読み込みとデータ仮想化によるパフォーマンス最適化"
+msgstr "Оптимизировал производительность ленивой загрузкой и виртуализацией данных"
 
 #. placeholder {0}: cited.pageNumber
 #. placeholder {0}: quote.pageNumber
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:84
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:161
 msgid "Page {0}"
-msgstr "{0} ページ"
+msgstr "Стр. {0}"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:156
 msgid "Page number"
-msgstr "ページ番号"
+msgstr "Номер страницы"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
-msgstr "PDF 引用ハイライト"
+msgstr "Подсветка цитаты в PDF"
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:91
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
-msgstr "PDF は 20 MB 以下、Markdown は 1 MB 以下にしてください。"
+msgstr "PDF — не больше 20 МБ, Markdown — не больше 1 МБ."
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:236
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
-msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
+msgstr "PDF до 20 МБ · Markdown до 1 МБ"
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:76
 msgid "Please choose one document at a time."
-msgstr "一度に 1 つのドキュメントを選択してください。"
+msgstr "Выберите один документ за раз."
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:82
 msgid "Please upload a PDF or Markdown file."
-msgstr "PDF または Markdown ファイルをアップロードしてください。"
+msgstr "Загрузите файл PDF или Markdown."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:148
 msgid "Previous page"
-msgstr "前のページ"
+msgstr "Предыдущая страница"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:91
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:25
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
-msgstr "プロダクト更新"
+msgstr "Обновления продукта"
 
 #: src/app/[lang]/resume/layout.tsx:29
 msgid "Professional Experience & Skills"
-msgstr "専門的な経験とスキル"
+msgstr "Опыт и навыки"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:57
 msgid "Quotes connect back to the PDF. Click a citation to open that page and highlight the original sentence by searching the text layer."
-msgstr "引用は PDF に戻れます。クリックすると該当ページを開き、テキストレイヤーを検索して原文をハイライトします。"
+msgstr "Цитаты связаны с PDF. Нажмите ссылку, чтобы открыть страницу и подсветить исходное предложение в текстовом слое."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:45
 msgid "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, ReactFlow, React-Windows, Fetch, Vite, Vue2, ECharts, ElementUI, Next.js, SSR, ISR, Strapi-CMS"
@@ -541,241 +541,241 @@ msgstr "React.js, React-Router, Redux, ShadcnUI, TailwindCSS, TanStack Query, Re
 
 #: src/app/[lang]/knowledge/page.tsx:60
 msgid "Read and explore documents"
-msgstr "ドキュメントを読んで理解する"
+msgstr "Читайте и изучайте документы"
 
 #: src/app/[lang]/knowledge/page.tsx:9
 msgid "Read PDF and Markdown documents without an account. Select passages, collect quotes with page references, and return to highlighted PDF text in a dedicated document workspace."
-msgstr "ログインなしで PDF と Markdown を閲覧。文章を選び、ページ番号付きの引用を残し、専用ワークスペースでハイライトされた PDF 原文に戻れます。"
+msgstr "Читайте PDF и Markdown без аккаунта. Выделяйте фрагменты, собирайте цитаты со страницами и возвращайтесь к подсвеченному тексту в отдельном пространстве."
 
 #: src/app/[lang]/knowledge/page.tsx:65
 msgid "Read PDF and Markdown files"
-msgstr "PDF と Markdown を読む"
+msgstr "Читайте PDF и Markdown"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:88
 msgid "Read PDF and Markdown in one workspace"
-msgstr "1つのワークスペースで PDF と Markdown を読む"
+msgstr "PDF и Markdown в одном пространстве"
 
 #: src/app/[lang]/knowledge/page.tsx:53
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
-msgstr "読み、探り、質問する。ドキュメントと思考を並べて。"
+msgstr "Читайте, изучайте и задавайте вопросы. Документы и мысли — рядом."
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:291
 msgid "Reading document…"
-msgstr "ドキュメントを読み込み中…"
+msgstr "Чтение документа…"
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:37
 msgid "Release versions"
-msgstr "リリース一覧"
+msgstr "Версии релизов"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:343
 msgid "Remove"
-msgstr "削除"
+msgstr "Удалить"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:167
 msgid "Remove document"
-msgstr "ドキュメントを削除"
+msgstr "Удалить документ"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:357
 msgid "Remove quote"
-msgstr "引用を削除"
+msgstr "Удалить цитату"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:160
 msgid "Replace"
-msgstr "変更"
+msgstr "Заменить"
 
 #: src/app/[lang]/resume/layout.tsx:12
 msgid "Resume"
-msgstr "履歴書"
+msgstr "Резюме"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:308
 msgid "Retry"
-msgstr "再試行"
+msgstr "Повторить"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:84
 msgid "Reusable UI components and design references"
-msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
+msgstr "Переиспользуемые UI-компоненты и образцы дизайна"
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
 msgid "Scroll down to read and quote your document"
-msgstr "下にスクロールして閲覧と引用を始める"
+msgstr "Прокрутите вниз, чтобы читать и цитировать документ"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:57
 msgid "Scroll to latest message"
-msgstr "最新のメッセージへ"
+msgstr "К последнему сообщению"
 
 #: src/app/[lang]/knowledge/page.tsx:80
 msgid "Select a passage and add it to your conversation as a quote. Keep the document name and page number alongside your questions and notes."
-msgstr "文章を選択して会話に引用できます。質問やメモとともに、ドキュメント名とページ番号を残せます。"
+msgstr "Выделите фрагмент и добавьте его в диалог как цитату. Название документа и номер страницы останутся рядом с вопросами и заметками."
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:262
 msgid "Select a shorter passage (up to 4,000 characters)."
-msgstr "短い文章を選択してください（最大 4,000 文字）。"
+msgstr "Выберите более короткий фрагмент (до 4000 символов)."
 
 #: src/app/[lang]/knowledge/_components/document/markdown/preview.tsx:16
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:135
 msgid "Select text to quote"
-msgstr "テキストを選択して引用"
+msgstr "Выделите текст для цитаты"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:239
 msgid "Selected text"
-msgstr "選択したテキスト"
+msgstr "Выделенный текст"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:28
 msgid "Selection-aware AI"
-msgstr "選択テキスト向け AI"
+msgstr "ИИ с учётом выделения"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:341
 msgid "Send message"
-msgstr "メッセージを送信"
+msgstr "Отправить сообщение"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:78
 msgid "Sentences"
-msgstr "座右銘"
+msgstr "Фразы"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:19
 msgid "Shinnosuke Nohara"
-msgstr "野原しんのすけ"
+msgstr "Синносукэ Нохара"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:342
 msgid "Stop response"
-msgstr "応答を停止"
+msgstr "Остановить ответ"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:320
 msgid "Summarize"
-msgstr "要約"
+msgstr "Кратко"
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:315
 msgid "Summarize this passage."
-msgstr "この文章を簡潔に要約してください。"
+msgstr "Кратко перескажите этот фрагмент."
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
-msgstr "技術スタック"
+msgstr "Стек"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:291
 msgid "The assistant only receives the quoted passage and your instruction."
-msgstr "アシスタントが受け取るのは引用箇所と指示のみです。"
+msgstr "Ассистент получает только цитату и вашу инструкцию."
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:136
 msgid "The sample could not be loaded. Please try again."
-msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
+msgstr "Не удалось загрузить образец. Попробуйте ещё раз."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
-msgstr "考え中…"
+msgstr "Думаю…"
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
-msgstr "読み込めませんでした。有効な UTF-8 の Markdown ファイルを使用してください。"
+msgstr "Файл не удалось прочитать. Нужен корректный Markdown в UTF-8."
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:86
 msgid "This file is empty. Please choose another file."
-msgstr "ファイルが空です。別のファイルを選択してください。"
+msgstr "Файл пуст. Выберите другой."
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:105
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
-msgstr "長いドキュメントのため、先頭 60,000 文字をチャット用に準備しました。それ以降の文章は引用して追加できます。"
+msgstr "Документ длинный. Для чата подготовлены первые 60 000 символов; чтобы взять текст с дальнейших страниц, процитируйте фрагмент."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:320
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:329
 msgid "This page could not be rendered."
-msgstr "このページを表示できませんでした。"
+msgstr "Эту страницу не удалось отобразить."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:273
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:278
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:281
 msgid "This PDF could not be opened. Try another file."
-msgstr "この PDF を開けませんでした。別のファイルをお試しください。"
+msgstr "Этот PDF не удалось открыть. Выберите другой файл."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:246
 msgid "This PDF is password protected."
-msgstr "この PDF はパスワードで保護されています。"
+msgstr "Этот PDF защищён паролем."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:92
 msgid "Three iterations of the Docs workspace"
-msgstr "Docs ワークスペースの3回のイテレーション"
+msgstr "Три итерации пространства Docs"
 
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:28
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
-msgstr "Docs ワークスペースは3バージョンを公開済み。ファイル閲覧から PDF 原文の引用、選択テキストの AI まで。"
+msgstr "Три выпущенные версии пространства Docs: от чтения файлов к цитированию PDF и ИИ, учитывающему выделение."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:200
 msgid "Throttle"
-msgstr "節流"
+msgstr "Ограничение"
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:196
 msgid "Throttle off. The full conversation is sent."
-msgstr "節流オフ。会話全体を送信します。"
+msgstr "Ограничение выкл. Отправляется весь диалог."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:195
 msgid "Throttle on. Only the current question is sent."
-msgstr "節流オン。現在の質問のみ送信します。"
+msgstr "Ограничение вкл. Отправляется только текущий вопрос."
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:303
 msgid "Translate"
-msgstr "翻訳"
+msgstr "Перевести"
 
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:37
 msgid "Translate or summarize from the selection toolbar"
-msgstr "選択ツールバーから翻訳または要約"
+msgstr "Перевод или краткий пересказ из панели выделения"
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:39
 msgid "Translate this passage into American English."
-msgstr "この文章をアメリカ英語に翻訳してください。"
+msgstr "Переведите этот фрагмент на американский английский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:45
 msgid "Translate this passage into Arabic."
-msgstr "この文章をアラビア語に翻訳してください。"
+msgstr "Переведите этот фрагмент на арабский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:44
 msgid "Translate this passage into French."
-msgstr "この文章をフランス語に翻訳してください。"
+msgstr "Переведите этот фрагмент на французский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:40
 msgid "Translate this passage into Japanese."
-msgstr "この文章を日本語に翻訳してください。"
+msgstr "Переведите этот фрагмент на японский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:41
 msgid "Translate this passage into Korean."
-msgstr "この文章を韓国語に翻訳してください。"
+msgstr "Переведите этот фрагмент на корейский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:43
 msgid "Translate this passage into Russian."
-msgstr "この文章をロシア語に翻訳してください。"
+msgstr "Переведите этот фрагмент на русский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:42
 msgid "Translate this passage into Simplified Chinese."
-msgstr "この文章を簡体字中国語に翻訳してください。"
+msgstr "Переведите этот фрагмент на упрощённый китайский."
 
 #: src/app/[lang]/knowledge/_components/document/translation-language.ts:46
 msgid "Translate this passage into Uyghur."
-msgstr "この文章をウイグル語に翻訳してください。"
+msgstr "Переведите этот фрагмент на уйгурский."
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:85
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:90
 msgid "Translate to"
-msgstr "翻訳先"
+msgstr "Перевести на"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:241
 msgid "Try a sample document"
-msgstr "サンプルドキュメントを試す"
+msgstr "Открыть образец"
 
 #: src/app/[lang]/(home)/_components/home-content.tsx:36
 msgid "Try Knowledge"
-msgstr "ナレッジを試す"
+msgstr "Попробовать Knowledge"
 
 #: src/app/[lang]/knowledge/page.tsx:98
 msgid "Try the included sample or open your own file. Documents and notes stay in the current page session; AI replies and scanned-document OCR are not available yet."
-msgstr "サンプルや自分のファイルを開いてお試しください。ドキュメントとメモは現在のページでのみ保持されます。AI の応答とスキャン文書の OCR はまだ利用できません。"
+msgstr "Откройте встроенный образец или свой файл. Документы и заметки живут в текущей сессии; ответы ИИ и OCR сканов пока недоступны."
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:262
 msgid "Unlock PDF"
-msgstr "PDF を開く"
+msgstr "Разблокировать PDF"
 
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
 msgid "Upload document"
-msgstr "ドキュメントをアップロード"
+msgstr "Загрузить документ"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
@@ -785,32 +785,32 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 #: src/app/[lang]/resume/hooks/use-experience.ts:38
 #: src/app/[lang]/resume/hooks/use-experience.ts:71
 msgid "Web Developer"
-msgstr "Web開発者"
+msgstr "Веб-разработчик"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:26
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
-msgstr "家族や友だちと過ごすしんちゃんの毎日は、いたずらや思いがけない出来事、そしてたくさんの笑いでいっぱいです。"
+msgstr "Вместе с семьёй и друзьями Син-тян наполняет обычные дни проказами, сюрпризами и смехом."
 
 #: src/app/[lang]/resume/_components/intro.tsx:34
 msgid "Wuhan University of Science and Technology."
-msgstr "武漢科学技術大学"
+msgstr "Уханьский университет науки и технологий."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:70
 msgid "Wuhan Zhaori Technology Co., Ltd."
-msgstr "武漢 Zhaori Technology Co., Ltd."
+msgstr "Wuhan Zhaori Technology Co., Ltd."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:244
 msgid "You"
-msgstr "あなた"
+msgstr "Вы"
 
 #: src/app/[lang]/resume/_components/intro.tsx:53
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
-msgstr "私に連絡することができます:<0><1>mrvnseason@gmail.com</1><2>または電話: +86 15623192717</2></0>"
+msgstr "Связаться со мной:<0><1>mrvnseason@gmail.com</1><2>или телефон: +86 15623192717</2></0>"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:221
 msgid "Zoom in"
-msgstr "拡大"
+msgstr "Приблизить"
 
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:200
 msgid "Zoom out"
-msgstr "縮小"
+msgstr "Отдалить"

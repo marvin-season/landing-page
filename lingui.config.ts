@@ -1,9 +1,11 @@
+import { locales, pseudoLocale, sourceLocale } from "./src/lib/i18n/locales";
+
 export default {
-  locales: ["en", "zh", "ja", "pseudo"] as const,
-  pseudoLocale: "pseudo",
-  sourceLocale: "en",
+  locales,
+  pseudoLocale,
+  sourceLocale,
   fallbackLocales: {
-    default: "en",
+    default: sourceLocale,
   },
   catalogs: [
     {

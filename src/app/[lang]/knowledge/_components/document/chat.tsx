@@ -85,7 +85,7 @@ function QuoteBlock({
             </span>
           ) : null}
         </span>
-        <span className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words text-muted-foreground block">
+        <span className="max-h-32 overflow-y-auto whitespace-pre-wrap wrap-break-word text-muted-foreground block">
           {quote.text}
         </span>
       </button>
@@ -176,7 +176,7 @@ export function DocumentChat({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-card/50">
-      <div className="flex items-center gap-2 border-b border-border/60 px-4 py-4">
+      <div className="flex shrink-0 items-center gap-2 border-b border-border/60 px-4 py-4">
         <MessageSquare className="size-4 text-primary" />
         <h2 className="text-sm font-medium">
           <Trans>Document chat</Trans>
@@ -209,7 +209,7 @@ export function DocumentChat({
         </div>
       </div>
       <StickToBottom
-        className="relative min-h-0 flex-1 overflow-hidden"
+        className="relative min-h-0 flex-auto overflow-hidden"
         initial={reducedMotion ? "instant" : "smooth"}
         resize={reducedMotion ? "instant" : "smooth"}
       >
@@ -254,7 +254,7 @@ export function DocumentChat({
                 ) : null}
                 {message.text ? (
                   message.role === "user" ? (
-                    <p className="whitespace-pre-wrap break-words text-sm leading-7">
+                    <p className="whitespace-pre-wrap wrap-break-word text-sm leading-7">
                       {message.text}
                     </p>
                   ) : (
@@ -286,7 +286,7 @@ export function DocumentChat({
         </StickToBottom.Content>
         <ScrollToLatest />
       </StickToBottom>
-      <div className="space-y-3 border-t border-border/60 p-4">
+      <div className="shrink-0 space-y-3 border-t border-border/60 p-4">
         <p className="text-xs leading-5 text-muted-foreground">
           <Trans>
             The assistant only receives the quoted passage and your instruction.

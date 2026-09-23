@@ -11,9 +11,10 @@ import {
   getI18nInstance,
   type PageLangParam,
 } from "@/lib/i18n/appRouterI18n";
-import linguiConfig from "~/lingui.config";
+import { getLocaleDir, locales } from "@/lib/i18n/locales";
 import "@/css/globals.css";
 import { LocatorRuntime } from "@/components/locator-runtime";
+import { PageFade } from "@/components/page-transition/page-fade";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";
 
 const lora = Lora({
@@ -22,7 +23,7 @@ const lora = Lora({
 });
 
 export async function generateStaticParams() {
-  return linguiConfig.locales.map((lang) => ({ lang }));
+  return locales.map((lang) => ({ lang }));
 }
 
 export async function generateMetadata(props: PageLangParam) {
@@ -53,7 +54,11 @@ export default async function RootLayout({
   setI18n(i18n);
 
   return (
-    <html lang={lang as string} suppressHydrationWarning>
+    <html
+      lang={lang as string}
+      dir={getLocaleDir(lang)}
+      suppressHydrationWarning
+    >
       <body
         className={`${lora.className} min-h-dvh antialiased shinchan:font-sans!`}
       >
@@ -64,7 +69,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <LocatorRuntime />
             <SettingsMenu currentLang={lang} />
-            {children}
+            <PageFade>{children}</PageFade>
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>

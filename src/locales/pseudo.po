@@ -88,7 +88,7 @@ msgstr ""
 msgid "Back to overview"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:225
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:227
 msgid "Bring a document. Start a conversation."
 msgstr ""
 
@@ -134,8 +134,8 @@ msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
 #: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:108
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:132
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
 msgstr ""
 
@@ -242,11 +242,11 @@ msgstr ""
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:228
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:230
 msgid "Drop a PDF or Markdown file here, or click to browse."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:279
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:281
 msgid "Drop to open this document"
 msgstr ""
 
@@ -446,7 +446,7 @@ msgstr ""
 msgid "Next.js, TRPC, Zustand, ShadcnUI, TailwindCSS, TanStack Query, SSR, ISR, Strapi-CMS"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:135
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:137
 msgid "No account needed · PDF & Markdown"
 msgstr ""
 
@@ -454,7 +454,7 @@ msgstr ""
 msgid "No matches"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:101
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:103
 msgid "No selectable text was found. Scanned PDFs need OCR before text-based questions can be answered."
 msgstr ""
 
@@ -505,7 +505,7 @@ msgstr ""
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:234
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:236
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr ""
 
@@ -559,7 +559,7 @@ msgstr ""
 msgid "Read, explore, and ask questions. Your documents and ideas, side by side."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:289
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:291
 msgid "Reading document…"
 msgstr ""
 
@@ -571,7 +571,7 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:165
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:167
 msgid "Remove document"
 msgstr ""
 
@@ -579,7 +579,7 @@ msgstr ""
 msgid "Remove quote"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:158
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:160
 msgid "Replace"
 msgstr ""
 
@@ -672,7 +672,7 @@ msgstr ""
 msgid "This file is empty. Please choose another file."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:103
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:105
 msgid "This is a long document. The first 60,000 characters are prepared for chat; quote a specific passage to include text from later pages."
 msgstr ""
 
@@ -720,20 +720,36 @@ msgstr ""
 msgid "Translate or summarize from the selection toolbar"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:26
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:39
 msgid "Translate this passage into American English."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:27
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:45
+msgid "Translate this passage into Arabic."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:44
+msgid "Translate this passage into French."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:40
 msgid "Translate this passage into Japanese."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:28
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:41
 msgid "Translate this passage into Korean."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/document/translation-language.ts:29
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:43
+msgid "Translate this passage into Russian."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:42
 msgid "Translate this passage into Simplified Chinese."
+msgstr ""
+
+#: src/app/[lang]/knowledge/_components/document/translation-language.ts:46
+msgid "Translate this passage into Uyghur."
 msgstr ""
 
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:85
@@ -741,7 +757,7 @@ msgstr ""
 msgid "Translate to"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:239
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:241
 msgid "Try a sample document"
 msgstr ""
 
@@ -757,7 +773,7 @@ msgstr ""
 msgid "Unlock PDF"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:118
+#: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
 msgid "Upload document"
 msgstr ""
 
