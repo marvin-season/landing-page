@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   motion,
@@ -10,7 +9,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowUp, ChevronDown } from "lucide-react";
 import { type ReactNode, useRef, useState } from "react";
 import { KnowledgeWorkspace } from "./knowledge-workspace";
 
@@ -83,14 +82,42 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
         >
           <div className="mx-auto flex min-h-full w-full max-w-[1600px] flex-col gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
             {overview}
-            <div className="mt-auto flex flex-wrap items-center gap-4 pb-2">
-              <Button type="button" onClick={() => scrollToScene(true)}>
-                <Trans>Open document workspace</Trans>
-                <ArrowDown className="size-4" aria-hidden="true" />
-              </Button>
-              <span className="text-xs text-muted-foreground">
+            <div className="mt-auto flex flex-col items-center gap-3 pb-2">
+              <button
+                type="button"
+                onClick={() => scrollToScene(true)}
+                className="flex flex-col items-center gap-3 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <Trans>Scroll down to read and quote your document</Trans>
-              </span>
+                <span
+                  aria-hidden="true"
+                  className="flex flex-col items-center"
+                >
+                  {[0, 1].map((layer) => (
+                    <motion.span
+                      key={layer}
+                      className={layer === 0 ? "flex" : "-mt-3 flex"}
+                      animate={
+                        reducedMotion
+                          ? { y: 0, opacity: layer === 0 ? 0.4 : 1 }
+                          : { y: [0, 4, 0], opacity: [0.2, 1, 0.2] }
+                      }
+                      transition={
+                        reducedMotion
+                          ? { duration: 0 }
+                          : {
+                              duration: 1.4,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                              delay: layer * 0.18,
+                            }
+                      }
+                    >
+                      <ChevronDown className="size-5" strokeWidth={2.25} />
+                    </motion.span>
+                  ))}
+                </span>
+              </button>
             </div>
           </div>
         </motion.div>
