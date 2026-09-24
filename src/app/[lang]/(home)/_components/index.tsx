@@ -1,7 +1,7 @@
 import { cn } from "@landing-page/utils";
 import { Trans } from "@lingui/react/macro";
 import type { CSSProperties, ReactNode } from "react";
-import { TrackedLink } from "@/components/analytics/tracked-link";
+import { Link } from "@/components/link/link";
 import type { HomeNavLink } from "../data/home-data";
 
 const getRevealStyle = (delay: number): CSSProperties =>
@@ -82,7 +82,7 @@ export function NavCard({
   const featured = href === "/knowledge";
 
   return (
-    <TrackedLink
+    <Link
       href={href}
       eventName="Home Navigation Click"
       eventProperties={{
@@ -128,7 +128,7 @@ export function NavCard({
       <span className="mt-auto block text-xs font-medium text-primary opacity-60 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 pt-3 group-focus-visible:opacity-100">
         {external ? <Trans>Open reference</Trans> : <Trans>Open page</Trans>}
       </span>
-    </TrackedLink>
+    </Link>
   );
 }
 

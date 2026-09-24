@@ -71,7 +71,10 @@ export function MockPdfPreview() {
   );
 
   return (
-    <div ref={containerRef} className="min-h-0 flex-1 overflow-auto bg-muted/40 p-4">
+    <div
+      ref={containerRef}
+      className="min-h-0 flex-1 overflow-auto bg-muted/40 p-4"
+    >
       {error ? (
         <p className="p-6 text-center text-sm text-destructive">
           This PDF could not be opened.

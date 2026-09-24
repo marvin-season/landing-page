@@ -1,16 +1,14 @@
 import { Trans } from "@lingui/react/macro";
 import { ArrowLeft, ArrowRight, History } from "lucide-react";
-import Link from "next/link";
-import { TrackedLink } from "@/components/analytics/tracked-link";
-import { withLocalePrefix } from "@/lib/i18n/locales";
+import { Link } from "@/components/link/link";
 import { changelogReleases } from "./changelog-data";
 
-export function ChangelogContent({ lang }: { lang: string }) {
+export function ChangelogContent() {
   return (
     <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <Link
-          href={withLocalePrefix("/", lang)}
+          href="/"
           className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -113,7 +111,7 @@ export function ChangelogContent({ lang }: { lang: string }) {
           })}
         </ol>
 
-        <TrackedLink
+        <Link
           href="/knowledge"
           eventName="Changelog CTA Click"
           eventProperties={{ target: "knowledge", location: "changelog" }}
@@ -124,7 +122,7 @@ export function ChangelogContent({ lang }: { lang: string }) {
             className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
             aria-hidden="true"
           />
-        </TrackedLink>
+        </Link>
       </div>
     </main>
   );

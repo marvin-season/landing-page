@@ -1,5 +1,5 @@
 import { MessageSquarePlus } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/components/link/link";
 
 export default function AgentNotFound() {
   return (

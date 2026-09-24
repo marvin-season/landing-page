@@ -2,7 +2,7 @@
 
 import { useLocalStorageState } from "ahooks";
 import { use } from "react";
-import LandLink from "@/components/link/land-link";
+import { Link } from "@/components/link/link";
 
 export interface IFeature {
   id: number;
@@ -51,14 +51,14 @@ export const FeaturesContent = ({
       <BlockA />
       <BlockB />
       {features.slice(0, 3).map((feature) => (
-        <LandLink
+        <Link
           href={`/admin/crud/${feature.id}`}
           key={feature.id}
           className="text-left p-4 border border-border rounded-md hover:bg-background transition-colors"
         >
           <div className="text-sm text-foreground mb-2">{feature.title}</div>
           <div className="text-sm text-muted-foreground">{feature.body}</div>
-        </LandLink>
+        </Link>
       ))}
     </div>
   );

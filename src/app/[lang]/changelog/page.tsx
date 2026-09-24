@@ -28,5 +28,5 @@ export default async function ChangelogPage({ params }: PageLangParam) {
   const i18n = getI18nInstance(lang);
   setI18n(i18n);
 
-  return <ChangelogContent lang={lang} />;
+  return <ChangelogContent />;
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { Link } from "@/components/link/link";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import { useTRPC } from "@/lib/trpc";
 export default function AdminPage() {

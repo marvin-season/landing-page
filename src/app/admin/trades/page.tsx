@@ -2,8 +2,8 @@
 
 import { Button, Input } from "@landing-page/design-system";
 import { useLocalStorageState } from "ahooks";
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Link } from "@/components/link/link";
 
 type TradeAction = "buy" | "sell";
 

@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { TrackedLink } from "@/components/analytics/tracked-link";
+import { Link } from "@/components/link/link";
 import { navLinks, profile, quotes } from "../data/home-data";
 import { NavigationCarousel, Quote, Section } from "./index";
 
@@ -27,7 +27,7 @@ export function HomeContent() {
               {profile.summary}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <TrackedLink
+              <Link
                 href="/knowledge"
                 eventName="Home Hero CTA Click"
                 eventProperties={{ target: "knowledge", location: "hero" }}
@@ -38,8 +38,8 @@ export function HomeContent() {
                   className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   aria-hidden="true"
                 />
-              </TrackedLink>
-              <TrackedLink
+              </Link>
+              <Link
                 href="https://www.tv-asahi.co.jp/shinchan/character/"
                 eventName="Home Hero CTA Click"
                 eventProperties={{ target: "shinchan", location: "hero" }}
@@ -48,7 +48,7 @@ export function HomeContent() {
                 className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
               >
                 <Trans>Meet Shin-chan</Trans>
-              </TrackedLink>
+              </Link>
             </div>
           </div>
 

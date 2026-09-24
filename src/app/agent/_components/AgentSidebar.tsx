@@ -29,10 +29,11 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import Link, { useLinkStatus } from "next/link";
+import { useLinkStatus } from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
+import { Link } from "@/components/link/link";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { useTRPC } from "@/lib/trpc";
 
