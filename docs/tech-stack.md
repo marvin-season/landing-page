@@ -33,6 +33,7 @@
 | **next-auth** (5.0.0-beta) | 认证         |
 | **Zod**                    | 数据验证       |
 | **@mastra/libsql**         | LibSQL 数据库 |
+| **@libsql/client**         | Turso 账号表   |
 
 
 ## UI 组件

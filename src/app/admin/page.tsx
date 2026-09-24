@@ -1,28 +1,34 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
-import { MotionDiv } from "@/components/ui/motion/motion-div";
-import { useTRPC } from "@/lib/trpc";
-export default function AdminPage() {
-  const trpc = useTRPC();
-  const { data } = useQuery(trpc.user.list.queryOptions());
-  return (
-    <MotionDiv
-      initial={{ opacity: 0, y: 48 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -48 }}
-      className="space-y-6 px-4 py-8 md:px-6"
-    >
-      <div>
-        <p className="text-sm text-muted-foreground">Admin</p>
-        <h1 className="text-3xl font-semibold text-foreground">管理入口</h1>
-      </div>
+import Link from "next/link";
+import { AdminShell } from "./_components/admin-shell";
 
-      {data?.map((user) => (
-        <div key={user.id}>
-          <h1>{user.name}</h1>
-          <p>{user.email}</p>
-        </div>
-      ))}
-    </MotionDiv>
+const tools = [
+  {
+    href: "/admin/users",
+    title: "账号",
+    description: "查看登录账号，修改密码。",
+  },
+];
+
+export default function AdminPage() {
+  return (
+    <AdminShell title="管理入口" description="内部工具，仅登录后可访问。">
+      <ul className="flex flex-col gap-3">
+        {tools.map((tool) => (
+          <li key={tool.href}>
+            <Link
+              href={tool.href}
+              className="block rounded-xl border bg-card px-4 py-4 shadow-sm transition-colors hover:bg-muted/60 shinchan:matte-surface apple:glass-surface"
+            >
+              <p className="text-sm font-medium text-foreground">
+                {tool.title}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {tool.description}
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </AdminShell>
   );
 }

@@ -1,4 +1,3 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { isLocale, locales, sourceLocale } from "@/lib/i18n/locales";
 
 export type ProtectedPage = {
@@ -9,10 +8,8 @@ export type ProtectedPage = {
 export const protectedPages: ProtectedPage[] = [
   { path: "/resume", locale: true },
   { path: "/agent", locale: false },
+  { path: "/admin", locale: false },
 ];
-
-const credentialsHash =
-  "2668164004831331d871bdf941f5de1a4aebff8d839d12dff1e9dd974a4615c2";
 
 function normalizePathname(pathname: string) {
   try {
@@ -74,14 +71,4 @@ export function getAuthorizationUrl(returnTo: string, locale?: string) {
   return `${prefix}/auth?${new URLSearchParams({
     returnTo: safe,
   })}`;
-}
-
-export async function verifyCredentials(username: string, password: string) {
-  if (!username || !password) return false;
-
-  const hash = createHash("sha256").update(`${username}:${password}`).digest();
-  const expected = Buffer.from(credentialsHash, "hex");
-  if (hash.length !== expected.length) return false;
-
-  return timingSafeEqual(hash, expected);
 }

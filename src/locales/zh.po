@@ -75,16 +75,16 @@ msgstr "针对文档提问…"
 msgid "Assistant"
 msgstr "助手"
 
-#: src/app/[lang]/auth/page.tsx:41
-#: src/app/[lang]/auth/page.tsx:76
+#: src/app/[lang]/auth/page.tsx:40
+#: src/app/[lang]/auth/page.tsx:70
 msgid "Authorization required"
 msgstr "需要授权"
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:21
+#: src/app/[lang]/auth/_components/submit-button.tsx:15
 msgid "Authorize and continue"
 msgstr "授权并继续"
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:18
+#: src/app/[lang]/auth/_components/submit-button.tsx:13
 msgid "Authorizing…"
 msgstr "正在授权…"
 
@@ -502,7 +502,7 @@ msgstr "第 {0} 页"
 msgid "Page number"
 msgstr "页码"
 
-#: src/app/[lang]/auth/page.tsx:112
+#: src/app/[lang]/auth/page.tsx:98
 msgid "Password"
 msgstr "密码"
 
@@ -669,7 +669,7 @@ msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
-#: src/app/[lang]/auth/page.tsx:131
+#: src/app/[lang]/auth/page.tsx:116
 msgid "The username or password is incorrect. Try again."
 msgstr "账号或密码错误，请重试。"
 
@@ -677,8 +677,8 @@ msgstr "账号或密码错误，请重试。"
 msgid "Thinking…"
 msgstr "正在思考…"
 
-#: src/app/[lang]/auth/page.tsx:43
-#: src/app/[lang]/auth/page.tsx:79
+#: src/app/[lang]/auth/page.tsx:42
+#: src/app/[lang]/auth/page.tsx:73
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr "此内容需要授权，请输入账号和密码后继续。"
 
@@ -795,7 +795,7 @@ msgstr "解锁 PDF"
 msgid "Upload document"
 msgstr "上传文档"
 
-#: src/app/[lang]/auth/page.tsx:93
+#: src/app/[lang]/auth/page.tsx:83
 msgid "Username"
 msgstr "账号"
 

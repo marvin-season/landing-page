@@ -5,7 +5,6 @@ import {
   getProtectedPage,
   getSafeReturnTo,
   isProtectedPath,
-  verifyCredentials,
 } from "./page-auth";
 
 describe("isProtectedPath", () => {
@@ -21,9 +20,13 @@ describe("isProtectedPath", () => {
     assert.equal(isProtectedPath("/agent/thread-1"), true);
   });
 
+  it("matches admin and admin subpaths", () => {
+    assert.equal(isProtectedPath("/admin"), true);
+    assert.equal(isProtectedPath("/admin/users"), true);
+  });
+
   it("does not match public or lookalike paths", () => {
     assert.equal(isProtectedPath("/"), false);
-    assert.equal(isProtectedPath("/admin"), false);
     assert.equal(isProtectedPath("/agency"), false);
     assert.equal(isProtectedPath("/zh"), false);
     assert.equal(isProtectedPath("/zh/home"), false);
@@ -34,7 +37,7 @@ describe("getProtectedPage", () => {
   it("returns locale config for resume and not for agent", () => {
     assert.equal(getProtectedPage("/zh/resume")?.locale, true);
     assert.equal(getProtectedPage("/agent")?.locale, false);
-    assert.equal(getProtectedPage("/admin"), undefined);
+    assert.equal(getProtectedPage("/admin")?.locale, false);
   });
 });
 
@@ -43,11 +46,12 @@ describe("getSafeReturnTo", () => {
     assert.equal(getSafeReturnTo("/resume"), "/resume");
     assert.equal(getSafeReturnTo("/zh/resume"), "/zh/resume");
     assert.equal(getSafeReturnTo("/agent/thread-1"), "/agent/thread-1");
+    assert.equal(getSafeReturnTo("/admin"), "/admin");
+    assert.equal(getSafeReturnTo("/admin/users"), "/admin/users");
   });
 
   it("rejects public, absolute, and protocol-relative values", () => {
     assert.equal(getSafeReturnTo("/"), "/");
-    assert.equal(getSafeReturnTo("/admin"), "/");
     assert.equal(getSafeReturnTo("https://evil.test/resume"), "/");
     assert.equal(getSafeReturnTo("//evil.test/resume"), "/");
     assert.equal(getSafeReturnTo("/agency"), "/");
@@ -88,12 +92,5 @@ describe("getAuthorizationUrl", () => {
       getAuthorizationUrl("/agent", "nope"),
       "/auth?returnTo=%2Fagent",
     );
-  });
-});
-
-describe("verifyCredentials", () => {
-  it("rejects the wrong username or password", async () => {
-    assert.equal(await verifyCredentials("wrong", "wrong"), false);
-    assert.equal(await verifyCredentials("", ""), false);
   });
 });

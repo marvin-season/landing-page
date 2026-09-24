@@ -82,6 +82,6 @@ export const config = {
      * Agent is included so the session gate can run. Auth lives under [lang]
      * and is not a protected page, so the gate does not redirect it.
      */
-    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };

@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { verifyCredentials } from "@/lib/page-auth";
+import { verifyCredentials } from "@/lib/auth-users/store";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

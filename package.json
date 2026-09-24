@@ -23,6 +23,7 @@
     "@landing-page/biz-ui": "workspace:*",
     "@landing-page/design-system": "workspace:*",
     "@landing-page/utils": "workspace:*",
+    "@libsql/client": "^0.18.0",
     "@lingui/core": "^5.9.5",
     "@lingui/react": "^5.9.5",
     "@mastra/ai-sdk": "1.0.2",

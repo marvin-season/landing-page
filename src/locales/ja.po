@@ -75,16 +75,16 @@ msgstr "ドキュメントについて質問…"
 msgid "Assistant"
 msgstr "アシスタント"
 
-#: src/app/[lang]/auth/page.tsx:41
-#: src/app/[lang]/auth/page.tsx:76
+#: src/app/[lang]/auth/page.tsx:40
+#: src/app/[lang]/auth/page.tsx:70
 msgid "Authorization required"
 msgstr ""
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:21
+#: src/app/[lang]/auth/_components/submit-button.tsx:15
 msgid "Authorize and continue"
 msgstr ""
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:18
+#: src/app/[lang]/auth/_components/submit-button.tsx:13
 msgid "Authorizing…"
 msgstr ""
 
@@ -502,7 +502,7 @@ msgstr "{0} ページ"
 msgid "Page number"
 msgstr "ページ番号"
 
-#: src/app/[lang]/auth/page.tsx:112
+#: src/app/[lang]/auth/page.tsx:98
 msgid "Password"
 msgstr ""
 
@@ -669,7 +669,7 @@ msgstr "アシスタントが受け取るのは引用箇所と指示のみです
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
 
-#: src/app/[lang]/auth/page.tsx:131
+#: src/app/[lang]/auth/page.tsx:116
 msgid "The username or password is incorrect. Try again."
 msgstr ""
 
@@ -677,8 +677,8 @@ msgstr ""
 msgid "Thinking…"
 msgstr "考え中…"
 
-#: src/app/[lang]/auth/page.tsx:43
-#: src/app/[lang]/auth/page.tsx:79
+#: src/app/[lang]/auth/page.tsx:42
+#: src/app/[lang]/auth/page.tsx:73
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr ""
 
@@ -795,7 +795,7 @@ msgstr "PDF を開く"
 msgid "Upload document"
 msgstr "ドキュメントをアップロード"
 
-#: src/app/[lang]/auth/page.tsx:93
+#: src/app/[lang]/auth/page.tsx:83
 msgid "Username"
 msgstr ""
 

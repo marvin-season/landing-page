@@ -1,4 +1,4 @@
-# 移除 PPT 与交易记录，授权页纳入多语言，整理四套主题目录
+# 授权用户迁到 Turso，收简 admin 样式；并整理主题与授权页
 
 ## 彻底移除 PPT 相关代码 (本地时间 09:46:00)
 - **文件**: `src/app/admin/ppt/`、`src/app/api/ppt/`、`src/store/`、`mastra-server/agents/ppt-agent.ts`、`mastra-server/lib/ppt.ts`、`src/lib/constant/agent.ts`、`mastra-server/index.ts`、`src/app/[lang]/(home)/data/home-data.tsx`、`docs/architecture.md`、`docs/tech-stack.md`、`README.md`、`AGENTS.md`、`src/locales/*`
@@ -39,3 +39,13 @@
 - **文件**: `src/lib/page-auth.ts`
 - **修改内容**: 将 `verifyCredentials` 使用的账号密码摘要改为 `marvin` / `marvin`。
 - **原因/上下文**: 用户要求重置授权账号密码。
+
+## 授权用户改存 Turso，admin 可改密 (本地时间 11:32:00)
+- **文件**: `src/lib/auth-users/`、`src/lib/page-auth.ts`、`src/auth.ts`、`src/proxy.ts`、`server/user/index.ts`、`src/app/admin/page.tsx`、`src/app/admin/users/page.tsx`、`docs/architecture.md`
+- **修改内容**: 登录校验从源码哈希改为 Turso `auth_users` 表；空表时种子超级管理员 `marvin`。`/admin` 纳入登录门闩，新增账号页可改密码。
+- **原因/上下文**: 用户不要 Vercel Blob 文档库，现有 Turso 能用就行。
+
+## 收简 admin 账号页样式 (本地时间 11:38:00)
+- **文件**: `src/app/admin/_components/admin-shell.tsx`、`src/app/admin/page.tsx`、`src/app/admin/users/`
+- **修改内容**: 管理页改成和授权页一样的窄栏。入口用卡片链接，改密从表格改成每账号一张卡片、上下排列的表单。
+- **原因/上下文**: 用户认为 admin 表格样式太丑。

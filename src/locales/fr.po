@@ -75,16 +75,16 @@ msgstr "Posez une question sur votre document…"
 msgid "Assistant"
 msgstr "Assistant"
 
-#: src/app/[lang]/auth/page.tsx:41
-#: src/app/[lang]/auth/page.tsx:76
+#: src/app/[lang]/auth/page.tsx:40
+#: src/app/[lang]/auth/page.tsx:70
 msgid "Authorization required"
 msgstr ""
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:21
+#: src/app/[lang]/auth/_components/submit-button.tsx:15
 msgid "Authorize and continue"
 msgstr ""
 
-#: src/app/[lang]/auth/_components/submit-button.tsx:18
+#: src/app/[lang]/auth/_components/submit-button.tsx:13
 msgid "Authorizing…"
 msgstr ""
 
@@ -502,7 +502,7 @@ msgstr "Page {0}"
 msgid "Page number"
 msgstr "Numéro de page"
 
-#: src/app/[lang]/auth/page.tsx:112
+#: src/app/[lang]/auth/page.tsx:98
 msgid "Password"
 msgstr ""
 
@@ -669,7 +669,7 @@ msgstr "L’assistant ne reçoit que le passage cité et votre consigne."
 msgid "The sample could not be loaded. Please try again."
 msgstr "Impossible de charger l’exemple. Veuillez réessayer."
 
-#: src/app/[lang]/auth/page.tsx:131
+#: src/app/[lang]/auth/page.tsx:116
 msgid "The username or password is incorrect. Try again."
 msgstr ""
 
@@ -677,8 +677,8 @@ msgstr ""
 msgid "Thinking…"
 msgstr "Réflexion…"
 
-#: src/app/[lang]/auth/page.tsx:43
-#: src/app/[lang]/auth/page.tsx:79
+#: src/app/[lang]/auth/page.tsx:42
+#: src/app/[lang]/auth/page.tsx:73
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr ""
 
@@ -795,7 +795,7 @@ msgstr "Déverrouiller le PDF"
 msgid "Upload document"
 msgstr "Téléverser un document"
 
-#: src/app/[lang]/auth/page.tsx:93
+#: src/app/[lang]/auth/page.tsx:83
 msgid "Username"
 msgstr ""
 

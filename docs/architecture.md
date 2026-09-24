@@ -90,7 +90,7 @@ flowchart TB
 
 ### 3.3 认证 `src/app/[lang]/auth/`
 
-- NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。
+- NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 Turso `auth_users` 表上的 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。首次没有用户时写入超级管理员 `marvin`。
 - JWT session，8 小时；`session.user.id` 为登录账号。
 - 唯一认证页在 `[lang]/auth`。英文无前缀，公开地址是 `/auth`；其他语言是 `/{lang}/auth`。`pages.signIn` 仍是 `/auth`。
 - `/auth/signin` 与 `/auth/resume` 只做兼容跳转，并带上当前语言。
@@ -98,19 +98,19 @@ flowchart TB
 
 ### 3.4 管理 `src/app/admin/`
 
-- 聚合入口、`crud` 及 catch-all `[...params]`。
+- 需登录。聚合入口、`/admin/users` 改密、`crud` 及 catch-all `[...params]`。
 
 ### 3.5 国际化与 `src/proxy.ts`
 
 - Next.js 16 使用 `src/proxy.ts` 作为请求拦截入口（不再需要根目录 `middleware.ts`）。
-- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent` 和 `auth`），再做 locale 检测与重写。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
+- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent` 和 `admin`），再做 locale 检测与重写。`/admin` 有会话后直接放行，不做语言重写。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
 
 ## 4. 数据层与 API
 
 ### 4.1 tRPC
 
 - **入口**：`src/app/api/trpc/[trpc]/route.ts` → `fetchRequestHandler` + `appRouter`。
-- **聚合路由**：`server/index.ts` 组合 `user`、`model`、`thread`。
+- **聚合路由**：`server/index.ts` 组合 `user`（Turso 账号列表 / 改密）、`model`、`thread`。
 - **上下文**：`server/trpc.ts` 的 `createTRPCContext` 注入 `next-auth` 的 `session`；`protectedProcedure` 要求已登录用户。
 - **客户端**：`src/lib/trpc.ts` 使用 `@trpc/tanstack-react-query` 的 `TRPCProvider` / `useTRPC`；在 Agent 布局中挂载。
 
