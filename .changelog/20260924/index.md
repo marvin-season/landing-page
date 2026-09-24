@@ -34,3 +34,8 @@
 - **文件**: `src/styles/tokens.css`、`src/styles/themes/light.css`、`src/styles/themes/dark.css`、`src/styles/globals.css`、`docs/architecture.md`
 - **修改内容**: 删除 `tokens.css`。浅色、深色分别放到 `themes/light.css`、`themes/dark.css`，和 shinchan、apple 并列。
 - **原因/上下文**: 目录看起来像只有两套主题，实际 Light / Dark 也是主题。
+
+## 重置授权账号 (本地时间 11:04:00)
+- **文件**: `src/lib/page-auth.ts`
+- **修改内容**: 将 `verifyCredentials` 使用的账号密码摘要改为 `marvin` / `marvin`。
+- **原因/上下文**: 用户要求重置授权账号密码。

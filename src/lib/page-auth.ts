@@ -12,7 +12,7 @@ export const protectedPages: ProtectedPage[] = [
 ];
 
 const credentialsHash =
-  "78a4c94a01ce7f420ac9546d1ad8dcbf2417ae88796ae27d24399ad22f0df07b";
+  "2668164004831331d871bdf941f5de1a4aebff8d839d12dff1e9dd974a4615c2";
 
 function normalizePathname(pathname: string) {
   try {
