@@ -1,0 +1,76 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import {
+  getAuthorizationUrl,
+  getProtectedPage,
+  getSafeReturnTo,
+  isProtectedPath,
+  verifyCredentials,
+} from "./page-auth";
+
+describe("isProtectedPath", () => {
+  it("matches resume with and without locale prefix", () => {
+    assert.equal(isProtectedPath("/resume"), true);
+    assert.equal(isProtectedPath("/zh/resume"), true);
+    assert.equal(isProtectedPath("/en/resume"), true);
+    assert.equal(isProtectedPath("/zh/resume/"), true);
+  });
+
+  it("matches agent and agent thread paths", () => {
+    assert.equal(isProtectedPath("/agent"), true);
+    assert.equal(isProtectedPath("/agent/thread-1"), true);
+  });
+
+  it("does not match public or lookalike paths", () => {
+    assert.equal(isProtectedPath("/"), false);
+    assert.equal(isProtectedPath("/admin"), false);
+    assert.equal(isProtectedPath("/agency"), false);
+    assert.equal(isProtectedPath("/zh"), false);
+    assert.equal(isProtectedPath("/zh/home"), false);
+  });
+});
+
+describe("getProtectedPage", () => {
+  it("returns locale config for resume and not for agent", () => {
+    assert.equal(getProtectedPage("/zh/resume")?.locale, true);
+    assert.equal(getProtectedPage("/agent")?.locale, false);
+    assert.equal(getProtectedPage("/admin"), undefined);
+  });
+});
+
+describe("getSafeReturnTo", () => {
+  it("keeps protected relative paths", () => {
+    assert.equal(getSafeReturnTo("/resume"), "/resume");
+    assert.equal(getSafeReturnTo("/zh/resume"), "/zh/resume");
+    assert.equal(getSafeReturnTo("/agent/thread-1"), "/agent/thread-1");
+  });
+
+  it("rejects public, absolute, and protocol-relative values", () => {
+    assert.equal(getSafeReturnTo("/"), "/");
+    assert.equal(getSafeReturnTo("/admin"), "/");
+    assert.equal(getSafeReturnTo("https://evil.test/resume"), "/");
+    assert.equal(getSafeReturnTo("//evil.test/resume"), "/");
+    assert.equal(getSafeReturnTo("/agency"), "/");
+    assert.equal(getSafeReturnTo(undefined), "/");
+  });
+});
+
+describe("getAuthorizationUrl", () => {
+  it("points at /auth with a sanitized returnTo", () => {
+    assert.equal(
+      getAuthorizationUrl("/agent/thread-1"),
+      "/auth?returnTo=%2Fagent%2Fthread-1",
+    );
+    assert.equal(
+      getAuthorizationUrl("https://evil.test"),
+      "/auth?returnTo=%2F",
+    );
+  });
+});
+
+describe("verifyCredentials", () => {
+  it("rejects the wrong username or password", async () => {
+    assert.equal(await verifyCredentials("wrong", "wrong"), false);
+    assert.equal(await verifyCredentials("", ""), false);
+  });
+});
