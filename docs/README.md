@@ -17,7 +17,7 @@
 | [agent-server/docs/agui_copilot.md](../agent-server/docs/agui_copilot.md) | 人 / Agent | AgUI Copilot |
 | [agent-server/docs/agui_agno.md](../agent-server/docs/agui_agno.md) | 人 / Agent | AgUI 与 Agno |
 | [src/lib/stream/README.md](../src/lib/stream/README.md) | 人 / Agent | 流式聊天模块说明 |
-| [src/app/admin/README.md](../src/app/admin/README.md) | 人 | Admin 区域说明 |
+| [src/app/[lang]/admin/README.md](../src/app/[lang]/admin/README.md) | 人 | Admin 区域说明 |
 | [.cursor/skills/pretext/SKILL.md](../.cursor/skills/pretext/SKILL.md) | Agent | Pretext 技能入口 |
 | [.cursor/skills/pretext/reference.md](../.cursor/skills/pretext/reference.md) | Agent | Pretext 参考 |
 | [.cursor/skills/vercel-react-best-practices/SKILL.md](../.cursor/skills/vercel-react-best-practices/SKILL.md) | Agent | React/Next 性能技能入口 |

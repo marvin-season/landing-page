@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/app/admin/_components/admin-shell";
 import { useTRPC } from "@/lib/trpc";
+import { AdminShell } from "../_components/admin-shell";
 import { CreateUserCard } from "./_components/create-user-card";
 import { UserAccountCard } from "./_components/user-account-card";
 

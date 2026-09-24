@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/link/link";
 import { AdminShell } from "./_components/admin-shell";
 
 const tools = [

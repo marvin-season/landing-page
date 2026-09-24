@@ -4,6 +4,7 @@ export default function RestPage({
   params,
 }: {
   params: Promise<{
+    lang: string;
     params: Array<string>;
   }>;
 }) {

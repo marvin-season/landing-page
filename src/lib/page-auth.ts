@@ -8,7 +8,7 @@ export type ProtectedPage = {
 export const protectedPages: ProtectedPage[] = [
   { path: "/resume", locale: true },
   { path: "/agent", locale: false },
-  { path: "/admin", locale: false },
+  { path: "/admin", locale: true },
 ];
 
 function normalizePathname(pathname: string) {

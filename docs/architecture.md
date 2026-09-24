@@ -8,7 +8,7 @@
 
 - **营销 / 个人站点**：多语言落地页与简历等，路由在 `src/app/[lang]/` 下。
 - **Agent 对话**：`/agent` 下的聊天界面，依赖 NextAuth 登录、tRPC 管理线程、Mastra 流式对话。
-- **管理**：`/admin` 下的内部工具入口与账号改密。
+- **管理**：`[lang]/admin` 下的内部工具入口与账号改密。英文无前缀，公开地址是 `/admin`。
 - **类型安全 API**：`server/` 中的 tRPC 路由，经 `src/app/api/trpc` 暴露。
 - **AI 运行时配置**：`mastra-server/` 中的 Mastra 实例、Agent、工具与工作流，被 API Route 与同进程 tRPC 直接引用。
 
@@ -96,14 +96,15 @@ flowchart TB
 - `/auth/signin` 与 `/auth/resume` 只做兼容跳转，并带上当前语言。
 - 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置。未登录访问时 `src/proxy.ts` 跳到对应语言的 `/auth?returnTo=...`（例如 `/zh/resume` → `/zh/auth`）。认证页本身不在受保护列表里。
 
-### 3.4 管理 `src/app/admin/`
+### 3.4 管理 `src/app/[lang]/admin/`
 
 - 需登录。聚合入口、`/admin/users` 账号列表。角色为 `super_admin` / `admin` / `guest`；只有超级管理员可以创建管理员或访客、修改密码。catch-all `[...params]`。
+- 英文无前缀，公开地址是 `/admin`；其他语言是 `/{lang}/admin`。沿用 `[lang]` 的语言、主题和设置菜单。
 
 ### 3.5 国际化与 `src/proxy.ts`
 
 - Next.js 16 使用 `src/proxy.ts` 作为请求拦截入口（不再需要根目录 `middleware.ts`）。
-- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent` 和 `admin`），再做 locale 检测与重写。`/admin` 有会话后直接放行，不做语言重写。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
+- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent`、`admin` 和带语言前缀的受保护页），再做 locale 检测与重写。`/admin` 与 `/resume` 一样会重写到默认语言；`/{lang}/admin` 直接放行。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
 
 ## 4. 数据层与 API
 

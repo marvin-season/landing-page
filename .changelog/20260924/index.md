@@ -1,4 +1,4 @@
-# 授权用户迁到 Turso，整理 admin 账号交互与多角色创建；并整理主题与授权页
+# 授权用户迁到 Turso，整理 admin 账号交互；授权页与管理页移入 [lang]
 
 ## 彻底移除 PPT 相关代码 (本地时间 09:46:00)
 - **文件**: `src/app/admin/ppt/`、`src/app/api/ppt/`、`src/store/`、`mastra-server/agents/ppt-agent.ts`、`mastra-server/lib/ppt.ts`、`src/lib/constant/agent.ts`、`mastra-server/index.ts`、`src/app/[lang]/(home)/data/home-data.tsx`、`docs/architecture.md`、`docs/tech-stack.md`、`README.md`、`AGENTS.md`、`src/locales/*`
@@ -64,3 +64,8 @@
 - **文件**: `server/user/index.ts`、`src/lib/auth-users/roles.ts`、`src/app/admin/users/page.tsx`
 - **修改内容**: `z.enum(CREATABLE_ROLES)` 初始化时报错导致整个 user 路由没挂上。角色常量拆到独立文件，权限并进 `user.list`，去掉 `user.me`。
 - **原因/上下文**: 页面报 `No procedure found on path "user.me"`。
+
+## 将 admin 移入 [lang] (本地时间 14:00:08)
+- **文件**: `src/app/[lang]/admin/`、`src/app/admin/`、`src/lib/page-auth.ts`、`src/lib/page-auth.test.ts`、`src/lib/i18n/locales.ts`、`src/proxy.ts`、`docs/architecture.md`、`AGENTS.md`、`docs/README.md`
+- **修改内容**: 管理页从独立根布局挪到 `[lang]/admin`，沿用站点语言、主题和设置菜单。英文仍是 `/admin`，其他语言是 `/{lang}/admin`。未登录访问时跳到对应语言的授权地址。
+- **原因/上下文**: 用户要求把 admin 移入 `[lang]`。

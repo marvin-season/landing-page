@@ -21,7 +21,7 @@ export async function proxy(request: NextRequest) {
         NextResponse.redirect(
           new URL(getAuthorizationUrl(pathname), request.url),
         ),
-        protectedPage.path === "/resume",
+        isPrivateProtectedPage(protectedPage.path),
       );
     }
 
@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
 
     return withPrivateHeaders(
       localize(request),
-      protectedPage.path === "/resume",
+      isPrivateProtectedPage(protectedPage.path),
     );
   }
 
@@ -41,6 +41,10 @@ export async function proxy(request: NextRequest) {
   }
 
   return localize(request);
+}
+
+function isPrivateProtectedPage(path: string) {
+  return path === "/resume" || path === "/admin";
 }
 
 function withPrivateHeaders(response: NextResponse, enabled: boolean) {

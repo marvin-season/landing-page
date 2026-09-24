@@ -46,7 +46,7 @@ export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
 
-const unlocalizedRoots = new Set(["admin", "agent", "agui", "api", "pdfjs"]);
+const unlocalizedRoots = new Set(["agent", "agui", "api", "pdfjs"]);
 
 /** Prefix an internal path with the current locale. `en` stays unprefixed. */
 export function withLocalePrefix(href: string, locale: string): string {

@@ -20,9 +20,11 @@ describe("isProtectedPath", () => {
     assert.equal(isProtectedPath("/agent/thread-1"), true);
   });
 
-  it("matches admin and admin subpaths", () => {
+  it("matches admin with and without locale prefix", () => {
     assert.equal(isProtectedPath("/admin"), true);
     assert.equal(isProtectedPath("/admin/users"), true);
+    assert.equal(isProtectedPath("/zh/admin"), true);
+    assert.equal(isProtectedPath("/zh/admin/users"), true);
   });
 
   it("does not match public or lookalike paths", () => {
@@ -37,7 +39,8 @@ describe("getProtectedPage", () => {
   it("returns locale config for resume and not for agent", () => {
     assert.equal(getProtectedPage("/zh/resume")?.locale, true);
     assert.equal(getProtectedPage("/agent")?.locale, false);
-    assert.equal(getProtectedPage("/admin")?.locale, false);
+    assert.equal(getProtectedPage("/admin")?.locale, true);
+    assert.equal(getProtectedPage("/zh/admin")?.locale, true);
   });
 });
 
@@ -48,6 +51,8 @@ describe("getSafeReturnTo", () => {
     assert.equal(getSafeReturnTo("/agent/thread-1"), "/agent/thread-1");
     assert.equal(getSafeReturnTo("/admin"), "/admin");
     assert.equal(getSafeReturnTo("/admin/users"), "/admin/users");
+    assert.equal(getSafeReturnTo("/zh/admin"), "/zh/admin");
+    assert.equal(getSafeReturnTo("/zh/admin/users"), "/zh/admin/users");
   });
 
   it("rejects public, absolute, and protocol-relative values", () => {
@@ -75,6 +80,10 @@ describe("getAuthorizationUrl", () => {
     assert.equal(
       getAuthorizationUrl("/zh/resume"),
       "/zh/auth?returnTo=%2Fzh%2Fresume",
+    );
+    assert.equal(
+      getAuthorizationUrl("/zh/admin/users"),
+      "/zh/auth?returnTo=%2Fzh%2Fadmin%2Fusers",
     );
     assert.equal(
       getAuthorizationUrl("/agent", "ja"),

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { Link } from "@/components/link/link";
 
 export function AdminShell({
   title,
@@ -15,7 +15,7 @@ export function AdminShell({
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-6 py-20">
+    <main className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-6 py-20">
       <header>
         {backHref ? (
           <Link
