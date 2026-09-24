@@ -5,7 +5,7 @@ const tools = [
   {
     href: "/admin/users",
     title: "账号",
-    description: "查看登录账号，修改密码。",
+    description: "查看登录账号，创建管理员或访客，按需改密。",
   },
 ];
 

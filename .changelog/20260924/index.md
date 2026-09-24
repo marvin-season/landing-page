@@ -1,4 +1,4 @@
-# 授权用户迁到 Turso，收简 admin 样式；并整理主题与授权页
+# 授权用户迁到 Turso，整理 admin 账号交互与多角色创建；并整理主题与授权页
 
 ## 彻底移除 PPT 相关代码 (本地时间 09:46:00)
 - **文件**: `src/app/admin/ppt/`、`src/app/api/ppt/`、`src/store/`、`mastra-server/agents/ppt-agent.ts`、`mastra-server/lib/ppt.ts`、`src/lib/constant/agent.ts`、`mastra-server/index.ts`、`src/app/[lang]/(home)/data/home-data.tsx`、`docs/architecture.md`、`docs/tech-stack.md`、`README.md`、`AGENTS.md`、`src/locales/*`
@@ -49,3 +49,18 @@
 - **文件**: `src/app/admin/_components/admin-shell.tsx`、`src/app/admin/page.tsx`、`src/app/admin/users/`
 - **修改内容**: 管理页改成和授权页一样的窄栏。入口用卡片链接，改密从表格改成每账号一张卡片、上下排列的表单。
 - **原因/上下文**: 用户认为 admin 表格样式太丑。
+
+## 重做 admin 账号交互并删除 crud (本地时间 11:43:20)
+- **文件**: `src/app/admin/_components/admin-shell.tsx`、`src/app/admin/page.tsx`、`src/app/admin/users/`、`src/app/admin/crud/`、`docs/architecture.md`
+- **修改内容**: 账号页默认只展示用户名、角色和更新时间，「修改密码」点开后才出表单，可取消或保存。子页才显示「返回管理」。删除实验性 `/admin/crud`。
+- **原因/上下文**: 每张卡都摊开改密表单，看起来像登录页；crud 已不再需要。
+
+## 超级管理员可创建 admin / guest (本地时间 11:46:54)
+- **文件**: `src/lib/auth-users/store.ts`、`src/lib/auth-users/store.test.ts`、`server/user/index.ts`、`src/app/admin/users/`、`src/app/admin/page.tsx`、`docs/architecture.md`
+- **修改内容**: 角色扩展为 `super_admin` / `admin` / `guest`。只有超级管理员能创建管理员或访客、修改密码；账号页增加按需展开的新建表单。
+- **原因/上下文**: 需要刻意创建其他角色账号，且权限仅限超级管理员。
+
+## 修复 user 路由加载失败 (本地时间 11:48:28)
+- **文件**: `server/user/index.ts`、`src/lib/auth-users/roles.ts`、`src/app/admin/users/page.tsx`
+- **修改内容**: `z.enum(CREATABLE_ROLES)` 初始化时报错导致整个 user 路由没挂上。角色常量拆到独立文件，权限并进 `user.list`，去掉 `user.me`。
+- **原因/上下文**: 页面报 `No procedure found on path "user.me"`。

@@ -1,5 +1,6 @@
 import { type Client, createClient } from "@libsql/client";
 import { hashPassword, verifyPassword } from "./password";
+import { isCreatableRole, isUserRole, type UserRole } from "./roles";
 
 export class AuthStoreError extends Error {
   constructor(message: string) {
@@ -7,8 +8,6 @@ export class AuthStoreError extends Error {
     this.name = "AuthStoreError";
   }
 }
-
-export type UserRole = "super_admin";
 
 export type AuthUser = {
   username: string;
@@ -47,6 +46,11 @@ export function getAuthDb() {
   return db;
 }
 
+function parseUserRole(value: unknown): UserRole {
+  if (isUserRole(value)) return value;
+  throw new AuthStoreError("invalid role");
+}
+
 function rowToUser(row: {
   username: unknown;
   password_hash: unknown;
@@ -56,7 +60,7 @@ function rowToUser(row: {
   return {
     username: String(row.username),
     passwordHash: String(row.password_hash),
-    role: "super_admin",
+    role: parseUserRole(row.role),
     updatedAt: String(row.updated_at),
   };
 }
@@ -106,7 +110,14 @@ export async function loadAuthUsers() {
   const result = await client.execute(
     "SELECT username, password_hash, role, updated_at FROM auth_users ORDER BY username",
   );
-  return result.rows.map((row) => rowToUser(row));
+  return result.rows.map((row) =>
+    rowToUser({
+      username: row.username,
+      password_hash: row.password_hash,
+      role: row.role,
+      updated_at: row.updated_at,
+    }),
+  );
 }
 
 export async function getUserRole(username: string): Promise<UserRole | null> {
@@ -115,7 +126,8 @@ export async function getUserRole(username: string): Promise<UserRole | null> {
     sql: "SELECT role FROM auth_users WHERE username = ?",
     args: [username],
   });
-  return result.rows[0]?.role === "super_admin" ? "super_admin" : null;
+  const role = result.rows[0]?.role;
+  return isUserRole(role) ? role : null;
 }
 
 export async function verifyCredentials(username: string, password: string) {
@@ -133,6 +145,39 @@ export async function verifyCredentials(username: string, password: string) {
   } catch {
     return false;
   }
+}
+
+export async function createUser(
+  username: string,
+  password: string,
+  role: UserRole,
+) {
+  const name = username.trim();
+  if (!name) throw new AuthStoreError("username is empty");
+  if (!password) throw new AuthStoreError("password is empty");
+  if (!isCreatableRole(role)) throw new AuthStoreError("role is not creatable");
+
+  const client = await ensureReady();
+  const existing = await client.execute({
+    sql: "SELECT username FROM auth_users WHERE username = ?",
+    args: [name],
+  });
+  if (existing.rows[0]) throw new AuthStoreError("user already exists");
+
+  const updatedAt = new Date().toISOString();
+  await client.execute({
+    sql: `
+      INSERT INTO auth_users (username, password_hash, role, updated_at)
+      VALUES (?, ?, ?, ?)
+    `,
+    args: [name, await hashPassword(password), role, updatedAt],
+  });
+
+  return {
+    username: name,
+    role,
+    updatedAt,
+  } satisfies PublicAuthUser;
 }
 
 export async function updateUserPassword(username: string, password: string) {
@@ -154,7 +199,7 @@ export async function updateUserPassword(username: string, password: string) {
 
   return {
     username,
-    role: "super_admin",
+    role: parseUserRole(row.role),
     updatedAt,
   } satisfies PublicAuthUser;
 }

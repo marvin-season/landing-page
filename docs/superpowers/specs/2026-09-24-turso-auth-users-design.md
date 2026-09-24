@@ -9,7 +9,7 @@ This replaces the earlier Vercel Blob draft. The project already has Turso; a JS
 ## Decisions
 
 - Storage is the existing Turso database via `@libsql/client`. Table name: `auth_users`.
-- First version only changes passwords. No create, disable, or delete user.
+- Super admin can create `admin` / `guest` accounts and change any password. No disable or delete.
 - Super admin is `marvin` / `super_marvin`. The password is hashed with scrypt before write.
 - `verifyCredentials` lives in `src/lib/auth-users/store.ts` so `page-auth.ts` (used by proxy) does not import the database client at the path-helper layer. NextAuth still calls `verifyCredentials`. `session.user.id` = username.
 - `/admin` joins `protectedPages`. Unauthenticated visits redirect to `/auth` and come back after login.
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS auth_users (
 ```
 
 - `username` is unique and is the login id.
-- `role` has only `super_admin` in this version.
+- `role` is `super_admin` | `admin` | `guest`. Only `admin` and `guest` can be created.
 - List and login responses never include `password_hash`.
 
 Seed, only when the table is empty:
@@ -48,7 +48,7 @@ Node `crypto.scrypt`. Encoded string: `scrypt$16384$8$1$<salt_b64url>$<key_b64ur
 - `src/lib/auth-users/store.ts`: Turso client, seed, list, verify, update. Tests inject `:memory:`
 - `src/lib/page-auth.ts`: path helpers only; `protectedPages` includes `{ path: "/admin", locale: false }`
 - `src/auth.ts`: `authorize` calls `verifyCredentials` from the store
-- `server/user/index.ts`: `list` + `updatePassword`
+- `server/user/index.ts`: `list` + `create` + `updatePassword`
 
 Do not change `mastra-server` storage.
 
@@ -56,13 +56,14 @@ Do not change `mastra-server` storage.
 
 Both procedures require a session.
 
-- `user.list`: `{ username, role, updatedAt }[]`
+- `user.list`: `{ users: { username, role, updatedAt }[], canManage: boolean }`
+- `user.create`: `{ username, password, role: "admin" | "guest" }`. Caller must have `role === "super_admin"`.
 - `user.updatePassword`: `{ username, password }`. Caller must have `role === "super_admin"`.
 
 ## Admin UI
 
 - `/admin` links to 「账号」
-- `/admin/users` lists username, role, last update, and a per-row password form
+- `/admin/users` lists username, role, last update. Super admin can expand a create form or a per-row password form.
 - Chinese copy. No i18n catalogs.
 
 ## Proxy
@@ -82,8 +83,9 @@ Uses existing `TURSO_DATABASE_URL` and `TURSO_DATABASE_AUTH_TOKEN`. Missing URL:
 
 ## Out of scope
 
-- Creating, disabling, or deleting users.
-- Roles other than `super_admin`.
+- Creating another `super_admin`.
+- Disabling or deleting users.
+- Role changes after create.
 - Vercel Blob / Neon user tables.
 - Changing NextAuth session shape, Agent `resourceId`, or the `/auth` page.
 

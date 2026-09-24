@@ -8,7 +8,7 @@
 
 - **营销 / 个人站点**：多语言落地页与简历等，路由在 `src/app/[lang]/` 下。
 - **Agent 对话**：`/agent` 下的聊天界面，依赖 NextAuth 登录、tRPC 管理线程、Mastra 流式对话。
-- **管理 / 演示**：`/admin` 下的 CRUD 等实验性功能。
+- **管理**：`/admin` 下的内部工具入口与账号改密。
 - **类型安全 API**：`server/` 中的 tRPC 路由，经 `src/app/api/trpc` 暴露。
 - **AI 运行时配置**：`mastra-server/` 中的 Mastra 实例、Agent、工具与工作流，被 API Route 与同进程 tRPC 直接引用。
 
@@ -98,7 +98,7 @@ flowchart TB
 
 ### 3.4 管理 `src/app/admin/`
 
-- 需登录。聚合入口、`/admin/users` 改密、`crud` 及 catch-all `[...params]`。
+- 需登录。聚合入口、`/admin/users` 账号列表。角色为 `super_admin` / `admin` / `guest`；只有超级管理员可以创建管理员或访客、修改密码。catch-all `[...params]`。
 
 ### 3.5 国际化与 `src/proxy.ts`
 
@@ -110,7 +110,7 @@ flowchart TB
 ### 4.1 tRPC
 
 - **入口**：`src/app/api/trpc/[trpc]/route.ts` → `fetchRequestHandler` + `appRouter`。
-- **聚合路由**：`server/index.ts` 组合 `user`（Turso 账号列表 / 改密）、`model`、`thread`。
+- **聚合路由**：`server/index.ts` 组合 `user`（Turso 账号列表与是否可管理 / 创建 / 改密）、`model`、`thread`。
 - **上下文**：`server/trpc.ts` 的 `createTRPCContext` 注入 `next-auth` 的 `session`；`protectedProcedure` 要求已登录用户。
 - **客户端**：`src/lib/trpc.ts` 使用 `@trpc/tanstack-react-query` 的 `TRPCProvider` / `useTRPC`；在 Agent 布局中挂载。
 

@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import { createClient } from "@libsql/client";
 import {
+  createUser,
+  getUserRole,
   listPublicUsers,
   loadAuthUsers,
   SUPER_ADMIN_USERNAME,
@@ -82,5 +84,61 @@ describe("auth user store", () => {
     useMemoryDb();
     await assert.rejects(() => updateUserPassword("nobody", "x"), /not found/i);
     await assert.rejects(() => updateUserPassword("marvin", ""), /empty/i);
+  });
+
+  it("creates admin and guest users", async () => {
+    useMemoryDb();
+    await loadAuthUsers();
+
+    const admin = await createUser("alice", "alice-pass", "admin");
+    const guest = await createUser("bob", "bob-pass", "guest");
+
+    assert.equal(admin.role, "admin");
+    assert.equal(guest.role, "guest");
+    assert.equal(await getUserRole("alice"), "admin");
+    assert.equal(await getUserRole("bob"), "guest");
+    assert.equal(await getUserRole("marvin"), "super_admin");
+    assert.equal(await verifyCredentials("alice", "alice-pass"), true);
+    assert.equal(await verifyCredentials("bob", "bob-pass"), true);
+
+    const users = await loadAuthUsers();
+    assert.deepEqual(
+      users.map((user) => [user.username, user.role]),
+      [
+        ["alice", "admin"],
+        ["bob", "guest"],
+        ["marvin", "super_admin"],
+      ],
+    );
+  });
+
+  it("keeps the original role when updating a password", async () => {
+    useMemoryDb();
+    await loadAuthUsers();
+    await createUser("alice", "alice-pass", "admin");
+    const updated = await updateUserPassword("alice", "next-pass");
+    assert.equal(updated.role, "admin");
+    assert.equal(await verifyCredentials("alice", "next-pass"), true);
+  });
+
+  it("rejects creating a super admin or a duplicate username", async () => {
+    useMemoryDb();
+    await loadAuthUsers();
+    await assert.rejects(
+      () => createUser("eve", "eve-pass", "super_admin"),
+      /not creatable/i,
+    );
+    await assert.rejects(
+      () => createUser("marvin", "other-pass", "admin"),
+      /already exists/i,
+    );
+    await assert.rejects(
+      () => createUser("  ", "x", "guest"),
+      /username is empty/i,
+    );
+    await assert.rejects(
+      () => createUser("carol", "", "guest"),
+      /password is empty/i,
+    );
   });
 });
