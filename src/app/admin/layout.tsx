@@ -17,7 +17,7 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="shinchan:font-sans">
+      <body className="shinchan:font-sans apple:font-sans">
         <ThemeProvider>
           <ThemeMenu />
           <TankQueryClientProvider>{children}</TankQueryClientProvider>

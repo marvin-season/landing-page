@@ -4,10 +4,12 @@
 @import "./component.css";
 @import "./base.css";
 @import "./shinchan.css";
+@import "./apple.css";
 @source "../../packages/design-system/src";
 @source "../../packages/biz-ui/src";
 @custom-variant dark (&:is(.dark *));
 @custom-variant shinchan (&:is(.shinchan *));
+@custom-variant apple (&:is(.apple *));
 
 @plugin "@tailwindcss/typography";
 

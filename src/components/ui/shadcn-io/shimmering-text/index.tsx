@@ -26,7 +26,7 @@ function ShimmeringText({
 }: ShimmeringTextProps) {
   const { resolvedTheme } = useTheme();
 
-  if (resolvedTheme === "shinchan") {
+  if (resolvedTheme === "shinchan" || resolvedTheme === "apple") {
     return (
       <motion.span
         className={cn("relative inline-block perspective-normal", className)}

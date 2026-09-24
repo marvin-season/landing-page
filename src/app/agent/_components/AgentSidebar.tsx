@@ -241,10 +241,10 @@ function ThreadListContent({
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
                     className={cn(
-                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg",
+                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg apple:rounded-xl",
                       threadId === t.id
-                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)]"
-                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45",
+                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)] apple:border-primary/25 apple:shadow-[var(--glass-shadow)]"
+                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45 apple:hover:border-white/50 apple:hover:bg-card/50",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">

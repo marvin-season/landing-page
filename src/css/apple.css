@@ -1,0 +1,134 @@
+.apple {
+  color-scheme: light;
+  --radius: 0.875rem;
+  --background: #f2f2f7;
+  --foreground: #1c1c1e;
+  --card: #ffffff;
+  --card-foreground: #1c1c1e;
+  --popover: #ffffff;
+  --popover-foreground: #1c1c1e;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: #e5e5ea;
+  --secondary-foreground: #1c1c1e;
+  --muted: #ebebf0;
+  --muted-foreground: #6c6c70;
+  --accent: #d6e4ff;
+  --accent-foreground: #003d99;
+  --destructive: #ff3b30;
+  --border: rgb(60 60 67 / 12%);
+  --input: rgb(60 60 67 / 18%);
+  --ring: #007aff;
+  --chart-1: #007aff;
+  --chart-2: #34c759;
+  --chart-3: #5856d6;
+  --chart-4: #ff9500;
+  --chart-5: #ff2d55;
+  --sidebar: rgb(255 255 255 / 72%);
+  --sidebar-foreground: #1c1c1e;
+  --sidebar-primary: #007aff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(0 122 255 / 10%);
+  --sidebar-accent-foreground: #007aff;
+  --sidebar-border: rgb(255 255 255 / 45%);
+  --sidebar-ring: #007aff;
+  --slate-350: #6c6c70;
+  --glass-shadow: 0 8px 32px rgb(0 0 0 / 6%);
+}
+
+@utility glass-surface {
+  @apply bg-card/65 shadow-[var(--glass-shadow)] backdrop-blur-2xl backdrop-saturate-150;
+  border-color: rgb(255 255 255 / 55%);
+}
+
+@layer base {
+  .apple body {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 12% -8%,
+        rgb(0 122 255 / 18%),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 55% 40% at 92% 8%,
+        rgb(88 86 214 / 12%),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 50% 36% at 70% 108%,
+        rgb(255 45 85 / 8%),
+        transparent 50%
+      );
+  }
+}
+
+@layer components {
+  .apple .agent-sketch {
+    --agent-ink: var(--foreground);
+    --agent-muted-ink: var(--muted-foreground);
+    --agent-paper: var(--background);
+    --agent-paper-soft: var(--muted);
+    --agent-crayon-red: var(--primary);
+    --agent-crayon-yellow: #e8f1ff;
+    --agent-crayon-green: #e8f8ee;
+    --agent-crayon-blue: #eef2ff;
+    --agent-border: var(--border);
+    @apply bg-background text-foreground;
+  }
+
+  .apple .agent-sketch .agent-doodle-grid {
+    @apply border-sidebar-border bg-sidebar backdrop-blur-2xl;
+  }
+
+  .apple .agent-sketch .agent-hand-border,
+  .apple .agent-sketch .agent-hand-border-soft {
+    @apply rounded-2xl border border-white/50 shadow-[var(--glass-shadow)];
+  }
+
+  .apple .agent-sketch .agent-paper-panel {
+    @apply glass-surface;
+  }
+
+  .apple .agent-sketch .agent-paper-panel::before,
+  .apple .agent-sketch .agent-paper-panel::after {
+    @apply hidden;
+  }
+
+  .apple .agent-sketch .agent-crayon-fill,
+  .apple .agent-sketch .agent-yellow-fill {
+    @apply bg-accent/70;
+  }
+
+  .apple .agent-sketch .agent-blue-fill {
+    @apply bg-[var(--agent-crayon-blue)];
+  }
+
+  .apple .agent-sketch .agent-green-fill {
+    @apply bg-[var(--agent-crayon-green)];
+  }
+
+  .apple .agent-sketch .agent-red-fill {
+    @apply bg-primary/10;
+  }
+
+  .apple .agent-sketch .agent-scribble-title {
+    @apply no-underline;
+  }
+
+  .apple .agent-sketch .agent-doodle-chip {
+    @apply rounded-xl border-white/50 bg-card/60 shadow-none backdrop-blur-xl;
+  }
+
+  .apple .agent-sketch .agent-sketched-button {
+    @apply rounded-full border-transparent bg-primary text-primary-foreground shadow-sm;
+  }
+
+  .apple .agent-sketch .agent-sketched-button:hover {
+    @apply bg-primary/90 shadow-sm;
+  }
+
+  .apple .agent-sketch .agent-sketched-input {
+    @apply rounded-xl border-input bg-card/70 shadow-none backdrop-blur-xl;
+  }
+}

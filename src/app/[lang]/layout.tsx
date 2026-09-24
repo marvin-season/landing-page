@@ -60,7 +60,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${lora.className} min-h-dvh antialiased shinchan:font-sans!`}
+        className={`${lora.className} min-h-dvh antialiased shinchan:font-sans! apple:font-sans!`}
       >
         <LinguiClientProvider
           initialLocale={lang}

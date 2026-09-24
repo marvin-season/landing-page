@@ -22,7 +22,7 @@ export default function GradientText({
 
   return (
     <span
-      className={`${cn("z-2 text-transparent cursor-pointer bg-cover shinchan:text-primary shinchan:bg-none!", className)}`}
+      className={`${cn("z-2 text-transparent cursor-pointer bg-cover shinchan:text-primary shinchan:bg-none! apple:text-primary apple:bg-none!", className)}`}
       style={{
         ...gradientStyle,
         backgroundClip: "text",

@@ -5,7 +5,7 @@ import { changelogReleases } from "./changelog-data";
 
 export function ChangelogContent() {
   return (
-    <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
+    <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent apple:bg-transparent">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <Link
           href="/"
@@ -65,7 +65,7 @@ export function ChangelogContent() {
                 >
                   <Icon className="size-3.5" />
                 </span>
-                <article className="rounded-xl border border-border/60 bg-card/80 p-5 shadow-sm sm:p-6 shinchan:matte-surface">
+                <article className="rounded-xl border border-border/60 bg-card/80 p-5 shadow-sm sm:p-6 shinchan:matte-surface apple:glass-surface">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full border border-primary/25 bg-primary/5 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-primary">
                       {release.version}
@@ -115,7 +115,7 @@ export function ChangelogContent() {
           href="/knowledge"
           eventName="Changelog CTA Click"
           eventProperties={{ target: "knowledge", location: "changelog" }}
-          className="group inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
+          className="group inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm apple:shadow-sm apple:hover:shadow-sm"
         >
           <Trans>Open Docs workspace</Trans>
           <ArrowRight
