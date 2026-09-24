@@ -47,7 +47,7 @@ flowchart TB
 | `packages/design-system` | 原子组件（`@landing-page/design-system`） |
 | `packages/biz-ui` | 可复用业务组合件（`@landing-page/biz-ui`）；按需抽取，不批量迁移 |
 | `packages/utils` | 共享工具（`@landing-page/utils`） |
-| `src/styles/` | 全局样式入口、token、主题与页面特征样式 |
+| `src/styles/` | 全局样式入口、主题（light / dark / shinchan / apple）与页面特征样式 |
 | `src/lib/` | 工具函数、i18n 封装、chat/stream、tRPC 客户端封装等 |
 | `src/locales/` | Lingui 编译产物与 `.po` 源（按语言分文件） |
 | `server/` | tRPC `appRouter` 及各子路由（user / model / thread） |

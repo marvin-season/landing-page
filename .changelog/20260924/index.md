@@ -1,4 +1,4 @@
-# 移除 PPT 与交易记录，授权页纳入多语言，新增 Apple 主题并整理样式目录
+# 移除 PPT 与交易记录，授权页纳入多语言，整理四套主题目录
 
 ## 彻底移除 PPT 相关代码 (本地时间 09:46:00)
 - **文件**: `src/app/admin/ppt/`、`src/app/api/ppt/`、`src/store/`、`mastra-server/agents/ppt-agent.ts`、`mastra-server/lib/ppt.ts`、`src/lib/constant/agent.ts`、`mastra-server/index.ts`、`src/app/[lang]/(home)/data/home-data.tsx`、`docs/architecture.md`、`docs/tech-stack.md`、`README.md`、`AGENTS.md`、`src/locales/*`
@@ -29,3 +29,8 @@
 - **文件**: `src/styles/`、各 layout / `error.tsx` / `not-found.tsx`、`components.json`、`AGENTS.md`、`docs/architecture.md`
 - **修改内容**: `src/css` 重命名为 `src/styles`。`zone.css` 改为 `tokens.css`，主题放进 `themes/`，首页与 agent 样式放进 `features/`。`globals.css` 只做入口；agent 不再单独引入 sketch 样式。
 - **原因/上下文**: 用户认为 css 目录文件杂乱，要求改名并整理。
+
+## Light / Dark 拆进 themes (本地时间 11:00:12)
+- **文件**: `src/styles/tokens.css`、`src/styles/themes/light.css`、`src/styles/themes/dark.css`、`src/styles/globals.css`、`docs/architecture.md`
+- **修改内容**: 删除 `tokens.css`。浅色、深色分别放到 `themes/light.css`、`themes/dark.css`，和 shinchan、apple 并列。
+- **原因/上下文**: 目录看起来像只有两套主题，实际 Light / Dark 也是主题。

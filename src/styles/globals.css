@@ -1,9 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./tokens.css";
 @import "./base.css";
 @import "./features/home.css";
 @import "./features/agent-sketch.css";
+@import "./themes/light.css";
+@import "./themes/dark.css";
 @import "./themes/shinchan.css";
 @import "./themes/apple.css";
 @source "../../packages/design-system/src";
