@@ -91,7 +91,7 @@ flowchart TB
 
 - NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。
 - JWT session，8 小时；`session.user.id` 为登录账号。
-- 唯一认证页是 `/auth`。`/auth/signin` 与 `/auth/resume` 只做兼容跳转。
+- 唯一认证页是 `/auth`。
 - 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置；未登录访问时 `src/proxy.ts` 跳到 `/auth?returnTo=...`。
 
 ### 3.4 管理 `src/app/admin/`
