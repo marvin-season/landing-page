@@ -34,7 +34,7 @@ export const useLanguage = (currentLang?: string) => {
    */
   const changeLanguage = (locale: string) => {
     const newPath = buildLanguagePath(locale);
-    router.push(newPath);
+    router.push(`${newPath}${window.location.search}${window.location.hash}`);
   };
 
   return {

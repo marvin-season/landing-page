@@ -75,6 +75,19 @@ msgstr "Ask about your document…"
 msgid "Assistant"
 msgstr "Assistant"
 
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr "Authorization required"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr "Authorize and continue"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr "Authorizing…"
+
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
@@ -489,6 +502,10 @@ msgstr "Page {0}"
 msgid "Page number"
 msgstr "Page number"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr "Password"
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "PDF citation highlight"
@@ -652,9 +669,18 @@ msgstr "The assistant only receives the quoted passage and your instruction."
 msgid "The sample could not be loaded. Please try again."
 msgstr "The sample could not be loaded. Please try again."
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr "The username or password is incorrect. Try again."
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "Thinking…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr "This content requires authorization. Enter your username and password to continue."
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -768,6 +794,10 @@ msgstr "Unlock PDF"
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
 msgid "Upload document"
 msgstr "Upload document"
+
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr "Username"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"

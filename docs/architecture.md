@@ -77,7 +77,7 @@ flowchart TB
 ### 3.1 多语言站点 `src/app/[lang]/`
 
 - 动态段 `[lang]` 与 `src/lib/i18n/locales.ts` 中的 `locales` 对齐；`generateStaticParams` 在根 layout 中为每种语言生成静态参数。`lingui.config.ts` 从同一文件读取。
-- 子路由示例：`(home)/` 首页、`resume/` 简历页等。
+- 子路由示例：`(home)/` 首页、`resume/` 简历页、`auth/` 授权页等。
 - 根 layout 负责：`Lingui` 服务端/客户端、`ThemeProvider`、全局样式与 `SettingsMenu`。
 
 ### 3.2 Agent `src/app/agent/`
@@ -87,12 +87,13 @@ flowchart TB
 - 挂载 `TankQueryClientProvider`（tRPC + React Query），侧边栏与 `ChatModeSwitcher`。
 - 动态线程页：`agent/[threadId]/page.tsx`。
 
-### 3.3 认证 `src/app/auth/`
+### 3.3 认证 `src/app/[lang]/auth/`
 
 - NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。
 - JWT session，8 小时；`session.user.id` 为登录账号。
-- 唯一认证页是 `/auth`。
-- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置；未登录访问时 `src/proxy.ts` 跳到 `/auth?returnTo=...`。
+- 唯一认证页在 `[lang]/auth`。英文无前缀，公开地址是 `/auth`；其他语言是 `/{lang}/auth`。`pages.signIn` 仍是 `/auth`。
+- `/auth/signin` 与 `/auth/resume` 只做兼容跳转，并带上当前语言。
+- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置。未登录访问时 `src/proxy.ts` 跳到对应语言的 `/auth?returnTo=...`（例如 `/zh/resume` → `/zh/auth`）。认证页本身不在受保护列表里。
 
 ### 3.4 管理 `src/app/admin/`
 
@@ -101,7 +102,7 @@ flowchart TB
 ### 3.5 国际化与 `src/proxy.ts`
 
 - Next.js 16 使用 `src/proxy.ts` 作为请求拦截入口（不再需要根目录 `middleware.ts`）。
-- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent`，排除 `auth`），再做 `Accept-Language` locale 检测与重写。
+- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent` 和 `auth`），再做 locale 检测与重写。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
 
 ## 4. 数据层与 API
 

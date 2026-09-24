@@ -66,6 +66,29 @@ describe("getAuthorizationUrl", () => {
       "/auth?returnTo=%2F",
     );
   });
+
+  it("keeps the locale from a localized return path or an explicit locale", () => {
+    assert.equal(
+      getAuthorizationUrl("/zh/resume"),
+      "/zh/auth?returnTo=%2Fzh%2Fresume",
+    );
+    assert.equal(
+      getAuthorizationUrl("/agent", "ja"),
+      "/ja/auth?returnTo=%2Fagent",
+    );
+    assert.equal(
+      getAuthorizationUrl("/resume", "en"),
+      "/auth?returnTo=%2Fresume",
+    );
+    assert.equal(
+      getAuthorizationUrl("https://evil.test", "zh"),
+      "/zh/auth?returnTo=%2F",
+    );
+    assert.equal(
+      getAuthorizationUrl("/agent", "nope"),
+      "/auth?returnTo=%2Fagent",
+    );
+  });
 });
 
 describe("verifyCredentials", () => {

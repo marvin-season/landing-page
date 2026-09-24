@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { locales } from "@/lib/i18n/locales";
+import { isLocale, locales, sourceLocale } from "@/lib/i18n/locales";
 
 export type ProtectedPage = {
   path: string;
@@ -57,9 +57,22 @@ export function getSafeReturnTo(value: unknown) {
   return isProtectedPath(pathname) ? pathname : "/";
 }
 
-export function getAuthorizationUrl(returnTo: string) {
-  return `/auth?${new URLSearchParams({
-    returnTo: getSafeReturnTo(returnTo),
+function resolveAuthLocale(returnTo: string, locale?: string) {
+  if (locale && isLocale(locale)) return locale;
+
+  const first = normalizePathname(returnTo).split("/").filter(Boolean)[0];
+  if (first && isLocale(first)) return first;
+
+  return sourceLocale;
+}
+
+export function getAuthorizationUrl(returnTo: string, locale?: string) {
+  const safe = getSafeReturnTo(returnTo);
+  const resolved = resolveAuthLocale(safe, locale);
+  const prefix = resolved === sourceLocale ? "" : `/${resolved}`;
+
+  return `${prefix}/auth?${new URLSearchParams({
+    returnTo: safe,
   })}`;
 }
 

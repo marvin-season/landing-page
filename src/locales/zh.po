@@ -75,6 +75,19 @@ msgstr "针对文档提问…"
 msgid "Assistant"
 msgstr "助手"
 
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr "需要授权"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr "授权并继续"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr "正在授权…"
+
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
@@ -489,6 +502,10 @@ msgstr "第 {0} 页"
 msgid "Page number"
 msgstr "页码"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr "密码"
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "PDF 原文高亮"
@@ -652,9 +669,18 @@ msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr "账号或密码错误，请重试。"
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "正在思考…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr "此内容需要授权，请输入账号和密码后继续。"
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -768,6 +794,10 @@ msgstr "解锁 PDF"
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
 msgid "Upload document"
 msgstr "上传文档"
+
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr "账号"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"

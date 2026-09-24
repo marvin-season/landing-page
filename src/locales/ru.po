@@ -75,6 +75,19 @@ msgstr "Спросите о документе…"
 msgid "Assistant"
 msgstr "Ассистент"
 
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr ""
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr ""
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr ""
+
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
@@ -489,6 +502,10 @@ msgstr "Стр. {0}"
 msgid "Page number"
 msgstr "Номер страницы"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr ""
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "Подсветка цитаты в PDF"
@@ -652,9 +669,18 @@ msgstr "Ассистент получает только цитату и ваш�
 msgid "The sample could not be loaded. Please try again."
 msgstr "Не удалось загрузить образец. Попробуйте ещё раз."
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr ""
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "Думаю…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr ""
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -768,6 +794,10 @@ msgstr "Разблокировать PDF"
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:120
 msgid "Upload document"
 msgstr "Загрузить документ"
+
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr ""
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"

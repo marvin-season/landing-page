@@ -79,9 +79,9 @@ export const config = {
      * - favicon.ico (favicon file)
      * - manifest.json, robots.txt, sitemap.xml (SEO files)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Agent is included so the session gate can run. Auth stays excluded
-     * to avoid a redirect loop.
+     * Agent is included so the session gate can run. Auth lives under [lang]
+     * and is not a protected page, so the gate does not redirect it.
      */
-    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|auth|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };
