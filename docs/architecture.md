@@ -8,7 +8,7 @@
 
 - **营销 / 个人站点**：多语言落地页与简历等，路由在 `src/app/[lang]/` 下。
 - **Agent 对话**：`/agent` 下的聊天界面，依赖 NextAuth 登录、tRPC 管理线程、Mastra 流式对话。
-- **管理 / 演示**：`/admin` 下的 CRUD、PPT 画布等实验性功能。
+- **管理 / 演示**：`/admin` 下的 CRUD 等实验性功能。
 - **类型安全 API**：`server/` 中的 tRPC 路由，经 `src/app/api/trpc` 暴露。
 - **AI 运行时配置**：`mastra-server/` 中的 Mastra 实例、Agent、工具与工作流，被 API Route 与同进程 tRPC 直接引用。
 
@@ -48,7 +48,6 @@ flowchart TB
 | `packages/biz-ui` | 可复用业务组合件（`@landing-page/biz-ui`）；按需抽取，不批量迁移 |
 | `packages/utils` | 共享工具（`@landing-page/utils`） |
 | `src/lib/` | 工具函数、i18n 封装、chat/stream、tRPC 客户端封装等 |
-| `src/store/` | Zustand 状态（消息、会话、PPT、IndexedDB 持久化等） |
 | `src/locales/` | Lingui 编译产物与 `.po` 源（按语言分文件） |
 | `server/` | tRPC `appRouter` 及各子路由（user / model / thread） |
 | `mastra-server/` | Mastra 单例、agents、tools、workflows、storage |
@@ -94,7 +93,7 @@ flowchart TB
 
 ### 3.4 管理 `src/app/admin/`
 
-- 聚合入口、`crud`、`ppt`（Fabric 相关）及 catch-all `[...params]`。
+- 聚合入口、`crud` 及 catch-all `[...params]`。
 
 ### 3.5 国际化与 `src/proxy.ts`
 
@@ -121,7 +120,7 @@ flowchart TB
 
 ### 4.4 其他 API
 
-- 例如 `src/app/api/ppt/route.ts` 等，按功能拆分。
+- `src/app/api/knowledge/chat/route.ts`、`src/app/api/email/test/route.ts` 等，按功能拆分。
 
 ### 4.5 Next.js `rewrites`（`next.config.ts`）
 
@@ -132,12 +131,11 @@ flowchart TB
 
 详见 [mastra-server/README.md](../mastra-server/README.md)。要点：
 
-- `mastra-server/index.ts` 注册 agents（如 general、ppt）、workflow、LibSQL storage、日志与 observability。
+- `mastra-server/index.ts` 注册 agents（如 general、knowledge）、workflow、LibSQL storage、日志与 observability。
 - 与 Next 进程**同一 Node 运行时**内 import，无单独 HTTP 端口要求（与可选的 `localhost:7777` 外部服务不同）。
 
 ## 6. 前端状态与流式 UI
 
-- **Zustand**：`src/store/`（消息、会话、聊天设置、PPT、IDB 持久化等）。
 - **流式聊天**：`src/lib/stream/`、`use-chat-stream-state` 等与 AI SDK / Mastra 流对接。
 - **UI 栈**：Tailwind CSS 4、Radix、Framer Motion / Motion、GSAP、统一 Markdown（unified 管线）等。
 

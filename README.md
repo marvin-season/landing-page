@@ -14,7 +14,7 @@ Next.js 全栈落地页与 Agent 演示项目。版本以根目录 `package.json
 - [tRPC](https://trpc.io/) + [TanStack Query](https://tanstack.com/query/latest) — 类型安全 API
 - [Mastra](https://mastra.ai/) — Agent 运行时，见 [mastra-server/README.md](./mastra-server/README.md)
 - [Agno](https://agno.ai/) — 独立 Python Agent 服务，见 [agent-server/README.md](./agent-server/README.md)
-- [RxJS](https://rxjs.dev/) / [Zustand](https://zustand-demo.pmnd.rs/) — 响应式与客户端状态
+- [RxJS](https://rxjs.dev/) — 响应式流
 - [`@antfu/ni`](https://github.com/antfu/ni) + `corepack enable` — 包管理入口（本仓库为 pnpm）
 
 ## Architecture

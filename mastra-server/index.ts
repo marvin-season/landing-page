@@ -9,7 +9,6 @@ import { AgentConstant } from "~/mastra-server/constant";
 import { storage } from "~/mastra-server/storage";
 import { generalAgent } from "./agents/general-agent";
 import { knowledgeAgent } from "./agents/knowledge-agent";
-import { pptAgent } from "./agents/ppt-agent";
 import { weatherWorkflow } from "./workflows/weather-workflow";
 
 export const mastra = new Mastra({
@@ -17,7 +16,6 @@ export const mastra = new Mastra({
   agents: {
     [AgentConstant.GENERAL_AGENT]: generalAgent,
     [AgentConstant.KNOWLEDGE_AGENT]: knowledgeAgent,
-    [AgentConstant.PPT_AGENT]: pptAgent,
   },
   storage,
   logger: new PinoLogger({

@@ -25,7 +25,7 @@ msgstr "نظرة شاملة على خبرتي العملية ومشاريعي و
 msgid "A conversation with your document"
 msgstr "محادثة مع مستندك"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "قليل من المقالب وكثير من البهجة"
 
@@ -33,7 +33,7 @@ msgstr "قليل من المقالب وكثير من البهجة"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "وكيل معرفة Mastra يبث الرد؛ وضع الحد يمنع تداخل المحادثات"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "طفل مشاكس في الخامسة يحوّل الحياة اليومية إلى مغامرة."
@@ -42,15 +42,11 @@ msgstr "طفل مشاكس في الخامسة يحوّل الحياة اليوم
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "يمكن ترجمة المقطع المحدد أو تلخيصه دون إدراجه أولاً في حقل الكتابة. يتلقى وكيل المعرفة المقتطف والتعليمات فقط."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-msgid "A Simple PPT Generator"
-msgstr "مولّد عروض تقديمية بسيط"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:66
 msgid "About me in detail"
 msgstr "عني بالتفصيل"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:58
 msgid "Agent UI"
 msgstr "واجهة الوكيل"
 
@@ -79,7 +75,7 @@ msgstr "اسأل عن مستندك…"
 msgid "Assistant"
 msgstr "المساعد"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
 msgstr "العودة إلى الصفحة الرئيسية"
@@ -96,7 +92,7 @@ msgstr "أحضر مستنداً. ابدأ محادثة."
 msgid "Career"
 msgstr "المسار المهني"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:21
 msgid "Changelog"
 msgstr "سجل التغييرات"
 
@@ -116,7 +112,7 @@ msgstr "انقر اقتباساً من PDF للعودة إلى صفحته وإب
 msgid "Conversations can start with a sample citation for demos"
 msgstr "يمكن أن تبدأ المحادثات باقتباس تجريبي للعروض"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "كرايون شين-تشان"
@@ -125,7 +121,7 @@ msgstr "كرايون شين-تشان"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "أنشأت حل تدويل مبني على Vite وBabel"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:75
 msgid "Current"
 msgstr "الحالي"
 
@@ -139,11 +135,11 @@ msgstr "وضع الحد الافتراضي، لا يمكن تغييره"
 msgid "Default workspace"
 msgstr "مساحة العمل الافتراضية"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:100
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "التصميم ليس مجرد الشكل. التصميم هو طريقة العمل."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:74
 msgid "Design System & Component Libs"
 msgstr "نظام تصميم ومكتبات مكوّنات"
 
@@ -238,7 +234,7 @@ msgstr "نظرة عامة على قراءة المستندات"
 msgid "Document workspace"
 msgstr "مساحة عمل المستندات"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:48
+#: src/app/[lang]/(home)/data/home-data.tsx:47
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "وثائق عن تطوير الواجهات وتطبيقات الذكاء الاصطناعي والممارسات الهندسية"
 
@@ -262,7 +258,7 @@ msgstr "Enter للإرسال · Shift + Enter لسطر جديد · @ للإشا�
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "منصة مؤسسية متكاملة لبناء وإدارة تطبيقات الذكاء الاصطناعي، تجمع النموذج والبيانات والتطبيق والقدرة الحاسوبية."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "Experience, projects, and personal profile"
 msgstr "الخبرة والمشاريع والملف الشخصي"
 
@@ -277,10 +273,6 @@ msgstr "اعثر على كل اقتباس في سياقه"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "ملاءمة العرض"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:76
-msgid "Generate slide content in a structured workflow"
-msgstr "أنشئ محتوى الشرائح ضمن سير عمل منظم"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -394,11 +386,11 @@ msgstr "احتفظ بالمقاطع المهمة"
 msgid "Key Responsibilities"
 msgstr "المسؤوليات الرئيسية"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Knowledge"
 msgstr "المعرفة"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:99
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "استخلاص رؤى أكبر من بيانات أقل."
 
@@ -414,7 +406,7 @@ msgstr "جارٍ تحميل المعاينة…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "تحديد موضع اقتباس دون حفظ هندسة التحديد"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Main chat flow powered by Mastra"
 msgstr "تدفق المحادثة الرئيسي مدعوم من Mastra"
 
@@ -466,7 +458,7 @@ msgstr "افتح مستند PDF أو Markdown دون حساب. تصفّح صفح
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 msgstr "افتح ملف PDF أو Markdown دون حساب. حدّد مقاطع واحفظها كاقتباسات باسم المستند ورقم الصفحة، وابدأ من ملف عيّنة."
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:120
 msgid "Open Docs workspace"
 msgstr "فتح مساحة Docs"
 
@@ -521,8 +513,8 @@ msgstr "يرجى رفع ملف PDF أو Markdown."
 msgid "Previous page"
 msgstr "الصفحة السابقة"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
 msgstr "تحديثات المنتج"
@@ -563,7 +555,7 @@ msgstr "اقرأ واستكشف واطرح الأسئلة. مستنداتك وأ
 msgid "Reading document…"
 msgstr "جارٍ قراءة المستند…"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:36
 msgid "Release versions"
 msgstr "إصدارات الإصدار"
 
@@ -591,7 +583,7 @@ msgstr "السيرة الذاتية"
 msgid "Retry"
 msgstr "إعادة المحاولة"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:84
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "Reusable UI components and design references"
 msgstr "مكوّنات واجهة قابلة لإعادة الاستخدام ومراجع تصميم"
 
@@ -632,7 +624,7 @@ msgstr "إرسال الرسالة"
 msgid "Sentences"
 msgstr "جمل"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "شينوسكي نوهارا"
 
@@ -691,11 +683,11 @@ msgstr "تعذّر فتح ملف PDF هذا. جرّب ملفاً آخر."
 msgid "This PDF is password protected."
 msgstr "ملف PDF هذا محمي بكلمة مرور."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Three iterations of the Docs workspace"
 msgstr "ثلاث تكرارات لمساحة Docs"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:27
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "ثلاث إصدارات من مساحة Docs، من قراءة الملفات إلى اقتباس نص PDF ثم الذكاء الاصطناعي الذي يراعي التحديد."
@@ -787,7 +779,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "مطور ويب"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:26
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "مع عائلته وأصدقائه يملأ شين-تشان الأيام العادية بالمقالب والمفاجآت والضحك."
 

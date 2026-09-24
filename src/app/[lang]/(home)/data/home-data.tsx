@@ -5,7 +5,6 @@ import {
   FileUser,
   History,
   type LucideIcon,
-  Presentation,
   Shapes,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -68,14 +67,6 @@ export const navLinks: HomeNavLink[] = [
     description: <Trans>Experience, projects, and personal profile</Trans>,
     badge: "Profile",
     icon: FileUser,
-  },
-  {
-    href: "/admin/ppt",
-    analyticsId: "admin_ppt",
-    title: <Trans>A Simple PPT Generator</Trans>,
-    description: <Trans>Generate slide content in a structured workflow</Trans>,
-    badge: "Tool",
-    icon: Presentation,
   },
   {
     href: "https://marvin-season.github.io/registry-template/",

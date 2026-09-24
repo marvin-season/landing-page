@@ -25,7 +25,7 @@ msgstr ""
 msgid "A conversation with your document"
 msgstr "ドキュメントと対話する"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "ちょっぴりいたずら、たっぷり笑顔"
 
@@ -33,7 +33,7 @@ msgstr "ちょっぴりいたずら、たっぷり笑顔"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "Mastra のナレッジエージェントがストリーミングで返信。スロットルモードで会話の重なりを防ぎます"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の男の子。"
@@ -42,15 +42,11 @@ msgstr "何気ない毎日を冒険に変える、いたずら好きな5歳の�
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "引用を入力欄に入れなくても、選択した文章を翻訳・要約できます。ナレッジエージェントは抜粋と指示だけを受け取ります。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-msgid "A Simple PPT Generator"
-msgstr "シンプルなPPTジェネレーター"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:66
 msgid "About me in detail"
 msgstr "詳細な自己紹介"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:58
 msgid "Agent UI"
 msgstr "エージェントUI"
 
@@ -79,7 +75,7 @@ msgstr "ドキュメントについて質問…"
 msgid "Assistant"
 msgstr "アシスタント"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
 msgstr "ホームに戻る"
@@ -96,7 +92,7 @@ msgstr "ドキュメントを開いて、対話を始めましょう。"
 msgid "Career"
 msgstr "キャリア"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:21
 msgid "Changelog"
 msgstr "更新履歴"
 
@@ -116,7 +112,7 @@ msgstr "PDF の引用をクリックすると、該当ページに移動し、�
 msgid "Conversations can start with a sample citation for demos"
 msgstr "デモ用のサンプル引用から会話を開始できます"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "クレヨンしんちゃん"
@@ -125,7 +121,7 @@ msgstr "クレヨンしんちゃん"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite と Babel に基づく国際化ソリューションを作成"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:75
 msgid "Current"
 msgstr "現行"
 
@@ -139,11 +135,11 @@ msgstr ""
 msgid "Default workspace"
 msgstr "デフォルトのワークスペース"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:100
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "デザインは見た目だけではありません。デザインはどのように機能するかです。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:74
 msgid "Design System & Component Libs"
 msgstr "デザインシステムとコンポーネントライブラリ"
 
@@ -238,7 +234,7 @@ msgstr "ドキュメント閲覧の概要"
 msgid "Document workspace"
 msgstr "ドキュメントワークスペース"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:48
+#: src/app/[lang]/(home)/data/home-data.tsx:47
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "フロントエンド開発、AIアプリケーション、開発実践のドキュメント"
 
@@ -262,7 +258,7 @@ msgstr "Enter で送信 · Shift + Enter で改行 · @ でメンション"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "モデル、データ、アプリケーション、およびコンピューティングパワーを完全に統合したエンタープライズレベルのAIアプリケーションの一元的な構築と管理プラットフォーム。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "Experience, projects, and personal profile"
 msgstr "経験、プロジェクト、および個人プロフィール"
 
@@ -277,10 +273,6 @@ msgstr "引用の前後を確認する"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "幅に合わせる"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:76
-msgid "Generate slide content in a structured workflow"
-msgstr "構造化ワークフローでスライドコンテンツを生成"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -394,11 +386,11 @@ msgstr "大切な文章を残す"
 msgid "Key Responsibilities"
 msgstr "主要責任"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Knowledge"
 msgstr "ナレッジ"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:99
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "より少ないデータでより大きな洞察を生成する。"
 
@@ -414,7 +406,7 @@ msgstr "プレビューを読み込み中…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "選択範囲の座標を保存せずに引用を特定"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastraによるメインチャットフロー"
 
@@ -466,7 +458,7 @@ msgstr "ログインなしで PDF や Markdown を開けます。同じワーク
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 msgstr "アカウントなしで PDF または Markdown を開けます。段落を引用として文書名とページ番号付きで残し、サンプルから始められます。"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:120
 msgid "Open Docs workspace"
 msgstr "ドキュメントワークスペースを開く"
 
@@ -521,8 +513,8 @@ msgstr "PDF または Markdown ファイルをアップロードしてくださ�
 msgid "Previous page"
 msgstr "前のページ"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
 msgstr "プロダクト更新"
@@ -563,7 +555,7 @@ msgstr "読み、探り、質問する。ドキュメントと思考を並べて
 msgid "Reading document…"
 msgstr "ドキュメントを読み込み中…"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:36
 msgid "Release versions"
 msgstr "リリース一覧"
 
@@ -591,7 +583,7 @@ msgstr "履歴書"
 msgid "Retry"
 msgstr "再試行"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:84
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
@@ -632,7 +624,7 @@ msgstr "メッセージを送信"
 msgid "Sentences"
 msgstr "座右銘"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "野原しんのすけ"
 
@@ -691,11 +683,11 @@ msgstr "この PDF を開けませんでした。別のファイルをお試し�
 msgid "This PDF is password protected."
 msgstr "この PDF はパスワードで保護されています。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Three iterations of the Docs workspace"
 msgstr "Docs ワークスペースの3回のイテレーション"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:27
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Docs ワークスペースは3バージョンを公開済み。ファイル閲覧から PDF 原文の引用、選択テキストの AI まで。"
@@ -787,7 +779,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web開発者"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:26
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "家族や友だちと過ごすしんちゃんの毎日は、いたずらや思いがけない出来事、そしてたくさんの笑いでいっぱいです。"
 
