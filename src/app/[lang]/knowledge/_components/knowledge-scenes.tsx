@@ -80,7 +80,7 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
           }}
           className="h-full overflow-y-auto"
         >
-          <div className="mx-auto flex min-h-full w-full max-w-[1600px] flex-col gap-10 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
+          <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col gap-10 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
             {overview}
             <div className="mt-auto flex flex-col items-center gap-3 pb-2">
               <button
@@ -132,7 +132,7 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
             y: reducedMotion ? 0 : workspaceY,
             scale: reducedMotion ? 1 : workspaceScale,
           }}
-          className="mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col gap-3 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-8 sm:pt-4 sm:pb-6"
+          className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col gap-3 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-8 sm:pt-4 sm:pb-6"
         >
           <button
             type="button"
