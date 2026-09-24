@@ -434,7 +434,7 @@ function UserFooter({
           variant="ghost"
           size="sm"
           className="mt-3 w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
-          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          onClick={() => signOut({ callbackUrl: "/auth" })}
         >
           <LogOut className="size-4" />
           退出登录
@@ -478,7 +478,7 @@ function DesktopCollapsedContent({
         ) : (
           <DesktopRailButton
             label="退出登录"
-            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+            onClick={() => signOut({ callbackUrl: "/auth" })}
           >
             <LogOut className="size-4" />
           </DesktopRailButton>
@@ -540,7 +540,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
-                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
                 退出登录
@@ -582,7 +582,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
-                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
                 退出登录
