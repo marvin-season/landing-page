@@ -94,7 +94,7 @@ flowchart TB
 - JWT session，8 小时；`session.user.id` 为登录账号。
 - 唯一认证页在 `[lang]/auth`。英文无前缀，公开地址是 `/auth`；其他语言是 `/{lang}/auth`。`pages.signIn` 仍是 `/auth`。
 - `/auth/signin` 与 `/auth/resume` 只做兼容跳转，并带上当前语言。
-- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置。未登录访问时 `src/proxy.ts` 跳到对应语言的 `/auth?returnTo=...`（例如 `/zh/resume` → `/zh/auth`）。认证页本身不在受保护列表里。
+- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置。未登录访问时 `src/proxy.ts` 跳到对应语言的 `/auth?returnTo=...`（例如 `/zh/resume` → `/zh/auth`）。认证页本身不在受保护列表里。完整路径见 [auth.md](./auth.md)。
 
 ### 3.4 管理 `src/app/[lang]/admin/`
 
@@ -159,6 +159,7 @@ flowchart TB
 
 ## 9. 相关文档
 
+- [授权路径](./auth.md)
 - [技术栈清单](./tech-stack.md)
 - [i18n](./i18n.md)
 - [Mastra 目录说明](../mastra-server/README.md)

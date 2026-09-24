@@ -7,6 +7,7 @@
 | [README.md](../README.md) | 人 / Agent | 项目简介、技术栈、快速开始 |
 | [AGENTS.md](../AGENTS.md) | Agent | Cursor 规则、Skills、文档与子系统入口 |
 | [docs/architecture.md](./architecture.md) | 人 / Agent | 架构总览、目录、tRPC、Mastra、路由 |
+| [docs/auth.md](./auth.md) | 人 / Agent | 登录、页面门闩、角色与 API 鉴权 |
 | [docs/tech-stack.md](./tech-stack.md) | 人 | 技术栈表（版本以 package.json 为准） |
 | [docs/i18n.md](./i18n.md) | 人 / Agent | Lingui 与国际化流程 |
 | [.changelog/README.md](../.changelog/README.md) | 人 | 变更历史目录约定（摘要） |
