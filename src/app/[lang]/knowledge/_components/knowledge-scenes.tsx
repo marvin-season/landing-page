@@ -80,7 +80,7 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
           }}
           className="h-full overflow-y-auto"
         >
-          <div className="mx-auto flex min-h-full w-full max-w-[1600px] flex-col gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
+          <div className="mx-auto flex min-h-full w-full max-w-[1600px] flex-col gap-10 px-5 py-8 sm:px-8 sm:py-10 lg:py-12">
             {overview}
             <div className="mt-auto flex flex-col items-center gap-3 pb-2">
               <button
@@ -89,10 +89,7 @@ export function KnowledgeScenes({ overview }: { overview: ReactNode }) {
                 className="flex flex-col items-center gap-3 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Trans>Scroll down to read and quote your document</Trans>
-                <span
-                  aria-hidden="true"
-                  className="flex flex-col items-center"
-                >
+                <span aria-hidden="true" className="flex flex-col items-center">
                   {[0, 1].map((layer) => (
                     <motion.span
                       key={layer}

@@ -79,3 +79,8 @@
 - **文件**: `src/app/[lang]/admin/users/_components/users-list.tsx`、`user-account-card.tsx`、`create-user-card.tsx`、`users-page-ui.tsx`、`roles.ts`、`format-user-time.ts`
 - **修改内容**: 去掉一排同质卡片。账号列表改成可搜索、按角色筛选的目录；桌面端左侧点选、右侧改密或新建，移动端用底部抽屉。相对时间、首字母头像、`/` 聚焦搜索、方向键切换选中。
 - **原因/上下文**: 用户认为账号列表没有设计和交互。
+
+## Knowledge 文档会话写入 sessionStorage (本地时间 16:55:00)
+- **文件**: `src/app/[lang]/knowledge/_components/use-document-session.ts`、`document-session-storage.ts`
+- **修改内容**: 用 ahooks `useSessionStorageState` 在当前标签页保留已打开的文档。Sample 只存路径，刷新后重新拉取；用户上传的 Markdown 和不超过约 3.5 MB 的 PDF 写入 session。关闭标签页或点移除会清空。
+- **原因/上下文**: 刷新页面会丢掉上次打开的文件（含 sample），用户要求用 ahooks 的 session hook 在客户端保留状态。

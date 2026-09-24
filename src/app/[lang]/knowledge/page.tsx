@@ -56,7 +56,7 @@ export default async function KnowledgePage({ params }: PageLangParam) {
           </header>
 
           <section
-            className="grid gap-5 border-t border-border/60 pt-6 sm:grid-cols-3 sm:gap-8"
+            className="grid gap-5 border-t border-border/60 pt-8 sm:grid-cols-3 sm:gap-8"
             aria-label={i18n._(msg`Read and explore documents`)}
           >
             <article className="space-y-3">

@@ -1,10 +1,12 @@
 "use client";
 
 import { useLingui } from "@lingui/react/macro";
+import { useSessionStorageState } from "ahooks";
 import {
   type DragEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -16,6 +18,16 @@ import {
   readMarkdownSource,
 } from "./document/model";
 import { type SampleDocument, sampleFileType } from "./document/samples";
+import {
+  canPersistUpload,
+  createSampleSnapshot,
+  createUploadSnapshot,
+  DOCUMENT_SESSION_KEY,
+  documentFromUpload,
+  findStoredSample,
+  type PersistedDocument,
+  parsePersistedDocument,
+} from "./document-session-storage";
 
 export function useDocumentSession() {
   const { t } = useLingui();
@@ -24,11 +36,25 @@ export function useDocumentSession() {
   const sampleRequest = useRef<AbortController | null>(null);
   const activeDocumentId = useRef<string | null>(null);
   const dragDepth = useRef(0);
+  const [persisted, setPersisted] = useSessionStorageState<
+    PersistedDocument | undefined
+  >(DOCUMENT_SESSION_KEY, {
+    defaultValue: undefined,
+    getInitialValueInEffect: true,
+    deserializer: parsePersistedDocument,
+    onError() {},
+  });
   const [source, setSource] = useState<KnowledgeDocument | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [documentError, setDocumentError] = useState<string | null>(null);
   const [reading, setReading] = useState(false);
   const [dragging, setDragging] = useState(false);
+
+  const restoredUpload = useMemo(() => {
+    if (source || persisted?.origin !== "upload") return null;
+    return documentFromUpload(persisted);
+  }, [persisted, source]);
+  const resolvedSource = source ?? restoredUpload;
 
   useEffect(
     () => () => {
@@ -38,7 +64,65 @@ export function useDocumentSession() {
     [],
   );
 
-  const sourceId = source?.id;
+  useEffect(() => {
+    if (resolvedSource) activeDocumentId.current = resolvedSource.id;
+  }, [resolvedSource]);
+
+  const restoreSampleId =
+    resolvedSource || persisted?.origin !== "sample" ? undefined : persisted.id;
+  const restoreSamplePath =
+    resolvedSource || persisted?.origin !== "sample"
+      ? undefined
+      : persisted.path;
+
+  useEffect(() => {
+    if (!restoreSampleId || !restoreSamplePath) return;
+    const sample = findStoredSample(restoreSamplePath);
+    const version = ++uploadVersion.current;
+    sampleRequest.current?.abort();
+    const controller = new AbortController();
+    sampleRequest.current = controller;
+    setUploadError(null);
+    setReading(true);
+
+    void (async () => {
+      try {
+        if (!sample) throw new Error("sample");
+        const response = await fetch(sample.path, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Sample unavailable");
+        const blob = await response.blob();
+        if (uploadVersion.current !== version) return;
+        const file = new File([blob], sample.name, {
+          type: sampleFileType(sample.kind),
+        });
+        const kind = getDocumentKind(file.name);
+        if (!kind) return;
+        const payload =
+          kind === "markdown"
+            ? { kind, markdown: await readMarkdownSource(file) }
+            : { kind };
+        if (uploadVersion.current !== version) return;
+        setSource(createKnowledgeDocument(restoreSampleId, file, payload));
+        setDocumentError(null);
+      } catch {
+        if (uploadVersion.current === version && !controller.signal.aborted) {
+          setPersisted(undefined);
+          setUploadError(t`The sample could not be loaded. Please try again.`);
+        }
+      } finally {
+        if (uploadVersion.current === version) {
+          sampleRequest.current = null;
+          setReading(false);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [restoreSampleId, restoreSamplePath, setPersisted, t]);
+
+  const sourceId = resolvedSource?.id;
   const onDocumentError = useCallback(
     (message: string) => {
       if (activeDocumentId.current === sourceId) setDocumentError(message);
@@ -55,7 +139,24 @@ export function useDocumentSession() {
     return version;
   }
 
-  async function readFile(file: File, version: number) {
+  async function persistUpload(document: KnowledgeDocument, version: number) {
+    if (!canPersistUpload(document)) {
+      if (uploadVersion.current === version) setPersisted(undefined);
+      return;
+    }
+    try {
+      const snapshot = await createUploadSnapshot(document);
+      if (uploadVersion.current === version) setPersisted(snapshot);
+    } catch {
+      if (uploadVersion.current === version) setPersisted(undefined);
+    }
+  }
+
+  async function readFile(
+    file: File,
+    version: number,
+    id = crypto.randomUUID(),
+  ) {
     const kind = getDocumentKind(file.name);
     if (!kind) return;
     const payload =
@@ -63,10 +164,35 @@ export function useDocumentSession() {
         ? { kind, markdown: await readMarkdownSource(file) }
         : { kind };
     if (uploadVersion.current !== version) return;
-    const next = createKnowledgeDocument(crypto.randomUUID(), file, payload);
+    const next = createKnowledgeDocument(id, file, payload);
     activeDocumentId.current = next.id;
     setSource(next);
     setDocumentError(null);
+    return next;
+  }
+
+  async function loadSample(
+    sample: SampleDocument,
+    version: number,
+    id: string,
+  ) {
+    const controller = new AbortController();
+    sampleRequest.current = controller;
+    try {
+      const response = await fetch(sample.path, { signal: controller.signal });
+      if (!response.ok) throw new Error("Sample unavailable");
+      const blob = await response.blob();
+      if (uploadVersion.current !== version) return;
+      return await readFile(
+        new File([blob], sample.name, {
+          type: sampleFileType(sample.kind),
+        }),
+        version,
+        id,
+      );
+    } finally {
+      if (uploadVersion.current === version) sampleRequest.current = null;
+    }
   }
 
   async function upload(files: FileList | File[]) {
@@ -94,7 +220,8 @@ export function useDocumentSession() {
     }
     const version = beginLoad();
     try {
-      await readFile(file, version);
+      const next = await readFile(file, version);
+      if (next) await persistUpload(next, version);
     } catch {
       if (uploadVersion.current === version)
         setUploadError(
@@ -110,6 +237,7 @@ export function useDocumentSession() {
     sampleRequest.current?.abort();
     sampleRequest.current = null;
     activeDocumentId.current = null;
+    setPersisted(undefined);
     setSource(null);
     setUploadError(null);
     setDocumentError(null);
@@ -118,33 +246,22 @@ export function useDocumentSession() {
 
   async function openSample(sample: SampleDocument) {
     const version = beginLoad();
-    const controller = new AbortController();
-    sampleRequest.current = controller;
     try {
-      const response = await fetch(sample.path, { signal: controller.signal });
-      if (!response.ok) throw new Error("Sample unavailable");
-      const blob = await response.blob();
-      if (uploadVersion.current !== version) return;
-      await readFile(
-        new File([blob], sample.name, {
-          type: sampleFileType(sample.kind),
-        }),
-        version,
-      );
+      const next = await loadSample(sample, version, crypto.randomUUID());
+      if (next && uploadVersion.current === version) {
+        setPersisted(createSampleSnapshot(next.id, sample));
+      }
     } catch {
-      if (uploadVersion.current === version && !controller.signal.aborted) {
+      if (uploadVersion.current === version) {
         setUploadError(t`The sample could not be loaded. Please try again.`);
       }
     } finally {
-      if (uploadVersion.current === version) {
-        sampleRequest.current = null;
-        setReading(false);
-      }
+      if (uploadVersion.current === version) setReading(false);
     }
   }
 
   return {
-    source,
+    source: resolvedSource,
     uploadError,
     documentError,
     reading,
