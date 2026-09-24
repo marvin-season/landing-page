@@ -2,9 +2,18 @@ import { type Client, createClient } from "@libsql/client";
 import { hashPassword, verifyPassword } from "./password";
 import { isCreatableRole, isUserRole, type UserRole } from "./roles";
 
+export type AuthStoreErrorCode =
+  | "storage_not_configured"
+  | "user_not_found"
+  | "user_already_exists"
+  | "username_empty"
+  | "password_empty"
+  | "role_not_creatable"
+  | "invalid_role";
+
 export class AuthStoreError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(readonly code: AuthStoreErrorCode) {
+    super(code);
     this.name = "AuthStoreError";
   }
 }
@@ -36,7 +45,7 @@ export function getAuthDb() {
 
   const url = process.env.TURSO_DATABASE_URL;
   if (!url) {
-    throw new AuthStoreError("storage is not configured");
+    throw new AuthStoreError("storage_not_configured");
   }
 
   db = createClient({
@@ -48,7 +57,7 @@ export function getAuthDb() {
 
 function parseUserRole(value: unknown): UserRole {
   if (isUserRole(value)) return value;
-  throw new AuthStoreError("invalid role");
+  throw new AuthStoreError("invalid_role");
 }
 
 function rowToUser(row: {
@@ -153,16 +162,16 @@ export async function createUser(
   role: UserRole,
 ) {
   const name = username.trim();
-  if (!name) throw new AuthStoreError("username is empty");
-  if (!password) throw new AuthStoreError("password is empty");
-  if (!isCreatableRole(role)) throw new AuthStoreError("role is not creatable");
+  if (!name) throw new AuthStoreError("username_empty");
+  if (!password) throw new AuthStoreError("password_empty");
+  if (!isCreatableRole(role)) throw new AuthStoreError("role_not_creatable");
 
   const client = await ensureReady();
   const existing = await client.execute({
     sql: "SELECT username FROM auth_users WHERE username = ?",
     args: [name],
   });
-  if (existing.rows[0]) throw new AuthStoreError("user already exists");
+  if (existing.rows[0]) throw new AuthStoreError("user_already_exists");
 
   const updatedAt = new Date().toISOString();
   await client.execute({
@@ -181,7 +190,7 @@ export async function createUser(
 }
 
 export async function updateUserPassword(username: string, password: string) {
-  if (!password) throw new AuthStoreError("password is empty");
+  if (!password) throw new AuthStoreError("password_empty");
 
   const client = await ensureReady();
   const existing = await client.execute({
@@ -189,7 +198,7 @@ export async function updateUserPassword(username: string, password: string) {
     args: [username],
   });
   const row = existing.rows[0];
-  if (!row) throw new AuthStoreError("user not found");
+  if (!row) throw new AuthStoreError("user_not_found");
 
   const updatedAt = new Date().toISOString();
   await client.execute({
