@@ -69,3 +69,8 @@
 - **文件**: `src/app/[lang]/admin/`、`src/app/admin/`、`src/lib/page-auth.ts`、`src/lib/page-auth.test.ts`、`src/lib/i18n/locales.ts`、`src/proxy.ts`、`docs/architecture.md`、`AGENTS.md`、`docs/README.md`
 - **修改内容**: 管理页从独立根布局挪到 `[lang]/admin`，沿用站点语言、主题和设置菜单。英文仍是 `/admin`，其他语言是 `/{lang}/admin`。未登录访问时跳到对应语言的授权地址。
 - **原因/上下文**: 用户要求把 admin 移入 `[lang]`。
+
+## 去掉 AdminShell 抽取 (本地时间 14:05:54)
+- **文件**: `src/app/[lang]/admin/layout.tsx`、`src/app/[lang]/admin/page.tsx`、`src/app/[lang]/admin/users/page.tsx`、`src/app/[lang]/admin/_components/admin-shell.tsx`
+- **修改内容**: 删除复用的 `AdminShell`。页面壳放到 `admin/layout.tsx`，入口页和账号页各自写标题；账号页用返回链接回到父级 `/admin`。
+- **原因/上下文**: admin 本身就是 `admin/users` 的父级路由，不必再抽一层壳。

@@ -9,5 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: PropsWithChildren) {
-  return <TankQueryClientProvider>{children}</TankQueryClientProvider>;
+  return (
+    <TankQueryClientProvider>
+      <main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-6 py-20">
+        {children}
+      </main>
+    </TankQueryClientProvider>
+  );
 }
