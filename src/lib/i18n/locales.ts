@@ -46,6 +46,29 @@ export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
 
+const unlocalizedRoots = new Set([
+  "admin",
+  "agent",
+  "agui",
+  "api",
+  "auth",
+  "pdfjs",
+]);
+
+/** Prefix an internal path with the current locale. `en` stays unprefixed. */
+export function withLocalePrefix(href: string, locale: string): string {
+  if (!href.startsWith("/") || href.startsWith("//")) return href;
+
+  const path = href.split(/[?#]/, 1)[0] ?? href;
+  const suffix = href.slice(path.length);
+  const first = path.split("/").filter(Boolean)[0];
+
+  if (first && (isLocale(first) || unlocalizedRoots.has(first))) return href;
+  if (locale === sourceLocale) return href;
+  if (path === "/") return `/${locale}${suffix}`;
+  return `/${locale}${path}${suffix}`;
+}
+
 export function getLocaleDir(locale: string): "ltr" | "rtl" {
   return (rtlLocales as readonly string[]).includes(locale) ? "rtl" : "ltr";
 }

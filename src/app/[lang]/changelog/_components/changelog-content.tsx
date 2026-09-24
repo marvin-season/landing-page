@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { ArrowLeft, ArrowRight, History } from "lucide-react";
 import Link from "next/link";
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { withLocalePrefix } from "@/lib/i18n/locales";
 import { changelogReleases } from "./changelog-data";
 
 export function ChangelogContent({ lang }: { lang: string }) {
@@ -9,7 +10,7 @@ export function ChangelogContent({ lang }: { lang: string }) {
     <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <Link
-          href={`/${lang}`}
+          href={withLocalePrefix("/", lang)}
           className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />

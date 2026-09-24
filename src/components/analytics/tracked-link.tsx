@@ -3,6 +3,8 @@
 import { track } from "@vercel/analytics/react";
 import Link, { type LinkProps } from "next/link";
 import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { useLanguage } from "@/hooks/use-language";
+import { withLocalePrefix } from "@/lib/i18n/locales";
 
 type AnalyticsProperties = Record<
   string,
@@ -16,20 +18,35 @@ type TrackedLinkProps = LinkProps &
     eventProperties?: AnalyticsProperties;
   };
 
+function localizeHref(
+  href: LinkProps["href"],
+  locale: string,
+): LinkProps["href"] {
+  if (typeof href === "string") return withLocalePrefix(href, locale);
+  if (href.pathname) {
+    return { ...href, pathname: withLocalePrefix(href.pathname, locale) };
+  }
+  return href;
+}
+
 export function TrackedLink({
   children,
   eventName,
   eventProperties,
+  href,
   onClick,
   ...props
 }: TrackedLinkProps) {
+  const { currentLanguage } = useLanguage();
+  const localizedHref = localizeHref(href, currentLanguage);
+
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     track(eventName, eventProperties);
     onClick?.(event);
   }
 
   return (
-    <Link {...props} onClick={handleClick}>
+    <Link {...props} href={localizedHref} onClick={handleClick}>
       {children}
     </Link>
   );

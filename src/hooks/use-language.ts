@@ -1,7 +1,12 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { availableLocales, isLocale, sourceLocale } from "@/lib/i18n/locales";
+import {
+  availableLocales,
+  isLocale,
+  sourceLocale,
+  withLocalePrefix,
+} from "@/lib/i18n/locales";
 
 /**
  * 语言切换 Hook
@@ -21,8 +26,7 @@ export const useLanguage = (currentLang?: string) => {
    */
   const buildLanguagePath = (locale: string) => {
     const tail = rest.join("/");
-    if (locale === sourceLocale) return tail ? `/${tail}` : "/";
-    return tail ? `/${locale}/${tail}` : `/${locale}`;
+    return withLocalePrefix(tail ? `/${tail}` : "/", locale);
   };
 
   /**

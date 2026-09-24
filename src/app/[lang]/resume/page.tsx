@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { PageLangParam } from "@/lib/i18n/appRouterI18n";
+import { withLocalePrefix } from "@/lib/i18n/locales";
 import {
   getResumeAuthorizationUrl,
   hasResumeAccess,
@@ -14,7 +15,7 @@ export default async function ResumePage({ params }: PageLangParam) {
   const { lang } = await params;
   const cookieStore = await cookies();
   if (!hasResumeAccess(cookieStore.get(resumeCookieName)?.value)) {
-    redirect(getResumeAuthorizationUrl(`/${lang}/resume`));
+    redirect(getResumeAuthorizationUrl(withLocalePrefix("/resume", lang)));
   }
 
   return (
