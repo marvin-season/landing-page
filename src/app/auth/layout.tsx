@@ -6,8 +6,9 @@ import { brandedTitle, SITE_NAME } from "@/lib/site";
 import "@/css/globals.css";
 
 export const metadata: Metadata = {
-  title: brandedTitle(`Sign in · ${SITE_NAME}`),
-  description: "Sign in to continue",
+  title: brandedTitle(`授权 · ${SITE_NAME}`),
+  description: "Authorize to continue",
+  robots: { index: false, follow: false, noarchive: true },
 };
 
 export default function AuthLayout({
