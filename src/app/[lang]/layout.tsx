@@ -12,7 +12,7 @@ import {
   type PageLangParam,
 } from "@/lib/i18n/appRouterI18n";
 import { getLocaleDir, locales } from "@/lib/i18n/locales";
-import "@/css/globals.css";
+import "@/styles/globals.css";
 import { LocatorRuntime } from "@/components/locator-runtime";
 import { PageFade } from "@/components/page-transition/page-fade";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";

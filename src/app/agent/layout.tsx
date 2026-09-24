@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import "@/css/globals.css";
-import "@/css/agent-sketch.css";
+import "@/styles/globals.css";
 import { AgentSidebar } from "@/app/agent/_components/AgentSidebar";
 import { auth } from "@/auth";
 import { LocatorRuntime } from "@/components/locator-runtime";

@@ -1,5 +1,5 @@
 import { Link } from "@/components/link/link";
-import "@/css/globals.css";
+import "@/styles/globals.css";
 
 export default function NotFound() {
   return (

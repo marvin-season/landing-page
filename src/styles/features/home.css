@@ -1,6 +1,20 @@
-@import "tailwindcss";
+@theme {
+  --animate-home-avatar-walk: home-avatar-walk 0.9s ease-in-out infinite;
 
-/* BookClient 子元素样式 - 使用 Tailwind 工具类定义可复用样式 */
+  @keyframes home-avatar-walk {
+    0%,
+    100% {
+      transform: translate(-2px, 0) rotate(-3deg);
+    }
+    25%,
+    75% {
+      transform: translate(0, -3px) rotate(0deg);
+    }
+    50% {
+      transform: translate(2px, 0) rotate(3deg);
+    }
+  }
+}
 
 @layer components {
   @keyframes home-navigation-scroll {
