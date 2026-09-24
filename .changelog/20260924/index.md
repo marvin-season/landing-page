@@ -1,4 +1,4 @@
-# 授权用户迁到 Turso，整理 admin 账号交互；授权页与管理页移入 [lang]
+# 授权用户迁到 Turso，整理 admin 账号交互；账号页改成目录式左右栏
 
 ## 彻底移除 PPT 相关代码 (本地时间 09:46:00)
 - **文件**: `src/app/admin/ppt/`、`src/app/api/ppt/`、`src/store/`、`mastra-server/agents/ppt-agent.ts`、`mastra-server/lib/ppt.ts`、`src/lib/constant/agent.ts`、`mastra-server/index.ts`、`src/app/[lang]/(home)/data/home-data.tsx`、`docs/architecture.md`、`docs/tech-stack.md`、`README.md`、`AGENTS.md`、`src/locales/*`
@@ -74,3 +74,8 @@
 - **文件**: `src/app/[lang]/admin/layout.tsx`、`src/app/[lang]/admin/page.tsx`、`src/app/[lang]/admin/users/page.tsx`、`src/app/[lang]/admin/_components/admin-shell.tsx`
 - **修改内容**: 删除复用的 `AdminShell`。页面壳放到 `admin/layout.tsx`，入口页和账号页各自写标题；账号页用返回链接回到父级 `/admin`。
 - **原因/上下文**: admin 本身就是 `admin/users` 的父级路由，不必再抽一层壳。
+
+## 账号页改成目录式左右栏 (本地时间 14:32:00)
+- **文件**: `src/app/[lang]/admin/users/_components/users-list.tsx`、`user-account-card.tsx`、`create-user-card.tsx`、`users-page-ui.tsx`、`roles.ts`、`format-user-time.ts`
+- **修改内容**: 去掉一排同质卡片。账号列表改成可搜索、按角色筛选的目录；桌面端左侧点选、右侧改密或新建，移动端用底部抽屉。相对时间、首字母头像、`/` 聚焦搜索、方向键切换选中。
+- **原因/上下文**: 用户认为账号列表没有设计和交互。
