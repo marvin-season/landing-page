@@ -82,14 +82,17 @@ flowchart TB
 
 ### 3.2 Agent `src/app/agent/`
 
-- 独立 `layout.tsx`：全屏布局、**NextAuth 会话校验**，未登录重定向到 `/auth/signin`。
+- 独立 `layout.tsx`：全屏布局，读取 NextAuth 会话给侧边栏用，**不在 layout 里做登录跳转**。
+- 是否需要登录由 `src/lib/page-auth.ts` 的 `protectedPages` 声明，`src/proxy.ts` 统一拦截。
 - 挂载 `TankQueryClientProvider`（tRPC + React Query），侧边栏与 `ChatModeSwitcher`。
 - 动态线程页：`agent/[threadId]/page.tsx`。
 
 ### 3.3 认证 `src/app/auth/`
 
-- NextAuth v5：`src/auth.ts`（Credentials 演示用登录）、`src/app/api/auth/[...nextauth]/route.ts`。
-- JWT session，自定义 `signIn` 页面路径。
+- NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。
+- JWT session，8 小时；`session.user.id` 为登录账号。
+- 唯一认证页是 `/auth`。`/auth/signin` 与 `/auth/resume` 只做兼容跳转。
+- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置；未登录访问时 `src/proxy.ts` 跳到 `/auth?returnTo=...`。
 
 ### 3.4 管理 `src/app/admin/`
 
@@ -97,8 +100,8 @@ flowchart TB
 
 ### 3.5 国际化与 `src/proxy.ts`
 
-- `src/proxy.ts` 实现了基于 `Accept-Language` 的 locale 检测与重定向逻辑，并带有 `config.matcher` 说明（排除 `api`、`auth`、`agent`、`admin` 等）。
-- **当前仓库中未发现根目录 `middleware.ts` 调用该函数**；若需要无 locale 前缀访问时自动跳转到 `/[lang]/...`，需在 Next.js `middleware` 中接入（参见文件内注释链接的 Next.js i18n 文档）。
+- Next.js 16 使用 `src/proxy.ts` 作为请求拦截入口（不再需要根目录 `middleware.ts`）。
+- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent`，排除 `auth`），再做 `Accept-Language` locale 检测与重写。
 
 ## 4. 数据层与 API
 
