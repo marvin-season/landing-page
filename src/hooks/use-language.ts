@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { availableLocales, locales } from "@/lib/i18n/locales";
+import { availableLocales, isLocale, sourceLocale } from "@/lib/i18n/locales";
 
 /**
  * 语言切换 Hook
@@ -11,13 +11,18 @@ export const useLanguage = (currentLang?: string) => {
   const pathname = usePathname();
   const router = useRouter();
   const pathSegments = pathname.split("/").filter(Boolean);
-  const pathLocale = currentLang || pathSegments[0] || locales[0];
+  const hasPrefix = Boolean(pathSegments[0] && isLocale(pathSegments[0]));
+  const rest = hasPrefix ? pathSegments.slice(1) : pathSegments;
+  const pathLocale =
+    currentLang || (hasPrefix ? pathSegments[0] : sourceLocale);
 
   /**
-   * 构建指定语言的新路径
+   * 构建指定语言的新路径。`en` 无前缀：`/`、`/docs`；其他：`/zh`、`/zh/docs`。
    */
   const buildLanguagePath = (locale: string) => {
-    return `/${locale}/${pathSegments.slice(1).join("/")}`;
+    const tail = rest.join("/");
+    if (locale === sourceLocale) return tail ? `/${tail}` : "/";
+    return tail ? `/${locale}/${tail}` : `/${locale}`;
   };
 
   /**

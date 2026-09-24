@@ -3,9 +3,8 @@
  * https://nextjs.org/docs/app/building-your-application/routing/internationalization
  * */
 
-import Negotiator from "negotiator";
 import { type NextRequest, NextResponse } from "next/server";
-import { locales } from "@/lib/i18n/locales";
+import { locales, sourceLocale } from "@/lib/i18n/locales";
 import {
   getResumeAuthorizationUrl,
   hasResumeAccess,
@@ -13,55 +12,47 @@ import {
   resumeCookieName,
 } from "@/lib/resume-access";
 
+const defaultPrefix = `/${sourceLocale}`;
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isResumePath(pathname)) {
-    let response: NextResponse;
-    if (!hasResumeAccess(request.cookies.get(resumeCookieName)?.value)) {
-      response = NextResponse.redirect(
-        new URL(getResumeAuthorizationUrl(pathname), request.url),
-      );
-    } else if (pathname === "/resume" || pathname.startsWith("/resume/")) {
-      request.nextUrl.pathname = `/${getRequestLocale(request.headers)}${pathname}`;
-      response = NextResponse.redirect(request.nextUrl);
-    } else {
-      response = NextResponse.next();
-    }
+    const response = !hasResumeAccess(
+      request.cookies.get(resumeCookieName)?.value,
+    )
+      ? NextResponse.redirect(
+          new URL(getResumeAuthorizationUrl(pathname), request.url),
+        )
+      : localize(request);
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
     return response;
   }
 
-  // Skip i18n routing for SEO files
   const seoFiles = ["/manifest.json", "/robots.txt", "/sitemap.xml"];
   if (seoFiles.includes(pathname)) {
     return NextResponse.next();
   }
 
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
-  );
-
-  if (pathnameHasLocale) return;
-
-  // Redirect if there is no locale
-  const locale = getRequestLocale(request.headers);
-  request.nextUrl.pathname = `/${locale}${pathname}`;
-  // e.g. incoming request is /products
-  // The new URL is now /en/products
-  return NextResponse.redirect(request.nextUrl);
+  return localize(request);
 }
 
-function getRequestLocale(requestHeaders: Headers): string {
-  const langHeader = requestHeaders.get("accept-language") || undefined;
-  const languages = new Negotiator({
-    headers: { "accept-language": langHeader },
-  }).languages(locales.slice());
+function localize(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  const activeLocale = languages[0] || locales[0] || "en";
+  if (pathname === defaultPrefix || pathname.startsWith(`${defaultPrefix}/`)) {
+    request.nextUrl.pathname = pathname.slice(defaultPrefix.length) || "/";
+    return NextResponse.redirect(request.nextUrl);
+  }
 
-  return activeLocale;
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+  );
+  if (pathnameHasLocale) return NextResponse.next();
+
+  request.nextUrl.pathname = `${defaultPrefix}${pathname === "/" ? "" : pathname}`;
+  return NextResponse.rewrite(request.nextUrl);
 }
 
 export const config = {
