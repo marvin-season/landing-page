@@ -10,7 +10,7 @@ function Card({ className, ...props }: DivProps) {
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground rounded-xl border shadow-sm shinchan:matte-surface",
+        "bg-card text-card-foreground rounded-xl border shadow-sm shinchan:matte-surface apple:glass-surface",
         className,
       )}
       {...props}

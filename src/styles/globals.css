@@ -1,33 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./zone.css";
-@import "./component.css";
 @import "./base.css";
-@import "./shinchan.css";
+@import "./features/home.css";
+@import "./features/agent-sketch.css";
+@import "./themes/light.css";
+@import "./themes/dark.css";
+@import "./themes/shinchan.css";
+@import "./themes/apple.css";
 @source "../../packages/design-system/src";
 @source "../../packages/biz-ui/src";
 @custom-variant dark (&:is(.dark *));
 @custom-variant shinchan (&:is(.shinchan *));
+@custom-variant apple (&:is(.apple *));
 
 @plugin "@tailwindcss/typography";
-
-@theme {
-  --animate-home-avatar-walk: home-avatar-walk 0.9s ease-in-out infinite;
-
-  @keyframes home-avatar-walk {
-    0%,
-    100% {
-      transform: translate(-2px, 0) rotate(-3deg);
-    }
-    25%,
-    75% {
-      transform: translate(0, -3px) rotate(0deg);
-    }
-    50% {
-      transform: translate(2px, 0) rotate(3deg);
-    }
-  }
-}
 
 @theme inline {
   --color-background: var(--background);

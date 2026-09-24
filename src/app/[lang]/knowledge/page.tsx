@@ -1,9 +1,8 @@
 import { msg } from "@lingui/core/macro";
 import { ArrowLeft, BookOpen, FileText, Quote, ScanText } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/link/link";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
-import { withLocalePrefix } from "@/lib/i18n/locales";
 import { KnowledgeScenes } from "./_components/knowledge-scenes";
 
 const pageTitle = msg`Docs & Knowledge`;
@@ -34,7 +33,7 @@ export default async function KnowledgePage({ params }: PageLangParam) {
       overview={
         <>
           <Link
-            href={withLocalePrefix("/", lang)}
+            href="/"
             className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />

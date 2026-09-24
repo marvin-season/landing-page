@@ -1,8 +1,8 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import Link from "next/link";
 import H2 from "@/app/[lang]/resume/_components/h2";
+import { Link } from "@/components/link/link";
 import { MotionDiv } from "@/components/ui/motion/motion-div";
 import GradientText from "@/components/ui/react-bits/gradient-text";
 import { ShimmeringText } from "@/components/ui/shadcn-io/shimmering-text";

@@ -8,7 +8,7 @@
 
 - **营销 / 个人站点**：多语言落地页与简历等，路由在 `src/app/[lang]/` 下。
 - **Agent 对话**：`/agent` 下的聊天界面，依赖 NextAuth 登录、tRPC 管理线程、Mastra 流式对话。
-- **管理 / 演示**：`/admin` 下的 CRUD、PPT 画布等实验性功能。
+- **管理 / 演示**：`/admin` 下的 CRUD 等实验性功能。
 - **类型安全 API**：`server/` 中的 tRPC 路由，经 `src/app/api/trpc` 暴露。
 - **AI 运行时配置**：`mastra-server/` 中的 Mastra 实例、Agent、工具与工作流，被 API Route 与同进程 tRPC 直接引用。
 
@@ -47,8 +47,8 @@ flowchart TB
 | `packages/design-system` | 原子组件（`@landing-page/design-system`） |
 | `packages/biz-ui` | 可复用业务组合件（`@landing-page/biz-ui`）；按需抽取，不批量迁移 |
 | `packages/utils` | 共享工具（`@landing-page/utils`） |
+| `src/styles/` | 全局样式入口、主题（light / dark / shinchan / apple）与页面特征样式 |
 | `src/lib/` | 工具函数、i18n 封装、chat/stream、tRPC 客户端封装等 |
-| `src/store/` | Zustand 状态（消息、会话、PPT、IndexedDB 持久化等） |
 | `src/locales/` | Lingui 编译产物与 `.po` 源（按语言分文件） |
 | `server/` | tRPC `appRouter` 及各子路由（user / model / thread） |
 | `mastra-server/` | Mastra 单例、agents、tools、workflows、storage |
@@ -78,28 +78,32 @@ flowchart TB
 ### 3.1 多语言站点 `src/app/[lang]/`
 
 - 动态段 `[lang]` 与 `src/lib/i18n/locales.ts` 中的 `locales` 对齐；`generateStaticParams` 在根 layout 中为每种语言生成静态参数。`lingui.config.ts` 从同一文件读取。
-- 子路由示例：`(home)/` 首页、`resume/` 简历页等。
+- 子路由示例：`(home)/` 首页、`resume/` 简历页、`auth/` 授权页等。
 - 根 layout 负责：`Lingui` 服务端/客户端、`ThemeProvider`、全局样式与 `SettingsMenu`。
 
 ### 3.2 Agent `src/app/agent/`
 
-- 独立 `layout.tsx`：全屏布局、**NextAuth 会话校验**，未登录重定向到 `/auth/signin`。
+- 独立 `layout.tsx`：全屏布局，读取 NextAuth 会话给侧边栏用，**不在 layout 里做登录跳转**。
+- 是否需要登录由 `src/lib/page-auth.ts` 的 `protectedPages` 声明，`src/proxy.ts` 统一拦截。
 - 挂载 `TankQueryClientProvider`（tRPC + React Query），侧边栏与 `ChatModeSwitcher`。
 - 动态线程页：`agent/[threadId]/page.tsx`。
 
-### 3.3 认证 `src/app/auth/`
+### 3.3 认证 `src/app/[lang]/auth/`
 
-- NextAuth v5：`src/auth.ts`（Credentials 演示用登录）、`src/app/api/auth/[...nextauth]/route.ts`。
-- JWT session，自定义 `signIn` 页面路径。
+- NextAuth v5：`src/auth.ts`（账号 + 密码，校验走 `verifyCredentials`）、`src/app/api/auth/[...nextauth]/route.ts`。
+- JWT session，8 小时；`session.user.id` 为登录账号。
+- 唯一认证页在 `[lang]/auth`。英文无前缀，公开地址是 `/auth`；其他语言是 `/{lang}/auth`。`pages.signIn` 仍是 `/auth`。
+- `/auth/signin` 与 `/auth/resume` 只做兼容跳转，并带上当前语言。
+- 受保护路径由 `src/lib/page-auth.ts` 的 `protectedPages` 配置。未登录访问时 `src/proxy.ts` 跳到对应语言的 `/auth?returnTo=...`（例如 `/zh/resume` → `/zh/auth`）。认证页本身不在受保护列表里。
 
 ### 3.4 管理 `src/app/admin/`
 
-- 聚合入口、`crud`、`ppt`（Fabric 相关）及 catch-all `[...params]`。
+- 聚合入口、`crud` 及 catch-all `[...params]`。
 
 ### 3.5 国际化与 `src/proxy.ts`
 
-- `src/proxy.ts` 实现了基于 `Accept-Language` 的 locale 检测与重定向逻辑，并带有 `config.matcher` 说明（排除 `api`、`auth`、`agent`、`admin` 等）。
-- **当前仓库中未发现根目录 `middleware.ts` 调用该函数**；若需要无 locale 前缀访问时自动跳转到 `/[lang]/...`，需在 Next.js `middleware` 中接入（参见文件内注释链接的 Next.js i18n 文档）。
+- Next.js 16 使用 `src/proxy.ts` 作为请求拦截入口（不再需要根目录 `middleware.ts`）。
+- 先按 `protectedPages` 做会话门闩（matcher 包含 `agent` 和 `auth`），再做 locale 检测与重写。`/auth` 会重写到默认语言；`/{lang}/auth` 直接放行。
 
 ## 4. 数据层与 API
 
@@ -121,7 +125,7 @@ flowchart TB
 
 ### 4.4 其他 API
 
-- 例如 `src/app/api/ppt/route.ts` 等，按功能拆分。
+- `src/app/api/knowledge/chat/route.ts`、`src/app/api/email/test/route.ts` 等，按功能拆分。
 
 ### 4.5 Next.js `rewrites`（`next.config.ts`）
 
@@ -132,12 +136,11 @@ flowchart TB
 
 详见 [mastra-server/README.md](../mastra-server/README.md)。要点：
 
-- `mastra-server/index.ts` 注册 agents（如 general、ppt）、workflow、LibSQL storage、日志与 observability。
+- `mastra-server/index.ts` 注册 agents（如 general、knowledge）、workflow、LibSQL storage、日志与 observability。
 - 与 Next 进程**同一 Node 运行时**内 import，无单独 HTTP 端口要求（与可选的 `localhost:7777` 外部服务不同）。
 
 ## 6. 前端状态与流式 UI
 
-- **Zustand**：`src/store/`（消息、会话、聊天设置、PPT、IDB 持久化等）。
 - **流式聊天**：`src/lib/stream/`、`use-chat-stream-state` 等与 AI SDK / Mastra 流对接。
 - **UI 栈**：Tailwind CSS 4、Radix、Framer Motion / Motion、GSAP、统一 Markdown（unified 管线）等。
 

@@ -25,7 +25,7 @@ msgstr "خىزمەت تەجرىبەم، تۈرلىرىم ۋە تېخنىكىلى
 msgid "A conversation with your document"
 msgstr "ھۆججىتىڭىز بىلەن سۆھبەت"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "ئازراق بەزىنە، تولۇپ تاشقان خۇشاللىق"
 
@@ -33,7 +33,7 @@ msgstr "ئازراق بەزىنە، تولۇپ تاشقان خۇشاللىق"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "Mastra بىلىم ۋاكالەتچىسى جاۋابنى ئېقىم شەكلىدە يوللايدۇ؛ چەكلەش ھالىتى سۆھبەتلەرنىڭ ئۆز ئارا گىرەلىشىشىنىڭ ئالدىنى ئالىدۇ"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "كۈندىلىك تۇرمۇشنى سەرگۈزەشتىگە ئايلاندۇرىدىغان بەش ياشلىق لەتپىباز بالا."
@@ -42,15 +42,11 @@ msgstr "كۈندىلىك تۇرمۇشنى سەرگۈزەشتىگە ئايلان�
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "تاللانغان بۆلەكنى كىرگۈزۈش رامكىسىغا ئالدىن نەقىل قىلمىسىمۇ تەرجىمە ياكى قىسقىچە خۇلاسىلىگىلى بولىدۇ. بىلىم ۋاكالەتچىسى پەقەت ئۈزۈندە ۋە كۆرسەتمىنىلا تاپشۇرۇۋالىدۇ."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-msgid "A Simple PPT Generator"
-msgstr "ئاددىي PPT ھاسىللىغۇچ"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:66
 msgid "About me in detail"
 msgstr "تەپسىلىي تونۇشتۇرۇش"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:58
 msgid "Agent UI"
 msgstr "ۋاكالەتچى كۆرۈنمە يۈزى"
 
@@ -79,7 +75,20 @@ msgstr "ھۆججىتىڭىز ھەققىدە سوراڭ…"
 msgid "Assistant"
 msgstr "ياردەمچى"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr ""
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr ""
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr ""
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
 msgstr "باش بەتكە قايتىش"
@@ -96,7 +105,7 @@ msgstr "ھۆججەت ئېلىپ كېلىڭ. سۆھبەت باشلاڭ."
 msgid "Career"
 msgstr "كەسپىي تەجرىبە"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:21
 msgid "Changelog"
 msgstr "ئۆزگەرتىش خاتىرىسى"
 
@@ -116,7 +125,7 @@ msgstr "PDF نەقىلىنى چېكىپ شۇ بەتكە قايتىپ ئەسلى 
 msgid "Conversations can start with a sample citation for demos"
 msgstr "نامايىش ئۈچۈن سۆھبەتنى ئۈلگە نەقىل بىلەن باشلىغىلى بولىدۇ"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "Crayon Shin-chan"
@@ -125,7 +134,7 @@ msgstr "Crayon Shin-chan"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Vite ۋە Babel ئاساسىدا خەلقئارالاشتۇرۇش ھەل قىلىش لايىھەسى قۇردۇم"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:75
 msgid "Current"
 msgstr "نۆۋەتتىكى"
 
@@ -139,11 +148,11 @@ msgstr "سۈكۈتتىكى چەكلەش ھالىتى، ئۆزگەرتكىلى ب
 msgid "Default workspace"
 msgstr "سۈكۈتتىكى خىزمەت رايونى"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:100
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "لايىھە پەقەت قانداق كۆرۈنۈشلا ئەمەس. لايىھە قانداق ئىشلەيدىغانلىقى."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:74
 msgid "Design System & Component Libs"
 msgstr "لايىھە سىستېمىسى ۋە بۆلەك ئامبىرى"
 
@@ -238,7 +247,7 @@ msgstr "ھۆججەت ئوقۇش ئومۇمىي كۆرۈنۈشى"
 msgid "Document workspace"
 msgstr "ھۆججەت خىزمەت رايونى"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:48
+#: src/app/[lang]/(home)/data/home-data.tsx:47
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "ئالدى ئۇچ تەرەققىياتى، سۈنئىي ئەقىل قوللىنىشلىرى ۋە قۇرۇلۇش ئەمەلىيىتى ھەققىدىكى ماتېرىياللار"
 
@@ -262,7 +271,7 @@ msgstr "Enter يوللاش · Shift + Enter يېڭى قۇر · @ تىلغا ئې
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "مودېل، سانلىق مەلۇمات، ئەپ ۋە ھېسابلاش كۈچىنى بىرلەشتۈرىدىغان كارخانا دەرىجىلىك سۈنئىي ئەقىل ئەپ قۇرۇش ۋە باشقۇرۇش سۇپىسى."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "Experience, projects, and personal profile"
 msgstr "تەجرىبە، تۈرلەر ۋە شەخسىي تونۇشتۇرۇش"
 
@@ -277,10 +286,6 @@ msgstr "ھەر بىر نەقىلنى مەزمۇندا تېپىڭ"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "كەڭلىككە ماسلاشتۇرۇش"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:76
-msgid "Generate slide content in a structured workflow"
-msgstr "قۇرۇلمىلىق ئېقىمدا تام تەسۋىر مەزمۇنى ھاسىل قىلىڭ"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -394,11 +399,11 @@ msgstr "مۇھىم بۆلەكلەرنى ساقلاپ قېلىڭ"
 msgid "Key Responsibilities"
 msgstr "ئاساسلىق مەسئۇلىيەتلەر"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Knowledge"
 msgstr "بىلىم"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:99
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "ئاز سانلىق مەلۇماتتىن تېخىمۇ مول تونۇش ھاسىل قىلىش."
 
@@ -414,7 +419,7 @@ msgstr "ئالدىن كۆرۈش يۈكلىنىۋاتىدۇ…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "تاللانما گېئومېتىرىيەسىنى ساقلىماي نەقىلنى تېپىش"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastra ھەرىكەتلەندۈرىدىغان ئاساسىي سۆھبەت ئېقىمى"
 
@@ -466,7 +471,7 @@ msgstr "ھېساباتسىز PDF ياكى Markdown ھۆججىتىنى ئېچىڭ
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 msgstr "ھېساباتسىز PDF ياكى Markdown ھۆججىتىنى ئېچىڭ. بۆلەك تاللاڭ، ھۆججەت نامى ۋە بەت نومۇرى بىلەن نەقىل سۈپىتىدە ساقلاڭ، ئۈلگىدىن باشلاڭ."
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:120
 msgid "Open Docs workspace"
 msgstr "Docs خىزمەت رايونىنى ئېچىش"
 
@@ -497,6 +502,10 @@ msgstr "{0}-بەت"
 msgid "Page number"
 msgstr "بەت نومۇرى"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr ""
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "PDF نەقىل يورۇتۇش"
@@ -521,8 +530,8 @@ msgstr "PDF ياكى Markdown ھۆججىتى يۈكلەڭ."
 msgid "Previous page"
 msgstr "ئالدىنقى بەت"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
 msgstr "مەھسۇلات يېڭىلىنىشلىرى"
@@ -563,7 +572,7 @@ msgstr "ئوقۇڭ، ئىزدىڭ ۋە سوئال سوراڭ. ھۆججەتلىر
 msgid "Reading document…"
 msgstr "ھۆججەت ئوقۇلۇۋاتىدۇ…"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:36
 msgid "Release versions"
 msgstr "تارقىتىلغان نەشرلەر"
 
@@ -591,7 +600,7 @@ msgstr "تەرجىمىھال"
 msgid "Retry"
 msgstr "قايتا سىناش"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:84
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "Reusable UI components and design references"
 msgstr "قايتا ئىشلىتىلىدىغان UI بۆلەكلىرى ۋە لايىھە پايدىلىنىشلىرى"
 
@@ -632,7 +641,7 @@ msgstr "ئۇچۇر يوللاش"
 msgid "Sentences"
 msgstr "جۈملىلەر"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "Shinnosuke Nohara"
 
@@ -660,9 +669,18 @@ msgstr "ياردەمچى پەقەت نەقىل قىلىنغان بۆلەك ۋە 
 msgid "The sample could not be loaded. Please try again."
 msgstr "ئۈلگىنى يۈكلىيەلمىدى. قايتا سىناڭ."
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr ""
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "ئويلىنىۋاتىدۇ…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr ""
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -691,11 +709,11 @@ msgstr "بۇ PDF نى ئاچالمىدى. باشقا ھۆججەت سىناڭ."
 msgid "This PDF is password protected."
 msgstr "بۇ PDF پارول بىلەن قوغدالغان."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Three iterations of the Docs workspace"
 msgstr "Docs خىزمەت رايونىنىڭ ئۈچ قېتىملىق نەشرى"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:27
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Docs خىزمەت رايونىنىڭ تارقىتىلغان ئۈچ نەشرى: ھۆججەت ئوقۇشتىن PDF تېكىستىنى نەقىل قىلىشقىچە، ئاندىن تاللانمىنى چۈشىنىدىغان سۈنئىي ئەقىلگىچە."
@@ -777,6 +795,10 @@ msgstr "PDF قۇلۇپىنى ئېچىش"
 msgid "Upload document"
 msgstr "ھۆججەت يۈكلەش"
 
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr ""
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr "Vue2, UniApp, Vuex, VantUI"
@@ -787,7 +809,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "تور ئاچقۇچى"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:26
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "ئائىلىسى ۋە دوستلىرى بىلەن Shin-chan ئادەتتىكى كۈنلەرنى لەتىپە، تاسادىپىي ھەيران قالدۇرۇش ۋە كۈلكە بىلەن تولدۇرىدۇ."
 

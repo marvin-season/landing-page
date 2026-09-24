@@ -25,7 +25,7 @@ msgstr "A comprehensive overview of my work experience, projects, and technical 
 msgid "A conversation with your document"
 msgstr "A conversation with your document"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "A little mischief, a lot of joy"
 
@@ -33,7 +33,7 @@ msgstr "A little mischief, a lot of joy"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "A mischievous five-year-old who turns everyday life into an adventure."
@@ -42,15 +42,11 @@ msgstr "A mischievous five-year-old who turns everyday life into an adventure."
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-msgid "A Simple PPT Generator"
-msgstr "A Simple PPT Generator"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:66
 msgid "About me in detail"
 msgstr "About me in detail"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:58
 msgid "Agent UI"
 msgstr "Agent UI"
 
@@ -79,7 +75,20 @@ msgstr "Ask about your document…"
 msgid "Assistant"
 msgstr "Assistant"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr "Authorization required"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr "Authorize and continue"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr "Authorizing…"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
 msgstr "Back to home"
@@ -96,7 +105,7 @@ msgstr "Bring a document. Start a conversation."
 msgid "Career"
 msgstr "Career"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:21
 msgid "Changelog"
 msgstr "Changelog"
 
@@ -116,7 +125,7 @@ msgstr "Click a PDF quote to return to its page and highlight the original passa
 msgid "Conversations can start with a sample citation for demos"
 msgstr "Conversations can start with a sample citation for demos"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "Crayon Shin-chan"
@@ -125,7 +134,7 @@ msgstr "Crayon Shin-chan"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "Created internationalization solution based on Vite and Babel"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:75
 msgid "Current"
 msgstr "Current"
 
@@ -139,11 +148,11 @@ msgstr "Default throttle mode, cannot be changed"
 msgid "Default workspace"
 msgstr "Default workspace"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:100
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "Design is not just what it looks like. Design is how it works."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:74
 msgid "Design System & Component Libs"
 msgstr "Design System & Component Libs"
 
@@ -238,7 +247,7 @@ msgstr "Document reading overview"
 msgid "Document workspace"
 msgstr "Document workspace"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:48
+#: src/app/[lang]/(home)/data/home-data.tsx:47
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "Documentation on frontend development, AI applications, and engineering practices"
 
@@ -262,7 +271,7 @@ msgstr "Enter to send · Shift + Enter for a new line · @ to mention"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "Experience, projects, and personal profile"
 msgstr "Experience, projects, and personal profile"
 
@@ -277,10 +286,6 @@ msgstr "Find every quote in context"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "Fit to width"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:76
-msgid "Generate slide content in a structured workflow"
-msgstr "Generate slide content in a structured workflow"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -394,11 +399,11 @@ msgstr "Keep the passages that matter"
 msgid "Key Responsibilities"
 msgstr "Key Responsibilities"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Knowledge"
 msgstr "Knowledge"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:99
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "Leveraging less data to generate greater insights."
 
@@ -414,7 +419,7 @@ msgstr "Loading preview…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "Locate a quote without storing selection geometry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Main chat flow powered by Mastra"
 msgstr "Main chat flow powered by Mastra"
 
@@ -466,7 +471,7 @@ msgstr "Open a PDF or Markdown document without an account. Browse PDF pages, ad
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 msgstr "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:120
 msgid "Open Docs workspace"
 msgstr "Open Docs workspace"
 
@@ -497,6 +502,10 @@ msgstr "Page {0}"
 msgid "Page number"
 msgstr "Page number"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr "Password"
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "PDF citation highlight"
@@ -521,8 +530,8 @@ msgstr "Please upload a PDF or Markdown file."
 msgid "Previous page"
 msgstr "Previous page"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
 msgstr "Product updates"
@@ -563,7 +572,7 @@ msgstr "Read, explore, and ask questions. Your documents and ideas, side by side
 msgid "Reading document…"
 msgstr "Reading document…"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:36
 msgid "Release versions"
 msgstr "Release versions"
 
@@ -591,7 +600,7 @@ msgstr "Resume"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:84
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
@@ -632,7 +641,7 @@ msgstr "Send message"
 msgid "Sentences"
 msgstr "Sentences"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "Shinnosuke Nohara"
 
@@ -660,9 +669,18 @@ msgstr "The assistant only receives the quoted passage and your instruction."
 msgid "The sample could not be loaded. Please try again."
 msgstr "The sample could not be loaded. Please try again."
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr "The username or password is incorrect. Try again."
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "Thinking…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr "This content requires authorization. Enter your username and password to continue."
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -691,11 +709,11 @@ msgstr "This PDF could not be opened. Try another file."
 msgid "This PDF is password protected."
 msgstr "This PDF is password protected."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Three iterations of the Docs workspace"
 msgstr "Three iterations of the Docs workspace"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:27
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
@@ -777,6 +795,10 @@ msgstr "Unlock PDF"
 msgid "Upload document"
 msgstr "Upload document"
 
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr "Username"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr "Vue2, UniApp, Vuex, VantUI"
@@ -787,7 +809,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web Developer"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:26
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 

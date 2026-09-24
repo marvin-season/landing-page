@@ -11,9 +11,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 shinchan:shadow-sm",
+          "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 shinchan:shadow-sm apple:shadow-sm",
         outline:
-          "border border-border/60 bg-card/60 text-foreground shadow-sm hover:shadow-md hover:bg-card hover:text-foreground shinchan:matte-surface shinchan:hover:shadow-sm",
+          "border border-border/60 bg-card/60 text-foreground shadow-sm hover:shadow-md hover:bg-card hover:text-foreground shinchan:matte-surface shinchan:hover:shadow-sm apple:glass-surface apple:hover:shadow-sm",
         ghost:
           "bg-transparent text-foreground hover:bg-muted hover:text-foreground",
         soft: "bg-secondary text-secondary-foreground hover:bg-secondary/80",

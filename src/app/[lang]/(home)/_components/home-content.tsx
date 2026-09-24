@@ -1,13 +1,13 @@
 import { Trans } from "@lingui/react/macro";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { TrackedLink } from "@/components/analytics/tracked-link";
+import { Link } from "@/components/link/link";
 import { navLinks, profile, quotes } from "../data/home-data";
 import { NavigationCarousel, Quote, Section } from "./index";
 
 export function HomeContent() {
   return (
-    <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent">
+    <main className="min-h-dvh bg-background text-foreground shinchan:bg-transparent apple:bg-transparent">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:py-20">
         <section className="grid min-h-[62dvh] items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.75fr)]">
           <div className="home-reveal flex flex-col items-start">
@@ -27,28 +27,28 @@ export function HomeContent() {
               {profile.summary}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <TrackedLink
+              <Link
                 href="/knowledge"
                 eventName="Home Hero CTA Click"
                 eventProperties={{ target: "knowledge", location: "hero" }}
-                className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
+                className="group inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/15 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm apple:shadow-sm apple:hover:shadow-sm"
               >
                 <Trans>Try Knowledge</Trans>
                 <ArrowRight
                   className="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   aria-hidden="true"
                 />
-              </TrackedLink>
-              <TrackedLink
+              </Link>
+              <Link
                 href="https://www.tv-asahi.co.jp/shinchan/character/"
                 eventName="Home Hero CTA Click"
                 eventProperties={{ target: "shinchan", location: "hero" }}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-border/70 bg-card/70 px-5 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shinchan:shadow-sm shinchan:hover:shadow-sm apple:glass-surface apple:shadow-sm apple:hover:shadow-sm"
               >
                 <Trans>Meet Shin-chan</Trans>
-              </TrackedLink>
+              </Link>
             </div>
           </div>
 
@@ -56,7 +56,7 @@ export function HomeContent() {
             className="home-reveal relative mx-auto flex aspect-square w-full max-w-85 items-center justify-center md:ml-auto"
             style={{ "--home-reveal-delay": "120ms" } as React.CSSProperties}
           >
-            <div className="absolute inset-6 rounded-full border border-border/60 bg-card/70 shadow-2xl shadow-primary/10 shinchan:matte-surface" />
+            <div className="absolute inset-6 rounded-full border border-border/60 bg-card/70 shadow-2xl shadow-primary/10 shinchan:matte-surface apple:glass-surface" />
             <div className="absolute inset-0 rounded-full border border-border/40" />
             <div className="absolute inset-12 rounded-full border border-primary/15" />
             <Image
@@ -66,7 +66,7 @@ export function HomeContent() {
               alt={profile.avatarAlt}
               width={184}
               height={184}
-              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl shinchan:shadow-sm origin-bottom motion-safe:animate-home-avatar-walk"
+              className="relative rounded-full border border-border/60 bg-background object-cover shadow-xl shinchan:shadow-sm apple:shadow-sm origin-bottom motion-safe:animate-home-avatar-walk"
             />
           </div>
         </section>

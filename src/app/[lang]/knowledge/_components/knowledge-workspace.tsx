@@ -193,7 +193,7 @@ export function KnowledgeWorkspace() {
               duration: reducedMotion ? 0 : 0.28,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="flex min-h-125 max-h-full w-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface"
+            className="flex min-h-125 max-h-full w-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/70 shadow-sm shinchan:matte-surface apple:glass-surface"
           >
             <KnowledgeDocumentPanes
               source={source}

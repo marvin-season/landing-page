@@ -25,7 +25,7 @@ msgstr "我的工作经历、项目和技术专长的综合概述。"
 msgid "A conversation with your document"
 msgstr "与文档展开对话"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:17
 msgid "A little mischief, a lot of joy"
 msgstr "一点调皮，满满欢乐"
 
@@ -33,7 +33,7 @@ msgstr "一点调皮，满满欢乐"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "Mastra 知识助手流式回复；节流模式避免对话重叠"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:21
+#: src/app/[lang]/(home)/data/home-data.tsx:20
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "一个调皮的五岁小孩，把平凡的日子过成有趣的冒险。"
@@ -42,15 +42,11 @@ msgstr "一个调皮的五岁小孩，把平凡的日子过成有趣的冒险。
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "选中文字后可直接翻译或总结，不必先引用到输入框。知识助手只会收到摘录和指令。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-msgid "A Simple PPT Generator"
-msgstr "一个简单的 PPT 生成器"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:66
 msgid "About me in detail"
 msgstr "关于我的详细信息"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:58
 msgid "Agent UI"
 msgstr "智能体交互界面"
 
@@ -79,7 +75,20 @@ msgstr "针对文档提问…"
 msgid "Assistant"
 msgstr "助手"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:16
+#: src/app/[lang]/auth/page.tsx:41
+#: src/app/[lang]/auth/page.tsx:76
+msgid "Authorization required"
+msgstr "需要授权"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:21
+msgid "Authorize and continue"
+msgstr "授权并继续"
+
+#: src/app/[lang]/auth/_components/submit-button.tsx:18
+msgid "Authorizing…"
+msgstr "正在授权…"
+
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:15
 #: src/app/[lang]/knowledge/page.tsx:40
 msgid "Back to home"
 msgstr "返回首页"
@@ -96,7 +105,7 @@ msgstr "上传一份文档，开启一段对话。"
 msgid "Career"
 msgstr "职业经历"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:22
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:21
 msgid "Changelog"
 msgstr "更新日志"
 
@@ -116,7 +125,7 @@ msgstr "点击 PDF 引文，即可回到对应页面并高亮原文。在保留�
 msgid "Conversations can start with a sample citation for demos"
 msgstr "对话可用示例引文开场，便于演示高亮"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:14
+#: src/app/[lang]/(home)/data/home-data.tsx:13
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "蜡笔小新"
@@ -125,7 +134,7 @@ msgstr "蜡笔小新"
 msgid "Created internationalization solution based on Vite and Babel"
 msgstr "基于 Vite 和 Babel 创建国际化解决方案"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:76
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:75
 msgid "Current"
 msgstr "当前"
 
@@ -139,11 +148,11 @@ msgstr ""
 msgid "Default workspace"
 msgstr "默认工作区"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:100
+#: src/app/[lang]/(home)/data/home-data.tsx:91
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "设计不仅仅是外观，设计是功能。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:74
 msgid "Design System & Component Libs"
 msgstr "设计系统 & 组件库"
 
@@ -238,7 +247,7 @@ msgstr "文档阅读概览"
 msgid "Document workspace"
 msgstr "文档工作区"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:48
+#: src/app/[lang]/(home)/data/home-data.tsx:47
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "前端开发、AI 应用与工程实践文档"
 
@@ -262,7 +271,7 @@ msgstr "Enter 发送 · Shift + Enter 换行 · @ 引用"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "企业级 AI 应用一站式建设和管理平台，完全集成模型、数据、应用和计算能力。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:68
+#: src/app/[lang]/(home)/data/home-data.tsx:67
 msgid "Experience, projects, and personal profile"
 msgstr "工作经验、项目和个人简介"
 
@@ -277,10 +286,6 @@ msgstr "回到引文所在的原文"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "适应宽度"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:76
-msgid "Generate slide content in a structured workflow"
-msgstr "在结构化工作流中生成幻灯片内容"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -394,11 +399,11 @@ msgstr "留住值得关注的段落"
 msgid "Key Responsibilities"
 msgstr "关键职责"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:45
 msgid "Knowledge"
 msgstr "知识库"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:99
+#: src/app/[lang]/(home)/data/home-data.tsx:90
 msgid "Leveraging less data to generate greater insights."
 msgstr "利用更少的数据生成更大的洞察。"
 
@@ -414,7 +419,7 @@ msgstr "正在加载预览…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "无需保存选区坐标即可定位引文"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:60
+#: src/app/[lang]/(home)/data/home-data.tsx:59
 msgid "Main chat flow powered by Mastra"
 msgstr "主要聊天流由 Mastra 提供支持"
 
@@ -466,7 +471,7 @@ msgstr "无需登录即可打开 PDF 或 Markdown 文档。在同一个工作区
 msgid "Open a PDF or Markdown file without an account. Select passages, keep them as quotes with document name and page number, and start from a sample document."
 msgstr "无需登录即可打开 PDF 或 Markdown。选中段落并保留带文档名与页码的引用，也可从示例文档开始。"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:121
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:120
 msgid "Open Docs workspace"
 msgstr "打开文档工作区"
 
@@ -497,6 +502,10 @@ msgstr "第 {0} 页"
 msgid "Page number"
 msgstr "页码"
 
+#: src/app/[lang]/auth/page.tsx:112
+msgid "Password"
+msgstr "密码"
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:55
 msgid "PDF citation highlight"
 msgstr "PDF 原文高亮"
@@ -521,8 +530,8 @@ msgstr "请上传 PDF 或 Markdown 文件。"
 msgid "Previous page"
 msgstr "上一页"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
 msgstr "产品迭代"
@@ -563,7 +572,7 @@ msgstr "阅读、探索、提问，让文档与思考并肩展开。"
 msgid "Reading document…"
 msgstr "正在读取文档…"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:37
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:36
 msgid "Release versions"
 msgstr "版本列表"
 
@@ -591,7 +600,7 @@ msgstr "简历"
 msgid "Retry"
 msgstr "重试"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:84
+#: src/app/[lang]/(home)/data/home-data.tsx:75
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
@@ -632,7 +641,7 @@ msgstr "发送消息"
 msgid "Sentences"
 msgstr "座右铭"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:19
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 msgid "Shinnosuke Nohara"
 msgstr "野原新之助"
 
@@ -660,9 +669,18 @@ msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
+#: src/app/[lang]/auth/page.tsx:131
+msgid "The username or password is incorrect. Try again."
+msgstr "账号或密码错误，请重试。"
+
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:282
 msgid "Thinking…"
 msgstr "正在思考…"
+
+#: src/app/[lang]/auth/page.tsx:43
+#: src/app/[lang]/auth/page.tsx:79
+msgid "This content requires authorization. Enter your username and password to continue."
+msgstr "此内容需要授权，请输入账号和密码后继续。"
 
 #: src/app/[lang]/knowledge/_components/use-document-session.ts:101
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
@@ -691,11 +709,11 @@ msgstr "无法打开此 PDF，请尝试其他文件。"
 msgid "This PDF is password protected."
 msgstr "此 PDF 受密码保护。"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:83
 msgid "Three iterations of the Docs workspace"
 msgstr "Docs 工作区的三次迭代"
 
-#: src/app/[lang]/changelog/_components/changelog-content.tsx:28
+#: src/app/[lang]/changelog/_components/changelog-content.tsx:27
 #: src/app/[lang]/changelog/page.tsx:8
 msgid "Three shipped iterations of the Docs workspace, from reading files to citing PDF text to selection-aware AI."
 msgstr "Docs 工作区已发布三个版本：从阅读文档，到定位 PDF 原文，再到划词即可调用 AI。"
@@ -777,6 +795,10 @@ msgstr "解锁 PDF"
 msgid "Upload document"
 msgstr "上传文档"
 
+#: src/app/[lang]/auth/page.tsx:93
+msgid "Username"
+msgstr "账号"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:77
 msgid "Vue2, UniApp, Vuex, VantUI"
 msgstr "Vue2, UniApp, Vuex, VantUI"
@@ -787,7 +809,7 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web 开发工程师"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:26
+#: src/app/[lang]/(home)/data/home-data.tsx:25
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "和家人、朋友在一起，小新总能用天马行空的想法和调皮捣蛋，把日常变成充满惊喜与欢笑的小故事。"
 

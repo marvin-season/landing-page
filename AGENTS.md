@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Next.js 16 app using React 19, TypeScript, Tailwind CSS 4, Lingui, tRPC, and Mastra. Main app code lives in `src/`: routes in `src/app`, app-level UI in `src/components`, stores in `src/store`, hooks in `src/hooks`, utilities/API helpers in `src/lib`, styles in `src/css`, and translations in `src/locales`. Shared packages live in `packages/`: `design-system` (atomic UI), `biz-ui` (reusable composed business UI), and `utils`. Static assets are in `public/`. Mastra code is in `mastra-server/`; the standalone Python agent service is in `agent-server/`. Database/config assets live in `db/`, and documentation is in `docs/`.
+This is a Next.js 16 app using React 19, TypeScript, Tailwind CSS 4, Lingui, tRPC, and Mastra. Main app code lives in `src/`: routes in `src/app`, app-level UI in `src/components`, hooks in `src/hooks`, utilities/API helpers in `src/lib`, styles in `src/styles`, and translations in `src/locales`. Shared packages live in `packages/`: `design-system` (atomic UI), `biz-ui` (reusable composed business UI), and `utils`. Static assets are in `public/`. Mastra code is in `mastra-server/`; the standalone Python agent service is in `agent-server/`. Database/config assets live in `db/`, and documentation is in `docs/`.
 
 ## Build, Test, and Development Commands
 

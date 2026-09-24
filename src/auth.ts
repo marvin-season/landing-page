@@ -1,19 +1,32 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { verifyCredentials } from "@/lib/page-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       name: "credentials",
       credentials: {
-        userId: { label: "User ID", type: "text" },
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const userId = credentials?.userId as string | undefined;
-        if (userId) {
-          return { id: userId, name: userId, email: `${userId}@local.dev` };
+        if (!process.env.AUTH_SECRET) return null;
+
+        const username = credentials?.username;
+        const password = credentials?.password;
+        if (typeof username !== "string" || typeof password !== "string") {
+          return null;
         }
-        return null;
+        if (!(await verifyCredentials(username, password))) {
+          return null;
+        }
+
+        return {
+          id: username,
+          name: username,
+          email: `${username}@local.dev`,
+        };
       },
     }),
   ],
@@ -32,10 +45,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/auth",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 8 * 60 * 60,
   },
 });

@@ -29,10 +29,11 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import Link, { useLinkStatus } from "next/link";
+import { useLinkStatus } from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useCallback, useState } from "react";
+import { Link } from "@/components/link/link";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { useTRPC } from "@/lib/trpc";
 
@@ -240,10 +241,10 @@ function ThreadListContent({
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
                     className={cn(
-                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg",
+                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg apple:rounded-xl",
                       threadId === t.id
-                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)]"
-                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45",
+                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)] apple:border-primary/25 apple:shadow-[var(--glass-shadow)]"
+                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45 apple:hover:border-white/50 apple:hover:bg-card/50",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">
@@ -433,7 +434,7 @@ function UserFooter({
           variant="ghost"
           size="sm"
           className="mt-3 w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
-          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          onClick={() => signOut({ callbackUrl: "/auth" })}
         >
           <LogOut className="size-4" />
           退出登录
@@ -477,7 +478,7 @@ function DesktopCollapsedContent({
         ) : (
           <DesktopRailButton
             label="退出登录"
-            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+            onClick={() => signOut({ callbackUrl: "/auth" })}
           >
             <LogOut className="size-4" />
           </DesktopRailButton>
@@ -539,7 +540,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
-                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
                 退出登录
@@ -581,7 +582,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
-                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
                 退出登录

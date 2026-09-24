@@ -4,30 +4,35 @@
  * */
 
 import { type NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { locales, sourceLocale } from "@/lib/i18n/locales";
-import {
-  getResumeAuthorizationUrl,
-  hasResumeAccess,
-  isResumePath,
-  resumeCookieName,
-} from "@/lib/resume-access";
+import { getAuthorizationUrl, getProtectedPage } from "@/lib/page-auth";
 
 const defaultPrefix = `/${sourceLocale}`;
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const protectedPage = getProtectedPage(pathname);
 
-  if (isResumePath(pathname)) {
-    const response = !hasResumeAccess(
-      request.cookies.get(resumeCookieName)?.value,
-    )
-      ? NextResponse.redirect(
-          new URL(getResumeAuthorizationUrl(pathname), request.url),
-        )
-      : localize(request);
-    response.headers.set("Cache-Control", "private, no-store, max-age=0");
-    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-    return response;
+  if (protectedPage) {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return withPrivateHeaders(
+        NextResponse.redirect(
+          new URL(getAuthorizationUrl(pathname), request.url),
+        ),
+        protectedPage.path === "/resume",
+      );
+    }
+
+    if (!protectedPage.locale) {
+      return NextResponse.next();
+    }
+
+    return withPrivateHeaders(
+      localize(request),
+      protectedPage.path === "/resume",
+    );
   }
 
   const seoFiles = ["/manifest.json", "/robots.txt", "/sitemap.xml"];
@@ -36,6 +41,13 @@ export function proxy(request: NextRequest) {
   }
 
   return localize(request);
+}
+
+function withPrivateHeaders(response: NextResponse, enabled: boolean) {
+  if (!enabled) return response;
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  return response;
 }
 
 function localize(request: NextRequest) {
@@ -67,8 +79,9 @@ export const config = {
      * - favicon.ico (favicon file)
      * - manifest.json, robots.txt, sitemap.xml (SEO files)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
+     * Agent is included so the session gate can run. Auth lives under [lang]
+     * and is not a protected page, so the gate does not redirect it.
      */
-    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|auth|agent|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|admin|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };

@@ -229,7 +229,7 @@ function FireworksBackground({
   React.useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
   React.useEffect(() => {
-    if (resolvedTheme === "shinchan") return;
+    if (resolvedTheme === "shinchan" || resolvedTheme === "apple") return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -364,7 +364,7 @@ function FireworksBackground({
         {...canvasProps}
         ref={canvasRef}
         className={cn(
-          "absolute inset-0 size-full shinchan:hidden",
+          "absolute inset-0 size-full shinchan:hidden apple:hidden",
           canvasProps?.className,
         )}
       />
