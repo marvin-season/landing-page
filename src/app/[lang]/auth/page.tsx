@@ -2,7 +2,6 @@ import { Input } from "@landing-page/design-system";
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { setI18n } from "@lingui/react/server";
-import { LockKeyhole } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { auth, signIn } from "@/auth";
@@ -66,74 +65,59 @@ export default async function AuthorizationPage({
   const hasError = query.error === "invalid";
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-5 py-16">
-      <div className="w-full max-w-md rounded-3xl border border-border/70 bg-card/80 p-8 shadow-2xl shadow-primary/10 shinchan:matte-surface shinchan:shadow-sm sm:p-10">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <span className="mb-5 inline-flex size-12 items-center justify-center rounded-full border border-border/70 bg-background/80 text-primary shadow-sm">
-            <LockKeyhole className="size-5" aria-hidden="true" />
-          </span>
-          <h1 className="text-3xl font-semibold tracking-normal text-foreground">
-            <Trans>Authorization required</Trans>
-          </h1>
-          <p className="mt-3 max-w-sm text-sm leading-7 text-muted-foreground">
-            <Trans>
-              This content requires authorization. Enter your username and
-              password to continue.
-            </Trans>
-          </p>
+    <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6 py-20">
+      <h1 className="text-xl font-semibold text-foreground">
+        <Trans>Authorization required</Trans>
+      </h1>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <Trans>
+          This content requires authorization. Enter your username and password
+          to continue.
+        </Trans>
+      </p>
+      <form action={authorize} className="mt-8 flex flex-col gap-4">
+        <input type="hidden" name="returnTo" value={returnTo} />
+        <input type="hidden" name="lang" value={lang} />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="username" className="text-sm text-foreground">
+            <Trans>Username</Trans>
+          </label>
+          <Input
+            id="username"
+            name="username"
+            type="text"
+            autoComplete="username"
+            autoFocus
+            required
+            aria-invalid={hasError}
+            aria-describedby={hasError ? "authorization-error" : undefined}
+          />
         </div>
-        <form action={authorize} className="space-y-5">
-          <input type="hidden" name="returnTo" value={returnTo} />
-          <input type="hidden" name="lang" value={lang} />
-          <div className="space-y-2">
-            <label
-              htmlFor="username"
-              className="text-sm font-medium text-foreground"
-            >
-              <Trans>Username</Trans>
-            </label>
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              autoFocus
-              required
-              aria-invalid={hasError}
-              aria-describedby={hasError ? "authorization-error" : undefined}
-              className="h-11 rounded-xl px-3.5"
-            />
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-foreground"
-            >
-              <Trans>Password</Trans>
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              aria-invalid={hasError}
-              aria-describedby={hasError ? "authorization-error" : undefined}
-              className="h-11 rounded-xl px-3.5"
-            />
-          </div>
-          {hasError ? (
-            <p
-              id="authorization-error"
-              role="alert"
-              className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm leading-6 text-destructive"
-            >
-              <Trans>The username or password is incorrect. Try again.</Trans>
-            </p>
-          ) : null}
-          <AuthorizationSubmitButton />
-        </form>
-      </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="password" className="text-sm text-foreground">
+            <Trans>Password</Trans>
+          </label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            aria-invalid={hasError}
+            aria-describedby={hasError ? "authorization-error" : undefined}
+          />
+        </div>
+        {hasError ? (
+          <p
+            id="authorization-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            <Trans>The username or password is incorrect. Try again.</Trans>
+          </p>
+        ) : null}
+        <AuthorizationSubmitButton />
+      </form>
     </main>
   );
 }

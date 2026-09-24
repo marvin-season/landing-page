@@ -14,3 +14,8 @@
 - **文件**: `src/app/[lang]/auth/`、`src/app/auth/`、`src/lib/page-auth.ts`、`src/proxy.ts`、`src/lib/i18n/locales.ts`、`src/hooks/use-language.ts`、`src/locales/*`、`docs/architecture.md`
 - **修改内容**: 授权页从独立根布局挪到 `[lang]/auth`，沿用站点语言、主题和设置菜单。英文仍是 `/auth`，其他语言是 `/{lang}/auth`。未登录访问受保护页时跳到对应语言的授权地址。登录卡片改为与首页一致的圆角磨砂面板，输入框加高，错误提示单独成条，提交时显示等待状态。文案走 Lingui，中文保持原意。
 - **原因/上下文**: 用户要求把 Auth 页面放进 `/lang` 目录并优化样式。
+
+## 收简授权表单 (本地时间 10:43:00)
+- **文件**: `src/app/[lang]/auth/page.tsx`、`src/app/[lang]/auth/_components/submit-button.tsx`
+- **修改内容**: 去掉锁图标、居中大卡片、重阴影和转圈按钮。表单改为左对齐窄栏，输入框和按钮沿用设计系统默认样式，错误只显示一行文字。
+- **原因/上下文**: 用户认为授权表单装饰过重，希望简约并适配当前主题。
