@@ -20,6 +20,7 @@ import {
   Clock3,
   DatabaseBackup,
   Download,
+  Images,
   Pencil,
   Plus,
   ReceiptText,
@@ -311,7 +312,7 @@ export function OrdersHome() {
                     导出备份
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => void exportBackup(true)}>
-                    <Camera className="size-4" aria-hidden="true" />
+                    <Images className="size-4" aria-hidden="true" />
                     导出备份（包含照片）
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
