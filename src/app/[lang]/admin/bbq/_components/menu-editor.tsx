@@ -31,15 +31,19 @@ import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const dishGridCls = cls`
   grid grid-cols-2 gap-2
-  md:grid-cols-[minmax(0,1fr)_7rem_5rem_5rem_5rem_6rem] md:gap-0
+  md:grid-cols-[minmax(0,1fr)_7rem_5rem_5rem_5rem_6rem]
 `;
 const dishRowCls = cls`
   rounded-lg border bg-card p-2.5
-  md:items-center md:rounded-none md:border-x-0 md:border-t-0 md:p-0
+  md:rounded-none md:border-x-0 md:border-t-0 md:p-0
 `;
 const dishInputCls = cls`
   h-10 w-full min-w-0 rounded-lg border bg-background px-3 text-sm shadow-none
   md:rounded-none md:border-0 md:bg-transparent md:px-2 md:text-sm
+`;
+const newDishInputCls = cls`
+  md:rounded-lg md:border md:bg-background md:px-3
+  focus-visible:ring-2 focus-visible:ring-inset
 `;
 
 export function MenuEditor() {
@@ -191,17 +195,10 @@ function DishTable({
           </p>
         </div>
         <div className="p-2.5">
-          <div className={`${dishGridCls} hidden px-2 pb-1.5 md:grid`}>
-            <span className="text-xs text-muted-foreground">名称</span>
-            <span className="text-xs text-muted-foreground">单价</span>
-            <span className="text-xs text-muted-foreground">单位</span>
-            <span className="text-xs text-muted-foreground">排序</span>
-            <span className="text-xs text-muted-foreground">上架</span>
-            <span className="text-xs text-muted-foreground">操作</span>
-          </div>
           <DishRow
             key="new"
             categoryId={categoryId}
+            showLabels
             onSaved={onSaved}
             onError={onError}
           />
@@ -253,15 +250,23 @@ function DishTable({
 function DishRow({
   dish,
   categoryId,
+  showLabels = false,
   onSaved,
   onError,
 }: {
   dish?: Dish;
   categoryId: string;
+  showLabels?: boolean;
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
   const isNew = dish === undefined;
+  const fieldLabelCls = showLabels
+    ? "text-xs text-muted-foreground"
+    : "text-xs text-muted-foreground md:sr-only";
+  const inputClassName = showLabels
+    ? `${dishInputCls} ${newDishInputCls}`
+    : dishInputCls;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "",
@@ -418,64 +423,106 @@ function DishRow({
   }
 
   return (
-    <div className={`${dishGridCls} ${dishRowCls}`}>
-      <label className="col-span-2 flex min-w-0 flex-col gap-1 md:col-span-1 md:block">
-        <span className="text-xs text-muted-foreground md:sr-only">名称</span>
+    <div
+      className={`${dishGridCls} ${dishRowCls} ${
+        showLabels
+          ? "md:items-end md:gap-2 md:border-b-0"
+          : "md:items-center md:gap-0"
+      }`}
+    >
+      <label
+        className={`col-span-2 flex min-w-0 flex-col gap-1 md:col-span-1 ${
+          showLabels ? "md:flex" : "md:block"
+        }`}
+      >
+        <span className={fieldLabelCls}>名称</span>
         <Input
           ref={nameRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={dishInputCls}
+          className={inputClassName}
           autoComplete="off"
           aria-label="菜品名称"
           placeholder={isNew ? "新菜品" : undefined}
         />
       </label>
-      <label className="flex min-w-0 flex-col gap-1 md:block">
-        <span className="text-xs text-muted-foreground md:sr-only">单价</span>
+      <label
+        className={`flex min-w-0 flex-col gap-1 ${
+          showLabels ? "md:flex" : "md:block"
+        }`}
+      >
+        <span className={fieldLabelCls}>单价</span>
         <Input
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          className={`${dishInputCls} tabular-nums`}
+          className={`${inputClassName} tabular-nums`}
           inputMode="decimal"
           autoComplete="off"
           aria-label="单价"
           placeholder={isNew ? "0.00" : undefined}
         />
       </label>
-      <label className="flex min-w-0 flex-col gap-1 md:block">
-        <span className="text-xs text-muted-foreground md:sr-only">单位</span>
+      <label
+        className={`flex min-w-0 flex-col gap-1 ${
+          showLabels ? "md:flex" : "md:block"
+        }`}
+      >
+        <span className={fieldLabelCls}>单位</span>
         <Input
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
-          className={dishInputCls}
+          className={inputClassName}
           autoComplete="off"
           aria-label="单位"
           placeholder={isNew ? "串" : undefined}
         />
       </label>
-      <label className="flex min-w-0 flex-col gap-1 md:block">
-        <span className="text-xs text-muted-foreground md:sr-only">排序</span>
+      <label
+        className={`flex min-w-0 flex-col gap-1 ${
+          showLabels ? "md:flex" : "md:block"
+        }`}
+      >
+        <span className={fieldLabelCls}>排序</span>
         <Input
           value={sort}
           onChange={(event) => setSort(event.target.value)}
-          className={`${dishInputCls} tabular-nums`}
+          className={`${inputClassName} tabular-nums`}
           inputMode="numeric"
           autoComplete="off"
           aria-label="排序"
         />
       </label>
-      <div className="flex min-h-10 items-center justify-between gap-2 md:justify-center">
-        <span className="text-xs text-muted-foreground md:sr-only">上架</span>
+      <div
+        className={`flex min-h-10 justify-between ${
+          showLabels
+            ? "flex-col items-start gap-1 md:items-center"
+            : "items-center gap-2 md:justify-center"
+        }`}
+      >
+        <span
+          className={`${fieldLabelCls} ${showLabels ? "w-full text-center" : ""}`}
+        >
+          上架
+        </span>
         <div className="flex min-h-10 min-w-10 items-center justify-center">
           <Switch
             checked={listed}
             aria-label="菜品上架"
+            className={showLabels ? "focus-visible:ring-2" : undefined}
             onCheckedChange={setListed}
           />
         </div>
       </div>
-      <div className="col-span-2 flex min-h-10 items-end justify-end gap-1.5 md:col-span-1 md:items-center md:px-1">
+      <div
+        className={`col-span-2 flex min-h-10 md:col-span-1 ${
+          showLabels
+            ? "flex-col items-stretch gap-1"
+            : "items-end justify-end gap-1.5 md:items-center md:px-1"
+        }`}
+      >
+        {showLabels ? (
+          <span className={`${fieldLabelCls} text-center`}>操作</span>
+        ) : null}
         {dish ? (
           <Button
             type="button"
@@ -492,7 +539,11 @@ function DishRow({
         <Button
           type="button"
           variant="outline"
-          className="h-10 flex-1 px-3 md:px-2"
+          className={
+            showLabels
+              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2"
+              : "h-10 flex-1 px-3 md:px-2"
+          }
           onClick={() => void commit()}
         >
           <Save className="size-4" aria-hidden="true" />
