@@ -78,6 +78,10 @@ export type BbqBackup = {
   orders: Order[];
 };
 
+export type BbqBackupExportOptions = {
+  includePhotos?: boolean;
+};
+
 export type SaveOrderInput = {
   id?: string;
   seat: number | null;

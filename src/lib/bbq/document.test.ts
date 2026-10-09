@@ -86,6 +86,32 @@ describe("document", () => {
     assert.equal(exportBackup(saved.document).version, 1);
   });
 
+  it("omits photos from backups by default and includes them on request", () => {
+    const shop = openShop();
+    const photo = {
+      id: "photo-1",
+      dataUrl: "data:image/jpeg;base64,cGhvdG8=",
+      createdAt: "2026-10-10T07:05:00.000Z",
+    };
+    const saved = saveOrder(
+      shop.document,
+      {
+        seat: 1,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+        photos: [photo],
+      },
+      shop.clock,
+    );
+
+    assert.deepEqual(exportBackup(saved.document).orders[0]?.photos, []);
+    assert.deepEqual(
+      exportBackup(saved.document, { includePhotos: true }).orders[0]?.photos,
+      [photo],
+    );
+    assert.deepEqual(saved.order.photos, [photo]);
+  });
+
   it("rejects a dish with an empty unit", () => {
     const shop = openShop();
     assert.throws(

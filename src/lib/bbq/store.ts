@@ -1,5 +1,6 @@
 import type {
   BbqBackup,
+  BbqBackupExportOptions,
   Category,
   Dish,
   Order,
@@ -39,6 +40,6 @@ export interface BbqStore {
   getOrder(id: string): Promise<Order | null>;
   saveOrder(input: SaveOrderInput): Promise<Order>;
   deleteOrder(id: string): Promise<void>;
-  exportBackup(): Promise<BbqBackup>;
+  exportBackup(options?: BbqBackupExportOptions): Promise<BbqBackup>;
   importBackup(backup: BbqBackup): Promise<void>;
 }

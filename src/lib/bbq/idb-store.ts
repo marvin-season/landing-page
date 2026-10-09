@@ -127,8 +127,10 @@ export function createIdbStore(): BbqStore {
         await ordersTable.delete(id);
       });
     },
-    exportBackup() {
-      return guard(async () => exportBackupDocument(await readDocument()));
+    exportBackup(options) {
+      return guard(async () =>
+        exportBackupDocument(await readDocument(), options),
+      );
     },
     importBackup(backup) {
       return guard(async () => {

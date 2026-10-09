@@ -177,10 +177,10 @@ export function OrdersHome() {
     if (nextAll) setAllOrders(nextAll);
   }
 
-  async function exportBackup() {
+  async function exportBackup(includePhotos = false) {
     try {
-      const backup = await bbqStore.exportBackup();
-      downloadBackup(backup);
+      const backup = await bbqStore.exportBackup({ includePhotos });
+      downloadBackup(backup, includePhotos);
     } catch (error) {
       setMessage(bbqErrorMessage(error));
     }
@@ -300,16 +300,21 @@ export function OrdersHome() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel>
-                    <span className="block">完整数据备份</span>
+                    <span className="block">全部数据备份</span>
                     <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-                      包含全部菜单、历史订单和留存照片
+                      默认不包含留存照片，文件更小
                     </span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onSelect={() => void exportBackup()}>
                     <Download className="size-4" aria-hidden="true" />
-                    导出完整备份
+                    导出备份
                   </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => void exportBackup(true)}>
+                    <Camera className="size-4" aria-hidden="true" />
+                    导出备份（包含照片）
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onSelect={() => importInputRef.current?.click()}
                   >
@@ -796,14 +801,15 @@ function OrderSummary({
   );
 }
 
-function downloadBackup(backup: BbqBackup) {
+function downloadBackup(backup: BbqBackup, includePhotos: boolean) {
   const blob = new Blob([JSON.stringify(backup)], {
     type: "application/json",
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `bbq-backup-${formatShanghaiDate(new Date())}.json`;
+  const suffix = includePhotos ? "-with-photos" : "";
+  link.download = `bbq-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
   document.body.append(link);
   link.click();
   link.remove();

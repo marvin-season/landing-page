@@ -8,6 +8,7 @@ import {
 import { BbqStoreError } from "./store";
 import type {
   BbqBackup,
+  BbqBackupExportOptions,
   Category,
   Dish,
   Order,
@@ -240,12 +241,18 @@ export function deleteOrder(document: BbqDocument, id: string): BbqDocument {
   };
 }
 
-export function exportBackup(document: BbqDocument): BbqBackup {
+export function exportBackup(
+  document: BbqDocument,
+  options: BbqBackupExportOptions = {},
+): BbqBackup {
+  const orders = listAllOrders(document);
   return {
     version: 1,
     categories: listCategories(document),
     dishes: listDishes(document),
-    orders: listAllOrders(document),
+    orders: options.includePhotos
+      ? orders
+      : orders.map((order) => ({ ...order, photos: [] })),
   };
 }
 
