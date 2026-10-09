@@ -332,6 +332,49 @@ describe("document", () => {
     assert.equal(updated.order.businessDayKey, opened.order.businessDayKey);
   });
 
+  it("keeps order photos when an update omits the photo field", () => {
+    const shop = openShop();
+    const photo = {
+      id: "photo-1",
+      dataUrl: "data:image/jpeg;base64,cGhvdG8=",
+      createdAt: "2026-10-10T04:00:00.000Z",
+    };
+    const opened = saveOrder(
+      shop.document,
+      {
+        seat: 1,
+        status: "open",
+        photos: [photo],
+        lines: [lineInput(shop.dish)],
+      },
+      shop.clock,
+    );
+    const line = opened.order.lines[0];
+    assert.ok(line);
+
+    const updated = saveOrder(
+      opened.document,
+      {
+        id: opened.order.id,
+        seat: 1,
+        status: "done",
+        lines: [
+          {
+            id: line.id,
+            dishId: line.dishId,
+            name: line.name,
+            priceCents: line.priceCents,
+            unit: line.unit,
+            quantity: line.quantity,
+          },
+        ],
+      },
+      shop.clock,
+    );
+
+    assert.deepEqual(updated.order.photos, [photo]);
+  });
+
   it("lists open orders before done orders and newer orders first", () => {
     const shop = openShop();
     let document = shop.document;
@@ -409,6 +452,13 @@ describe("document", () => {
     assert.equal(order?.openedAt, "2026-10-10T06:00:00.000Z");
     assert.equal(order?.businessDayKey, "2026-10-10");
     assert.equal(order?.seq, 9);
+    assert.deepEqual(order?.photos, [
+      {
+        id: "photo-local",
+        dataUrl: "data:image/jpeg;base64,bG9jYWw=",
+        createdAt: "2026-10-09T04:05:00.000Z",
+      },
+    ]);
     assert.deepEqual(
       order?.lines.map((line) => line.id),
       ["l1", "l-local", "l-new"],
@@ -485,6 +535,21 @@ describe("document", () => {
           },
         ],
       },
+      {
+        ...backup,
+        orders: [
+          {
+            ...backup.orders[0],
+            photos: [
+              {
+                id: "photo-invalid",
+                dataUrl: "https://example.com/photo.jpg",
+                createdAt: "2026-10-10T06:05:00.000Z",
+              },
+            ],
+          },
+        ],
+      },
     ];
     for (const item of invalid) {
       assert.throws(
@@ -551,6 +616,13 @@ function sampleDocument(): BbqDocument {
         sampleLine("l1", "旧菜", 100, 1),
         sampleLine("l-local", "本机行", 200, 2),
       ],
+      photos: [
+        {
+          id: "photo-local",
+          dataUrl: "data:image/jpeg;base64,bG9jYWw=",
+          createdAt: "2026-10-09T04:05:00.000Z",
+        },
+      ],
       totalCents: 500,
     },
     {
@@ -561,6 +633,7 @@ function sampleDocument(): BbqDocument {
       status: "done",
       openedAt: "2026-10-09T05:00:00.000Z",
       lines: [sampleLine("l-order-local", "本机菜", 200, 1)],
+      photos: [],
       totalCents: 200,
     },
   ];

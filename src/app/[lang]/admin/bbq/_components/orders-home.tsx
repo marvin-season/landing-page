@@ -2,6 +2,7 @@
 
 import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import {
+  Camera,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -10,10 +11,13 @@ import {
   Pencil,
   Plus,
   ReceiptText,
+  RotateCcw,
   Store,
   Upload,
   UtensilsCrossed,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
@@ -26,7 +30,7 @@ import {
 } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan } from "@/lib/bbq/money";
-import type { BbqBackup, Order } from "@/lib/bbq/types";
+import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls, touchCls } from "./bbq-layout";
 import {
@@ -74,6 +78,8 @@ export function OrdersHome() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<Order["status"]>("open");
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [previewPhoto, setPreviewPhoto] = useState<OrderPhoto | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [storageFailed, setStorageFailed] = useState(false);
   const [readyDay, setReadyDay] = useState<string | null>(null);
@@ -146,6 +152,32 @@ export function OrdersHome() {
     setSelectedId(id);
   }
 
+  async function toggleOrderStatus(order: Order) {
+    if (updatingStatusId) return;
+    setUpdatingStatusId(order.id);
+    setMessage(null);
+    try {
+      await bbqStore.saveOrder({
+        id: order.id,
+        seat: order.seat,
+        status: order.status === "open" ? "done" : "open",
+        lines: order.lines.map((line) => ({
+          id: line.id,
+          dishId: line.dishId,
+          name: line.name,
+          priceCents: line.priceCents,
+          unit: line.unit,
+          quantity: line.quantity,
+        })),
+      });
+      await reload();
+    } catch (error) {
+      setMessage(bbqErrorMessage(error));
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  }
+
   const openOrders = orders.filter((order) => order.status === "open");
   const doneOrders = orders.filter((order) => order.status === "done");
   const visibleOrders = statusFilter === "open" ? openOrders : doneOrders;
@@ -166,6 +198,7 @@ export function OrdersHome() {
       }
       return nextOrders[0]?.id ?? null;
     });
+    setPreviewPhoto(null);
   }, [orders, statusFilter]);
 
   return (
@@ -446,9 +479,64 @@ export function OrdersHome() {
                         </li>
                       ))}
                     </ul>
+                    {selected.photos.length > 0 ? (
+                      <section className="mt-4 border-t pt-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-1.5">
+                            <Camera
+                              className="size-4 text-primary"
+                              aria-hidden="true"
+                            />
+                            <h3 className="text-sm font-medium text-foreground">
+                              留存照片
+                            </h3>
+                          </div>
+                          <span className="text-xs tabular-nums text-muted-foreground">
+                            {selected.photos.length} 张
+                          </span>
+                        </div>
+                        <ul className="mt-2 grid grid-cols-3 gap-2 lg:grid-cols-4">
+                          {selected.photos.map((photo, index) => (
+                            <li key={photo.id}>
+                              <button
+                                type="button"
+                                className="relative block aspect-square w-full overflow-hidden rounded-lg border bg-muted transition-opacity hover:opacity-85"
+                                aria-label={`查看第 ${index + 1} 张留存照片`}
+                                onClick={() => setPreviewPhoto(photo)}
+                              >
+                                <Image
+                                  src={photo.dataUrl}
+                                  alt={`订单留存照片 ${index + 1}`}
+                                  fill
+                                  sizes="8rem"
+                                  unoptimized
+                                  className="size-full object-cover"
+                                />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    ) : null}
                   </div>
-                  <div className="border-t p-3">
-                    <Button asChild className="w-full">
+                  <div className="grid grid-cols-2 gap-2 border-t p-3">
+                    <Button
+                      type="button"
+                      disabled={updatingStatusId !== null}
+                      onClick={() => void toggleOrderStatus(selected)}
+                    >
+                      {selected.status === "open" ? (
+                        <CheckCircle2 className="size-4" aria-hidden="true" />
+                      ) : (
+                        <RotateCcw className="size-4" aria-hidden="true" />
+                      )}
+                      {updatingStatusId === selected.id
+                        ? "处理中…"
+                        : selected.status === "open"
+                          ? "完成订单"
+                          : "恢复进行中"}
+                    </Button>
+                    <Button asChild variant="outline">
                       <Link href={bbqOrderPath(selected.id)}>
                         <Pencil className="size-4" aria-hidden="true" />
                         修改订单
@@ -471,6 +559,35 @@ export function OrdersHome() {
           </div>
         </div>
       )}
+      {previewPhoto ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="查看订单留存照片"
+          onClick={() => setPreviewPhoto(null)}
+        >
+          <Image
+            src={previewPhoto.dataUrl}
+            alt="订单留存照片大图"
+            width={1600}
+            height={1600}
+            unoptimized
+            className="max-h-full max-w-full object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+          <Button
+            type="button"
+            variant="soft"
+            size="icon"
+            className="absolute top-4 right-4 shadow-lg"
+            aria-label="关闭照片预览"
+            onClick={() => setPreviewPhoto(null)}
+          >
+            <X className="size-4" aria-hidden="true" />
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -519,6 +636,15 @@ function OrderSummary({
           </span>
           <span aria-hidden="true">·</span>
           <span>{order.lines.length} 项</span>
+          {order.photos.length > 0 ? (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="inline-flex items-center gap-1">
+                <Camera className="size-3.5" aria-hidden="true" />
+                {order.photos.length}
+              </span>
+            </>
+          ) : null}
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">

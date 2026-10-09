@@ -27,6 +27,12 @@ export type OrderLine = {
   lineCents: number;
 };
 
+export type OrderPhoto = {
+  id: string;
+  dataUrl: string;
+  createdAt: string;
+};
+
 export type Order = {
   id: string;
   businessDayKey: string;
@@ -35,6 +41,7 @@ export type Order = {
   status: OrderStatus;
   openedAt: string;
   lines: OrderLine[];
+  photos: OrderPhoto[];
   totalCents: number;
 };
 
@@ -77,4 +84,5 @@ export type SaveOrderInput = {
   status: OrderStatus;
   openedAt?: string;
   lines: SaveOrderLineInput[];
+  photos?: OrderPhoto[];
 };

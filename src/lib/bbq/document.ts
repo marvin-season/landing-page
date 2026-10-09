@@ -12,6 +12,7 @@ import type {
   Dish,
   Order,
   OrderLine,
+  OrderPhoto,
   OrderStatus,
   SaveCategoryInput,
   SaveDishInput,
@@ -180,6 +181,7 @@ export function saveOrder(
     };
   });
   const orderTotal = totalCents(lines);
+  const photos = input.photos ?? existing?.photos ?? [];
 
   if (existing) {
     const order: Order = {
@@ -187,6 +189,7 @@ export function saveOrder(
       seat,
       status: input.status,
       lines,
+      photos,
       totalCents: orderTotal,
     };
     return {
@@ -209,6 +212,7 @@ export function saveOrder(
     status: input.status,
     openedAt,
     lines,
+    photos,
     totalCents: orderTotal,
   };
   return {
@@ -343,6 +347,24 @@ function parseLine(value: unknown, seen: Set<string>): OrderLine {
   };
 }
 
+function parsePhotos(value: unknown): OrderPhoto[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) invalidBackup();
+  const photoIds = new Set<string>();
+  return value.map((photo) => {
+    if (!isRecord(photo)) invalidBackup();
+    const dataUrl = requireText(photo.dataUrl);
+    if (!/^data:image\/(?:jpeg|png|webp);base64,/i.test(dataUrl)) {
+      invalidBackup();
+    }
+    return {
+      id: requireId(photo.id, photoIds),
+      dataUrl,
+      createdAt: requireOpenedAt(photo.createdAt),
+    };
+  });
+}
+
 function parseOrder(value: unknown, seen: Set<string>): Order {
   if (!isRecord(value)) invalidBackup();
   if (!Array.isArray(value.lines)) invalidBackup();
@@ -355,6 +377,7 @@ function parseOrder(value: unknown, seen: Set<string>): Order {
     status: requireStatus(value.status),
     openedAt: requireOpenedAt(value.openedAt),
     lines: value.lines.map((line) => parseLine(line, lineIds)),
+    photos: parsePhotos(value.photos),
     totalCents: requireInteger(value.totalCents, 0),
   };
 }
@@ -413,6 +436,7 @@ function mergeOrders(current: Order[], incoming: Order[]): Order[] {
     for (const line of order.lines) {
       if (!localIds.has(line.id)) lines.push(line);
     }
+    const photos = mergeById(local.photos, order.photos);
     merged.set(
       order.id,
       recalculate({
@@ -423,6 +447,7 @@ function mergeOrders(current: Order[], incoming: Order[]): Order[] {
         businessDayKey: order.businessDayKey,
         seq: order.seq,
         lines,
+        photos,
       }),
     );
   }

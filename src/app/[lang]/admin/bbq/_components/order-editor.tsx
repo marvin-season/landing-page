@@ -8,7 +8,9 @@ import {
 } from "@landing-page/design-system";
 import {
   ArrowLeft,
+  Camera,
   CheckCircle2,
+  ImagePlus,
   Minus,
   Package,
   Plus,
@@ -16,14 +18,17 @@ import {
   Save,
   Trash2,
   UtensilsCrossed,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 import { type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
-import type { Dish, Order, OrderStatus } from "@/lib/bbq/types";
+import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
+import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import {
   cls,
@@ -79,11 +84,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [seat, setSeat] = useState<number | null>(null);
   const [done, setDone] = useState(false);
   const [lines, setLines] = useState<DraftLine[]>([]);
+  const [photos, setPhotos] = useState<OrderPhoto[]>([]);
   const [phase, setPhase] = useState<"loading" | "ready" | "missing" | "error">(
     "loading",
   );
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [processingPhotos, setProcessingPhotos] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -101,6 +108,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           setOrder(existing);
           setSeat(existing.seat);
           setDone(existing.status === "done");
+          setPhotos(existing.photos);
           setLines(
             existing.lines.map((line) => ({
               key: line.id,
@@ -186,8 +194,42 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     );
   }
 
+  async function addPhotos(files: FileList | null) {
+    if (!files || processingPhotos) return;
+    const selectedFiles = Array.from(files);
+    const remaining = MAX_ORDER_PHOTOS - photos.length;
+    if (remaining <= 0) {
+      setMessage(`每张订单最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+      return;
+    }
+
+    setProcessingPhotos(true);
+    setMessage(null);
+    try {
+      const results = await Promise.allSettled(
+        selectedFiles.slice(0, remaining).map(createOrderPhoto),
+      );
+      const nextPhotos = results.flatMap((result) =>
+        result.status === "fulfilled" ? [result.value] : [],
+      );
+      setPhotos((current) => [...current, ...nextPhotos]);
+
+      if (results.some((result) => result.status === "rejected")) {
+        setMessage("部分照片读取失败，请选择浏览器可读取的图片");
+      } else if (selectedFiles.length > remaining) {
+        setMessage(`每张订单最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+      }
+    } finally {
+      setProcessingPhotos(false);
+    }
+  }
+
+  function removePhoto(id: string) {
+    setPhotos((current) => current.filter((photo) => photo.id !== id));
+  }
+
   async function save() {
-    if (saving) return;
+    if (saving || processingPhotos) return;
     setSaving(true);
     setMessage(null);
     const status: OrderStatus = done ? "done" : "open";
@@ -196,6 +238,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         id: order?.id,
         seat,
         status,
+        photos,
         lines: lines.map((line) => ({
           id: line.id,
           dishId: line.dishId,
@@ -453,33 +496,93 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               )}
             </section>
             <section className="mt-4 border-t pt-4">
-              <div className="flex items-center justify-between gap-3 rounded-lg border bg-background px-3 py-2">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    订单状态
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Camera
+                      className="size-4 text-primary"
+                      aria-hidden="true"
+                    />
+                    <h2 className="text-sm font-medium text-foreground">
+                      拍照留存
+                    </h2>
+                  </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {done ? "订单已完成并计入已结金额" : "订单仍在进行中"}
+                    最多 {MAX_ORDER_PHOTOS} 张，仅保存在当前设备及备份中
                   </p>
                 </div>
-                <label className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm">
-                  <Switch checked={done} onCheckedChange={setDone} />
-                  <span>{done ? "已完成" : "进行中"}</span>
-                </label>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {photos.length}/{MAX_ORDER_PHOTOS}
+                </span>
               </div>
-              {order ? (
+              <label className="mt-2 inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
+                <ImagePlus className="size-4" aria-hidden="true" />
+                {processingPhotos
+                  ? "处理照片中…"
+                  : photos.length > 0
+                    ? "继续添加"
+                    : "拍照或选择照片"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  disabled={
+                    processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                  }
+                  className="sr-only"
+                  onChange={(event) => {
+                    const input = event.currentTarget;
+                    void addPhotos(input.files).finally(() => {
+                      input.value = "";
+                    });
+                  }}
+                />
+              </label>
+              {photos.length > 0 ? (
+                <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {photos.map((photo, index) => (
+                    <li
+                      key={photo.id}
+                      className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
+                    >
+                      <Image
+                        src={photo.dataUrl}
+                        alt={`订单留存照片 ${index + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 33vw, 10rem"
+                        unoptimized
+                        className="size-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="soft"
+                        size="icon"
+                        className="absolute top-1 right-1 size-7 shadow-sm"
+                        aria-label={`删除第 ${index + 1} 张照片`}
+                        onClick={() => removePhoto(photo.id)}
+                      >
+                        <X className="size-3.5" aria-hidden="true" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+            {order ? (
+              <section className="mt-4 border-t pt-3">
                 <Button
                   type="button"
                   variant="ghost"
-                  className="mt-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                   disabled={saving}
                   onClick={() => void removeOrder()}
                 >
                   <Trash2 className="size-4" aria-hidden="true" />
                   删除这张订单
                 </Button>
-              ) : null}
-            </section>
+              </section>
+            ) : null}
             {message ? (
               <Alert className="mt-3 border-destructive/30 bg-destructive/5 p-3">
                 <AlertDescription className="text-destructive">
@@ -489,25 +592,44 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </div>
           <TotalBar>
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2">
-              <div>
+            <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+              <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
                   {itemCount} 份 · 订单总额
                 </p>
                 <p className={editorTotalCls}>{formatYuan(total)}</p>
               </div>
-              <Button
-                type="button"
-                disabled={saving}
-                onClick={() => void save()}
-              >
-                {done ? (
-                  <CheckCircle2 className="size-4" aria-hidden="true" />
-                ) : (
-                  <Save className="size-4" aria-hidden="true" />
-                )}
-                {saving ? "保存中…" : order ? "保存修改" : "保存订单"}
-              </Button>
+              <div className="flex shrink-0 items-center gap-3">
+                <label className="inline-flex h-10 shrink-0 items-center gap-2 border-r pr-3">
+                  <span className="text-right">
+                    <span className="block text-[10px] leading-none text-muted-foreground">
+                      订单状态
+                    </span>
+                    <span className="mt-1 block text-xs font-medium leading-none text-foreground">
+                      {done ? "已完成" : "进行中"}
+                    </span>
+                  </span>
+                  <Switch
+                    checked={done}
+                    disabled={saving}
+                    aria-label="切换订单状态"
+                    onCheckedChange={setDone}
+                  />
+                </label>
+                <Button
+                  type="button"
+                  className="px-3"
+                  disabled={saving || processingPhotos}
+                  onClick={() => void save()}
+                >
+                  {done ? (
+                    <CheckCircle2 className="size-4" aria-hidden="true" />
+                  ) : (
+                    <Save className="size-4" aria-hidden="true" />
+                  )}
+                  {saving ? "保存中…" : order ? "保存修改" : "保存订单"}
+                </Button>
+              </div>
             </div>
           </TotalBar>
         </section>

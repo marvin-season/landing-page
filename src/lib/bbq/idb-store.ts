@@ -13,11 +13,12 @@ import {
   saveOrder as saveOrderDocument,
 } from "./document";
 import { type BbqStore, BbqStoreError } from "./store";
-import type { Category, Dish, Order } from "./types";
+import type { Category, Dish, Order, OrderPhoto } from "./types";
 
 type StoredDish = Omit<Dish, "unit"> & { unit?: string };
-type StoredOrder = Omit<Order, "lines"> & {
+type StoredOrder = Omit<Order, "lines" | "photos"> & {
   lines: Array<Omit<Order["lines"][number], "unit"> & { unit?: string }>;
+  photos?: OrderPhoto[];
 };
 
 const db = new Dexie("bbq");
@@ -48,6 +49,7 @@ async function readDocument() {
   }));
   const orders: Order[] = storedOrders.map((order) => ({
     ...order,
+    photos: order.photos ?? [],
     lines: order.lines.map((line) => ({
       ...line,
       unit: line.unit?.trim() || "份",
