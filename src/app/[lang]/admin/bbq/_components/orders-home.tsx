@@ -260,7 +260,8 @@ function OrderSummary({ order }: { order: Order }) {
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-base font-medium text-foreground">
-          单号 {order.seq} · {order.seat} 号座
+          单号 {order.seq} ·{" "}
+          {order.seat === null ? "打包" : `${order.seat} 号座`}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           {statusLabel(order.status)} ·{" "}

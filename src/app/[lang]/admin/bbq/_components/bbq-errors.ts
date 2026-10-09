@@ -10,7 +10,7 @@ export function bbqErrorMessage(error: unknown): string {
     case "invalid_name":
       return "名称不能为空";
     case "invalid_seat":
-      return "座号要在 1 到 8 之间";
+      return "座号只能空着或选 1 到 8";
     case "invalid_money":
       return "金额不正确";
     case "category_not_found":

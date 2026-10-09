@@ -31,7 +31,7 @@ export type Order = {
   id: string;
   businessDayKey: string;
   seq: number;
-  seat: number;
+  seat: number | null;
   status: OrderStatus;
   openedAt: string;
   lines: OrderLine[];
@@ -73,7 +73,7 @@ export type BbqBackup = {
 
 export type SaveOrderInput = {
   id?: string;
-  seat: number;
+  seat: number | null;
   status: OrderStatus;
   openedAt?: string;
   lines: SaveOrderLineInput[];

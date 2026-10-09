@@ -39,7 +39,8 @@ function requireName(name: string): string {
   return trimmed;
 }
 
-function requireSeat(seat: number): number {
+function requireSeat(seat: number | null): number | null {
+  if (seat === null) return null;
   if (!Number.isInteger(seat) || seat < 1 || seat > 8) {
     throw new BbqStoreError("invalid_seat");
   }
@@ -350,12 +351,17 @@ function parseOrder(value: unknown, seen: Set<string>): Order {
     id: requireId(value.id, seen),
     businessDayKey: requireText(value.businessDayKey),
     seq: requireInteger(value.seq, 1),
-    seat: requireInteger(value.seat, 1, 8),
+    seat: requireSeatValue(value.seat),
     status: requireStatus(value.status),
     openedAt: requireOpenedAt(value.openedAt),
     lines: value.lines.map((line) => parseLine(line, lineIds)),
     totalCents: requireInteger(value.totalCents, 0),
   };
+}
+
+function requireSeatValue(value: unknown): number | null {
+  if (value === null) return null;
+  return requireInteger(value, 1, 8);
 }
 
 function requireOpenedAt(value: unknown): string {

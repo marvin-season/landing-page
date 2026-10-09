@@ -252,6 +252,30 @@ describe("document", () => {
     );
   });
 
+  it("allows a takeaway order with no seat", () => {
+    const shop = openShop();
+    const saved = saveOrder(
+      shop.document,
+      { seat: null, status: "open", lines: [lineInput(shop.dish)] },
+      shop.clock,
+    );
+    assert.equal(saved.order.seat, null);
+  });
+
+  it("rejects a seat outside 1 to 8", () => {
+    const shop = openShop();
+    assert.throws(
+      () =>
+        saveOrder(
+          shop.document,
+          { seat: 9, status: "open", lines: [lineInput(shop.dish)] },
+          shop.clock,
+        ),
+      (error: unknown) =>
+        error instanceof BbqStoreError && error.code === "invalid_seat",
+    );
+  });
+
   it("allows two open orders on the same seat", () => {
     const shop = openShop();
     const first = saveOrder(
@@ -399,6 +423,10 @@ describe("document", () => {
     assert.equal(
       merged.orders.find((item) => item.id === "o-new")?.totalCents,
       100,
+    );
+    assert.equal(
+      merged.orders.find((item) => item.id === "o-takeaway")?.seat,
+      null,
     );
   });
 
@@ -589,6 +617,16 @@ function sampleBackup() {
         openedAt: "2026-10-10T07:00:00.000Z",
         lines: [sampleLine("l-order-new", "整单", 50, 2)],
         totalCents: 999,
+      },
+      {
+        id: "o-takeaway",
+        businessDayKey: "2026-10-10",
+        seq: 2,
+        seat: null,
+        status: "open" as const,
+        openedAt: "2026-10-10T07:30:00.000Z",
+        lines: [sampleLine("l-takeaway", "打包", 200, 1)],
+        totalCents: 200,
       },
     ],
   };

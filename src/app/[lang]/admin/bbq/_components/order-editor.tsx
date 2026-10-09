@@ -154,7 +154,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   async function save() {
-    if (seat === null || saving) return;
+    if (saving) return;
     setSaving(true);
     setMessage(null);
     const status: OrderStatus = done ? "done" : "open";
@@ -262,6 +262,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           <div className={orderBodyCls}>
             <h2 className="text-base font-medium text-foreground">座号</h2>
             <div className="mt-2 grid grid-cols-4 gap-2">
+              <Button
+                type="button"
+                variant={seat === null ? "default" : "outline"}
+                aria-pressed={seat === null}
+                className={`${touchCls} col-span-4 min-w-11 text-base`}
+                onClick={() => setSeat(null)}
+              >
+                打包
+              </Button>
               {SEATS.map((number) => (
                 <Button
                   key={number}
@@ -343,7 +352,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <Button
                 type="button"
                 size="lg"
-                disabled={seat === null || saving}
+                disabled={saving}
                 onClick={() => void save()}
               >
                 保存
