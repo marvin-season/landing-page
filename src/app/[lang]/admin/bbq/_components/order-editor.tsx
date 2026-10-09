@@ -508,37 +508,53 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     </h2>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    最多 {MAX_ORDER_PHOTOS} 张，仅保存在当前设备及备份中
+                    最多 {MAX_ORDER_PHOTOS} 张，可拍照追加或从相册一次选择多张
                   </p>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
                   {photos.length}/{MAX_ORDER_PHOTOS}
                 </span>
               </div>
-              <label className="mt-2 inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
-                <ImagePlus className="size-4" aria-hidden="true" />
-                {processingPhotos
-                  ? "处理照片中…"
-                  : photos.length > 0
-                    ? "继续添加"
-                    : "拍照或选择照片"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  multiple
-                  disabled={
-                    processingPhotos || photos.length >= MAX_ORDER_PHOTOS
-                  }
-                  className="sr-only"
-                  onChange={(event) => {
-                    const input = event.currentTarget;
-                    void addPhotos(input.files).finally(() => {
-                      input.value = "";
-                    });
-                  }}
-                />
-              </label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
+                  <Camera className="size-4" aria-hidden="true" />
+                  {processingPhotos ? "处理照片中…" : "拍照"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    disabled={
+                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                    }
+                    className="sr-only"
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      void addPhotos(input.files).finally(() => {
+                        input.value = "";
+                      });
+                    }}
+                  />
+                </label>
+                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
+                  <ImagePlus className="size-4" aria-hidden="true" />
+                  {processingPhotos ? "处理照片中…" : "从相册选择"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={
+                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                    }
+                    className="sr-only"
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      void addPhotos(input.files).finally(() => {
+                        input.value = "";
+                      });
+                    }}
+                  />
+                </label>
+              </div>
               {photos.length > 0 ? (
                 <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {photos.map((photo, index) => (
