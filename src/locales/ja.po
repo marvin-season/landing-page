@@ -93,7 +93,7 @@ msgstr ""
 msgid "Back to home"
 msgstr "ホームに戻る"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:143
 msgid "Back to overview"
 msgstr "概要に戻る"
 
@@ -142,7 +142,7 @@ msgstr "現行"
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:124
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
@@ -224,7 +224,7 @@ msgstr "選択を解除"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:66
 #: src/app/[lang]/knowledge/page.tsx:8
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
@@ -239,7 +239,7 @@ msgstr "ドキュメントチャット"
 msgid "Document preview"
 msgstr "ドキュメントのプレビュー"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:71
 msgid "Document reading overview"
 msgstr "ドキュメント閲覧の概要"
 
@@ -475,10 +475,6 @@ msgstr "アカウントなしで PDF または Markdown を開けます。段落
 msgid "Open Docs workspace"
 msgstr "ドキュメントワークスペースを開く"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
-msgid "Open document workspace"
-msgstr "ドキュメントワークスペースを開く"
-
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
 msgstr ""
@@ -510,7 +506,7 @@ msgstr ""
 msgid "PDF citation highlight"
 msgstr "PDF 引用ハイライト"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:91
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:217
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF は 20 MB 以下、Markdown は 1 MB 以下にしてください。"
 
@@ -518,11 +514,11 @@ msgstr "PDF は 20 MB 以下、Markdown は 1 MB 以下にしてください。"
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:76
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:202
 msgid "Please choose one document at a time."
 msgstr "一度に 1 つのドキュメントを選択してください。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:82
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:208
 msgid "Please upload a PDF or Markdown file."
 msgstr "PDF または Markdown ファイルをアップロードしてください。"
 
@@ -604,7 +600,7 @@ msgstr "再試行"
 msgid "Reusable UI components and design references"
 msgstr "再利用可能なUIコンポーネントとデザインリファレンス"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:91
 msgid "Scroll down to read and quote your document"
 msgstr "下にスクロールして閲覧と引用を始める"
 
@@ -665,7 +661,8 @@ msgstr "技術スタック"
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr "アシスタントが受け取るのは引用箇所と指示のみです。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:136
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:112
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:256
 msgid "The sample could not be loaded. Please try again."
 msgstr "サンプルを読み込めませんでした。もう一度お試しください。"
 
@@ -682,11 +679,11 @@ msgstr "考え中…"
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:101
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:228
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "読み込めませんでした。有効な UTF-8 の Markdown ファイルを使用してください。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:86
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:212
 msgid "This file is empty. Please choose another file."
 msgstr "ファイルが空です。別のファイルを選択してください。"
 

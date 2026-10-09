@@ -1,3 +1,4 @@
+import { Link } from "@/components/link/link";
 import { PrefetchUsersLink } from "./_components/prefetch-users-link";
 
 const tools = [
@@ -6,7 +7,32 @@ const tools = [
     title: "闲人止步",
     description: "管理用户列表，创建管理员或访客",
   },
+  {
+    href: "/admin/bbq",
+    title: "烧烤记账",
+    description: "上架菜单，按座号记账",
+  },
 ];
+
+const toolClassName =
+  "block rounded-xl border bg-card px-4 py-4 shadow-sm transition-colors hover:bg-muted/60 shinchan:matte-surface apple:glass-surface";
+
+function ToolText({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <>
+      <p className="text-sm font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+        {description}
+      </p>
+    </>
+  );
+}
 
 export default function AdminPage() {
   return (
@@ -17,17 +43,15 @@ export default function AdminPage() {
       <ul className="mt-8 flex flex-col gap-3">
         {tools.map((tool) => (
           <li key={tool.href}>
-            <PrefetchUsersLink
-              href={tool.href}
-              className="block rounded-xl border bg-card px-4 py-4 shadow-sm transition-colors hover:bg-muted/60 shinchan:matte-surface apple:glass-surface"
-            >
-              <p className="text-sm font-medium text-foreground">
-                {tool.title}
-              </p>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                {tool.description}
-              </p>
-            </PrefetchUsersLink>
+            {tool.href === "/admin/users" ? (
+              <PrefetchUsersLink href={tool.href} className={toolClassName}>
+                <ToolText title={tool.title} description={tool.description} />
+              </PrefetchUsersLink>
+            ) : (
+              <Link href={tool.href} className={toolClassName}>
+                <ToolText title={tool.title} description={tool.description} />
+              </Link>
+            )}
           </li>
         ))}
       </ul>

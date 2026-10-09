@@ -93,7 +93,7 @@ msgstr ""
 msgid "Back to home"
 msgstr "홈으로"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:143
 msgid "Back to overview"
 msgstr "개요로"
 
@@ -142,7 +142,7 @@ msgstr "현재"
 msgid "Default throttle mode, cannot be changed"
 msgstr "기본 스로틀 모드이며 변경할 수 없습니다"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:124
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
@@ -224,7 +224,7 @@ msgstr "선택 해제"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:66
 #: src/app/[lang]/knowledge/page.tsx:8
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
@@ -239,7 +239,7 @@ msgstr "문서 대화"
 msgid "Document preview"
 msgstr "문서 미리보기"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:71
 msgid "Document reading overview"
 msgstr "문서 읽기 개요"
 
@@ -475,10 +475,6 @@ msgstr "계정 없이 PDF 또는 Markdown을 여세요. 문장을 선택해 문�
 msgid "Open Docs workspace"
 msgstr "문서 작업 공간 열기"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
-msgid "Open document workspace"
-msgstr "문서 작업 공간 열기"
-
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
 msgstr "페이지 열기"
@@ -510,7 +506,7 @@ msgstr ""
 msgid "PDF citation highlight"
 msgstr "PDF 원문 강조"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:91
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:217
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF는 20MB, Markdown은 1MB를 넘을 수 없습니다."
 
@@ -518,11 +514,11 @@ msgstr "PDF는 20MB, Markdown은 1MB를 넘을 수 없습니다."
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 최대 20MB · Markdown 최대 1MB"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:76
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:202
 msgid "Please choose one document at a time."
 msgstr "한 번에 문서 하나만 선택하세요."
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:82
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:208
 msgid "Please upload a PDF or Markdown file."
 msgstr "PDF 또는 Markdown 파일을 업로드하세요."
 
@@ -604,7 +600,7 @@ msgstr "다시 시도"
 msgid "Reusable UI components and design references"
 msgstr "재사용 가능한 UI 컴포넌트와 디자인 참고"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:91
 msgid "Scroll down to read and quote your document"
 msgstr "아래로 스크롤해 문서를 읽고 인용하세요"
 
@@ -665,7 +661,8 @@ msgstr "기술 스택"
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr "어시스턴트는 인용문과 지시만 받으며, 전체 문서는 보내지 않습니다."
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:136
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:112
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:256
 msgid "The sample could not be loaded. Please try again."
 msgstr "샘플을 불러오지 못했습니다. 다시 시도하세요."
 
@@ -682,11 +679,11 @@ msgstr "생각 중…"
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:101
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:228
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "이 파일을 읽을 수 없습니다. 유효한 UTF-8 Markdown 파일을 사용하세요."
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:86
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:212
 msgid "This file is empty. Please choose another file."
 msgstr "파일이 비어 있습니다. 다른 파일을 선택하세요."
 

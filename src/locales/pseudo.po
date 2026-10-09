@@ -93,7 +93,7 @@ msgstr ""
 msgid "Back to home"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:143
 msgid "Back to overview"
 msgstr ""
 
@@ -142,7 +142,7 @@ msgstr ""
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:124
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
@@ -224,7 +224,7 @@ msgstr ""
 msgid "Docs"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:66
 #: src/app/[lang]/knowledge/page.tsx:8
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
@@ -239,7 +239,7 @@ msgstr ""
 msgid "Document preview"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:71
 msgid "Document reading overview"
 msgstr ""
 
@@ -475,10 +475,6 @@ msgstr ""
 msgid "Open Docs workspace"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
-msgid "Open document workspace"
-msgstr ""
-
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
 msgstr ""
@@ -510,7 +506,7 @@ msgstr ""
 msgid "PDF citation highlight"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:91
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:217
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr ""
 
@@ -518,11 +514,11 @@ msgstr ""
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:76
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:202
 msgid "Please choose one document at a time."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:82
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:208
 msgid "Please upload a PDF or Markdown file."
 msgstr ""
 
@@ -604,7 +600,7 @@ msgstr ""
 msgid "Reusable UI components and design references"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:91
 msgid "Scroll down to read and quote your document"
 msgstr ""
 
@@ -665,7 +661,8 @@ msgstr ""
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:136
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:112
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:256
 msgid "The sample could not be loaded. Please try again."
 msgstr ""
 
@@ -682,11 +679,11 @@ msgstr ""
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:101
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:228
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:86
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:212
 msgid "This file is empty. Please choose another file."
 msgstr ""
 

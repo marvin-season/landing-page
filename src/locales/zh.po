@@ -93,7 +93,7 @@ msgstr "正在授权…"
 msgid "Back to home"
 msgstr "返回首页"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:119
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:143
 msgid "Back to overview"
 msgstr "返回概览"
 
@@ -142,7 +142,7 @@ msgstr "当前"
 msgid "Default throttle mode, cannot be changed"
 msgstr ""
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:100
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:124
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:110
 #: src/app/[lang]/knowledge/_components/knowledge-workspace.tsx:134
 msgid "Default workspace"
@@ -224,7 +224,7 @@ msgstr "取消选中"
 msgid "Docs"
 msgstr "Docs"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:67
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:66
 #: src/app/[lang]/knowledge/page.tsx:8
 #: src/app/[lang]/knowledge/page.tsx:49
 msgid "Docs & Knowledge"
@@ -239,7 +239,7 @@ msgstr "文档对话"
 msgid "Document preview"
 msgstr "文档预览"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:72
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:71
 msgid "Document reading overview"
 msgstr "文档阅读概览"
 
@@ -475,10 +475,6 @@ msgstr "无需登录即可打开 PDF 或 Markdown。选中段落并保留带文�
 msgid "Open Docs workspace"
 msgstr "打开文档工作区"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:88
-msgid "Open document workspace"
-msgstr "进入文档工作区"
-
 #: src/app/[lang]/(home)/_components/index.tsx:129
 msgid "Open page"
 msgstr ""
@@ -510,7 +506,7 @@ msgstr "密码"
 msgid "PDF citation highlight"
 msgstr "PDF 原文高亮"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:91
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:217
 msgid "PDF files must be under 20 MB and Markdown files under 1 MB."
 msgstr "PDF 文件不能超过 20 MB，Markdown 文件不能超过 1 MB。"
 
@@ -518,11 +514,11 @@ msgstr "PDF 文件不能超过 20 MB，Markdown 文件不能超过 1 MB。"
 msgid "PDF up to 20 MB · Markdown up to 1 MB"
 msgstr "PDF 最大 20 MB · Markdown 最大 1 MB"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:76
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:202
 msgid "Please choose one document at a time."
 msgstr "每次请选择一份文档。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:82
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:208
 msgid "Please upload a PDF or Markdown file."
 msgstr "请上传 PDF 或 Markdown 文件。"
 
@@ -604,7 +600,7 @@ msgstr "重试"
 msgid "Reusable UI components and design references"
 msgstr "可重用 UI 组件和设计参考"
 
-#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:92
+#: src/app/[lang]/knowledge/_components/knowledge-scenes.tsx:91
 msgid "Scroll down to read and quote your document"
 msgstr "向下滚动，开始阅读与引用"
 
@@ -665,7 +661,8 @@ msgstr "技术栈"
 msgid "The assistant only receives the quoted passage and your instruction."
 msgstr "助手只会收到划词内容和你的指令，不会发送整篇文档。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:136
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:112
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:256
 msgid "The sample could not be loaded. Please try again."
 msgstr "示例文件加载失败，请重试。"
 
@@ -682,11 +679,11 @@ msgstr "正在思考…"
 msgid "This content requires authorization. Enter your username and password to continue."
 msgstr "此内容需要授权，请输入账号和密码后继续。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:101
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:228
 msgid "This file could not be read. Use a valid UTF-8 Markdown file."
 msgstr "无法读取此文件，请使用有效的 UTF-8 编码 Markdown 文件。"
 
-#: src/app/[lang]/knowledge/_components/use-document-session.ts:86
+#: src/app/[lang]/knowledge/_components/use-document-session.ts:212
 msgid "This file is empty. Please choose another file."
 msgstr "文件内容为空，请选择其他文件。"
 

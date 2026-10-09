@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: PropsWithChildren) {
   return (
     <TankQueryClientProvider>
-      <main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-6 py-20">
+      <main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-4 sm:px-6 lg:py-20">
         {children}
       </main>
     </TankQueryClientProvider>
