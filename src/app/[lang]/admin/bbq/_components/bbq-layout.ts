@@ -12,7 +12,7 @@ export function cls(
 }
 
 export const pageShellCls = cls`
-  flex flex-col gap-4
+  flex flex-col gap-3
   md:h-[calc(100dvh-2rem)] md:overflow-hidden
   lg:h-[calc(100dvh-10rem)]
 `;
@@ -38,9 +38,9 @@ export const orderBodyCls = cls`
 `;
 
 export const totalBarCls = cls`
-  fixed inset-x-0 bottom-0 z-20 border-t bg-background px-4 pt-3
-  pb-[calc(0.75rem+env(safe-area-inset-bottom))]
-  md:static md:inset-auto md:z-auto md:pb-3
+  fixed inset-x-0 bottom-0 z-20 border-t bg-background px-3 pt-2
+  pb-[calc(0.5rem+env(safe-area-inset-bottom))]
+  md:static md:inset-auto md:z-auto md:pb-2
 `;
 
 export const detailPaneCls = cls`
@@ -50,7 +50,7 @@ export const detailPaneCls = cls`
 
 export const listPaneCls = cls`min-h-0 min-w-0 md:overflow-auto`;
 
-export const editorTotalCls = cls`text-4xl font-semibold tabular-nums`;
+export const editorTotalCls = cls`text-3xl font-semibold tabular-nums`;
 
 export const cardTotalCls = cls`text-2xl font-semibold tabular-nums`;
 

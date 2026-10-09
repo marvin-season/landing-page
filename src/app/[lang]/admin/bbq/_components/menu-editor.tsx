@@ -1,6 +1,21 @@
 "use client";
 
-import { Button, Input, Switch } from "@landing-page/design-system";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Input,
+  Switch,
+} from "@landing-page/design-system";
+import {
+  ArrowLeft,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+  UtensilsCrossed,
+  X,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import { bbqStore } from "@/lib/bbq/idb-store";
@@ -15,16 +30,16 @@ import { cls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const dishGridCls = cls`
-  grid grid-cols-2 gap-3
-  md:grid-cols-[minmax(0,1fr)_5rem_4rem_4rem_4rem_4rem] md:gap-0
+  grid grid-cols-2 gap-2
+  md:grid-cols-[minmax(0,1fr)_7rem_5rem_5rem_5rem_6rem] md:gap-0
 `;
 const dishRowCls = cls`
-  rounded-xl border bg-card p-3
-  md:items-end md:rounded-none md:border-x-0 md:border-t-0 md:p-0
+  rounded-lg border bg-card p-2.5
+  md:items-center md:rounded-none md:border-x-0 md:border-t-0 md:p-0
 `;
 const dishInputCls = cls`
-  h-11 w-full min-w-0 rounded-lg border bg-background px-3 text-base shadow-none
-  md:rounded-none md:border-0 md:bg-transparent md:px-2 md:text-base
+  h-10 w-full min-w-0 rounded-lg border bg-background px-3 text-sm shadow-none
+  md:rounded-none md:border-0 md:bg-transparent md:px-2 md:text-sm
 `;
 
 export function MenuEditor() {
@@ -71,29 +86,75 @@ export function MenuEditor() {
   }, [reload]);
 
   if (phase === "loading") {
-    return <p className="text-sm text-muted-foreground">读取中</p>;
-  }
-
-  if (phase === "error") {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-        <Link href="/admin/bbq" className="text-sm text-muted-foreground">
-          返回
-        </Link>
-        <p className="text-base">{message}</p>
+      <div
+        className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
+        role="status"
+      >
+        读取菜单中…
       </div>
     );
   }
 
-  return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <header className="flex flex-col gap-2">
-        <Link href="/admin/bbq" className="text-sm text-muted-foreground">
-          返回
+  if (phase === "error") {
+    return (
+      <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
+        <Link
+          href="/admin/bbq"
+          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          返回订单
         </Link>
-        <h1 className="text-xl font-semibold text-foreground">菜单</h1>
+        <Alert className="border-destructive/30 bg-destructive/5 p-3">
+          <AlertDescription className="text-destructive">
+            {message}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const listedCount = dishes.filter((dish) => dish.listed).length;
+
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+      <header className="flex flex-col gap-2">
+        <Link
+          href="/admin/bbq"
+          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          返回订单
+        </Link>
+        <div>
+          <div className="flex items-center gap-1.5">
+            <UtensilsCrossed
+              className="size-4 text-primary"
+              aria-hidden="true"
+            />
+            <h1 className="text-lg font-semibold text-foreground">菜单管理</h1>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            维护菜品价格、单位、展示顺序和上架状态
+          </p>
+        </div>
       </header>
-      {message ? <p className="text-sm text-destructive">{message}</p> : null}
+      <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border bg-border">
+        <MenuMetric label="全部菜品" value={`${dishes.length} 项`} />
+        <MenuMetric label="已上架" value={`${listedCount} 项`} />
+        <MenuMetric
+          label="未上架"
+          value={`${dishes.length - listedCount} 项`}
+        />
+      </dl>
+      {message ? (
+        <Alert className="border-destructive/30 bg-destructive/5 p-3">
+          <AlertDescription className="text-destructive">
+            {message}
+          </AlertDescription>
+        </Alert>
+      ) : null}
       {categoryId ? (
         <DishTable
           categoryId={categoryId}
@@ -118,36 +179,61 @@ function DishTable({
   onError: (message: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-3 rounded-xl border border-dashed bg-muted/30 p-3">
-        <div className={`${dishGridCls} hidden px-2 md:grid`}>
-          <span className="text-sm text-muted-foreground">名称</span>
-          <span className="text-sm text-muted-foreground">单价</span>
-          <span className="text-sm text-muted-foreground">单位</span>
-          <span className="text-sm text-muted-foreground">排序</span>
-          <span className="text-sm text-muted-foreground">上架</span>
-          <span className="text-sm text-muted-foreground">操作</span>
+    <div className="flex flex-col gap-4">
+      <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+        <div className="border-b bg-muted/30 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <Plus className="size-4 text-primary" aria-hidden="true" />
+            <h2 className="text-sm font-medium text-foreground">新增菜品</h2>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            保存后会立即出现在已上架菜单中
+          </p>
         </div>
-        <DishRow
-          key="new"
-          categoryId={categoryId}
-          onSaved={onSaved}
-          onError={onError}
-        />
+        <div className="p-2.5">
+          <div className={`${dishGridCls} hidden px-2 pb-1.5 md:grid`}>
+            <span className="text-xs text-muted-foreground">名称</span>
+            <span className="text-xs text-muted-foreground">单价</span>
+            <span className="text-xs text-muted-foreground">单位</span>
+            <span className="text-xs text-muted-foreground">排序</span>
+            <span className="text-xs text-muted-foreground">上架</span>
+            <span className="text-xs text-muted-foreground">操作</span>
+          </div>
+          <DishRow
+            key="new"
+            categoryId={categoryId}
+            onSaved={onSaved}
+            onError={onError}
+          />
+        </div>
       </section>
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-2">
         <div className="flex items-end justify-between gap-3">
-          <h2 className="text-base font-medium text-foreground">菜品列表</h2>
-          <span className="text-sm tabular-nums text-muted-foreground">
+          <div>
+            <h2 className="text-sm font-medium text-foreground">已有菜品</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              上架菜品可在开单页面直接选择
+            </p>
+          </div>
+          <span className="text-xs tabular-nums text-muted-foreground">
             {dishes.length} 项
           </span>
         </div>
         {dishes.length === 0 ? (
-          <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-            还没有菜品
-          </p>
+          <div className="flex min-h-36 flex-col items-center justify-center rounded-xl border bg-card px-5 text-center">
+            <UtensilsCrossed
+              className="size-7 text-muted-foreground/60"
+              aria-hidden="true"
+            />
+            <p className="mt-2 text-sm font-medium text-foreground">
+              还没有菜品
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              使用上方表单添加第一项菜品
+            </p>
+          </div>
         ) : (
-          <div className="flex flex-col gap-3 md:gap-0 md:border-t">
+          <div className="flex flex-col gap-2 md:gap-0 md:overflow-hidden md:rounded-xl md:border md:bg-card md:shadow-sm">
             {dishes.map((dish) => (
               <DishRow
                 key={dish.id}
@@ -270,12 +356,22 @@ function DishRow({
     }
   }
 
+  function cancelEditing() {
+    if (!dish) return;
+    setName(dish.name);
+    setPrice(centsToYuanInput(dish.priceCents));
+    setUnit(dish.unit);
+    setSort(String(dish.sort));
+    setListed(dish.listed);
+    setEditing(false);
+  }
+
   if (dish && !editing) {
     return (
-      <article className="flex flex-col gap-3 rounded-xl border bg-card p-4 sm:flex-row sm:items-center">
+      <article className="flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center md:rounded-none md:border-0 md:border-b md:last:border-b-0">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2">
-            <h3 className="truncate text-base font-medium text-foreground">
+            <h3 className="truncate text-sm font-medium text-foreground">
               {dish.name}
             </h3>
             <span
@@ -288,7 +384,7 @@ function DishRow({
               {dish.listed ? "已上架" : "未上架"}
             </span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             <span className="tabular-nums text-foreground">
               {formatYuan(dish.priceCents)}
             </span>
@@ -297,21 +393,23 @@ function DishRow({
             排序 {dish.sort}
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 gap-1.5">
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 flex-1 px-4 sm:flex-none"
+            className="h-9 flex-1 px-3 sm:flex-none"
             onClick={() => setEditing(true)}
           >
+            <Pencil className="size-4" aria-hidden="true" />
             编辑
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="min-h-11 flex-1 px-4 text-destructive sm:flex-none"
+            className="h-9 flex-1 px-3 text-destructive sm:flex-none"
             onClick={() => void remove()}
           >
+            <Trash2 className="size-4" aria-hidden="true" />
             删除
           </Button>
         </div>
@@ -367,9 +465,9 @@ function DishRow({
           aria-label="排序"
         />
       </label>
-      <div className="flex min-h-11 items-center justify-between gap-2 md:justify-center">
+      <div className="flex min-h-10 items-center justify-between gap-2 md:justify-center">
         <span className="text-xs text-muted-foreground md:sr-only">上架</span>
-        <div className="flex min-h-11 min-w-11 items-center justify-center">
+        <div className="flex min-h-10 min-w-10 items-center justify-center">
           <Switch
             checked={listed}
             aria-label="菜品上架"
@@ -377,16 +475,41 @@ function DishRow({
           />
         </div>
       </div>
-      <div className="flex min-h-11 items-end justify-end md:items-center">
+      <div className="col-span-2 flex min-h-10 items-end justify-end gap-1.5 md:col-span-1 md:items-center md:px-1">
+        {dish ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="size-9 shrink-0"
+            aria-label="取消编辑"
+            title="取消编辑"
+            onClick={cancelEditing}
+          >
+            <X className="size-4" aria-hidden="true" />
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="outline"
-          className="min-h-11 px-3 md:w-full md:px-1"
+          className="h-10 flex-1 px-3 md:px-2"
           onClick={() => void commit()}
         >
-          保存
+          <Save className="size-4" aria-hidden="true" />
+          {isNew ? "添加" : "保存"}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function MenuMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-card px-3 py-2">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground">
+        {value}
+      </dd>
     </div>
   );
 }
