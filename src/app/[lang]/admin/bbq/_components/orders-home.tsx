@@ -269,7 +269,7 @@ export function OrdersHome() {
             <div className="flex items-center gap-1.5">
               <Store className="size-4 text-primary" aria-hidden="true" />
               <h1 className="text-lg font-semibold text-pretty text-foreground">
-                烧烤记账
+                富民记账
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">

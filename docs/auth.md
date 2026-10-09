@@ -34,12 +34,14 @@ flowchart LR
 | `path` | `locale` | 公开地址 | 说明 |
 |---|---|---|---|
 | `/resume` | `true` | `/resume`，其他语言 `/{lang}/resume` | 简历；未登录不可看 |
-| `/admin` | `true` | `/admin`，其他语言 `/{lang}/admin` | 管理入口与子页 |
+| `/admin` | `true` | `/admin`，其他语言 `/{lang}/admin` | 管理入口与子页，BBQ 路由除外 |
 | `/agent` | `false` | 只有 `/agent`，无语言前缀 | Agent 对话与线程页 |
 
 `locale: true` 会同时匹配无前缀和所有 `/{lang}` 前缀（含 `/en/...`）。`locale: false` 只匹配该 path 本身及其子路径。
 
-**不是**受保护页：`/`、营销页、`/auth`、`/auth/signin`、`/auth/resume`。认证页本身不会被门闩再踢回登录。
+**不是**受保护页：`/`、营销页、`/auth`、`/auth/signin`、`/auth/resume`，以及 `/admin/bbq` 和它的全部子路由。认证页本身不会被门闩再踢回登录。
+
+`protectedPages` 可以通过 `excludedPaths` 从受保护前缀中排除公开子树。当前 `/admin` 仍保护管理入口和用户管理，但排除了 `/admin/bbq`；该排除同样应用于所有语言前缀。
 
 匹配是前缀匹配：`/admin/users`、`/zh/resume/`、`/agent/thread-1` 都会命中。`/agency` 这种前缀相似路径不会命中。
 

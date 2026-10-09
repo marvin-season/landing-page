@@ -27,6 +27,15 @@ describe("isProtectedPath", () => {
     assert.equal(isProtectedPath("/zh/admin/users"), true);
   });
 
+  it("keeps BBQ pages public with and without locale prefix", () => {
+    assert.equal(isProtectedPath("/admin/bbq"), false);
+    assert.equal(isProtectedPath("/admin/bbq/menu"), false);
+    assert.equal(isProtectedPath("/admin/bbq/orders/new"), false);
+    assert.equal(isProtectedPath("/admin/bbq/orders/order-1"), false);
+    assert.equal(isProtectedPath("/zh/admin/bbq"), false);
+    assert.equal(isProtectedPath("/zh/admin/bbq/orders/new"), false);
+  });
+
   it("does not match public or lookalike paths", () => {
     assert.equal(isProtectedPath("/"), false);
     assert.equal(isProtectedPath("/agency"), false);
@@ -41,6 +50,7 @@ describe("getProtectedPage", () => {
     assert.equal(getProtectedPage("/agent")?.locale, false);
     assert.equal(getProtectedPage("/admin")?.locale, true);
     assert.equal(getProtectedPage("/zh/admin")?.locale, true);
+    assert.equal(getProtectedPage("/admin/bbq"), undefined);
   });
 });
 
@@ -57,6 +67,8 @@ describe("getSafeReturnTo", () => {
 
   it("rejects public, absolute, and protocol-relative values", () => {
     assert.equal(getSafeReturnTo("/"), "/");
+    assert.equal(getSafeReturnTo("/admin/bbq"), "/");
+    assert.equal(getSafeReturnTo("/zh/admin/bbq/menu"), "/");
     assert.equal(getSafeReturnTo("https://evil.test/resume"), "/");
     assert.equal(getSafeReturnTo("//evil.test/resume"), "/");
     assert.equal(getSafeReturnTo("/agency"), "/");

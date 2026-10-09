@@ -3,12 +3,13 @@ import { isLocale, locales, sourceLocale } from "@/lib/i18n/locales";
 export type ProtectedPage = {
   path: string;
   locale?: boolean;
+  excludedPaths?: string[];
 };
 
 export const protectedPages: ProtectedPage[] = [
   { path: "/resume", locale: true },
   { path: "/agent", locale: false },
-  { path: "/admin", locale: true },
+  { path: "/admin", locale: true, excludedPaths: ["/admin/bbq"] },
 ];
 
 function normalizePathname(pathname: string) {
@@ -21,14 +22,24 @@ function normalizePathname(pathname: string) {
   }
 }
 
+function localizedPrefixes(path: string, locale?: boolean) {
+  return locale ? [path, ...locales.map((item) => `/${item}${path}`)] : [path];
+}
+
+function matchesPrefix(pathname: string, prefixes: string[]) {
+  return prefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 function matchesPage(pathname: string, page: ProtectedPage) {
   const normalized = normalizePathname(pathname);
-  const prefixes = page.locale
-    ? [page.path, ...locales.map((locale) => `/${locale}${page.path}`)]
-    : [page.path];
+  if (!matchesPrefix(normalized, localizedPrefixes(page.path, page.locale))) {
+    return false;
+  }
 
-  return prefixes.some(
-    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+  return !(page.excludedPaths ?? []).some((path) =>
+    matchesPrefix(normalized, localizedPrefixes(path, page.locale)),
   );
 }
 
