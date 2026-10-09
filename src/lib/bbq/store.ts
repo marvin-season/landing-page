@@ -35,6 +35,7 @@ export interface BbqStore {
   saveDish(input: SaveDishInput): Promise<Dish>;
   deleteDish(id: string): Promise<void>;
   listOrders(businessDayKey: string): Promise<Order[]>;
+  listAllOrders(): Promise<Order[]>;
   getOrder(id: string): Promise<Order | null>;
   saveOrder(input: SaveOrderInput): Promise<Order>;
   deleteOrder(id: string): Promise<void>;

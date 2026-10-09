@@ -4,6 +4,7 @@ import {
   deleteOrder as deleteOrderDocument,
   exportBackup as exportBackupDocument,
   getOrder as getOrderDocument,
+  listAllOrders as listAllOrdersDocument,
   listCategories as listCategoriesDocument,
   listDishes as listDishesDocument,
   listOrders as listOrdersDocument,
@@ -103,6 +104,9 @@ export function createIdbStore(): BbqStore {
       return guard(async () =>
         listOrdersDocument(await readDocument(), businessDayKey),
       );
+    },
+    listAllOrders() {
+      return guard(async () => listAllOrdersDocument(await readDocument()));
     },
     getOrder(id) {
       return guard(async () => getOrderDocument(await readDocument(), id));

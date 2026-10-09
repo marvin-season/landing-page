@@ -7,6 +7,7 @@ import {
   emptyDocument,
   exportBackup,
   getOrder,
+  listAllOrders,
   listOrders,
   mergeBackup,
   saveCategory,
@@ -417,6 +418,14 @@ describe("document", () => {
       shop.clock,
     );
     assert.equal(saved.order.businessDayKey, "2026-10-09");
+  });
+
+  it("lists all orders from newest to oldest", () => {
+    const document = sampleDocument();
+    assert.deepEqual(
+      listAllOrders(document).map((order) => order.id),
+      ["o-local", "o1"],
+    );
   });
 
   it("merges backups by id and recalculates order totals", () => {

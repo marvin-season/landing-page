@@ -1,12 +1,24 @@
 "use client";
 
-import { Alert, AlertDescription, Button } from "@landing-page/design-system";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@landing-page/design-system";
 import {
   Camera,
+  ChartLine,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Clock3,
+  DatabaseBackup,
   Download,
   Pencil,
   Plus,
@@ -19,7 +31,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
   businessDayLabel,
@@ -30,6 +42,7 @@ import {
 } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan } from "@/lib/bbq/money";
+import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls, touchCls } from "./bbq-layout";
@@ -39,6 +52,9 @@ import {
   bbqNewOrderPath,
   bbqOrderPath,
 } from "./bbq-paths";
+import { OrdersStatistics } from "./orders-statistics";
+
+type HomeView = "orders" | "statistics";
 
 function statusLabel(status: Order["status"]): string {
   return status === "open" ? "进行中" : "已完成";
@@ -48,12 +64,6 @@ function orderTotalCls(status: Order["status"]): string {
   const tone = status === "done" ? "text-muted-foreground" : "text-foreground";
   return `text-base font-semibold tabular-nums ${tone}`;
 }
-
-const utilityActionCls = cls`
-  inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full
-  px-3 text-xs font-medium text-muted-foreground transition-colors
-  hover:bg-muted hover:text-foreground
-`;
 
 const homePageShellCls = cls`
   flex flex-col gap-3
@@ -71,11 +81,20 @@ const orderTabCls = cls`
   px-2 text-xs font-medium transition-colors
 `;
 
+const homeViewTabCls = cls`
+  inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md px-3
+  text-sm font-medium transition-colors
+`;
+
 export function OrdersHome() {
   const searchParams = useSearchParams();
   const dayParam = searchParams.get("day");
+  const importInputRef = useRef<HTMLInputElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [homeView, setHomeView] = useState<HomeView>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
+  const [allOrders, setAllOrders] = useState<Order[] | null>(null);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<Order["status"]>("open");
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
@@ -114,12 +133,42 @@ export function OrdersHome() {
     };
   }, [day, mounted]);
 
+  useEffect(() => {
+    if (homeView !== "statistics" || allOrders !== null) {
+      return;
+    }
+    let cancelled = false;
+    setStatisticsLoading(true);
+    void bbqStore
+      .listAllOrders()
+      .then((next) => {
+        if (cancelled) return;
+        setAllOrders(next);
+        setMessage(null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setStorageFailed(true);
+        setMessage(bbqErrorMessage(error));
+      })
+      .finally(() => {
+        if (!cancelled) setStatisticsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [allOrders, homeView]);
+
   async function reload() {
-    const next = await bbqStore.listOrders(day);
+    const [next, nextAll] = await Promise.all([
+      bbqStore.listOrders(day),
+      allOrders === null ? Promise.resolve(null) : bbqStore.listAllOrders(),
+    ]);
     setOrders(next);
+    if (nextAll) setAllOrders(nextAll);
   }
 
-  async function exportOrders() {
+  async function exportBackup() {
     try {
       const backup = await bbqStore.exportBackup();
       downloadBackup(backup);
@@ -187,6 +236,7 @@ export function OrdersHome() {
     (total, order) => total + order.totalCents,
     0,
   );
+  const statistics = summarizeOrdersByBusinessDay(allOrders ?? []);
 
   useEffect(() => {
     setSelectedId((current) => {
@@ -213,49 +263,10 @@ export function OrdersHome() {
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              管理当档订单、结账状态和营业数据
+              管理当前档期订单，并查看全部档期经营趋势
             </p>
           </div>
-          <div className="inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm">
-            <Button
-              asChild
-              size="icon"
-              variant="ghost"
-              className="size-8 shrink-0"
-            >
-              <Link
-                href={
-                  day ? bbqHomePath(shiftBusinessDayKey(day, -1)) : "/admin/bbq"
-                }
-                aria-label="上一档"
-                title="上一档"
-              >
-                <ChevronLeft className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <p className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground">
-              {day ? businessDayLabel(day) : "营业日"}
-            </p>
-            <Button
-              asChild
-              size="icon"
-              variant="ghost"
-              className="size-8 shrink-0"
-            >
-              <Link
-                href={
-                  day ? bbqHomePath(shiftBusinessDayKey(day, 1)) : "/admin/bbq"
-                }
-                aria-label="下一档"
-                title="下一档"
-              >
-                <ChevronRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-        {storageFailed ? null : (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          {storageFailed ? null : (
             <div className="flex flex-wrap gap-1.5">
               <Button asChild>
                 <Link href={bbqNewOrderPath()}>
@@ -269,32 +280,131 @@ export function OrdersHome() {
                   菜单
                 </Link>
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="button" variant="outline">
+                    <DatabaseBackup className="size-4" aria-hidden="true" />
+                    数据备份
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>
+                    <span className="block">完整数据备份</span>
+                    <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                      包含全部菜单、历史订单和留存照片
+                    </span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => void exportBackup()}>
+                    <Download className="size-4" aria-hidden="true" />
+                    导出完整备份
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => importInputRef.current?.click()}
+                  >
+                    <Upload className="size-4" aria-hidden="true" />
+                    导入完整备份
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="sr-only"
+                onChange={(event) => {
+                  const input = event.currentTarget;
+                  const file = input.files?.[0];
+                  input.value = "";
+                  void importFile(file);
+                }}
+              />
             </div>
-            <div className="flex flex-wrap items-center gap-0.5">
+          )}
+        </div>
+        {storageFailed ? null : (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              className="flex w-fit rounded-lg bg-muted p-0.5"
+              role="tablist"
+              aria-label="首页视图"
+            >
               <button
                 type="button"
-                className={utilityActionCls}
-                onClick={() => void exportOrders()}
+                role="tab"
+                aria-selected={homeView === "orders"}
+                className={`${homeViewTabCls} ${
+                  homeView === "orders"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => setHomeView("orders")}
               >
-                <Download className="size-4" aria-hidden="true" />
-                导出备份
+                <ReceiptText className="size-4" aria-hidden="true" />
+                当前档
               </button>
-              <label className={utilityActionCls}>
-                <Upload className="size-4" aria-hidden="true" />
-                导入备份
-                <input
-                  type="file"
-                  accept=".json,application/json"
-                  className="sr-only"
-                  onChange={(event) => {
-                    const input = event.currentTarget;
-                    const file = input.files?.[0];
-                    input.value = "";
-                    void importFile(file);
-                  }}
-                />
-              </label>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={homeView === "statistics"}
+                className={`${homeViewTabCls} ${
+                  homeView === "statistics"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                onClick={() => setHomeView("statistics")}
+              >
+                <ChartLine className="size-4" aria-hidden="true" />
+                经营趋势
+              </button>
             </div>
+            {homeView === "orders" ? (
+              <div className="inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm">
+                <Button
+                  asChild
+                  size="icon"
+                  variant="ghost"
+                  className="size-8 shrink-0"
+                >
+                  <Link
+                    href={
+                      day
+                        ? bbqHomePath(shiftBusinessDayKey(day, -1))
+                        : "/admin/bbq"
+                    }
+                    aria-label="上一档"
+                    title="上一档"
+                  >
+                    <ChevronLeft className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+                <p className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground">
+                  {day ? businessDayLabel(day) : "营业日"}
+                </p>
+                <Button
+                  asChild
+                  size="icon"
+                  variant="ghost"
+                  className="size-8 shrink-0"
+                >
+                  <Link
+                    href={
+                      day
+                        ? bbqHomePath(shiftBusinessDayKey(day, 1))
+                        : "/admin/bbq"
+                    }
+                    aria-label="下一档"
+                    title="下一档"
+                  >
+                    <ChevronRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                汇总本机保存的全部历史订单
+              </p>
+            )}
           </div>
         )}
         {message ? (
@@ -305,7 +415,7 @@ export function OrdersHome() {
           </Alert>
         ) : null}
       </header>
-      {storageFailed ? null : (
+      {storageFailed ? null : homeView === "orders" ? (
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-4">
             <Metric label="全部订单" value={`${orders.length} 张`} />
@@ -558,6 +668,15 @@ export function OrdersHome() {
             </aside>
           </div>
         </div>
+      ) : statisticsLoading || allOrders === null ? (
+        <div
+          className="flex min-h-80 flex-1 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground shadow-sm"
+          role="status"
+        >
+          读取全部档期数据中…
+        </div>
+      ) : (
+        <OrdersStatistics statistics={statistics} />
       )}
       {previewPhoto ? (
         <div

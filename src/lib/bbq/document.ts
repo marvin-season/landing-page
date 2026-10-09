@@ -137,6 +137,15 @@ export function listOrders(document: BbqDocument, dayKey: string): Order[] {
     });
 }
 
+export function listAllOrders(document: BbqDocument): Order[] {
+  return document.orders.toSorted((left, right) => {
+    if (left.openedAt !== right.openedAt) {
+      return left.openedAt < right.openedAt ? 1 : -1;
+    }
+    return right.seq - left.seq;
+  });
+}
+
 export function getOrder(document: BbqDocument, id: string): Order | null {
   return document.orders.find((order) => order.id === id) ?? null;
 }
@@ -236,12 +245,7 @@ export function exportBackup(document: BbqDocument): BbqBackup {
     version: 1,
     categories: listCategories(document),
     dishes: listDishes(document),
-    orders: document.orders.toSorted((left, right) => {
-      if (left.openedAt !== right.openedAt) {
-        return left.openedAt < right.openedAt ? 1 : -1;
-      }
-      return right.seq - left.seq;
-    }),
+    orders: listAllOrders(document),
   };
 }
 
