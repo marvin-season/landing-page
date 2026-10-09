@@ -266,7 +266,7 @@ function DishRow({
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "",
   );
-  const [unit, setUnit] = useState(dish?.unit ?? "");
+  const [unit, setUnit] = useState(dish?.unit ?? "串");
   const [sort, setSort] = useState(dish ? String(dish.sort) : "0");
   const [listed, setListed] = useState(dish?.listed ?? true);
   const [editing, setEditing] = useState(isNew);

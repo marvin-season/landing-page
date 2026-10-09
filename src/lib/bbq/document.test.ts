@@ -25,7 +25,7 @@ function createIds(): () => string {
   };
 }
 
-function openShop(now = new Date("2026-10-10T04:00:00.000Z")) {
+function openShop(now = new Date("2026-10-10T07:00:00.000Z")) {
   const createId = createIds();
   const clock: DocumentClock = { now, createId };
   let document = emptyDocument();
@@ -380,10 +380,10 @@ describe("document", () => {
     const shop = openShop();
     let document = shop.document;
     const openedAt = [
-      "2026-10-10T04:00:00.000Z",
-      "2026-10-10T06:00:00.000Z",
-      "2026-10-10T05:00:00.000Z",
+      "2026-10-10T07:00:00.000Z",
+      "2026-10-10T09:00:00.000Z",
       "2026-10-10T08:00:00.000Z",
+      "2026-10-10T11:00:00.000Z",
     ];
     const statuses = ["open", "open", "done", "done"] as const;
     for (let index = 0; index < openedAt.length; index += 1) {
@@ -403,10 +403,10 @@ describe("document", () => {
       (order) => `${order.status}:${order.openedAt}`,
     );
     assert.deepEqual(listed, [
-      "open:2026-10-10T06:00:00.000Z",
-      "open:2026-10-10T04:00:00.000Z",
+      "open:2026-10-10T09:00:00.000Z",
+      "open:2026-10-10T07:00:00.000Z",
+      "done:2026-10-10T11:00:00.000Z",
       "done:2026-10-10T08:00:00.000Z",
-      "done:2026-10-10T05:00:00.000Z",
     ]);
   });
 

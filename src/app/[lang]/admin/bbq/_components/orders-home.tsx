@@ -35,6 +35,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
   businessDayLabel,
+  canCreateOrderForBusinessDay,
   formatShanghaiDate,
   formatShanghaiHm,
   readBusinessDayParam,
@@ -72,8 +73,10 @@ const homePageShellCls = cls`
 `;
 
 const orderWorkspaceCls = cls`
-  grid min-h-0 flex-1 overflow-hidden rounded-xl border bg-card shadow-sm
-  md:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)]
+  grid min-h-0 flex-1 gap-2 overflow-hidden rounded-xl border-0 bg-transparent
+  shadow-none
+  md:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] md:gap-0 md:border
+  md:bg-card md:shadow-sm
 `;
 
 const orderTabCls = cls`
@@ -91,6 +94,7 @@ export function OrdersHome() {
   const dayParam = searchParams.get("day");
   const importInputRef = useRef<HTMLInputElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [homeView, setHomeView] = useState<HomeView>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [allOrders, setAllOrders] = useState<Order[] | null>(null);
@@ -105,11 +109,16 @@ export function OrdersHome() {
 
   useEffect(() => {
     setMounted(true);
+    setCurrentTime(new Date());
+    const timer = window.setInterval(() => setCurrentTime(new Date()), 60_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const day = mounted
     ? readBusinessDayParam(dayParam, new Date())
     : (dayParam ?? "");
+  const canCreateOrder =
+    currentTime !== null && canCreateOrderForBusinessDay(currentTime, day);
 
   useEffect(() => {
     if (!mounted || !day) return;
@@ -268,12 +277,14 @@ export function OrdersHome() {
           </div>
           {storageFailed ? null : (
             <div className="flex flex-wrap gap-1.5">
-              <Button asChild>
-                <Link href={bbqNewOrderPath()}>
-                  <Plus className="size-4" aria-hidden="true" />
-                  开单
-                </Link>
-              </Button>
+              {canCreateOrder ? (
+                <Button asChild>
+                  <Link href={bbqNewOrderPath()}>
+                    <Plus className="size-4" aria-hidden="true" />
+                    开单
+                  </Link>
+                </Button>
+              ) : null}
               <Button asChild variant="outline">
                 <Link href={bbqMenuPath()}>
                   <UtensilsCrossed className="size-4" aria-hidden="true" />
@@ -424,7 +435,7 @@ export function OrdersHome() {
             <Metric label="已结金额" value={formatYuan(settledTotal)} />
           </dl>
           <div className={orderWorkspaceCls}>
-            <section className="min-h-0 min-w-0 md:overflow-auto">
+            <section className="min-h-0 min-w-0 max-h-[50dvh] overflow-auto rounded-xl border bg-card shadow-sm md:max-h-none md:overflow-auto md:rounded-none md:border-0 md:bg-transparent md:shadow-none">
               <div className="sticky top-0 z-10 flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 backdrop-blur">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -502,7 +513,7 @@ export function OrdersHome() {
                       ? "新订单会按开单时间显示在最前面"
                       : "完成订单后会显示在这里"}
                   </p>
-                  {statusFilter === "open" ? (
+                  {statusFilter === "open" && canCreateOrder ? (
                     <Button asChild className="mt-4">
                       <Link href={bbqNewOrderPath()}>
                         <Plus className="size-4" aria-hidden="true" />
@@ -529,10 +540,14 @@ export function OrdersHome() {
                 </ul>
               )}
             </section>
-            <aside className="hidden min-h-0 min-w-0 border-l md:flex md:flex-col">
+            <aside
+              className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm md:rounded-none md:border-0 md:border-l md:bg-transparent md:shadow-none ${
+                selected ? "flex" : "hidden md:flex"
+              }`}
+            >
               {selected ? (
-                <div className="flex h-full min-h-0 flex-col">
-                  <div className="border-b p-4">
+                <div className="flex min-h-0 flex-col md:h-full">
+                  <div className="border-b p-3 md:p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground">
@@ -560,7 +575,7 @@ export function OrdersHome() {
                       </div>
                     </div>
                   </div>
-                  <div className="min-h-0 flex-1 overflow-auto p-4">
+                  <div className="min-h-0 flex-1 p-3 md:overflow-auto md:p-4">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-sm font-medium text-foreground">
                         点单明细
@@ -629,7 +644,7 @@ export function OrdersHome() {
                       </section>
                     ) : null}
                   </div>
-                  <div className="grid grid-cols-2 gap-2 border-t p-3">
+                  <div className="grid grid-cols-2 gap-2 border-t p-2 md:p-3">
                     <Button
                       type="button"
                       disabled={updatingStatusId !== null}
