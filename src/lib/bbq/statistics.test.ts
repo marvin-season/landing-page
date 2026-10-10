@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { summarizeOrdersByBusinessDay } from "./statistics";
+import { getTrendRange, summarizeOrdersByBusinessDay } from "./statistics";
 import type { Order } from "./types";
 
 describe("summarizeOrdersByBusinessDay", () => {
@@ -65,3 +65,21 @@ function order(overrides: Partial<Order>): Order {
     ...overrides,
   };
 }
+
+it("keeps positive, negative and mixed trend values within the axis range", () => {
+  for (const [values, expected] of [
+    [[-300, -100, null], { minimum: -300, maximum: 0, span: 300 }],
+    [[-200, 500], { minimum: -200, maximum: 500, span: 700 }],
+    [[100, 300], { minimum: 0, maximum: 300, span: 300 }],
+    [[0, null], { minimum: 0, maximum: 1, span: 1 }],
+    [[], { minimum: 0, maximum: 1, span: 1 }],
+  ] as const) {
+    const range = getTrendRange(values);
+    assert.deepEqual(range, expected);
+    for (const value of values) {
+      if (value === null) continue;
+      const position = (value - range.minimum) / range.span;
+      assert.ok(position >= 0 && position <= 1);
+    }
+  }
+});

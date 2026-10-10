@@ -89,7 +89,10 @@ export function saveCategory(
 }
 
 export function listDishes(document: BbqDocument): Dish[] {
-  return document.dishes.toSorted(bySortThenName);
+  return document.dishes.toSorted((left, right) => {
+    if (left.sort !== right.sort) return right.sort - left.sort;
+    return left.name.localeCompare(right.name, "zh-CN");
+  });
 }
 
 export function deleteDish(document: BbqDocument, id: string): BbqDocument {

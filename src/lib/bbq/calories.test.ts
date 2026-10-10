@@ -32,7 +32,8 @@ describe("calories", () => {
 
   it("rejects invalid values and accepts omitted or decimal calories", () => {
     for (const value of [
-      -1,
+      Number.NEGATIVE_INFINITY,
+      -Number.MAX_VALUE,
       Number.NaN,
       Number.POSITIVE_INFINITY,
       Number.MAX_VALUE,
@@ -42,6 +43,7 @@ describe("calories", () => {
     assert.equal(assertCaloriesKcal(undefined), null);
     assert.equal(assertCaloriesKcal(null), null);
     assert.equal(assertCaloriesKcal(12.5), 12.5);
+    assert.equal(assertCaloriesKcal(-200.5), -200.5);
   });
 
   it("only totals completed records and preserves unknown calorie coverage", () => {
@@ -84,4 +86,47 @@ describe("calories", () => {
     });
     assert.equal(formatCalories(summary.settledCalories), "600 kcal（部分）");
   });
+});
+
+it("deducts exercise by quantity and includes negative completed totals in statistics", () => {
+  const lines = [
+    { caloriesKcal: 500, quantity: 1 },
+    { caloriesKcal: -300.5, quantity: 2 },
+  ];
+  assert.equal(formatCalories(summarizeCalories(lines)), "-101 kcal");
+  assert.equal(
+    formatCalories(summarizeCalories([...lines, { quantity: 1 }])),
+    "-101 kcal（部分）",
+  );
+  assert.equal(
+    formatCalories(summarizeCalories([{ caloriesKcal: -0.1, quantity: 3 }])),
+    "-0.3 kcal",
+  );
+  const record: Order = {
+    id: "exercise",
+    businessDayKey: "2026-10-10",
+    seq: 1,
+    seat: null,
+    status: "done",
+    openedAt: "2026-10-10T06:00:00.000Z",
+    photos: [],
+    totalCents: 0,
+    lines: [
+      {
+        id: "run",
+        dishId: null,
+        name: "跑步",
+        priceCents: 0,
+        unit: "次",
+        quantity: 2,
+        lineCents: 0,
+        caloriesKcal: -300.5,
+      },
+    ],
+  };
+  const [summary] = summarizeOrdersByBusinessDay([
+    record,
+    { ...record, id: "pending", status: "open" },
+  ]);
+  assert.equal(formatCalories(summary.settledCalories), "-601 kcal");
 });

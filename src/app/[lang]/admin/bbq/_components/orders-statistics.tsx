@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { businessDayLabel } from "@/lib/bbq/business-day";
 import { formatCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
-import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
+import {
+  type BusinessDayStatistics,
+  getTrendRange,
+} from "@/lib/bbq/statistics";
 import { cls } from "./bbq-layout";
 
 type ChartMode = "revenue" | "orders" | "calories";
@@ -139,7 +142,7 @@ export function OrdersStatistics({
         <TrendChart statistics={statistics} mode={chartMode} />
         <p className="px-3 pb-3 text-xs text-muted-foreground">
           金额与热量仅统计已完成记录；热量按每单位 ×
-          数量汇总，未填写的项目不计入，含缺失项时标记“部分”。
+          数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
         </p>
         <section className="border-t md:hidden" aria-label="时段明细">
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
@@ -275,7 +278,7 @@ function TrendChart({
           ? item.settledCalories.totalKcal
           : null,
   );
-  const maximum = Math.max(...values.map((value) => value ?? 0), 1);
+  const { minimum, span } = getTrendRange(values);
   const points = statistics.map((item, index) => {
     const x =
       chartPadding.left +
@@ -284,7 +287,8 @@ function TrendChart({
         : (index / (statistics.length - 1)) * plotWidth);
     const value = values[index];
     if (value == null) return null;
-    const y = chartPadding.top + plotHeight - (value / maximum) * plotHeight;
+    const y =
+      chartPadding.top + plotHeight - ((value - minimum) / span) * plotHeight;
     return { item, value, x, y };
   });
   // Missing calorie data is a gap, not a zero-calorie day.
@@ -295,7 +299,10 @@ function TrendChart({
         : "",
     )
     .join(" ");
-  const ticks = [0, 0.25, 0.5, 0.75, 1];
+  const zeroTick = -minimum / span;
+  const ticks = [...new Set([0, 0.25, 0.5, 0.75, 1, zeroTick])].sort(
+    (a, b) => a - b,
+  );
 
   return (
     <div className="shrink-0 px-2 py-3 min-w-0">
@@ -319,7 +326,7 @@ function TrendChart({
         >
           {ticks.map((tick) => {
             const y = chartPadding.top + plotHeight - tick * plotHeight;
-            const value = maximum * tick;
+            const value = tick === zeroTick ? 0 : minimum + span * tick;
             return (
               <g key={tick}>
                 <line
@@ -328,7 +335,7 @@ function TrendChart({
                   y1={y}
                   y2={y}
                   className="stroke-border"
-                  strokeDasharray={tick === 0 ? undefined : "4 4"}
+                  strokeDasharray={tick === zeroTick ? undefined : "4 4"}
                 />
                 <text
                   x={chartPadding.left - 10}

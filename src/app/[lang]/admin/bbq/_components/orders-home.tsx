@@ -73,6 +73,7 @@ const homePageShellCls = cls`
   flex flex-col gap-3
   md:h-[calc(100dvh-2rem)] md:overflow-hidden
   lg:h-[calc(100dvh-10rem)]
+  max-md:pt-12
 `;
 
 const orderWorkspaceCls = cls`
@@ -91,6 +92,38 @@ const orderTabCls = cls`
 const homeViewTabCls = cls`
   inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md px-3
   text-sm font-medium transition-colors
+  max-md:min-h-7 max-md:gap-1 max-md:px-1.5 max-md:text-[11px]
+  max-md:[&>svg]:size-3
+  max-md:flex-1
+`;
+
+const homeActionsCls = cls`
+  flex flex-wrap gap-1.5
+  max-md:gap-1 max-md:w-full
+  max-md:[&>:is(button,a)]:h-7
+  max-md:[&>:is(button,a)]:gap-0.5
+  max-md:[&>:is(button,a)]:px-2
+  max-md:[&>:is(button,a)]:text-[11px]
+  max-md:[&>:is(button,a)_svg]:size-3
+  max-md:[&>:is(button,a)]:flex-1
+  max-md:[&>:is(button,a)]:whitespace-nowrap
+`;
+
+const homePeriodCls = cls`
+  inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm
+  max-md:w-full max-md:rounded-lg
+  max-md:[&>button]:flex-1 max-md:[&>button]:min-w-0
+  max-md:[&>button]:min-h-7 max-md:[&>button]:text-[11px]
+  max-md:[&>[data-slot=button]]:size-7
+  max-md:[&>[data-slot=button]_svg]:size-3
+`;
+
+const homeMetricsCls = cls`
+  grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5
+  max-md:grid-cols-6 max-md:[&>div]:col-span-2
+  max-md:[&>div:nth-child(n+4)]:col-span-3
+  max-md:[&>div]:min-w-0 max-md:[&>div]:px-2 max-md:[&>div]:py-1.5
+  max-md:[&_dt]:text-[11px] max-md:[&_dd]:text-sm max-md:[&_dd]:break-words
 `;
 
 export function OrdersHome() {
@@ -266,8 +299,8 @@ export function OrdersHome() {
 
   return (
     <div className={homePageShellCls}>
-      <header className="flex shrink-0 flex-col gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex shrink-0 flex-col gap-3 max-md:gap-1.5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between max-md:gap-1.5 max-md:flex-col max-md:items-stretch">
           <div>
             <div className="flex items-center gap-1.5">
               <Store className="size-4 text-primary" aria-hidden="true" />
@@ -280,7 +313,7 @@ export function OrdersHome() {
             </p>
           </div>
           {storageFailed ? null : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className={homeActionsCls}>
               {canCreateOrder ? (
                 <Button asChild>
                   <Link href={bbqNewOrderPath()}>
@@ -344,9 +377,9 @@ export function OrdersHome() {
           )}
         </div>
         {storageFailed ? null : (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between max-md:flex-col max-md:items-stretch max-md:gap-1.5">
             <div
-              className="flex w-fit rounded-lg bg-muted p-0.5"
+              className="flex w-fit rounded-lg bg-muted p-0.5 max-md:w-full"
               role="tablist"
               aria-label="首页视图"
             >
@@ -380,7 +413,7 @@ export function OrdersHome() {
               </button>
             </div>
             {homeView === "orders" ? (
-              <div className="inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm">
+              <div className={homePeriodCls}>
                 <Button
                   asChild
                   size="icon"
@@ -436,7 +469,7 @@ export function OrdersHome() {
       </header>
       {storageFailed ? null : homeView === "orders" ? (
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5">
+          <dl className={homeMetricsCls}>
             <Metric label="全部记录" value={`${orders.length} 条`} />
             <Metric label="进行中" value={`${openOrders.length} 条`} />
             <Metric label="已完成" value={`${doneOrders.length} 条`} />

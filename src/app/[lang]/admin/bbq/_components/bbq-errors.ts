@@ -12,7 +12,7 @@ export function bbqErrorMessage(error: unknown): string {
     case "invalid_seat":
       return "座号只能空着或选 1 到 8";
     case "invalid_calories":
-      return "热量应为非负数字（kcal）";
+      return "热量应为有效数字（kcal），支持负数";
     case "invalid_money":
       return "金额不正确";
     case "category_not_found":

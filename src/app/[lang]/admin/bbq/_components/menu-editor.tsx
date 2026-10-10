@@ -32,7 +32,7 @@ import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const dishGridCls = cls`
   grid grid-cols-3 gap-2
-  md:grid-cols-[minmax(0,1fr)_7rem_6rem_5rem_4rem_4rem_6rem]
+  md:grid-cols-[minmax(0,1fr)_9rem_6rem_5rem_4rem_4rem_8.5rem]
 `;
 const dishRowCls = cls`
   rounded-lg border bg-card p-2.5
@@ -195,7 +195,7 @@ function DishTable({
             <h2 className="text-sm font-medium text-foreground">新增项目</h2>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground max-md:mt-0 max-md:text-[11px]">
-            启用后可在记账时选择；热量按每单位填写，非饮食项目可留空
+            热量按每单位填写：摄入填正数，跑步等消耗填负数，无需统计可留空
           </p>
         </div>
         <div className="p-2.5">
@@ -272,7 +272,7 @@ function DishRow({
   const inputClassName = cls`${dishInputCls} ${showLabels ? newDishInputCls : ""}`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
-    dish ? centsToYuanInput(dish.priceCents) : "",
+    dish ? centsToYuanInput(dish.priceCents) : "0",
   );
   const [calories, setCalories] = useState(
     dish?.caloriesKcal?.toString() ?? "",
@@ -296,16 +296,17 @@ function DishRow({
 
   async function commit() {
     if (savingRef.current) return;
-    const priceCents = parseYuanToCents(price);
+    const priceCents = parseYuanToCents(price.trim() || "0");
+    const normalizedUnit = unit.trim() || "份";
     const parsedSort = parseSort(sort);
     const caloriesKcal = calories.trim() === "" ? null : Number(calories);
     if (
       caloriesKcal !== null &&
-      (!/^\d+(?:\.\d+)?$/.test(calories.trim()) ||
+      (!/^-?\d+(?:\.\d+)?$/.test(calories.trim()) ||
         !Number.isFinite(caloriesKcal) ||
-        caloriesKcal > Number.MAX_SAFE_INTEGER)
+        Math.abs(caloriesKcal) > Number.MAX_SAFE_INTEGER)
     ) {
-      onError("热量应为非负数字（kcal），不填写则不计入热量统计");
+      onError("热量应为有效数字（kcal），运动消耗可填负数");
       return;
     }
     if (name.trim() === "") {
@@ -314,10 +315,6 @@ function DishRow({
     }
     if (priceCents === null) {
       onError("金额不正确");
-      return;
-    }
-    if (unit.trim() === "") {
-      onError("单位不能为空");
       return;
     }
     if (parsedSort === null) {
@@ -329,7 +326,7 @@ function DishRow({
       name === dish.name &&
       priceCents === dish.priceCents &&
       caloriesKcal === (dish.caloriesKcal ?? null) &&
-      unit === dish.unit &&
+      normalizedUnit === dish.unit &&
       parsedSort === dish.sort &&
       listed === dish.listed
     ) {
@@ -344,15 +341,15 @@ function DishRow({
         name,
         priceCents,
         caloriesKcal,
-        unit,
+        unit: normalizedUnit,
         sort: parsedSort,
         listed,
       });
       if (isNew) {
         setName("");
-        setPrice("");
+        setPrice("0");
         setCalories("");
-        setUnit("");
+        setUnit("份");
         setSort("0");
         setListed(true);
         nameRef.current?.focus();
@@ -482,13 +479,14 @@ function DishRow({
       >
         <span className={fieldLabelCls}>热量 kcal / 单位</span>
         <Input
+          type="number"
+          step={100}
           value={calories}
           onChange={(event) => setCalories(event.target.value)}
           className={`${inputClassName} tabular-nums`}
-          inputMode="decimal"
           autoComplete="off"
           aria-label="每单位热量（kcal，选填）"
-          placeholder="选填"
+          placeholder="如 300 / -200"
         />
       </label>
       <label
@@ -496,15 +494,15 @@ function DishRow({
           showLabels ? "md:flex" : "md:block"
         }`}
       >
-        <span className={fieldLabelCls}>单价</span>
+        <span className={fieldLabelCls}>单价（选填）</span>
         <Input
           value={price}
           onChange={(event) => setPrice(event.target.value)}
           className={`${inputClassName} tabular-nums`}
           inputMode="decimal"
           autoComplete="off"
-          aria-label="单价"
-          placeholder={isNew ? "0.00" : undefined}
+          aria-label="单价（选填，默认 0 元）"
+          placeholder="0"
         />
       </label>
       <label
@@ -512,14 +510,14 @@ function DishRow({
           showLabels ? "md:flex" : "md:block"
         }`}
       >
-        <span className={fieldLabelCls}>单位</span>
+        <span className={fieldLabelCls}>单位（选填）</span>
         <Input
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
           className={inputClassName}
           autoComplete="off"
-          aria-label="单位"
-          placeholder={isNew ? "份 / 次 / 件" : undefined}
+          aria-label="单位（选填，默认份）"
+          placeholder="份"
         />
       </label>
       <label
@@ -534,7 +532,8 @@ function DishRow({
           className={`${inputClassName} tabular-nums`}
           inputMode="numeric"
           autoComplete="off"
-          aria-label="排序"
+          aria-label="排序（数字越大越靠前）"
+          title="数字越大越靠前"
         />
       </label>
       <div
@@ -589,7 +588,7 @@ function DishRow({
           className={
             showLabels
               ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2 max-md:h-9 max-md:w-auto max-md:min-w-24 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
-              : "h-10 flex-1 px-3 md:px-2 max-md:h-9 max-md:flex-none max-md:min-w-20 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
+              : "h-10 flex-1 px-3 md:px-2 max-md:h-9 max-md:flex-none max-md:min-w-20 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0 min-w-20 shrink-0 whitespace-nowrap"
           }
           onClick={() => void commit()}
         >

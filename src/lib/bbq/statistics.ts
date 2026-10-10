@@ -10,6 +10,16 @@ export type BusinessDayStatistics = {
   settledCalories: CalorieSummary;
 };
 
+/** Include zero and both signs so exercise totals stay inside the chart. */
+export function getTrendRange(values: ReadonlyArray<number | null>) {
+  const minimum = Math.min(0, ...values.map((value) => value ?? 0));
+  const maximum = Math.max(
+    minimum < 0 ? 0 : 1,
+    ...values.map((value) => value ?? 0),
+  );
+  return { minimum, maximum, span: maximum - minimum };
+}
+
 export function summarizeOrdersByBusinessDay(
   orders: Order[],
 ): BusinessDayStatistics[] {

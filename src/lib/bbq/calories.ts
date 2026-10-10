@@ -10,7 +10,7 @@ export function assertCaloriesKcal(
   value: number | null | undefined,
 ): number | null {
   if (value === undefined || value === null) return null;
-  if (!Number.isFinite(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
+  if (!Number.isFinite(value) || Math.abs(value) > Number.MAX_SAFE_INTEGER) {
     throw new BbqStoreError("invalid_calories");
   }
   return value;

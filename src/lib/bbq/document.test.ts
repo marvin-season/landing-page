@@ -8,6 +8,7 @@ import {
   exportBackup,
   getOrder,
   listAllOrders,
+  listDishes,
   listOrders,
   mergeBackup,
   saveCategory,
@@ -844,7 +845,7 @@ describe("calorie snapshots and backups", () => {
     assert.equal(restored.dishes[0].caloriesKcal, 0);
     assert.equal(restored.orders[0].lines[0].caloriesKcal, 0);
     for (const invalid of [
-      -1,
+      -Number.MAX_VALUE,
       "120",
       Number.NaN,
       Number.POSITIVE_INFINITY,
@@ -867,7 +868,7 @@ describe("calorie snapshots and backups", () => {
       () =>
         saveDish(
           shop.document,
-          { ...shop.dish, caloriesKcal: -1 },
+          { ...shop.dish, caloriesKcal: Number.NEGATIVE_INFINITY },
           shop.createId,
         ),
       /invalid_calories/,
@@ -1046,4 +1047,69 @@ describe("order grouping switch", () => {
       );
     }
   });
+});
+
+it("saves negative exercise calories as snapshots and restores them from backups", () => {
+  const shop = openShop();
+  const exercise = saveDish(
+    shop.document,
+    {
+      ...shop.dish,
+      name: "跑步",
+      priceCents: 0,
+      unit: "次",
+      caloriesKcal: -200.5,
+    },
+    shop.createId,
+  );
+  const saved = saveOrder(
+    exercise.document,
+    { seat: null, status: "done", lines: [lineInput(exercise.dish, 2)] },
+    shop.clock,
+  );
+  assert.equal(saved.order.lines[0].caloriesKcal, -200.5);
+  assert.equal(saved.order.totalCents, 0);
+  const changed = saveDish(
+    saved.document,
+    { ...exercise.dish, caloriesKcal: -300 },
+    shop.createId,
+  );
+  const restored = mergeBackup(emptyDocument(), exportBackup(changed.document));
+  assert.equal(restored.dishes[0].caloriesKcal, -300);
+  assert.equal(restored.orders[0].lines[0].caloriesKcal, -200.5);
+});
+
+it("lists higher-sort menu items first and reorders after an edit without mutating stored order", () => {
+  const shop = openShop();
+  const document = {
+    ...shop.document,
+    dishes: [
+      { ...shop.dish, id: "low", sort: -1 },
+      { ...shop.dish, id: "b", name: "B", sort: 100 },
+      { ...shop.dish, id: "zero", sort: 0 },
+      { ...shop.dish, id: "a", name: "A", sort: 100 },
+    ],
+  };
+  assert.deepEqual(
+    listDishes(document).map((dish) => dish.id),
+    ["a", "b", "zero", "low"],
+  );
+  assert.deepEqual(
+    document.dishes.map((dish) => dish.id),
+    ["low", "b", "zero", "a"],
+  );
+  const changed = saveDish(
+    document,
+    { ...document.dishes[0], sort: 200 },
+    shop.createId,
+  );
+  assert.deepEqual(
+    listDishes(changed.document).map((dish) => dish.id),
+    ["low", "a", "b", "zero"],
+  );
+  const restored = mergeBackup(emptyDocument(), exportBackup(changed.document));
+  assert.deepEqual(
+    listDishes(restored).map((dish) => dish.id),
+    ["low", "a", "b", "zero"],
+  );
 });
