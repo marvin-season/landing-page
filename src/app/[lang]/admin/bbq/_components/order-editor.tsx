@@ -455,13 +455,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </Button>
             </div>
           ) : (
-            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none">
+            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none auto-rows-max content-start p-1">
               {availableDishes.map((dish) => (
                 <Button
                   key={dish.id}
                   type="button"
                   variant="outline"
-                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70`}
+                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0`}
                   onClick={() => addDish(dish)}
                 >
                   <span className="min-w-0">
