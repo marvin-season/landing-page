@@ -80,12 +80,13 @@ export const config = {
      * - _next/image (image optimization files)
      * - pdfjs (PDF.js worker, character maps, fonts, and Wasm)
      * - knowledge/examples (sample documents)
+     * - bbq-pwa (BBQ installation manifests and icons)
      * - favicon.ico (favicon file)
      * - manifest.json, robots.txt, sitemap.xml (SEO files)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Agent is included so the session gate can run. Auth lives under [lang]
      * and is not a protected page, so the gate does not redirect it.
      */
-    "/((?!knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!bbq-pwa(?:/|$)|knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };

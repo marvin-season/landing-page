@@ -46,6 +46,7 @@ import { formatYuan } from "@/lib/bbq/money";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
+import { BbqInstallButton } from "./bbq-install-button";
 import { cls, touchCls } from "./bbq-layout";
 import {
   bbqHomePath,
@@ -325,6 +326,7 @@ export function OrdersHome() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <BbqInstallButton />
               <input
                 ref={importInputRef}
                 type="file"

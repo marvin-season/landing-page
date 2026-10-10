@@ -1,0 +1,32 @@
+{
+  "id": "/admin/bbq",
+  "name": "天天记账",
+  "short_name": "天天记账",
+  "description": "烧烤点单、菜单管理与经营统计",
+  "lang": "zh-CN",
+  "start_url": "/zh/admin/bbq",
+  "scope": "/zh/admin/bbq",
+  "display": "standalone",
+  "background_color": "#f6f3ed",
+  "theme_color": "#b9443d",
+  "icons": [
+    {
+      "src": "/bbq-pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/bbq-pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/bbq-pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
