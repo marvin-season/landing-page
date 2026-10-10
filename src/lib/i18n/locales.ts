@@ -1,4 +1,15 @@
-export const locales = [
+export type Locale =
+  | "en"
+  | "zh"
+  | "ja"
+  | "ko"
+  | "ru"
+  | "fr"
+  | "ar"
+  | "ug"
+  | "pseudo";
+
+export const locales: Locale[] = [
   "en",
   "zh",
   "ja",
@@ -8,12 +19,11 @@ export const locales = [
   "ar",
   "ug",
   "pseudo",
-] as const;
+];
 export const sourceLocale = "en";
 export const pseudoLocale = "pseudo";
 export const rtlLocales = ["ar", "ug"] as const;
 
-export type Locale = (typeof locales)[number];
 export type AppLocale = Exclude<Locale, typeof pseudoLocale>;
 
 export const availableLocales = locales.filter(
