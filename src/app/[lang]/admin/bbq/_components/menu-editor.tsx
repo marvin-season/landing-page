@@ -28,6 +28,7 @@ import type { Dish } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
+import { bbqHomePath } from "./bbq-paths";
 
 const dishGridCls = cls`
   grid grid-cols-3 gap-2
@@ -107,7 +108,7 @@ export function MenuEditor() {
     return (
       <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
         <Link
-          href="/admin/bbq"
+          href={bbqHomePath()}
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -128,7 +129,7 @@ export function MenuEditor() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 md:gap-4">
       <header className="flex flex-col gap-2 max-md:flex-row-reverse max-md:items-start max-md:justify-between">
         <Link
-          href="/admin/bbq"
+          href={bbqHomePath()}
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground max-md:min-h-7 max-md:shrink-0"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />

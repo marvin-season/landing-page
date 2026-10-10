@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
 import {
+  ArrowLeft,
   Camera,
   ChartLine,
   CheckCircle2,
@@ -28,6 +29,7 @@ import {
   Store,
   Upload,
   UtensilsCrossed,
+  Wallet,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -35,16 +37,24 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
+  orderLabel,
+  readAccountingDay,
+  shiftAccountingDay,
+} from "@/lib/bbq/accounting";
+import {
   canCreateOrderForBusinessDay,
   formatShanghaiDate,
   formatShanghaiHm,
-  readBusinessDayParam,
-  shiftBusinessDayKey,
 } from "@/lib/bbq/business-day";
-import { bbqStore } from "@/lib/bbq/idb-store";
+import { getAccountingStore } from "@/lib/bbq/idb-store";
 import { formatYuan } from "@/lib/bbq/money";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
-import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
+import type {
+  AccountingMode,
+  BbqBackup,
+  Order,
+  OrderPhoto,
+} from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { BbqInstallButton } from "./bbq-install-button";
 import { cls, touchCls } from "./bbq-layout";
@@ -92,7 +102,9 @@ const homeViewTabCls = cls`
   text-sm font-medium transition-colors
 `;
 
-export function OrdersHome() {
+export function OrdersHome({ mode = "shop" }: { mode?: AccountingMode }) {
+  const personal = mode === "personal";
+  const store = getAccountingStore(mode);
   const searchParams = useSearchParams();
   const dayParam = searchParams.get("day");
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -118,15 +130,16 @@ export function OrdersHome() {
   }, []);
 
   const day = mounted
-    ? readBusinessDayParam(dayParam, new Date())
+    ? readAccountingDay(mode, dayParam, currentTime ?? new Date())
     : (dayParam ?? "");
   const canCreateOrder =
-    currentTime !== null && canCreateOrderForBusinessDay(currentTime, day);
+    currentTime !== null &&
+    (personal || canCreateOrderForBusinessDay(currentTime, day));
 
   useEffect(() => {
     if (!mounted || !day) return;
     let cancelled = false;
-    void bbqStore
+    void store
       .listOrders(day)
       .then((next) => {
         if (cancelled) return;
@@ -143,7 +156,7 @@ export function OrdersHome() {
     return () => {
       cancelled = true;
     };
-  }, [day, mounted]);
+  }, [day, mounted, store]);
 
   useEffect(() => {
     if (homeView !== "statistics" || allOrders !== null) {
@@ -151,7 +164,7 @@ export function OrdersHome() {
     }
     let cancelled = false;
     setStatisticsLoading(true);
-    void bbqStore
+    void store
       .listAllOrders()
       .then((next) => {
         if (cancelled) return;
@@ -169,12 +182,12 @@ export function OrdersHome() {
     return () => {
       cancelled = true;
     };
-  }, [allOrders, homeView]);
+  }, [allOrders, homeView, store]);
 
   async function reload() {
     const [next, nextAll] = await Promise.all([
-      bbqStore.listOrders(day),
-      allOrders === null ? Promise.resolve(null) : bbqStore.listAllOrders(),
+      store.listOrders(day),
+      allOrders === null ? Promise.resolve(null) : store.listAllOrders(),
     ]);
     setOrders(next);
     if (nextAll) setAllOrders(nextAll);
@@ -182,8 +195,8 @@ export function OrdersHome() {
 
   async function exportBackup(includePhotos = false) {
     try {
-      const backup = await bbqStore.exportBackup({ includePhotos });
-      downloadBackup(backup, includePhotos);
+      const backup = await store.exportBackup({ includePhotos });
+      downloadBackup(backup, includePhotos, mode);
     } catch (error) {
       setMessage(bbqErrorMessage(error));
     }
@@ -200,7 +213,7 @@ export function OrdersHome() {
     }
     if (!window.confirm("把备份按编号合并进当前记账数据？")) return;
     try {
-      await bbqStore.importBackup(parsed as BbqBackup);
+      await store.importBackup(parsed as BbqBackup);
       setSelectedId(null);
       await reload();
       setMessage(null);
@@ -218,7 +231,7 @@ export function OrdersHome() {
     setUpdatingStatusId(order.id);
     setMessage(null);
     try {
-      await bbqStore.saveOrder({
+      await store.saveOrder({
         id: order.id,
         seat: order.seat,
         status: order.status === "open" ? "done" : "open",
@@ -266,34 +279,49 @@ export function OrdersHome() {
   return (
     <div className={homePageShellCls}>
       <header className="flex shrink-0 flex-col gap-3">
+        <Link
+          href="/admin/bbq"
+          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          切换记账方式
+        </Link>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-1.5">
-              <Store className="size-4 text-primary" aria-hidden="true" />
+              {personal ? (
+                <Wallet className="size-4 text-primary" aria-hidden="true" />
+              ) : (
+                <Store className="size-4 text-primary" aria-hidden="true" />
+              )}
               <h1 className="text-lg font-semibold text-pretty text-foreground">
-                天天记账
+                {personal ? "个人记账" : "店铺记账"}
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              管理当前档期订单，并查看全部档期经营趋势
+              {personal
+                ? "记录日常消费，按日期查看订单与消费统计"
+                : "管理当前档期订单，并查看全部档期经营趋势"}
             </p>
           </div>
           {storageFailed ? null : (
             <div className="flex flex-wrap gap-1.5">
               {canCreateOrder ? (
                 <Button asChild>
-                  <Link href={bbqNewOrderPath()}>
+                  <Link href={bbqNewOrderPath(mode, day)}>
                     <Plus className="size-4" aria-hidden="true" />
-                    开单
+                    {personal ? "记一笔" : "开单"}
                   </Link>
                 </Button>
               ) : null}
-              <Button asChild variant="outline">
-                <Link href={bbqMenuPath()}>
-                  <UtensilsCrossed className="size-4" aria-hidden="true" />
-                  菜单
-                </Link>
-              </Button>
+              {personal ? null : (
+                <Button asChild variant="outline">
+                  <Link href={bbqMenuPath()}>
+                    <UtensilsCrossed className="size-4" aria-hidden="true" />
+                    菜单
+                  </Link>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="button" variant="outline">
@@ -303,7 +331,9 @@ export function OrdersHome() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel>
-                    <span className="block">全部数据备份</span>
+                    <span className="block">
+                      {personal ? "个人账本备份" : "店铺账本备份"}
+                    </span>
                     <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
                       默认不包含留存照片，文件更小
                     </span>
@@ -361,7 +391,7 @@ export function OrdersHome() {
                 onClick={() => setHomeView("orders")}
               >
                 <ReceiptText className="size-4" aria-hidden="true" />
-                当前档
+                {personal ? "每日订单" : "当前档"}
               </button>
               <button
                 type="button"
@@ -375,7 +405,7 @@ export function OrdersHome() {
                 onClick={() => setHomeView("statistics")}
               >
                 <ChartLine className="size-4" aria-hidden="true" />
-                经营趋势
+                {personal ? "消费统计" : "经营趋势"}
               </button>
             </div>
             {homeView === "orders" ? (
@@ -389,16 +419,16 @@ export function OrdersHome() {
                   <Link
                     href={
                       day
-                        ? bbqHomePath(shiftBusinessDayKey(day, -1))
-                        : "/admin/bbq"
+                        ? bbqHomePath(shiftAccountingDay(mode, day, -1), mode)
+                        : bbqHomePath(undefined, mode)
                     }
-                    aria-label="上一档"
-                    title="上一档"
+                    aria-label={personal ? "上一天" : "上一档"}
+                    title={personal ? "上一天" : "上一档"}
                   >
                     <ChevronLeft className="size-4" aria-hidden="true" />
                   </Link>
                 </Button>
-                <BusinessDayCalendar day={day} />
+                <BusinessDayCalendar day={day} mode={mode} />
                 <Button
                   asChild
                   size="icon"
@@ -408,11 +438,11 @@ export function OrdersHome() {
                   <Link
                     href={
                       day
-                        ? bbqHomePath(shiftBusinessDayKey(day, 1))
-                        : "/admin/bbq"
+                        ? bbqHomePath(shiftAccountingDay(mode, day, 1), mode)
+                        : bbqHomePath(undefined, mode)
                     }
-                    aria-label="下一档"
-                    title="下一档"
+                    aria-label={personal ? "下一天" : "下一档"}
+                    title={personal ? "下一天" : "下一档"}
                   >
                     <ChevronRight className="size-4" aria-hidden="true" />
                   </Link>
@@ -439,7 +469,10 @@ export function OrdersHome() {
             <Metric label="全部订单" value={`${orders.length} 张`} />
             <Metric label="进行中" value={`${openOrders.length} 张`} />
             <Metric label="已完成" value={`${doneOrders.length} 张`} />
-            <Metric label="已结金额" value={formatYuan(settledTotal)} />
+            <Metric
+              label={personal ? "已完成支出" : "已结金额"}
+              value={formatYuan(settledTotal)}
+            />
           </dl>
           <div className={orderWorkspaceCls}>
             <section
@@ -451,7 +484,9 @@ export function OrdersHome() {
                   <div>
                     <h2 className="text-sm font-medium text-foreground max-md:font-semibold">
                       <span className="md:hidden">订单列表</span>
-                      <span className="hidden md:inline">当档订单</span>
+                      <span className="hidden md:inline">
+                        {personal ? "当日订单" : "当档订单"}
+                      </span>
                     </h2>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       <span className="md:hidden">
@@ -522,7 +557,9 @@ export function OrdersHome() {
                   <p className="mt-3 text-sm font-medium text-foreground">
                     {statusFilter === "open"
                       ? "当前没有进行中的订单"
-                      : "这一档还没有已完成订单"}
+                      : personal
+                        ? "这一天还没有已完成订单"
+                        : "这一档还没有已完成订单"}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {statusFilter === "open"
@@ -531,9 +568,9 @@ export function OrdersHome() {
                   </p>
                   {statusFilter === "open" && canCreateOrder ? (
                     <Button asChild className="mt-4">
-                      <Link href={bbqNewOrderPath()}>
+                      <Link href={bbqNewOrderPath(mode, day)}>
                         <Plus className="size-4" aria-hidden="true" />
-                        开单
+                        {personal ? "记一笔" : "开单"}
                       </Link>
                     </Button>
                   ) : null}
@@ -555,6 +592,7 @@ export function OrdersHome() {
                       >
                         <OrderSummary
                           order={order}
+                          mode={mode}
                           showChevron
                           isSelected={selectedId === order.id}
                         />
@@ -592,9 +630,11 @@ export function OrdersHome() {
                           订单 #{selected.seq}
                         </p>
                         <h2 className="mt-0.5 text-lg font-semibold text-foreground max-md:mt-0 max-md:text-xl">
-                          {selected.seat === null
-                            ? "打包订单"
-                            : `${selected.seat} 号座`}
+                          {personal
+                            ? orderLabel(mode, selected)
+                            : selected.seat === null
+                              ? "打包订单"
+                              : `${selected.seat} 号座`}
                         </h2>
                         <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock3 className="size-4" aria-hidden="true" />
@@ -618,7 +658,7 @@ export function OrdersHome() {
                   <div className="min-h-0 flex-1 p-3 md:overflow-auto md:p-4">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-sm font-medium text-foreground">
-                        点单明细
+                        {personal ? "商品明细" : "点单明细"}
                       </h3>
                       <span className="text-xs tabular-nums text-muted-foreground">
                         {selected.lines.length} 项
@@ -707,7 +747,7 @@ export function OrdersHome() {
                       variant="outline"
                       className="max-md:rounded-lg max-md:px-3 max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
                     >
-                      <Link href={bbqOrderPath(selected.id)}>
+                      <Link href={bbqOrderPath(selected.id, mode)}>
                         <Pencil className="size-4" aria-hidden="true" />
                         修改订单
                       </Link>
@@ -733,10 +773,10 @@ export function OrdersHome() {
           className="flex min-h-80 flex-1 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground shadow-sm"
           role="status"
         >
-          读取全部档期数据中…
+          {personal ? "读取消费数据中…" : "读取全部档期数据中…"}
         </div>
       ) : (
-        <OrdersStatistics statistics={statistics} />
+        <OrdersStatistics statistics={statistics} mode={mode} />
       )}
       {previewPhoto ? (
         <div
@@ -784,10 +824,12 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function OrderSummary({
   order,
+  mode,
   showChevron = false,
   isSelected = false,
 }: {
   order: Order;
+  mode: AccountingMode;
   showChevron?: boolean;
   isSelected?: boolean;
 }) {
@@ -796,7 +838,7 @@ function OrderSummary({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium text-foreground">
-            {order.seat === null ? "打包" : `${order.seat} 号座`}
+            {orderLabel(mode, order)}
           </p>
           <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
             #{order.seq}
@@ -848,7 +890,11 @@ function OrderSummary({
   );
 }
 
-function downloadBackup(backup: BbqBackup, includePhotos: boolean) {
+function downloadBackup(
+  backup: BbqBackup,
+  includePhotos: boolean,
+  mode: AccountingMode,
+) {
   const blob = new Blob([JSON.stringify(backup)], {
     type: "application/json",
   });
@@ -856,7 +902,7 @@ function downloadBackup(backup: BbqBackup, includePhotos: boolean) {
   const link = document.createElement("a");
   link.href = url;
   const suffix = includePhotos ? "-with-photos" : "";
-  link.download = `bbq-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
+  link.download = `bbq-${mode}-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
   document.body.append(link);
   link.click();
   link.remove();

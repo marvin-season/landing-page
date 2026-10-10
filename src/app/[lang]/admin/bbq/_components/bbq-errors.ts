@@ -5,6 +5,10 @@ export function bbqErrorMessage(error: unknown): string {
   switch (error.code) {
     case "storage_failed":
       return "本机数据库打不开";
+    case "backup_mode_mismatch":
+      return "备份所属账本不匹配，请切换到对应的店铺或个人记账后导入";
+    case "invalid_date":
+      return "请选择有效的记账日期";
     case "invalid_backup":
       return "备份文件不正确";
     case "invalid_name":

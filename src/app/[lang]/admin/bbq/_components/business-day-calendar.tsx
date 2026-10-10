@@ -5,12 +5,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
-import {
-  businessDayLabel,
-  currentBusinessDayKey,
-  formatShanghaiDate,
-} from "@/lib/bbq/business-day";
-import { bbqStore } from "@/lib/bbq/idb-store";
+import { accountingDay, accountingDayLabel } from "@/lib/bbq/accounting";
+import { formatShanghaiDate } from "@/lib/bbq/business-day";
+import { getAccountingStore } from "@/lib/bbq/idb-store";
+import type { AccountingMode } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls } from "./bbq-layout";
 import { bbqHomePath } from "./bbq-paths";
@@ -30,7 +28,14 @@ const dateCls = cls`
   border duration-150 focus-visible:ring-inset
 `;
 
-export function BusinessDayCalendar({ day }: { day: string }) {
+export function BusinessDayCalendar({
+  day,
+  mode = "shop",
+}: {
+  day: string;
+  mode?: AccountingMode;
+}) {
+  const personal = mode === "personal";
   const [open, setOpen] = useState(false);
 
   return (
@@ -40,9 +45,9 @@ export function BusinessDayCalendar({ day }: { day: string }) {
           type="button"
           disabled={!day}
           className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground min-h-8 rounded-full transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 duration-150 focus-visible:ring-inset focus-visible:bg-muted/70 data-[state=open]:bg-muted/70 cursor-pointer disabled:pointer-events-none"
-          aria-label={`${day ? businessDayLabel(day) : "营业日"}，打开日历`}
+          aria-label={`${day ? accountingDayLabel(mode, day) : personal ? "日期" : "营业日"}，打开日历`}
         >
-          {day ? businessDayLabel(day) : "营业日"}
+          {day ? accountingDayLabel(mode, day) : personal ? "日期" : "营业日"}
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -50,7 +55,7 @@ export function BusinessDayCalendar({ day }: { day: string }) {
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
           <div className="flex items-center justify-between gap-3">
             <Dialog.Title className="text-base font-semibold">
-              营业日日历
+              {personal ? "记账日历" : "营业日日历"}
             </Dialog.Title>
             <Dialog.Close asChild>
               <Button
@@ -65,16 +70,20 @@ export function BusinessDayCalendar({ day }: { day: string }) {
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-1 text-xs text-muted-foreground">
-            选择日期查看订单 · 营业时间 06:00 至次日 03:00
+            {personal
+              ? "选择日期查看消费订单，按自然日统计"
+              : "选择日期查看订单 · 营业时间 06:00 至次日 03:00"}
           </Dialog.Description>
-          {open ? <CalendarContent day={day} /> : null}
+          {open ? <CalendarContent day={day} mode={mode} /> : null}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
 }
 
-function CalendarContent({ day }: { day: string }) {
+function CalendarContent({ day, mode }: { day: string; mode: AccountingMode }) {
+  const personal = mode === "personal";
+  const store = getAccountingStore(mode);
   const [month, setMonth] = useState(day.slice(0, 7));
   const [offPeriod, setOffPeriod] = useState(day.endsWith("#off"));
   const [counts, setCounts] = useState<Map<string, number> | null>(null);
@@ -83,7 +92,7 @@ function CalendarContent({ day }: { day: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    void bbqStore.listAllOrders().then(
+    void store.listAllOrders().then(
       (orders) => {
         if (cancelled) return;
         const next = new Map<string, number>();
@@ -102,7 +111,7 @@ function CalendarContent({ day }: { day: string }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [store]);
 
   const [year, monthNumber] = month.split("-").map(Number);
   const firstWeekday =
@@ -164,25 +173,27 @@ function CalendarContent({ day }: { day: string }) {
           <ChevronRight className="size-4" aria-hidden="true" />
         </Button>
       </div>
-      <div
-        className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted/60 p-1"
-        role="group"
-        aria-label="选择档期类型"
-      >
-        {[false, true].map((off) => (
-          <Button
-            key={String(off)}
-            type="button"
-            size="sm"
-            variant="ghost"
-            className={`${calendarControlCls} ${offPeriod === off ? "bg-card text-foreground hover:bg-card focus-visible:bg-card" : "text-muted-foreground hover:text-foreground focus-visible:text-foreground"}`}
-            aria-pressed={offPeriod === off}
-            onClick={() => setOffPeriod(off)}
-          >
-            {off ? "非营业时段" : "营业日"}
-          </Button>
-        ))}
-      </div>
+      {personal ? null : (
+        <div
+          className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted/60 p-1"
+          role="group"
+          aria-label="选择档期类型"
+        >
+          {[false, true].map((off) => (
+            <Button
+              key={String(off)}
+              type="button"
+              size="sm"
+              variant="ghost"
+              className={`${calendarControlCls} ${offPeriod === off ? "bg-card text-foreground hover:bg-card focus-visible:bg-card" : "text-muted-foreground hover:text-foreground focus-visible:text-foreground"}`}
+              aria-pressed={offPeriod === off}
+              onClick={() => setOffPeriod(off)}
+            >
+              {off ? "非营业时段" : "营业日"}
+            </Button>
+          ))}
+        </div>
+      )}
       <div className="mt-3 grid grid-cols-7 gap-1 text-center">
         {weekdays.map((weekday) => (
           <span key={weekday} className="py-1 text-xs text-muted-foreground">
@@ -199,9 +210,9 @@ function CalendarContent({ day }: { day: string }) {
           return (
             <Dialog.Close key={dateKey} asChild>
               <Link
-                href={bbqHomePath(key)}
+                href={bbqHomePath(key, mode)}
                 prefetch={false}
-                aria-label={`${businessDayLabel(key)}${counts ? `，${count} 张订单` : ""}${selected ? "，已选中" : ""}`}
+                aria-label={`${accountingDayLabel(mode, key)}${counts ? `，${count} 张订单` : ""}${selected ? "，已选中" : ""}`}
                 aria-current={dateKey === today ? "date" : undefined}
                 className={`${dateCls} ${selected ? "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:bg-primary/90 focus-visible:ring-primary-foreground/70" : count > 0 ? "bg-primary/5 text-foreground hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-primary/50" : "text-muted-foreground hover:bg-muted/70 focus-visible:bg-muted/70 focus-visible:ring-primary/50"} ${dateKey === today && !selected ? "border-primary/30" : "border-transparent"}`}
               >
@@ -216,7 +227,12 @@ function CalendarContent({ day }: { day: string }) {
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 border-t pt-3">
         <p className="text-xs text-muted-foreground" role="status">
-          {error ?? (counts ? "有订单的日期显示单数" : "读取营业日订单中…")}
+          {error ??
+            (counts
+              ? "有订单的日期显示单数"
+              : personal
+                ? "读取每日订单中…"
+                : "读取营业日订单中…")}
         </p>
         <Dialog.Close asChild>
           <Button
@@ -225,8 +241,8 @@ function CalendarContent({ day }: { day: string }) {
             size="sm"
             className={`${calendarControlCls} shrink-0 bg-muted/40`}
           >
-            <Link href={bbqHomePath(currentBusinessDayKey(new Date()))}>
-              回到当前档
+            <Link href={bbqHomePath(accountingDay(mode, new Date()), mode)}>
+              {personal ? "回到今天" : "回到当前档"}
             </Link>
           </Button>
         </Dialog.Close>

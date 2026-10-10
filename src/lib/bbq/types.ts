@@ -1,3 +1,5 @@
+export type AccountingMode = "shop" | "personal";
+
 export type OrderStatus = "open" | "done";
 
 export type Category = {
@@ -72,6 +74,7 @@ export type SaveOrderLineInput = {
 };
 
 export type BbqBackup = {
+  accountingMode?: AccountingMode;
   version: 1;
   categories: Category[];
   dishes: Dish[];

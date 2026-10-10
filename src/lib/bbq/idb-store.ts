@@ -14,7 +14,13 @@ import {
   saveOrder as saveOrderDocument,
 } from "./document";
 import { type BbqStore, BbqStoreError } from "./store";
-import type { Category, Dish, Order, OrderPhoto } from "./types";
+import type {
+  AccountingMode,
+  Category,
+  Dish,
+  Order,
+  OrderPhoto,
+} from "./types";
 
 type StoredDish = Omit<Dish, "unit"> & { unit?: string };
 type StoredOrder = Omit<Order, "lines" | "photos"> & {
@@ -22,53 +28,54 @@ type StoredOrder = Omit<Order, "lines" | "photos"> & {
   photos?: OrderPhoto[];
 };
 
-const db = new Dexie("bbq");
+export function createIdbStore(mode: AccountingMode = "shop"): BbqStore {
+  // Keep the existing shop database intact; personal records live separately.
+  const db = new Dexie(mode === "personal" ? "bbq-personal" : "bbq");
 
-db.version(1).stores({
-  categories: "id, sort, name",
-  dishes: "id, categoryId, sort, name",
-  orders: "id, businessDayKey, status, openedAt, seat",
-});
+  db.version(1).stores({
+    categories: "id, sort, name",
+    dishes: "id, categoryId, sort, name",
+    orders: "id, businessDayKey, status, openedAt, seat",
+  });
 
-const categoriesTable = db.table<Category, string>("categories");
-const dishesTable = db.table<StoredDish, string>("dishes");
-const ordersTable = db.table<StoredOrder, string>("orders");
+  const categoriesTable = db.table<Category, string>("categories");
+  const dishesTable = db.table<StoredDish, string>("dishes");
+  const ordersTable = db.table<StoredOrder, string>("orders");
 
-function createId(): string {
-  return crypto.randomUUID();
-}
-
-async function readDocument() {
-  const [categories, storedDishes, storedOrders] = await Promise.all([
-    categoriesTable.toArray(),
-    dishesTable.toArray(),
-    ordersTable.toArray(),
-  ]);
-  const dishes: Dish[] = storedDishes.map((dish) => ({
-    ...dish,
-    unit: dish.unit?.trim() || "份",
-  }));
-  const orders: Order[] = storedOrders.map((order) => ({
-    ...order,
-    photos: order.photos ?? [],
-    lines: order.lines.map((line) => ({
-      ...line,
-      unit: line.unit?.trim() || "份",
-    })),
-  }));
-  return { categories, dishes, orders };
-}
-
-async function guard<T>(work: () => Promise<T>): Promise<T> {
-  try {
-    return await work();
-  } catch (error) {
-    if (error instanceof BbqStoreError) throw error;
-    throw new BbqStoreError("storage_failed");
+  function createId(): string {
+    return crypto.randomUUID();
   }
-}
 
-export function createIdbStore(): BbqStore {
+  async function readDocument() {
+    const [categories, storedDishes, storedOrders] = await Promise.all([
+      categoriesTable.toArray(),
+      dishesTable.toArray(),
+      ordersTable.toArray(),
+    ]);
+    const dishes: Dish[] = storedDishes.map((dish) => ({
+      ...dish,
+      unit: dish.unit?.trim() || "份",
+    }));
+    const orders: Order[] = storedOrders.map((order) => ({
+      ...order,
+      photos: order.photos ?? [],
+      lines: order.lines.map((line) => ({
+        ...line,
+        unit: line.unit?.trim() || "份",
+      })),
+    }));
+    return { categories, dishes, orders };
+  }
+
+  async function guard<T>(work: () => Promise<T>): Promise<T> {
+    try {
+      return await work();
+    } catch (error) {
+      if (error instanceof BbqStoreError) throw error;
+      throw new BbqStoreError("storage_failed");
+    }
+  }
+
   return {
     listCategories() {
       return guard(async () => listCategoriesDocument(await readDocument()));
@@ -115,6 +122,7 @@ export function createIdbStore(): BbqStore {
       return guard(async () => {
         const saved = saveOrderDocument(await readDocument(), input, {
           now: new Date(),
+          mode,
           createId,
         });
         await ordersTable.put(saved.order);
@@ -129,13 +137,13 @@ export function createIdbStore(): BbqStore {
     },
     exportBackup(options) {
       return guard(async () =>
-        exportBackupDocument(await readDocument(), options),
+        exportBackupDocument(await readDocument(), options, mode),
       );
     },
     importBackup(backup) {
       return guard(async () => {
         const current = await readDocument();
-        const next = mergeBackup(current, backup);
+        const next = mergeBackup(current, backup, mode);
         const categoryIds = new Set(backup.categories.map((item) => item.id));
         const dishIds = new Set(backup.dishes.map((item) => item.id));
         const orderIds = new Set(backup.orders.map((item) => item.id));
@@ -162,3 +170,9 @@ export function createIdbStore(): BbqStore {
 }
 
 export const bbqStore: BbqStore = createIdbStore();
+
+export const personalStore: BbqStore = createIdbStore("personal");
+
+export function getAccountingStore(mode: AccountingMode): BbqStore {
+  return mode === "personal" ? personalStore : bbqStore;
+}

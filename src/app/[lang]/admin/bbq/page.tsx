@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { OrdersHome } from "./_components/orders-home";
+import { AccountingHome } from "./_components/accounting-home";
 
 export default function BbqOrdersPage() {
   return (
     <Suspense fallback={null}>
-      <OrdersHome />
+      <AccountingHome />
     </Suspense>
   );
 }

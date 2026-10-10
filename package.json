@@ -11,6 +11,7 @@
     "lint": "biome check --write",
     "format": "biome format --write",
     "check": "biome check .",
+    "test:bbq": "node --import tsx --test src/lib/bbq/*.test.ts",
     "bbq:pwa:assets": "node --import tsx scripts/generate-bbq-pwa.ts",
     "check:staged": "biome check --write --staged --no-errors-on-unmatched && git update-index --again",
     "lingui:extract": "lingui extract --clean",

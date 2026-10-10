@@ -1,4 +1,4 @@
-import { businessDayKey } from "./business-day";
+import { businessDayKey, formatShanghaiDate } from "./business-day";
 import {
   assertPriceCents,
   assertQuantity,
@@ -7,6 +7,7 @@ import {
 } from "./money";
 import { BbqStoreError } from "./store";
 import type {
+  AccountingMode,
   BbqBackup,
   BbqBackupExportOptions,
   Category,
@@ -27,6 +28,7 @@ export type BbqDocument = {
 };
 
 export type DocumentClock = {
+  mode?: AccountingMode;
   now: Date;
   createId: () => string;
 };
@@ -164,9 +166,38 @@ export function saveOrder(
   input: SaveOrderInput,
   clock: DocumentClock,
 ): { document: BbqDocument; order: Order } {
-  const seat = requireSeat(input.seat);
+  const personal = clock.mode === "personal";
+  const seat = personal ? null : requireSeat(input.seat);
+  if (personal && input.lines.length === 0)
+    throw new BbqStoreError("invalid_name");
   const existing = input.id ? getOrder(document, input.id) : null;
   const lines: OrderLine[] = input.lines.map((lineInput) => {
+    // Personal entries have no menu source; editing updates their own values.
+    // Shop lines below continue to use the original menu snapshots.
+    if (personal) {
+      if (
+        lineInput.id &&
+        !existing?.lines.some((line) => line.id === lineInput.id)
+      ) {
+        throw new BbqStoreError("not_found");
+      }
+      const priceCents = assertPriceCents(lineInput.priceCents);
+      const quantity = assertQuantity(lineInput.quantity);
+      if (
+        !Number.isSafeInteger(quantity) ||
+        !Number.isSafeInteger(priceCents * quantity)
+      )
+        throw new BbqStoreError("invalid_money");
+      return {
+        id: lineInput.id ?? clock.createId(),
+        dishId: null,
+        name: requireName(lineInput.name),
+        priceCents,
+        unit: requireName(lineInput.unit),
+        quantity,
+        lineCents: lineCents(priceCents, quantity),
+      };
+    }
     if (lineInput.id) {
       const previous = existing?.lines.find((line) => line.id === lineInput.id);
       if (!previous) throw new BbqStoreError("not_found");
@@ -191,11 +222,35 @@ export function saveOrder(
     };
   });
   const orderTotal = totalCents(lines);
+  if (personal && !Number.isSafeInteger(orderTotal))
+    throw new BbqStoreError("invalid_money");
   const photos = input.photos ?? existing?.photos ?? [];
+  const inputOpenedAt =
+    (personal ? input.openedAt : undefined) ??
+    existing?.openedAt ??
+    input.openedAt ??
+    clock.now.toISOString();
+  if (Number.isNaN(Date.parse(inputOpenedAt)))
+    throw new BbqStoreError("invalid_date");
+  const openedAt = personal
+    ? new Date(inputOpenedAt).toISOString()
+    : inputOpenedAt;
+  const dayKey = personal
+    ? formatShanghaiDate(new Date(openedAt))
+    : businessDayKey(new Date(openedAt));
+  const seq =
+    existing?.businessDayKey === dayKey
+      ? existing.seq
+      : document.orders.reduce((max, order) => {
+          return order.businessDayKey === dayKey
+            ? Math.max(max, order.seq)
+            : max;
+        }, 0) + 1;
 
   if (existing) {
     const order: Order = {
       ...existing,
+      ...(personal ? { openedAt, businessDayKey: dayKey, seq } : {}),
       seat,
       status: input.status,
       lines,
@@ -208,12 +263,6 @@ export function saveOrder(
     };
   }
 
-  const openedAt = input.openedAt ?? clock.now.toISOString();
-  const dayKey = businessDayKey(new Date(openedAt));
-  const seq =
-    document.orders.reduce((max, order) => {
-      return order.businessDayKey === dayKey ? Math.max(max, order.seq) : max;
-    }, 0) + 1;
   const order: Order = {
     id: input.id ?? clock.createId(),
     businessDayKey: dayKey,
@@ -244,10 +293,12 @@ export function deleteOrder(document: BbqDocument, id: string): BbqDocument {
 export function exportBackup(
   document: BbqDocument,
   options: BbqBackupExportOptions = {},
+  mode: AccountingMode = "shop",
 ): BbqBackup {
   const orders = listAllOrders(document);
   return {
     version: 1,
+    ...(mode === "personal" ? { accountingMode: mode } : {}),
     categories: listCategories(document),
     dishes: listDishes(document),
     orders: options.includePhotos
@@ -468,8 +519,27 @@ function mergeOrders(current: Order[], incoming: Order[]): Order[] {
 export function mergeBackup(
   current: BbqDocument,
   incoming: unknown,
+  mode: AccountingMode = "shop",
 ): BbqDocument {
+  // Legacy backups belong to the shop; never merge one ledger into the other.
+  if (!isRecord(incoming)) invalidBackup();
+  if ((incoming.accountingMode ?? "shop") !== mode) {
+    throw new BbqStoreError("backup_mode_mismatch");
+  }
   const backup = parseBackup(incoming, current);
+  if (
+    mode === "personal" &&
+    (backup.categories.length > 0 ||
+      backup.dishes.length > 0 ||
+      backup.orders.some(
+        (order) =>
+          order.seat !== null ||
+          order.lines.length === 0 ||
+          order.lines.some((line) => line.dishId !== null) ||
+          order.businessDayKey !== formatShanghaiDate(new Date(order.openedAt)),
+      ))
+  )
+    invalidBackup();
   return {
     categories: mergeById(current.categories, backup.categories),
     dishes: mergeById(current.dishes, backup.dishes),

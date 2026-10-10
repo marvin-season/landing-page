@@ -4,6 +4,7 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Input,
   Switch,
 } from "@landing-page/design-system";
 import {
@@ -13,6 +14,7 @@ import {
   ImagePlus,
   Minus,
   Package,
+  Pencil,
   Plus,
   ReceiptText,
   Save,
@@ -24,15 +26,23 @@ import Image from "next/image";
 import { type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@/components/link/link";
-import { formatShanghaiHm } from "@/lib/bbq/business-day";
-import { bbqStore } from "@/lib/bbq/idb-store";
+import { readAccountingDay } from "@/lib/bbq/accounting";
+import { formatShanghaiDate, formatShanghaiHm } from "@/lib/bbq/business-day";
+import { getAccountingStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
-import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
+import type {
+  AccountingMode,
+  Dish,
+  Order,
+  OrderPhoto,
+  OrderStatus,
+} from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls, pageShellCls, totalBarCls, touchCls } from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
+import { ManualItemForm } from "./manual-item-form";
 import { useBbqNavigate } from "./use-bbq-nav";
 
 const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -84,11 +94,20 @@ type DraftLine = {
   quantity: number;
 };
 
-function readMenu() {
-  return bbqStore.listDishes();
-}
-
-export function OrderEditor({ orderId }: { orderId?: string }) {
+export function OrderEditor({
+  orderId,
+  mode = "shop",
+  initialDay,
+}: {
+  orderId?: string;
+  mode?: AccountingMode;
+  initialDay?: string;
+}) {
+  const personal = mode === "personal";
+  const store = getAccountingStore(mode);
+  const [recordDate, setRecordDate] = useState("");
+  const [editingLineKey, setEditingLineKey] = useState<string | null>(null);
+  const [manualDirty, setManualDirty] = useState(false);
   const navigate = useBbqNavigate();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
@@ -107,14 +126,21 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     let cancelled = false;
     void (async () => {
       try {
-        const nextDishes = await readMenu();
-        const existing = orderId ? await bbqStore.getOrder(orderId) : null;
+        const [nextDishes, existing] = await Promise.all([
+          personal ? Promise.resolve([]) : store.listDishes(),
+          orderId ? store.getOrder(orderId) : Promise.resolve(null),
+        ]);
         if (cancelled) return;
         if (orderId && !existing) {
           setPhase("missing");
           return;
         }
         setDishes(nextDishes);
+        setRecordDate(
+          existing
+            ? formatShanghaiDate(new Date(existing.openedAt))
+            : readAccountingDay(mode, initialDay ?? null, new Date()),
+        );
         if (existing) {
           setOrder(existing);
           setSeat(existing.seat);
@@ -142,12 +168,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, store, personal, mode, initialDay]);
 
   useEffect(() => {
+    if (personal) return;
     let cancelled = false;
     const refreshMenu = () => {
-      void readMenu()
+      void store
+        .listDishes()
         .then((nextDishes) => {
           if (cancelled) return;
           setDishes(nextDishes);
@@ -161,7 +189,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       cancelled = true;
       window.removeEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
     };
-  }, []);
+  }, [store, personal]);
 
   const availableDishes = dishes.filter((dish) => dish.listed);
 
@@ -241,12 +269,33 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
 
   async function save() {
     if (saving || processingPhotos) return;
+    if (personal && manualDirty) {
+      setMessage("请先将正在填写的商品添加到订单，或保存商品修改");
+      return;
+    }
+    if (personal && lines.length === 0) {
+      setMessage("请至少添加一件商品");
+      return;
+    }
+    if (
+      personal &&
+      (!recordDate ||
+        readAccountingDay(mode, recordDate, new Date()) !== recordDate)
+    ) {
+      setMessage("请选择有效的记账日期");
+      return;
+    }
     setSaving(true);
     setMessage(null);
     const status: OrderStatus = done ? "done" : "open";
     try {
-      const saved = await bbqStore.saveOrder({
+      const saved = await store.saveOrder({
         id: order?.id,
+        openedAt: personal
+          ? order && formatShanghaiDate(new Date(order.openedAt)) === recordDate
+            ? order.openedAt
+            : `${recordDate}T${formatShanghaiHm(new Date())}:00+08:00`
+          : undefined,
         seat,
         status,
         photos,
@@ -259,7 +308,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           quantity: line.quantity,
         })),
       });
-      navigate(bbqHomePath(saved.businessDayKey));
+      navigate(bbqHomePath(saved.businessDayKey, mode));
     } catch (error) {
       setMessage(bbqErrorMessage(error));
       setSaving(false);
@@ -271,8 +320,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     if (!window.confirm("删除这张订单？")) return;
     setSaving(true);
     try {
-      await bbqStore.deleteOrder(order.id);
-      navigate(bbqHomePath(order.businessDayKey));
+      await store.deleteOrder(order.id);
+      navigate(bbqHomePath(order.businessDayKey, mode));
     } catch (error) {
       setMessage(bbqErrorMessage(error));
       setSaving(false);
@@ -294,7 +343,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     return (
       <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
         <Link
-          href="/admin/bbq"
+          href={bbqHomePath(undefined, mode)}
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -315,7 +364,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     >
       <header className="flex shrink-0 flex-col gap-2">
         <Link
-          href={order ? bbqHomePath(order.businessDayKey) : "/admin/bbq"}
+          href={
+            order
+              ? bbqHomePath(order.businessDayKey, mode)
+              : bbqHomePath(personal ? initialDay : undefined, mode)
+          }
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -332,24 +385,34 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             <p className="mt-0.5 text-xs text-muted-foreground">
               {order
                 ? `${formatShanghaiHm(new Date(order.openedAt))} 开单`
-                : "选择座号和菜品后保存订单"}
+                : personal
+                  ? "填写商品信息后保存个人订单"
+                  : "选择座号和菜品后保存订单"}
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link href={bbqMenuPath()}>
-              <UtensilsCrossed className="size-4" aria-hidden="true" />
-              管理菜单
-            </Link>
-          </Button>
+          {personal ? null : (
+            <Button asChild size="sm" variant="outline">
+              <Link href={bbqMenuPath()}>
+                <UtensilsCrossed className="size-4" aria-hidden="true" />
+                管理菜单
+              </Link>
+            </Button>
+          )}
         </div>
       </header>
       <div className={editorWorkspaceCls}>
         <section className="border-b px-3 py-2.5 md:col-span-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-medium text-foreground">用餐方式</h2>
+              <h2 className="text-sm font-medium text-foreground">
+                {personal ? "个人订单" : "用餐方式"}
+              </h2>
               <p className="text-xs text-muted-foreground">
-                {seat === null ? "当前选择打包" : `当前选择 ${seat} 号座`}
+                {personal
+                  ? "自由记录购买的商品"
+                  : seat === null
+                    ? "当前选择打包"
+                    : `当前选择 ${seat} 号座`}
               </p>
             </div>
             <label className="inline-flex shrink-0 items-center gap-1.5">
@@ -366,79 +429,119 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               />
             </label>
           </div>
-          <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
-            <Button
-              type="button"
-              variant={seat === null ? "default" : "outline"}
-              aria-pressed={seat === null}
-              className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-              onClick={() => setSeat(null)}
-            >
-              <Package className="size-4" aria-hidden="true" />
-              打包
-            </Button>
-            {SEATS.map((number) => (
-              <Button
-                key={number}
-                type="button"
-                variant={seat === number ? "default" : "outline"}
-                aria-pressed={seat === number}
-                className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                onClick={() => setSeat(number)}
-              >
-                {number}
-              </Button>
-            ))}
-          </div>
-        </section>
-        <section className={editorMenuPaneCls}>
-          <div className="flex shrink-0 items-center justify-between gap-2">
-            <div>
-              <h2 className="text-sm font-medium text-foreground">选择菜品</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                点击菜品即可加入订单
-              </p>
-            </div>
-            <span className="text-xs tabular-nums text-muted-foreground">
-              {availableDishes.length} 项
-            </span>
-          </div>
-          {availableDishes.length === 0 ? (
-            <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
-              <UtensilsCrossed
-                className="size-7 text-muted-foreground/60"
-                aria-hidden="true"
+          {personal ? (
+            <label className="mt-2 flex items-center gap-3 text-sm">
+              记账日期
+              <Input
+                type="date"
+                className="w-auto"
+                value={recordDate}
+                disabled={saving}
+                onChange={(event) => setRecordDate(event.target.value)}
               />
-              <p className="mt-2 text-sm font-medium text-foreground">
-                还没有上架菜品
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                先到菜单中新增并上架菜品
-              </p>
-              <Button asChild size="sm" variant="outline" className="mt-3">
-                <Link href={bbqMenuPath()}>管理菜单</Link>
-              </Button>
-            </div>
+            </label>
           ) : (
-            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none">
-              {availableDishes.map((dish) => (
+            <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
+              <Button
+                type="button"
+                variant={seat === null ? "default" : "outline"}
+                aria-pressed={seat === null}
+                className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                onClick={() => setSeat(null)}
+              >
+                <Package className="size-4" aria-hidden="true" />
+                打包
+              </Button>
+              {SEATS.map((number) => (
                 <Button
-                  key={dish.id}
+                  key={number}
                   type="button"
-                  variant="outline"
-                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70`}
-                  onClick={() => addDish(dish)}
+                  variant={seat === number ? "default" : "outline"}
+                  aria-pressed={seat === number}
+                  className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                  onClick={() => setSeat(number)}
                 >
-                  <span className="min-w-0">
-                    <span className="block truncate">{dish.name}</span>
-                    <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                      {formatYuan(dish.priceCents)}/{dish.unit}
-                    </span>
-                  </span>
-                  <Plus className="size-4 shrink-0" aria-hidden="true" />
+                  {number}
                 </Button>
               ))}
             </div>
+          )}
+        </section>
+        <section className={editorMenuPaneCls}>
+          {personal ? (
+            <ManualItemForm
+              key={editingLineKey ?? "new"}
+              initial={lines.find((line) => line.key === editingLineKey)}
+              disabled={saving}
+              onDirty={setManualDirty}
+              onCancel={() => setEditingLineKey(null)}
+              onSave={(input) => {
+                const key = editingLineKey ?? crypto.randomUUID();
+                const next: DraftLine = { ...input, key };
+                setLines((current) =>
+                  editingLineKey
+                    ? current.map((line) =>
+                        line.key === editingLineKey ? next : line,
+                      )
+                    : [...current, next],
+                );
+                setEditingLineKey(null);
+                setMessage(null);
+              }}
+            />
+          ) : (
+            <>
+              <div className="flex shrink-0 items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-sm font-medium text-foreground">
+                    选择菜品
+                  </h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    点击菜品即可加入订单
+                  </p>
+                </div>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {availableDishes.length} 项
+                </span>
+              </div>
+              {availableDishes.length === 0 ? (
+                <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                  <UtensilsCrossed
+                    className="size-7 text-muted-foreground/60"
+                    aria-hidden="true"
+                  />
+                  <p className="mt-2 text-sm font-medium text-foreground">
+                    还没有上架菜品
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    先到菜单中新增并上架菜品
+                  </p>
+                  <Button asChild size="sm" variant="outline" className="mt-3">
+                    <Link href={bbqMenuPath()}>管理菜单</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none">
+                  {availableDishes.map((dish) => (
+                    <Button
+                      key={dish.id}
+                      type="button"
+                      variant="outline"
+                      className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70`}
+                      onClick={() => addDish(dish)}
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate">{dish.name}</span>
+                        <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
+                          {formatYuan(dish.priceCents)}/{dish.unit}
+                        </span>
+                      </span>
+                      <Plus className="size-4 shrink-0" aria-hidden="true" />
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
         <section className={editorOrderPaneCls}>
@@ -450,11 +553,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     订单明细
                   </h2>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    调整数量，减至零会移除菜品
+                    {personal
+                      ? "可修改商品信息，或调整数量、移除商品"
+                      : "调整数量，减至零会移除菜品"}
                   </p>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
-                  {itemCount} 份
+                  {itemCount} {personal ? "件" : "份"}
                 </span>
               </div>
               {lines.length === 0 ? (
@@ -464,7 +569,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     aria-hidden="true"
                   />
                   <p className="text-xs text-muted-foreground">
-                    还没有添加菜品
+                    {personal ? "还没有添加商品" : "还没有添加菜品"}
                   </p>
                 </div>
               ) : (
@@ -488,11 +593,43 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           )}
                         </p>
                       </div>
+                      {personal ? (
+                        <>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            disabled={saving || manualDirty}
+                            aria-label={`修改 ${line.name}`}
+                            onClick={() => {
+                              setEditingLineKey(line.key);
+                              setManualDirty(true);
+                            }}
+                          >
+                            <Pencil className="size-4" aria-hidden="true" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            disabled={saving || manualDirty}
+                            aria-label={`移除 ${line.name}`}
+                            onClick={() =>
+                              setLines((current) =>
+                                current.filter((item) => item.key !== line.key),
+                              )
+                            }
+                          >
+                            <Trash2 className="size-4" aria-hidden="true" />
+                          </Button>
+                        </>
+                      ) : null}
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
                         className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
+                        disabled={personal && (saving || manualDirty)}
                         aria-label={`减少 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, -1)}
                       >
@@ -506,6 +643,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         variant="outline"
                         size="icon"
                         className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
+                        disabled={personal && (saving || manualDirty)}
                         aria-label={`增加 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, 1)}
                       >
@@ -632,7 +770,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
-                  {itemCount} 份 · 订单总额
+                  {itemCount} {personal ? "件" : "份"} · 订单总额
                 </p>
                 <p className="text-2xl font-semibold tabular-nums tracking-tight">
                   {formatYuan(total)}

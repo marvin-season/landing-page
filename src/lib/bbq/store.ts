@@ -12,6 +12,8 @@ import type {
 export type BbqStoreErrorCode =
   | "storage_failed"
   | "invalid_backup"
+  | "backup_mode_mismatch"
+  | "invalid_date"
   | "not_found"
   | "invalid_seat"
   | "invalid_money"

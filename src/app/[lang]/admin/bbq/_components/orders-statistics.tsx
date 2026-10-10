@@ -2,9 +2,10 @@
 
 import { ChartLine, ReceiptText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { businessDayLabel } from "@/lib/bbq/business-day";
+import { accountingDayLabel } from "@/lib/bbq/accounting";
 import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
+import type { AccountingMode } from "@/lib/bbq/types";
 import { cls } from "./bbq-layout";
 
 type ChartMode = "revenue" | "orders";
@@ -22,9 +23,12 @@ const chartPadding = { top: 20, right: 48, bottom: 48, left: 64 };
 
 export function OrdersStatistics({
   statistics,
+  mode = "shop",
 }: {
   statistics: BusinessDayStatistics[];
+  mode?: AccountingMode;
 }) {
+  const personal = mode === "personal";
   const [chartMode, setChartMode] = useState<ChartMode>("revenue");
 
   if (statistics.length === 0) {
@@ -34,9 +38,13 @@ export function OrdersStatistics({
           className="size-8 text-muted-foreground/60"
           aria-hidden="true"
         />
-        <p className="mt-3 text-sm font-medium text-foreground">暂无经营数据</p>
+        <p className="mt-3 text-sm font-medium text-foreground">
+          {personal ? "暂无消费数据" : "暂无经营数据"}
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          创建订单后，这里会按档期汇总订单与已结金额
+          {personal
+            ? "记录订单后，这里会按日期汇总订单与已完成支出"
+            : "创建订单后，这里会按档期汇总订单与已结金额"}
         </p>
       </div>
     );
@@ -59,11 +67,14 @@ export function OrdersStatistics({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full">
       <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-4">
-        <StatisticMetric label="累计档期" value={`${statistics.length} 档`} />
+        <StatisticMetric
+          label={personal ? "记账天数" : "累计档期"}
+          value={`${statistics.length} ${personal ? "天" : "档"}`}
+        />
         <StatisticMetric label="全部订单" value={`${totalOrders} 张`} />
         <StatisticMetric label="已完成订单" value={`${settledOrders} 张`} />
         <StatisticMetric
-          label="累计已结金额"
+          label={personal ? "累计已完成支出" : "累计已结金额"}
           value={formatYuan(settledTotal)}
         />
       </dl>
@@ -72,10 +83,14 @@ export function OrdersStatistics({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <ChartLine className="size-4 text-primary" aria-hidden="true" />
-              <h2 className="text-sm font-medium text-foreground">档期趋势</h2>
+              <h2 className="text-sm font-medium text-foreground">
+                {personal ? "消费趋势" : "档期趋势"}
+              </h2>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              按开单时间排列全部已有档期，平均每档已结金额
+              {personal
+                ? "仅统计已完成订单的支出，平均每个记账日支出"
+                : "按开单时间排列全部已有档期，平均每档已结金额"}
               {formatYuan(averagePerPeriod)}
             </p>
           </div>
@@ -95,7 +110,7 @@ export function OrdersStatistics({
               }`}
               onClick={() => setChartMode("revenue")}
             >
-              已结金额
+              {personal ? "已完成支出" : "已结金额"}
             </button>
             <button
               type="button"
@@ -112,11 +127,22 @@ export function OrdersStatistics({
             </button>
           </div>
         </div>
-        <TrendChart statistics={statistics} mode={chartMode} />
-        <section className="border-t md:hidden" aria-label="档期明细">
+        <TrendChart
+          statistics={statistics}
+          mode={chartMode}
+          accountingMode={mode}
+        />
+        <section
+          className="border-t md:hidden"
+          aria-label={personal ? "每日明细" : "档期明细"}
+        >
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
-            <h3 className="text-sm font-medium text-foreground">档期明细</h3>
-            <span className="text-xs text-muted-foreground">最近档期在前</span>
+            <h3 className="text-sm font-medium text-foreground">
+              {personal ? "每日明细" : "档期明细"}
+            </h3>
+            <span className="text-xs text-muted-foreground">
+              {personal ? "最近日期在前" : "最近档期在前"}
+            </span>
           </div>
           <ul className="divide-y px-3">
             {statistics.toReversed().map((item) => (
@@ -126,9 +152,11 @@ export function OrdersStatistics({
                     {item.businessDayKey.slice(0, 10)}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {item.businessDayKey.endsWith("#off")
-                      ? "非营业时段"
-                      : "营业日"}
+                    {personal
+                      ? "记账日"
+                      : item.businessDayKey.endsWith("#off")
+                        ? "非营业时段"
+                        : "营业日"}
                   </span>
                 </div>
                 <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
@@ -145,7 +173,9 @@ export function OrdersStatistics({
                     </dd>
                   </div>
                   <div className="min-w-0 text-right">
-                    <dt className="text-muted-foreground">已结金额</dt>
+                    <dt className="text-muted-foreground">
+                      {personal ? "已完成支出" : "已结金额"}
+                    </dt>
                     <dd className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground">
                       {formatYuan(item.settledTotalCents)}
                     </dd>
@@ -159,17 +189,21 @@ export function OrdersStatistics({
           <table className="w-full min-w-140 text-left text-sm">
             <thead className="sticky top-0 bg-muted/95 text-xs text-muted-foreground backdrop-blur">
               <tr>
-                <th className="px-4 py-2 font-medium">档期</th>
+                <th className="px-4 py-2 font-medium">
+                  {personal ? "日期" : "档期"}
+                </th>
                 <th className="px-4 py-2 text-right font-medium">订单</th>
                 <th className="px-4 py-2 text-right font-medium">已完成</th>
-                <th className="px-4 py-2 text-right font-medium">已结金额</th>
+                <th className="px-4 py-2 text-right font-medium">
+                  {personal ? "已完成支出" : "已结金额"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {statistics.toReversed().map((item) => (
                 <tr key={item.businessDayKey}>
                   <td className="px-4 py-2.5 text-foreground">
-                    {businessDayLabel(item.businessDayKey)}
+                    {accountingDayLabel(mode, item.businessDayKey)}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
                     {item.orderCount} 张
@@ -193,9 +227,11 @@ export function OrdersStatistics({
 function TrendChart({
   statistics,
   mode,
+  accountingMode,
 }: {
   statistics: BusinessDayStatistics[];
   mode: ChartMode;
+  accountingMode: AccountingMode;
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -248,7 +284,13 @@ function TrendChart({
           viewBox={`0 0 ${width} ${chartHeight}`}
           role="img"
           aria-label={
-            mode === "revenue" ? "各档期已结金额趋势" : "各档期订单数趋势"
+            accountingMode === "personal"
+              ? mode === "revenue"
+                ? "每日已完成支出趋势"
+                : "每日订单数趋势"
+              : mode === "revenue"
+                ? "各档期已结金额趋势"
+                : "各档期订单数趋势"
           }
           className="block max-w-none"
         >
@@ -296,7 +338,7 @@ function TrendChart({
                 className="fill-card text-primary"
               >
                 <title>
-                  {businessDayLabel(item.businessDayKey)}：
+                  {accountingDayLabel(accountingMode, item.businessDayKey)}：
                   {mode === "revenue"
                     ? formatYuan(item.settledTotalCents)
                     : `${item.orderCount} 张订单`}
@@ -324,7 +366,9 @@ function TrendChart({
       </div>
       {viewportWidth > 0 && width > viewportWidth ? (
         <p className="mt-1 text-center text-xs text-muted-foreground md:hidden">
-          左右滑动查看全部档期
+          {accountingMode === "personal"
+            ? "左右滑动查看全部日期"
+            : "左右滑动查看全部档期"}
         </p>
       ) : null}
     </div>
