@@ -77,8 +77,8 @@ describe("business day", () => {
   });
 
   it("labels business days and off periods", () => {
-    assert.equal(businessDayLabel("2026-10-10"), "2026-10-10 营业日");
-    assert.equal(businessDayLabel("2026-10-10#off"), "2026-10-10 非营业时段");
+    assert.equal(businessDayLabel("2026-10-10"), "2026-10-10 记账时段");
+    assert.equal(businessDayLabel("2026-10-10#off"), "2026-10-10 休息时段");
     assert.equal(
       currentBusinessDayKey(new Date("2026-10-09T22:00:00.000Z")),
       "2026-10-10",

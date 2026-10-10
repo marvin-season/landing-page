@@ -25,6 +25,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
+import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
@@ -80,6 +81,7 @@ type DraftLine = {
   dishId: string | null;
   name: string;
   priceCents: number;
+  caloriesKcal?: number | null;
   unit: string;
   quantity: number;
 };
@@ -92,6 +94,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const navigate = useBbqNavigate();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
+  const [groupingEnabled, setGroupingEnabled] = useState(false);
   const [seat, setSeat] = useState<number | null>(null);
   const [done, setDone] = useState(false);
   const [lines, setLines] = useState<DraftLine[]>([]);
@@ -107,17 +110,18 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     let cancelled = false;
     void (async () => {
       try {
-        const nextDishes = await readMenu();
+        const menu = await readMenu();
         const existing = orderId ? await bbqStore.getOrder(orderId) : null;
         if (cancelled) return;
         if (orderId && !existing) {
           setPhase("missing");
           return;
         }
-        setDishes(nextDishes);
+        setDishes(menu);
         if (existing) {
           setOrder(existing);
-          setSeat(existing.seat);
+          setGroupingEnabled(existing.groupingEnabled ?? true);
+          setSeat(existing.groupingEnabled === false ? null : existing.seat);
           setDone(existing.status === "done");
           setPhotos(existing.photos);
           setLines(
@@ -127,6 +131,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               dishId: line.dishId,
               name: line.name,
               priceCents: line.priceCents,
+              caloriesKcal: line.caloriesKcal,
               unit: line.unit,
               quantity: line.quantity,
             })),
@@ -148,9 +153,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     let cancelled = false;
     const refreshMenu = () => {
       void readMenu()
-        .then((nextDishes) => {
+        .then((menu) => {
           if (cancelled) return;
-          setDishes(nextDishes);
+          setDishes(menu);
         })
         .catch((error: unknown) => {
           if (!cancelled) setMessage(bbqErrorMessage(error));
@@ -183,6 +188,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             dishId: dish.id,
             name: dish.name,
             priceCents: dish.priceCents,
+            caloriesKcal: dish.caloriesKcal,
             unit: dish.unit,
             quantity: 1,
           },
@@ -210,7 +216,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     const selectedFiles = Array.from(files);
     const remaining = MAX_ORDER_PHOTOS - photos.length;
     if (remaining <= 0) {
-      setMessage(`每张订单最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+      setMessage(`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
       return;
     }
 
@@ -228,7 +234,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       if (results.some((result) => result.status === "rejected")) {
         setMessage("部分照片读取失败，请选择浏览器可读取的图片");
       } else if (selectedFiles.length > remaining) {
-        setMessage(`每张订单最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+        setMessage(`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
       }
     } finally {
       setProcessingPhotos(false);
@@ -247,7 +253,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     try {
       const saved = await bbqStore.saveOrder({
         id: order?.id,
-        seat,
+        groupingEnabled,
+        seat: groupingEnabled ? seat : null,
         status,
         photos,
         lines: lines.map((line) => ({
@@ -255,6 +262,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           dishId: line.dishId,
           name: line.name,
           priceCents: line.priceCents,
+          caloriesKcal: line.caloriesKcal,
           unit: line.unit,
           quantity: line.quantity,
         })),
@@ -268,7 +276,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
 
   async function removeOrder() {
     if (!order || saving) return;
-    if (!window.confirm("删除这张订单？")) return;
+    if (!window.confirm("删除这条记录？")) return;
     setSaving(true);
     try {
       await bbqStore.deleteOrder(order.id);
@@ -285,7 +293,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
         role="status"
       >
-        读取订单中…
+        读取记录中…
       </div>
     );
   }
@@ -298,11 +306,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          返回订单
+          返回记录
         </Link>
         <Alert className="border-destructive/30 bg-destructive/5 p-3">
           <AlertDescription className="text-destructive">
-            {phase === "missing" ? "没有找到这张订单" : message}
+            {phase === "missing" ? "没有找到这条记录" : message}
           </AlertDescription>
         </Alert>
       </div>
@@ -319,20 +327,26 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          返回订单
+          返回记录
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-1.5">
               <ReceiptText className="size-4 text-primary" aria-hidden="true" />
               <h1 className="text-lg font-semibold text-foreground">
-                {order ? `修改订单 #${order.seq}` : "新建订单"}
+                {order
+                  ? `修改${groupingEnabled ? "订单" : "记录"} #${order.seq}`
+                  : groupingEnabled
+                    ? "新建订单"
+                    : "新建记录"}
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {order
-                ? `${formatShanghaiHm(new Date(order.openedAt))} 开单`
-                : "选择座号和菜品后保存订单"}
+                ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? "开单" : "记账"}`
+                : groupingEnabled
+                  ? "选择打包或座号和项目后保存订单"
+                  : "选择项目记账，需要时可开启分组"}
             </p>
           </div>
           <Button asChild size="sm" variant="outline">
@@ -347,9 +361,28 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         <section className="border-b px-3 py-2.5 md:col-span-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-medium text-foreground">用餐方式</h2>
+              <label
+                htmlFor="order-grouping"
+                className="text-sm font-medium text-foreground"
+              >
+                启用分组
+              </label>
+              <Switch
+                id="order-grouping"
+                checked={groupingEnabled}
+                disabled={saving}
+                aria-label="启用分组（打包或座号）"
+                onCheckedChange={(enabled) => {
+                  setGroupingEnabled(enabled);
+                  if (!enabled) setSeat(null);
+                }}
+              />
               <p className="text-xs text-muted-foreground">
-                {seat === null ? "当前选择打包" : `当前选择 ${seat} 号座`}
+                {groupingEnabled
+                  ? seat === null
+                    ? "当前选择打包"
+                    : `当前选择 ${seat} 号座`
+                  : "日常记账"}
               </p>
             </div>
             <label className="inline-flex shrink-0 items-center gap-1.5">
@@ -361,42 +394,44 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <Switch
                 checked={done}
                 disabled={saving}
-                aria-label="切换订单状态"
+                aria-label="切换记录状态"
                 onCheckedChange={setDone}
               />
             </label>
           </div>
-          <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
-            <Button
-              type="button"
-              variant={seat === null ? "default" : "outline"}
-              aria-pressed={seat === null}
-              className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-              onClick={() => setSeat(null)}
-            >
-              <Package className="size-4" aria-hidden="true" />
-              打包
-            </Button>
-            {SEATS.map((number) => (
+          {groupingEnabled ? (
+            <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
               <Button
-                key={number}
                 type="button"
-                variant={seat === number ? "default" : "outline"}
-                aria-pressed={seat === number}
-                className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                onClick={() => setSeat(number)}
+                variant={seat === null ? "default" : "outline"}
+                aria-pressed={seat === null}
+                className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                onClick={() => setSeat(null)}
               >
-                {number}
+                <Package className="size-4" aria-hidden="true" />
+                打包
               </Button>
-            ))}
-          </div>
+              {SEATS.map((number) => (
+                <Button
+                  key={number}
+                  type="button"
+                  variant={seat === number ? "default" : "outline"}
+                  aria-pressed={seat === number}
+                  className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                  onClick={() => setSeat(number)}
+                >
+                  {number}
+                </Button>
+              ))}
+            </div>
+          ) : null}
         </section>
         <section className={editorMenuPaneCls}>
           <div className="flex shrink-0 items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-medium text-foreground">选择菜品</h2>
+              <h2 className="text-sm font-medium text-foreground">选择项目</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                点击菜品即可加入订单
+                点击项目即可加入记录
               </p>
             </div>
             <span className="text-xs tabular-nums text-muted-foreground">
@@ -410,10 +445,10 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 aria-hidden="true"
               />
               <p className="mt-2 text-sm font-medium text-foreground">
-                还没有上架菜品
+                还没有启用项目
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                先到菜单中新增并上架菜品
+                先到菜单中新增并启用项目
               </p>
               <Button asChild size="sm" variant="outline" className="mt-3">
                 <Link href={bbqMenuPath()}>管理菜单</Link>
@@ -434,6 +469,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
                       {formatYuan(dish.priceCents)}/{dish.unit}
                     </span>
+                    <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
+                      热量{" "}
+                      {formatCalories(
+                        summarizeCalories([{ ...dish, quantity: 1 }]),
+                      )}
+                    </span>
                   </span>
                   <Plus className="size-4 shrink-0" aria-hidden="true" />
                 </Button>
@@ -447,14 +488,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-medium text-foreground">
-                    订单明细
+                    记录明细
                   </h2>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    调整数量，减至零会移除菜品
+                    调整数量，减至零会移除项目
                   </p>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
-                  {itemCount} 份
+                  {itemCount} 件
                 </span>
               </div>
               {lines.length === 0 ? (
@@ -464,7 +505,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     aria-hidden="true"
                   />
                   <p className="text-xs text-muted-foreground">
-                    还没有添加菜品
+                    还没有添加项目
                   </p>
                 </div>
               ) : (
@@ -486,6 +527,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           {formatYuan(
                             lineCents(line.priceCents, line.quantity),
                           )}
+                        </p>
+                        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                          热量 {formatCalories(summarizeCalories([line]))}
                         </p>
                       </div>
                       <Button
@@ -585,7 +629,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     >
                       <Image
                         src={photo.dataUrl}
-                        alt={`订单留存照片 ${index + 1}`}
+                        alt={`记录留存照片 ${index + 1}`}
                         fill
                         sizes="(max-width: 767px) 25vw, 7rem"
                         unoptimized
@@ -616,7 +660,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   onClick={() => void removeOrder()}
                 >
                   <Trash2 className="size-4" aria-hidden="true" />
-                  删除这张订单
+                  删除这条记录
                 </Button>
               </section>
             ) : null}
@@ -632,10 +676,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
-                  {itemCount} 份 · 订单总额
+                  {itemCount} 件 · 记录总额
                 </p>
                 <p className="text-2xl font-semibold tabular-nums tracking-tight">
                   {formatYuan(total)}
+                </p>
+                <p className="text-xs tabular-nums text-muted-foreground">
+                  热量 {formatCalories(summarizeCalories(lines))}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -650,7 +697,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   ) : (
                     <Save className="size-4" aria-hidden="true" />
                   )}
-                  {saving ? "保存中…" : order ? "保存修改" : "保存订单"}
+                  {saving
+                    ? "保存中…"
+                    : order
+                      ? "保存修改"
+                      : groupingEnabled
+                        ? "保存订单"
+                        : "保存记录"}
                 </Button>
               </div>
             </div>

@@ -15,6 +15,7 @@ export type BbqStoreErrorCode =
   | "not_found"
   | "invalid_seat"
   | "invalid_money"
+  | "invalid_calories"
   | "invalid_name"
   | "category_not_found"
   | "dish_unavailable";

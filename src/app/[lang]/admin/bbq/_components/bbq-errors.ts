@@ -11,13 +11,15 @@ export function bbqErrorMessage(error: unknown): string {
       return "名称不能为空";
     case "invalid_seat":
       return "座号只能空着或选 1 到 8";
+    case "invalid_calories":
+      return "热量应为非负数字（kcal）";
     case "invalid_money":
       return "金额不正确";
     case "category_not_found":
-      return "菜系不存在";
+      return "分类不存在";
     case "dish_unavailable":
-      return "这个菜现在不能点";
+      return "这个项目当前不可用";
     case "not_found":
-      return "没有找到这张订单";
+      return "没有找到这条记录";
   }
 }

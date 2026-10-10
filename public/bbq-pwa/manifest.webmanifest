@@ -2,7 +2,7 @@
   "id": "/admin/bbq",
   "name": "天天记账",
   "short_name": "天天记账",
-  "description": "烧烤点单、菜单管理与经营统计",
+  "description": "个人支出、日常记账、菜单管理与饮食热量统计",
   "lang": "zh-CN",
   "start_url": "/zh/admin/bbq",
   "scope": "/zh/admin/bbq",

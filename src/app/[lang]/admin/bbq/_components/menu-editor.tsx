@@ -18,20 +18,21 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
+import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import {
   centsToYuanInput,
   formatYuan,
   parseYuanToCents,
 } from "@/lib/bbq/money";
-import type { Dish } from "@/lib/bbq/types";
+import type { Category, Dish } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { cls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const dishGridCls = cls`
   grid grid-cols-3 gap-2
-  md:grid-cols-[minmax(0,1fr)_7rem_5rem_5rem_5rem_6rem]
+  md:grid-cols-[minmax(0,1fr)_7rem_6rem_5rem_4rem_4rem_6rem]
 `;
 const dishRowCls = cls`
   rounded-lg border bg-card p-2.5
@@ -50,7 +51,7 @@ const newDishInputCls = cls`
 `;
 
 export function MenuEditor() {
-  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [menu, setMenu] = useState<Category | null>(null);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export function MenuEditor() {
         sort: 0,
         listed: true,
       }));
-    setCategoryId(category.id);
+    setMenu(category);
     setDishes(nextDishes);
   }, []);
   const handleSaved = useCallback(async () => {
@@ -111,7 +112,7 @@ export function MenuEditor() {
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          返回订单
+          返回记录
         </Link>
         <Alert className="border-destructive/30 bg-destructive/5 p-3">
           <AlertDescription className="text-destructive">
@@ -132,7 +133,7 @@ export function MenuEditor() {
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground max-md:min-h-7 max-md:shrink-0"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          返回订单
+          返回记录
         </Link>
         <div>
           <div className="flex items-center gap-1.5">
@@ -143,15 +144,15 @@ export function MenuEditor() {
             <h1 className="text-lg font-semibold text-foreground">菜单管理</h1>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            维护菜品价格、单位、展示顺序和上架状态
+            管理常用消费或餐饮项目，设置单价、单位与热量
           </p>
         </div>
       </header>
       <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border bg-border">
-        <MenuMetric label="全部菜品" value={`${dishes.length} 项`} />
-        <MenuMetric label="已上架" value={`${listedCount} 项`} />
+        <MenuMetric label="全部项目" value={`${dishes.length} 项`} />
+        <MenuMetric label="已启用" value={`${listedCount} 项`} />
         <MenuMetric
-          label="未上架"
+          label="未启用"
           value={`${dishes.length - listedCount} 项`}
         />
       </dl>
@@ -162,9 +163,9 @@ export function MenuEditor() {
           </AlertDescription>
         </Alert>
       ) : null}
-      {categoryId ? (
+      {menu ? (
         <DishTable
-          categoryId={categoryId}
+          categoryId={menu.id}
           dishes={dishes}
           onSaved={handleSaved}
           onError={setMessage}
@@ -191,10 +192,10 @@ function DishTable({
         <div className="border-b bg-muted/30 px-3 py-2 max-md:flex max-md:flex-wrap max-md:items-center max-md:gap-x-2 max-md:gap-y-0.5">
           <div className="flex items-center gap-2">
             <Plus className="size-4 text-primary" aria-hidden="true" />
-            <h2 className="text-sm font-medium text-foreground">新增菜品</h2>
+            <h2 className="text-sm font-medium text-foreground">新增项目</h2>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground max-md:mt-0 max-md:text-[11px]">
-            保存后会立即出现在已上架菜单中
+            启用后可在记账时选择；热量按每单位填写，非饮食项目可留空
           </p>
         </div>
         <div className="p-2.5">
@@ -210,9 +211,9 @@ function DishTable({
       <section className="flex flex-col gap-2">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-sm font-medium text-foreground">已有菜品</h2>
+            <h2 className="text-sm font-medium text-foreground">已有项目</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              上架菜品可在开单页面直接选择
+              启用项目可在记账页面直接选择
             </p>
           </div>
           <span className="text-xs tabular-nums text-muted-foreground">
@@ -226,10 +227,10 @@ function DishTable({
               aria-hidden="true"
             />
             <p className="mt-2 text-sm font-medium text-foreground">
-              还没有菜品
+              还没有项目
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              使用上方表单添加第一项菜品
+              使用上方表单添加第一个项目
             </p>
           </div>
         ) : (
@@ -273,7 +274,10 @@ function DishRow({
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "",
   );
-  const [unit, setUnit] = useState(dish?.unit ?? "串");
+  const [calories, setCalories] = useState(
+    dish?.caloriesKcal?.toString() ?? "",
+  );
+  const [unit, setUnit] = useState(dish?.unit ?? "份");
   const [sort, setSort] = useState(dish ? String(dish.sort) : "0");
   const [listed, setListed] = useState(dish?.listed ?? true);
   const [editing, setEditing] = useState(isNew);
@@ -284,6 +288,7 @@ function DishRow({
     if (!dish) return;
     setName(dish.name);
     setPrice(centsToYuanInput(dish.priceCents));
+    setCalories(dish.caloriesKcal?.toString() ?? "");
     setUnit(dish.unit);
     setSort(String(dish.sort));
     setListed(dish.listed);
@@ -293,6 +298,16 @@ function DishRow({
     if (savingRef.current) return;
     const priceCents = parseYuanToCents(price);
     const parsedSort = parseSort(sort);
+    const caloriesKcal = calories.trim() === "" ? null : Number(calories);
+    if (
+      caloriesKcal !== null &&
+      (!/^\d+(?:\.\d+)?$/.test(calories.trim()) ||
+        !Number.isFinite(caloriesKcal) ||
+        caloriesKcal > Number.MAX_SAFE_INTEGER)
+    ) {
+      onError("热量应为非负数字（kcal），不填写则不计入热量统计");
+      return;
+    }
     if (name.trim() === "") {
       onError("名称不能为空");
       return;
@@ -313,6 +328,7 @@ function DishRow({
       dish &&
       name === dish.name &&
       priceCents === dish.priceCents &&
+      caloriesKcal === (dish.caloriesKcal ?? null) &&
       unit === dish.unit &&
       parsedSort === dish.sort &&
       listed === dish.listed
@@ -327,6 +343,7 @@ function DishRow({
         categoryId: dish?.categoryId ?? categoryId,
         name,
         priceCents,
+        caloriesKcal,
         unit,
         sort: parsedSort,
         listed,
@@ -334,6 +351,7 @@ function DishRow({
       if (isNew) {
         setName("");
         setPrice("");
+        setCalories("");
         setUnit("");
         setSort("0");
         setListed(true);
@@ -351,7 +369,7 @@ function DishRow({
 
   async function remove() {
     if (!dish || savingRef.current) return;
-    if (!window.confirm("删除这个菜品？")) return;
+    if (!window.confirm("删除这个项目？")) return;
     savingRef.current = true;
     try {
       await bbqStore.deleteDish(dish.id);
@@ -367,6 +385,7 @@ function DishRow({
     if (!dish) return;
     setName(dish.name);
     setPrice(centsToYuanInput(dish.priceCents));
+    setCalories(dish.caloriesKcal?.toString() ?? "");
     setUnit(dish.unit);
     setSort(String(dish.sort));
     setListed(dish.listed);
@@ -391,7 +410,7 @@ function DishRow({
                   : "shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
               }
             >
-              {dish.listed ? "已上架" : "未上架"}
+              {dish.listed ? "已启用" : "未启用"}
             </span>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -401,6 +420,9 @@ function DishRow({
             /{dish.unit}
             <span className="mx-2">·</span>
             排序 {dish.sort}
+            <span className="mx-2">·</span>
+            热量 {formatCalories(summarizeCalories([{ ...dish, quantity: 1 }]))}
+            /{dish.unit}
           </p>
         </div>
         <div className="flex shrink-0 gap-1.5 max-md:gap-0.5">
@@ -449,8 +471,24 @@ function DishRow({
           onChange={(event) => setName(event.target.value)}
           className={inputClassName}
           autoComplete="off"
-          aria-label="菜品名称"
-          placeholder={isNew ? "新菜品" : undefined}
+          aria-label="项目名称"
+          placeholder={isNew ? "新项目" : undefined}
+        />
+      </label>
+      <label
+        className={`col-span-3 flex min-w-0 flex-col gap-1 md:col-span-1 ${
+          showLabels ? "md:flex" : "md:block"
+        }`}
+      >
+        <span className={fieldLabelCls}>热量 kcal / 单位</span>
+        <Input
+          value={calories}
+          onChange={(event) => setCalories(event.target.value)}
+          className={`${inputClassName} tabular-nums`}
+          inputMode="decimal"
+          autoComplete="off"
+          aria-label="每单位热量（kcal，选填）"
+          placeholder="选填"
         />
       </label>
       <label
@@ -481,7 +519,7 @@ function DishRow({
           className={inputClassName}
           autoComplete="off"
           aria-label="单位"
-          placeholder={isNew ? "串" : undefined}
+          placeholder={isNew ? "份 / 次 / 件" : undefined}
         />
       </label>
       <label
@@ -509,12 +547,12 @@ function DishRow({
         <span
           className={`${fieldLabelCls} ${showLabels ? "md:w-full md:text-center" : ""}`}
         >
-          上架
+          启用
         </span>
         <div className="flex min-h-10 min-w-10 items-center justify-center max-md:min-h-9 max-md:min-w-0">
           <Switch
             checked={listed}
-            aria-label="菜品上架"
+            aria-label="项目启用"
             className={showLabels ? "focus-visible:ring-2" : undefined}
             onCheckedChange={setListed}
           />

@@ -295,7 +295,12 @@ describe("document", () => {
       () =>
         saveOrder(
           shop.document,
-          { seat: 9, status: "open", lines: [lineInput(shop.dish)] },
+          {
+            groupingEnabled: true,
+            seat: 9,
+            status: "open",
+            lines: [lineInput(shop.dish)],
+          },
           shop.clock,
         ),
       (error: unknown) =>
@@ -307,12 +312,22 @@ describe("document", () => {
     const shop = openShop();
     const first = saveOrder(
       shop.document,
-      { seat: 4, status: "open", lines: [lineInput(shop.dish)] },
+      {
+        groupingEnabled: true,
+        seat: 4,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+      },
       shop.clock,
     );
     const second = saveOrder(
       first.document,
-      { seat: 4, status: "open", lines: [lineInput(shop.dish)] },
+      {
+        groupingEnabled: true,
+        seat: 4,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+      },
       shop.clock,
     );
     assert.equal(first.order.seq, 1);
@@ -739,3 +754,296 @@ function sampleBackup() {
     ],
   };
 }
+
+describe("calorie snapshots and backups", () => {
+  it("snapshots menu calories and keeps them after menu edits, status and quantity changes", () => {
+    const shop = openShop();
+    const menu = saveDish(
+      shop.document,
+      { ...shop.dish, caloriesKcal: 120.5 },
+      shop.createId,
+    );
+    const opened = saveOrder(
+      menu.document,
+      {
+        seat: null,
+        status: "open",
+        lines: [{ ...lineInput(menu.dish, 2), caloriesKcal: 999 }],
+      },
+      shop.clock,
+    );
+    assert.equal(opened.order.lines[0].caloriesKcal, 120.5);
+    const changed = saveDish(
+      opened.document,
+      { ...menu.dish, caloriesKcal: 250 },
+      shop.createId,
+    );
+    const saved = saveOrder(
+      changed.document,
+      {
+        id: opened.order.id,
+        seat: null,
+        status: "done",
+        lines: [{ ...opened.order.lines[0], quantity: 3, caloriesKcal: 999 }],
+      },
+      shop.clock,
+    );
+    assert.equal(saved.order.lines[0].caloriesKcal, 120.5);
+    assert.equal(saved.order.lines[0].quantity, 3);
+    assert.equal(saved.order.totalCents, 1500);
+    const restored = mergeBackup(emptyDocument(), exportBackup(saved.document));
+    assert.equal(restored.dishes[0].caloriesKcal, 250);
+    assert.equal(restored.orders[0].lines[0].caloriesKcal, 120.5);
+  });
+
+  it("imports legacy backups without assigning current menu calories to historical lines", () => {
+    const shop = openShop();
+    const saved = saveOrder(
+      shop.document,
+      { seat: null, status: "done", lines: [lineInput(shop.dish)] },
+      shop.clock,
+    );
+    const backup = exportBackup(saved.document);
+    delete backup.dishes[0].caloriesKcal;
+    delete backup.orders[0].lines[0].caloriesKcal;
+    const restored = mergeBackup(emptyDocument(), backup);
+    assert.equal(restored.dishes[0].caloriesKcal, null);
+    assert.equal(restored.orders[0].lines[0].caloriesKcal, null);
+    const changed = saveDish(
+      restored,
+      { ...restored.dishes[0], caloriesKcal: 100 },
+      shop.createId,
+    );
+    const updated = saveOrder(
+      changed.document,
+      {
+        id: saved.order.id,
+        seat: null,
+        status: "open",
+        lines: saved.order.lines,
+      },
+      shop.clock,
+    );
+    assert.equal(updated.order.lines[0].caloriesKcal, null);
+  });
+
+  it("preserves zero calorie values and rejects malformed calorie backups before merging", () => {
+    const shop = openShop();
+    const menu = saveDish(
+      shop.document,
+      { ...shop.dish, caloriesKcal: 0 },
+      shop.createId,
+    );
+    const saved = saveOrder(
+      menu.document,
+      { seat: null, status: "done", lines: [lineInput(menu.dish)] },
+      shop.clock,
+    );
+    const backup = exportBackup(saved.document);
+    const restored = mergeBackup(emptyDocument(), backup);
+    assert.equal(restored.dishes[0].caloriesKcal, 0);
+    assert.equal(restored.orders[0].lines[0].caloriesKcal, 0);
+    for (const invalid of [
+      -1,
+      "120",
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      {},
+    ]) {
+      const invalidDish = structuredClone(backup);
+      Object.assign(invalidDish.dishes[0], { caloriesKcal: invalid });
+      assert.throws(
+        () => mergeBackup(emptyDocument(), invalidDish),
+        /invalid_backup/,
+      );
+      const invalidLine = structuredClone(backup);
+      Object.assign(invalidLine.orders[0].lines[0], { caloriesKcal: invalid });
+      assert.throws(
+        () => mergeBackup(emptyDocument(), invalidLine),
+        /invalid_backup/,
+      );
+    }
+    assert.throws(
+      () =>
+        saveDish(
+          shop.document,
+          { ...shop.dish, caloriesKcal: -1 },
+          shop.createId,
+        ),
+      /invalid_calories/,
+    );
+  });
+});
+
+describe("order grouping switch", () => {
+  it("defaults new records to ungrouped even if a stale seat is supplied", () => {
+    const shop = openShop();
+    const saved = saveOrder(
+      shop.document,
+      { seat: 7, status: "open", lines: [lineInput(shop.dish)] },
+      shop.clock,
+    );
+    assert.equal(saved.order.groupingEnabled, false);
+    assert.equal(saved.order.seat, null);
+  });
+
+  it("allows seat or takeaway when enabled and clears the seat when disabled", () => {
+    const shop = openShop();
+    const saved = saveOrder(
+      shop.document,
+      {
+        groupingEnabled: true,
+        seat: 2,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+      },
+      shop.clock,
+    );
+    assert.equal(saved.order.seat, 2);
+    const takeaway = saveOrder(
+      saved.document,
+      {
+        id: saved.order.id,
+        groupingEnabled: true,
+        seat: null,
+        status: "open",
+        lines: saved.order.lines,
+      },
+      shop.clock,
+    );
+    assert.equal(takeaway.order.groupingEnabled, true);
+    assert.equal(takeaway.order.seat, null);
+    const disabled = saveOrder(
+      saved.document,
+      {
+        id: saved.order.id,
+        groupingEnabled: false,
+        seat: 2,
+        status: "done",
+        lines: saved.order.lines,
+      },
+      shop.clock,
+    );
+    assert.equal(disabled.order.groupingEnabled, false);
+    assert.equal(disabled.order.seat, null);
+    const enabledAgain = saveOrder(
+      disabled.document,
+      {
+        id: saved.order.id,
+        groupingEnabled: true,
+        seat: 5,
+        status: "open",
+        lines: [],
+      },
+      shop.clock,
+    );
+    assert.equal(enabledAgain.order.groupingEnabled, true);
+    assert.equal(enabledAgain.order.seat, 5);
+  });
+
+  it("preserves the switch on status updates and edits of legacy orders", () => {
+    const shop = openShop();
+    for (const groupingEnabled of [true, false]) {
+      const saved = saveOrder(
+        shop.document,
+        {
+          groupingEnabled,
+          seat: 3,
+          status: "open",
+          lines: [lineInput(shop.dish)],
+        },
+        shop.clock,
+      );
+      const changed = saveOrder(
+        saved.document,
+        {
+          id: saved.order.id,
+          seat: saved.order.seat,
+          status: "done",
+          lines: saved.order.lines,
+        },
+        shop.clock,
+      );
+      assert.equal(changed.order.groupingEnabled, groupingEnabled);
+      assert.equal(changed.order.seat, groupingEnabled ? 3 : null);
+    }
+    const legacy = saveOrder(
+      shop.document,
+      {
+        groupingEnabled: true,
+        seat: 4,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+      },
+      shop.clock,
+    );
+    delete legacy.order.groupingEnabled;
+    const updated = saveOrder(
+      legacy.document,
+      {
+        id: legacy.order.id,
+        seat: 4,
+        status: "done",
+        lines: legacy.order.lines,
+      },
+      shop.clock,
+    );
+    assert.equal(updated.order.groupingEnabled, true);
+    assert.equal(updated.order.seat, 4);
+  });
+
+  it("round-trips both modes and merges the switch without deriving it from items", () => {
+    const shop = openShop();
+    for (const groupingEnabled of [true, false]) {
+      const saved = saveOrder(
+        shop.document,
+        {
+          groupingEnabled,
+          seat: 6,
+          status: "done",
+          lines: [lineInput(shop.dish)],
+        },
+        shop.clock,
+      );
+      const backup = exportBackup(saved.document);
+      const restored = mergeBackup(emptyDocument(), backup);
+      assert.equal(restored.orders[0].groupingEnabled, groupingEnabled);
+      assert.equal(restored.orders[0].seat, groupingEnabled ? 6 : null);
+      const merged = mergeBackup(
+        {
+          ...saved.document,
+          orders: [{ ...saved.order, groupingEnabled: !groupingEnabled }],
+        },
+        backup,
+      );
+      assert.equal(merged.orders[0].groupingEnabled, groupingEnabled);
+    }
+  });
+
+  it("accepts old backups and rejects nonboolean grouping flags", () => {
+    const shop = openShop();
+    const saved = saveOrder(
+      shop.document,
+      {
+        groupingEnabled: true,
+        seat: 1,
+        status: "open",
+        lines: [lineInput(shop.dish)],
+      },
+      shop.clock,
+    );
+    const legacy = exportBackup(structuredClone(saved.document));
+    delete legacy.orders[0].groupingEnabled;
+    const restored = mergeBackup(emptyDocument(), legacy);
+    assert.equal(restored.orders[0].groupingEnabled, true);
+    assert.equal(restored.orders[0].seat, 1);
+    for (const value of [null, 1, "false", {}]) {
+      const backup = exportBackup(structuredClone(saved.document));
+      Object.assign(backup.orders[0], { groupingEnabled: value });
+      assert.throws(
+        () => mergeBackup(emptyDocument(), backup),
+        /invalid_backup/,
+      );
+    }
+  });
+});

@@ -40,9 +40,9 @@ export function BusinessDayCalendar({ day }: { day: string }) {
           type="button"
           disabled={!day}
           className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground min-h-8 rounded-full transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 duration-150 focus-visible:ring-inset focus-visible:bg-muted/70 data-[state=open]:bg-muted/70 cursor-pointer disabled:pointer-events-none"
-          aria-label={`${day ? businessDayLabel(day) : "营业日"}，打开日历`}
+          aria-label={`${day ? businessDayLabel(day) : "记账时段"}，打开日历`}
         >
-          {day ? businessDayLabel(day) : "营业日"}
+          {day ? businessDayLabel(day) : "记账时段"}
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -50,7 +50,7 @@ export function BusinessDayCalendar({ day }: { day: string }) {
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
           <div className="flex items-center justify-between gap-3">
             <Dialog.Title className="text-base font-semibold">
-              营业日日历
+              记账时段日历
             </Dialog.Title>
             <Dialog.Close asChild>
               <Button
@@ -65,7 +65,7 @@ export function BusinessDayCalendar({ day }: { day: string }) {
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-1 text-xs text-muted-foreground">
-            选择日期查看订单 · 营业时间 06:00 至次日 03:00
+            选择日期查看记录 · 记账时段 06:00 至次日 03:00
           </Dialog.Description>
           {open ? <CalendarContent day={day} /> : null}
         </Dialog.Content>
@@ -167,7 +167,7 @@ function CalendarContent({ day }: { day: string }) {
       <div
         className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted/60 p-1"
         role="group"
-        aria-label="选择档期类型"
+        aria-label="选择时段类型"
       >
         {[false, true].map((off) => (
           <Button
@@ -179,7 +179,7 @@ function CalendarContent({ day }: { day: string }) {
             aria-pressed={offPeriod === off}
             onClick={() => setOffPeriod(off)}
           >
-            {off ? "非营业时段" : "营业日"}
+            {off ? "休息时段" : "记账时段"}
           </Button>
         ))}
       </div>
@@ -201,13 +201,13 @@ function CalendarContent({ day }: { day: string }) {
               <Link
                 href={bbqHomePath(key)}
                 prefetch={false}
-                aria-label={`${businessDayLabel(key)}${counts ? `，${count} 张订单` : ""}${selected ? "，已选中" : ""}`}
+                aria-label={`${businessDayLabel(key)}${counts ? `，${count} 条记录` : ""}${selected ? "，已选中" : ""}`}
                 aria-current={dateKey === today ? "date" : undefined}
                 className={`${dateCls} ${selected ? "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:bg-primary/90 focus-visible:ring-primary-foreground/70" : count > 0 ? "bg-primary/5 text-foreground hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-primary/50" : "text-muted-foreground hover:bg-muted/70 focus-visible:bg-muted/70 focus-visible:ring-primary/50"} ${dateKey === today && !selected ? "border-primary/30" : "border-transparent"}`}
               >
                 <span className="font-medium">{date}</span>
                 <span className="h-3 text-[10px] leading-3">
-                  {count > 0 ? `${count} 单` : ""}
+                  {count > 0 ? `${count} 条` : ""}
                 </span>
               </Link>
             </Dialog.Close>
@@ -216,7 +216,7 @@ function CalendarContent({ day }: { day: string }) {
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 border-t pt-3">
         <p className="text-xs text-muted-foreground" role="status">
-          {error ?? (counts ? "有订单的日期显示单数" : "读取营业日订单中…")}
+          {error ?? (counts ? "有记录的日期显示记录数" : "读取记账时段记录中…")}
         </p>
         <Dialog.Close asChild>
           <Button
@@ -226,7 +226,7 @@ function CalendarContent({ day }: { day: string }) {
             className={`${calendarControlCls} shrink-0 bg-muted/40`}
           >
             <Link href={bbqHomePath(currentBusinessDayKey(new Date()))}>
-              回到当前档
+              回到当前时段
             </Link>
           </Button>
         </Dialog.Close>

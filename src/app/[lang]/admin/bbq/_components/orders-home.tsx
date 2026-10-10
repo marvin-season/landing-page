@@ -41,6 +41,7 @@ import {
   readBusinessDayParam,
   shiftBusinessDayKey,
 } from "@/lib/bbq/business-day";
+import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan } from "@/lib/bbq/money";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
@@ -275,7 +276,7 @@ export function OrdersHome() {
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              管理当前档期订单，并查看全部档期经营趋势
+              记录日常支出与订单，查看金额和饮食热量趋势
             </p>
           </div>
           {storageFailed ? null : (
@@ -284,7 +285,7 @@ export function OrdersHome() {
                 <Button asChild>
                   <Link href={bbqNewOrderPath()}>
                     <Plus className="size-4" aria-hidden="true" />
-                    开单
+                    记账
                   </Link>
                 </Button>
               ) : null}
@@ -361,7 +362,7 @@ export function OrdersHome() {
                 onClick={() => setHomeView("orders")}
               >
                 <ReceiptText className="size-4" aria-hidden="true" />
-                当前档
+                当前时段
               </button>
               <button
                 type="button"
@@ -375,7 +376,7 @@ export function OrdersHome() {
                 onClick={() => setHomeView("statistics")}
               >
                 <ChartLine className="size-4" aria-hidden="true" />
-                经营趋势
+                统计趋势
               </button>
             </div>
             {homeView === "orders" ? (
@@ -392,8 +393,8 @@ export function OrdersHome() {
                         ? bbqHomePath(shiftBusinessDayKey(day, -1))
                         : "/admin/bbq"
                     }
-                    aria-label="上一档"
-                    title="上一档"
+                    aria-label="上一时段"
+                    title="上一时段"
                   >
                     <ChevronLeft className="size-4" aria-hidden="true" />
                   </Link>
@@ -411,8 +412,8 @@ export function OrdersHome() {
                         ? bbqHomePath(shiftBusinessDayKey(day, 1))
                         : "/admin/bbq"
                     }
-                    aria-label="下一档"
-                    title="下一档"
+                    aria-label="下一时段"
+                    title="下一时段"
                   >
                     <ChevronRight className="size-4" aria-hidden="true" />
                   </Link>
@@ -420,7 +421,7 @@ export function OrdersHome() {
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">
-                汇总本机保存的全部历史订单
+                汇总本机保存的全部历史记录
               </p>
             )}
           </div>
@@ -435,41 +436,47 @@ export function OrdersHome() {
       </header>
       {storageFailed ? null : homeView === "orders" ? (
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-4">
-            <Metric label="全部订单" value={`${orders.length} 张`} />
-            <Metric label="进行中" value={`${openOrders.length} 张`} />
-            <Metric label="已完成" value={`${doneOrders.length} 张`} />
-            <Metric label="已结金额" value={formatYuan(settledTotal)} />
+          <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5">
+            <Metric label="全部记录" value={`${orders.length} 条`} />
+            <Metric label="进行中" value={`${openOrders.length} 条`} />
+            <Metric label="已完成" value={`${doneOrders.length} 条`} />
+            <Metric label="已完成金额" value={formatYuan(settledTotal)} />
+            <Metric
+              label="已完成热量"
+              value={formatCalories(
+                summarizeCalories(doneOrders.flatMap((order) => order.lines)),
+              )}
+            />
           </dl>
           <div className={orderWorkspaceCls}>
             <section
               className="min-h-0 min-w-0 max-h-[50dvh] overflow-auto rounded-xl border bg-card shadow-sm md:max-h-none md:overflow-auto md:rounded-none md:border-0 md:bg-transparent md:shadow-none max-md:max-h-[max(16rem,38dvh)] max-md:bg-muted/40"
-              aria-label="订单列表"
+              aria-label="记录列表"
             >
               <div className="sticky top-0 z-10 flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 backdrop-blur">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-medium text-foreground max-md:font-semibold">
-                      <span className="md:hidden">订单列表</span>
-                      <span className="hidden md:inline">当档订单</span>
+                      <span className="md:hidden">记录列表</span>
+                      <span className="hidden md:inline">本时段记录</span>
                     </h2>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       <span className="md:hidden">
-                        点击订单，在下方查看详情
+                        点击记录，在下方查看详情
                       </span>
                       <span className="hidden md:inline">
-                        新下单的订单显示在最前面
+                        新建记录显示在最前面
                       </span>
                     </p>
                   </div>
                   <span className="text-sm tabular-nums text-muted-foreground max-md:rounded-md max-md:bg-muted max-md:px-2 max-md:py-1 max-md:text-xs">
-                    {visibleOrders.length} 张
+                    {visibleOrders.length} 条
                   </span>
                 </div>
                 <div
                   className="flex rounded-lg bg-muted p-0.5"
                   role="tablist"
-                  aria-label="订单状态"
+                  aria-label="记录状态"
                 >
                   <button
                     type="button"
@@ -508,7 +515,7 @@ export function OrdersHome() {
                   className="flex min-h-56 items-center justify-center text-sm text-muted-foreground"
                   role="status"
                 >
-                  读取订单中…
+                  读取记录中…
                 </div>
               ) : visibleOrders.length === 0 ? (
                 <div className="flex min-h-64 flex-col items-center justify-center px-6 text-center">
@@ -521,19 +528,19 @@ export function OrdersHome() {
                   </span>
                   <p className="mt-3 text-sm font-medium text-foreground">
                     {statusFilter === "open"
-                      ? "当前没有进行中的订单"
-                      : "这一档还没有已完成订单"}
+                      ? "当前没有进行中的记录"
+                      : "这一时段还没有已完成记录"}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {statusFilter === "open"
-                      ? "新订单会按开单时间显示在最前面"
-                      : "完成订单后会显示在这里"}
+                      ? "新记录会按记账时间显示在最前面"
+                      : "完成记录后会显示在这里"}
                   </p>
                   {statusFilter === "open" && canCreateOrder ? (
                     <Button asChild className="mt-4">
                       <Link href={bbqNewOrderPath()}>
                         <Plus className="size-4" aria-hidden="true" />
-                        开单
+                        记账
                       </Link>
                     </Button>
                   ) : null}
@@ -566,7 +573,7 @@ export function OrdersHome() {
             </section>
             <aside
               id="bbq-order-detail"
-              aria-label="订单详情"
+              aria-label="记录详情"
               className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm md:rounded-none md:border-0 md:border-l md:bg-transparent md:shadow-none max-md:overflow-hidden max-md:border-primary/25 ${
                 selected ? "flex" : "hidden md:flex"
               }`}
@@ -579,22 +586,24 @@ export function OrdersHome() {
                         className="size-4 text-primary"
                         aria-hidden="true"
                       />
-                      订单详情
+                      记录详情
                     </span>
                     <span className="text-xs font-medium tabular-nums text-muted-foreground">
-                      订单 #{selected.seq}
+                      记录 #{selected.seq}
                     </span>
                   </div>
                   <div className="border-b p-3 md:p-4 max-md:bg-muted/20">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground max-md:hidden">
-                          订单 #{selected.seq}
+                          记录 #{selected.seq}
                         </p>
                         <h2 className="mt-0.5 text-lg font-semibold text-foreground max-md:mt-0 max-md:text-xl">
-                          {selected.seat === null
-                            ? "打包订单"
-                            : `${selected.seat} 号座`}
+                          {selected.groupingEnabled === false
+                            ? "日常记账"
+                            : selected.seat === null
+                              ? "打包订单"
+                              : `${selected.seat} 号座`}
                         </h2>
                         <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock3 className="size-4" aria-hidden="true" />
@@ -607,10 +616,14 @@ export function OrdersHome() {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-muted-foreground">
-                          订单金额
+                          记录金额
                         </p>
                         <p className="mt-0.5 text-xl font-semibold tabular-nums text-foreground max-md:text-2xl max-md:tracking-tight">
                           {formatYuan(selected.totalCents)}
+                        </p>
+                        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                          热量{" "}
+                          {formatCalories(summarizeCalories(selected.lines))}
                         </p>
                       </div>
                     </div>
@@ -618,7 +631,7 @@ export function OrdersHome() {
                   <div className="min-h-0 flex-1 p-3 md:overflow-auto md:p-4">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-sm font-medium text-foreground">
-                        点单明细
+                        记录明细
                       </h3>
                       <span className="text-xs tabular-nums text-muted-foreground">
                         {selected.lines.length} 项
@@ -636,6 +649,9 @@ export function OrdersHome() {
                             </p>
                             <p className="mt-0.5 tabular-nums text-muted-foreground max-md:text-xs">
                               {formatYuan(line.priceCents)} × {line.quantity}
+                            </p>
+                            <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                              热量 {formatCalories(summarizeCalories([line]))}
                             </p>
                           </div>
                           <span className="shrink-0 font-medium tabular-nums text-foreground">
@@ -671,7 +687,7 @@ export function OrdersHome() {
                               >
                                 <Image
                                   src={photo.dataUrl}
-                                  alt={`订单留存照片 ${index + 1}`}
+                                  alt={`记录留存照片 ${index + 1}`}
                                   fill
                                   sizes="8rem"
                                   unoptimized
@@ -699,7 +715,7 @@ export function OrdersHome() {
                       {updatingStatusId === selected.id
                         ? "处理中…"
                         : selected.status === "open"
-                          ? "完成订单"
+                          ? "完成记录"
                           : "恢复进行中"}
                     </Button>
                     <Button
@@ -709,7 +725,7 @@ export function OrdersHome() {
                     >
                       <Link href={bbqOrderPath(selected.id)}>
                         <Pencil className="size-4" aria-hidden="true" />
-                        修改订单
+                        修改记录
                       </Link>
                     </Button>
                   </div>
@@ -721,7 +737,7 @@ export function OrdersHome() {
                     aria-hidden="true"
                   />
                   <p className="mt-3 text-sm text-muted-foreground">
-                    从左侧选择一张订单查看明细
+                    从左侧选择一条记录查看明细
                   </p>
                 </div>
               )}
@@ -733,7 +749,7 @@ export function OrdersHome() {
           className="flex min-h-80 flex-1 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground shadow-sm"
           role="status"
         >
-          读取全部档期数据中…
+          读取全部时段数据中…
         </div>
       ) : (
         <OrdersStatistics statistics={statistics} />
@@ -743,12 +759,12 @@ export function OrdersHome() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="查看订单留存照片"
+          aria-label="查看记录留存照片"
           onClick={() => setPreviewPhoto(null)}
         >
           <Image
             src={previewPhoto.dataUrl}
-            alt="订单留存照片大图"
+            alt="记录留存照片大图"
             width={1600}
             height={1600}
             unoptimized
@@ -796,7 +812,11 @@ function OrderSummary({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium text-foreground">
-            {order.seat === null ? "打包" : `${order.seat} 号座`}
+            {order.groupingEnabled === false
+              ? "日常记账"
+              : order.seat === null
+                ? "打包"
+                : `${order.seat} 号座`}
           </p>
           <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
             #{order.seq}
@@ -856,7 +876,7 @@ function downloadBackup(backup: BbqBackup, includePhotos: boolean) {
   const link = document.createElement("a");
   link.href = url;
   const suffix = includePhotos ? "-with-photos" : "";
-  link.download = `bbq-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
+  link.download = `daily-ledger-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
   document.body.append(link);
   link.click();
   link.remove();

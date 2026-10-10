@@ -1,3 +1,4 @@
+import { type CalorieSummary, summarizeCalories } from "./calories";
 import type { Order } from "./types";
 
 export type BusinessDayStatistics = {
@@ -6,6 +7,7 @@ export type BusinessDayStatistics = {
   orderCount: number;
   settledOrderCount: number;
   settledTotalCents: number;
+  settledCalories: CalorieSummary;
 };
 
 export function summarizeOrdersByBusinessDay(
@@ -20,6 +22,11 @@ export function summarizeOrdersByBusinessDay(
       orderCount: 0,
       settledOrderCount: 0,
       settledTotalCents: 0,
+      settledCalories: {
+        totalKcal: 0,
+        recordedLineCount: 0,
+        missingLineCount: 0,
+      },
     };
     current.orderCount += 1;
     if (order.openedAt < current.firstOpenedAt) {
@@ -28,6 +35,10 @@ export function summarizeOrdersByBusinessDay(
     if (order.status === "done") {
       current.settledOrderCount += 1;
       current.settledTotalCents += order.totalCents;
+      const calories = summarizeCalories(order.lines);
+      current.settledCalories.totalKcal += calories.totalKcal;
+      current.settledCalories.recordedLineCount += calories.recordedLineCount;
+      current.settledCalories.missingLineCount += calories.missingLineCount;
     }
     summaries.set(order.businessDayKey, current);
   }

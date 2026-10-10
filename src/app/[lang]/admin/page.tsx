@@ -9,8 +9,8 @@ const tools = [
   },
   {
     href: "/admin/bbq",
-    title: "烧烤记账",
-    description: "上架菜单，按座号记账",
+    title: "天天记账",
+    description: "个人支出、日常记账与饮食热量统计",
   },
 ];
 

@@ -29,6 +29,11 @@ describe("summarizeOrdersByBusinessDay", () => {
         orderCount: 1,
         settledOrderCount: 1,
         settledTotalCents: 1000,
+        settledCalories: {
+          totalKcal: 0,
+          recordedLineCount: 0,
+          missingLineCount: 0,
+        },
       },
       {
         businessDayKey: "2026-10-10",
@@ -36,6 +41,11 @@ describe("summarizeOrdersByBusinessDay", () => {
         orderCount: 2,
         settledOrderCount: 1,
         settledTotalCents: 3000,
+        settledCalories: {
+          totalKcal: 0,
+          recordedLineCount: 0,
+          missingLineCount: 0,
+        },
       },
     ]);
   });

@@ -51,8 +51,8 @@ export function isBusinessHours(now: Date): boolean {
 }
 
 export function businessDayLabel(key: string): string {
-  if (key.endsWith("#off")) return `${key.slice(0, -4)} 非营业时段`;
-  return `${key} 营业日`;
+  if (key.endsWith("#off")) return `${key.slice(0, -4)} 休息时段`;
+  return `${key} 记账时段`;
 }
 
 export function currentBusinessDayKey(now: Date): string {

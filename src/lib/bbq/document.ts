@@ -1,4 +1,5 @@
 import { businessDayKey } from "./business-day";
+import { assertCaloriesKcal } from "./calories";
 import {
   assertPriceCents,
   assertQuantity,
@@ -116,6 +117,7 @@ export function saveDish(
     categoryId: input.categoryId,
     name: requireName(input.name),
     priceCents: assertPriceCents(input.priceCents),
+    caloriesKcal: assertCaloriesKcal(input.caloriesKcal),
     unit: requireName(input.unit),
     sort: input.sort,
     listed: input.listed,
@@ -164,7 +166,6 @@ export function saveOrder(
   input: SaveOrderInput,
   clock: DocumentClock,
 ): { document: BbqDocument; order: Order } {
-  const seat = requireSeat(input.seat);
   const existing = input.id ? getOrder(document, input.id) : null;
   const lines: OrderLine[] = input.lines.map((lineInput) => {
     if (lineInput.id) {
@@ -185,17 +186,25 @@ export function saveOrder(
       dishId: dish.id,
       name: dish.name,
       priceCents: dish.priceCents,
+      // Like price/unit, calories are a snapshot; later menu edits cannot rewrite history.
+      caloriesKcal: assertCaloriesKcal(dish.caloriesKcal),
       unit: dish.unit,
       quantity,
       lineCents: lineCents(dish.priceCents, quantity),
     };
   });
+  // Grouping belongs to this record, independently of its menu items.
+  const groupingEnabled =
+    input.groupingEnabled ??
+    (existing ? (existing.groupingEnabled ?? true) : false);
+  const seat = groupingEnabled ? requireSeat(input.seat) : null;
   const orderTotal = totalCents(lines);
   const photos = input.photos ?? existing?.photos ?? [];
 
   if (existing) {
     const order: Order = {
       ...existing,
+      groupingEnabled,
       seat,
       status: input.status,
       lines,
@@ -217,6 +226,7 @@ export function saveOrder(
   const order: Order = {
     id: input.id ?? clock.createId(),
     businessDayKey: dayKey,
+    groupingEnabled,
     seq,
     seat,
     status: input.status,
@@ -311,6 +321,17 @@ function requireDishId(value: unknown): string | null {
   return value;
 }
 
+function requireBackupCalories(value: unknown): number | null {
+  // Missing calories in older backups mean unknown, not zero.
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "number") invalidBackup();
+  try {
+    return assertCaloriesKcal(value);
+  } catch {
+    return invalidBackup();
+  }
+}
+
 function parseCategory(value: unknown, seen: Set<string>): Category {
   if (!isRecord(value)) invalidBackup();
   return {
@@ -335,6 +356,7 @@ function parseDish(
     categoryId,
     name: requireBackupName(value.name),
     priceCents,
+    caloriesKcal: requireBackupCalories(value.caloriesKcal),
     unit: requireBackupName(value.unit),
     sort: requireFinite(value.sort),
     listed: requireBoolean(value.listed),
@@ -352,6 +374,7 @@ function parseLine(value: unknown, seen: Set<string>): OrderLine {
     dishId: requireDishId(value.dishId),
     name: requireBackupName(value.name),
     priceCents,
+    caloriesKcal: requireBackupCalories(value.caloriesKcal),
     unit: requireBackupName(value.unit),
     quantity,
     lineCents: lineTotal,
@@ -380,14 +403,21 @@ function parseOrder(value: unknown, seen: Set<string>): Order {
   if (!isRecord(value)) invalidBackup();
   if (!Array.isArray(value.lines)) invalidBackup();
   const lineIds = new Set<string>();
+  const groupingEnabled =
+    value.groupingEnabled === undefined
+      ? true
+      : requireBoolean(value.groupingEnabled);
+  const lines = value.lines.map((line) => parseLine(line, lineIds));
+  const seat = requireSeatValue(value.seat);
   return {
     id: requireId(value.id, seen),
     businessDayKey: requireText(value.businessDayKey),
     seq: requireInteger(value.seq, 1),
-    seat: requireSeatValue(value.seat),
+    groupingEnabled,
+    seat: groupingEnabled ? seat : null,
     status: requireStatus(value.status),
     openedAt: requireOpenedAt(value.openedAt),
-    lines: value.lines.map((line) => parseLine(line, lineIds)),
+    lines,
     photos: parsePhotos(value.photos),
     totalCents: requireInteger(value.totalCents, 0),
   };
@@ -453,6 +483,7 @@ function mergeOrders(current: Order[], incoming: Order[]): Order[] {
       recalculate({
         ...local,
         seat: order.seat,
+        groupingEnabled: order.groupingEnabled,
         status: order.status,
         openedAt: order.openedAt,
         businessDayKey: order.businessDayKey,
