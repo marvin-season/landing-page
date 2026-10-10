@@ -30,13 +30,7 @@ import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
 import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
-import {
-  cls,
-  editorTotalCls,
-  pageShellCls,
-  totalBarCls,
-  touchCls,
-} from "./bbq-layout";
+import { cls, pageShellCls, totalBarCls, touchCls } from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
 import { useBbqNavigate } from "./use-bbq-nav";
@@ -45,22 +39,39 @@ const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const editorWorkspaceCls = cls`
   grid min-h-0 flex-1 overflow-hidden rounded-xl border bg-card shadow-sm
-  md:grid-cols-[minmax(18rem,0.85fr)_minmax(0,1.15fr)]
+  md:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]
+  md:grid-rows-[auto_minmax(0,1fr)]
 `;
 
 const editorMenuPaneCls = cls`
-  order-2 min-h-0 min-w-0 border-t p-3 pb-32
-  md:order-1 md:overflow-auto md:border-t-0 md:border-r md:pb-3
+  min-h-0 min-w-0 border-b p-3
+  md:overflow-auto md:border-b-0 md:border-r
+  flex flex-col
 `;
 
 const editorOrderPaneCls = cls`
-  order-1 flex min-h-0 min-w-0 flex-col
-  md:order-2 md:h-full
+  flex min-h-0 min-w-0 flex-col
+  md:h-full
 `;
 
 const editorOrderBodyCls = cls`
-  min-h-0 p-3 pb-32
-  md:flex-1 md:overflow-auto md:pb-3
+  min-h-0 p-3
+  md:flex-1 md:overflow-auto
+`;
+
+const editorControlCls = cls`
+  rounded-lg shadow-none transition-colors
+  hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset
+  focus-visible:ring-primary/50 focus-visible:ring-offset-0
+  shinchan:rounded-lg
+`;
+
+const photoActionCls = cls`
+  inline-flex h-8 cursor-pointer items-center justify-center gap-1.5
+  rounded-lg border bg-card px-2.5 text-xs font-medium text-foreground
+  transition-colors hover:bg-muted/70 has-disabled:pointer-events-none
+  has-disabled:opacity-50 has-focus-visible:ring-1
+  has-focus-visible:ring-inset has-focus-visible:ring-primary/50
 `;
 
 type DraftLine = {
@@ -299,7 +310,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div className={pageShellCls}>
+    <div
+      className={`${pageShellCls} pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0`}
+    >
       <header className="flex shrink-0 flex-col gap-2">
         <Link
           href={order ? bbqHomePath(order.businessDayKey) : "/admin/bbq"}
@@ -331,8 +344,55 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         </div>
       </header>
       <div className={editorWorkspaceCls}>
+        <section className="border-b px-3 py-2.5 md:col-span-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-medium text-foreground">用餐方式</h2>
+              <p className="text-xs text-muted-foreground">
+                {seat === null ? "当前选择打包" : `当前选择 ${seat} 号座`}
+              </p>
+            </div>
+            <label className="inline-flex shrink-0 items-center gap-1.5">
+              <span className="text-right">
+                <span className="block text-xs font-medium leading-none text-foreground">
+                  {done ? "已完成" : "进行中"}
+                </span>
+              </span>
+              <Switch
+                checked={done}
+                disabled={saving}
+                aria-label="切换订单状态"
+                onCheckedChange={setDone}
+              />
+            </label>
+          </div>
+          <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
+            <Button
+              type="button"
+              variant={seat === null ? "default" : "outline"}
+              aria-pressed={seat === null}
+              className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+              onClick={() => setSeat(null)}
+            >
+              <Package className="size-4" aria-hidden="true" />
+              打包
+            </Button>
+            {SEATS.map((number) => (
+              <Button
+                key={number}
+                type="button"
+                variant={seat === number ? "default" : "outline"}
+                aria-pressed={seat === number}
+                className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                onClick={() => setSeat(number)}
+              >
+                {number}
+              </Button>
+            ))}
+          </div>
+        </section>
         <section className={editorMenuPaneCls}>
-          <div className="flex items-end justify-between gap-2">
+          <div className="flex shrink-0 items-center justify-between gap-2">
             <div>
               <h2 className="text-sm font-medium text-foreground">选择菜品</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -360,13 +420,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </Button>
             </div>
           ) : (
-            <div className="mt-3 flex flex-col gap-1.5">
+            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none">
               {availableDishes.map((dish) => (
                 <Button
                   key={dish.id}
                   type="button"
                   variant="outline"
-                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-3 py-2 text-left text-sm`}
+                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70`}
                   onClick={() => addDish(dish)}
                 >
                   <span className="min-w-0">
@@ -384,45 +444,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         <section className={editorOrderPaneCls}>
           <div className={editorOrderBodyCls}>
             <section>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-medium text-foreground">
-                    用餐方式
-                  </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {seat === null ? "当前选择打包" : `当前选择 ${seat} 号座`}
-                  </p>
-                </div>
-                {seat === null ? (
-                  <Package className="size-5 text-primary" aria-hidden="true" />
-                ) : null}
-              </div>
-              <div className="mt-2 grid grid-cols-4 gap-1.5">
-                <Button
-                  type="button"
-                  variant={seat === null ? "default" : "outline"}
-                  aria-pressed={seat === null}
-                  className={`${touchCls} col-span-4 min-w-11 text-sm`}
-                  onClick={() => setSeat(null)}
-                >
-                  <Package className="size-4" aria-hidden="true" />
-                  打包
-                </Button>
-                {SEATS.map((number) => (
-                  <Button
-                    key={number}
-                    type="button"
-                    variant={seat === number ? "default" : "outline"}
-                    aria-pressed={seat === number}
-                    className={`${touchCls} min-w-11 text-sm`}
-                    onClick={() => setSeat(number)}
-                  >
-                    {number}
-                  </Button>
-                ))}
-              </div>
-            </section>
-            <section className="mt-4 border-t pt-4">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-medium text-foreground">
@@ -437,12 +458,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </span>
               </div>
               {lines.length === 0 ? (
-                <div className="mt-2 flex min-h-28 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
                   <ReceiptText
-                    className="size-7 text-muted-foreground/60"
+                    className="size-5 text-muted-foreground/60"
                     aria-hidden="true"
                   />
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     还没有添加菜品
                   </p>
                 </div>
@@ -451,7 +472,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   {lines.map((line) => (
                     <li
                       key={line.key}
-                      className="flex items-center gap-2 rounded-lg bg-muted/40 px-3 py-2"
+                      className="flex items-center gap-1.5 rounded-lg bg-muted/40 px-2.5 py-2"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">
@@ -471,20 +492,20 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="outline"
                         size="icon"
-                        className="size-8 shrink-0"
+                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
                         aria-label={`减少 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, -1)}
                       >
                         <Minus className="size-4" aria-hidden="true" />
                       </Button>
-                      <span className="w-7 text-center text-sm font-medium tabular-nums">
+                      <span className="min-w-6 text-center text-sm font-medium tabular-nums">
                         {line.quantity}
                       </span>
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
-                        className="size-8 shrink-0"
+                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
                         aria-label={`增加 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, 1)}
                       >
@@ -495,7 +516,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </ul>
               )}
             </section>
-            <section className="mt-4 border-t pt-4">
+            <section className="mt-3 border-t pt-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -508,15 +529,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     </h2>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    最多 {MAX_ORDER_PHOTOS} 张，可拍照追加或从相册一次选择多张
+                    选填，最多 {MAX_ORDER_PHOTOS} 张
                   </p>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
                   {photos.length}/{MAX_ORDER_PHOTOS}
                 </span>
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <label className={photoActionCls}>
                   <Camera className="size-4" aria-hidden="true" />
                   {processingPhotos ? "处理照片中…" : "拍照"}
                   <input
@@ -535,7 +556,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     }}
                   />
                 </label>
-                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground has-disabled:pointer-events-none has-disabled:opacity-50">
+                <label className={photoActionCls}>
                   <ImagePlus className="size-4" aria-hidden="true" />
                   {processingPhotos ? "处理照片中…" : "从相册选择"}
                   <input
@@ -556,7 +577,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </label>
               </div>
               {photos.length > 0 ? (
-                <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                <ul className="mt-2 grid grid-cols-4 gap-1.5">
                   {photos.map((photo, index) => (
                     <li
                       key={photo.id}
@@ -566,7 +587,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         src={photo.dataUrl}
                         alt={`订单留存照片 ${index + 1}`}
                         fill
-                        sizes="(max-width: 640px) 33vw, 10rem"
+                        sizes="(max-width: 767px) 25vw, 7rem"
                         unoptimized
                         className="size-full object-cover"
                       />
@@ -608,33 +629,19 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </div>
           <TotalBar>
-            <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+            <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
                   {itemCount} 份 · 订单总额
                 </p>
-                <p className={editorTotalCls}>{formatYuan(total)}</p>
+                <p className="text-2xl font-semibold tabular-nums tracking-tight">
+                  {formatYuan(total)}
+                </p>
               </div>
-              <div className="flex shrink-0 items-center gap-3">
-                <label className="inline-flex h-10 shrink-0 items-center gap-2 border-r pr-3">
-                  <span className="text-right">
-                    <span className="block text-[10px] leading-none text-muted-foreground">
-                      订单状态
-                    </span>
-                    <span className="mt-1 block text-xs font-medium leading-none text-foreground">
-                      {done ? "已完成" : "进行中"}
-                    </span>
-                  </span>
-                  <Switch
-                    checked={done}
-                    disabled={saving}
-                    aria-label="切换订单状态"
-                    onCheckedChange={setDone}
-                  />
-                </label>
+              <div className="flex shrink-0 items-center gap-2">
                 <Button
                   type="button"
-                  className="px-3"
+                  className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70`}
                   disabled={saving || processingPhotos}
                   onClick={() => void save()}
                 >

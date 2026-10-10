@@ -30,7 +30,7 @@ import { cls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const dishGridCls = cls`
-  grid grid-cols-2 gap-2
+  grid grid-cols-3 gap-2
   md:grid-cols-[minmax(0,1fr)_7rem_5rem_5rem_5rem_6rem]
 `;
 const dishRowCls = cls`
@@ -40,6 +40,9 @@ const dishRowCls = cls`
 const dishInputCls = cls`
   h-10 w-full min-w-0 rounded-lg border bg-background px-3 text-sm shadow-none
   md:rounded-none md:border-0 md:bg-transparent md:px-2 md:text-sm
+  max-md:h-9 max-md:px-2 max-md:text-base
+  max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset
+  max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0
 `;
 const newDishInputCls = cls`
   md:rounded-lg md:border md:bg-background md:px-3
@@ -122,11 +125,11 @@ export function MenuEditor() {
   const listedCount = dishes.filter((dish) => dish.listed).length;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-      <header className="flex flex-col gap-2">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 md:gap-4">
+      <header className="flex flex-col gap-2 max-md:flex-row-reverse max-md:items-start max-md:justify-between">
         <Link
           href="/admin/bbq"
-          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground max-md:min-h-7 max-md:shrink-0"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           返回订单
@@ -183,14 +186,14 @@ function DishTable({
   onError: (message: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 md:gap-4">
       <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-        <div className="border-b bg-muted/30 px-3 py-2">
+        <div className="border-b bg-muted/30 px-3 py-2 max-md:flex max-md:flex-wrap max-md:items-center max-md:gap-x-2 max-md:gap-y-0.5">
           <div className="flex items-center gap-2">
             <Plus className="size-4 text-primary" aria-hidden="true" />
             <h2 className="text-sm font-medium text-foreground">新增菜品</h2>
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="mt-0.5 text-xs text-muted-foreground max-md:mt-0 max-md:text-[11px]">
             保存后会立即出现在已上架菜单中
           </p>
         </div>
@@ -230,7 +233,7 @@ function DishTable({
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 md:gap-0 md:overflow-hidden md:rounded-xl md:border md:bg-card md:shadow-sm">
+          <div className="flex flex-col gap-1.5 md:gap-0 md:overflow-hidden md:rounded-xl md:border md:bg-card md:shadow-sm">
             {dishes.map((dish) => (
               <DishRow
                 key={dish.id}
@@ -261,12 +264,11 @@ function DishRow({
   onError: (message: string) => void;
 }) {
   const isNew = dish === undefined;
-  const fieldLabelCls = showLabels
-    ? "text-xs text-muted-foreground"
-    : "text-xs text-muted-foreground md:sr-only";
-  const inputClassName = showLabels
-    ? `${dishInputCls} ${newDishInputCls}`
-    : dishInputCls;
+  const fieldLabelCls = cls`
+    text-xs text-muted-foreground max-md:text-[11px]
+    ${showLabels ? "" : "md:sr-only"}
+  `;
+  const inputClassName = cls`${dishInputCls} ${showLabels ? newDishInputCls : ""}`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "",
@@ -373,10 +375,13 @@ function DishRow({
 
   if (dish && !editing) {
     return (
-      <article className="flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center md:rounded-none md:border-0 md:border-b md:last:border-b-0">
+      <article className="flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center md:rounded-none md:border-0 md:border-b md:last:border-b-0 max-md:flex-row max-md:items-center max-md:p-2.5">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2">
-            <h3 className="truncate text-sm font-medium text-foreground">
+            <h3
+              className="truncate text-sm font-medium text-foreground"
+              title={dish.name}
+            >
               {dish.name}
             </h3>
             <span
@@ -398,24 +403,26 @@ function DishRow({
             排序 {dish.sort}
           </p>
         </div>
-        <div className="flex shrink-0 gap-1.5">
+        <div className="flex shrink-0 gap-1.5 max-md:gap-0.5">
           <Button
             type="button"
             variant="outline"
-            className="h-9 flex-1 px-3 sm:flex-none"
+            className="h-9 flex-1 px-3 sm:flex-none max-md:size-9 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:shadow-none max-md:hover:bg-muted/70 max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
+            aria-label={`编辑 ${dish.name}`}
             onClick={() => setEditing(true)}
           >
             <Pencil className="size-4" aria-hidden="true" />
-            编辑
+            <span className="max-md:sr-only">编辑</span>
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="h-9 flex-1 px-3 text-destructive sm:flex-none"
+            className="h-9 flex-1 px-3 text-destructive sm:flex-none max-md:size-9 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:hover:bg-destructive/10 max-md:hover:text-destructive max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-destructive/50 max-md:focus-visible:ring-offset-0"
+            aria-label={`删除 ${dish.name}`}
             onClick={() => void remove()}
           >
             <Trash2 className="size-4" aria-hidden="true" />
-            删除
+            <span className="max-md:sr-only">删除</span>
           </Button>
         </div>
       </article>
@@ -426,12 +433,12 @@ function DishRow({
     <div
       className={`${dishGridCls} ${dishRowCls} ${
         showLabels
-          ? "md:items-end md:gap-2 md:border-b-0"
+          ? "md:items-end md:gap-2 md:border-b-0 max-md:border-0 max-md:p-0"
           : "md:items-center md:gap-0"
       }`}
     >
       <label
-        className={`col-span-2 flex min-w-0 flex-col gap-1 md:col-span-1 ${
+        className={`col-span-3 flex min-w-0 flex-col gap-1 md:col-span-1 ${
           showLabels ? "md:flex" : "md:block"
         }`}
       >
@@ -493,18 +500,18 @@ function DishRow({
         />
       </label>
       <div
-        className={`flex min-h-10 justify-between ${
+        className={`flex min-h-10 justify-between max-md:min-h-9 max-md:justify-start ${
           showLabels
-            ? "flex-col items-start gap-1 md:items-center"
+            ? "flex-row items-center gap-2 md:flex-col md:items-center md:gap-1"
             : "items-center gap-2 md:justify-center"
         }`}
       >
         <span
-          className={`${fieldLabelCls} ${showLabels ? "w-full text-center" : ""}`}
+          className={`${fieldLabelCls} ${showLabels ? "md:w-full md:text-center" : ""}`}
         >
           上架
         </span>
-        <div className="flex min-h-10 min-w-10 items-center justify-center">
+        <div className="flex min-h-10 min-w-10 items-center justify-center max-md:min-h-9 max-md:min-w-0">
           <Switch
             checked={listed}
             aria-label="菜品上架"
@@ -514,14 +521,16 @@ function DishRow({
         </div>
       </div>
       <div
-        className={`col-span-2 flex min-h-10 md:col-span-1 ${
+        className={`col-span-2 flex min-h-10 md:col-span-1 max-md:min-h-9 ${
           showLabels
-            ? "flex-col items-stretch gap-1"
+            ? "flex-col items-stretch gap-1 max-md:flex-row max-md:items-center max-md:justify-end"
             : "items-end justify-end gap-1.5 md:items-center md:px-1"
         }`}
       >
         {showLabels ? (
-          <span className={`${fieldLabelCls} text-center`}>操作</span>
+          <span className={`${fieldLabelCls} text-center max-md:sr-only`}>
+            操作
+          </span>
         ) : null}
         {dish ? (
           <Button
@@ -541,8 +550,8 @@ function DishRow({
           variant="outline"
           className={
             showLabels
-              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2"
-              : "h-10 flex-1 px-3 md:px-2"
+              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2 max-md:h-9 max-md:w-auto max-md:min-w-24 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
+              : "h-10 flex-1 px-3 md:px-2 max-md:h-9 max-md:flex-none max-md:min-w-20 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
           }
           onClick={() => void commit()}
         >
@@ -556,9 +565,9 @@ function DishRow({
 
 function MenuMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card px-3 py-2">
+    <div className="bg-card px-3 py-2 max-md:flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-1 max-md:px-2">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground">
+      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground max-md:mt-0 max-md:text-sm">
         {value}
       </dd>
     </div>

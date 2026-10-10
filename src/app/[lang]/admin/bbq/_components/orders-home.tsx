@@ -35,7 +35,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
-  businessDayLabel,
   canCreateOrderForBusinessDay,
   formatShanghaiDate,
   formatShanghaiHm,
@@ -54,6 +53,7 @@ import {
   bbqNewOrderPath,
   bbqOrderPath,
 } from "./bbq-paths";
+import { BusinessDayCalendar } from "./business-day-calendar";
 import { OrdersStatistics } from "./orders-statistics";
 
 type HomeView = "orders" | "statistics";
@@ -78,6 +78,7 @@ const orderWorkspaceCls = cls`
   shadow-none
   md:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] md:gap-0 md:border
   md:bg-card md:shadow-sm
+  max-md:gap-3
 `;
 
 const orderTabCls = cls`
@@ -269,7 +270,7 @@ export function OrdersHome() {
             <div className="flex items-center gap-1.5">
               <Store className="size-4 text-primary" aria-hidden="true" />
               <h1 className="text-lg font-semibold text-pretty text-foreground">
-                富民记账
+                天天记账
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -381,7 +382,7 @@ export function OrdersHome() {
                   asChild
                   size="icon"
                   variant="ghost"
-                  className="size-8 shrink-0"
+                  className="size-8 shrink-0 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70"
                 >
                   <Link
                     href={
@@ -395,14 +396,12 @@ export function OrdersHome() {
                     <ChevronLeft className="size-4" aria-hidden="true" />
                   </Link>
                 </Button>
-                <p className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground">
-                  {day ? businessDayLabel(day) : "营业日"}
-                </p>
+                <BusinessDayCalendar day={day} />
                 <Button
                   asChild
                   size="icon"
                   variant="ghost"
-                  className="size-8 shrink-0"
+                  className="size-8 shrink-0 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70"
                 >
                   <Link
                     href={
@@ -441,18 +440,27 @@ export function OrdersHome() {
             <Metric label="已结金额" value={formatYuan(settledTotal)} />
           </dl>
           <div className={orderWorkspaceCls}>
-            <section className="min-h-0 min-w-0 max-h-[50dvh] overflow-auto rounded-xl border bg-card shadow-sm md:max-h-none md:overflow-auto md:rounded-none md:border-0 md:bg-transparent md:shadow-none">
+            <section
+              className="min-h-0 min-w-0 max-h-[50dvh] overflow-auto rounded-xl border bg-card shadow-sm md:max-h-none md:overflow-auto md:rounded-none md:border-0 md:bg-transparent md:shadow-none max-md:max-h-[max(16rem,38dvh)] max-md:bg-muted/40"
+              aria-label="订单列表"
+            >
               <div className="sticky top-0 z-10 flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 backdrop-blur">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-sm font-medium text-foreground">
-                      当档订单
+                    <h2 className="text-sm font-medium text-foreground max-md:font-semibold">
+                      <span className="md:hidden">订单列表</span>
+                      <span className="hidden md:inline">当档订单</span>
                     </h2>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      新下单的订单显示在最前面
+                      <span className="md:hidden">
+                        点击订单，在下方查看详情
+                      </span>
+                      <span className="hidden md:inline">
+                        新下单的订单显示在最前面
+                      </span>
                     </p>
                   </div>
-                  <span className="text-sm tabular-nums text-muted-foreground">
+                  <span className="text-sm tabular-nums text-muted-foreground max-md:rounded-md max-md:bg-muted max-md:px-2 max-md:py-1 max-md:text-xs">
                     {visibleOrders.length} 张
                   </span>
                 </div>
@@ -529,17 +537,25 @@ export function OrdersHome() {
                   ) : null}
                 </div>
               ) : (
-                <ul className="divide-y">
+                <ul className="divide-y max-md:divide-y-0 max-md:space-y-1.5 max-md:p-2">
                   {visibleOrders.map((order) => (
                     <li key={order.id}>
                       <button
                         type="button"
-                        className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors hover:bg-muted/60 ${
-                          selectedId === order.id ? "bg-primary/5" : ""
+                        className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors hover:bg-muted/60 max-md:rounded-lg max-md:border max-md:focus-visible:outline-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 ${
+                          selectedId === order.id
+                            ? "bg-primary/5 max-md:border-primary/35 max-md:bg-primary/10 max-md:hover:bg-primary/10"
+                            : "max-md:border-transparent max-md:bg-card max-md:hover:bg-muted/70"
                         }`}
+                        aria-pressed={selectedId === order.id}
+                        aria-controls="bbq-order-detail"
                         onClick={() => openOrder(order.id)}
                       >
-                        <OrderSummary order={order} showChevron />
+                        <OrderSummary
+                          order={order}
+                          showChevron
+                          isSelected={selectedId === order.id}
+                        />
                       </button>
                     </li>
                   ))}
@@ -547,19 +563,33 @@ export function OrdersHome() {
               )}
             </section>
             <aside
-              className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm md:rounded-none md:border-0 md:border-l md:bg-transparent md:shadow-none ${
+              id="bbq-order-detail"
+              aria-label="订单详情"
+              className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm md:rounded-none md:border-0 md:border-l md:bg-transparent md:shadow-none max-md:overflow-hidden max-md:border-primary/25 ${
                 selected ? "flex" : "hidden md:flex"
               }`}
             >
               {selected ? (
                 <div className="flex min-h-0 flex-col md:h-full">
-                  <div className="border-b p-3 md:p-4">
+                  <div className="flex items-center justify-between gap-2 border-b border-primary/15 bg-primary/5 px-3 py-2 md:hidden">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                      <ReceiptText
+                        className="size-4 text-primary"
+                        aria-hidden="true"
+                      />
+                      订单详情
+                    </span>
+                    <span className="text-xs font-medium tabular-nums text-muted-foreground">
+                      订单 #{selected.seq}
+                    </span>
+                  </div>
+                  <div className="border-b p-3 md:p-4 max-md:bg-muted/20">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">
+                        <p className="text-xs font-medium text-muted-foreground max-md:hidden">
                           订单 #{selected.seq}
                         </p>
-                        <h2 className="mt-0.5 text-lg font-semibold text-foreground">
+                        <h2 className="mt-0.5 text-lg font-semibold text-foreground max-md:mt-0 max-md:text-xl">
                           {selected.seat === null
                             ? "打包订单"
                             : `${selected.seat} 号座`}
@@ -568,14 +598,16 @@ export function OrdersHome() {
                           <Clock3 className="size-4" aria-hidden="true" />
                           {formatShanghaiHm(new Date(selected.openedAt))}
                           <span aria-hidden="true">·</span>
-                          {statusLabel(selected.status)}
+                          <span className="max-md:rounded-md max-md:bg-primary/10 max-md:px-1.5 max-md:py-0.5 max-md:font-medium max-md:text-primary">
+                            {statusLabel(selected.status)}
+                          </span>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-muted-foreground">
                           订单金额
                         </p>
-                        <p className="mt-0.5 text-xl font-semibold tabular-nums text-foreground">
+                        <p className="mt-0.5 text-xl font-semibold tabular-nums text-foreground max-md:text-2xl max-md:tracking-tight">
                           {formatYuan(selected.totalCents)}
                         </p>
                       </div>
@@ -597,10 +629,10 @@ export function OrdersHome() {
                           className="flex items-center justify-between gap-4 py-2"
                         >
                           <div className="min-w-0">
-                            <p className="truncate text-foreground">
+                            <p className="truncate text-foreground max-md:font-medium">
                               {line.name}
                             </p>
-                            <p className="mt-0.5 tabular-nums text-muted-foreground">
+                            <p className="mt-0.5 tabular-nums text-muted-foreground max-md:text-xs">
                               {formatYuan(line.priceCents)} × {line.quantity}
                             </p>
                           </div>
@@ -650,9 +682,10 @@ export function OrdersHome() {
                       </section>
                     ) : null}
                   </div>
-                  <div className="grid grid-cols-2 gap-2 border-t p-2 md:p-3">
+                  <div className="grid grid-cols-2 gap-2 border-t p-2 md:p-3 max-md:bg-muted/30">
                     <Button
                       type="button"
+                      className="max-md:rounded-lg max-md:px-3 max-md:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary-foreground/70 max-md:focus-visible:ring-offset-0"
                       disabled={updatingStatusId !== null}
                       onClick={() => void toggleOrderStatus(selected)}
                     >
@@ -667,7 +700,11 @@ export function OrdersHome() {
                           ? "完成订单"
                           : "恢复进行中"}
                     </Button>
-                    <Button asChild variant="outline">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="max-md:rounded-lg max-md:px-3 max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
+                    >
                       <Link href={bbqOrderPath(selected.id)}>
                         <Pencil className="size-4" aria-hidden="true" />
                         修改订单
@@ -746,9 +783,11 @@ function Metric({ label, value }: { label: string; value: string }) {
 function OrderSummary({
   order,
   showChevron = false,
+  isSelected = false,
 }: {
   order: Order;
   showChevron?: boolean;
+  isSelected?: boolean;
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
@@ -760,6 +799,11 @@ function OrderSummary({
           <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
             #{order.seq}
           </span>
+          {isSelected ? (
+            <span className="shrink-0 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground md:hidden">
+              查看中
+            </span>
+          ) : null}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
@@ -793,7 +837,7 @@ function OrderSummary({
         </p>
         {showChevron ? (
           <ChevronRight
-            className="size-4 text-muted-foreground"
+            className={`size-4 text-muted-foreground ${isSelected ? "max-md:rotate-90 max-md:text-primary" : ""}`}
             aria-hidden="true"
           />
         ) : null}
