@@ -41,13 +41,13 @@ export function businessDayKey(openedAt: Date): string {
   const parts = shanghaiParts(openedAt);
   const date = formatDate(parts.year, parts.month, parts.day);
   if (parts.hour < 3) return addDays(date, -1);
-  if (parts.hour < 15) return `${date}#off`;
+  if (parts.hour < 6) return `${date}#off`;
   return date;
 }
 
 export function isBusinessHours(now: Date): boolean {
   const { hour } = shanghaiParts(now);
-  return hour >= 15 || hour < 3;
+  return hour >= 6 || hour < 3;
 }
 
 export function businessDayLabel(key: string): string {
