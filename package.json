@@ -12,6 +12,7 @@
     "format": "biome format --write",
     "check": "biome check .",
     "test:bbq": "node --import tsx --test src/lib/bbq/*.test.ts",
+    "test:page-transition": "node --import tsx --test src/components/page-transition/page-fade.test.tsx",
     "bbq:pwa:assets": "node --import tsx scripts/generate-bbq-pwa.ts",
     "check:staged": "biome check --write --staged --no-errors-on-unmatched && git update-index --again",
     "lingui:extract": "lingui extract --clean",
