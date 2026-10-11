@@ -13,8 +13,7 @@ export function cls(
 
 export const pageShellCls = cls`
   flex flex-col gap-3
-  md:h-[calc(100dvh-2rem)] md:overflow-hidden
-  lg:h-[calc(100dvh-10rem)]
+  md:h-full md:overflow-hidden
 `;
 
 export const splitCls = cls`

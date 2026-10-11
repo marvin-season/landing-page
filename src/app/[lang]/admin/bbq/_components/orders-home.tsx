@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
   Camera,
   ChartLine,
@@ -21,13 +22,13 @@ import {
   DatabaseBackup,
   Download,
   Images,
+  LoaderCircle,
   Pencil,
   Plus,
   ReceiptText,
   RotateCcw,
   Store,
   Upload,
-  UtensilsCrossed,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -49,12 +50,7 @@ import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { BbqInstallButton } from "./bbq-install-button";
 import { cls, touchCls } from "./bbq-layout";
-import {
-  bbqHomePath,
-  bbqMenuPath,
-  bbqNewOrderPath,
-  bbqOrderPath,
-} from "./bbq-paths";
+import { bbqHomePath, bbqNewOrderPath, bbqOrderPath } from "./bbq-paths";
 import { BusinessDayCalendar } from "./business-day-calendar";
 import { OrdersStatistics } from "./orders-statistics";
 
@@ -71,8 +67,7 @@ function orderTotalCls(status: Order["status"]): string {
 
 const homePageShellCls = cls`
   flex flex-col gap-3
-  md:h-[calc(100dvh-2rem)] md:overflow-hidden
-  lg:h-[calc(100dvh-10rem)]
+  md:h-full md:overflow-hidden
 `;
 
 const orderWorkspaceCls = cls`
@@ -87,6 +82,7 @@ const orderTabCls = cls`
   inline-flex min-h-8 flex-1 items-center justify-center gap-1.5 rounded-md
   px-2 text-xs font-medium transition-colors
   max-md:min-h-11
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
 `;
 
 const homeViewTabCls = cls`
@@ -95,6 +91,7 @@ const homeViewTabCls = cls`
   max-md:min-h-11 max-md:gap-1.5 max-md:px-2 max-md:text-sm
   max-md:[&>svg]:size-4
   max-md:flex-1
+  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
 `;
 
 const homeActionsCls = cls`
@@ -143,6 +140,12 @@ export function OrdersHome() {
   const [message, setMessage] = useState<string | null>(null);
   const [storageFailed, setStorageFailed] = useState(false);
   const [readyDay, setReadyDay] = useState<string | null>(null);
+  const [backupTask, setBackupTask] = useState<"import" | "export" | null>(
+    null,
+  );
+  const [notice, setNotice] = useState<string | null>(null);
+  const backupBusyRef = useRef(false);
+  const photoTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -215,16 +218,25 @@ export function OrdersHome() {
   }
 
   async function exportBackup(includePhotos = false) {
+    if (backupBusyRef.current) return;
+    backupBusyRef.current = true;
+    setBackupTask("export");
+    setMessage(null);
+    setNotice(null);
     try {
       const backup = await bbqStore.exportBackup({ includePhotos });
       downloadBackup(backup, includePhotos);
+      setNotice("备份已生成，请在浏览器下载中查看");
     } catch (error) {
       setMessage(bbqErrorMessage(error));
+    } finally {
+      backupBusyRef.current = false;
+      setBackupTask(null);
     }
   }
 
   async function importFile(file: File | undefined) {
-    if (!file) return;
+    if (!file || backupBusyRef.current) return;
     let parsed: unknown;
     try {
       parsed = JSON.parse(await file.text()) as unknown;
@@ -232,14 +244,25 @@ export function OrdersHome() {
       setMessage("备份文件不正确");
       return;
     }
-    if (!window.confirm("把备份按编号合并进当前记账数据？")) return;
+    if (
+      !window.confirm("把备份按编号合并进当前记账数据？相同编号的数据会更新。")
+    )
+      return;
+    backupBusyRef.current = true;
+    setBackupTask("import");
+    setNotice(null);
+    setMessage(null);
     try {
       await bbqStore.importBackup(parsed as BbqBackup);
       setSelectedId(null);
       await reload();
       setMessage(null);
+      setNotice("备份已导入，记录和菜单已更新");
     } catch (error) {
       setMessage(bbqErrorMessage(error));
+    } finally {
+      backupBusyRef.current = false;
+      setBackupTask(null);
     }
   }
 
@@ -314,28 +337,32 @@ export function OrdersHome() {
           </div>
           {storageFailed ? null : (
             <div className={homeActionsCls}>
-              {canCreateOrder ? (
-                <Button asChild className="max-md:hidden">
-                  <Link href={bbqNewOrderPath()}>
-                    <Plus className="size-4" aria-hidden="true" />
-                    记账
-                  </Link>
-                </Button>
-              ) : null}
-              <Button asChild variant="outline" className="max-md:hidden">
-                <Link href={bbqMenuPath()}>
-                  <UtensilsCrossed className="size-4" aria-hidden="true" />
-                  菜单
-                </Link>
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="button" variant="outline">
-                    <DatabaseBackup className="size-4" aria-hidden="true" />
-                    数据备份
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={backupTask !== null}
+                  >
+                    {backupTask ? (
+                      <LoaderCircle
+                        className="size-4 animate-spin motion-reduce:animate-none"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <DatabaseBackup className="size-4" aria-hidden="true" />
+                    )}
+                    {backupTask === "import"
+                      ? "导入中…"
+                      : backupTask === "export"
+                        ? "导出中…"
+                        : "数据备份"}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 max-md:[&_[role=menuitem]]:min-h-11"
+                >
                   <DropdownMenuLabel>
                     <span className="block">全部数据备份</span>
                     <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
@@ -380,13 +407,12 @@ export function OrdersHome() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between max-md:flex-col max-md:items-stretch max-md:gap-1.5">
             <div
               className="flex w-fit rounded-lg bg-muted p-0.5 max-md:w-full"
-              role="tablist"
+              role="group"
               aria-label="首页视图"
             >
               <button
                 type="button"
-                role="tab"
-                aria-selected={homeView === "orders"}
+                aria-pressed={homeView === "orders"}
                 className={`${homeViewTabCls} ${
                   homeView === "orders"
                     ? "bg-card text-foreground shadow-sm"
@@ -399,8 +425,7 @@ export function OrdersHome() {
               </button>
               <button
                 type="button"
-                role="tab"
-                aria-selected={homeView === "statistics"}
+                aria-pressed={homeView === "statistics"}
                 className={`${homeViewTabCls} ${
                   homeView === "statistics"
                     ? "bg-card text-foreground shadow-sm"
@@ -459,6 +484,14 @@ export function OrdersHome() {
             )}
           </div>
         )}
+        {notice && !message ? (
+          <p
+            className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary"
+            role="status"
+          >
+            {notice}
+          </p>
+        ) : null}
         {message ? (
           <Alert className="border-destructive/30 bg-destructive/5 p-3">
             <AlertDescription className="text-destructive">
@@ -508,13 +541,12 @@ export function OrdersHome() {
                 </div>
                 <div
                   className="flex rounded-lg bg-muted p-0.5"
-                  role="tablist"
+                  role="group"
                   aria-label="记录状态"
                 >
                   <button
                     type="button"
-                    role="tab"
-                    aria-selected={statusFilter === "open"}
+                    aria-pressed={statusFilter === "open"}
                     className={`${orderTabCls} ${
                       statusFilter === "open"
                         ? "bg-card text-foreground shadow-sm"
@@ -528,8 +560,7 @@ export function OrdersHome() {
                   </button>
                   <button
                     type="button"
-                    role="tab"
-                    aria-selected={statusFilter === "done"}
+                    aria-pressed={statusFilter === "done"}
                     className={`${orderTabCls} ${
                       statusFilter === "done"
                         ? "bg-card text-foreground shadow-sm"
@@ -716,7 +747,10 @@ export function OrdersHome() {
                                 type="button"
                                 className="relative block aspect-square w-full overflow-hidden rounded-lg border bg-muted transition-opacity hover:opacity-85"
                                 aria-label={`查看第 ${index + 1} 张留存照片`}
-                                onClick={() => setPreviewPhoto(photo)}
+                                onClick={(event) => {
+                                  photoTriggerRef.current = event.currentTarget;
+                                  setPreviewPhoto(photo);
+                                }}
                               >
                                 <Image
                                   src={photo.dataUrl}
@@ -785,37 +819,56 @@ export function OrdersHome() {
           读取全部时段数据中…
         </div>
       ) : (
-        <OrdersStatistics statistics={statistics} />
+        <OrdersStatistics
+          statistics={statistics}
+          onSelectDay={() => setHomeView("orders")}
+        />
       )}
-      {previewPhoto ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label="查看记录留存照片"
-          onClick={() => setPreviewPhoto(null)}
-        >
-          <Image
-            src={previewPhoto.dataUrl}
-            alt="记录留存照片大图"
-            width={1600}
-            height={1600}
-            unoptimized
-            className="max-h-full max-w-full object-contain"
-            onClick={(event) => event.stopPropagation()}
-          />
-          <Button
-            type="button"
-            variant="soft"
-            size="icon"
-            className="absolute top-4 right-4 shadow-lg"
-            aria-label="关闭照片预览"
-            onClick={() => setPreviewPhoto(null)}
+      <Dialog.Root
+        open={previewPhoto !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewPhoto(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-110 bg-black/80" />
+          <Dialog.Content
+            className="fixed top-1/2 left-1/2 z-110 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl bg-background p-2 pt-14 shadow-lg focus:outline-none"
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              photoTriggerRef.current?.focus();
+            }}
           >
-            <X className="size-4" aria-hidden="true" />
-          </Button>
-        </div>
-      ) : null}
+            <Dialog.Title className="absolute top-4 left-4 text-sm font-medium">
+              记录留存照片
+            </Dialog.Title>
+            <Dialog.Description className="sr-only">
+              记录的照片大图，可按 Esc 或关闭按钮返回记录详情
+            </Dialog.Description>
+            {previewPhoto ? (
+              <Image
+                src={previewPhoto.dataUrl}
+                alt="记录留存照片大图"
+                width={1600}
+                height={1600}
+                unoptimized
+                className="max-h-[calc(100dvh-7rem)] w-auto max-w-full object-contain"
+              />
+            ) : null}
+            <Dialog.Close asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-1 right-1 size-11"
+                aria-label="关闭照片预览"
+              >
+                <X className="size-4" aria-hidden="true" />
+              </Button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

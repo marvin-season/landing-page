@@ -10,6 +10,7 @@ import {
   Camera,
   CheckCircle2,
   ImagePlus,
+  LoaderCircle,
   Minus,
   Package,
   Plus,
@@ -33,6 +34,7 @@ import { bbqErrorMessage } from "./bbq-errors";
 import { cls, pageShellCls, totalBarCls, touchCls } from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
+import { BbqSearch } from "./bbq-search";
 import { useBbqNavigate } from "./use-bbq-nav";
 
 const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -105,6 +107,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -169,6 +172,18 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }, []);
 
   const availableDishes = dishes.filter((dish) => dish.listed);
+
+  const filteredDishes = availableDishes.filter((dish) =>
+    dish.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
+  );
+  const selectedQuantities = new Map<string, number>();
+  for (const line of lines) {
+    if (line.dishId)
+      selectedQuantities.set(
+        line.dishId,
+        (selectedQuantities.get(line.dishId) ?? 0) + line.quantity,
+      );
+  }
 
   const total = totalCents(
     lines.map((line) => ({
@@ -311,7 +326,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div className={`${pageShellCls} pb-24 md:pb-0`}>
+    <div className={`${pageShellCls} ${message ? "pb-60" : "pb-40"} md:pb-0`}>
       <header className="flex shrink-0 flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -333,18 +348,16 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   : "选择项目记账，需要时可开启分组"}
             </p>
           </div>
-          <Button asChild size="sm" variant="outline" className="max-md:hidden">
-            <Link href={bbqMenuPath()}>
-              <UtensilsCrossed className="size-4" aria-hidden="true" />
-              管理菜单
-            </Link>
-          </Button>
         </div>
       </header>
-      <div className={editorWorkspaceCls}>
+      <fieldset
+        className={`${editorWorkspaceCls} min-w-0`}
+        disabled={saving}
+        aria-busy={saving}
+      >
         <section className="border-b px-3 py-2.5 md:col-span-2">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 max-md:flex-wrap">
               <label
                 htmlFor="order-grouping"
                 className="text-sm font-medium text-foreground"
@@ -369,19 +382,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   : "日常记账"}
               </p>
             </div>
-            <label className="inline-flex shrink-0 items-center gap-1.5">
-              <span className="text-right">
-                <span className="block text-xs font-medium leading-none text-foreground">
-                  {done ? "已完成" : "进行中"}
-                </span>
-              </span>
-              <Switch
-                checked={done}
-                disabled={saving}
-                aria-label="切换记录状态"
-                onCheckedChange={setDone}
-              />
-            </label>
           </div>
           {groupingEnabled ? (
             <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
@@ -422,6 +422,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               {availableDishes.length} 项
             </span>
           </div>
+          {availableDishes.length > 0 ? (
+            <div className="mt-3 shrink-0">
+              <BbqSearch
+                value={search}
+                onChange={setSearch}
+                label="搜索项目名称…"
+              />
+            </div>
+          ) : null}
           {availableDishes.length === 0 ? (
             <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
               <UtensilsCrossed
@@ -438,18 +447,26 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <Link href={bbqMenuPath()}>管理菜单</Link>
               </Button>
             </div>
+          ) : filteredDishes.length === 0 ? (
+            <p
+              className="py-8 text-center text-sm text-muted-foreground"
+              role="status"
+            >
+              没有匹配的项目，请换个关键词
+            </p>
           ) : (
-            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none auto-rows-max content-start p-1">
-              {availableDishes.map((dish) => (
+            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none auto-rows-max content-start p-1 overscroll-y-contain">
+              {filteredDishes.map((dish) => (
                 <Button
                   key={dish.id}
                   type="button"
                   variant="outline"
-                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0`}
+                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "border-primary/40 bg-primary/5" : ""}`}
+                  aria-label={`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                   onClick={() => addDish(dish)}
                 >
                   <span className="min-w-0">
-                    <span className="block truncate">{dish.name}</span>
+                    <span className="block break-words">{dish.name}</span>
                     <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
                       {formatYuan(dish.priceCents)}/{dish.unit}
                     </span>
@@ -460,7 +477,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       )}
                     </span>
                   </span>
-                  <Plus className="size-4 shrink-0" aria-hidden="true" />
+                  <span className="flex shrink-0 flex-col items-center gap-1">
+                    <Plus className="size-4" aria-hidden="true" />
+                    {selectedQuantities.has(dish.id) ? (
+                      <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
+                        {selectedQuantities.get(dish.id)}
+                      </span>
+                    ) : null}
+                  </span>
                 </Button>
               ))}
             </div>
@@ -521,10 +545,18 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         variant="outline"
                         size="icon"
                         className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70 max-md:size-11`}
-                        aria-label={`减少 ${line.name} 数量`}
+                        aria-label={
+                          line.quantity === 1
+                            ? `移除 ${line.name}`
+                            : `减少 ${line.name} 数量`
+                        }
                         onClick={() => changeQuantity(line.key, -1)}
                       >
-                        <Minus className="size-4" aria-hidden="true" />
+                        {line.quantity === 1 ? (
+                          <Trash2 className="size-4" aria-hidden="true" />
+                        ) : (
+                          <Minus className="size-4" aria-hidden="true" />
+                        )}
                       </Button>
                       <span className="min-w-6 text-center text-sm font-medium tabular-nums">
                         {line.quantity}
@@ -605,7 +637,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </label>
               </div>
               {photos.length > 0 ? (
-                <ul className="mt-2 grid grid-cols-4 gap-1.5">
+                <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {photos.map((photo, index) => (
                     <li
                       key={photo.id}
@@ -623,7 +655,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="soft"
                         size="icon"
-                        className="absolute top-1 right-1 size-7 shadow-sm"
+                        className="absolute top-1 right-1 size-7 shadow-sm max-md:size-11"
                         aria-label={`删除第 ${index + 1} 张照片`}
                         onClick={() => removePhoto(photo.id)}
                       >
@@ -648,15 +680,40 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </Button>
               </section>
             ) : null}
-            {message ? (
-              <Alert className="mt-3 border-destructive/30 bg-destructive/5 p-3">
-                <AlertDescription className="text-destructive">
-                  {message}
-                </AlertDescription>
-              </Alert>
-            ) : null}
           </div>
           <TotalBar>
+            <div className="mx-auto w-full max-w-6xl">
+              {message ? (
+                <Alert
+                  className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
+                  role="alert"
+                >
+                  <AlertDescription className="text-destructive">
+                    {message}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+              <div className="mb-2 flex items-center justify-between gap-2 border-b pb-1">
+                <p className="text-xs text-muted-foreground">
+                  {lines.length === 0
+                    ? "选择项目后保存"
+                    : `${lines.length} 项 · ${itemCount} 件`}
+                </p>
+                <label className="inline-flex min-h-11 shrink-0 items-center gap-2">
+                  <span className="text-right">
+                    <span className="block text-xs font-medium leading-none text-foreground">
+                      {done ? "已完成" : "进行中"}
+                    </span>
+                  </span>
+                  <Switch
+                    checked={done}
+                    disabled={saving}
+                    aria-label="切换记录状态"
+                    onCheckedChange={setDone}
+                  />
+                </label>
+              </div>
+            </div>
             <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
@@ -676,7 +733,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   disabled={saving || processingPhotos}
                   onClick={() => void save()}
                 >
-                  {done ? (
+                  {saving ? (
+                    <LoaderCircle
+                      className="size-4 animate-spin motion-reduce:animate-none"
+                      aria-hidden="true"
+                    />
+                  ) : done ? (
                     <CheckCircle2 className="size-4" aria-hidden="true" />
                   ) : (
                     <Save className="size-4" aria-hidden="true" />
@@ -693,7 +755,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             </div>
           </TotalBar>
         </section>
-      </div>
+      </fieldset>
     </div>
   );
 }

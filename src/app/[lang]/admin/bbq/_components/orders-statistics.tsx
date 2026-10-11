@@ -2,6 +2,7 @@
 
 import { ChartLine, ReceiptText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@/components/link/link";
 import { businessDayLabel } from "@/lib/bbq/business-day";
 import { formatCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
@@ -10,6 +11,7 @@ import {
   getTrendRange,
 } from "@/lib/bbq/statistics";
 import { cls } from "./bbq-layout";
+import { bbqHomePath } from "./bbq-paths";
 
 type ChartMode = "revenue" | "orders" | "calories";
 
@@ -18,6 +20,7 @@ const chartModeCls = cls`
   font-medium transition-colors
   max-md:flex-1 focus-visible:outline-none focus-visible:ring-1
   focus-visible:ring-inset focus-visible:ring-primary/50
+  max-md:min-h-11
 `;
 
 const chartWidthPerPoint = 76;
@@ -26,8 +29,10 @@ const chartPadding = { top: 20, right: 48, bottom: 48, left: 64 };
 
 export function OrdersStatistics({
   statistics,
+  onSelectDay,
 }: {
   statistics: BusinessDayStatistics[];
+  onSelectDay: () => void;
 }) {
   const [chartMode, setChartMode] = useState<ChartMode>("revenue");
 
@@ -72,7 +77,7 @@ export function OrdersStatistics({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full">
-      <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5">
+      <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5 max-md:grid-cols-6 max-md:[&>div]:col-span-2 max-md:[&>div:nth-child(n+4)]:col-span-3">
         <StatisticMetric label="累计时段" value={`${statistics.length} 个`} />
         <StatisticMetric label="全部记录" value={`${totalOrders} 条`} />
         <StatisticMetric label="已完成记录" value={`${settledOrders} 条`} />
@@ -99,13 +104,12 @@ export function OrdersStatistics({
           </div>
           <div
             className="flex w-fit rounded-lg bg-muted p-0.5 shrink-0 max-sm:w-full"
-            role="tablist"
+            role="group"
             aria-label="趋势指标"
           >
             <button
               type="button"
-              role="tab"
-              aria-selected={chartMode === "revenue"}
+              aria-pressed={chartMode === "revenue"}
               className={`${chartModeCls} ${
                 chartMode === "revenue"
                   ? "bg-card text-foreground shadow-sm"
@@ -117,8 +121,7 @@ export function OrdersStatistics({
             </button>
             <button
               type="button"
-              role="tab"
-              aria-selected={chartMode === "orders"}
+              aria-pressed={chartMode === "orders"}
               className={`${chartModeCls} ${
                 chartMode === "orders"
                   ? "bg-card text-foreground shadow-sm"
@@ -130,8 +133,7 @@ export function OrdersStatistics({
             </button>
             <button
               type="button"
-              role="tab"
-              aria-selected={chartMode === "calories"}
+              aria-pressed={chartMode === "calories"}
               className={`${chartModeCls} ${chartMode === "calories" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               onClick={() => setChartMode("calories")}
             >
@@ -153,9 +155,14 @@ export function OrdersStatistics({
             {statistics.toReversed().map((item) => (
               <li key={item.businessDayKey} className="py-3">
                 <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                  <span className="text-sm font-medium tabular-nums text-foreground">
+                  <Link
+                    href={bbqHomePath(item.businessDayKey)}
+                    onNavigate={onSelectDay}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  >
                     {item.businessDayKey.slice(0, 10)}
-                  </span>
+                    <span className="text-xs">查看记录 →</span>
+                  </Link>
                   <span className="text-xs text-muted-foreground">
                     {item.businessDayKey.endsWith("#off")
                       ? "休息时段"
@@ -204,7 +211,13 @@ export function OrdersStatistics({
               {statistics.toReversed().map((item) => (
                 <tr key={item.businessDayKey}>
                   <td className="px-4 py-2.5 text-foreground">
-                    {businessDayLabel(item.businessDayKey)}
+                    <Link
+                      href={bbqHomePath(item.businessDayKey)}
+                      onNavigate={onSelectDay}
+                      className="inline-flex min-h-9 items-center rounded-md text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    >
+                      {businessDayLabel(item.businessDayKey)}
+                    </Link>
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
                     {item.orderCount} 条

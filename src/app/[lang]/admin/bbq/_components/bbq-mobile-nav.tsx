@@ -29,7 +29,8 @@ const mobileNavCls = cls`
   border-t bg-background pb-[env(safe-area-inset-bottom)]
   pl-[max(0.75rem,env(safe-area-inset-left))]
   pr-[max(0.75rem,env(safe-area-inset-right))]
-  md:hidden
+  md:static md:inset-auto md:z-auto md:h-14 md:shrink-0
+  md:rounded-xl md:border md:bg-card md:px-2 md:pb-0
 `;
 
 const mobileNavLinkCls = cls`
@@ -39,22 +40,27 @@ const mobileNavLinkCls = cls`
   focus-visible:ring-inset focus-visible:ring-primary/50
   aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary
   aria-disabled:opacity-40
+  touch-manipulation md:flex-row md:gap-2 md:text-sm
 `;
 
 export function BbqMobileNav() {
   const segment = useSelectedLayoutSegment();
-  const [canCreate, setCanCreate] = useState(false);
+  const [canCreate, setCanCreate] = useState<boolean | null>(null);
 
   useEffect(() => {
     const update = () => setCanCreate(isBusinessHours(new Date()));
     update();
     const timer = window.setInterval(update, 60_000);
-    return () => window.clearInterval(timer);
+    window.addEventListener("focus", update);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+    };
   }, []);
 
   return (
     <nav aria-label="天天记账主导航" className={mobileNavCls}>
-      <div className="mx-auto grid h-full max-w-md grid-cols-3 gap-2 py-1.5">
+      <div className="mx-auto grid h-full max-w-md grid-cols-3 gap-2 py-1.5 md:mx-0 md:py-1">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
           const disabled = itemSegment === "orders" && !canCreate && !active;
@@ -73,7 +79,9 @@ export function BbqMobileNav() {
               }}
             >
               <Icon className="size-5" aria-hidden="true" />
-              <span>{label}</span>
+              <span>
+                {disabled && canCreate === false ? "记账（休息中）" : label}
+              </span>
             </Link>
           );
         })}

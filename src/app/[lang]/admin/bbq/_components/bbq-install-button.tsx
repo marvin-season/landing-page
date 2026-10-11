@@ -82,8 +82,8 @@ export function BbqInstallButton() {
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-110 bg-black/50" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-110 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
           <div className="flex items-center justify-between gap-3">
             <Dialog.Title className="text-base font-semibold">
               安装天天记账
@@ -93,6 +93,7 @@ export function BbqInstallButton() {
                 type="button"
                 variant="ghost"
                 size="icon"
+                className="size-11"
                 aria-label="关闭安装说明"
               >
                 <X className="size-4" aria-hidden="true" />
