@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
+import { BbqMobileNav } from "./_components/bbq-mobile-nav";
 
 const title = "天天记账 · 支出与热量统计";
 const description =
@@ -43,5 +44,10 @@ export const viewport: Viewport = {
 };
 
 export default function BbqLayout({ children }: PropsWithChildren) {
-  return children;
+  return (
+    <div className="min-w-0 max-md:pt-12 max-md:pb-[calc(5rem+env(safe-area-inset-bottom))]">
+      {children}
+      <BbqMobileNav />
+    </div>
+  );
 }

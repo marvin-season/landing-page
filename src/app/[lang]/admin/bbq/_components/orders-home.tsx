@@ -73,7 +73,6 @@ const homePageShellCls = cls`
   flex flex-col gap-3
   md:h-[calc(100dvh-2rem)] md:overflow-hidden
   lg:h-[calc(100dvh-10rem)]
-  max-md:pt-12
 `;
 
 const orderWorkspaceCls = cls`
@@ -87,24 +86,25 @@ const orderWorkspaceCls = cls`
 const orderTabCls = cls`
   inline-flex min-h-8 flex-1 items-center justify-center gap-1.5 rounded-md
   px-2 text-xs font-medium transition-colors
+  max-md:min-h-11
 `;
 
 const homeViewTabCls = cls`
   inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md px-3
   text-sm font-medium transition-colors
-  max-md:min-h-7 max-md:gap-1 max-md:px-1.5 max-md:text-[11px]
-  max-md:[&>svg]:size-3
+  max-md:min-h-11 max-md:gap-1.5 max-md:px-2 max-md:text-sm
+  max-md:[&>svg]:size-4
   max-md:flex-1
 `;
 
 const homeActionsCls = cls`
   flex flex-wrap gap-1.5
-  max-md:gap-1 max-md:w-full
-  max-md:[&>:is(button,a)]:h-7
-  max-md:[&>:is(button,a)]:gap-0.5
-  max-md:[&>:is(button,a)]:px-2
-  max-md:[&>:is(button,a)]:text-[11px]
-  max-md:[&>:is(button,a)_svg]:size-3
+  max-md:gap-2 max-md:w-full
+  max-md:[&>:is(button,a)]:h-11
+  max-md:[&>:is(button,a)]:gap-1.5
+  max-md:[&>:is(button,a)]:px-3
+  max-md:[&>:is(button,a)]:text-xs
+  max-md:[&>:is(button,a)_svg]:size-4
   max-md:[&>:is(button,a)]:flex-1
   max-md:[&>:is(button,a)]:whitespace-nowrap
 `;
@@ -113,9 +113,9 @@ const homePeriodCls = cls`
   inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm
   max-md:w-full max-md:rounded-lg
   max-md:[&>button]:flex-1 max-md:[&>button]:min-w-0
-  max-md:[&>button]:min-h-7 max-md:[&>button]:text-[11px]
-  max-md:[&>[data-slot=button]]:size-7
-  max-md:[&>[data-slot=button]_svg]:size-3
+  max-md:[&>button]:min-h-11 max-md:[&>button]:text-xs
+  max-md:[&>[data-slot=button]]:size-11
+  max-md:[&>[data-slot=button]_svg]:size-4
 `;
 
 const homeMetricsCls = cls`
@@ -315,14 +315,14 @@ export function OrdersHome() {
           {storageFailed ? null : (
             <div className={homeActionsCls}>
               {canCreateOrder ? (
-                <Button asChild>
+                <Button asChild className="max-md:hidden">
                   <Link href={bbqNewOrderPath()}>
                     <Plus className="size-4" aria-hidden="true" />
                     记账
                   </Link>
                 </Button>
               ) : null}
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="max-md:hidden">
                 <Link href={bbqMenuPath()}>
                   <UtensilsCrossed className="size-4" aria-hidden="true" />
                   菜单

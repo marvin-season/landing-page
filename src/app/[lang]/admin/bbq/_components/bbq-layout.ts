@@ -37,9 +37,10 @@ export const orderBodyCls = cls`
   md:flex-1 md:overflow-auto md:pb-0
 `;
 
+// 移动端保存栏位于 4rem 主导航和底部安全区之上；桌面仍留在详情面板内。
 export const totalBarCls = cls`
-  fixed inset-x-0 bottom-0 z-20 border-t bg-background px-3 pt-2
-  pb-[calc(0.5rem+env(safe-area-inset-bottom))]
+  fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t bg-background px-3 pt-2
+  pb-2
   md:static md:inset-auto md:z-auto md:pb-2
 `;
 

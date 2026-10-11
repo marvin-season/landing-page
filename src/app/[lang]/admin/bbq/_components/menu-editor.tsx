@@ -7,17 +7,8 @@ import {
   Input,
   Switch,
 } from "@landing-page/design-system";
-import {
-  ArrowLeft,
-  Pencil,
-  Plus,
-  Save,
-  Trash2,
-  UtensilsCrossed,
-  X,
-} from "lucide-react";
+import { Pencil, Plus, Save, Trash2, UtensilsCrossed, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "@/components/link/link";
 import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import {
@@ -41,7 +32,7 @@ const dishRowCls = cls`
 const dishInputCls = cls`
   h-10 w-full min-w-0 rounded-lg border bg-background px-3 text-sm shadow-none
   md:rounded-none md:border-0 md:bg-transparent md:px-2 md:text-sm
-  max-md:h-9 max-md:px-2 max-md:text-base
+  max-md:h-11 max-md:px-2 max-md:text-base
   max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset
   max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0
 `;
@@ -107,13 +98,6 @@ export function MenuEditor() {
   if (phase === "error") {
     return (
       <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
-        <Link
-          href="/admin/bbq"
-          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          返回记录
-        </Link>
         <Alert className="border-destructive/30 bg-destructive/5 p-3">
           <AlertDescription className="text-destructive">
             {message}
@@ -127,14 +111,7 @@ export function MenuEditor() {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 md:gap-4">
-      <header className="flex flex-col gap-2 max-md:flex-row-reverse max-md:items-start max-md:justify-between">
-        <Link
-          href="/admin/bbq"
-          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground max-md:min-h-7 max-md:shrink-0"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          返回记录
-        </Link>
+      <header className="flex flex-col gap-2 max-md:flex-row max-md:items-start max-md:justify-between">
         <div>
           <div className="flex items-center gap-1.5">
             <UtensilsCrossed
@@ -426,7 +403,7 @@ function DishRow({
           <Button
             type="button"
             variant="outline"
-            className="h-9 flex-1 px-3 sm:flex-none max-md:size-9 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:shadow-none max-md:hover:bg-muted/70 max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
+            className="h-9 flex-1 px-3 sm:flex-none max-md:size-11 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:shadow-none max-md:hover:bg-muted/70 max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
             aria-label={`编辑 ${dish.name}`}
             onClick={() => setEditing(true)}
           >
@@ -436,7 +413,7 @@ function DishRow({
           <Button
             type="button"
             variant="ghost"
-            className="h-9 flex-1 px-3 text-destructive sm:flex-none max-md:size-9 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:hover:bg-destructive/10 max-md:hover:text-destructive max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-destructive/50 max-md:focus-visible:ring-offset-0"
+            className="h-9 flex-1 px-3 text-destructive sm:flex-none max-md:size-11 max-md:flex-none max-md:rounded-lg max-md:px-0 max-md:hover:bg-destructive/10 max-md:hover:text-destructive max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-destructive/50 max-md:focus-visible:ring-offset-0"
             aria-label={`删除 ${dish.name}`}
             onClick={() => void remove()}
           >
@@ -574,7 +551,7 @@ function DishRow({
             type="button"
             size="icon"
             variant="ghost"
-            className="size-9 shrink-0"
+            className="size-9 shrink-0 max-md:size-11"
             aria-label="取消编辑"
             title="取消编辑"
             onClick={cancelEditing}
@@ -587,8 +564,8 @@ function DishRow({
           variant="outline"
           className={
             showLabels
-              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2 max-md:h-9 max-md:w-auto max-md:min-w-24 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
-              : "h-10 flex-1 px-3 md:px-2 max-md:h-9 max-md:flex-none max-md:min-w-20 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0 min-w-20 shrink-0 whitespace-nowrap"
+              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 md:px-2 max-md:h-11 max-md:w-auto max-md:min-w-24 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0"
+              : "h-10 flex-1 px-3 md:px-2 max-md:h-11 max-md:flex-none max-md:min-w-20 max-md:rounded-lg max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-offset-0 min-w-20 shrink-0 whitespace-nowrap"
           }
           onClick={() => void commit()}
         >

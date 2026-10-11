@@ -7,7 +7,6 @@ import {
   Switch,
 } from "@landing-page/design-system";
 import {
-  ArrowLeft,
   Camera,
   CheckCircle2,
   ImagePlus,
@@ -73,6 +72,7 @@ const photoActionCls = cls`
   transition-colors hover:bg-muted/70 has-disabled:pointer-events-none
   has-disabled:opacity-50 has-focus-visible:ring-1
   has-focus-visible:ring-inset has-focus-visible:ring-primary/50
+  max-md:h-11
 `;
 
 type DraftLine = {
@@ -301,13 +301,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   if (phase === "error" || phase === "missing") {
     return (
       <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
-        <Link
-          href="/admin/bbq"
-          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          返回记录
-        </Link>
         <Alert className="border-destructive/30 bg-destructive/5 p-3">
           <AlertDescription className="text-destructive">
             {phase === "missing" ? "没有找到这条记录" : message}
@@ -318,17 +311,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div
-      className={`${pageShellCls} pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0`}
-    >
+    <div className={`${pageShellCls} pb-24 md:pb-0`}>
       <header className="flex shrink-0 flex-col gap-2">
-        <Link
-          href={order ? bbqHomePath(order.businessDayKey) : "/admin/bbq"}
-          className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          返回记录
-        </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-1.5">
@@ -349,7 +333,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   : "选择项目记账，需要时可开启分组"}
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="max-md:hidden">
             <Link href={bbqMenuPath()}>
               <UtensilsCrossed className="size-4" aria-hidden="true" />
               管理菜单
@@ -536,7 +520,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="outline"
                         size="icon"
-                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
+                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70 max-md:size-11`}
                         aria-label={`减少 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, -1)}
                       >
@@ -549,7 +533,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="outline"
                         size="icon"
-                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70`}
+                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70 max-md:size-11`}
                         aria-label={`增加 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, 1)}
                       >
