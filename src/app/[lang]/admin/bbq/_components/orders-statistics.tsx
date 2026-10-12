@@ -16,11 +16,9 @@ import { bbqHomePath } from "./bbq-paths";
 type ChartMode = "revenue" | "orders" | "calories";
 
 const chartModeCls = cls`
-  inline-flex min-h-8 items-center justify-center rounded-md px-3 text-xs
-  font-medium transition-colors
-  max-md:flex-1 focus-visible:outline-none focus-visible:ring-1
-  focus-visible:ring-inset focus-visible:ring-primary/50
-  max-md:min-h-11
+  inline-flex items-center justify-center rounded-md px-3 text-xs font-medium
+  transition-colors flex-1 focus-visible:outline-none focus-visible:ring-1
+  focus-visible:ring-inset focus-visible:ring-primary/50 min-h-11
 `;
 
 const chartWidthPerPoint = 76;
@@ -77,7 +75,7 @@ export function OrdersStatistics({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full">
-      <dl className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5 max-md:grid-cols-6 max-md:[&>div]:col-span-2 max-md:[&>div:nth-child(n+4)]:col-span-3">
+      <dl className="grid shrink-0 gap-px overflow-hidden rounded-xl border bg-border grid-cols-6 [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3">
         <StatisticMetric label="累计时段" value={`${statistics.length} 个`} />
         <StatisticMetric label="全部记录" value={`${totalOrders} 条`} />
         <StatisticMetric label="已完成记录" value={`${settledOrders} 条`} />
@@ -90,8 +88,8 @@ export function OrdersStatistics({
           value={formatCalories(settledCalories)}
         />
       </dl>
-      <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-w-0 max-md:flex-none">
-        <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between shrink-0 max-md:gap-2 max-md:px-3">
+      <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-w-0 flex-none">
+        <div className="flex flex-col border-b py-3 shrink-0 gap-2 px-3">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <ChartLine className="size-4 text-primary" aria-hidden="true" />
@@ -103,7 +101,7 @@ export function OrdersStatistics({
             </p>
           </div>
           <div
-            className="flex w-fit rounded-lg bg-muted p-0.5 shrink-0 max-sm:w-full"
+            className="flex rounded-lg bg-muted p-0.5 shrink-0 w-full"
             role="group"
             aria-label="趋势指标"
           >
@@ -146,7 +144,7 @@ export function OrdersStatistics({
           金额与热量仅统计已完成记录；热量按每单位 ×
           数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
         </p>
-        <section className="border-t md:hidden" aria-label="时段明细">
+        <section className="border-t" aria-label="时段明细">
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
             <h3 className="text-sm font-medium text-foreground">时段明细</h3>
             <span className="text-xs text-muted-foreground">最近时段在前</span>
@@ -196,46 +194,6 @@ export function OrdersStatistics({
             ))}
           </ul>
         </section>
-        <div className="min-h-0 overflow-auto border-t hidden md:block">
-          <table className="w-full min-w-140 text-left text-sm">
-            <thead className="sticky top-0 bg-muted/95 text-xs text-muted-foreground backdrop-blur">
-              <tr>
-                <th className="px-4 py-2 font-medium">时段</th>
-                <th className="px-4 py-2 text-right font-medium">记录</th>
-                <th className="px-4 py-2 text-right font-medium">已完成</th>
-                <th className="px-4 py-2 text-right font-medium">已完成金额</th>
-                <th className="px-4 py-2 text-right font-medium">已完成热量</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {statistics.toReversed().map((item) => (
-                <tr key={item.businessDayKey}>
-                  <td className="px-4 py-2.5 text-foreground">
-                    <Link
-                      href={bbqHomePath(item.businessDayKey)}
-                      onNavigate={onSelectDay}
-                      className="inline-flex min-h-9 items-center rounded-md text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                    >
-                      {businessDayLabel(item.businessDayKey)}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
-                    {item.orderCount} 条
-                  </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
-                    {item.settledOrderCount} 条
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-medium tabular-nums text-foreground">
-                    {formatYuan(item.settledTotalCents)}
-                  </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
-                    {formatCalories(item.settledCalories)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </section>
     </div>
   );
@@ -412,7 +370,7 @@ function TrendChart({
         </svg>
       </div>
       {viewportWidth > 0 && width > viewportWidth ? (
-        <p className="mt-1 text-center text-xs text-muted-foreground md:hidden">
+        <p className="mt-1 text-center text-xs text-muted-foreground">
           左右滑动查看全部时段
         </p>
       ) : null}

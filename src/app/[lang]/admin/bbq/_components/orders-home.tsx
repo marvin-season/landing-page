@@ -1,34 +1,19 @@
 "use client";
 
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@landing-page/design-system";
+import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   Camera,
   ChartLine,
   CheckCircle2,
-  ChevronLeft,
+  ChevronDown,
   ChevronRight,
   Clock3,
-  DatabaseBackup,
-  Download,
-  Images,
-  LoaderCircle,
   Pencil,
   Plus,
   ReceiptText,
   RotateCcw,
   Store,
-  Upload,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -36,21 +21,19 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
+  businessDayLabel,
   canCreateOrderForBusinessDay,
-  formatShanghaiDate,
   formatShanghaiHm,
   readBusinessDayParam,
-  shiftBusinessDayKey,
 } from "@/lib/bbq/business-day";
 import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan } from "@/lib/bbq/money";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
-import type { BbqBackup, Order, OrderPhoto } from "@/lib/bbq/types";
+import type { Order, OrderPhoto } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
-import { BbqInstallButton } from "./bbq-install-button";
-import { cls, touchCls } from "./bbq-layout";
-import { bbqHomePath, bbqNewOrderPath, bbqOrderPath } from "./bbq-paths";
+import { cls, pageShellCls, touchCls } from "./bbq-layout";
+import { bbqNewOrderPath, bbqOrderPath } from "./bbq-paths";
 import { BusinessDayCalendar } from "./business-day-calendar";
 import { OrdersStatistics } from "./orders-statistics";
 
@@ -65,68 +48,32 @@ function orderTotalCls(status: Order["status"]): string {
   return `text-base font-semibold tabular-nums ${tone}`;
 }
 
-const homePageShellCls = cls`
-  flex flex-col gap-3
-  md:h-full md:overflow-hidden
-`;
-
 const orderWorkspaceCls = cls`
-  grid min-h-0 flex-1 gap-2 overflow-hidden rounded-xl border-0 bg-transparent
-  shadow-none
-  md:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] md:gap-0 md:border
-  md:bg-card md:shadow-sm
-  max-md:gap-3
+  grid min-h-0 flex-1 overflow-hidden rounded-xl border-0 bg-transparent shadow-none gap-3
 `;
 
 const orderTabCls = cls`
-  inline-flex min-h-8 flex-1 items-center justify-center gap-1.5 rounded-md
-  px-2 text-xs font-medium transition-colors
-  max-md:min-h-11
-  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
+  inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 text-xs
+  font-medium transition-colors min-h-11 focus-visible:outline-none focus-visible:ring-2
+  focus-visible:ring-inset focus-visible:ring-primary/50
 `;
 
 const homeViewTabCls = cls`
-  inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md px-3
-  text-sm font-medium transition-colors
-  max-md:min-h-11 max-md:gap-1.5 max-md:px-2 max-md:text-sm
-  max-md:[&>svg]:size-4
-  max-md:flex-1
-  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
-`;
-
-const homeActionsCls = cls`
-  flex flex-wrap gap-1.5
-  max-md:gap-2 max-md:w-full
-  max-md:[&>:is(button,a)]:h-11
-  max-md:[&>:is(button,a)]:gap-1.5
-  max-md:[&>:is(button,a)]:px-3
-  max-md:[&>:is(button,a)]:text-xs
-  max-md:[&>:is(button,a)_svg]:size-4
-  max-md:[&>:is(button,a)]:flex-1
-  max-md:[&>:is(button,a)]:whitespace-nowrap
-`;
-
-const homePeriodCls = cls`
-  inline-flex w-fit items-center rounded-full border bg-card p-0.5 shadow-sm
-  max-md:w-full max-md:rounded-lg
-  max-md:[&>button]:flex-1 max-md:[&>button]:min-w-0
-  max-md:[&>button]:min-h-11 max-md:[&>button]:text-xs
-  max-md:[&>[data-slot=button]]:size-11
-  max-md:[&>[data-slot=button]_svg]:size-4
+  inline-flex items-center justify-center rounded-md font-medium transition-colors
+  min-h-10 gap-1.5 px-2 text-xs [&>svg]:size-3.5 flex-1 focus-visible:outline-none
+  focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
+  min-w-0 basis-0
 `;
 
 const homeMetricsCls = cls`
-  grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-5
-  max-md:grid-cols-6 max-md:[&>div]:col-span-2
-  max-md:[&>div:nth-child(n+4)]:col-span-3
-  max-md:[&>div]:min-w-0 max-md:[&>div]:px-2 max-md:[&>div]:py-1.5
-  max-md:[&_dt]:text-[11px] max-md:[&_dd]:text-sm max-md:[&_dd]:break-words
+  grid shrink-0 gap-px overflow-hidden rounded-xl border bg-border grid-cols-6
+  [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3 [&>div]:min-w-0 [&>div]:px-2
+  [&>div]:py-1.5 [&_dt]:text-[11px] [&_dd]:text-sm [&_dd]:break-words
 `;
 
 export function OrdersHome() {
   const searchParams = useSearchParams();
   const dayParam = searchParams.get("day");
-  const importInputRef = useRef<HTMLInputElement>(null);
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [homeView, setHomeView] = useState<HomeView>("orders");
@@ -140,11 +87,6 @@ export function OrdersHome() {
   const [message, setMessage] = useState<string | null>(null);
   const [storageFailed, setStorageFailed] = useState(false);
   const [readyDay, setReadyDay] = useState<string | null>(null);
-  const [backupTask, setBackupTask] = useState<"import" | "export" | null>(
-    null,
-  );
-  const [notice, setNotice] = useState<string | null>(null);
-  const backupBusyRef = useRef(false);
   const photoTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -217,55 +159,6 @@ export function OrdersHome() {
     if (nextAll) setAllOrders(nextAll);
   }
 
-  async function exportBackup(includePhotos = false) {
-    if (backupBusyRef.current) return;
-    backupBusyRef.current = true;
-    setBackupTask("export");
-    setMessage(null);
-    setNotice(null);
-    try {
-      const backup = await bbqStore.exportBackup({ includePhotos });
-      downloadBackup(backup, includePhotos);
-      setNotice("备份已生成，请在浏览器下载中查看");
-    } catch (error) {
-      setMessage(bbqErrorMessage(error));
-    } finally {
-      backupBusyRef.current = false;
-      setBackupTask(null);
-    }
-  }
-
-  async function importFile(file: File | undefined) {
-    if (!file || backupBusyRef.current) return;
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(await file.text()) as unknown;
-    } catch {
-      setMessage("备份文件不正确");
-      return;
-    }
-    if (
-      !window.confirm("把备份按编号合并进当前记账数据？相同编号的数据会更新。")
-    )
-      return;
-    backupBusyRef.current = true;
-    setBackupTask("import");
-    setNotice(null);
-    setMessage(null);
-    try {
-      await bbqStore.importBackup(parsed as BbqBackup);
-      setSelectedId(null);
-      await reload();
-      setMessage(null);
-      setNotice("备份已导入，记录和菜单已更新");
-    } catch (error) {
-      setMessage(bbqErrorMessage(error));
-    } finally {
-      backupBusyRef.current = false;
-      setBackupTask(null);
-    }
-  }
-
   function openOrder(id: string) {
     setSelectedId(id);
   }
@@ -321,13 +214,13 @@ export function OrdersHome() {
   }, [orders, statusFilter]);
 
   return (
-    <div className={homePageShellCls}>
-      <header className="flex shrink-0 flex-col gap-3 max-md:gap-1.5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between max-md:gap-1.5 max-md:flex-col max-md:items-stretch">
+    <div className={pageShellCls}>
+      <header className="flex shrink-0 flex-col gap-1.5">
+        <div className="flex gap-1.5 flex-col items-stretch">
           <div>
             <div className="flex items-center gap-1.5">
               <Store className="size-4 text-primary" aria-hidden="true" />
-              <h1 className="text-lg font-semibold text-pretty text-foreground">
+              <h1 className="text-lg font-semibold text-pretty text-foreground pr-24">
                 天天记账
               </h1>
             </div>
@@ -335,94 +228,49 @@ export function OrdersHome() {
               记录日常支出与订单，查看金额和饮食热量趋势
             </p>
           </div>
-          {storageFailed ? null : (
-            <div className={homeActionsCls}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={backupTask !== null}
-                  >
-                    {backupTask ? (
-                      <LoaderCircle
-                        className="size-4 animate-spin motion-reduce:animate-none"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <DatabaseBackup className="size-4" aria-hidden="true" />
-                    )}
-                    {backupTask === "import"
-                      ? "导入中…"
-                      : backupTask === "export"
-                        ? "导出中…"
-                        : "数据备份"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-64 max-md:[&_[role=menuitem]]:min-h-11"
-                >
-                  <DropdownMenuLabel>
-                    <span className="block">全部数据备份</span>
-                    <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
-                      默认不包含留存照片，文件更小
-                    </span>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => void exportBackup()}>
-                    <Download className="size-4" aria-hidden="true" />
-                    导出备份
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => void exportBackup(true)}>
-                    <Images className="size-4" aria-hidden="true" />
-                    导出备份（包含照片）
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => importInputRef.current?.click()}
-                  >
-                    <Upload className="size-4" aria-hidden="true" />
-                    导入完整备份
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <BbqInstallButton />
-              <input
-                ref={importInputRef}
-                type="file"
-                accept=".json,application/json"
-                className="sr-only"
-                onChange={(event) => {
-                  const input = event.currentTarget;
-                  const file = input.files?.[0];
-                  input.value = "";
-                  void importFile(file);
-                }}
-              />
-            </div>
-          )}
         </div>
         {storageFailed ? null : (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between max-md:flex-col max-md:items-stretch max-md:gap-1.5">
+          <div className="flex flex-col items-stretch gap-1.5">
             <div
-              className="flex w-fit rounded-lg bg-muted p-0.5 max-md:w-full"
+              className="flex rounded-lg bg-muted p-0.5 w-full"
               role="group"
               aria-label="首页视图"
             >
-              <button
-                type="button"
-                aria-pressed={homeView === "orders"}
-                className={`${homeViewTabCls} ${
-                  homeView === "orders"
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={() => setHomeView("orders")}
-              >
-                <ReceiptText className="size-4" aria-hidden="true" />
-                当前时段
-              </button>
+              <BusinessDayCalendar day={day}>
+                <button
+                  type="button"
+                  disabled={!day}
+                  aria-pressed={homeView === "orders"}
+                  aria-label={`${day ? businessDayLabel(day) : "当前时段"}，${homeView === "orders" ? "打开日历" : "查看记录"}`}
+                  className={`${homeViewTabCls} ${
+                    homeView === "orders"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={(event) => {
+                    if (homeView !== "orders") {
+                      // 从统计返回时先切换视图；再次点击当前时段才打开日历。
+                      event.preventDefault();
+                      setHomeView("orders");
+                    }
+                  }}
+                >
+                  <span className="shrink-0">当前时段</span>
+                  {day ? (
+                    <span
+                      className="truncate text-[11px] font-normal tabular-nums text-muted-foreground"
+                      title={businessDayLabel(day)}
+                    >
+                      {day.slice(5, 10)}
+                      {day.endsWith("#off") ? " 休息" : ""}
+                    </span>
+                  ) : null}
+                  <ChevronDown
+                    className="size-3.5 shrink-0"
+                    aria-hidden="true"
+                  />
+                </button>
+              </BusinessDayCalendar>
               <button
                 type="button"
                 aria-pressed={homeView === "statistics"}
@@ -437,61 +285,13 @@ export function OrdersHome() {
                 统计趋势
               </button>
             </div>
-            {homeView === "orders" ? (
-              <div className={homePeriodCls}>
-                <Button
-                  asChild
-                  size="icon"
-                  variant="ghost"
-                  className="size-8 shrink-0 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70"
-                >
-                  <Link
-                    href={
-                      day
-                        ? bbqHomePath(shiftBusinessDayKey(day, -1))
-                        : "/admin/bbq"
-                    }
-                    aria-label="上一时段"
-                    title="上一时段"
-                  >
-                    <ChevronLeft className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-                <BusinessDayCalendar day={day} />
-                <Button
-                  asChild
-                  size="icon"
-                  variant="ghost"
-                  className="size-8 shrink-0 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70"
-                >
-                  <Link
-                    href={
-                      day
-                        ? bbqHomePath(shiftBusinessDayKey(day, 1))
-                        : "/admin/bbq"
-                    }
-                    aria-label="下一时段"
-                    title="下一时段"
-                  >
-                    <ChevronRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-              </div>
-            ) : (
+            {homeView === "statistics" ? (
               <p className="text-xs text-muted-foreground">
                 汇总本机保存的全部历史记录
               </p>
-            )}
+            ) : null}
           </div>
         )}
-        {notice && !message ? (
-          <p
-            className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary"
-            role="status"
-          >
-            {notice}
-          </p>
-        ) : null}
         {message ? (
           <Alert className="border-destructive/30 bg-destructive/5 p-3">
             <AlertDescription className="text-destructive">
@@ -516,26 +316,20 @@ export function OrdersHome() {
           </dl>
           <div className={orderWorkspaceCls}>
             <section
-              className="min-h-0 min-w-0 max-h-[50dvh] overflow-auto rounded-xl border bg-card shadow-sm md:max-h-none md:overflow-auto md:rounded-none md:border-0 md:bg-transparent md:shadow-none max-md:max-h-[max(16rem,38dvh)] max-md:bg-muted/40"
+              className="min-h-96 min-w-0 overflow-hidden rounded-xl border shadow-sm bg-muted/40 flex flex-col"
               aria-label="记录列表"
             >
-              <div className="sticky top-0 z-10 flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 backdrop-blur">
+              <div className="flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 shrink-0">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-sm font-medium text-foreground max-md:font-semibold">
-                      <span className="md:hidden">记录列表</span>
-                      <span className="hidden md:inline">本时段记录</span>
+                    <h2 className="text-sm text-foreground font-semibold">
+                      记录列表
                     </h2>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      <span className="md:hidden">
-                        点击记录，在下方查看详情
-                      </span>
-                      <span className="hidden md:inline">
-                        新建记录显示在最前面
-                      </span>
+                      点击记录，在下方查看详情
                     </p>
                   </div>
-                  <span className="text-sm tabular-nums text-muted-foreground max-md:rounded-md max-md:bg-muted max-md:px-2 max-md:py-1 max-md:text-xs">
+                  <span className="tabular-nums text-muted-foreground rounded-md bg-muted px-2 py-1 text-xs">
                     {visibleOrders.length} 条
                   </span>
                 </div>
@@ -576,13 +370,13 @@ export function OrdersHome() {
               </div>
               {readyDay !== day ? (
                 <div
-                  className="flex min-h-56 items-center justify-center text-sm text-muted-foreground"
+                  className="flex min-h-56 items-center justify-center text-sm text-muted-foreground flex-1"
                   role="status"
                 >
                   读取记录中…
                 </div>
               ) : visibleOrders.length === 0 ? (
-                <div className="flex min-h-64 flex-col items-center justify-center px-6 text-center">
+                <div className="flex min-h-64 flex-col items-center justify-center px-6 text-center flex-1 py-6">
                   <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     {statusFilter === "open" ? (
                       <Clock3 className="size-5" aria-hidden="true" />
@@ -610,15 +404,15 @@ export function OrdersHome() {
                   ) : null}
                 </div>
               ) : (
-                <ul className="divide-y max-md:divide-y-0 max-md:space-y-1.5 max-md:p-2">
+                <ul className="divide-y-0 space-y-1.5 p-2 max-h-[max(20rem,60dvh)] overflow-y-auto overscroll-y-contain">
                   {visibleOrders.map((order) => (
                     <li key={order.id}>
                       <button
                         type="button"
-                        className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors hover:bg-muted/60 max-md:rounded-lg max-md:border max-md:focus-visible:outline-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 ${
+                        className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors rounded-lg border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 ${
                           selectedId === order.id
-                            ? "bg-primary/5 max-md:border-primary/35 max-md:bg-primary/10 max-md:hover:bg-primary/10"
-                            : "max-md:border-transparent max-md:bg-card max-md:hover:bg-muted/70"
+                            ? "border-primary/35 bg-primary/10 hover:bg-primary/10"
+                            : "border-transparent bg-card hover:bg-muted/70"
                         }`}
                         aria-pressed={selectedId === order.id}
                         aria-controls="bbq-order-detail"
@@ -638,13 +432,13 @@ export function OrdersHome() {
             <aside
               id="bbq-order-detail"
               aria-label="记录详情"
-              className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm md:rounded-none md:border-0 md:border-l md:bg-transparent md:shadow-none max-md:overflow-hidden max-md:border-primary/25 ${
-                selected ? "flex" : "hidden md:flex"
+              className={`min-h-0 min-w-0 flex-col rounded-xl border bg-card shadow-sm overflow-hidden border-primary/25 ${
+                selected ? "flex" : "hidden"
               }`}
             >
               {selected ? (
-                <div className="flex min-h-0 flex-col md:h-full">
-                  <div className="flex items-center justify-between gap-2 border-b border-primary/15 bg-primary/5 px-3 py-2 md:hidden">
+                <div className="flex min-h-0 flex-col">
+                  <div className="flex items-center justify-between gap-2 border-b border-primary/15 bg-primary/5 px-3 py-2">
                     <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
                       <ReceiptText
                         className="size-4 text-primary"
@@ -656,13 +450,10 @@ export function OrdersHome() {
                       记录 #{selected.seq}
                     </span>
                   </div>
-                  <div className="border-b p-3 md:p-4 max-md:bg-muted/20">
+                  <div className="border-b p-3 bg-muted/20">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground max-md:hidden">
-                          记录 #{selected.seq}
-                        </p>
-                        <h2 className="mt-0.5 text-lg font-semibold text-foreground max-md:mt-0 max-md:text-xl">
+                        <h2 className="font-semibold text-foreground mt-0 text-xl">
                           {selected.groupingEnabled === false
                             ? "日常记账"
                             : selected.seat === null
@@ -673,7 +464,7 @@ export function OrdersHome() {
                           <Clock3 className="size-4" aria-hidden="true" />
                           {formatShanghaiHm(new Date(selected.openedAt))}
                           <span aria-hidden="true">·</span>
-                          <span className="max-md:rounded-md max-md:bg-primary/10 max-md:px-1.5 max-md:py-0.5 max-md:font-medium max-md:text-primary">
+                          <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
                             {statusLabel(selected.status)}
                           </span>
                         </div>
@@ -682,7 +473,7 @@ export function OrdersHome() {
                         <p className="text-xs text-muted-foreground">
                           记录金额
                         </p>
-                        <p className="mt-0.5 text-xl font-semibold tabular-nums text-foreground max-md:text-2xl max-md:tracking-tight">
+                        <p className="mt-0.5 font-semibold tabular-nums text-foreground text-2xl tracking-tight">
                           {formatYuan(selected.totalCents)}
                         </p>
                         <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
@@ -692,7 +483,7 @@ export function OrdersHome() {
                       </div>
                     </div>
                   </div>
-                  <div className="min-h-0 flex-1 p-3 md:overflow-auto md:p-4">
+                  <div className="min-h-0 flex-1 p-3">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-sm font-medium text-foreground">
                         记录明细
@@ -708,10 +499,10 @@ export function OrdersHome() {
                           className="flex items-center justify-between gap-4 py-2"
                         >
                           <div className="min-w-0">
-                            <p className="truncate text-foreground max-md:font-medium">
+                            <p className="truncate text-foreground font-medium">
                               {line.name}
                             </p>
-                            <p className="mt-0.5 tabular-nums text-muted-foreground max-md:text-xs">
+                            <p className="mt-0.5 tabular-nums text-muted-foreground text-xs">
                               {formatYuan(line.priceCents)} × {line.quantity}
                             </p>
                             <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
@@ -740,7 +531,7 @@ export function OrdersHome() {
                             {selected.photos.length} 张
                           </span>
                         </div>
-                        <ul className="mt-2 grid grid-cols-3 gap-2 lg:grid-cols-4">
+                        <ul className="mt-2 grid grid-cols-3 gap-2">
                           {selected.photos.map((photo, index) => (
                             <li key={photo.id}>
                               <button
@@ -767,10 +558,10 @@ export function OrdersHome() {
                       </section>
                     ) : null}
                   </div>
-                  <div className="grid grid-cols-2 gap-2 border-t p-2 md:p-3 max-md:bg-muted/30">
+                  <div className="grid grid-cols-2 gap-2 border-t p-2 bg-muted/30">
                     <Button
                       type="button"
-                      className="max-md:rounded-lg max-md:px-3 max-md:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary-foreground/70 max-md:focus-visible:ring-offset-0"
+                      className="rounded-lg px-3 shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary-foreground/70 focus-visible:ring-offset-0"
                       disabled={updatingStatusId !== null}
                       onClick={() => void toggleOrderStatus(selected)}
                     >
@@ -788,7 +579,7 @@ export function OrdersHome() {
                     <Button
                       asChild
                       variant="outline"
-                      className="max-md:rounded-lg max-md:px-3 max-md:shadow-none max-md:hover:shadow-none max-md:focus-visible:ring-1 max-md:focus-visible:ring-inset max-md:focus-visible:ring-primary/50 max-md:focus-visible:ring-offset-0"
+                      className="rounded-lg px-3 shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
                     >
                       <Link href={bbqOrderPath(selected.id)}>
                         <Pencil className="size-4" aria-hidden="true" />
@@ -797,17 +588,7 @@ export function OrdersHome() {
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex h-full min-h-64 flex-col items-center justify-center px-6 text-center">
-                  <ReceiptText
-                    className="size-8 text-muted-foreground/60"
-                    aria-hidden="true"
-                  />
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    从左侧选择一条记录查看明细
-                  </p>
-                </div>
-              )}
+              ) : null}
             </aside>
           </div>
         </div>
@@ -908,7 +689,7 @@ function OrderSummary({
             #{order.seq}
           </span>
           {isSelected ? (
-            <span className="shrink-0 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground md:hidden">
+            <span className="shrink-0 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
               查看中
             </span>
           ) : null}
@@ -945,26 +726,11 @@ function OrderSummary({
         </p>
         {showChevron ? (
           <ChevronRight
-            className={`size-4 text-muted-foreground ${isSelected ? "max-md:rotate-90 max-md:text-primary" : ""}`}
+            className={`size-4 ${isSelected ? "rotate-90 text-primary" : "text-muted-foreground"}`}
             aria-hidden="true"
           />
         ) : null}
       </div>
     </div>
   );
-}
-
-function downloadBackup(backup: BbqBackup, includePhotos: boolean) {
-  const blob = new Blob([JSON.stringify(backup)], {
-    type: "application/json",
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  const suffix = includePhotos ? "-with-photos" : "";
-  link.download = `daily-ledger-backup${suffix}-${formatShanghaiDate(new Date())}.json`;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
 }

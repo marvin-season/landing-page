@@ -3,16 +3,29 @@
 import { Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Smartphone, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  type PropsWithChildren,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 type InstallPromptEvent = Event & {
   prompt(): Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export function BbqInstallButton() {
+const InstallContext = createContext<{
+  installed: boolean;
+  installing: boolean;
+  requestInstall: () => Promise<boolean>;
+} | null>(null);
+
+// 安装事件可能在首页触发，由常驻 layout 保存，切到设置后仍可使用原生安装。
+export function BbqInstallProvider({ children }: PropsWithChildren) {
   const installPrompt = useRef<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
-  const [open, setOpen] = useState(false);
   const [installing, setInstalling] = useState(false);
 
   useEffect(() => {
@@ -31,7 +44,6 @@ export function BbqInstallButton() {
     const onInstalled = () => {
       installPrompt.current = null;
       setInstalled(true);
-      setOpen(false);
     };
 
     syncDisplayMode();
@@ -45,25 +57,44 @@ export function BbqInstallButton() {
     };
   }, []);
 
-  async function install() {
+  async function requestInstall() {
     const prompt = installPrompt.current;
     if (!prompt) {
-      setOpen(true);
-      return;
+      return false;
     }
 
     installPrompt.current = null;
     setInstalling(true);
     try {
       await prompt.prompt();
+      return true;
     } catch {
-      setOpen(true);
+      return false;
     } finally {
       setInstalling(false);
     }
   }
 
-  if (installed) return null;
+  return (
+    <InstallContext.Provider value={{ installed, installing, requestInstall }}>
+      {children}
+    </InstallContext.Provider>
+  );
+}
+
+export function BbqInstallButton() {
+  const context = useContext(InstallContext);
+  const [open, setOpen] = useState(false);
+  if (!context) throw new Error("BbqInstallButton requires BbqInstallProvider");
+  const { installed, installing, requestInstall } = context;
+
+  async function install() {
+    if (!(await requestInstall())) setOpen(true);
+  }
+
+  if (installed) {
+    return <p className="text-sm text-muted-foreground">已安装到主屏幕</p>;
+  }
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>

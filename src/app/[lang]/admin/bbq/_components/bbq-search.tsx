@@ -24,7 +24,7 @@ export function BbqSearch({
         aria-label={label}
         placeholder={label}
         autoComplete="off"
-        className="h-11 w-full rounded-lg bg-background pr-12 pl-9 text-base md:text-sm"
+        className="h-11 w-full rounded-lg bg-background pr-12 pl-9 text-base placeholder:text-sm"
       />
       {value ? (
         <Button

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
+import { BbqInstallProvider } from "./_components/bbq-install-button";
 import { BbqMobileNav } from "./_components/bbq-mobile-nav";
 
 const title = "天天记账 · 支出与热量统计";
@@ -45,11 +46,11 @@ export const viewport: Viewport = {
 
 export default function BbqLayout({ children }: PropsWithChildren) {
   return (
-    <div className="min-w-0 max-md:pt-12 max-md:pb-[calc(5rem+env(safe-area-inset-bottom))] flex flex-col gap-3 md:h-[calc(100dvh-2rem)] md:pt-12 lg:h-[calc(100dvh-6rem)]">
-      <BbqMobileNav />
-      <div className="min-w-0 md:min-h-0 md:flex-1 md:overflow-auto">
-        {children}
+    <BbqInstallProvider>
+      <div className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] flex flex-col gap-3 mx-auto w-full max-w-xl">
+        <BbqMobileNav />
+        <div className="min-w-0">{children}</div>
       </div>
-    </div>
+    </BbqInstallProvider>
   );
 }

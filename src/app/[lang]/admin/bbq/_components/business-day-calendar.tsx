@@ -3,7 +3,7 @@
 import { Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
 import {
   businessDayLabel,
@@ -17,11 +17,10 @@ import { bbqHomePath } from "./bbq-paths";
 
 const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
 const calendarControlCls = cls`
-  rounded-lg shadow-none transition-colors duration-150
-  hover:bg-muted/70 hover:shadow-none focus-visible:ring-1
-  focus-visible:ring-inset focus-visible:ring-primary/50
-  focus-visible:ring-offset-0 focus-visible:bg-muted/70
-  shinchan:rounded-lg max-md:min-h-11
+  rounded-lg shadow-none transition-colors duration-150 hover:bg-muted/70
+  hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset
+  focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70
+  shinchan:rounded-lg min-h-11
 `;
 const dateCls = cls`
   flex min-h-12 flex-col items-center justify-center rounded-lg text-sm
@@ -30,21 +29,18 @@ const dateCls = cls`
   border duration-150 focus-visible:ring-inset
 `;
 
-export function BusinessDayCalendar({ day }: { day: string }) {
+export function BusinessDayCalendar({
+  day,
+  children,
+}: {
+  day: string;
+  children: ReactElement;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <button
-          type="button"
-          disabled={!day}
-          className="min-w-36 px-2 text-center text-xs font-medium tabular-nums text-foreground min-h-8 rounded-full transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 duration-150 focus-visible:ring-inset focus-visible:bg-muted/70 data-[state=open]:bg-muted/70 cursor-pointer disabled:pointer-events-none"
-          aria-label={`${day ? businessDayLabel(day) : "记账时段"}，打开日历`}
-        >
-          {day ? businessDayLabel(day) : "记账时段"}
-        </button>
-      </Dialog.Trigger>
+      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-110 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 z-110 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
@@ -57,7 +53,7 @@ export function BusinessDayCalendar({ day }: { day: string }) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`${calendarControlCls} size-8 max-md:size-11`}
+                className={`${calendarControlCls} size-11`}
                 aria-label="关闭日历"
               >
                 <X className="size-4" aria-hidden="true" />
@@ -135,7 +131,7 @@ function CalendarContent({ day }: { day: string }) {
           type="button"
           variant="ghost"
           size="icon"
-          className={`${calendarControlCls} size-8 max-md:size-11`}
+          className={`${calendarControlCls} size-11`}
           aria-label="上个月"
           onClick={() => shiftMonth(-1)}
         >
@@ -143,7 +139,7 @@ function CalendarContent({ day }: { day: string }) {
         </Button>
         <select
           aria-label="选择月份"
-          className="min-h-9 rounded-lg border border-transparent bg-muted/40 px-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-inset focus-visible:bg-muted/70 cursor-pointer text-foreground max-md:min-h-11 max-md:text-base"
+          className="rounded-lg border border-transparent bg-muted/40 px-2 font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-inset focus-visible:bg-muted/70 cursor-pointer text-foreground min-h-11 text-base"
           value={month}
           onChange={(event) => setMonth(event.target.value)}
         >
@@ -157,7 +153,7 @@ function CalendarContent({ day }: { day: string }) {
           type="button"
           variant="ghost"
           size="icon"
-          className={`${calendarControlCls} size-8 max-md:size-11`}
+          className={`${calendarControlCls} size-11`}
           aria-label="下个月"
           onClick={() => shiftMonth(1)}
         >

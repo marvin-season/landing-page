@@ -21,8 +21,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { type ReactNode, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
@@ -41,25 +40,13 @@ const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const editorWorkspaceCls = cls`
   grid min-h-0 flex-1 overflow-hidden rounded-xl border bg-card shadow-sm
-  md:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]
-  md:grid-rows-[auto_minmax(0,1fr)]
 `;
 
-const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 border-b p-3
-  md:overflow-auto md:border-b-0 md:border-r
-  flex flex-col
-`;
+const editorMenuPaneCls = cls`min-h-0 min-w-0 border-b p-3 flex flex-col`;
 
-const editorOrderPaneCls = cls`
-  flex min-h-0 min-w-0 flex-col
-  md:h-full
-`;
+const editorOrderPaneCls = cls`flex min-h-0 min-w-0 flex-col`;
 
-const editorOrderBodyCls = cls`
-  min-h-0 p-3
-  md:flex-1 md:overflow-auto
-`;
+const editorOrderBodyCls = cls`min-h-0 p-3`;
 
 const editorControlCls = cls`
   rounded-lg shadow-none transition-colors
@@ -69,12 +56,10 @@ const editorControlCls = cls`
 `;
 
 const photoActionCls = cls`
-  inline-flex h-8 cursor-pointer items-center justify-center gap-1.5
-  rounded-lg border bg-card px-2.5 text-xs font-medium text-foreground
-  transition-colors hover:bg-muted/70 has-disabled:pointer-events-none
-  has-disabled:opacity-50 has-focus-visible:ring-1
-  has-focus-visible:ring-inset has-focus-visible:ring-primary/50
-  max-md:h-11
+  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border bg-card
+  px-2.5 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
+  has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1
+  has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11
 `;
 
 type DraftLine = {
@@ -326,13 +311,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div className={`${pageShellCls} ${message ? "pb-60" : "pb-40"} md:pb-0`}>
+    <div className={`${pageShellCls} ${message ? "pb-60" : "pb-40"}`}>
       <header className="flex shrink-0 flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-1.5">
               <ReceiptText className="size-4 text-primary" aria-hidden="true" />
-              <h1 className="text-lg font-semibold text-foreground">
+              <h1 className="text-lg font-semibold text-foreground pr-24">
                 {order
                   ? `修改${groupingEnabled ? "订单" : "记录"} #${order.seq}`
                   : groupingEnabled
@@ -355,9 +340,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         disabled={saving}
         aria-busy={saving}
       >
-        <section className="border-b px-3 py-2.5 md:col-span-2">
+        <section className="border-b px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 max-md:flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               <label
                 htmlFor="order-grouping"
                 className="text-sm font-medium text-foreground"
@@ -384,12 +369,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             </div>
           </div>
           {groupingEnabled ? (
-            <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">
+            <div className="mt-2 grid grid-cols-5 gap-1.5">
               <Button
                 type="button"
                 variant={seat === null ? "default" : "outline"}
                 aria-pressed={seat === null}
-                className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 sm:col-span-1 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
                 onClick={() => setSeat(null)}
               >
                 <Package className="size-4" aria-hidden="true" />
@@ -455,7 +440,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               没有匹配的项目，请换个关键词
             </p>
           ) : (
-            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] md:max-h-none auto-rows-max content-start p-1 overscroll-y-contain">
+            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] auto-rows-max content-start p-1 overscroll-y-contain">
               {filteredDishes.map((dish) => (
                 <Button
                   key={dish.id}
@@ -544,7 +529,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="outline"
                         size="icon"
-                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70 max-md:size-11`}
+                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
                         aria-label={
                           line.quantity === 1
                             ? `移除 ${line.name}`
@@ -565,7 +550,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="outline"
                         size="icon"
-                        className={`size-8 shrink-0 ${editorControlCls} hover:bg-muted/70 max-md:size-11`}
+                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
                         aria-label={`增加 ${line.name} 数量`}
                         onClick={() => changeQuantity(line.key, 1)}
                       >
@@ -637,7 +622,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </label>
               </div>
               {photos.length > 0 ? (
-                <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                <ul className="mt-2 grid grid-cols-3 gap-2">
                   {photos.map((photo, index) => (
                     <li
                       key={photo.id}
@@ -655,7 +640,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         type="button"
                         variant="soft"
                         size="icon"
-                        className="absolute top-1 right-1 size-7 shadow-sm max-md:size-11"
+                        className="absolute top-1 right-1 shadow-sm size-11"
                         aria-label={`删除第 ${index + 1} 张照片`}
                         onClick={() => removePhoto(photo.id)}
                       >
@@ -681,8 +666,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </section>
             ) : null}
           </div>
-          <TotalBar>
-            <div className="mx-auto w-full max-w-6xl">
+          <div className={totalBarCls}>
+            <div className="mx-auto w-full max-w-xl">
               {message ? (
                 <Alert
                   className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
@@ -714,7 +699,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </label>
               </div>
             </div>
-            <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">
                   {itemCount} 件 · 记录总额
@@ -753,29 +738,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </Button>
               </div>
             </div>
-          </TotalBar>
+          </div>
         </section>
       </fieldset>
     </div>
   );
-}
-
-function TotalBar({ children }: { children: ReactNode }) {
-  const [narrow, setNarrow] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 767px)").matches,
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
-    const update = () => setNarrow(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  const bar = <div className={totalBarCls}>{children}</div>;
-  if (narrow) return createPortal(bar, document.body);
-  return bar;
 }

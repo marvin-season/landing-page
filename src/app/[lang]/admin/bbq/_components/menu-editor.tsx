@@ -30,24 +30,12 @@ import { cls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
 
-const dishGridCls = cls`
-  grid grid-cols-3 gap-2 min-w-0
-  lg:grid-cols-[minmax(0,1fr)_9rem_6rem_5rem_4rem_4rem_8.5rem]
-`;
-const dishRowCls = cls`
-  rounded-lg border bg-card p-2.5
-  lg:rounded-none lg:border-x-0 lg:border-t-0 lg:p-0
-`;
+const dishGridCls = cls`grid grid-cols-3 gap-2 min-w-0`;
+const dishRowCls = cls`rounded-lg border bg-card p-2.5`;
 const dishInputCls = cls`
-  h-10 w-full min-w-0 rounded-lg border bg-background px-3 text-sm shadow-none
-  lg:rounded-none lg:border-0 lg:bg-transparent lg:px-2 lg:text-sm
-  max-lg:h-11 max-lg:px-2 max-lg:text-base
-  max-lg:focus-visible:ring-1 max-lg:focus-visible:ring-inset
-  max-lg:focus-visible:ring-primary/50 max-lg:focus-visible:ring-offset-0
-`;
-const newDishInputCls = cls`
-  lg:rounded-lg lg:border lg:bg-background lg:px-3
-  focus-visible:ring-2 focus-visible:ring-inset
+  w-full min-w-0 rounded-lg border bg-background shadow-none h-11 px-2 text-base
+  focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50
+  focus-visible:ring-offset-0 placeholder:text-sm
 `;
 
 export function MenuEditor() {
@@ -121,15 +109,17 @@ export function MenuEditor() {
   const listedCount = dishes.filter((dish) => dish.listed).length;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 lg:gap-4">
-      <header className="flex flex-col gap-2 max-lg:flex-row max-lg:items-start max-lg:justify-between">
+    <div className="mx-auto flex w-full flex-col gap-3">
+      <header className="flex gap-2 flex-row items-start justify-between">
         <div>
           <div className="flex items-center gap-1.5">
             <UtensilsCrossed
               className="size-4 text-primary"
               aria-hidden="true"
             />
-            <h1 className="text-lg font-semibold text-foreground">菜单管理</h1>
+            <h1 className="text-lg font-semibold text-foreground pr-24">
+              菜单管理
+            </h1>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
             管理常用消费或餐饮项目，设置单价、单位与热量
@@ -188,14 +178,14 @@ function DishTable({
     dish.name.toLocaleLowerCase().includes(query),
   );
   return (
-    <div className="flex flex-col gap-3 lg:gap-4">
+    <div className="flex flex-col gap-3">
       <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-        <div className="border-b bg-muted/30 px-3 py-2 max-lg:flex max-lg:flex-wrap max-lg:items-center max-lg:gap-x-2 max-lg:gap-y-0.5">
+        <div className="border-b bg-muted/30 px-3 py-2 flex flex-wrap items-center gap-x-2 gap-y-0.5">
           <div className="flex items-center gap-2">
             <Plus className="size-4 text-primary" aria-hidden="true" />
             <h2 className="text-sm font-medium text-foreground">新增项目</h2>
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground max-lg:mt-0 max-lg:text-[11px]">
+          <p className="text-muted-foreground mt-0 text-[11px]">
             热量按每单位填写：摄入填正数，跑步等消耗填负数，无需统计可留空
           </p>
         </div>
@@ -203,7 +193,6 @@ function DishTable({
           <DishRow
             key="new"
             categoryId={categoryId}
-            showLabels
             onSaved={onSaved}
             onError={onError}
           />
@@ -250,7 +239,7 @@ function DishTable({
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-1.5 lg:gap-0 lg:overflow-hidden lg:rounded-xl lg:border lg:bg-card lg:shadow-sm">
+          <div className="flex flex-col gap-1.5">
             {dishes.map((dish) => (
               <div
                 key={dish.id}
@@ -278,21 +267,16 @@ function DishTable({
 function DishRow({
   dish,
   categoryId,
-  showLabels = false,
   onSaved,
   onError,
 }: {
   dish?: Dish;
   categoryId: string;
-  showLabels?: boolean;
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
   const isNew = dish === undefined;
-  const fieldLabelCls = cls`
-    text-xs text-muted-foreground max-lg:text-xs
-  `;
-  const inputClassName = cls`${dishInputCls} ${showLabels ? newDishInputCls : ""}`;
+  const fieldLabelCls = cls`text-muted-foreground text-xs`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "0",
@@ -429,7 +413,7 @@ function DishRow({
 
   if (dish && !editing) {
     return (
-      <article className="flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center lg:rounded-none lg:border-0 lg:border-b max-lg:flex-row max-lg:items-center max-lg:p-2.5">
+      <article className="flex gap-2 rounded-lg border bg-card flex-row items-center p-2.5">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2">
             <h3
@@ -460,22 +444,22 @@ function DishRow({
             /{dish.unit}
           </p>
         </div>
-        <div className="flex shrink-0 gap-1.5 max-lg:gap-0.5">
+        <div className="flex shrink-0 gap-0.5">
           <Button
             type="button"
             variant="outline"
-            className="h-9 flex-1 px-3 sm:flex-none max-lg:size-11 max-lg:flex-none max-lg:rounded-lg max-lg:px-0 max-lg:shadow-none max-lg:hover:bg-muted/70 max-lg:hover:shadow-none max-lg:focus-visible:ring-1 max-lg:focus-visible:ring-inset max-lg:focus-visible:ring-primary/50 max-lg:focus-visible:ring-offset-0"
+            className="size-11 flex-none rounded-lg px-0 shadow-none hover:bg-muted/70 hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
             aria-label={`编辑 ${dish.name}`}
             onClick={() => setEditing(true)}
           >
             <Pencil className="size-4" aria-hidden="true" />
-            <span className="max-lg:sr-only">编辑</span>
+            <span className="sr-only">编辑</span>
           </Button>
           <Button
             type="button"
             variant="ghost"
-            className="h-9 flex-1 px-3 text-destructive sm:flex-none max-lg:size-11 max-lg:flex-none max-lg:rounded-lg max-lg:px-0 max-lg:hover:bg-destructive/10 max-lg:hover:text-destructive max-lg:focus-visible:ring-1 max-lg:focus-visible:ring-inset max-lg:focus-visible:ring-destructive/50 max-lg:focus-visible:ring-offset-0"
+            className="text-destructive size-11 flex-none rounded-lg px-0 hover:bg-destructive/10 hover:text-destructive focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-destructive/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
             aria-label={`删除 ${dish.name}`}
             onClick={() => void remove()}
@@ -488,7 +472,7 @@ function DishRow({
             ) : (
               <Trash2 className="size-4" aria-hidden="true" />
             )}
-            <span className="max-lg:sr-only">删除</span>
+            <span className="sr-only">删除</span>
           </Button>
         </div>
       </article>
@@ -499,131 +483,85 @@ function DishRow({
     <fieldset
       disabled={pending !== null}
       aria-busy={pending !== null}
-      className={`${dishGridCls} ${dishRowCls} ${
-        showLabels
-          ? "lg:items-end lg:gap-2 lg:border-b-0 max-lg:border-0 max-lg:p-0"
-          : "lg:items-center lg:gap-0"
-      }`}
+      className={`${dishGridCls} ${isNew ? "" : dishRowCls}`}
     >
-      <label
-        className={`col-span-3 flex min-w-0 flex-col gap-1 lg:col-span-1 ${
-          showLabels ? "lg:flex" : "lg:block"
-        }`}
-      >
+      <label className="col-span-3 flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>名称</span>
         <Input
           ref={nameRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={inputClassName}
+          className={dishInputCls}
           autoComplete="off"
           aria-label="项目名称"
           placeholder={isNew ? "新项目" : undefined}
         />
       </label>
-      <label
-        className={`col-span-3 flex min-w-0 flex-col gap-1 lg:col-span-1 ${
-          showLabels ? "lg:flex" : "lg:block"
-        }`}
-      >
+      <label className="col-span-3 flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>热量 kcal / 单位</span>
         <Input
           type="number"
           step="any"
           value={calories}
           onChange={(event) => setCalories(event.target.value)}
-          className={`${inputClassName} tabular-nums`}
+          className={`${dishInputCls} tabular-nums`}
           autoComplete="off"
           aria-label="每单位热量（kcal，选填）"
           placeholder="如 300 / -200"
         />
       </label>
-      <label
-        className={`flex min-w-0 flex-col gap-1 ${
-          showLabels ? "lg:flex" : "lg:block"
-        }`}
-      >
+      <label className="flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>单价（选填）</span>
         <Input
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          className={`${inputClassName} tabular-nums`}
+          className={`${dishInputCls} tabular-nums`}
           inputMode="decimal"
           autoComplete="off"
           aria-label="单价（选填，默认 0 元）"
           placeholder="0"
         />
       </label>
-      <label
-        className={`flex min-w-0 flex-col gap-1 ${
-          showLabels ? "lg:flex" : "lg:block"
-        }`}
-      >
+      <label className="flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>单位（选填）</span>
         <Input
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
-          className={inputClassName}
+          className={dishInputCls}
           autoComplete="off"
           aria-label="单位（选填，默认份）"
           placeholder="份"
         />
       </label>
-      <label
-        className={`flex min-w-0 flex-col gap-1 ${
-          showLabels ? "lg:flex" : "lg:block"
-        }`}
-      >
+      <label className="flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>排序</span>
         <Input
           value={sort}
           onChange={(event) => setSort(event.target.value)}
-          className={`${inputClassName} tabular-nums`}
+          className={`${dishInputCls} tabular-nums`}
           inputMode="numeric"
           autoComplete="off"
           aria-label="排序（数字越大越靠前）"
           title="数字越大越靠前"
         />
       </label>
-      <div
-        className={`flex min-h-10 justify-between max-lg:min-h-9 max-lg:justify-start ${
-          showLabels
-            ? "flex-row items-center gap-2 lg:flex-col lg:items-center lg:gap-1"
-            : "items-center gap-2 lg:justify-center"
-        }`}
-      >
-        <span
-          className={`${fieldLabelCls} ${showLabels ? "lg:w-full lg:text-center" : ""}`}
-        >
-          启用
-        </span>
-        <div className="flex min-h-10 min-w-10 items-center justify-center max-lg:min-h-9 max-lg:min-w-0">
+      <div className="flex min-h-11 justify-start items-center gap-2">
+        <span className={fieldLabelCls}>启用</span>
+        <div className="flex items-center justify-center min-h-9 min-w-0">
           <Switch
             checked={listed}
             aria-label="项目启用"
-            className={showLabels ? "focus-visible:ring-2" : undefined}
             onCheckedChange={setListed}
           />
         </div>
       </div>
-      <div
-        className={`col-span-2 flex min-h-10 lg:col-span-1 max-lg:min-h-9 ${
-          showLabels
-            ? "flex-col items-stretch gap-1 max-lg:flex-row max-lg:items-center max-lg:justify-end"
-            : "items-end justify-end gap-1.5 lg:items-center lg:px-1"
-        }`}
-      >
-        {showLabels ? (
-          <span className={`${fieldLabelCls} text-center max-lg:sr-only`}>
-            操作
-          </span>
-        ) : null}
+      <div className="col-span-2 flex min-h-11 items-center justify-end gap-1.5">
         {dish ? (
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="size-9 shrink-0 max-lg:size-11"
+            className="shrink-0 size-11"
             aria-label="取消编辑"
             title="取消编辑"
             onClick={cancelEditing}
@@ -634,11 +572,7 @@ function DishRow({
         <Button
           type="button"
           variant="default"
-          className={
-            showLabels
-              ? "h-10 w-full rounded-md px-3 focus-visible:ring-2 lg:px-2 max-lg:h-11 max-lg:w-auto max-lg:min-w-24 max-lg:rounded-lg max-lg:shadow-none max-lg:hover:shadow-none max-lg:focus-visible:ring-1 max-lg:focus-visible:ring-inset max-lg:focus-visible:ring-offset-0"
-              : "h-10 flex-1 px-3 lg:px-2 max-lg:h-11 max-lg:flex-none max-lg:min-w-20 max-lg:rounded-lg max-lg:shadow-none max-lg:hover:shadow-none max-lg:focus-visible:ring-1 max-lg:focus-visible:ring-inset max-lg:focus-visible:ring-offset-0 min-w-20 shrink-0 whitespace-nowrap"
-          }
+          className="px-3 h-11 min-w-24 rounded-lg shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-offset-0 shrink-0 whitespace-nowrap"
           onClick={() => void commit()}
         >
           {pending === "save" ? (
@@ -654,7 +588,7 @@ function DishRow({
       </div>
       {error ? (
         <p
-          className="col-span-3 rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive lg:col-span-7"
+          className="col-span-3 rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -666,9 +600,9 @@ function DishRow({
 
 function MenuMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card px-3 py-2 max-lg:flex max-lg:flex-wrap max-lg:items-center max-lg:justify-between max-lg:gap-x-1 max-lg:px-2">
+    <div className="bg-card py-2 flex flex-wrap items-center justify-between gap-x-1 px-2">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground max-lg:mt-0 max-lg:text-sm">
+      <dd className="font-semibold tabular-nums text-foreground mt-0 text-sm">
         {value}
       </dd>
     </div>

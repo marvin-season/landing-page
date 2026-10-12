@@ -14,3 +14,7 @@ export function bbqOrderPath(id: string): string {
 export function bbqMenuPath(): string {
   return "/admin/bbq/menu";
 }
+
+export function bbqSettingsPath(): string {
+  return "/admin/bbq/settings";
+}
