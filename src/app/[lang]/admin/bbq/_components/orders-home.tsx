@@ -21,9 +21,8 @@ import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
 
 const homeMetricsCls = cls`
-  grid shrink-0 gap-px overflow-hidden rounded-xl border bg-border grid-cols-6
-  [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3 [&>div]:min-w-0 [&>div]:px-2
-  [&>div]:py-1.5 [&_dt]:text-[11px] [&_dd]:text-sm [&_dd]:break-words
+  grid shrink-0 gap-px overflow-hidden rounded-lg border bg-border grid-cols-6
+  [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3 [&>div]:min-w-0
 `;
 
 // 扣除外层上下内边距（移动端 2rem / 大屏 6rem）和底部导航，列表在剩余空间内滚动。
@@ -196,7 +195,7 @@ export function OrdersHome() {
           className={`flex min-h-0 flex-1 flex-col ${homeView === "orders" ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
         >
           {homeView === "orders" ? (
-            <div className="flex min-h-0 flex-1 flex-col gap-3">
+            <div className="flex min-h-0 flex-1 flex-col gap-2">
               <dl className={homeMetricsCls}>
                 <Metric label="全部记录" value={`${orders.length} 条`} />
                 <Metric label="进行中" value={`${openOrders.length} 条`} />
@@ -244,9 +243,9 @@ export function OrdersHome() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card px-3 py-2">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground">
+    <div className="bg-card px-2 py-1 flex flex-wrap items-baseline justify-between gap-x-1">
+      <dt className="text-[11px] text-muted-foreground leading-5">{label}</dt>
+      <dd className="text-xs font-semibold tabular-nums text-foreground leading-5 break-words min-w-0">
         {value}
       </dd>
     </div>
