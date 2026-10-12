@@ -2,7 +2,13 @@
 
 import { Button } from "@landing-page/design-system";
 import { Camera, CheckCircle2, ChevronRight, Clock3, Plus } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  type CSSProperties,
+  type RefObject,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { formatYuan } from "@/lib/bbq/money";
@@ -53,20 +59,12 @@ export function OrdersList({
   updatingStatusId: string | null;
   onToggleStatus: (order: Order) => Promise<void>;
 }) {
-  const reducedMotion = useReducedMotion();
-  const transition = {
-    duration: reducedMotion ? 0 : 0.22,
-    ease: [0.22, 1, 0.36, 1] as const,
-  };
+  const viewportRef = useRef<HTMLDivElement>(null);
   const openOrders = orders.filter((order) => order.status === "open");
   const doneOrders = orders.filter((order) => order.status === "done");
   const visibleOrders = statusFilter === "open" ? openOrders : doneOrders;
   const selected =
     visibleOrders.find((order) => order.id === selectedId) ?? null;
-
-  function openOrder(id: string) {
-    onSelect(selectedId === id ? null : id);
-  }
 
   function changeFilter(status: Order["status"]) {
     if (status === statusFilter) return;
@@ -131,9 +129,9 @@ export function OrdersList({
             </button>
           </div>
         </div>
-        <motion.div
-          layoutScroll
-          className={`min-h-0 flex flex-1 flex-col ${selected ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
+        <div
+          ref={viewportRef}
+          className={`min-h-0 flex flex-1 flex-col [scrollbar-gutter:stable] ${selected ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
         >
           {loading ? (
             <div
@@ -171,76 +169,143 @@ export function OrdersList({
               ) : null}
             </div>
           ) : (
-            <ul
-              className={`divide-y-0 space-y-1.5 p-2 flex-1 ${selected ? "min-h-0 flex flex-col overflow-hidden" : ""}`}
-            >
-              <AnimatePresence initial={false}>
-                {(selected ? [selected] : visibleOrders).map((order) => (
-                  <motion.li
-                    key={order.id}
-                    layout={reducedMotion ? false : "position"}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: selected ? "100%" : "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={transition}
-                    className={
-                      selected
-                        ? "overflow-hidden rounded-lg border border-primary/35 bg-card min-h-0 flex flex-col shrink-0"
-                        : "overflow-hidden"
-                    }
-                  >
-                    <button
-                      type="button"
-                      className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors rounded-lg border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 duration-150 active:bg-primary/15 touch-manipulation motion-reduce:transition-none ${
-                        selectedId === order.id
-                          ? "rounded-b-none border-transparent bg-primary/10 hover:bg-primary/10 shrink-0"
-                          : "border-transparent bg-card hover:bg-muted/70"
-                      }`}
-                      aria-expanded={selectedId === order.id}
-                      aria-controls={
-                        selectedId === order.id
-                          ? `bbq-order-detail-${order.id}`
-                          : undefined
-                      }
-                      onClick={() => openOrder(order.id)}
-                    >
-                      <OrderSummary
-                        order={order}
-                        showChevron
-                        isSelected={selectedId === order.id}
-                      />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {selected ? (
-                        <motion.div
-                          key="detail"
-                          id={`bbq-order-detail-${order.id}`}
-                          role="region"
-                          aria-label={`记录 #${selected.seq} 详情`}
-                          initial={{ opacity: 0, y: reducedMotion ? 0 : 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={transition}
-                          className="overflow-hidden min-h-0 flex flex-1 flex-col"
-                        >
-                          <div className="border-t border-primary/15 min-h-0 flex flex-1 flex-col">
-                            <OrderDetail
-                              order={selected}
-                              updatingStatusId={updatingStatusId}
-                              onToggleStatus={onToggleStatus}
-                            />
-                          </div>
-                        </motion.div>
-                      ) : null}
-                    </AnimatePresence>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
+            <ul className="divide-y-0 space-y-1.5 p-2 flex-1">
+              {visibleOrders.map((order) => (
+                <OrderListItem
+                  key={order.id}
+                  order={order}
+                  expanded={selected?.id === order.id}
+                  hidden={selected !== null && selected.id !== order.id}
+                  viewportRef={viewportRef}
+                  updatingStatusId={updatingStatusId}
+                  onToggleStatus={onToggleStatus}
+                  onToggle={() =>
+                    onSelect(selectedId === order.id ? null : order.id)
+                  }
+                />
+              ))}
             </ul>
           )}
-        </motion.div>
+        </div>
       </section>
     </div>
+  );
+}
+
+// 外层 li 始终保留摘要高度；只移动内部卡片，避免改变其他记录的位置和 scrollTop。
+function OrderListItem({
+  order,
+  expanded,
+  hidden,
+  viewportRef,
+  updatingStatusId,
+  onToggleStatus,
+  onToggle,
+}: {
+  order: Order;
+  expanded: boolean;
+  hidden: boolean;
+  viewportRef: RefObject<HTMLDivElement | null>;
+  updatingStatusId: string | null;
+  onToggleStatus: (order: Order) => Promise<void>;
+  onToggle: () => void;
+}) {
+  const rowRef = useRef<HTMLLIElement>(null);
+  const summaryRef = useRef<HTMLButtonElement>(null);
+  const [geometry, setGeometry] = useState({
+    rowHeight: 0,
+    height: 0,
+    offset: 0,
+  });
+  const [showDetail, setShowDetail] = useState(expanded);
+
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    const summary = summaryRef.current;
+    const viewport = viewportRef.current;
+    if (!row || !summary || !viewport) return;
+    const measure = () => {
+      const rowHeight = summary.offsetHeight + 2;
+      const height = Math.max(rowHeight, viewport.clientHeight - 16);
+      const offset = expanded
+        ? viewport.getBoundingClientRect().top +
+          8 -
+          row.getBoundingClientRect().top
+        : 0;
+      setGeometry((current) =>
+        current.rowHeight === rowHeight &&
+        current.height === height &&
+        current.offset === offset
+          ? current
+          : { rowHeight, height, offset },
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(summary);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [expanded, viewportRef]);
+
+  useLayoutEffect(() => {
+    if (expanded) {
+      setShowDetail(true);
+      return;
+    }
+    // 收起动画结束后再释放详情；记录摘要及占位始终常驻。
+    const timer = window.setTimeout(() => setShowDetail(false), 280);
+    return () => window.clearTimeout(timer);
+  }, [expanded]);
+
+  const variables = {
+    "--row-height": geometry.rowHeight ? `${geometry.rowHeight}px` : "auto",
+    "--detail-height": `${geometry.height}px`,
+    "--row-offset": `${geometry.offset}px`,
+  } as CSSProperties;
+
+  return (
+    <li
+      ref={rowRef}
+      style={variables}
+      inert={hidden}
+      aria-hidden={hidden || undefined}
+      className={`relative h-[var(--row-height)] transition-opacity duration-200 motion-reduce:transition-none ${hidden ? "opacity-0 pointer-events-none" : "opacity-100"} ${expanded || showDetail ? "z-10" : "z-0"}`}
+    >
+      <div
+        className={`overflow-hidden rounded-lg border bg-card min-h-0 flex flex-col transition-[transform,height,border-color] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${expanded ? "h-[var(--detail-height)] [transform:translateY(var(--row-offset))] border-primary/35" : "h-[var(--row-height)] transform-none border-transparent"}`}
+      >
+        <button
+          ref={summaryRef}
+          type="button"
+          className={`${touchCls} w-full px-3 py-2.5 text-left transition-colors rounded-lg border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 duration-150 active:bg-primary/15 touch-manipulation motion-reduce:transition-none shrink-0 ${expanded ? "rounded-b-none border-transparent bg-primary/10 hover:bg-primary/10" : "border-transparent bg-card hover:bg-muted/70"}`}
+          aria-expanded={expanded}
+          aria-controls={
+            showDetail ? `bbq-order-detail-${order.id}` : undefined
+          }
+          onClick={onToggle}
+        >
+          <OrderSummary order={order} showChevron isSelected={expanded} />
+        </button>
+        {showDetail ? (
+          <div
+            id={`bbq-order-detail-${order.id}`}
+            role="region"
+            aria-label={`记录 #${order.seq} 详情`}
+            inert={!expanded}
+            aria-hidden={!expanded || undefined}
+            className={`overflow-hidden min-h-0 flex flex-1 flex-col transition-opacity duration-200 motion-reduce:transition-none ${expanded ? "opacity-100" : "opacity-0"}`}
+          >
+            <div className="border-t border-primary/15 min-h-0 flex flex-1 flex-col">
+              <OrderDetail
+                order={order}
+                updatingStatusId={updatingStatusId}
+                onToggleStatus={onToggleStatus}
+              />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </li>
   );
 }
 
