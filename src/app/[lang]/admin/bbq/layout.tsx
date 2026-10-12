@@ -47,9 +47,9 @@ export const viewport: Viewport = {
 export default function BbqLayout({ children }: PropsWithChildren) {
   return (
     <BbqInstallProvider>
-      <div className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] flex flex-col gap-3 mx-auto w-full max-w-xl">
+      <div className="min-w-0 pb-[calc(4rem+env(safe-area-inset-bottom))] flex flex-col gap-3 mx-auto w-full max-w-xl flex-1">
         <BbqMobileNav />
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0 flex flex-1 flex-col">{children}</div>
       </div>
     </BbqInstallProvider>
   );

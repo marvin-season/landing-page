@@ -1,0 +1,213 @@
+"use client";
+
+import { Button } from "@landing-page/design-system";
+import * as Dialog from "@radix-ui/react-dialog";
+import {
+  Camera,
+  CheckCircle2,
+  Clock3,
+  Pencil,
+  RotateCcw,
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
+import { Link } from "@/components/link/link";
+import { formatShanghaiHm } from "@/lib/bbq/business-day";
+import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
+import { formatYuan } from "@/lib/bbq/money";
+import type { Order, OrderPhoto } from "@/lib/bbq/types";
+import { bbqOrderPath } from "./bbq-paths";
+
+export function OrderDetail({
+  order,
+  updatingStatusId,
+  onToggleStatus,
+}: {
+  order: Order;
+  updatingStatusId: string | null;
+  onToggleStatus: (order: Order) => Promise<void>;
+}) {
+  const [previewPhoto, setPreviewPhoto] = useState<OrderPhoto | null>(null);
+  const photoTriggerRef = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <div className="flex min-h-0 flex-col flex-1 overflow-hidden">
+        <div className="border-b p-3 bg-muted/20 shrink-0">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-foreground mt-0 text-xl">
+                {order.groupingEnabled === false
+                  ? "日常记账"
+                  : order.seat === null
+                    ? "打包订单"
+                    : `${order.seat} 号座`}
+              </h2>
+              <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock3 className="size-4" aria-hidden="true" />
+                {formatShanghaiHm(new Date(order.openedAt))}
+                <span aria-hidden="true">·</span>
+                <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
+                  {order.status === "open" ? "进行中" : "已完成"}
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">记录金额</p>
+              <p className="mt-0.5 font-semibold tabular-nums text-foreground text-2xl tracking-tight">
+                {formatYuan(order.totalCents)}
+              </p>
+              <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                热量 {formatCalories(summarizeCalories(order.lines))}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="min-h-0 flex-1 p-3 overflow-y-auto overscroll-y-contain">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-medium text-foreground">记录明细</h3>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {order.lines.length} 项
+            </span>
+          </div>
+          <ul className="mt-2 divide-y text-sm">
+            {order.lines.map((line) => (
+              <li
+                key={line.id}
+                className="flex items-center justify-between gap-4 py-2"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-foreground font-medium">
+                    {line.name}
+                  </p>
+                  <p className="mt-0.5 tabular-nums text-muted-foreground text-xs">
+                    {formatYuan(line.priceCents)} × {line.quantity}
+                  </p>
+                  <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                    热量 {formatCalories(summarizeCalories([line]))}
+                  </p>
+                </div>
+                <span className="shrink-0 font-medium tabular-nums text-foreground">
+                  {formatYuan(line.lineCents)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {order.photos.length > 0 ? (
+            <section className="mt-4 border-t pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5">
+                  <Camera className="size-4 text-primary" aria-hidden="true" />
+                  <h3 className="text-sm font-medium text-foreground">
+                    留存照片
+                  </h3>
+                </div>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {order.photos.length} 张
+                </span>
+              </div>
+              <ul className="mt-2 grid grid-cols-3 gap-2">
+                {order.photos.map((photo, index) => (
+                  <li key={photo.id}>
+                    <button
+                      type="button"
+                      className="relative block aspect-square w-full overflow-hidden rounded-lg border bg-muted transition-opacity hover:opacity-85"
+                      aria-label={`查看第 ${index + 1} 张留存照片`}
+                      onClick={(event) => {
+                        photoTriggerRef.current = event.currentTarget;
+                        setPreviewPhoto(photo);
+                      }}
+                    >
+                      <Image
+                        src={photo.dataUrl}
+                        alt={`记录留存照片 ${index + 1}`}
+                        fill
+                        sizes="8rem"
+                        unoptimized
+                        className="size-full object-cover"
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+        </div>
+        <div className="grid grid-cols-2 gap-2 border-t p-2 bg-muted/30 shrink-0">
+          <Button
+            type="button"
+            className="rounded-lg px-3 shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary-foreground/70 focus-visible:ring-offset-0"
+            disabled={updatingStatusId !== null}
+            onClick={() => void onToggleStatus(order)}
+          >
+            {order.status === "open" ? (
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+            ) : (
+              <RotateCcw className="size-4" aria-hidden="true" />
+            )}
+            {updatingStatusId === order.id
+              ? "处理中…"
+              : order.status === "open"
+                ? "完成记录"
+                : "恢复进行中"}
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-lg px-3 shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
+          >
+            <Link href={bbqOrderPath(order.id)}>
+              <Pencil className="size-4" aria-hidden="true" />
+              修改记录
+            </Link>
+          </Button>
+        </div>
+      </div>
+      <Dialog.Root
+        open={previewPhoto !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewPhoto(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-110 bg-black/80" />
+          <Dialog.Content
+            className="fixed top-1/2 left-1/2 z-110 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl bg-background p-2 pt-14 shadow-lg focus:outline-none"
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              photoTriggerRef.current?.focus();
+            }}
+          >
+            <Dialog.Title className="absolute top-4 left-4 text-sm font-medium">
+              记录留存照片
+            </Dialog.Title>
+            <Dialog.Description className="sr-only">
+              记录的照片大图，可按 Esc 或关闭按钮返回记录详情
+            </Dialog.Description>
+            {previewPhoto ? (
+              <Image
+                src={previewPhoto.dataUrl}
+                alt="记录留存照片大图"
+                width={1600}
+                height={1600}
+                unoptimized
+                className="max-h-[calc(100dvh-7rem)] w-auto max-w-full object-contain"
+              />
+            ) : null}
+            <Dialog.Close asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-1 right-1 size-11"
+                aria-label="关闭照片预览"
+              >
+                <X className="size-4" aria-hidden="true" />
+              </Button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
+  );
+}
