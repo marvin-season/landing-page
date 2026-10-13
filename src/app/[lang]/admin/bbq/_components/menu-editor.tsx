@@ -26,8 +26,9 @@ import {
   parseYuanToCents,
 } from "@/lib/bbq/money";
 import type { Category, Dish } from "@/lib/bbq/types";
+import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
-import { cls } from "./bbq-layout";
+import { cls, pageTitleCls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
 
@@ -65,7 +66,7 @@ export function MenuEditor() {
     setMessage(null);
     await reload();
     notifyBbqMenuChanged();
-    setNotice("菜单已更新");
+    setNotice("常用项目已保存");
   }, [reload]);
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export function MenuEditor() {
         className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
         role="status"
       >
-        读取菜单中…
+        读取常用项目中…
       </div>
     );
   }
@@ -114,16 +115,10 @@ export function MenuEditor() {
       <header className="flex gap-2 flex-row items-start justify-between shrink-0">
         <div>
           <div className="flex items-center gap-1.5">
-            <UtensilsCrossed
-              className="size-4 text-primary"
-              aria-hidden="true"
-            />
-            <h1 className="text-lg font-semibold text-foreground pr-24">
-              菜单管理
-            </h1>
+            <h1 className={pageTitleCls}>常用项目</h1>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            全部 {dishes.length} 项 · 已启用 {listedCount} 项
+            常记的放这里 · {listedCount} 项可选
           </p>
         </div>
       </header>
@@ -142,7 +137,7 @@ export function MenuEditor() {
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-3">
         {menu ? (
           <DishList
             categoryId={menu.id}
@@ -178,13 +173,14 @@ function DishList({
       <details
         open={adding}
         onToggle={(event) => setAdding(event.currentTarget.open)}
-        className="overflow-hidden rounded-xl border bg-card group"
+        className="overflow-hidden rounded-xl bg-card group"
       >
         <summary className="px-3 py-2 flex items-center gap-2 min-h-11 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50">
           <Plus className="size-4 text-primary" aria-hidden="true" />
           <span className="text-sm font-medium text-foreground flex-1">
-            新增项目
+            添加常用项目
           </span>
+          <BbqCompanion mood="chef" className="block size-10 shrink-0" />
           <ChevronDown
             className="size-4 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none"
             aria-hidden="true"
@@ -204,7 +200,9 @@ function DishList({
       </details>
       <section className="flex flex-col gap-2">
         <div className="sticky top-0 z-10 bg-background py-2 flex flex-col gap-2">
-          <h2 className="text-sm font-medium text-foreground">已有项目</h2>
+          <h2 className="text-xs font-medium text-muted-foreground">
+            我的常用
+          </h2>
           {dishes.length > 0 ? (
             <BbqSearch
               value={search}
@@ -222,7 +220,7 @@ function DishList({
           </p>
         ) : null}
         {dishes.length === 0 ? (
-          <div className="flex min-h-36 flex-col items-center justify-center rounded-xl border bg-card px-5 text-center">
+          <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
             <UtensilsCrossed
               className="size-7 text-muted-foreground/60"
               aria-hidden="true"
@@ -231,17 +229,17 @@ function DishList({
               还没有项目
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              使用上方表单添加第一个项目
+              早餐、咖啡、跑步，从常记的开始。
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col rounded-xl bg-card overflow-hidden">
             {dishes.map((dish) => (
               <div
                 key={dish.id}
                 className={
                   dish.name.toLocaleLowerCase().includes(query)
-                    ? "contents"
+                    ? "border-b border-border/60 last:border-b-0"
                     : "hidden"
                 }
               >
@@ -409,7 +407,7 @@ function DishRow({
 
   if (dish && !editing) {
     return (
-      <article className="flex gap-2 rounded-lg border bg-card flex-row items-center p-2.5">
+      <article className="flex gap-2 bg-card flex-row items-center p-3">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2">
             <h3
@@ -421,8 +419,8 @@ function DishRow({
             <span
               className={
                 dish.listed
-                  ? "shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
-                  : "shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                  ? "sr-only"
+                  : "shrink-0 text-xs text-muted-foreground"
               }
             >
               {dish.listed ? "已启用" : "未启用"}
@@ -433,8 +431,6 @@ function DishRow({
               {formatYuan(dish.priceCents)}
             </span>
             /{dish.unit}
-            <span className="mx-2">·</span>
-            排序 {dish.sort}
             <span className="mx-2">·</span>
             热量 {formatCalories(summarizeCalories([{ ...dish, quantity: 1 }]))}
             /{dish.unit}

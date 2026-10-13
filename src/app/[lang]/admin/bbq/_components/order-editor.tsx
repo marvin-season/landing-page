@@ -14,7 +14,6 @@ import {
   Minus,
   Package,
   Plus,
-  ReceiptText,
   Save,
   Trash2,
   UtensilsCrossed,
@@ -29,8 +28,15 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
 import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
+import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
-import { cls, pageShellCls, totalBarCls, touchCls } from "./bbq-layout";
+import {
+  cls,
+  pageShellCls,
+  pageTitleCls,
+  totalBarCls,
+  touchCls,
+} from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
@@ -39,7 +45,7 @@ import { useBbqNavigate } from "./use-bbq-nav";
 const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const editorWorkspaceCls = cls`
-  grid min-h-0 flex-1 overflow-hidden rounded-xl border bg-card shadow-sm
+  grid min-h-0 flex-1 overflow-hidden rounded-xl bg-card
   grid-rows-[minmax(0,1fr)_auto]
 `;
 
@@ -317,13 +323,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-1.5">
-              <ReceiptText className="size-4 text-primary" aria-hidden="true" />
-              <h1 className="text-lg font-semibold text-foreground pr-24">
+              <h1 className={pageTitleCls}>
                 {order
                   ? `修改${groupingEnabled ? "订单" : "记录"} #${order.seq}`
                   : groupingEnabled
                     ? "新建订单"
-                    : "新建记录"}
+                    : "记一笔"}
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -331,7 +336,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? "开单" : "记账"}`
                 : groupingEnabled
                   ? "选择打包或座号和项目后保存订单"
-                  : "选择项目记账，需要时可开启分组"}
+                  : "这次记点什么？"}
             </p>
           </div>
         </div>
@@ -349,7 +354,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   htmlFor="order-grouping"
                   className="text-sm font-medium text-foreground"
                 >
-                  启用分组
+                  按座号分组
                 </label>
                 <Switch
                   id="order-grouping"
@@ -366,7 +371,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     ? seat === null
                       ? "当前选择打包"
                       : `当前选择 ${seat} 号座`
-                    : "日常记账"}
+                    : "选填"}
                 </p>
               </div>
             </div>
@@ -402,7 +407,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <div className="flex shrink-0 items-center justify-between gap-2">
                 <div>
                   <h2 className="text-sm font-medium text-foreground">
-                    选择项目
+                    常用项目
                   </h2>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
@@ -426,13 +431,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   aria-hidden="true"
                 />
                 <p className="mt-2 text-sm font-medium text-foreground">
-                  还没有启用项目
+                  先添几个常用项目
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  先到菜单中新增并启用项目
+                  比如早餐、咖啡，或一次跑步。
                 </p>
                 <Button asChild size="sm" variant="outline" className="mt-3">
-                  <Link href={bbqMenuPath()}>管理菜单</Link>
+                  <Link href={bbqMenuPath()}>添加常用项目</Link>
                 </Button>
               </div>
             ) : filteredDishes.length === 0 ? (
@@ -448,8 +453,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   <Button
                     key={dish.id}
                     type="button"
-                    variant="outline"
-                    className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "border-primary/40 bg-primary/5" : ""}`}
+                    variant="ghost"
+                    className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-3 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
                     aria-label={`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                     onClick={() => addDish(dish)}
                   >
@@ -458,12 +463,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
                         {formatYuan(dish.priceCents)}/{dish.unit}
                       </span>
-                      <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                        热量{" "}
-                        {formatCalories(
-                          summarizeCalories([{ ...dish, quantity: 1 }]),
-                        )}
-                      </span>
+                      {dish.caloriesKcal != null ? (
+                        <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
+                          {formatCalories(
+                            summarizeCalories([{ ...dish, quantity: 1 }]),
+                          )}
+                        </span>
+                      ) : null}
                     </span>
                     <span className="flex shrink-0 flex-col items-center gap-1">
                       <Plus className="size-4" aria-hidden="true" />
@@ -484,7 +490,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <div className="flex items-end justify-between gap-3 sticky top-0 z-10 bg-card pb-2">
                   <div>
                     <h2 className="text-sm font-medium text-foreground">
-                      记录明细
+                      这一笔
                     </h2>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground">
@@ -493,9 +499,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </div>
                 {lines.length === 0 ? (
                   <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
-                    <ReceiptText
-                      className="size-5 text-muted-foreground/60"
-                      aria-hidden="true"
+                    <BbqCompanion
+                      mood={groupingEnabled ? "chef" : "hello"}
+                      className="block size-12 shrink-0"
                     />
                     <p className="text-xs text-muted-foreground">
                       还没有添加项目
@@ -506,7 +512,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     {lines.map((line) => (
                       <li
                         key={line.key}
-                        className="flex items-center gap-1.5 rounded-lg bg-muted/40 px-2.5 py-2"
+                        className="flex items-center gap-1.5 border-b border-border/60 px-0.5 py-2 last:border-b-0"
                       >
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-foreground">
@@ -570,11 +576,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         aria-hidden="true"
                       />
                       <h2 className="text-sm font-medium text-foreground">
-                        拍照留存
+                        附张照片
                       </h2>
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      选填，最多 {MAX_ORDER_PHOTOS} 张
+                      小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张
                     </p>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground">

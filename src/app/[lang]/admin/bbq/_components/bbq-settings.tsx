@@ -6,7 +6,6 @@ import {
   Download,
   Images,
   LoaderCircle,
-  Settings,
   Smartphone,
   Upload,
 } from "lucide-react";
@@ -14,9 +13,10 @@ import { useRef, useState } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import type { BbqBackup } from "@/lib/bbq/types";
+import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
 import { BbqInstallButton } from "./bbq-install-button";
-import { cls, pageShellCls } from "./bbq-layout";
+import { cls, pageShellCls, pageTitleCls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
 const settingsActionCls = cls`
@@ -72,7 +72,7 @@ export function BbqSettings() {
       await bbqStore.importBackup(parsed as BbqBackup);
       notifyBbqMenuChanged();
       setMessage(null);
-      setNotice("备份已导入，记录和菜单已更新");
+      setNotice("备份已导入，记录和常用项目已更新");
     } catch (error) {
       setMessage(bbqErrorMessage(error));
     } finally {
@@ -85,11 +85,10 @@ export function BbqSettings() {
     <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
       <header className="shrink-0">
         <div className="flex items-center gap-1.5">
-          <Settings className="size-4 text-primary" aria-hidden="true" />
-          <h1 className="text-lg font-semibold text-foreground pr-24">设置</h1>
+          <h1 className={pageTitleCls}>设置</h1>
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          管理数据备份与应用安装
+          记录存在这台设备，记得定期备份。
         </p>
       </header>
       {message ? (
@@ -109,19 +108,22 @@ export function BbqSettings() {
           {notice}
         </p>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3">
-        <section className="overflow-hidden rounded-xl border bg-card shrink-0">
-          <div className="border-b px-3 py-3">
-            <h2 className="flex items-center gap-2 text-sm font-medium">
-              <DatabaseBackup
-                className="size-4 text-primary"
-                aria-hidden="true"
-              />
-              数据备份
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              导出全部记录与菜单，默认不包含照片。
-            </p>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-4 pb-3">
+        <section className="overflow-hidden rounded-xl bg-card shrink-0">
+          <div className="border-b px-3 py-3 flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="flex items-center gap-2 text-sm font-medium">
+                <DatabaseBackup
+                  className="size-4 text-primary"
+                  aria-hidden="true"
+                />
+                备份账本
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                保存一份记录和常用项目，换设备也能带走。
+              </p>
+            </div>
+            <BbqCompanion mood="care" className="block size-16 shrink-0" />
           </div>
           <fieldset
             disabled={backupTask !== null}
@@ -135,7 +137,7 @@ export function BbqSettings() {
               onClick={() => void exportBackup()}
             >
               <Download className="size-4" aria-hidden="true" />
-              导出备份
+              导出备份（不含照片）
             </Button>
             <Button
               type="button"
@@ -182,14 +184,22 @@ export function BbqSettings() {
             </p>
           ) : null}
         </section>
-        <section className="rounded-xl border bg-card p-3 shrink-0">
-          <h2 className="flex items-center gap-2 text-sm font-medium">
-            <Smartphone className="size-4 text-primary" aria-hidden="true" />
-            应用安装
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            添加到主屏幕，方便下次打开记账。
-          </p>
+        <section className="rounded-xl bg-card p-3 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="flex items-center gap-2 text-sm font-medium">
+                <Smartphone
+                  className="size-4 text-primary"
+                  aria-hidden="true"
+                />
+                放到主屏幕
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                添加到主屏幕，方便下次打开记账。
+              </p>
+            </div>
+            <BbqCompanion mood="wave" className="block size-16 shrink-0" />
+          </div>
           <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none">
             <BbqInstallButton />
           </div>

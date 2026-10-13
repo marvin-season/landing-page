@@ -1,6 +1,6 @@
 "use client";
 
-import { House, NotebookPen, Settings, UtensilsCrossed } from "lucide-react";
+import { Bookmark, BookOpen, NotebookPen, Settings } from "lucide-react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
@@ -14,18 +14,18 @@ import {
 } from "./bbq-paths";
 
 const items = [
-  { label: "首页", href: bbqHomePath(), segment: null, icon: House },
+  { label: "账本", href: bbqHomePath(), segment: null, icon: BookOpen },
   {
-    label: "记账",
+    label: "记一笔",
     href: bbqNewOrderPath(),
     segment: "orders",
     icon: NotebookPen,
   },
   {
-    label: "菜单",
+    label: "常用",
     href: bbqMenuPath(),
     segment: "menu",
-    icon: UtensilsCrossed,
+    icon: Bookmark,
   },
   {
     label: "设置",
@@ -36,10 +36,10 @@ const items = [
 ];
 
 const mobileNavLinkCls = cls`
-  flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs
+  flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-xs
   font-medium text-muted-foreground transition-colors hover:bg-muted/70
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset
-  focus-visible:ring-primary/50 aria-[current=page]:bg-primary/10
+  focus-visible:ring-primary/50 aria-[current=page]:bg-primary/5
   aria-[current=page]:text-primary aria-disabled:opacity-40 touch-manipulation
 `;
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { Alert, AlertDescription } from "@landing-page/design-system";
-import { Store } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,7 +12,7 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
-import { pageShellCls } from "./bbq-layout";
+import { pageShellCls, pageTitleCls } from "./bbq-layout";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
@@ -139,15 +138,8 @@ export function OrdersHome() {
     <div className={`${pageShellCls} overflow-hidden flex-1`}>
       <header className="flex shrink-0 flex-col gap-1.5">
         <div>
-          <div className="flex items-center gap-1.5">
-            <Store className="size-4 text-primary" aria-hidden="true" />
-            <h1 className="text-lg font-semibold text-pretty text-foreground pr-24">
-              天天记账
-            </h1>
-          </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            记录日常支出与订单，查看金额和饮食热量趋势
-          </p>
+          <h1 className={pageTitleCls}>天天记账</h1>
+          <p className="mt-1 text-xs text-muted-foreground">我的日常账本</p>
         </div>
         {storageFailed ? null : (
           <OrdersHomeTabs

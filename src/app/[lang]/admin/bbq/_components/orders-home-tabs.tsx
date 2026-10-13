@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartLine, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { businessDayLabel } from "@/lib/bbq/business-day";
 import { cls } from "./bbq-layout";
 import { BusinessDayCalendar } from "./business-day-calendar";
@@ -8,11 +8,11 @@ import { BusinessDayCalendar } from "./business-day-calendar";
 export type HomeView = "orders" | "statistics";
 
 const homeViewTabCls = cls`
-  inline-flex items-center justify-center rounded-md font-medium transition-colors
-  min-h-10 gap-1.5 px-2 text-xs [&>svg]:size-3.5 flex-1 focus-visible:outline-none
+  inline-flex items-center justify-center rounded-none font-medium transition-colors
+  min-h-11 gap-1.5 px-1 text-sm [&>svg]:size-3.5 focus-visible:outline-none
   focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50
-  min-w-0 basis-0 duration-150 active:bg-primary/10 touch-manipulation
-  motion-reduce:transition-none
+  min-w-0 duration-150 active:bg-primary/10 touch-manipulation
+  motion-reduce:transition-none border-b-2
 `;
 
 export function OrdersHomeTabs({
@@ -27,9 +27,9 @@ export function OrdersHomeTabs({
   return (
     <div className="flex flex-col items-stretch gap-1.5">
       <div
-        className="flex rounded-lg bg-muted p-0.5 w-full"
+        className="flex w-full gap-6 border-b"
         role="group"
-        aria-label="首页视图"
+        aria-label="账本视图"
       >
         <BusinessDayCalendar day={day}>
           <button
@@ -39,8 +39,8 @@ export function OrdersHomeTabs({
             aria-label={`${day ? businessDayLabel(day) : "当前时段"}，${homeView === "orders" ? "打开日历" : "查看记录"}`}
             className={`${homeViewTabCls} ${
               homeView === "orders"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "text-foreground border-primary"
+                : "text-muted-foreground hover:text-foreground border-transparent"
             }`}
             onClick={(event) => {
               if (homeView !== "orders") {
@@ -50,7 +50,7 @@ export function OrdersHomeTabs({
               }
             }}
           >
-            <span className="shrink-0">当前时段</span>
+            <span className="shrink-0">明细</span>
             {day ? (
               <span
                 className="truncate text-[11px] font-normal tabular-nums text-muted-foreground"
@@ -68,18 +68,17 @@ export function OrdersHomeTabs({
           aria-pressed={homeView === "statistics"}
           className={`${homeViewTabCls} ${
             homeView === "statistics"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "text-foreground border-primary"
+              : "text-muted-foreground hover:text-foreground border-transparent"
           }`}
           onClick={() => onViewChange("statistics")}
         >
-          <ChartLine className="size-4" aria-hidden="true" />
-          统计趋势
+          统计
         </button>
       </div>
       {homeView === "statistics" ? (
         <p className="text-xs text-muted-foreground">
-          汇总本机保存的全部历史记录
+          全部历史记录 · 仅保存在这台设备
         </p>
       ) : null}
     </div>

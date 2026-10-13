@@ -1,6 +1,5 @@
 "use client";
 
-import { ChartLine, ReceiptText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import { businessDayLabel } from "@/lib/bbq/business-day";
@@ -10,10 +9,18 @@ import {
   type BusinessDayStatistics,
   getTrendRange,
 } from "@/lib/bbq/statistics";
+import { BbqCompanion } from "./bbq-companion";
 import { cls } from "./bbq-layout";
 import { bbqHomePath } from "./bbq-paths";
 
 type ChartMode = "revenue" | "orders" | "calories";
+
+// 配图跟随当前指标：小蜜蜂积累、思考回顾、运动热量。
+const chartCompanionMoods = {
+  revenue: "busy",
+  orders: "ponder",
+  calories: "exercise",
+} as const;
 
 const chartModeCls = cls`
   inline-flex items-center justify-center rounded-md px-3 text-xs font-medium
@@ -36,14 +43,11 @@ export function OrdersStatistics({
 
   if (statistics.length === 0) {
     return (
-      <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border bg-card px-6 text-center shadow-sm">
-        <ReceiptText
-          className="size-8 text-muted-foreground/60"
-          aria-hidden="true"
-        />
-        <p className="mt-3 text-sm font-medium text-foreground">暂无统计数据</p>
+      <div className="flex min-h-80 flex-col items-center justify-center rounded-xl bg-card px-6 text-center">
+        <BbqCompanion mood="ponder" className="block size-28 shrink-0" />
+        <p className="mt-3 text-sm font-medium text-foreground">从第一笔开始</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          创建记录后，这里会按时段汇总记录、金额与热量
+          记下日常，就能在这里回看金额和热量的变化。
         </p>
       </div>
     );
@@ -74,11 +78,8 @@ export function OrdersStatistics({
   const averagePerPeriod = Math.round(settledTotal / statistics.length);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full">
-      <dl className="grid shrink-0 gap-px overflow-hidden rounded-xl border bg-border grid-cols-6 [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3">
-        <StatisticMetric label="累计时段" value={`${statistics.length} 个`} />
-        <StatisticMetric label="全部记录" value={`${totalOrders} 条`} />
-        <StatisticMetric label="已完成记录" value={`${settledOrders} 条`} />
+    <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full pb-3">
+      <dl className="grid shrink-0 gap-3 overflow-hidden rounded-xl bg-card grid-cols-2 p-4">
         <StatisticMetric
           label="累计已完成金额"
           value={formatYuan(settledTotal)}
@@ -88,17 +89,27 @@ export function OrdersStatistics({
           value={formatCalories(settledCalories)}
         />
       </dl>
-      <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm min-w-0 flex-none">
+      <p className="text-xs text-muted-foreground px-1">
+        {statistics.length} 个时段 · {totalOrders} 笔记录 · 已完成{" "}
+        {settledOrders} 笔
+      </p>
+      <section className="flex min-h-0 flex-col overflow-hidden rounded-xl bg-card min-w-0 flex-none">
         <div className="flex flex-col border-b py-3 shrink-0 gap-2 px-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <ChartLine className="size-4 text-primary" aria-hidden="true" />
-              <h2 className="text-sm font-medium text-foreground">时段趋势</h2>
+          <div className="min-w-0 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h2 className="text-sm font-medium text-foreground">
+                  变化趋势
+                </h2>
+              </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                每时段平均已完成金额 {formatYuan(averagePerPeriod)}
+              </p>
             </div>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              按记账时间排列全部已有时段，平均每时段已完成金额
-              {formatYuan(averagePerPeriod)}
-            </p>
+            <BbqCompanion
+              mood={chartCompanionMoods[chartMode]}
+              className="block size-16 shrink-0"
+            />
           </div>
           <div
             className="flex rounded-lg bg-muted p-0.5 shrink-0 w-full"
@@ -140,10 +151,15 @@ export function OrdersStatistics({
           </div>
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />
-        <p className="px-3 pb-3 text-xs text-muted-foreground">
-          金额与热量仅统计已完成记录；热量按每单位 ×
-          数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
-        </p>
+        <details className="px-3 pb-3 text-xs text-muted-foreground">
+          <summary className="cursor-pointer py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+            金额和热量怎么算？
+          </summary>
+          <p className="pt-1 leading-relaxed">
+            金额与热量仅统计已完成记录；热量按每单位 ×
+            数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
+          </p>
+        </details>
         <section className="border-t" aria-label="时段明细">
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
             <h3 className="text-sm font-medium text-foreground">时段明细</h3>
@@ -226,7 +242,7 @@ function TrendChart({
   if (noCalorieData) {
     return (
       <div className="flex min-h-48 shrink-0 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-        暂无热量数据，请在菜单中填写热量，并完成包含该项目的新记录。
+        暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。
       </div>
     );
   }
@@ -380,9 +396,9 @@ function TrendChart({
 
 function StatisticMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card px-3 py-2 min-w-0">
+    <div className="min-w-0">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground break-all">
+      <dd className="mt-1 text-xl font-semibold tabular-nums text-foreground break-all tracking-tight">
         {value}
       </dd>
     </div>
