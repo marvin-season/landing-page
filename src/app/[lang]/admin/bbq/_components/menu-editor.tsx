@@ -8,6 +8,7 @@ import {
   Switch,
 } from "@landing-page/design-system";
 import {
+  ChevronDown,
   LoaderCircle,
   Pencil,
   Plus,
@@ -109,8 +110,8 @@ export function MenuEditor() {
   const listedCount = dishes.filter((dish) => dish.listed).length;
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-3">
-      <header className="flex gap-2 flex-row items-start justify-between">
+    <div className="mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden">
+      <header className="flex gap-2 flex-row items-start justify-between shrink-0">
         <div>
           <div className="flex items-center gap-1.5">
             <UtensilsCrossed
@@ -122,18 +123,10 @@ export function MenuEditor() {
             </h1>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            管理常用消费或餐饮项目，设置单价、单位与热量
+            全部 {dishes.length} 项 · 已启用 {listedCount} 项
           </p>
         </div>
       </header>
-      <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border bg-border">
-        <MenuMetric label="全部项目" value={`${dishes.length} 项`} />
-        <MenuMetric label="已启用" value={`${listedCount} 项`} />
-        <MenuMetric
-          label="未启用"
-          value={`${dishes.length - listedCount} 项`}
-        />
-      </dl>
       {notice && !message ? (
         <p
           className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary"
@@ -149,19 +142,21 @@ export function MenuEditor() {
           </AlertDescription>
         </Alert>
       ) : null}
-      {menu ? (
-        <DishTable
-          categoryId={menu.id}
-          dishes={dishes}
-          onSaved={handleSaved}
-          onError={setMessage}
-        />
-      ) : null}
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+        {menu ? (
+          <DishList
+            categoryId={menu.id}
+            dishes={dishes}
+            onSaved={handleSaved}
+            onError={setMessage}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
 
-function DishTable({
+function DishList({
   categoryId,
   dishes,
   onSaved,
@@ -173,23 +168,32 @@ function DishTable({
   onError: (message: string) => void;
 }) {
   const [search, setSearch] = useState("");
+  const [adding, setAdding] = useState(dishes.length === 0);
   const query = search.trim().toLocaleLowerCase();
   const matches = dishes.filter((dish) =>
     dish.name.toLocaleLowerCase().includes(query),
   );
   return (
     <div className="flex flex-col gap-3">
-      <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-        <div className="border-b bg-muted/30 px-3 py-2 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <div className="flex items-center gap-2">
-            <Plus className="size-4 text-primary" aria-hidden="true" />
-            <h2 className="text-sm font-medium text-foreground">新增项目</h2>
-          </div>
-          <p className="text-muted-foreground mt-0 text-[11px]">
-            热量按每单位填写：摄入填正数，跑步等消耗填负数，无需统计可留空
+      <details
+        open={adding}
+        onToggle={(event) => setAdding(event.currentTarget.open)}
+        className="overflow-hidden rounded-xl border bg-card group"
+      >
+        <summary className="px-3 py-2 flex items-center gap-2 min-h-11 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50">
+          <Plus className="size-4 text-primary" aria-hidden="true" />
+          <span className="text-sm font-medium text-foreground flex-1">
+            新增项目
+          </span>
+          <ChevronDown
+            className="size-4 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none"
+            aria-hidden="true"
+          />
+        </summary>
+        <div className="p-2.5 border-t">
+          <p className="text-muted-foreground text-[11px] mb-2">
+            热量按每单位填写：摄入填正数，消耗填负数，可留空
           </p>
-        </div>
-        <div className="p-2.5">
           <DishRow
             key="new"
             categoryId={categoryId}
@@ -197,26 +201,18 @@ function DishTable({
             onError={onError}
           />
         </div>
-      </section>
+      </details>
       <section className="flex flex-col gap-2">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-medium text-foreground">已有项目</h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              启用项目可在记账页面直接选择
-            </p>
-          </div>
-          <span className="text-xs tabular-nums text-muted-foreground">
-            {dishes.length} 项
-          </span>
+        <div className="sticky top-0 z-10 bg-background py-2 flex flex-col gap-2">
+          <h2 className="text-sm font-medium text-foreground">已有项目</h2>
+          {dishes.length > 0 ? (
+            <BbqSearch
+              value={search}
+              onChange={setSearch}
+              label="搜索已有项目…"
+            />
+          ) : null}
         </div>
-        {dishes.length > 0 ? (
-          <BbqSearch
-            value={search}
-            onChange={setSearch}
-            label="搜索已有项目…"
-          />
-        ) : null}
         {dishes.length > 0 && matches.length === 0 ? (
           <p
             className="py-6 text-center text-sm text-muted-foreground"
@@ -595,17 +591,6 @@ function DishRow({
         </p>
       ) : null}
     </fieldset>
-  );
-}
-
-function MenuMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-card py-2 flex flex-wrap items-center justify-between gap-x-1 px-2">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="font-semibold tabular-nums text-foreground mt-0 text-sm">
-        {value}
-      </dd>
-    </div>
   );
 }
 

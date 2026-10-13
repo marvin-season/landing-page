@@ -82,8 +82,8 @@ export function BbqSettings() {
   }
 
   return (
-    <div className={pageShellCls}>
-      <header>
+    <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
+      <header className="shrink-0">
         <div className="flex items-center gap-1.5">
           <Settings className="size-4 text-primary" aria-hidden="true" />
           <h1 className="text-lg font-semibold text-foreground pr-24">设置</h1>
@@ -109,90 +109,92 @@ export function BbqSettings() {
           {notice}
         </p>
       ) : null}
-      <section className="overflow-hidden rounded-xl border bg-card">
-        <div className="border-b px-3 py-3">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3">
+        <section className="overflow-hidden rounded-xl border bg-card shrink-0">
+          <div className="border-b px-3 py-3">
+            <h2 className="flex items-center gap-2 text-sm font-medium">
+              <DatabaseBackup
+                className="size-4 text-primary"
+                aria-hidden="true"
+              />
+              数据备份
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              导出全部记录与菜单，默认不包含照片。
+            </p>
+          </div>
+          <fieldset
+            disabled={backupTask !== null}
+            aria-busy={backupTask !== null}
+            className="min-w-0 divide-y"
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              className={settingsActionCls}
+              onClick={() => void exportBackup()}
+            >
+              <Download className="size-4" aria-hidden="true" />
+              导出备份
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className={settingsActionCls}
+              onClick={() => void exportBackup(true)}
+            >
+              <Images className="size-4" aria-hidden="true" />
+              导出备份（包含照片）
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className={settingsActionCls}
+              onClick={() => importInputRef.current?.click()}
+            >
+              <Upload className="size-4" aria-hidden="true" />
+              导入完整备份
+            </Button>
+          </fieldset>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json,application/json"
+            className="sr-only"
+            disabled={backupTask !== null}
+            onChange={(event) => {
+              const input = event.currentTarget;
+              const file = input.files?.[0];
+              input.value = "";
+              void importFile(file);
+            }}
+          />
+          {backupTask ? (
+            <p
+              className="flex items-center gap-2 border-t px-3 py-2 text-xs text-muted-foreground"
+              role="status"
+            >
+              <LoaderCircle
+                className="size-4 animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+              {backupTask === "import" ? "导入中…" : "导出中…"}
+            </p>
+          ) : null}
+        </section>
+        <section className="rounded-xl border bg-card p-3 shrink-0">
           <h2 className="flex items-center gap-2 text-sm font-medium">
-            <DatabaseBackup
-              className="size-4 text-primary"
-              aria-hidden="true"
-            />
-            数据备份
+            <Smartphone className="size-4 text-primary" aria-hidden="true" />
+            应用安装
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            导出全部记录与菜单，默认不包含照片。
+            添加到主屏幕，方便下次打开记账。
           </p>
-        </div>
-        <fieldset
-          disabled={backupTask !== null}
-          aria-busy={backupTask !== null}
-          className="min-w-0 divide-y"
-        >
-          <Button
-            type="button"
-            variant="ghost"
-            className={settingsActionCls}
-            onClick={() => void exportBackup()}
-          >
-            <Download className="size-4" aria-hidden="true" />
-            导出备份
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className={settingsActionCls}
-            onClick={() => void exportBackup(true)}
-          >
-            <Images className="size-4" aria-hidden="true" />
-            导出备份（包含照片）
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className={settingsActionCls}
-            onClick={() => importInputRef.current?.click()}
-          >
-            <Upload className="size-4" aria-hidden="true" />
-            导入完整备份
-          </Button>
-        </fieldset>
-        <input
-          ref={importInputRef}
-          type="file"
-          accept=".json,application/json"
-          className="sr-only"
-          disabled={backupTask !== null}
-          onChange={(event) => {
-            const input = event.currentTarget;
-            const file = input.files?.[0];
-            input.value = "";
-            void importFile(file);
-          }}
-        />
-        {backupTask ? (
-          <p
-            className="flex items-center gap-2 border-t px-3 py-2 text-xs text-muted-foreground"
-            role="status"
-          >
-            <LoaderCircle
-              className="size-4 animate-spin motion-reduce:animate-none"
-              aria-hidden="true"
-            />
-            {backupTask === "import" ? "导入中…" : "导出中…"}
-          </p>
-        ) : null}
-      </section>
-      <section className="rounded-xl border bg-card p-3">
-        <h2 className="flex items-center gap-2 text-sm font-medium">
-          <Smartphone className="size-4 text-primary" aria-hidden="true" />
-          应用安装
-        </h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          添加到主屏幕，方便下次打开记账。
-        </p>
-        <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none">
-          <BbqInstallButton />
-        </div>
-      </section>
+          <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none">
+            <BbqInstallButton />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

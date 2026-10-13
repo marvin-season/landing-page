@@ -398,28 +398,27 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </section>
           <section className={editorMenuPaneCls}>
-            <div className="flex shrink-0 items-center justify-between gap-2">
-              <div>
-                <h2 className="text-sm font-medium text-foreground">
-                  选择项目
-                </h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  点击项目即可加入记录
-                </p>
+            <div className="sticky top-0 z-10 bg-card pb-2">
+              <div className="flex shrink-0 items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-sm font-medium text-foreground">
+                    选择项目
+                  </h2>
+                </div>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {availableDishes.length} 项
+                </span>
               </div>
-              <span className="text-xs tabular-nums text-muted-foreground">
-                {availableDishes.length} 项
-              </span>
+              {availableDishes.length > 0 ? (
+                <div className="mt-2 shrink-0">
+                  <BbqSearch
+                    value={search}
+                    onChange={setSearch}
+                    label="搜索项目名称…"
+                  />
+                </div>
+              ) : null}
             </div>
-            {availableDishes.length > 0 ? (
-              <div className="mt-3 shrink-0">
-                <BbqSearch
-                  value={search}
-                  onChange={setSearch}
-                  label="搜索项目名称…"
-                />
-              </div>
-            ) : null}
             {availableDishes.length === 0 ? (
               <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
                 <UtensilsCrossed
@@ -444,7 +443,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 没有匹配的项目，请换个关键词
               </p>
             ) : (
-              <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] auto-rows-max content-start p-1 overscroll-y-contain">
+              <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1">
                 {filteredDishes.map((dish) => (
                   <Button
                     key={dish.id}
@@ -482,14 +481,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           <section className={editorOrderPaneCls}>
             <div className={editorOrderBodyCls}>
               <section>
-                <div className="flex items-end justify-between gap-3">
+                <div className="flex items-end justify-between gap-3 sticky top-0 z-10 bg-card pb-2">
                   <div>
                     <h2 className="text-sm font-medium text-foreground">
                       记录明细
                     </h2>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      调整数量，减至零会移除项目
-                    </p>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground">
                     {itemCount} 件
@@ -673,24 +669,32 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </section>
         </div>
         <div className={totalBarCls}>
-          <div className="mx-auto w-full max-w-xl">
-            {message ? (
-              <Alert
-                className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
-                role="alert"
-              >
-                <AlertDescription className="text-destructive">
-                  {message}
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            <div className="mb-2 flex items-center justify-between gap-2 border-b pb-1">
+          {message ? (
+            <Alert
+              className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
+              role="alert"
+            >
+              <AlertDescription className="text-destructive">
+                {message}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <div className="min-w-0">
               <p className="text-xs text-muted-foreground">
                 {lines.length === 0
                   ? "选择项目后保存"
                   : `${lines.length} 项 · ${itemCount} 件`}
               </p>
-              <label className="inline-flex min-h-11 shrink-0 items-center gap-2">
+              <p className="text-xl font-semibold tabular-nums tracking-tight">
+                {formatYuan(total)}
+              </p>
+              <p className="text-xs tabular-nums text-muted-foreground">
+                热量 {formatCalories(summarizeCalories(lines))}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1 flex-col">
+              <label className="inline-flex min-h-9 shrink-0 items-center gap-2">
                 <span className="text-right">
                   <span className="block text-xs font-medium leading-none text-foreground">
                     {done ? "已完成" : "进行中"}
@@ -703,21 +707,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   onCheckedChange={setDone}
                 />
               </label>
-            </div>
-          </div>
-          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-            <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">
-                {itemCount} 件 · 记录总额
-              </p>
-              <p className="text-2xl font-semibold tabular-nums tracking-tight">
-                {formatYuan(total)}
-              </p>
-              <p className="text-xs tabular-nums text-muted-foreground">
-                热量 {formatCalories(summarizeCalories(lines))}
-              </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
               <Button
                 type="button"
                 className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70`}
