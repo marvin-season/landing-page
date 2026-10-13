@@ -27,11 +27,6 @@ function orderTotalCls(status: Order["status"]): string {
   return `text-base font-semibold tabular-nums ${tone}`;
 }
 
-const orderWorkspaceCls = cls`
-  grid min-h-0 flex-1 overflow-hidden rounded-xl border-0 bg-transparent shadow-none gap-3
-  grid-rows-[minmax(0,1fr)]
-`;
-
 const orderTabCls = cls`
   inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 text-xs
   font-medium transition-colors min-h-11 focus-visible:outline-none focus-visible:ring-2
@@ -81,122 +76,120 @@ export function OrdersList({
   }
 
   return (
-    <div className={orderWorkspaceCls}>
-      <section
-        className="min-h-0 min-w-0 overflow-hidden rounded-xl border shadow-sm bg-muted/40 flex flex-col"
-        aria-label="记录列表"
-      >
-        <div className="flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 shrink-0">
-          <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
-            <h2 className="text-sm text-foreground font-semibold">记录列表</h2>
-            <p className="text-[11px] text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <span>
-                已完成{" "}
-                <span className="font-medium tabular-nums text-foreground">
-                  {loading ? "—" : formatYuan(settledTotal)}
-                </span>
+    <section
+      className="min-h-0 min-w-0 overflow-hidden rounded-xl border shadow-sm bg-muted/40 flex flex-col flex-1"
+      aria-label="记录列表"
+    >
+      <div className="flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 shrink-0">
+        <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
+          <h2 className="text-sm text-foreground font-semibold">记录列表</h2>
+          <p className="text-[11px] text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span>
+              已完成{" "}
+              <span className="font-medium tabular-nums text-foreground">
+                {loading ? "—" : formatYuan(settledTotal)}
               </span>
-              <span>
-                热量{" "}
-                <span className="tabular-nums">
-                  {loading ? "—" : formatCalories(settledCalories)}
-                </span>
+            </span>
+            <span>
+              热量{" "}
+              <span className="tabular-nums">
+                {loading ? "—" : formatCalories(settledCalories)}
               </span>
-            </p>
-          </div>
-          <div
-            className="flex rounded-lg bg-muted p-0.5"
-            role="group"
-            aria-label="记录状态"
-          >
-            <button
-              type="button"
-              aria-pressed={statusFilter === "open"}
-              className={`${orderTabCls} ${
-                statusFilter === "open"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => changeFilter("open")}
-            >
-              <Clock3 className="size-4" aria-hidden="true" />
-              进行中
-            </button>
-            <button
-              type="button"
-              aria-pressed={statusFilter === "done"}
-              className={`${orderTabCls} ${
-                statusFilter === "done"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => changeFilter("done")}
-            >
-              <CheckCircle2 className="size-4" aria-hidden="true" />
-              已完成
-            </button>
-          </div>
+            </span>
+          </p>
         </div>
         <div
-          ref={viewportRef}
-          className={`min-h-0 flex flex-1 flex-col [scrollbar-gutter:stable] ${selected ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
+          className="flex rounded-lg bg-muted p-0.5"
+          role="group"
+          aria-label="记录状态"
         >
-          {loading ? (
-            <div
-              className="flex items-center justify-center text-sm text-muted-foreground flex-1 py-6"
-              role="status"
-            >
-              读取记录中…
-            </div>
-          ) : visibleOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
-              <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                {statusFilter === "open" ? (
-                  <Clock3 className="size-5" aria-hidden="true" />
-                ) : (
-                  <CheckCircle2 className="size-5" aria-hidden="true" />
-                )}
-              </span>
-              <p className="mt-3 text-sm font-medium text-foreground">
-                {statusFilter === "open"
-                  ? "当前没有进行中的记录"
-                  : "这一时段还没有已完成记录"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {statusFilter === "open"
-                  ? "新记录会按记账时间显示在最前面"
-                  : "完成记录后会显示在这里"}
-              </p>
-              {statusFilter === "open" && canCreateOrder ? (
-                <Button asChild className="mt-4">
-                  <Link href={bbqNewOrderPath()}>
-                    <Plus className="size-4" aria-hidden="true" />
-                    记账
-                  </Link>
-                </Button>
-              ) : null}
-            </div>
-          ) : (
-            <ul className="divide-y-0 space-y-1.5 p-2 flex-1">
-              {visibleOrders.map((order) => (
-                <OrderListItem
-                  key={order.id}
-                  order={order}
-                  expanded={selected?.id === order.id}
-                  hidden={selected !== null && selected.id !== order.id}
-                  viewportRef={viewportRef}
-                  updatingStatusId={updatingStatusId}
-                  onToggleStatus={onToggleStatus}
-                  onToggle={() =>
-                    onSelect(selectedId === order.id ? null : order.id)
-                  }
-                />
-              ))}
-            </ul>
-          )}
+          <button
+            type="button"
+            aria-pressed={statusFilter === "open"}
+            className={`${orderTabCls} ${
+              statusFilter === "open"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => changeFilter("open")}
+          >
+            <Clock3 className="size-4" aria-hidden="true" />
+            进行中
+          </button>
+          <button
+            type="button"
+            aria-pressed={statusFilter === "done"}
+            className={`${orderTabCls} ${
+              statusFilter === "done"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => changeFilter("done")}
+          >
+            <CheckCircle2 className="size-4" aria-hidden="true" />
+            已完成
+          </button>
         </div>
-      </section>
-    </div>
+      </div>
+      <div
+        ref={viewportRef}
+        className={`min-h-0 flex flex-1 flex-col [scrollbar-gutter:stable] ${selected ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
+      >
+        {loading ? (
+          <div
+            className="flex items-center justify-center text-sm text-muted-foreground flex-1 py-6"
+            role="status"
+          >
+            读取记录中…
+          </div>
+        ) : visibleOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
+            <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              {statusFilter === "open" ? (
+                <Clock3 className="size-5" aria-hidden="true" />
+              ) : (
+                <CheckCircle2 className="size-5" aria-hidden="true" />
+              )}
+            </span>
+            <p className="mt-3 text-sm font-medium text-foreground">
+              {statusFilter === "open"
+                ? "当前没有进行中的记录"
+                : "这一时段还没有已完成记录"}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {statusFilter === "open"
+                ? "新记录会按记账时间显示在最前面"
+                : "完成记录后会显示在这里"}
+            </p>
+            {statusFilter === "open" && canCreateOrder ? (
+              <Button asChild className="mt-4">
+                <Link href={bbqNewOrderPath()}>
+                  <Plus className="size-4" aria-hidden="true" />
+                  记账
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+        ) : (
+          <ul className="divide-y-0 space-y-1.5 p-2 flex-1">
+            {visibleOrders.map((order) => (
+              <OrderListItem
+                key={order.id}
+                order={order}
+                expanded={selected?.id === order.id}
+                hidden={selected !== null && selected.id !== order.id}
+                viewportRef={viewportRef}
+                updatingStatusId={updatingStatusId}
+                onToggleStatus={onToggleStatus}
+                onToggle={() =>
+                  onSelect(selectedId === order.id ? null : order.id)
+                }
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }
 

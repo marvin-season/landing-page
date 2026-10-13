@@ -14,11 +14,9 @@ export function cls(
 // BBQ 各页面与底部操作区共用窄屏宽度，PC 直接复用 H5 布局。
 export const pageShellCls = cls`flex flex-col gap-3`;
 
-// 保存栏始终位于 4rem 主导航和底部安全区之上。
+// 保存栏参与布局，由上方内容区承担滚动，不再计算导航和安全区的 fixed 偏移。
 export const totalBarCls = cls`
-  fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-20 border-t
-  bg-background px-3 pt-2 pb-2 mx-auto w-full max-w-xl
-  pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]
+  border-t bg-background px-3 pt-2 pb-2 w-full shrink-0
 `;
 
 export const touchCls = cls`min-h-11`;

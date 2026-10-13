@@ -13,17 +13,10 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
-import { cls, pageShellCls } from "./bbq-layout";
+import { pageShellCls } from "./bbq-layout";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
-
-// 扣除外层上下内边距（移动端 2rem / 大屏 6rem）和底部导航，列表在剩余空间内滚动。
-const homeViewportCls = cls`
-  h-[calc(100dvh-6rem-env(safe-area-inset-bottom))]
-  lg:h-[calc(100dvh-10rem-env(safe-area-inset-bottom))]
-  min-h-0 shrink-0 overflow-hidden
-`;
 
 export function OrdersHome() {
   const searchParams = useSearchParams();
@@ -143,20 +136,18 @@ export function OrdersHome() {
   const statistics = summarizeOrdersByBusinessDay(allOrders ?? []);
 
   return (
-    <div className={`${pageShellCls} ${homeViewportCls}`}>
+    <div className={`${pageShellCls} overflow-hidden flex-1`}>
       <header className="flex shrink-0 flex-col gap-1.5">
-        <div className="flex gap-1.5 flex-col items-stretch">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <Store className="size-4 text-primary" aria-hidden="true" />
-              <h1 className="text-lg font-semibold text-pretty text-foreground pr-24">
-                天天记账
-              </h1>
-            </div>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              记录日常支出与订单，查看金额和饮食热量趋势
-            </p>
+        <div>
+          <div className="flex items-center gap-1.5">
+            <Store className="size-4 text-primary" aria-hidden="true" />
+            <h1 className="text-lg font-semibold text-pretty text-foreground pr-24">
+              天天记账
+            </h1>
           </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            记录日常支出与订单，查看金额和饮食热量趋势
+          </p>
         </div>
         {storageFailed ? null : (
           <OrdersHomeTabs

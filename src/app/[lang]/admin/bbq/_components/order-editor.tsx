@@ -40,6 +40,7 @@ const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const editorWorkspaceCls = cls`
   grid min-h-0 flex-1 overflow-hidden rounded-xl border bg-card shadow-sm
+  grid-rows-[minmax(0,1fr)_auto]
 `;
 
 const editorMenuPaneCls = cls`min-h-0 min-w-0 border-b p-3 flex flex-col`;
@@ -311,7 +312,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div className={`${pageShellCls} ${message ? "pb-60" : "pb-40"}`}>
+    <div className={`${pageShellCls} min-h-0 overflow-hidden flex-1`}>
       <header className="flex shrink-0 flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -340,406 +341,410 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         disabled={saving}
         aria-busy={saving}
       >
-        <section className="border-b px-3 py-2.5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <label
-                htmlFor="order-grouping"
-                className="text-sm font-medium text-foreground"
+        <div className="min-h-0 overflow-y-auto overscroll-y-contain">
+          <section className="border-b px-3 py-2.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <label
+                  htmlFor="order-grouping"
+                  className="text-sm font-medium text-foreground"
+                >
+                  启用分组
+                </label>
+                <Switch
+                  id="order-grouping"
+                  checked={groupingEnabled}
+                  disabled={saving}
+                  aria-label="启用分组（打包或座号）"
+                  onCheckedChange={(enabled) => {
+                    setGroupingEnabled(enabled);
+                    if (!enabled) setSeat(null);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {groupingEnabled
+                    ? seat === null
+                      ? "当前选择打包"
+                      : `当前选择 ${seat} 号座`
+                    : "日常记账"}
+                </p>
+              </div>
+            </div>
+            {groupingEnabled ? (
+              <div className="mt-2 grid grid-cols-5 gap-1.5">
+                <Button
+                  type="button"
+                  variant={seat === null ? "default" : "outline"}
+                  aria-pressed={seat === null}
+                  className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                  onClick={() => setSeat(null)}
+                >
+                  <Package className="size-4" aria-hidden="true" />
+                  打包
+                </Button>
+                {SEATS.map((number) => (
+                  <Button
+                    key={number}
+                    type="button"
+                    variant={seat === number ? "default" : "outline"}
+                    aria-pressed={seat === number}
+                    className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
+                    onClick={() => setSeat(number)}
+                  >
+                    {number}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
+          </section>
+          <section className={editorMenuPaneCls}>
+            <div className="flex shrink-0 items-center justify-between gap-2">
+              <div>
+                <h2 className="text-sm font-medium text-foreground">
+                  选择项目
+                </h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  点击项目即可加入记录
+                </p>
+              </div>
+              <span className="text-xs tabular-nums text-muted-foreground">
+                {availableDishes.length} 项
+              </span>
+            </div>
+            {availableDishes.length > 0 ? (
+              <div className="mt-3 shrink-0">
+                <BbqSearch
+                  value={search}
+                  onChange={setSearch}
+                  label="搜索项目名称…"
+                />
+              </div>
+            ) : null}
+            {availableDishes.length === 0 ? (
+              <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                <UtensilsCrossed
+                  className="size-7 text-muted-foreground/60"
+                  aria-hidden="true"
+                />
+                <p className="mt-2 text-sm font-medium text-foreground">
+                  还没有启用项目
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  先到菜单中新增并启用项目
+                </p>
+                <Button asChild size="sm" variant="outline" className="mt-3">
+                  <Link href={bbqMenuPath()}>管理菜单</Link>
+                </Button>
+              </div>
+            ) : filteredDishes.length === 0 ? (
+              <p
+                className="py-8 text-center text-sm text-muted-foreground"
+                role="status"
               >
-                启用分组
-              </label>
-              <Switch
-                id="order-grouping"
-                checked={groupingEnabled}
-                disabled={saving}
-                aria-label="启用分组（打包或座号）"
-                onCheckedChange={(enabled) => {
-                  setGroupingEnabled(enabled);
-                  if (!enabled) setSeat(null);
-                }}
-              />
-              <p className="text-xs text-muted-foreground">
-                {groupingEnabled
-                  ? seat === null
-                    ? "当前选择打包"
-                    : `当前选择 ${seat} 号座`
-                  : "日常记账"}
+                没有匹配的项目，请换个关键词
               </p>
+            ) : (
+              <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] auto-rows-max content-start p-1 overscroll-y-contain">
+                {filteredDishes.map((dish) => (
+                  <Button
+                    key={dish.id}
+                    type="button"
+                    variant="outline"
+                    className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "border-primary/40 bg-primary/5" : ""}`}
+                    aria-label={`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
+                    onClick={() => addDish(dish)}
+                  >
+                    <span className="min-w-0">
+                      <span className="block break-words">{dish.name}</span>
+                      <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
+                        {formatYuan(dish.priceCents)}/{dish.unit}
+                      </span>
+                      <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
+                        热量{" "}
+                        {formatCalories(
+                          summarizeCalories([{ ...dish, quantity: 1 }]),
+                        )}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 flex-col items-center gap-1">
+                      <Plus className="size-4" aria-hidden="true" />
+                      {selectedQuantities.has(dish.id) ? (
+                        <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
+                          {selectedQuantities.get(dish.id)}
+                        </span>
+                      ) : null}
+                    </span>
+                  </Button>
+                ))}
+              </div>
+            )}
+          </section>
+          <section className={editorOrderPaneCls}>
+            <div className={editorOrderBodyCls}>
+              <section>
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-medium text-foreground">
+                      记录明细
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      调整数量，减至零会移除项目
+                    </p>
+                  </div>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {itemCount} 件
+                  </span>
+                </div>
+                {lines.length === 0 ? (
+                  <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
+                    <ReceiptText
+                      className="size-5 text-muted-foreground/60"
+                      aria-hidden="true"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      还没有添加项目
+                    </p>
+                  </div>
+                ) : (
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {lines.map((line) => (
+                      <li
+                        key={line.key}
+                        className="flex items-center gap-1.5 rounded-lg bg-muted/40 px-2.5 py-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground">
+                            {line.name}
+                          </p>
+                          <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                            {formatYuan(line.priceCents)}/{line.unit}
+                            <span className="mx-1.5" aria-hidden="true">
+                              ·
+                            </span>
+                            {formatYuan(
+                              lineCents(line.priceCents, line.quantity),
+                            )}
+                          </p>
+                          <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                            热量 {formatCalories(summarizeCalories([line]))}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
+                          aria-label={
+                            line.quantity === 1
+                              ? `移除 ${line.name}`
+                              : `减少 ${line.name} 数量`
+                          }
+                          onClick={() => changeQuantity(line.key, -1)}
+                        >
+                          {line.quantity === 1 ? (
+                            <Trash2 className="size-4" aria-hidden="true" />
+                          ) : (
+                            <Minus className="size-4" aria-hidden="true" />
+                          )}
+                        </Button>
+                        <span className="min-w-6 text-center text-sm font-medium tabular-nums">
+                          {line.quantity}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
+                          aria-label={`增加 ${line.name} 数量`}
+                          onClick={() => changeQuantity(line.key, 1)}
+                        >
+                          <Plus className="size-4" aria-hidden="true" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+              <section className="mt-3 border-t pt-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <Camera
+                        className="size-4 text-primary"
+                        aria-hidden="true"
+                      />
+                      <h2 className="text-sm font-medium text-foreground">
+                        拍照留存
+                      </h2>
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      选填，最多 {MAX_ORDER_PHOTOS} 张
+                    </p>
+                  </div>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {photos.length}/{MAX_ORDER_PHOTOS}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <label className={photoActionCls}>
+                    <Camera className="size-4" aria-hidden="true" />
+                    {processingPhotos ? "处理照片中…" : "拍照"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      disabled={
+                        processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                      }
+                      className="sr-only"
+                      onChange={(event) => {
+                        const input = event.currentTarget;
+                        void addPhotos(input.files).finally(() => {
+                          input.value = "";
+                        });
+                      }}
+                    />
+                  </label>
+                  <label className={photoActionCls}>
+                    <ImagePlus className="size-4" aria-hidden="true" />
+                    {processingPhotos ? "处理照片中…" : "从相册选择"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={
+                        processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                      }
+                      className="sr-only"
+                      onChange={(event) => {
+                        const input = event.currentTarget;
+                        void addPhotos(input.files).finally(() => {
+                          input.value = "";
+                        });
+                      }}
+                    />
+                  </label>
+                </div>
+                {photos.length > 0 ? (
+                  <ul className="mt-2 grid grid-cols-3 gap-2">
+                    {photos.map((photo, index) => (
+                      <li
+                        key={photo.id}
+                        className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
+                      >
+                        <Image
+                          src={photo.dataUrl}
+                          alt={`记录留存照片 ${index + 1}`}
+                          fill
+                          sizes="(max-width: 767px) 25vw, 7rem"
+                          unoptimized
+                          className="size-full object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="soft"
+                          size="icon"
+                          className="absolute top-1 right-1 shadow-sm size-11"
+                          aria-label={`删除第 ${index + 1} 张照片`}
+                          onClick={() => removePhoto(photo.id)}
+                        >
+                          <X className="size-3.5" aria-hidden="true" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+              {order ? (
+                <section className="mt-4 border-t pt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    disabled={saving}
+                    onClick={() => void removeOrder()}
+                  >
+                    <Trash2 className="size-4" aria-hidden="true" />
+                    删除这条记录
+                  </Button>
+                </section>
+              ) : null}
+            </div>
+          </section>
+        </div>
+        <div className={totalBarCls}>
+          <div className="mx-auto w-full max-w-xl">
+            {message ? (
+              <Alert
+                className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
+                role="alert"
+              >
+                <AlertDescription className="text-destructive">
+                  {message}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            <div className="mb-2 flex items-center justify-between gap-2 border-b pb-1">
+              <p className="text-xs text-muted-foreground">
+                {lines.length === 0
+                  ? "选择项目后保存"
+                  : `${lines.length} 项 · ${itemCount} 件`}
+              </p>
+              <label className="inline-flex min-h-11 shrink-0 items-center gap-2">
+                <span className="text-right">
+                  <span className="block text-xs font-medium leading-none text-foreground">
+                    {done ? "已完成" : "进行中"}
+                  </span>
+                </span>
+                <Switch
+                  checked={done}
+                  disabled={saving}
+                  aria-label="切换记录状态"
+                  onCheckedChange={setDone}
+                />
+              </label>
             </div>
           </div>
-          {groupingEnabled ? (
-            <div className="mt-2 grid grid-cols-5 gap-1.5">
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">
+                {itemCount} 件 · 记录总额
+              </p>
+              <p className="text-2xl font-semibold tabular-nums tracking-tight">
+                {formatYuan(total)}
+              </p>
+              <p className="text-xs tabular-nums text-muted-foreground">
+                热量 {formatCalories(summarizeCalories(lines))}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
               <Button
                 type="button"
-                variant={seat === null ? "default" : "outline"}
-                aria-pressed={seat === null}
-                className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                onClick={() => setSeat(null)}
+                className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70`}
+                disabled={saving || processingPhotos}
+                onClick={() => void save()}
               >
-                <Package className="size-4" aria-hidden="true" />
-                打包
-              </Button>
-              {SEATS.map((number) => (
-                <Button
-                  key={number}
-                  type="button"
-                  variant={seat === number ? "default" : "outline"}
-                  aria-pressed={seat === number}
-                  className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                  onClick={() => setSeat(number)}
-                >
-                  {number}
-                </Button>
-              ))}
-            </div>
-          ) : null}
-        </section>
-        <section className={editorMenuPaneCls}>
-          <div className="flex shrink-0 items-center justify-between gap-2">
-            <div>
-              <h2 className="text-sm font-medium text-foreground">选择项目</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                点击项目即可加入记录
-              </p>
-            </div>
-            <span className="text-xs tabular-nums text-muted-foreground">
-              {availableDishes.length} 项
-            </span>
-          </div>
-          {availableDishes.length > 0 ? (
-            <div className="mt-3 shrink-0">
-              <BbqSearch
-                value={search}
-                onChange={setSearch}
-                label="搜索项目名称…"
-              />
-            </div>
-          ) : null}
-          {availableDishes.length === 0 ? (
-            <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
-              <UtensilsCrossed
-                className="size-7 text-muted-foreground/60"
-                aria-hidden="true"
-              />
-              <p className="mt-2 text-sm font-medium text-foreground">
-                还没有启用项目
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                先到菜单中新增并启用项目
-              </p>
-              <Button asChild size="sm" variant="outline" className="mt-3">
-                <Link href={bbqMenuPath()}>管理菜单</Link>
-              </Button>
-            </div>
-          ) : filteredDishes.length === 0 ? (
-            <p
-              className="py-8 text-center text-sm text-muted-foreground"
-              role="status"
-            >
-              没有匹配的项目，请换个关键词
-            </p>
-          ) : (
-            <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 overflow-y-auto max-h-[40dvh] auto-rows-max content-start p-1 overscroll-y-contain">
-              {filteredDishes.map((dish) => (
-                <Button
-                  key={dish.id}
-                  type="button"
-                  variant="outline"
-                  className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "border-primary/40 bg-primary/5" : ""}`}
-                  aria-label={`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
-                  onClick={() => addDish(dish)}
-                >
-                  <span className="min-w-0">
-                    <span className="block break-words">{dish.name}</span>
-                    <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                      {formatYuan(dish.priceCents)}/{dish.unit}
-                    </span>
-                    <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                      热量{" "}
-                      {formatCalories(
-                        summarizeCalories([{ ...dish, quantity: 1 }]),
-                      )}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 flex-col items-center gap-1">
-                    <Plus className="size-4" aria-hidden="true" />
-                    {selectedQuantities.has(dish.id) ? (
-                      <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
-                        {selectedQuantities.get(dish.id)}
-                      </span>
-                    ) : null}
-                  </span>
-                </Button>
-              ))}
-            </div>
-          )}
-        </section>
-        <section className={editorOrderPaneCls}>
-          <div className={editorOrderBodyCls}>
-            <section>
-              <div className="flex items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-medium text-foreground">
-                    记录明细
-                  </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    调整数量，减至零会移除项目
-                  </p>
-                </div>
-                <span className="text-xs tabular-nums text-muted-foreground">
-                  {itemCount} 件
-                </span>
-              </div>
-              {lines.length === 0 ? (
-                <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
-                  <ReceiptText
-                    className="size-5 text-muted-foreground/60"
+                {saving ? (
+                  <LoaderCircle
+                    className="size-4 animate-spin motion-reduce:animate-none"
                     aria-hidden="true"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    还没有添加项目
-                  </p>
-                </div>
-              ) : (
-                <ul className="mt-2 flex flex-col gap-1.5">
-                  {lines.map((line) => (
-                    <li
-                      key={line.key}
-                      className="flex items-center gap-1.5 rounded-lg bg-muted/40 px-2.5 py-2"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">
-                          {line.name}
-                        </p>
-                        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                          {formatYuan(line.priceCents)}/{line.unit}
-                          <span className="mx-1.5" aria-hidden="true">
-                            ·
-                          </span>
-                          {formatYuan(
-                            lineCents(line.priceCents, line.quantity),
-                          )}
-                        </p>
-                        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                          热量 {formatCalories(summarizeCalories([line]))}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
-                        aria-label={
-                          line.quantity === 1
-                            ? `移除 ${line.name}`
-                            : `减少 ${line.name} 数量`
-                        }
-                        onClick={() => changeQuantity(line.key, -1)}
-                      >
-                        {line.quantity === 1 ? (
-                          <Trash2 className="size-4" aria-hidden="true" />
-                        ) : (
-                          <Minus className="size-4" aria-hidden="true" />
-                        )}
-                      </Button>
-                      <span className="min-w-6 text-center text-sm font-medium tabular-nums">
-                        {line.quantity}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
-                        aria-label={`增加 ${line.name} 数量`}
-                        onClick={() => changeQuantity(line.key, 1)}
-                      >
-                        <Plus className="size-4" aria-hidden="true" />
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-            <section className="mt-3 border-t pt-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <Camera
-                      className="size-4 text-primary"
-                      aria-hidden="true"
-                    />
-                    <h2 className="text-sm font-medium text-foreground">
-                      拍照留存
-                    </h2>
-                  </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    选填，最多 {MAX_ORDER_PHOTOS} 张
-                  </p>
-                </div>
-                <span className="text-xs tabular-nums text-muted-foreground">
-                  {photos.length}/{MAX_ORDER_PHOTOS}
-                </span>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <label className={photoActionCls}>
-                  <Camera className="size-4" aria-hidden="true" />
-                  {processingPhotos ? "处理照片中…" : "拍照"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    disabled={
-                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
-                    }
-                    className="sr-only"
-                    onChange={(event) => {
-                      const input = event.currentTarget;
-                      void addPhotos(input.files).finally(() => {
-                        input.value = "";
-                      });
-                    }}
-                  />
-                </label>
-                <label className={photoActionCls}>
-                  <ImagePlus className="size-4" aria-hidden="true" />
-                  {processingPhotos ? "处理照片中…" : "从相册选择"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    disabled={
-                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
-                    }
-                    className="sr-only"
-                    onChange={(event) => {
-                      const input = event.currentTarget;
-                      void addPhotos(input.files).finally(() => {
-                        input.value = "";
-                      });
-                    }}
-                  />
-                </label>
-              </div>
-              {photos.length > 0 ? (
-                <ul className="mt-2 grid grid-cols-3 gap-2">
-                  {photos.map((photo, index) => (
-                    <li
-                      key={photo.id}
-                      className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
-                    >
-                      <Image
-                        src={photo.dataUrl}
-                        alt={`记录留存照片 ${index + 1}`}
-                        fill
-                        sizes="(max-width: 767px) 25vw, 7rem"
-                        unoptimized
-                        className="size-full object-cover"
-                      />
-                      <Button
-                        type="button"
-                        variant="soft"
-                        size="icon"
-                        className="absolute top-1 right-1 shadow-sm size-11"
-                        aria-label={`删除第 ${index + 1} 张照片`}
-                        onClick={() => removePhoto(photo.id)}
-                      >
-                        <X className="size-3.5" aria-hidden="true" />
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </section>
-            {order ? (
-              <section className="mt-4 border-t pt-3">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  disabled={saving}
-                  onClick={() => void removeOrder()}
-                >
-                  <Trash2 className="size-4" aria-hidden="true" />
-                  删除这条记录
-                </Button>
-              </section>
-            ) : null}
-          </div>
-          <div className={totalBarCls}>
-            <div className="mx-auto w-full max-w-xl">
-              {message ? (
-                <Alert
-                  className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
-                  role="alert"
-                >
-                  <AlertDescription className="text-destructive">
-                    {message}
-                  </AlertDescription>
-                </Alert>
-              ) : null}
-              <div className="mb-2 flex items-center justify-between gap-2 border-b pb-1">
-                <p className="text-xs text-muted-foreground">
-                  {lines.length === 0
-                    ? "选择项目后保存"
-                    : `${lines.length} 项 · ${itemCount} 件`}
-                </p>
-                <label className="inline-flex min-h-11 shrink-0 items-center gap-2">
-                  <span className="text-right">
-                    <span className="block text-xs font-medium leading-none text-foreground">
-                      {done ? "已完成" : "进行中"}
-                    </span>
-                  </span>
-                  <Switch
-                    checked={done}
-                    disabled={saving}
-                    aria-label="切换记录状态"
-                    onCheckedChange={setDone}
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">
-                  {itemCount} 件 · 记录总额
-                </p>
-                <p className="text-2xl font-semibold tabular-nums tracking-tight">
-                  {formatYuan(total)}
-                </p>
-                <p className="text-xs tabular-nums text-muted-foreground">
-                  热量 {formatCalories(summarizeCalories(lines))}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <Button
-                  type="button"
-                  className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70`}
-                  disabled={saving || processingPhotos}
-                  onClick={() => void save()}
-                >
-                  {saving ? (
-                    <LoaderCircle
-                      className="size-4 animate-spin motion-reduce:animate-none"
-                      aria-hidden="true"
-                    />
-                  ) : done ? (
-                    <CheckCircle2 className="size-4" aria-hidden="true" />
-                  ) : (
-                    <Save className="size-4" aria-hidden="true" />
-                  )}
-                  {saving
-                    ? "保存中…"
-                    : order
-                      ? "保存修改"
-                      : groupingEnabled
-                        ? "保存订单"
-                        : "保存记录"}
-                </Button>
-              </div>
+                ) : done ? (
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                ) : (
+                  <Save className="size-4" aria-hidden="true" />
+                )}
+                {saving
+                  ? "保存中…"
+                  : order
+                    ? "保存修改"
+                    : groupingEnabled
+                      ? "保存订单"
+                      : "保存记录"}
+              </Button>
             </div>
           </div>
-        </section>
+        </div>
       </fieldset>
     </div>
   );

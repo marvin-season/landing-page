@@ -35,12 +35,6 @@ const items = [
   },
 ];
 
-const mobileNavCls = cls`
-  fixed inset-x-0 bottom-0 z-30 h-[calc(4rem+env(safe-area-inset-bottom))] border-t
-  bg-background pb-[env(safe-area-inset-bottom)] mx-auto w-full max-w-xl
-  pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]
-`;
-
 const mobileNavLinkCls = cls`
   flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs
   font-medium text-muted-foreground transition-colors hover:bg-muted/70
@@ -65,7 +59,10 @@ export function BbqMobileNav() {
   }, []);
 
   return (
-    <nav aria-label="天天记账主导航" className={mobileNavCls}>
+    <nav
+      aria-label="天天记账主导航"
+      className="sticky bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 h-10 bg-background shrink-0"
+    >
       <div className="mx-auto grid h-full grid-cols-4 gap-1 py-1.5">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
