@@ -7,7 +7,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
-import { Layers, Monitor, Moon, Sparkles, Sun } from "lucide-react";
+import { Heart, Layers, Monitor, Moon, Sparkles, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Theme, themeNames, useTheme } from "@/hooks/use-theme";
 
@@ -17,6 +17,7 @@ const themeIcons = {
   system: Monitor,
   shinchan: Sparkles,
   apple: Layers,
+  loopy: Heart,
 } as const;
 
 const themeShortNames: Record<Theme, string> = {
@@ -25,6 +26,7 @@ const themeShortNames: Record<Theme, string> = {
   system: "System",
   shinchan: "Shin",
   apple: "Apple",
+  loopy: "Loopy",
 };
 
 export function ThemePicker() {

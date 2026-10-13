@@ -7,11 +7,13 @@
 @import "./themes/dark.css";
 @import "./themes/shinchan.css";
 @import "./themes/apple.css";
+@import "./themes/loopy.css";
 @source "../../packages/design-system/src";
 @source "../../packages/biz-ui/src";
 @custom-variant dark (&:is(.dark *));
 @custom-variant shinchan (&:is(.shinchan *));
 @custom-variant apple (&:is(.apple *));
+@custom-variant loopy (&:is(.loopy *));
 
 @plugin "@tailwindcss/typography";
 

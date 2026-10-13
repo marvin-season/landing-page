@@ -3,15 +3,15 @@ import type { PropsWithChildren } from "react";
 import { BbqInstallProvider } from "./_components/bbq-install-button";
 import { BbqMobileNav } from "./_components/bbq-mobile-nav";
 
-const title = "天天记账 · 支出与热量统计";
+const title = "Loopy 记账 · 支出与热量统计";
 const description =
-  "天天记账支持个人支出、日常消费与订单记录，管理常用项目和餐饮菜单，按时段统计金额与饮食热量，支持照片留存及数据备份。";
+  "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。";
 
 export const metadata: Metadata = {
   title: { absolute: title },
   description,
   keywords: [
-    "天天记账",
+    "Loopy 记账",
     "个人记账",
     "支出统计",
     "日常消费",
@@ -22,26 +22,28 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    siteName: "天天记账",
+    siteName: "Loopy 记账",
     type: "website",
     locale: "zh_CN",
   },
   twitter: { card: "summary", title, description },
-  applicationName: "天天记账",
+  applicationName: "Loopy 记账",
   manifest: "/bbq-pwa/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "天天记账",
+    title: "Loopy 记账",
     statusBarStyle: "default",
   },
   icons: {
-    icon: [{ url: "/bbq-pwa/icon-192.png", sizes: "192x192" }],
-    apple: [{ url: "/bbq-pwa/apple-touch-icon.png", sizes: "180x180" }],
+    icon: [{ url: "/bbq-pwa/icon-192.png?v=loopy-1", sizes: "192x192" }],
+    apple: [
+      { url: "/bbq-pwa/apple-touch-icon.png?v=loopy-1", sizes: "180x180" },
+    ],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#b9443d",
+  themeColor: "#fff5f7",
 };
 
 export default function BbqLayout({ children }: PropsWithChildren) {

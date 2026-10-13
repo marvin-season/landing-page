@@ -6,16 +6,26 @@ import type { MetadataRoute } from "next";
 const require = createRequire(import.meta.url);
 const sharp = createRequire(require.resolve("next"))("sharp");
 const output = new URL("../public/bbq-pwa/", import.meta.url);
-const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#b9443d"/>
-  <path d="M164 122h184v268l-31-18-30 18-31-18-31 18-30-18-31 18Z" fill="#fff7ed"/>
-  <path d="M207 185h98M207 232h98M207 279h52" fill="none" stroke="#b9443d" stroke-width="18" stroke-linecap="round"/>
-  <circle cx="307" cy="310" r="39" fill="#f4bd59"/>
-  <path d="m291 310 11 11 22-23" fill="none" stroke="#693127" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+const portrait = new URL("../public/bbq/companions/happy-still.png", import.meta.url);
+const iconVersion = "loopy-1";
+
+function iconSvg(portraitData: string, inset: number) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#f9dce5"/>
+  <circle cx="256" cy="256" r="210" fill="#fff5f7"/>
+  <image x="${inset}" y="${inset}" width="${512 - inset * 2}" height="${512 - inset * 2}" href="data:image/png;base64,${portraitData}"/>
 </svg>`;
+}
 
 async function main() {
   await mkdir(output, { recursive: true });
+  // 只裁切生成独立的应用头像；页面使用的原始动图和静帧保持不变。
+  const croppedPortrait = await sharp(portrait.pathname)
+    .extract({ left: 100, top: 0, width: 310, height: 390 })
+    .png()
+    .toBuffer();
+  const portraitData = await sharp(croppedPortrait).trim().png().toBuffer();
+  const icon = iconSvg(portraitData.toString("base64"), 42);
   await writeFile(new URL("icon.svg", output), `${icon}\n`);
   await Promise.all(
     [192, 512, 180].map((size) =>
@@ -30,34 +40,39 @@ async function main() {
         ),
     ),
   );
+  // 单独留出 maskable 安全区，避免设备圆形裁切碰到角色的脸和耳朵。
+  await sharp(Buffer.from(iconSvg(portraitData.toString("base64"), 90)))
+    .resize(512, 512)
+    .png()
+    .toFile(new URL("icon-maskable-512.png", output).pathname);
 
   const manifest: MetadataRoute.Manifest = {
     // A stable app identity, separate from the personal site's PWA.
     id: "/admin/bbq",
-    name: "天天记账",
-    short_name: "天天记账",
-    description: "个人支出、日常记账、菜单管理与饮食热量统计",
+    name: "Loopy 记账",
+    short_name: "Loopy 记账",
+    description: "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
     lang: "zh-CN",
     start_url: "/zh/admin/bbq",
     scope: "/zh/admin/bbq",
     display: "standalone",
-    background_color: "#f6f3ed",
-    theme_color: "#b9443d",
+    background_color: "#fff5f7",
+    theme_color: "#fff5f7",
     icons: [
       {
-        src: "/bbq-pwa/icon-192.png",
+        src: `/bbq-pwa/icon-192.png?v=${iconVersion}`,
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/bbq-pwa/icon-512.png",
+        src: `/bbq-pwa/icon-512.png?v=${iconVersion}`,
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/bbq-pwa/icon-512.png",
+        src: `/bbq-pwa/icon-maskable-512.png?v=${iconVersion}`,
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

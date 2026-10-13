@@ -1,0 +1,36 @@
+.loopy {
+  color-scheme: light;
+  --radius: 0.875rem;
+  --background: #fff5f7;
+  --foreground: #4b2d39;
+  --card: #fffcfd;
+  --card-foreground: #4b2d39;
+  --popover: #fffcfd;
+  --popover-foreground: #4b2d39;
+  --primary: #b44468;
+  --primary-foreground: #ffffff;
+  --secondary: #f9dce5;
+  --secondary-foreground: #70394d;
+  --muted: #f9e9ee;
+  --muted-foreground: #805967;
+  --accent: #ffe0e9;
+  --accent-foreground: #873b55;
+  --destructive: #b9324f;
+  --border: #efd3dd;
+  --input: #d8a7b9;
+  --ring: #b44468;
+  --chart-1: #b44468;
+  --chart-2: #a16d24;
+  --chart-3: #557f70;
+  --chart-4: #9170a2;
+  --chart-5: #527f99;
+  --sidebar: #fce8ef;
+  --sidebar-foreground: #4b2d39;
+  --sidebar-primary: #b44468;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f7d4e1;
+  --sidebar-accent-foreground: #70394d;
+  --sidebar-border: #efd3dd;
+  --sidebar-ring: #b44468;
+  --slate-350: #805967;
+}

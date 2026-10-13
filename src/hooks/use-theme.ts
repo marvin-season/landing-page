@@ -2,7 +2,13 @@
 
 import { useTheme as useNextTheme } from "next-themes";
 
-export type Theme = "light" | "dark" | "system" | "shinchan" | "apple";
+export type Theme =
+  | "light"
+  | "dark"
+  | "system"
+  | "shinchan"
+  | "apple"
+  | "loopy";
 
 export const themeNames: Record<Theme, string> = {
   light: "Light",
@@ -10,9 +16,17 @@ export const themeNames: Record<Theme, string> = {
   system: "System",
   shinchan: "Shin-chan · Matte",
   apple: "Apple · Glass",
+  loopy: "Loopy · 奶油粉",
 };
 
-export const themes: Theme[] = ["shinchan", "apple", "system", "light", "dark"];
+export const themes: Theme[] = [
+  "shinchan",
+  "apple",
+  "loopy",
+  "system",
+  "light",
+  "dark",
+];
 
 /**
  * 主题切换 Hook

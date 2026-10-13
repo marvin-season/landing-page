@@ -9,7 +9,7 @@ export function ThemeProvider({
 }: React.ComponentProps<typeof NextThemesProvider>) {
   return (
     <NextThemesProvider
-      themes={["light", "dark", "neutral", "shinchan", "apple"]}
+      themes={["light", "dark", "neutral", "shinchan", "apple", "loopy"]}
       attribute="class"
       enableSystem
       defaultTheme="shinchan"

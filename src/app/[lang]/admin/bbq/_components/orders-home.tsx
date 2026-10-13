@@ -138,7 +138,7 @@ export function OrdersHome() {
     <div className={`${pageShellCls} overflow-hidden flex-1`}>
       <header className="flex shrink-0 flex-col gap-1.5">
         <div>
-          <h1 className={pageTitleCls}>天天记账</h1>
+          <h1 className={pageTitleCls}>Loopy 记账</h1>
           <p className="mt-1 text-xs text-muted-foreground">我的日常账本</p>
         </div>
         {storageFailed ? null : (

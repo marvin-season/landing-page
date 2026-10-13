@@ -60,7 +60,7 @@ export function BbqMobileNav() {
 
   return (
     <nav
-      aria-label="天天记账主导航"
+      aria-label="Loopy 记账主导航"
       className="relative z-30 bg-background shrink-0 mt-2 border-t"
     >
       <div className="mx-auto grid grid-cols-4 gap-1 py-1.5">
