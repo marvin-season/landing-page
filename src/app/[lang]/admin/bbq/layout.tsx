@@ -35,7 +35,24 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
-    icon: [{ url: "/bbq-pwa/icon-192.png?v=loopy-1", sizes: "192x192" }],
+    icon: [
+      {
+        url: "/bbq-pwa/icon-16.png?v=loopy-1",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/bbq-pwa/icon-32.png?v=loopy-1",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/bbq-pwa/icon-192.png?v=loopy-1",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/bbq-pwa/icon-32.png?v=loopy-1",
     apple: [
       { url: "/bbq-pwa/apple-touch-icon.png?v=loopy-1", sizes: "180x180" },
     ],

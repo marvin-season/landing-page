@@ -35,7 +35,7 @@ export const themes: Theme[] = [
 export const useTheme = () => {
   const { setTheme, theme } = useNextTheme();
 
-  const currentTheme = (theme as Theme) || "shinchan";
+  const currentTheme = (theme as Theme) || "loopy";
   const availableThemes = themes;
 
   const changeTheme = (newTheme: Theme) => {

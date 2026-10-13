@@ -28,7 +28,7 @@ async function main() {
   const icon = iconSvg(portraitData.toString("base64"), 42);
   await writeFile(new URL("icon.svg", output), `${icon}\n`);
   await Promise.all(
-    [192, 512, 180].map((size) =>
+    [16, 32, 192, 512, 180].map((size) =>
       sharp(Buffer.from(icon))
         .resize(size, size)
         .png()

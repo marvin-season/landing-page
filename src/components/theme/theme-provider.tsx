@@ -12,7 +12,7 @@ export function ThemeProvider({
       themes={["light", "dark", "neutral", "shinchan", "apple", "loopy"]}
       attribute="class"
       enableSystem
-      defaultTheme="shinchan"
+      defaultTheme="loopy"
       {...props}
     >
       {children}
