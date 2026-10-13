@@ -9,9 +9,7 @@ import {
   canCreateOrderForBusinessDay,
   readBusinessDayParam,
 } from "@/lib/bbq/business-day";
-import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
-import { formatYuan } from "@/lib/bbq/money";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
@@ -19,11 +17,6 @@ import { cls, pageShellCls } from "./bbq-layout";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
-
-const homeMetricsCls = cls`
-  grid shrink-0 gap-px overflow-hidden rounded-lg border bg-border grid-cols-6
-  [&>div]:col-span-2 [&>div:nth-child(n+4)]:col-span-3 [&>div]:min-w-0
-`;
 
 // 扣除外层上下内边距（移动端 2rem / 大屏 6rem）和底部导航，列表在剩余空间内滚动。
 const homeViewportCls = cls`
@@ -147,12 +140,6 @@ export function OrdersHome() {
     }
   }
 
-  const openOrders = orders.filter((order) => order.status === "open");
-  const doneOrders = orders.filter((order) => order.status === "done");
-  const settledTotal = doneOrders.reduce(
-    (total, order) => total + order.totalCents,
-    0,
-  );
   const statistics = summarizeOrdersByBusinessDay(allOrders ?? []);
 
   return (
@@ -195,33 +182,17 @@ export function OrdersHome() {
           className={`flex min-h-0 flex-1 flex-col ${homeView === "orders" ? "overflow-hidden" : "overflow-y-auto overscroll-y-contain"}`}
         >
           {homeView === "orders" ? (
-            <div className="flex min-h-0 flex-1 flex-col gap-2">
-              <dl className={homeMetricsCls}>
-                <Metric label="全部记录" value={`${orders.length} 条`} />
-                <Metric label="进行中" value={`${openOrders.length} 条`} />
-                <Metric label="已完成" value={`${doneOrders.length} 条`} />
-                <Metric label="已完成金额" value={formatYuan(settledTotal)} />
-                <Metric
-                  label="已完成热量"
-                  value={formatCalories(
-                    summarizeCalories(
-                      doneOrders.flatMap((order) => order.lines),
-                    ),
-                  )}
-                />
-              </dl>
-              <OrdersList
-                selectedId={selectedId}
-                statusFilter={statusFilter}
-                onSelect={setSelectedId}
-                onFilterChange={setStatusFilter}
-                orders={orders}
-                loading={readyDay !== day}
-                canCreateOrder={canCreateOrder}
-                updatingStatusId={updatingStatusId}
-                onToggleStatus={toggleOrderStatus}
-              />
-            </div>
+            <OrdersList
+              selectedId={selectedId}
+              statusFilter={statusFilter}
+              onSelect={setSelectedId}
+              onFilterChange={setStatusFilter}
+              orders={orders}
+              loading={readyDay !== day}
+              canCreateOrder={canCreateOrder}
+              updatingStatusId={updatingStatusId}
+              onToggleStatus={toggleOrderStatus}
+            />
           ) : statisticsLoading || allOrders === null ? (
             <div
               className="flex min-h-80 flex-1 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground shadow-sm"
@@ -237,17 +208,6 @@ export function OrdersHome() {
           )}
         </motion.div>
       )}
-    </div>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-card px-2 py-1 flex flex-wrap items-baseline justify-between gap-x-1">
-      <dt className="text-[11px] text-muted-foreground leading-5">{label}</dt>
-      <dd className="text-xs font-semibold tabular-nums text-foreground leading-5 break-words min-w-0">
-        {value}
-      </dd>
     </div>
   );
 }

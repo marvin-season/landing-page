@@ -2,18 +2,10 @@
 
 import { Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Camera,
-  CheckCircle2,
-  Clock3,
-  Pencil,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { Camera, CheckCircle2, Pencil, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Link } from "@/components/link/link";
-import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order, OrderPhoto } from "@/lib/bbq/types";
@@ -33,41 +25,11 @@ export function OrderDetail({
   return (
     <>
       <div className="flex min-h-0 flex-col flex-1 overflow-hidden">
-        <div className="border-b p-3 bg-muted/20 shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="font-semibold text-foreground mt-0 text-xl">
-                {order.groupingEnabled === false
-                  ? "日常记账"
-                  : order.seat === null
-                    ? "打包订单"
-                    : `${order.seat} 号座`}
-              </h2>
-              <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
-                <Clock3 className="size-4" aria-hidden="true" />
-                {formatShanghaiHm(new Date(order.openedAt))}
-                <span aria-hidden="true">·</span>
-                <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
-                  {order.status === "open" ? "进行中" : "已完成"}
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">记录金额</p>
-              <p className="mt-0.5 font-semibold tabular-nums text-foreground text-2xl tracking-tight">
-                {formatYuan(order.totalCents)}
-              </p>
-              <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                热量 {formatCalories(summarizeCalories(order.lines))}
-              </p>
-            </div>
-          </div>
-        </div>
         <div className="min-h-0 flex-1 p-3 overflow-y-auto overscroll-y-contain">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-sm font-medium text-foreground">记录明细</h3>
             <span className="text-xs tabular-nums text-muted-foreground">
-              {order.lines.length} 项
+              热量 {formatCalories(summarizeCalories(order.lines))}
             </span>
           </div>
           <ul className="mt-2 divide-y text-sm">

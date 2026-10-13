@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
+import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order } from "@/lib/bbq/types";
 import { cls, touchCls } from "./bbq-layout";
@@ -62,6 +63,13 @@ export function OrdersList({
   const viewportRef = useRef<HTMLDivElement>(null);
   const openOrders = orders.filter((order) => order.status === "open");
   const doneOrders = orders.filter((order) => order.status === "done");
+  const settledTotal = doneOrders.reduce(
+    (total, order) => total + order.totalCents,
+    0,
+  );
+  const settledCalories = summarizeCalories(
+    doneOrders.flatMap((order) => order.lines),
+  );
   const visibleOrders = statusFilter === "open" ? openOrders : doneOrders;
   const selected =
     visibleOrders.find((order) => order.id === selectedId) ?? null;
@@ -79,20 +87,22 @@ export function OrdersList({
         aria-label="记录列表"
       >
         <div className="flex flex-col gap-2 border-b bg-card/95 px-3 py-2.5 shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-sm text-foreground font-semibold">
-                记录列表
-              </h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {selected
-                  ? "再次点击记录可收起，查看全部记录"
-                  : "点击记录展开详情"}
-              </p>
-            </div>
-            <span className="tabular-nums text-muted-foreground rounded-md bg-muted px-2 py-1 text-xs">
-              {visibleOrders.length} 条
-            </span>
+          <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
+            <h2 className="text-sm text-foreground font-semibold">记录列表</h2>
+            <p className="text-[11px] text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span>
+                已完成{" "}
+                <span className="font-medium tabular-nums text-foreground">
+                  {loading ? "—" : formatYuan(settledTotal)}
+                </span>
+              </span>
+              <span>
+                热量{" "}
+                <span className="tabular-nums">
+                  {loading ? "—" : formatCalories(settledCalories)}
+                </span>
+              </span>
+            </p>
           </div>
           <div
             className="flex rounded-lg bg-muted p-0.5"
@@ -111,7 +121,6 @@ export function OrdersList({
             >
               <Clock3 className="size-4" aria-hidden="true" />
               进行中
-              <span className="tabular-nums">{openOrders.length}</span>
             </button>
             <button
               type="button"
@@ -125,7 +134,6 @@ export function OrdersList({
             >
               <CheckCircle2 className="size-4" aria-hidden="true" />
               已完成
-              <span className="tabular-nums">{doneOrders.length}</span>
             </button>
           </div>
         </div>
