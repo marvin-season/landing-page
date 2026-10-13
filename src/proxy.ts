@@ -5,7 +5,7 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { locales, sourceLocale } from "@/lib/i18n/locales";
+import { isBbqPath, locales, sourceLocale } from "@/lib/i18n/locales";
 import { getAuthorizationUrl, getProtectedPage } from "@/lib/page-auth";
 
 const defaultPrefix = `/${sourceLocale}`;
@@ -57,8 +57,15 @@ function withPrivateHeaders(response: NextResponse, enabled: boolean) {
 function localize(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (isBbqPath(pathname)) {
+    request.nextUrl.pathname = `/zh${pathname}`;
+    return NextResponse.redirect(request.nextUrl);
+  }
+
   if (pathname === defaultPrefix || pathname.startsWith(`${defaultPrefix}/`)) {
-    request.nextUrl.pathname = pathname.slice(defaultPrefix.length) || "/";
+    const unprefixed = pathname.slice(defaultPrefix.length) || "/";
+    if (isBbqPath(unprefixed)) return NextResponse.next();
+    request.nextUrl.pathname = unprefixed;
     return NextResponse.redirect(request.nextUrl);
   }
 

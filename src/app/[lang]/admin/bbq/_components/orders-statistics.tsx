@@ -1,15 +1,18 @@
 "use client";
 
+import type { I18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
-import { businessDayLabel } from "@/lib/bbq/business-day";
-import { formatCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import {
   type BusinessDayStatistics,
   getTrendRange,
 } from "@/lib/bbq/statistics";
 import { BbqCompanion } from "./bbq-companion";
+import { businessDayLabel, formatCalories } from "./bbq-i18n";
 import { cls } from "./bbq-layout";
 import { bbqHomePath } from "./bbq-paths";
 
@@ -39,15 +42,18 @@ export function OrdersStatistics({
   statistics: BusinessDayStatistics[];
   onSelectDay: () => void;
 }) {
+  const { i18n, t } = useLingui();
   const [chartMode, setChartMode] = useState<ChartMode>("revenue");
 
   if (statistics.length === 0) {
     return (
       <div className="flex min-h-80 flex-col items-center justify-center rounded-xl bg-card px-6 text-center">
         <BbqCompanion mood="ponder" className="block size-28 shrink-0" />
-        <p className="mt-3 text-sm font-medium text-foreground">从第一笔开始</p>
+        <p className="mt-3 text-sm font-medium text-foreground">
+          <Trans>从第一笔开始</Trans>
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          记下日常，就能在这里回看金额和热量的变化。
+          <Trans>记下日常，就能在这里回看金额和热量的变化。</Trans>
         </p>
       </div>
     );
@@ -81,17 +87,19 @@ export function OrdersStatistics({
     <div className="flex min-h-0 flex-1 flex-col gap-3 min-w-0 w-full pb-3">
       <dl className="grid shrink-0 gap-3 overflow-hidden rounded-xl bg-card grid-cols-2 p-4">
         <StatisticMetric
-          label="累计已完成金额"
+          label={t`累计已完成金额`}
           value={formatYuan(settledTotal)}
         />
         <StatisticMetric
-          label="累计已完成热量"
-          value={formatCalories(settledCalories)}
+          label={t`累计已完成热量`}
+          value={formatCalories(i18n, settledCalories)}
         />
       </dl>
       <p className="text-xs text-muted-foreground px-1">
-        {statistics.length} 个时段 · {totalOrders} 笔记录 · 已完成{" "}
-        {settledOrders} 笔
+        <Trans>
+          {statistics.length} 个时段 · {totalOrders} 笔记录 · 已完成{" "}
+          {settledOrders} 笔
+        </Trans>
       </p>
       <section className="flex min-h-0 flex-col overflow-hidden rounded-xl bg-card min-w-0 flex-none">
         <div className="flex flex-col border-b py-3 shrink-0 gap-2 px-3">
@@ -99,11 +107,13 @@ export function OrdersStatistics({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h2 className="text-sm font-medium text-foreground">
-                  变化趋势
+                  <Trans>变化趋势</Trans>
                 </h2>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                每时段平均已完成金额 {formatYuan(averagePerPeriod)}
+                <Trans>
+                  每时段平均已完成金额 {formatYuan(averagePerPeriod)}
+                </Trans>
               </p>
             </div>
             <BbqCompanion
@@ -114,7 +124,7 @@ export function OrdersStatistics({
           <div
             className="flex rounded-lg bg-muted p-0.5 shrink-0 w-full"
             role="group"
-            aria-label="趋势指标"
+            aria-label={t`趋势指标`}
           >
             <button
               type="button"
@@ -126,7 +136,7 @@ export function OrdersStatistics({
               }`}
               onClick={() => setChartMode("revenue")}
             >
-              已完成金额
+              <Trans>已完成金额</Trans>
             </button>
             <button
               type="button"
@@ -138,7 +148,7 @@ export function OrdersStatistics({
               }`}
               onClick={() => setChartMode("orders")}
             >
-              记录数
+              <Trans>记录数</Trans>
             </button>
             <button
               type="button"
@@ -146,24 +156,30 @@ export function OrdersStatistics({
               className={`${chartModeCls} ${chartMode === "calories" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               onClick={() => setChartMode("calories")}
             >
-              热量（kcal）
+              <Trans>热量（kcal）</Trans>
             </button>
           </div>
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />
         <details className="px-3 pb-3 text-xs text-muted-foreground">
           <summary className="cursor-pointer py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
-            金额和热量怎么算？
+            <Trans>金额和热量怎么算？</Trans>
           </summary>
           <p className="pt-1 leading-relaxed">
-            金额与热量仅统计已完成记录；热量按每单位 ×
-            数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
+            <Trans>
+              金额与热量仅统计已完成记录；热量按每单位 ×
+              数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
+            </Trans>
           </p>
         </details>
-        <section className="border-t" aria-label="时段明细">
+        <section className="border-t" aria-label={t`时段明细`}>
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
-            <h3 className="text-sm font-medium text-foreground">时段明细</h3>
-            <span className="text-xs text-muted-foreground">最近时段在前</span>
+            <h3 className="text-sm font-medium text-foreground">
+              <Trans>时段明细</Trans>
+            </h3>
+            <span className="text-xs text-muted-foreground">
+              <Trans>最近时段在前</Trans>
+            </span>
           </div>
           <ul className="divide-y px-3">
             {statistics.toReversed().map((item) => (
@@ -175,36 +191,46 @@ export function OrdersStatistics({
                     className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     {item.businessDayKey.slice(0, 10)}
-                    <span className="text-xs">查看记录 →</span>
+                    <span className="text-xs">
+                      <Trans>查看记录 →</Trans>
+                    </span>
                   </Link>
                   <span className="text-xs text-muted-foreground">
                     {item.businessDayKey.endsWith("#off")
-                      ? "休息时段"
-                      : "记账时段"}
+                      ? t`休息时段`
+                      : t`记账时段`}
                   </span>
                 </div>
                 <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
                   <div className="min-w-0">
-                    <dt className="text-muted-foreground">记录</dt>
+                    <dt className="text-muted-foreground">
+                      <Trans>记录</Trans>
+                    </dt>
                     <dd className="mt-0.5 tabular-nums text-foreground">
-                      {item.orderCount} 条
+                      <Trans>{item.orderCount} 条</Trans>
                     </dd>
                   </div>
                   <div className="min-w-0">
-                    <dt className="text-muted-foreground">已完成</dt>
+                    <dt className="text-muted-foreground">
+                      <Trans>已完成</Trans>
+                    </dt>
                     <dd className="mt-0.5 tabular-nums text-foreground">
-                      {item.settledOrderCount} 条
+                      <Trans>{item.settledOrderCount} 条</Trans>
                     </dd>
                   </div>
                   <div className="min-w-0 text-right">
-                    <dt className="text-muted-foreground">已完成金额</dt>
+                    <dt className="text-muted-foreground">
+                      <Trans>已完成金额</Trans>
+                    </dt>
                     <dd className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground">
                       {formatYuan(item.settledTotalCents)}
                     </dd>
                   </div>
                 </dl>
                 <p className="mt-2 text-xs tabular-nums text-muted-foreground">
-                  已完成热量 {formatCalories(item.settledCalories)}
+                  <Trans>
+                    已完成热量 {formatCalories(i18n, item.settledCalories)}
+                  </Trans>
                 </p>
               </li>
             ))}
@@ -222,6 +248,7 @@ function TrendChart({
   statistics: BusinessDayStatistics[];
   mode: ChartMode;
 }) {
+  const { i18n, t } = useLingui();
   const viewportRef = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
   const noCalorieData =
@@ -242,7 +269,9 @@ function TrendChart({
   if (noCalorieData) {
     return (
       <div className="flex min-h-48 shrink-0 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-        暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。
+        <Trans>
+          暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。
+        </Trans>
       </div>
     );
   }
@@ -304,10 +333,10 @@ function TrendChart({
           role="img"
           aria-label={
             mode === "revenue"
-              ? "各时段已完成金额趋势"
+              ? t`各时段已完成金额趋势`
               : mode === "orders"
-                ? "各时段记录数趋势"
-                : "各时段已完成热量趋势（kcal）"
+                ? t`各时段记录数趋势`
+                : t`各时段已完成热量趋势（kcal）`
           }
           className="block max-w-none"
         >
@@ -357,12 +386,12 @@ function TrendChart({
                   className="fill-card text-primary"
                 >
                   <title>
-                    {businessDayLabel(item.businessDayKey)}：
+                    {businessDayLabel(i18n, item.businessDayKey)}：
                     {mode === "revenue"
                       ? formatYuan(item.settledTotalCents)
                       : mode === "orders"
-                        ? `${item.orderCount} 条记录`
-                        : formatCalories(item.settledCalories)}
+                        ? t`${item.orderCount} 条记录`
+                        : formatCalories(i18n, item.settledCalories)}
                   </title>
                 </circle>
                 <text
@@ -371,7 +400,7 @@ function TrendChart({
                   textAnchor="middle"
                   className="fill-muted-foreground text-[11px]"
                 >
-                  {compactDayLabel(item.businessDayKey)}
+                  {compactDayLabel(i18n, item.businessDayKey)}
                 </text>
                 <text
                   x={x}
@@ -387,7 +416,7 @@ function TrendChart({
       </div>
       {viewportWidth > 0 && width > viewportWidth ? (
         <p className="mt-1 text-center text-xs text-muted-foreground">
-          左右滑动查看全部时段
+          <Trans>左右滑动查看全部时段</Trans>
         </p>
       ) : null}
     </div>
@@ -405,9 +434,9 @@ function StatisticMetric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function compactDayLabel(key: string): string {
+function compactDayLabel(i18n: I18n, key: string): string {
   const date = key.slice(5, 10);
-  return key.endsWith("#off") ? `${date} 休息` : date;
+  return key.endsWith("#off") ? i18n._(msg`${date} 休息`) : date;
 }
 
 function formatChartValue(value: number, mode: ChartMode): string {

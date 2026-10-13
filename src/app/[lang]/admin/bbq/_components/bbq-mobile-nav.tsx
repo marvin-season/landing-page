@@ -1,5 +1,8 @@
 "use client";
 
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
+
 import { Bookmark, BookOpen, NotebookPen, Settings } from "lucide-react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,21 +17,21 @@ import {
 } from "./bbq-paths";
 
 const items = [
-  { label: "账本", href: bbqHomePath(), segment: null, icon: BookOpen },
+  { label: msg`账本`, href: bbqHomePath(), segment: null, icon: BookOpen },
   {
-    label: "记一笔",
+    label: msg`记一笔`,
     href: bbqNewOrderPath(),
     segment: "orders",
     icon: NotebookPen,
   },
   {
-    label: "常用",
+    label: msg`常用`,
     href: bbqMenuPath(),
     segment: "menu",
     icon: Bookmark,
   },
   {
-    label: "设置",
+    label: msg`设置`,
     href: bbqSettingsPath(),
     segment: "settings",
     icon: Settings,
@@ -44,6 +47,7 @@ const mobileNavLinkCls = cls`
 `;
 
 export function BbqMobileNav() {
+  const { t, i18n } = useLingui();
   const segment = useSelectedLayoutSegment();
   const [canCreate, setCanCreate] = useState<boolean | null>(null);
 
@@ -60,7 +64,7 @@ export function BbqMobileNav() {
 
   return (
     <nav
-      aria-label="Loopy 记账主导航"
+      aria-label={t`Loopy 记账主导航`}
       className="relative z-30 bg-background shrink-0 mt-2 border-t"
     >
       <div className="mx-auto grid grid-cols-4 gap-1 py-1.5">
@@ -70,12 +74,12 @@ export function BbqMobileNav() {
 
           return (
             <Link
-              key={label}
+              key={href}
               href={href}
               className={mobileNavLinkCls}
               aria-current={active ? "page" : undefined}
               aria-disabled={disabled || undefined}
-              title={disabled ? "当前为休息时段，06:00 后可记账" : undefined}
+              title={disabled ? t`当前为休息时段，06:00 后可记账` : undefined}
               onClick={(event) => {
                 // 当前模块不重复跳转，避免点中记账导航时清空正在编辑的记录。
                 if (active || disabled) event.preventDefault();
@@ -83,7 +87,9 @@ export function BbqMobileNav() {
             >
               <Icon className="size-5" aria-hidden="true" />
               <span>
-                {disabled && canCreate === false ? "记账·休息中" : label}
+                {disabled && canCreate === false
+                  ? t`记账·休息中`
+                  : i18n._(label)}
               </span>
             </Link>
           );

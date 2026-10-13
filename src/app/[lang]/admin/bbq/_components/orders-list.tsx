@@ -1,6 +1,9 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import type { I18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Camera, ChevronRight, Plus } from "lucide-react";
 import {
   type CSSProperties,
@@ -11,16 +14,17 @@ import {
 } from "react";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
-import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
+import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
+import { formatCalories } from "./bbq-i18n";
 import { cls, touchCls } from "./bbq-layout";
 import { bbqNewOrderPath } from "./bbq-paths";
 import { OrderDetail } from "./order-detail";
 
-function statusLabel(status: Order["status"]): string {
-  return status === "open" ? "进行中" : "已完成";
+function statusLabel(i18n: I18n, status: Order["status"]): string {
+  return status === "open" ? i18n._(msg`进行中`) : i18n._(msg`已完成`);
 }
 
 function orderTotalCls(status: Order["status"]): string {
@@ -56,6 +60,7 @@ export function OrdersList({
   updatingStatusId: string | null;
   onToggleStatus: (order: Order) => Promise<void>;
 }) {
+  const { i18n, t } = useLingui();
   const viewportRef = useRef<HTMLDivElement>(null);
   const openOrders = orders.filter((order) => order.status === "open");
   const doneOrders = orders.filter((order) => order.status === "done");
@@ -79,17 +84,21 @@ export function OrdersList({
   return (
     <section
       className="min-h-0 min-w-0 overflow-hidden rounded-xl bg-card flex flex-col flex-1"
-      aria-label="记录列表"
+      aria-label={t`记录列表`}
     >
       <div className="flex flex-col gap-3 border-b bg-card/95 px-4 py-3 shrink-0">
         <div className="flex items-end justify-between gap-x-3 gap-y-1">
           <div className="min-w-0 flex-1">
-            <h2 className="text-xs text-muted-foreground">已完成合计</h2>
+            <h2 className="text-xs text-muted-foreground">
+              <Trans>已完成合计</Trans>
+            </h2>
             <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight break-all">
               {loading ? "—" : formatYuan(settledTotal)}
             </p>
             <p className="text-xs text-muted-foreground tabular-nums mt-1">
-              热量 {loading ? "—" : formatCalories(settledCalories)}
+              <Trans>
+                热量 {loading ? "—" : formatCalories(i18n, settledCalories)}
+              </Trans>
             </p>
           </div>
           {!loading && visibleOrders.length > 0 ? (
@@ -99,7 +108,7 @@ export function OrdersList({
             />
           ) : null}
         </div>
-        <div className="flex gap-1" role="group" aria-label="记录状态">
+        <div className="flex gap-1" role="group" aria-label={t`记录状态`}>
           <button
             type="button"
             aria-pressed={statusFilter === "open"}
@@ -110,7 +119,7 @@ export function OrdersList({
             }`}
             onClick={() => changeFilter("open")}
           >
-            进行中
+            <Trans>进行中</Trans>
           </button>
           <button
             type="button"
@@ -122,7 +131,7 @@ export function OrdersList({
             }`}
             onClick={() => changeFilter("done")}
           >
-            已完成
+            <Trans>已完成</Trans>
           </button>
         </div>
       </div>
@@ -135,7 +144,7 @@ export function OrdersList({
             className="flex items-center justify-center text-sm text-muted-foreground flex-1 py-6"
             role="status"
           >
-            读取记录中…
+            <Trans>读取记录中…</Trans>
           </div>
         ) : visibleOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
@@ -145,19 +154,19 @@ export function OrdersList({
             />
             <p className="mt-3 text-sm font-medium text-foreground">
               {statusFilter === "open"
-                ? "还没有进行中的记录"
-                : "还没有完成的记录"}
+                ? t`还没有进行中的记录`
+                : t`还没有完成的记录`}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {statusFilter === "open"
-                ? "一顿饭、一杯咖啡，都可以记在这里。"
-                : "把记录标为完成，就会计入上面的合计。"}
+                ? t`一顿饭、一杯咖啡，都可以记在这里。`
+                : t`把记录标为完成，就会计入上面的合计。`}
             </p>
             {statusFilter === "open" && canCreateOrder ? (
               <Button asChild className="mt-4">
                 <Link href={bbqNewOrderPath()}>
                   <Plus className="size-4" aria-hidden="true" />
-                  记一笔
+                  <Trans>记一笔</Trans>
                 </Link>
               </Button>
             ) : null}
@@ -203,6 +212,7 @@ function OrderListItem({
   onToggleStatus: (order: Order) => Promise<void>;
   onToggle: () => void;
 }) {
+  const { t } = useLingui();
   const rowRef = useRef<HTMLLIElement>(null);
   const summaryRef = useRef<HTMLButtonElement>(null);
   const [geometry, setGeometry] = useState({
@@ -283,7 +293,7 @@ function OrderListItem({
           <div
             id={`bbq-order-detail-${order.id}`}
             role="region"
-            aria-label={`记录 #${order.seq} 详情`}
+            aria-label={t`记录 #${order.seq} 详情`}
             inert={!expanded}
             aria-hidden={!expanded || undefined}
             className={`overflow-hidden min-h-0 flex flex-1 flex-col transition-opacity duration-200 motion-reduce:transition-none ${expanded ? "opacity-100" : "opacity-0"}`}
@@ -311,16 +321,20 @@ function OrderSummary({
   showChevron?: boolean;
   isSelected?: boolean;
 }) {
+  const { i18n, t } = useLingui();
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium text-foreground">
             {order.groupingEnabled === false
-              ? order.lines.map((line) => line.name).join("、") || "日常记账"
+              ? new Intl.ListFormat(
+                  i18n.locale === "pseudo" ? "en" : i18n.locale,
+                  { style: "short", type: "unit" },
+                ).format(order.lines.map((line) => line.name)) || t`日常记账`
               : order.seat === null
-                ? "打包"
-                : `${order.seat} 号座`}
+                ? t`打包`
+                : t`${order.seat} 号座`}
           </p>
           {order.groupingEnabled !== false ? (
             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
@@ -328,19 +342,23 @@ function OrderSummary({
             </span>
           ) : null}
           {isSelected ? (
-            <span className="shrink-0 text-xs text-muted-foreground">收起</span>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              <Trans>收起</Trans>
+            </span>
           ) : null}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            {statusLabel(order.status)}
+            {statusLabel(i18n, order.status)}
           </span>
           <span aria-hidden="true">·</span>
           <span className="tabular-nums">
             {formatShanghaiHm(new Date(order.openedAt))}
           </span>
           <span aria-hidden="true">·</span>
-          <span>{order.lines.length} 项</span>
+          <span>
+            <Trans>{order.lines.length} 项</Trans>
+          </span>
           {order.photos.length > 0 ? (
             <>
               <span aria-hidden="true">·</span>

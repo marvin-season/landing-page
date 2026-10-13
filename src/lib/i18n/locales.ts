@@ -58,7 +58,11 @@ export function isLocale(value: string): value is Locale {
 
 const unlocalizedRoots = new Set(["agent", "agui", "api", "pdfjs"]);
 
-/** Prefix an internal path with the current locale. `en` stays unprefixed. */
+export function isBbqPath(pathname: string): boolean {
+  return pathname === "/admin/bbq" || pathname.startsWith("/admin/bbq/");
+}
+
+/** BBQ defaults to Chinese; explicit locales remain available for every route. */
 export function withLocalePrefix(href: string, locale: string): string {
   if (!href.startsWith("/") || href.startsWith("//")) return href;
 
@@ -67,7 +71,8 @@ export function withLocalePrefix(href: string, locale: string): string {
   const first = path.split("/").filter(Boolean)[0];
 
   if (first && (isLocale(first) || unlocalizedRoots.has(first))) return href;
-  if (locale === sourceLocale) return href;
+  // Keep BBQ language explicit so English navigation never falls back to Chinese.
+  if (locale === sourceLocale && !isBbqPath(path)) return href;
   if (path === "/") return `/${locale}${suffix}`;
   return `/${locale}${path}${suffix}`;
 }

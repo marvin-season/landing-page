@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Smartphone, X } from "lucide-react";
 import {
@@ -83,6 +84,7 @@ export function BbqInstallProvider({ children }: PropsWithChildren) {
 }
 
 export function BbqInstallButton() {
+  const { t } = useLingui();
   const context = useContext(InstallContext);
   const [open, setOpen] = useState(false);
   if (!context) throw new Error("BbqInstallButton requires BbqInstallProvider");
@@ -93,7 +95,11 @@ export function BbqInstallButton() {
   }
 
   if (installed) {
-    return <p className="text-sm text-muted-foreground">已安装到主屏幕</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        <Trans>已安装到主屏幕</Trans>
+      </p>
+    );
   }
 
   return (
@@ -109,7 +115,7 @@ export function BbqInstallButton() {
           }}
         >
           <Smartphone className="size-4" aria-hidden="true" />
-          安装应用
+          <Trans>安装应用</Trans>
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -117,7 +123,7 @@ export function BbqInstallButton() {
         <Dialog.Content className="fixed top-1/2 left-1/2 z-110 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
           <div className="flex items-center justify-between gap-3">
             <Dialog.Title className="text-base font-semibold">
-              安装Loopy 记账
+              <Trans>安装Loopy 记账</Trans>
             </Dialog.Title>
             <Dialog.Close asChild>
               <Button
@@ -125,23 +131,37 @@ export function BbqInstallButton() {
                 variant="ghost"
                 size="icon"
                 className="size-11"
-                aria-label="关闭安装说明"
+                aria-label={t`关闭安装说明`}
               >
                 <X className="size-4" aria-hidden="true" />
               </Button>
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-2 text-sm text-muted-foreground">
-            添加到主屏幕后，可通过专属图标直接打开记账页面。
+            <Trans>添加到主屏幕后，可通过专属图标直接打开记账页面。</Trans>
           </Dialog.Description>
           <ul className="mt-4 space-y-3 text-sm">
-            <li>iPhone / iPad：在 Safari 中打开，点击分享 → 添加到主屏幕。</li>
-            <li>Android：在 Chrome 菜单中选择“添加到主屏幕”或“安装应用”。</li>
-            <li>电脑：在 Chrome / Edge 地址栏或菜单中选择“安装应用”。</li>
+            <li>
+              <Trans>
+                iPhone / iPad：在 Safari 中打开，点击分享 → 添加到主屏幕。
+              </Trans>
+            </li>
+            <li>
+              <Trans>
+                Android：在 Chrome 菜单中选择“添加到主屏幕”或“安装应用”。
+              </Trans>
+            </li>
+            <li>
+              <Trans>
+                电脑：在 Chrome / Edge 地址栏或菜单中选择“安装应用”。
+              </Trans>
+            </li>
           </ul>
           <p className="mt-4 text-xs text-muted-foreground">
-            请使用 HTTPS
-            网站地址。当前启动和切换页面需要联网；数据保存在本机，迁移设备或浏览器前请导出备份。
+            <Trans>
+              请使用 HTTPS
+              网站地址。当前启动和切换页面需要联网；数据保存在本机，迁移设备或浏览器前请导出备份。
+            </Trans>
           </p>
         </Dialog.Content>
       </Dialog.Portal>

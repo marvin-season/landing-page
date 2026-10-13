@@ -7,6 +7,7 @@ import {
   Input,
   Switch,
 } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ChevronDown,
   LoaderCircle,
@@ -17,7 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
+import { summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import {
   centsToYuanInput,
@@ -27,6 +28,7 @@ import {
 import type { Category, Dish } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
+import { formatCalories } from "./bbq-i18n";
 import { cls, pageTitleCls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
@@ -40,6 +42,7 @@ const dishInputCls = cls`
 `;
 
 export function MenuEditor() {
+  const { i18n, t } = useLingui();
   const [menu, setMenu] = useState<Category | null>(null);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
@@ -65,8 +68,8 @@ export function MenuEditor() {
     setMessage(null);
     await reload();
     notifyBbqMenuChanged();
-    setNotice("常用项目已保存");
-  }, [reload]);
+    setNotice(t`常用项目已保存`);
+  }, [reload, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,13 +79,13 @@ export function MenuEditor() {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setMessage(bbqErrorMessage(error));
+        setMessage(bbqErrorMessage(i18n, error));
         setPhase("error");
       });
     return () => {
       cancelled = true;
     };
-  }, [reload]);
+  }, [reload, i18n]);
 
   if (phase === "loading") {
     return (
@@ -90,7 +93,7 @@ export function MenuEditor() {
         className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
         role="status"
       >
-        读取常用项目中…
+        <Trans>读取常用项目中…</Trans>
       </div>
     );
   }
@@ -114,10 +117,12 @@ export function MenuEditor() {
       <header className="flex gap-2 flex-row items-start justify-between shrink-0">
         <div>
           <div className="flex items-center gap-1.5">
-            <h1 className={pageTitleCls}>常用项目</h1>
+            <h1 className={pageTitleCls}>
+              <Trans>常用项目</Trans>
+            </h1>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            常记的放这里 · {listedCount} 项可选
+            <Trans>常记的放这里 · {listedCount} 项可选</Trans>
           </p>
         </div>
       </header>
@@ -161,6 +166,7 @@ function DishList({
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
+  const { t } = useLingui();
   const [search, setSearch] = useState("");
   const [adding, setAdding] = useState(dishes.length === 0);
   const query = search.trim().toLocaleLowerCase();
@@ -177,7 +183,7 @@ function DishList({
         <summary className="px-3 py-2 flex items-center gap-2 min-h-11 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50">
           <Plus className="size-4 text-primary" aria-hidden="true" />
           <span className="text-sm font-medium text-foreground flex-1">
-            添加常用项目
+            <Trans>添加常用项目</Trans>
           </span>
           <BbqCompanion mood="chef" className="block size-10 shrink-0" />
           <ChevronDown
@@ -187,7 +193,7 @@ function DishList({
         </summary>
         <div className="p-2.5 border-t">
           <p className="text-muted-foreground text-[11px] mb-2">
-            热量按每单位填写：摄入填正数，消耗填负数，可留空
+            <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
           </p>
           <DishRow
             key="new"
@@ -200,13 +206,13 @@ function DishList({
       <section className="flex flex-col gap-2">
         <div className="sticky top-0 z-10 bg-background py-2 flex flex-col gap-2">
           <h2 className="text-xs font-medium text-muted-foreground">
-            我的常用
+            <Trans>我的常用</Trans>
           </h2>
           {dishes.length > 0 ? (
             <BbqSearch
               value={search}
               onChange={setSearch}
-              label="搜索已有项目…"
+              label={t`搜索已有项目…`}
             />
           ) : null}
         </div>
@@ -215,17 +221,17 @@ function DishList({
             className="py-6 text-center text-sm text-muted-foreground"
             role="status"
           >
-            没有匹配的项目，请换个关键词
+            <Trans>没有匹配的项目，请换个关键词</Trans>
           </p>
         ) : null}
         {dishes.length === 0 ? (
           <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
             <BbqCompanion mood="dance" className="block size-32 shrink-0" />
             <p className="mt-2 text-sm font-medium text-foreground">
-              还没有项目
+              <Trans>还没有项目</Trans>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              早餐、咖啡、跑步，从常记的开始。
+              <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
             </p>
           </div>
         ) : (
@@ -265,6 +271,7 @@ function DishRow({
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
+  const { i18n, t } = useLingui();
   const isNew = dish === undefined;
   const fieldLabelCls = cls`text-muted-foreground text-xs`;
   const [name, setName] = useState(dish?.name ?? "");
@@ -306,20 +313,20 @@ function DishRow({
         !Number.isFinite(caloriesKcal) ||
         Math.abs(caloriesKcal) > Number.MAX_SAFE_INTEGER)
     ) {
-      setError("热量应为有效数字（kcal），运动消耗可填负数");
+      setError(t`热量应为有效数字（kcal），运动消耗可填负数`);
       return;
     }
     if (name.trim() === "") {
-      setError("名称不能为空");
+      setError(t`名称不能为空`);
       nameRef.current?.focus();
       return;
     }
     if (priceCents === null) {
-      setError("金额不正确");
+      setError(t`金额不正确`);
       return;
     }
     if (parsedSort === null) {
-      setError("排序要是整数");
+      setError(t`排序要是整数`);
       return;
     }
     if (
@@ -361,8 +368,8 @@ function DishRow({
       await onSaved();
       saved = true;
     } catch (error) {
-      setError(bbqErrorMessage(error));
-      onError(bbqErrorMessage(error));
+      setError(bbqErrorMessage(i18n, error));
+      onError(bbqErrorMessage(i18n, error));
     } finally {
       savingRef.current = false;
       setPending(null);
@@ -374,7 +381,7 @@ function DishRow({
 
   async function remove() {
     if (!dish || savingRef.current) return;
-    if (!window.confirm(`删除“${dish.name}”？已有记录中的项目明细会保留。`))
+    if (!window.confirm(t`删除“${dish.name}”？已有记录中的项目明细会保留。`))
       return;
     savingRef.current = true;
     setPending("delete");
@@ -382,7 +389,7 @@ function DishRow({
       await bbqStore.deleteDish(dish.id);
       await onSaved();
     } catch (error) {
-      onError(bbqErrorMessage(error));
+      onError(bbqErrorMessage(i18n, error));
     } finally {
       savingRef.current = false;
       setPending(null);
@@ -419,7 +426,7 @@ function DishRow({
                   : "shrink-0 text-xs text-muted-foreground"
               }
             >
-              {dish.listed ? "已启用" : "未启用"}
+              {dish.listed ? t`已启用` : t`未启用`}
             </span>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground break-words">
@@ -428,8 +435,14 @@ function DishRow({
             </span>
             /{dish.unit}
             <span className="mx-2">·</span>
-            热量 {formatCalories(summarizeCalories([{ ...dish, quantity: 1 }]))}
-            /{dish.unit}
+            <Trans>
+              热量{" "}
+              {formatCalories(
+                i18n,
+                summarizeCalories([{ ...dish, quantity: 1 }]),
+              )}
+              /{dish.unit}
+            </Trans>
           </p>
         </div>
         <div className="flex shrink-0 gap-0.5">
@@ -438,18 +451,20 @@ function DishRow({
             variant="outline"
             className="size-11 flex-none rounded-lg px-0 shadow-none hover:bg-muted/70 hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
-            aria-label={`编辑 ${dish.name}`}
+            aria-label={t`编辑 ${dish.name}`}
             onClick={() => setEditing(true)}
           >
             <Pencil className="size-4" aria-hidden="true" />
-            <span className="sr-only">编辑</span>
+            <span className="sr-only">
+              <Trans>编辑</Trans>
+            </span>
           </Button>
           <Button
             type="button"
             variant="ghost"
             className="text-destructive size-11 flex-none rounded-lg px-0 hover:bg-destructive/10 hover:text-destructive focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-destructive/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
-            aria-label={`删除 ${dish.name}`}
+            aria-label={t`删除 ${dish.name}`}
             onClick={() => void remove()}
           >
             {pending === "delete" ? (
@@ -460,7 +475,9 @@ function DishRow({
             ) : (
               <Trash2 className="size-4" aria-hidden="true" />
             )}
-            <span className="sr-only">删除</span>
+            <span className="sr-only">
+              <Trans>删除</Trans>
+            </span>
           </Button>
         </div>
       </article>
@@ -474,19 +491,23 @@ function DishRow({
       className={`${dishGridCls} ${isNew ? "" : dishRowCls}`}
     >
       <label className="col-span-3 flex min-w-0 flex-col gap-1">
-        <span className={fieldLabelCls}>名称</span>
+        <span className={fieldLabelCls}>
+          <Trans>名称</Trans>
+        </span>
         <Input
           ref={nameRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
           className={dishInputCls}
           autoComplete="off"
-          aria-label="项目名称"
-          placeholder={isNew ? "新项目" : undefined}
+          aria-label={t`项目名称`}
+          placeholder={isNew ? t`新项目` : undefined}
         />
       </label>
       <label className="col-span-3 flex min-w-0 flex-col gap-1">
-        <span className={fieldLabelCls}>热量 kcal / 单位</span>
+        <span className={fieldLabelCls}>
+          <Trans>热量 kcal / 单位</Trans>
+        </span>
         <Input
           type="number"
           step="any"
@@ -494,51 +515,59 @@ function DishRow({
           onChange={(event) => setCalories(event.target.value)}
           className={`${dishInputCls} tabular-nums`}
           autoComplete="off"
-          aria-label="每单位热量（kcal，选填）"
-          placeholder="如 300 / -200"
+          aria-label={t`每单位热量（kcal，选填）`}
+          placeholder={t`如 300 / -200`}
         />
       </label>
       <label className="flex min-w-0 flex-col gap-1">
-        <span className={fieldLabelCls}>单价（选填）</span>
+        <span className={fieldLabelCls}>
+          <Trans>单价（选填）</Trans>
+        </span>
         <Input
           value={price}
           onChange={(event) => setPrice(event.target.value)}
           className={`${dishInputCls} tabular-nums`}
           inputMode="decimal"
           autoComplete="off"
-          aria-label="单价（选填，默认 0 元）"
+          aria-label={t`单价（选填，默认 0 元）`}
           placeholder="0"
         />
       </label>
       <label className="flex min-w-0 flex-col gap-1">
-        <span className={fieldLabelCls}>单位（选填）</span>
+        <span className={fieldLabelCls}>
+          <Trans>单位（选填）</Trans>
+        </span>
         <Input
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
           className={dishInputCls}
           autoComplete="off"
-          aria-label="单位（选填，默认份）"
-          placeholder="份"
+          aria-label={t`单位（选填，默认份）`}
+          placeholder={t`份`}
         />
       </label>
       <label className="flex min-w-0 flex-col gap-1">
-        <span className={fieldLabelCls}>排序</span>
+        <span className={fieldLabelCls}>
+          <Trans>排序</Trans>
+        </span>
         <Input
           value={sort}
           onChange={(event) => setSort(event.target.value)}
           className={`${dishInputCls} tabular-nums`}
           inputMode="numeric"
           autoComplete="off"
-          aria-label="排序（数字越大越靠前）"
-          title="数字越大越靠前"
+          aria-label={t`排序（数字越大越靠前）`}
+          title={t`数字越大越靠前`}
         />
       </label>
       <div className="flex min-h-11 justify-start items-center gap-2">
-        <span className={fieldLabelCls}>启用</span>
+        <span className={fieldLabelCls}>
+          <Trans>启用</Trans>
+        </span>
         <div className="flex items-center justify-center min-h-9 min-w-0">
           <Switch
             checked={listed}
-            aria-label="项目启用"
+            aria-label={t`项目启用`}
             onCheckedChange={setListed}
           />
         </div>
@@ -550,8 +579,8 @@ function DishRow({
             size="icon"
             variant="ghost"
             className="shrink-0 size-11"
-            aria-label="取消编辑"
-            title="取消编辑"
+            aria-label={t`取消编辑`}
+            title={t`取消编辑`}
             onClick={cancelEditing}
           >
             <X className="size-4" aria-hidden="true" />
@@ -571,7 +600,7 @@ function DishRow({
           ) : (
             <Save className="size-4" aria-hidden="true" />
           )}
-          {pending === "save" ? "保存中…" : isNew ? "添加项目" : "保存"}
+          {pending === "save" ? t`保存中…` : isNew ? t`添加项目` : t`保存`}
         </Button>
       </div>
       {error ? (

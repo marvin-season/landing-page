@@ -6,6 +6,7 @@ import {
   Button,
   Switch,
 } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Camera,
   CheckCircle2,
@@ -23,13 +24,14 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
-import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
+import { summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
 import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
+import { formatCalories } from "./bbq-i18n";
 import {
   cls,
   pageShellCls,
@@ -85,6 +87,7 @@ function readMenu() {
 }
 
 export function OrderEditor({ orderId }: { orderId?: string }) {
+  const { i18n, t } = useLingui();
   const navigate = useBbqNavigate();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
@@ -135,14 +138,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         setPhase("ready");
       } catch (error) {
         if (cancelled) return;
-        setMessage(bbqErrorMessage(error));
+        setMessage(bbqErrorMessage(i18n, error));
         setPhase("error");
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, i18n]);
 
   useEffect(() => {
     let cancelled = false;
@@ -153,7 +156,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           setDishes(menu);
         })
         .catch((error: unknown) => {
-          if (!cancelled) setMessage(bbqErrorMessage(error));
+          if (!cancelled) setMessage(bbqErrorMessage(i18n, error));
         });
     };
     window.addEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
@@ -161,7 +164,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       cancelled = true;
       window.removeEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
     };
-  }, []);
+  }, [i18n]);
 
   const availableDishes = dishes.filter((dish) => dish.listed);
 
@@ -223,7 +226,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     const selectedFiles = Array.from(files);
     const remaining = MAX_ORDER_PHOTOS - photos.length;
     if (remaining <= 0) {
-      setMessage(`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+      setMessage(t`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
       return;
     }
 
@@ -239,9 +242,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       setPhotos((current) => [...current, ...nextPhotos]);
 
       if (results.some((result) => result.status === "rejected")) {
-        setMessage("部分照片读取失败，请选择浏览器可读取的图片");
+        setMessage(t`部分照片读取失败，请选择浏览器可读取的图片`);
       } else if (selectedFiles.length > remaining) {
-        setMessage(`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
+        setMessage(t`每条记录最多留存 ${MAX_ORDER_PHOTOS} 张照片`);
       }
     } finally {
       setProcessingPhotos(false);
@@ -276,20 +279,20 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       });
       navigate(bbqHomePath(saved.businessDayKey));
     } catch (error) {
-      setMessage(bbqErrorMessage(error));
+      setMessage(bbqErrorMessage(i18n, error));
       setSaving(false);
     }
   }
 
   async function removeOrder() {
     if (!order || saving) return;
-    if (!window.confirm("删除这条记录？")) return;
+    if (!window.confirm(t`删除这条记录？`)) return;
     setSaving(true);
     try {
       await bbqStore.deleteOrder(order.id);
       navigate(bbqHomePath(order.businessDayKey));
     } catch (error) {
-      setMessage(bbqErrorMessage(error));
+      setMessage(bbqErrorMessage(i18n, error));
       setSaving(false);
     }
   }
@@ -300,7 +303,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
         role="status"
       >
-        读取记录中…
+        <Trans>读取记录中…</Trans>
       </div>
     );
   }
@@ -310,7 +313,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
         <Alert className="border-destructive/30 bg-destructive/5 p-3">
           <AlertDescription className="text-destructive">
-            {phase === "missing" ? "没有找到这条记录" : message}
+            {phase === "missing" ? t`没有找到这条记录` : message}
           </AlertDescription>
         </Alert>
       </div>
@@ -325,18 +328,18 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             <div className="flex items-center gap-1.5">
               <h1 className={pageTitleCls}>
                 {order
-                  ? `修改${groupingEnabled ? "订单" : "记录"} #${order.seq}`
+                  ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
                   : groupingEnabled
-                    ? "新建订单"
-                    : "记一笔"}
+                    ? t`新建订单`
+                    : t`记一笔`}
               </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {order
-                ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? "开单" : "记账"}`
+                ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
                 : groupingEnabled
-                  ? "选择打包或座号和项目后保存订单"
-                  : "这次记点什么？"}
+                  ? t`选择打包或座号和项目后保存订单`
+                  : t`这次记点什么？`}
             </p>
           </div>
         </div>
@@ -354,13 +357,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   htmlFor="order-grouping"
                   className="text-sm font-medium text-foreground"
                 >
-                  按座号分组
+                  <Trans>按座号分组</Trans>
                 </label>
                 <Switch
                   id="order-grouping"
                   checked={groupingEnabled}
                   disabled={saving}
-                  aria-label="启用分组（打包或座号）"
+                  aria-label={t`启用分组（打包或座号）`}
                   onCheckedChange={(enabled) => {
                     setGroupingEnabled(enabled);
                     if (!enabled) setSeat(null);
@@ -369,9 +372,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <p className="text-xs text-muted-foreground">
                   {groupingEnabled
                     ? seat === null
-                      ? "当前选择打包"
-                      : `当前选择 ${seat} 号座`
-                    : "选填"}
+                      ? t`当前选择打包`
+                      : t`当前选择 ${seat} 号座`
+                    : t`选填`}
                 </p>
               </div>
             </div>
@@ -385,7 +388,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   onClick={() => setSeat(null)}
                 >
                   <Package className="size-4" aria-hidden="true" />
-                  打包
+                  <Trans>打包</Trans>
                 </Button>
                 {SEATS.map((number) => (
                   <Button
@@ -407,11 +410,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <div className="flex shrink-0 items-center justify-between gap-2">
                 <div>
                   <h2 className="text-sm font-medium text-foreground">
-                    常用项目
+                    <Trans>常用项目</Trans>
                   </h2>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
-                  {availableDishes.length} 项
+                  <Trans>{availableDishes.length} 项</Trans>
                 </span>
               </div>
               {availableDishes.length > 0 ? (
@@ -419,7 +422,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   <BbqSearch
                     value={search}
                     onChange={setSearch}
-                    label="搜索项目名称…"
+                    label={t`搜索项目名称…`}
                   />
                 </div>
               ) : null}
@@ -431,13 +434,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   aria-hidden="true"
                 />
                 <p className="mt-2 text-sm font-medium text-foreground">
-                  先添几个常用项目
+                  <Trans>先添几个常用项目</Trans>
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  比如早餐、咖啡，或一次跑步。
+                  <Trans>比如早餐、咖啡，或一次跑步。</Trans>
                 </p>
                 <Button asChild size="sm" variant="outline" className="mt-3">
-                  <Link href={bbqMenuPath()}>添加常用项目</Link>
+                  <Link href={bbqMenuPath()}>
+                    <Trans>添加常用项目</Trans>
+                  </Link>
                 </Button>
               </div>
             ) : filteredDishes.length === 0 ? (
@@ -445,7 +450,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 className="py-8 text-center text-sm text-muted-foreground"
                 role="status"
               >
-                没有匹配的项目，请换个关键词
+                <Trans>没有匹配的项目，请换个关键词</Trans>
               </p>
             ) : (
               <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1">
@@ -455,7 +460,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     type="button"
                     variant="ghost"
                     className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-3 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
-                    aria-label={`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
+                    aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                     onClick={() => addDish(dish)}
                   >
                     <span className="min-w-0">
@@ -466,6 +471,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       {dish.caloriesKcal != null ? (
                         <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
                           {formatCalories(
+                            i18n,
                             summarizeCalories([{ ...dish, quantity: 1 }]),
                           )}
                         </span>
@@ -490,11 +496,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <div className="flex items-end justify-between gap-3 sticky top-0 z-10 bg-card pb-2">
                   <div>
                     <h2 className="text-sm font-medium text-foreground">
-                      这一笔
+                      <Trans>这一笔</Trans>
                     </h2>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground">
-                    {itemCount} 件
+                    <Trans>{itemCount} 件</Trans>
                   </span>
                 </div>
                 {lines.length === 0 ? (
@@ -504,7 +510,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       className="block size-12 shrink-0"
                     />
                     <p className="text-xs text-muted-foreground">
-                      还没有添加项目
+                      <Trans>还没有添加项目</Trans>
                     </p>
                   </div>
                 ) : (
@@ -528,7 +534,10 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                             )}
                           </p>
                           <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                            热量 {formatCalories(summarizeCalories([line]))}
+                            <Trans>
+                              热量{" "}
+                              {formatCalories(i18n, summarizeCalories([line]))}
+                            </Trans>
                           </p>
                         </div>
                         <Button
@@ -538,8 +547,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
                           aria-label={
                             line.quantity === 1
-                              ? `移除 ${line.name}`
-                              : `减少 ${line.name} 数量`
+                              ? t`移除 ${line.name}`
+                              : t`减少 ${line.name} 数量`
                           }
                           onClick={() => changeQuantity(line.key, -1)}
                         >
@@ -557,7 +566,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           variant="outline"
                           size="icon"
                           className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
-                          aria-label={`增加 ${line.name} 数量`}
+                          aria-label={t`增加 ${line.name} 数量`}
                           onClick={() => changeQuantity(line.key, 1)}
                         >
                           <Plus className="size-4" aria-hidden="true" />
@@ -576,11 +585,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         aria-hidden="true"
                       />
                       <h2 className="text-sm font-medium text-foreground">
-                        附张照片
+                        <Trans>附张照片</Trans>
                       </h2>
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张
+                      <Trans>小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张</Trans>
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
@@ -596,7 +605,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <label className={photoActionCls}>
                     <Camera className="size-4" aria-hidden="true" />
-                    {processingPhotos ? "处理照片中…" : "拍照"}
+                    {processingPhotos ? t`处理照片中…` : t`拍照`}
                     <input
                       type="file"
                       accept="image/*"
@@ -615,7 +624,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   </label>
                   <label className={photoActionCls}>
                     <ImagePlus className="size-4" aria-hidden="true" />
-                    {processingPhotos ? "处理照片中…" : "从相册选择"}
+                    {processingPhotos ? t`处理照片中…` : t`从相册选择`}
                     <input
                       type="file"
                       accept="image/*"
@@ -642,7 +651,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       >
                         <Image
                           src={photo.dataUrl}
-                          alt={`记录留存照片 ${index + 1}`}
+                          alt={t`记录留存照片 ${index + 1}`}
                           fill
                           sizes="(max-width: 767px) 25vw, 7rem"
                           unoptimized
@@ -653,7 +662,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           variant="soft"
                           size="icon"
                           className="absolute top-1 right-1 shadow-sm size-11"
-                          aria-label={`删除第 ${index + 1} 张照片`}
+                          aria-label={t`删除第 ${index + 1} 张照片`}
                           onClick={() => removePhoto(photo.id)}
                         >
                           <X className="size-3.5" aria-hidden="true" />
@@ -673,7 +682,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     onClick={() => void removeOrder()}
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
-                    删除这条记录
+                    <Trans>删除这条记录</Trans>
                   </Button>
                 </section>
               ) : null}
@@ -695,27 +704,29 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             <div className="min-w-0 flex flex-col gap-0.5">
               <p className="text-xs text-muted-foreground">
                 {lines.length === 0
-                  ? "选择项目后保存"
-                  : `${lines.length} 项 · ${itemCount} 件`}
+                  ? t`选择项目后保存`
+                  : t`${lines.length} 项 · ${itemCount} 件`}
               </p>
               <p className="text-xl font-semibold tabular-nums tracking-tight break-all leading-tight">
                 {formatYuan(total)}
               </p>
               <p className="text-xs tabular-nums text-muted-foreground break-words">
-                热量 {formatCalories(summarizeCalories(lines))}
+                <Trans>
+                  热量 {formatCalories(i18n, summarizeCalories(lines))}
+                </Trans>
               </p>
             </div>
             <div className="flex shrink-0 items-stretch gap-1 flex-col">
               <label className="inline-flex min-h-9 shrink-0 items-center gap-2 justify-between">
                 <span className="text-right">
                   <span className="block text-xs font-medium leading-none text-foreground">
-                    {done ? "已完成" : "进行中"}
+                    {done ? t`已完成` : t`进行中`}
                   </span>
                 </span>
                 <Switch
                   checked={done}
                   disabled={saving}
-                  aria-label="切换记录状态"
+                  aria-label={t`切换记录状态`}
                   onCheckedChange={setDone}
                 />
               </label>
@@ -736,12 +747,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   <Save className="size-4" aria-hidden="true" />
                 )}
                 {saving
-                  ? "保存中…"
+                  ? t`保存中…`
                   : order
-                    ? "保存修改"
+                    ? t`保存修改`
                     : groupingEnabled
-                      ? "保存订单"
-                      : "保存记录"}
+                      ? t`保存订单`
+                      : t`保存记录`}
               </Button>
             </div>
           </div>

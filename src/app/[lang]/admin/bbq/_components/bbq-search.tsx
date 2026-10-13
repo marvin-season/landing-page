@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Input } from "@landing-page/design-system";
+import { useLingui } from "@lingui/react/macro";
 import { Search, X } from "lucide-react";
 
 export function BbqSearch({
@@ -12,6 +13,7 @@ export function BbqSearch({
   onChange: (value: string) => void;
   label: string;
 }) {
+  const { t } = useLingui();
   return (
     <div className="relative min-w-0">
       <Search
@@ -32,7 +34,7 @@ export function BbqSearch({
           variant="ghost"
           size="icon"
           className="absolute top-0 right-0 size-11 rounded-lg"
-          aria-label="清空搜索"
+          aria-label={t`清空搜索`}
           onClick={() => onChange("")}
         >
           <X className="size-4" aria-hidden="true" />

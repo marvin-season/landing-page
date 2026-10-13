@@ -1,14 +1,16 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Camera, CheckCircle2, Pencil, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Link } from "@/components/link/link";
-import { formatCalories, summarizeCalories } from "@/lib/bbq/calories";
+import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order, OrderPhoto } from "@/lib/bbq/types";
+import { formatCalories } from "./bbq-i18n";
 import { bbqOrderPath } from "./bbq-paths";
 
 export function OrderDetail({
@@ -20,6 +22,7 @@ export function OrderDetail({
   updatingStatusId: string | null;
   onToggleStatus: (order: Order) => Promise<void>;
 }) {
+  const { i18n, t } = useLingui();
   const [previewPhoto, setPreviewPhoto] = useState<OrderPhoto | null>(null);
   const photoTriggerRef = useRef<HTMLButtonElement>(null);
   return (
@@ -27,9 +30,13 @@ export function OrderDetail({
       <div className="flex min-h-0 flex-col flex-1 overflow-hidden">
         <div className="min-h-0 flex-1 p-3 overflow-y-auto overscroll-y-contain">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-medium text-foreground">记录明细</h3>
+            <h3 className="text-sm font-medium text-foreground">
+              <Trans>记录明细</Trans>
+            </h3>
             <span className="text-xs tabular-nums text-muted-foreground">
-              热量 {formatCalories(summarizeCalories(order.lines))}
+              <Trans>
+                热量 {formatCalories(i18n, summarizeCalories(order.lines))}
+              </Trans>
             </span>
           </div>
           <ul className="mt-2 divide-y text-sm">
@@ -46,7 +53,9 @@ export function OrderDetail({
                     {formatYuan(line.priceCents)} × {line.quantity}
                   </p>
                   <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                    热量 {formatCalories(summarizeCalories([line]))}
+                    <Trans>
+                      热量 {formatCalories(i18n, summarizeCalories([line]))}
+                    </Trans>
                   </p>
                 </div>
                 <span className="shrink-0 font-medium tabular-nums text-foreground">
@@ -61,11 +70,11 @@ export function OrderDetail({
                 <div className="flex items-center gap-1.5">
                   <Camera className="size-4 text-primary" aria-hidden="true" />
                   <h3 className="text-sm font-medium text-foreground">
-                    留存照片
+                    <Trans>留存照片</Trans>
                   </h3>
                 </div>
                 <span className="text-xs tabular-nums text-muted-foreground">
-                  {order.photos.length} 张
+                  <Trans>{order.photos.length} 张</Trans>
                 </span>
               </div>
               <ul className="mt-2 grid grid-cols-3 gap-2">
@@ -74,7 +83,7 @@ export function OrderDetail({
                     <button
                       type="button"
                       className="relative block aspect-square w-full overflow-hidden rounded-lg border bg-muted transition-opacity hover:opacity-85"
-                      aria-label={`查看第 ${index + 1} 张留存照片`}
+                      aria-label={t`查看第 ${index + 1} 张留存照片`}
                       onClick={(event) => {
                         photoTriggerRef.current = event.currentTarget;
                         setPreviewPhoto(photo);
@@ -82,7 +91,7 @@ export function OrderDetail({
                     >
                       <Image
                         src={photo.dataUrl}
-                        alt={`记录留存照片 ${index + 1}`}
+                        alt={t`记录留存照片 ${index + 1}`}
                         fill
                         sizes="8rem"
                         unoptimized
@@ -108,10 +117,10 @@ export function OrderDetail({
               <RotateCcw className="size-4" aria-hidden="true" />
             )}
             {updatingStatusId === order.id
-              ? "处理中…"
+              ? t`处理中…`
               : order.status === "open"
-                ? "完成记录"
-                : "恢复进行中"}
+                ? t`完成记录`
+                : t`恢复进行中`}
           </Button>
           <Button
             asChild
@@ -120,7 +129,7 @@ export function OrderDetail({
           >
             <Link href={bbqOrderPath(order.id)}>
               <Pencil className="size-4" aria-hidden="true" />
-              修改记录
+              <Trans>修改记录</Trans>
             </Link>
           </Button>
         </div>
@@ -141,15 +150,15 @@ export function OrderDetail({
             }}
           >
             <Dialog.Title className="absolute top-4 left-4 text-sm font-medium">
-              记录留存照片
+              <Trans>记录留存照片</Trans>
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              记录的照片大图，可按 Esc 或关闭按钮返回记录详情
+              <Trans>记录的照片大图，可按 Esc 或关闭按钮返回记录详情</Trans>
             </Dialog.Description>
             {previewPhoto ? (
               <Image
                 src={previewPhoto.dataUrl}
-                alt="记录留存照片大图"
+                alt={t`记录留存照片大图`}
                 width={1600}
                 height={1600}
                 unoptimized
@@ -162,7 +171,7 @@ export function OrderDetail({
                 variant="ghost"
                 size="icon"
                 className="absolute top-1 right-1 size-11"
-                aria-label="关闭照片预览"
+                aria-label={t`关闭照片预览`}
               >
                 <X className="size-4" aria-hidden="true" />
               </Button>

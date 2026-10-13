@@ -6,8 +6,8 @@ import type { MetadataRoute } from "next";
 const require = createRequire(import.meta.url);
 const sharp = createRequire(require.resolve("next"))("sharp");
 const output = new URL("../public/bbq-pwa/", import.meta.url);
-const portrait = new URL("../public/bbq/companions/happy-still.png", import.meta.url);
-const iconVersion = "loopy-1";
+const portrait = new URL("../public/bbq-pwa/loopy-source.png", import.meta.url);
+const iconVersion = "loopy-2";
 
 function iconSvg(portraitData: string, inset: number) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -19,12 +19,8 @@ function iconSvg(portraitData: string, inset: number) {
 
 async function main() {
   await mkdir(output, { recursive: true });
-  // 只裁切生成独立的应用头像；页面使用的原始动图和静帧保持不变。
-  const croppedPortrait = await sharp(portrait.pathname)
-    .extract({ left: 100, top: 0, width: 310, height: 390 })
-    .png()
-    .toBuffer();
-  const portraitData = await sharp(croppedPortrait).trim().png().toBuffer();
+  // 生成时仅去除透明留白，保留完整角色；用户提供的源图保持不变。
+  const portraitData = await sharp(portrait.pathname).trim().png().toBuffer();
   const icon = iconSvg(portraitData.toString("base64"), 42);
   await writeFile(new URL("icon.svg", output), `${icon}\n`);
   await Promise.all(

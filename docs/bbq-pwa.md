@@ -18,7 +18,7 @@
 
 ## 维护与验收
 
-`nr bbq:pwa:assets` 生成 `public/bbq-pwa/` 下的中文静态 manifest 和图标。图标使用 `public/bbq/companions/happy-still.png` 中的 Loopy 笑脸，由 `scripts/generate-bbq-pwa.ts` 单独裁切生成 SVG、192/512 PNG、180 Apple touch icon 和独立的 maskable 图标，原配图保持不变。使用 Next 已安装的 Sharp，无额外依赖。修改品牌时重新运行此命令；替换图标时同步递增脚本与 BBQ metadata 的图标版本参数。
+`nr bbq:pwa:assets` 生成 `public/bbq-pwa/` 下的中文静态 manifest 和图标。图标使用 `public/bbq-pwa/loopy-source.png` 中的完整 Loopy 角色，由 `scripts/generate-bbq-pwa.ts` 去除透明留白后生成 SVG、16/32/192/512 PNG、180 Apple touch icon 和独立的 maskable 图标，原配图保持不变。使用 Next 已安装的 Sharp，无额外依赖。修改品牌时重新运行此命令；替换图标时同步递增脚本与 BBQ metadata 的图标版本参数。
 
 主题菜单新增 `Loopy · 奶油粉`，沿用现有主题偏好保存机制。PWA 的背景与浏览器主题色使用同款奶油粉，应用 ID、启动地址和作用域保持原值。
 

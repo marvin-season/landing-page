@@ -1,7 +1,9 @@
 "use client";
 
+import { Trans, useLingui } from "@lingui/react/macro";
+
 import { ChevronDown } from "lucide-react";
-import { businessDayLabel } from "@/lib/bbq/business-day";
+import { businessDayLabel } from "./bbq-i18n";
 import { cls } from "./bbq-layout";
 import { BusinessDayCalendar } from "./business-day-calendar";
 
@@ -24,19 +26,20 @@ export function OrdersHomeTabs({
   homeView: HomeView;
   onViewChange: (view: HomeView) => void;
 }) {
+  const { i18n, t } = useLingui();
   return (
     <div className="flex flex-col items-stretch gap-1.5">
       <div
         className="flex w-full gap-6 border-b"
         role="group"
-        aria-label="账本视图"
+        aria-label={t`账本视图`}
       >
         <BusinessDayCalendar day={day}>
           <button
             type="button"
             disabled={!day}
             aria-pressed={homeView === "orders"}
-            aria-label={`${day ? businessDayLabel(day) : "当前时段"}，${homeView === "orders" ? "打开日历" : "查看记录"}`}
+            aria-label={`${day ? businessDayLabel(i18n, day) : t`当前时段`}，${homeView === "orders" ? t`打开日历` : t`查看记录`}`}
             className={`${homeViewTabCls} ${
               homeView === "orders"
                 ? "text-foreground border-primary"
@@ -50,14 +53,16 @@ export function OrdersHomeTabs({
               }
             }}
           >
-            <span className="shrink-0">明细</span>
+            <span className="shrink-0">
+              <Trans>明细</Trans>
+            </span>
             {day ? (
               <span
                 className="truncate text-[11px] font-normal tabular-nums text-muted-foreground"
-                title={businessDayLabel(day)}
+                title={businessDayLabel(i18n, day)}
               >
                 {day.slice(5, 10)}
-                {day.endsWith("#off") ? " 休息" : ""}
+                {day.endsWith("#off") ? t` 休息` : ""}
               </span>
             ) : null}
             <ChevronDown className="size-3.5 shrink-0" aria-hidden="true" />
@@ -73,12 +78,12 @@ export function OrdersHomeTabs({
           }`}
           onClick={() => onViewChange("statistics")}
         >
-          统计
+          <Trans>统计</Trans>
         </button>
       </div>
       {homeView === "statistics" ? (
         <p className="text-xs text-muted-foreground">
-          全部历史记录 · 仅保存在这台设备
+          <Trans>全部历史记录 · 仅保存在这台设备</Trans>
         </p>
       ) : null}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, Button } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DatabaseBackup,
   Download,
@@ -25,6 +26,7 @@ const settingsActionCls = cls`
 `;
 
 export function BbqSettings() {
+  const { i18n, t } = useLingui();
   const importInputRef = useRef<HTMLInputElement>(null);
   const backupBusyRef = useRef(false);
   const [backupTask, setBackupTask] = useState<"import" | "export" | null>(
@@ -42,9 +44,9 @@ export function BbqSettings() {
     try {
       const backup = await bbqStore.exportBackup({ includePhotos });
       downloadBackup(backup, includePhotos);
-      setNotice("备份已生成，请在浏览器下载中查看");
+      setNotice(t`备份已生成，请在浏览器下载中查看`);
     } catch (error) {
-      setMessage(bbqErrorMessage(error));
+      setMessage(bbqErrorMessage(i18n, error));
     } finally {
       backupBusyRef.current = false;
       setBackupTask(null);
@@ -57,11 +59,11 @@ export function BbqSettings() {
     try {
       parsed = JSON.parse(await file.text()) as unknown;
     } catch {
-      setMessage("备份文件不正确");
+      setMessage(t`备份文件不正确`);
       return;
     }
     if (
-      !window.confirm("把备份按编号合并进当前记账数据？相同编号的数据会更新。")
+      !window.confirm(t`把备份按编号合并进当前记账数据？相同编号的数据会更新。`)
     )
       return;
     backupBusyRef.current = true;
@@ -72,9 +74,9 @@ export function BbqSettings() {
       await bbqStore.importBackup(parsed as BbqBackup);
       notifyBbqMenuChanged();
       setMessage(null);
-      setNotice("备份已导入，记录和常用项目已更新");
+      setNotice(t`备份已导入，记录和常用项目已更新`);
     } catch (error) {
-      setMessage(bbqErrorMessage(error));
+      setMessage(bbqErrorMessage(i18n, error));
     } finally {
       backupBusyRef.current = false;
       setBackupTask(null);
@@ -85,10 +87,12 @@ export function BbqSettings() {
     <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
       <header className="shrink-0">
         <div className="flex items-center gap-1.5">
-          <h1 className={pageTitleCls}>设置</h1>
+          <h1 className={pageTitleCls}>
+            <Trans>设置</Trans>
+          </h1>
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          记录存在这台设备，记得定期备份。
+          <Trans>记录存在这台设备，记得定期备份。</Trans>
         </p>
       </header>
       {message ? (
@@ -117,10 +121,10 @@ export function BbqSettings() {
                   className="size-4 text-primary"
                   aria-hidden="true"
                 />
-                备份账本
+                <Trans>备份账本</Trans>
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                保存一份记录和常用项目，换设备也能带走。
+                <Trans>保存一份记录和常用项目，换设备也能带走。</Trans>
               </p>
             </div>
             <BbqCompanion mood="care" className="block size-16 shrink-0" />
@@ -137,7 +141,7 @@ export function BbqSettings() {
               onClick={() => void exportBackup()}
             >
               <Download className="size-4" aria-hidden="true" />
-              导出备份（不含照片）
+              <Trans>导出备份（不含照片）</Trans>
             </Button>
             <Button
               type="button"
@@ -146,7 +150,7 @@ export function BbqSettings() {
               onClick={() => void exportBackup(true)}
             >
               <Images className="size-4" aria-hidden="true" />
-              导出备份（包含照片）
+              <Trans>导出备份（包含照片）</Trans>
             </Button>
             <Button
               type="button"
@@ -155,7 +159,7 @@ export function BbqSettings() {
               onClick={() => importInputRef.current?.click()}
             >
               <Upload className="size-4" aria-hidden="true" />
-              导入完整备份
+              <Trans>导入完整备份</Trans>
             </Button>
           </fieldset>
           <input
@@ -180,7 +184,7 @@ export function BbqSettings() {
                 className="size-4 animate-spin motion-reduce:animate-none"
                 aria-hidden="true"
               />
-              {backupTask === "import" ? "导入中…" : "导出中…"}
+              {backupTask === "import" ? t`导入中…` : t`导出中…`}
             </p>
           ) : null}
         </section>
@@ -192,10 +196,10 @@ export function BbqSettings() {
                   className="size-4 text-primary"
                   aria-hidden="true"
                 />
-                放到主屏幕
+                <Trans>放到主屏幕</Trans>
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                添加到主屏幕，方便下次打开记账。
+                <Trans>添加到主屏幕，方便下次打开记账。</Trans>
               </p>
             </div>
             <BbqCompanion mood="wave" className="block size-16 shrink-0" />

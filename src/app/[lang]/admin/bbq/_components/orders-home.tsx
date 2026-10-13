@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription } from "@landing-page/design-system";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { motion, useReducedMotion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
 
 export function OrdersHome() {
+  const { i18n } = useLingui();
   const searchParams = useSearchParams();
   const dayParam = searchParams.get("day");
   const [mounted, setMounted] = useState(false);
@@ -63,12 +65,12 @@ export function OrdersHome() {
       .catch((error: unknown) => {
         if (cancelled) return;
         setStorageFailed(true);
-        setMessage(bbqErrorMessage(error));
+        setMessage(bbqErrorMessage(i18n, error));
       });
     return () => {
       cancelled = true;
     };
-  }, [day, mounted]);
+  }, [day, mounted, i18n]);
 
   useEffect(() => {
     if (homeView !== "statistics" || allOrders !== null) {
@@ -86,7 +88,7 @@ export function OrdersHome() {
       .catch((error: unknown) => {
         if (cancelled) return;
         setStorageFailed(true);
-        setMessage(bbqErrorMessage(error));
+        setMessage(bbqErrorMessage(i18n, error));
       })
       .finally(() => {
         if (!cancelled) setStatisticsLoading(false);
@@ -94,7 +96,7 @@ export function OrdersHome() {
     return () => {
       cancelled = true;
     };
-  }, [allOrders, homeView]);
+  }, [allOrders, homeView, i18n]);
 
   async function reload() {
     const [next, nextAll] = await Promise.all([
@@ -126,7 +128,7 @@ export function OrdersHome() {
       await reload();
       setSelectedId((current) => (current === order.id ? null : current));
     } catch (error) {
-      setMessage(bbqErrorMessage(error));
+      setMessage(bbqErrorMessage(i18n, error));
     } finally {
       setUpdatingStatusId(null);
     }
@@ -138,8 +140,12 @@ export function OrdersHome() {
     <div className={`${pageShellCls} overflow-hidden flex-1`}>
       <header className="flex shrink-0 flex-col gap-1.5">
         <div>
-          <h1 className={pageTitleCls}>Loopy 记账</h1>
-          <p className="mt-1 text-xs text-muted-foreground">我的日常账本</p>
+          <h1 className={pageTitleCls}>
+            <Trans>Loopy 记账</Trans>
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <Trans>我的日常账本</Trans>
+          </p>
         </div>
         {storageFailed ? null : (
           <OrdersHomeTabs
@@ -181,7 +187,7 @@ export function OrdersHome() {
               className="flex min-h-80 flex-1 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground shadow-sm"
               role="status"
             >
-              读取全部时段数据中…
+              <Trans>读取全部时段数据中…</Trans>
             </div>
           ) : (
             <OrdersStatistics
