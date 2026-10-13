@@ -47,7 +47,7 @@ const editorMenuPaneCls = cls`min-h-0 min-w-0 border-b p-3 flex flex-col`;
 
 const editorOrderPaneCls = cls`flex min-h-0 min-w-0 flex-col`;
 
-const editorOrderBodyCls = cls`min-h-0 p-3`;
+const editorOrderBodyCls = cls`min-h-0 p-3 pb-5`;
 
 const editorControlCls = cls`
   rounded-lg shadow-none transition-colors
@@ -341,7 +341,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         disabled={saving}
         aria-busy={saving}
       >
-        <div className="min-h-0 overflow-y-auto overscroll-y-contain">
+        <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3">
           <section className="border-b px-3 py-2.5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-wrap">
@@ -679,22 +679,22 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </AlertDescription>
             </Alert>
           ) : null}
-          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-            <div className="min-w-0">
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+            <div className="min-w-0 flex flex-col gap-0.5">
               <p className="text-xs text-muted-foreground">
                 {lines.length === 0
                   ? "选择项目后保存"
                   : `${lines.length} 项 · ${itemCount} 件`}
               </p>
-              <p className="text-xl font-semibold tabular-nums tracking-tight">
+              <p className="text-xl font-semibold tabular-nums tracking-tight break-all leading-tight">
                 {formatYuan(total)}
               </p>
-              <p className="text-xs tabular-nums text-muted-foreground">
+              <p className="text-xs tabular-nums text-muted-foreground break-words">
                 热量 {formatCalories(summarizeCalories(lines))}
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-1 flex-col">
-              <label className="inline-flex min-h-9 shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-stretch gap-1 flex-col">
+              <label className="inline-flex min-h-9 shrink-0 items-center gap-2 justify-between">
                 <span className="text-right">
                   <span className="block text-xs font-medium leading-none text-foreground">
                     {done ? "已完成" : "进行中"}
@@ -709,7 +709,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </label>
               <Button
                 type="button"
-                className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70`}
+                className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full`}
                 disabled={saving || processingPhotos}
                 onClick={() => void save()}
               >

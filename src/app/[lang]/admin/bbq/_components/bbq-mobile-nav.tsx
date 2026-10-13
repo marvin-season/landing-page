@@ -61,9 +61,9 @@ export function BbqMobileNav() {
   return (
     <nav
       aria-label="天天记账主导航"
-      className="sticky bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 h-10 bg-background shrink-0"
+      className="relative z-30 bg-background shrink-0 mt-2 border-t"
     >
-      <div className="mx-auto grid h-full grid-cols-4 gap-1 py-1.5">
+      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
           const disabled = itemSegment === "orders" && !canCreate && !active;

@@ -48,7 +48,7 @@ export default function BbqLayout({ children }: PropsWithChildren) {
   return (
     <BbqInstallProvider>
       <div className="min-w-0 flex flex-col mx-auto w-full max-w-xl flex-none pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
-        <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-y-auto overscroll-y-contain">
+        <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden">
           {children}
         </div>
         <BbqMobileNav />
