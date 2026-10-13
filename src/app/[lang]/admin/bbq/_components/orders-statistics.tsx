@@ -111,9 +111,7 @@ export function OrdersStatistics({
                 </h2>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                <Trans>
-                  每时段平均已完成金额 {formatYuan(averagePerPeriod)}
-                </Trans>
+                {t`每时段平均已完成金额 ${formatYuan(averagePerPeriod)}`}
               </p>
             </div>
             <BbqCompanion
