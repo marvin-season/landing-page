@@ -4,11 +4,11 @@ import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DatabaseBackup,
-  Download,
-  Images,
+  FileDown,
+  FileUp,
+  FolderDown,
   LoaderCircle,
   Smartphone,
-  Upload,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
@@ -19,6 +19,7 @@ import { bbqErrorMessage } from "./bbq-errors";
 import { BbqInstallButton } from "./bbq-install-button";
 import { cls, pageShellCls, pageTitleCls } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
+import { BbqSupportCard } from "./bbq-support-card";
 
 const settingsActionCls = cls`
   min-h-11 w-full justify-start rounded-none px-3 text-sm shadow-none
@@ -140,7 +141,7 @@ export function BbqSettings() {
               className={settingsActionCls}
               onClick={() => void exportBackup()}
             >
-              <Download className="size-4" aria-hidden="true" />
+              <FileDown className="size-4" aria-hidden="true" />
               <Trans>导出备份（不含照片）</Trans>
             </Button>
             <Button
@@ -149,7 +150,7 @@ export function BbqSettings() {
               className={settingsActionCls}
               onClick={() => void exportBackup(true)}
             >
-              <Images className="size-4" aria-hidden="true" />
+              <FolderDown className="size-4" aria-hidden="true" />
               <Trans>导出备份（包含照片）</Trans>
             </Button>
             <Button
@@ -158,7 +159,7 @@ export function BbqSettings() {
               className={settingsActionCls}
               onClick={() => importInputRef.current?.click()}
             >
-              <Upload className="size-4" aria-hidden="true" />
+              <FileUp className="size-4" aria-hidden="true" />
               <Trans>导入完整备份</Trans>
             </Button>
           </fieldset>
@@ -208,6 +209,7 @@ export function BbqSettings() {
             <BbqInstallButton />
           </div>
         </section>
+        <BbqSupportCard />
       </div>
     </div>
   );
