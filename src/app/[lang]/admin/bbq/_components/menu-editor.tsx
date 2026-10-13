@@ -14,7 +14,6 @@ import {
   Plus,
   Save,
   Trash2,
-  UtensilsCrossed,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -221,10 +220,7 @@ function DishList({
         ) : null}
         {dishes.length === 0 ? (
           <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
-            <UtensilsCrossed
-              className="size-7 text-muted-foreground/60"
-              aria-hidden="true"
-            />
+            <BbqCompanion mood="dance" className="block size-32 shrink-0" />
             <p className="mt-2 text-sm font-medium text-foreground">
               还没有项目
             </p>

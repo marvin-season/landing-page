@@ -583,9 +583,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张
                     </p>
                   </div>
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {photos.length}/{MAX_ORDER_PHOTOS}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <BbqCompanion
+                      mood="photo-pose"
+                      className="block size-14 shrink-0"
+                    />
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {photos.length}/{MAX_ORDER_PHOTOS}
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <label className={photoActionCls}>

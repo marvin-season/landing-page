@@ -14,6 +14,7 @@ const companions = {
   ponder: { width: 226, height: 226 },
   happy: { width: 534, height: 534 },
   care: { width: 221, height: 221 },
+  "photo-pose": { width: 474, height: 474 },
 } as const;
 
 const companionCls = cls`block size-full object-contain select-none`;
