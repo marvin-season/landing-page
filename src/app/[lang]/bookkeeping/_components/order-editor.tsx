@@ -186,6 +186,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     })),
   );
   const itemCount = lines.reduce((count, line) => count + line.quantity, 0);
+  const canSave = lines.length > 0 && !saving && !processingPhotos;
 
   function addDish(dish: Dish) {
     setLines((current) => {
@@ -256,7 +257,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   async function save() {
-    if (saving || processingPhotos) return;
+    if (!canSave) return;
     setSaving(true);
     setMessage(null);
     const status: OrderStatus = done ? "done" : "open";
@@ -344,6 +345,16 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </div>
         </div>
       </header>
+      {message ? (
+        <Alert
+          className="max-h-20 shrink-0 overflow-auto border-destructive/30 bg-destructive/5 p-2"
+          role="alert"
+        >
+          <AlertDescription className="text-destructive">
+            {message}
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <fieldset
         className={`${editorWorkspaceCls} min-w-0`}
         disabled={saving}
@@ -351,7 +362,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       >
         <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3">
           <section className="border-b px-3 py-2.5">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2 flex-wrap">
                 <label
                   htmlFor="order-grouping"
@@ -377,6 +388,17 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     : t`选填`}
                 </p>
               </div>
+              <label className="inline-flex min-h-9 shrink-0 items-center gap-2">
+                <span className="text-xs font-medium text-foreground">
+                  {done ? t`已完成` : t`进行中`}
+                </span>
+                <Switch
+                  checked={done}
+                  disabled={saving}
+                  aria-label={t`切换记录状态`}
+                  onCheckedChange={setDone}
+                />
+              </label>
             </div>
             {groupingEnabled ? (
               <div className="mt-2 grid grid-cols-5 gap-1.5">
@@ -500,9 +522,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     </h2>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground">
-                    <Trans>{itemCount} 件</Trans>
+                    {t`${lines.length} 项 · ${itemCount} 件`}
                   </span>
                 </div>
+                <p className="text-xs tabular-nums text-muted-foreground break-words">
+                  <Trans>
+                    热量 {formatCalories(i18n, summarizeCalories(lines))}
+                  </Trans>
+                </p>
                 {lines.length === 0 ? (
                   <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
                     <BbqCompanion
@@ -690,71 +717,37 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </section>
         </div>
         <div className={totalBarCls}>
-          {message ? (
-            <Alert
-              className="mb-2 max-h-20 overflow-auto border-destructive/30 bg-destructive/5 p-2"
-              role="alert"
-            >
-              <AlertDescription className="text-destructive">
-                {message}
-              </AlertDescription>
-            </Alert>
-          ) : null}
           <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-            <div className="min-w-0 flex flex-col gap-0.5">
-              <p className="text-xs text-muted-foreground">
-                {lines.length === 0
-                  ? t`选择项目后保存`
-                  : t`${lines.length} 项 · ${itemCount} 件`}
-              </p>
-              <p className="text-xl font-semibold tabular-nums tracking-tight break-all leading-tight">
-                {formatYuan(total)}
-              </p>
-              <p className="text-xs tabular-nums text-muted-foreground break-words">
-                <Trans>
-                  热量 {formatCalories(i18n, summarizeCalories(lines))}
-                </Trans>
-              </p>
-            </div>
-            <div className="flex shrink-0 items-stretch gap-1 flex-col">
-              <label className="inline-flex min-h-9 shrink-0 items-center gap-2 justify-between">
-                <span className="text-right">
-                  <span className="block text-xs font-medium leading-none text-foreground">
-                    {done ? t`已完成` : t`进行中`}
-                  </span>
-                </span>
-                <Switch
-                  checked={done}
-                  disabled={saving}
-                  aria-label={t`切换记录状态`}
-                  onCheckedChange={setDone}
+            <p
+              className="text-xl font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
+              title={formatYuan(total)}
+            >
+              {formatYuan(total)}
+            </p>
+            <Button
+              type="button"
+              className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full`}
+              disabled={!canSave}
+              onClick={() => void save()}
+            >
+              {saving ? (
+                <LoaderCircle
+                  className="size-4 animate-spin motion-reduce:animate-none"
+                  aria-hidden="true"
                 />
-              </label>
-              <Button
-                type="button"
-                className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full`}
-                disabled={saving || processingPhotos}
-                onClick={() => void save()}
-              >
-                {saving ? (
-                  <LoaderCircle
-                    className="size-4 animate-spin motion-reduce:animate-none"
-                    aria-hidden="true"
-                  />
-                ) : done ? (
-                  <CheckCircle2 className="size-4" aria-hidden="true" />
-                ) : (
-                  <Save className="size-4" aria-hidden="true" />
-                )}
-                {saving
-                  ? t`保存中…`
-                  : order
-                    ? t`保存修改`
-                    : groupingEnabled
-                      ? t`保存订单`
-                      : t`保存记录`}
-              </Button>
-            </div>
+              ) : done ? (
+                <CheckCircle2 className="size-4" aria-hidden="true" />
+              ) : (
+                <Save className="size-4" aria-hidden="true" />
+              )}
+              {saving
+                ? t`保存中…`
+                : order
+                  ? t`保存修改`
+                  : groupingEnabled
+                    ? t`保存订单`
+                    : t`保存记录`}
+            </Button>
           </div>
         </div>
       </fieldset>
