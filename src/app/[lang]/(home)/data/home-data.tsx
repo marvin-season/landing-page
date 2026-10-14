@@ -6,6 +6,7 @@ import {
   History,
   type LucideIcon,
   Shapes,
+  Wallet,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -51,6 +52,19 @@ export const navLinks: HomeNavLink[] = [
     ),
     badge: "Core",
     icon: BookOpen,
+  },
+  {
+    href: "/bookkeeping",
+    analyticsId: "bookkeeping",
+    title: <Trans>Loopy 记账</Trans>,
+    description: (
+      <>
+        <Trans>个人记账</Trans> · <Trans>支出统计</Trans> ·{" "}
+        <Trans>热量记录</Trans>
+      </>
+    ),
+    badge: "NEW",
+    icon: Wallet,
   },
   {
     href: "/agent",

@@ -7,11 +7,6 @@ const tools = [
     title: "闲人止步",
     description: "管理用户列表，创建管理员或访客",
   },
-  {
-    href: "/bookkeeping",
-    title: "天天记账",
-    description: "个人支出、日常记账与饮食热量统计",
-  },
 ];
 
 const toolClassName =
