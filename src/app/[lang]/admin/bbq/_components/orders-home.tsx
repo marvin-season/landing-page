@@ -14,6 +14,7 @@ import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { pageShellCls, pageTitleCls } from "./bbq-layout";
+import { bbqSearchDescription } from "./bbq-search-copy";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 import { OrdersStatistics } from "./orders-statistics";
@@ -145,6 +146,9 @@ export function OrdersHome() {
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
             <Trans>我的日常账本</Trans>
+          </p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {i18n._(bbqSearchDescription)}
           </p>
         </div>
         {storageFailed ? null : (

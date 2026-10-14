@@ -2,8 +2,10 @@ import { msg } from "@lingui/core/macro";
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
+import { getSiteOrigin } from "@/lib/site-origin";
 import { BbqInstallProvider } from "./_components/bbq-install-button";
 import { BbqMobileNav } from "./_components/bbq-mobile-nav";
+import { bbqSearchDescription } from "./_components/bbq-search-copy";
 
 export async function generateMetadata({
   params,
@@ -11,13 +13,14 @@ export async function generateMetadata({
   const { lang } = await params;
   const i18n = getI18nInstance(lang);
   const title = i18n._(msg`Loopy 记账 · 支出与热量统计`);
-  const description = i18n._(
-    msg`和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。`,
-  );
+  const description = i18n._(bbqSearchDescription);
 
   return {
+    metadataBase: new URL(await getSiteOrigin()),
     title: { absolute: title },
     description,
+    robots: { index: true, follow: true },
+    alternates: { canonical: "/zh/admin/bbq" },
     keywords: [
       i18n._(msg`Loopy 记账`),
       i18n._(msg`个人记账`),
@@ -30,6 +33,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
+      url: "/zh/admin/bbq",
       siteName: i18n._(msg`Loopy 记账`),
       type: "website",
       locale: lang === "zh" ? "zh_CN" : lang,

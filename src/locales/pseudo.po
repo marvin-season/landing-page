@@ -46,13 +46,13 @@ msgstr ""
 
 #. placeholder {0}: item.orderCount
 #. placeholder {0}: item.settledOrderCount
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:210
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:218
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:208
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:216
 msgid "{0} 条"
 msgstr ""
 
 #. placeholder {0}: item.orderCount
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:393
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:391
 msgid "{0} 条记录"
 msgstr ""
 
@@ -72,7 +72,7 @@ msgstr ""
 msgid "{count} 条"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:439
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:437
 msgid "{date} 休息"
 msgstr ""
 
@@ -502,16 +502,20 @@ msgstr ""
 msgid "Locate a quote without storing selection geometry"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:144
-#: src/app/[lang]/admin/bbq/layout.tsx:22
-#: src/app/[lang]/admin/bbq/layout.tsx:33
-#: src/app/[lang]/admin/bbq/layout.tsx:38
+#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:145
+#: src/app/[lang]/admin/bbq/layout.tsx:25
+#: src/app/[lang]/admin/bbq/layout.tsx:37
 #: src/app/[lang]/admin/bbq/layout.tsx:42
+#: src/app/[lang]/admin/bbq/layout.tsx:46
 msgid "Loopy 记账"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:13
+#: src/app/[lang]/admin/bbq/layout.tsx:15
 msgid "Loopy 记账 · 支出与热量统计"
+msgstr ""
+
+#: src/app/[lang]/admin/bbq/_components/bbq-search-copy.ts:3
+msgid "Loopy 记账：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
 msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:67
@@ -945,7 +949,7 @@ msgstr ""
 msgid "下个月"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:23
+#: src/app/[lang]/admin/bbq/layout.tsx:26
 msgid "个人记账"
 msgstr ""
 
@@ -962,7 +966,7 @@ msgid "份"
 msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:190
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:200
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:198
 msgid "休息时段"
 msgstr ""
 
@@ -1025,7 +1029,7 @@ msgstr ""
 msgid "关闭照片预览"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:181
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:179
 msgid "最近时段在前"
 msgstr ""
 
@@ -1094,15 +1098,15 @@ msgstr ""
 msgid "变化趋势"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:339
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:337
 msgid "各时段已完成热量趋势（kcal）"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:336
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:334
 msgid "各时段已完成金额趋势"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:338
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:336
 msgid "各时段记录数趋势"
 msgstr ""
 
@@ -1121,10 +1125,6 @@ msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/order-editor.tsx:366
 msgid "启用分组（打包或座号）"
-msgstr ""
-
-#: src/app/[lang]/admin/bbq/layout.tsx:15
-msgid "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。"
 msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:238
@@ -1206,7 +1206,7 @@ msgstr ""
 msgid "小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:419
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:417
 msgid "左右滑动查看全部时段"
 msgstr ""
 
@@ -1221,7 +1221,7 @@ msgstr ""
 #: src/app/[lang]/admin/bbq/_components/order-editor.tsx:723
 #: src/app/[lang]/admin/bbq/_components/orders-list.tsx:27
 #: src/app/[lang]/admin/bbq/_components/orders-list.tsx:134
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:215
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:213
 msgid "已完成"
 msgstr ""
 
@@ -1230,12 +1230,12 @@ msgid "已完成合计"
 msgstr ""
 
 #. placeholder {0}: formatCalories(i18n, item.settledCalories)
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:231
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:229
 msgid "已完成热量 {0}"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:139
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:223
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:137
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:221
 msgid "已完成金额"
 msgstr ""
 
@@ -1292,7 +1292,7 @@ msgstr ""
 msgid "我的常用"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:147
+#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:148
 msgid "我的日常账本"
 msgstr ""
 
@@ -1341,7 +1341,7 @@ msgstr ""
 msgid "搜索项目名称…"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:24
+#: src/app/[lang]/admin/bbq/layout.tsx:27
 msgid "支出统计"
 msgstr ""
 
@@ -1373,7 +1373,7 @@ msgstr ""
 msgid "新项目"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:25
+#: src/app/[lang]/admin/bbq/layout.tsx:28
 msgid "日常消费"
 msgstr ""
 
@@ -1385,8 +1385,8 @@ msgstr ""
 msgid "早餐、咖啡、跑步，从常记的开始。"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:175
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:178
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:173
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:176
 msgid "时段明细"
 msgstr ""
 
@@ -1394,7 +1394,7 @@ msgstr ""
 msgid "明细"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:272
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:270
 msgid "暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。"
 msgstr ""
 
@@ -1428,7 +1428,7 @@ msgstr ""
 msgid "查看记录"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:195
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:193
 msgid "查看记录 →"
 msgstr ""
 
@@ -1508,7 +1508,7 @@ msgstr ""
 msgid "热量 kcal / 单位"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:159
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:157
 msgid "热量（kcal）"
 msgstr ""
 
@@ -1524,7 +1524,7 @@ msgstr ""
 msgid "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:26
+#: src/app/[lang]/admin/bbq/layout.tsx:29
 msgid "热量记录"
 msgstr ""
 
@@ -1574,7 +1574,7 @@ msgstr ""
 msgid "编辑记录 · Loopy 记账"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:27
+#: src/app/[lang]/admin/bbq/layout.tsx:30
 msgid "菜单管理"
 msgstr ""
 
@@ -1586,7 +1586,7 @@ msgstr ""
 msgid "订单"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/layout.tsx:28
+#: src/app/[lang]/admin/bbq/layout.tsx:31
 msgid "订单记录"
 msgstr ""
 
@@ -1601,7 +1601,7 @@ msgid "记下日常，就能在这里回看金额和热量的变化。"
 msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/order-editor.tsx:331
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:207
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:205
 msgid "记录"
 msgstr ""
 
@@ -1618,7 +1618,7 @@ msgstr ""
 msgid "记录存在这台设备，记得定期备份。"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:151
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:149
 msgid "记录数"
 msgstr ""
 
@@ -1661,7 +1661,7 @@ msgid "记账·休息中"
 msgstr ""
 
 #: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:190
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:201
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:199
 msgid "记账时段"
 msgstr ""
 
@@ -1686,7 +1686,7 @@ msgstr ""
 msgid "请使用 HTTPS 网站地址。当前启动和切换页面需要联网；数据保存在本机，迁移设备或浏览器前请导出备份。"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:190
+#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:194
 msgid "读取全部时段数据中…"
 msgstr ""
 
@@ -1711,7 +1711,7 @@ msgstr ""
 msgid "账本视图"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:127
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:125
 msgid "趋势指标"
 msgstr ""
 
@@ -1782,11 +1782,11 @@ msgstr ""
 msgid "金额不正确"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:169
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:167
 msgid "金额与热量仅统计已完成记录；热量按每单位 × 数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:166
+#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:164
 msgid "金额和热量怎么算？"
 msgstr ""
 
