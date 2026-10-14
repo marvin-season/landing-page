@@ -34,6 +34,12 @@ When dependencies are missing or need to be refreshed, use `ni` commands so the 
 
 Biome is the source of truth for formatting and linting. It uses 2-space indentation, recommended React/Next rules, and automatic import organization. Prefer TypeScript for app code, `tsx` for React components, and kebab-case file names when matching existing patterns, for example `chat-mode-switcher.tsx`. Keep atomic UI in `packages/design-system`, reusable composed business UI in `packages/biz-ui`, and page-only components near their route in `_components`. See `.cursor/rules/component-layers.mdc`.
 
+## Implementation & Reuse
+
+- Do not reinvent the wheel. First reuse existing project components, utilities, and dependencies; prefer mature, actively maintained libraries over hand-written implementations of common functionality.
+- Follow official documentation and best practices for the installed framework and library versions. Choose solutions based on project compatibility, reliability, accessibility, performance, and maintenance cost.
+- Write custom code only for requirements that existing solutions do not cover. Keep integration code minimal and avoid unnecessary dependencies, abstractions, or duplicate implementations.
+
 ## Testing Guidelines
 
 No JavaScript test runner is currently configured in `package.json`. For now, run `nr check` before submitting changes. Do not run `nr build` unless it is specifically requested, required to verify high-risk changes, or needed to diagnose a build-only failure, because production builds are time-consuming in this project. If adding tests, colocate them near the module or use a clear `*.test.ts` / `*.test.tsx` naming pattern, and add the runner command to `package.json`. For the Python agent service, see `agent-server/README.md` and `agent-server/test.py`.
