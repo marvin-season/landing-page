@@ -29,7 +29,13 @@ import type { Category, Dish } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
 import { formatCalories } from "./bbq-i18n";
-import { cls, pageTitleCls } from "./bbq-layout";
+import {
+  cls,
+  detailsChevronCls,
+  detailsMotionCls,
+  detailsSummaryCls,
+  pageTitleCls,
+} from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
 
@@ -178,29 +184,28 @@ function DishList({
       <details
         open={adding}
         onToggle={(event) => setAdding(event.currentTarget.open)}
-        className="overflow-hidden rounded-xl bg-card group"
+        className={`overflow-hidden rounded-xl bg-card ${detailsMotionCls}`}
       >
-        <summary className="px-3 py-2 flex items-center gap-2 min-h-11 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50">
+        <summary className={detailsSummaryCls}>
           <Plus className="size-4 text-primary" aria-hidden="true" />
           <span className="text-sm font-medium text-foreground flex-1">
             <Trans>添加常用项目</Trans>
           </span>
           <BbqCompanion mood="chef" className="block size-10 shrink-0" />
-          <ChevronDown
-            className="size-4 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none"
-            aria-hidden="true"
-          />
+          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
         </summary>
-        <div className="p-2.5 border-t">
-          <p className="text-muted-foreground text-[11px] mb-2">
-            <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
-          </p>
-          <DishRow
-            key="new"
-            categoryId={categoryId}
-            onSaved={onSaved}
-            onError={onError}
-          />
+        <div className="min-h-0 overflow-clip">
+          <div className="p-2.5 border-t">
+            <p className="text-muted-foreground text-[11px] mb-2">
+              <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
+            </p>
+            <DishRow
+              key="new"
+              categoryId={categoryId}
+              onSaved={onSaved}
+              onError={onError}
+            />
+          </div>
         </div>
       </details>
       <section className="flex flex-col gap-2">

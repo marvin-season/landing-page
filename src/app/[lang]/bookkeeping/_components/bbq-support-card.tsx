@@ -5,44 +5,30 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
 } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
+import {
+  detailsChevronCls,
+  detailsMotionCls,
+  detailsSummaryCls,
+} from "./bbq-layout";
 
 export function BbqSupportCard() {
   const { t } = useLingui();
 
   return (
-    <Collapsible defaultOpen={false} asChild>
-      <Card className="shrink-0 overflow-hidden border-0 shadow-none">
-        <CardHeader className="p-0">
-          <CardTitle className="text-sm font-medium tracking-normal">
-            <h2>
-              <CollapsibleTrigger asChild>
-                <button
-                  type="button"
-                  className="group flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-xl p-3 text-start text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50"
-                >
-                  <Heart className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="flex-1">
-                    <Trans>支持开源</Trans>
-                  </span>
-                  <ChevronDown
-                    className="size-4 shrink-0 transition-transform group-data-[state=open]:rotate-180 motion-reduce:transition-none"
-                    aria-hidden="true"
-                  />
-                </button>
-              </CollapsibleTrigger>
-            </h2>
-          </CardTitle>
-        </CardHeader>
-        <CollapsibleContent>
+    <Card className="shrink-0 overflow-hidden border-0 shadow-none">
+      <details className={detailsMotionCls}>
+        <summary className={detailsSummaryCls}>
+          <Heart className="size-4 shrink-0" aria-hidden="true" />
+          <h2 className="min-w-0 flex-1">
+            <Trans>支持开源</Trans>
+          </h2>
+          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
+        </summary>
+        <div className="min-h-0 overflow-clip">
           <CardContent className="flex flex-col gap-3 px-3 pb-3 pt-1">
             <CardDescription className="text-xs leading-relaxed">
               <Trans>
@@ -70,8 +56,8 @@ export function BbqSupportCard() {
               </Trans>
             </p>
           </CardFooter>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+        </div>
+      </details>
+    </Card>
   );
 }

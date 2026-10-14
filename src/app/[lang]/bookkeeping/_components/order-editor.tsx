@@ -35,6 +35,9 @@ import { bbqErrorMessage } from "./bbq-errors";
 import { formatCalories } from "./bbq-i18n";
 import {
   cls,
+  detailsChevronCls,
+  detailsMotionCls,
+  detailsSummaryCls,
   pageShellCls,
   pageTitleCls,
   totalBarCls,
@@ -53,20 +56,7 @@ const editorWorkspaceCls = cls`
 `;
 
 const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 border-b p-3 group/menu
-  [&::details-content]:grid [&::details-content]:grid-rows-[0fr]
-  [&::details-content]:transition-[grid-template-rows,content-visibility]
-  [&::details-content]:duration-200 [&::details-content]:ease-out
-  [&::details-content]:transition-discrete [&[open]::details-content]:grid-rows-[1fr]
-  motion-reduce:[&::details-content]:transition-none
-`;
-
-const editorMenuSummaryCls = cls`
-  cursor-pointer text-sm font-medium text-foreground
-  flex min-h-11 items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-2
-  list-none [&::-webkit-details-marker]:hidden transition-colors hover:bg-muted/70
-  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset
-  focus-visible:ring-primary/50 group-open/menu:bg-muted/70
+  min-h-0 min-w-0 border-b p-3 ${detailsMotionCls}
 `;
 
 const editorOrderPaneCls = cls`flex min-h-0 min-w-0 flex-col`;
@@ -444,7 +434,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </section>
           <details className={editorMenuPaneCls}>
-            <summary className={editorMenuSummaryCls}>
+            <summary className={detailsSummaryCls}>
               <Plus
                 className="size-4 shrink-0 text-primary"
                 aria-hidden="true"
@@ -455,10 +445,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <span className="text-xs tabular-nums text-muted-foreground shrink-0 font-normal">
                 <Trans>{availableDishes.length} 项</Trans>
               </span>
-              <ChevronDown
-                className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open/menu:rotate-180 motion-reduce:transition-none"
-                aria-hidden="true"
-              />
+              <ChevronDown className={detailsChevronCls} aria-hidden="true" />
             </summary>
             <div className="min-h-0 overflow-clip">
               <div className="sticky top-0 z-10 bg-card pb-2 mt-2">

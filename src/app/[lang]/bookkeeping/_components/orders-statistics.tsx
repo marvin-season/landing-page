@@ -4,6 +4,7 @@ import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import { formatYuan } from "@/lib/bbq/money";
@@ -13,7 +14,12 @@ import {
 } from "@/lib/bbq/statistics";
 import { BbqCompanion } from "./bbq-companion";
 import { businessDayLabel, formatCalories } from "./bbq-i18n";
-import { cls } from "./bbq-layout";
+import {
+  cls,
+  detailsChevronCls,
+  detailsMotionCls,
+  detailsSummaryCls,
+} from "./bbq-layout";
 import { bbqHomePath } from "./bbq-paths";
 
 type ChartMode = "revenue" | "orders" | "calories";
@@ -159,16 +165,23 @@ export function OrdersStatistics({
           </div>
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />
-        <details className="px-3 pb-3 text-xs text-muted-foreground">
-          <summary className="cursor-pointer py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
-            <Trans>金额和热量怎么算？</Trans>
+        <details
+          className={`px-3 pb-3 text-xs text-muted-foreground ${detailsMotionCls}`}
+        >
+          <summary className={detailsSummaryCls}>
+            <span className="min-w-0 flex-1">
+              <Trans>金额和热量怎么算？</Trans>
+            </span>
+            <ChevronDown className={detailsChevronCls} aria-hidden="true" />
           </summary>
-          <p className="pt-1 leading-relaxed">
-            <Trans>
-              金额与热量仅统计已完成记录；热量按每单位 ×
-              数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
-            </Trans>
-          </p>
+          <div className="min-h-0 overflow-clip">
+            <p className="pt-2 leading-relaxed px-2.5">
+              <Trans>
+                金额与热量仅统计已完成记录；热量按每单位 ×
+                数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
+              </Trans>
+            </p>
+          </div>
         </details>
         <section className="border-t" aria-label={t`时段明细`}>
           <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
