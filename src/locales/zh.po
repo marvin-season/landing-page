@@ -1801,3 +1801,43 @@ msgstr "项目名称"
 #: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
 msgid "项目启用"
 msgstr "项目启用"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:36
+msgid "Explore AI"
+msgstr "探索 AI"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:37
+msgid "Ideas start with curiosity"
+msgstr "让好奇心点亮灵感"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:38
+msgid "Your AI workspace"
+msgstr "你的 AI 工作空间"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:39
+msgid "Ask, learn, and create with AI."
+msgstr "与 AI 一起提问、学习和创作。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:41
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr "通过 AI 对话与创作工具探索知识、梳理问题，让灵感成为实用的成果。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Chat with AI"
+msgstr "与 AI 对话"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:66
+msgid "Take it easy, enjoy the little things"
+msgstr "慢慢来，享受生活里的小美好"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "Gentle, curious, and a little playful"
+msgstr "温柔、好奇，还有一点俏皮"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Make room for small joys every day."
+msgstr "每天都给小小的快乐留一点空间。"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:70
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "欢迎来到 Loopy 的温馨角落。放慢脚步，探索新鲜事，记录那些让你嘴角上扬的小瞬间。"

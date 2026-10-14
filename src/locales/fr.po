@@ -1801,3 +1801,43 @@ msgstr "Nom de l'élément"
 #: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
 msgid "项目启用"
 msgstr "Activer l'élément"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:36
+msgid "Explore AI"
+msgstr "Explorez l’IA"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:37
+msgid "Ideas start with curiosity"
+msgstr "Les idées naissent de la curiosité"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:38
+msgid "Your AI workspace"
+msgstr "Votre espace de travail IA"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:39
+msgid "Ask, learn, and create with AI."
+msgstr "Questionnez, apprenez et créez avec l’IA."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:41
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr "Explorez les connaissances, approfondissez vos questions et concrétisez vos idées grâce aux conversations avec l’IA et aux outils de création."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Chat with AI"
+msgstr "Discuter avec l’IA"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:66
+msgid "Take it easy, enjoy the little things"
+msgstr "Prenez votre temps, savourez les petits bonheurs"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "Gentle, curious, and a little playful"
+msgstr "De la douceur, de la curiosité et un brin de malice"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Make room for small joys every day."
+msgstr "Faites une place aux petits bonheurs de chaque jour."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:70
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "Bienvenue dans le petit cocon de Loopy. Ralentissez, découvrez de nouvelles choses et gardez les petits instants qui vous font sourire."

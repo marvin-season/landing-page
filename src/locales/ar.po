@@ -1801,3 +1801,43 @@ msgstr "اسم العنصر"
 #: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
 msgid "项目启用"
 msgstr "تفعيل العنصر"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:36
+msgid "Explore AI"
+msgstr "استكشف الذكاء الاصطناعي"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:37
+msgid "Ideas start with curiosity"
+msgstr "الأفكار تبدأ بالفضول"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:38
+msgid "Your AI workspace"
+msgstr "مساحة عملك مع الذكاء الاصطناعي"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:39
+msgid "Ask, learn, and create with AI."
+msgstr "اسأل وتعلّم وابتكر مع الذكاء الاصطناعي."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:41
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr "استكشف المعرفة وافهم الأسئلة وحوّل أفكارك إلى نتائج مفيدة من خلال محادثات الذكاء الاصطناعي وأدوات الإبداع."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Chat with AI"
+msgstr "تحدّث مع الذكاء الاصطناعي"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:66
+msgid "Take it easy, enjoy the little things"
+msgstr "تمهّل واستمتع بالأشياء الصغيرة"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "Gentle, curious, and a little playful"
+msgstr "لطف وفضول وقليل من المرح"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Make room for small joys every day."
+msgstr "اترك مساحة للأفراح الصغيرة كل يوم."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:70
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "مرحبًا بك في ركن Loopy الدافئ. تمهّل واستكشف شيئًا جديدًا واحتفظ باللحظات الصغيرة التي ترسم الابتسامة على وجهك."

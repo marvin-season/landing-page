@@ -1801,3 +1801,43 @@ msgstr ""
 #: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
 msgid "项目启用"
 msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:36
+msgid "Explore AI"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:37
+msgid "Ideas start with curiosity"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:38
+msgid "Your AI workspace"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:39
+msgid "Ask, learn, and create with AI."
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:41
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Chat with AI"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:66
+msgid "Take it easy, enjoy the little things"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "Gentle, curious, and a little playful"
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Make room for small joys every day."
+msgstr ""
+
+#: src/app/[lang]/(home)/data/home-data.tsx:70
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr ""

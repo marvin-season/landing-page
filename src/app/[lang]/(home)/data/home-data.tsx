@@ -30,6 +30,57 @@ export const profile = {
   ),
 };
 
+export const homeProfiles = [
+  {
+    theme: "default",
+    name: <Trans>Explore AI</Trans>,
+    eyebrow: <Trans>Ideas start with curiosity</Trans>,
+    title: <Trans>Your AI workspace</Trans>,
+    subtitle: <Trans>Ask, learn, and create with AI.</Trans>,
+    summary: (
+      <Trans>
+        Explore knowledge, work through questions, and turn ideas into something
+        useful with AI conversations and creative tools.
+      </Trans>
+    ),
+    action: {
+      href: "/agent",
+      label: <Trans>Chat with AI</Trans>,
+      analyticsId: "agent",
+      external: false,
+    },
+  },
+  {
+    theme: "shinchan",
+    ...profile,
+    action: {
+      href: "https://www.tv-asahi.co.jp/shinchan/character/",
+      label: <Trans>Meet Shin-chan</Trans>,
+      analyticsId: "shinchan",
+      external: true,
+    },
+  },
+  {
+    theme: "loopy",
+    name: "Loopy",
+    eyebrow: <Trans>Take it easy, enjoy the little things</Trans>,
+    title: <Trans>Gentle, curious, and a little playful</Trans>,
+    subtitle: <Trans>Make room for small joys every day.</Trans>,
+    summary: (
+      <Trans>
+        Welcome to Loopy's cozy corner. Slow down, explore something new, and
+        keep the little moments that make you smile.
+      </Trans>
+    ),
+    action: {
+      href: "/bookkeeping",
+      label: <Trans>Loopy 记账</Trans>,
+      analyticsId: "bookkeeping",
+      external: false,
+    },
+  },
+] as const;
+
 export type HomeNavLink = {
   href: string;
   analyticsId: string;

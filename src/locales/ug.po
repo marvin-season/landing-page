@@ -1801,3 +1801,43 @@ msgstr "تۈر نامى"
 #: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
 msgid "项目启用"
 msgstr "تۈرنى قوزغىتىش"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:36
+msgid "Explore AI"
+msgstr "سۈنئىي ئەقىل ئۈستىدە ئىزدىنىڭ"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:37
+msgid "Ideas start with curiosity"
+msgstr "ئىدىيە قىزىقىشتىن باشلىنىدۇ"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:38
+msgid "Your AI workspace"
+msgstr "سىزنىڭ سۈنئىي ئەقىل خىزمەت بوشلۇقىڭىز"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:39
+msgid "Ask, learn, and create with AI."
+msgstr "سۈنئىي ئەقىل بىلەن سوراڭ، ئۆگىنىڭ ۋە ئىجاد قىلىڭ."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:41
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr "سۈنئىي ئەقىل سۆھبىتى ۋە ئىجادىي قوراللار ئارقىلىق بىلىم ئۈستىدە ئىزدىنىڭ، سوئاللارنى ئايدىڭلاشتۇرۇڭ ۋە ئىدىيەلىرىڭىزنى پايدىلىق نەتىجىلەرگە ئايلاندۇرۇڭ."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Chat with AI"
+msgstr "سۈنئىي ئەقىل بىلەن پاراڭلىشىڭ"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:66
+msgid "Take it easy, enjoy the little things"
+msgstr "ئاستا بولۇڭ، كىچىك گۈزەللىكلەردىن ھۇزۇرلىنىڭ"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:67
+msgid "Gentle, curious, and a little playful"
+msgstr "مۇلايىم، قىزىقىشقا تولغان ۋە ئازراق چاقچاقچى"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:68
+msgid "Make room for small joys every day."
+msgstr "ھەر كۈنى كىچىك خۇشاللىقلارغا ئورۇن قالدۇرۇڭ."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:70
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "Loopy نىڭ ئىللىق بۇلۇڭىغا خۇش كەلدىڭىز. قەدىمىڭىزنى ئاستىلىتىڭ، يېڭى ئىشلار ئۈستىدە ئىزدىنىڭ ۋە سىزنى كۈلدۈرىدىغان كىچىك دەقىقىلەرنى خاتىرىلەڭ."
