@@ -10,6 +10,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Camera,
   CheckCircle2,
+  ChevronDown,
   ImagePlus,
   LoaderCircle,
   Minus,
@@ -51,7 +52,22 @@ const editorWorkspaceCls = cls`
   grid-rows-[minmax(0,1fr)_auto]
 `;
 
-const editorMenuPaneCls = cls`min-h-0 min-w-0 border-b p-3 flex flex-col`;
+const editorMenuPaneCls = cls`
+  min-h-0 min-w-0 border-b p-3 group/menu
+  [&::details-content]:grid [&::details-content]:grid-rows-[0fr]
+  [&::details-content]:transition-[grid-template-rows,content-visibility]
+  [&::details-content]:duration-200 [&::details-content]:ease-out
+  [&::details-content]:transition-discrete [&[open]::details-content]:grid-rows-[1fr]
+  motion-reduce:[&::details-content]:transition-none
+`;
+
+const editorMenuSummaryCls = cls`
+  cursor-pointer text-sm font-medium text-foreground
+  flex min-h-11 items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-2
+  list-none [&::-webkit-details-marker]:hidden transition-colors hover:bg-muted/70
+  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset
+  focus-visible:ring-primary/50 group-open/menu:bg-muted/70
+`;
 
 const editorOrderPaneCls = cls`flex min-h-0 min-w-0 flex-col`;
 
@@ -427,91 +443,104 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </div>
             ) : null}
           </section>
-          <section className={editorMenuPaneCls}>
-            <div className="sticky top-0 z-10 bg-card pb-2">
-              <div className="flex shrink-0 items-center justify-between gap-2">
-                <div>
-                  <h2 className="text-sm font-medium text-foreground">
-                    <Trans>常用项目</Trans>
-                  </h2>
-                </div>
-                <span className="text-xs tabular-nums text-muted-foreground">
-                  <Trans>{availableDishes.length} 项</Trans>
-                </span>
+          <details className={editorMenuPaneCls}>
+            <summary className={editorMenuSummaryCls}>
+              <Plus
+                className="size-4 shrink-0 text-primary"
+                aria-hidden="true"
+              />
+              <span className="min-w-0 flex-1 truncate">
+                <Trans>选择项目</Trans>
+              </span>
+              <span className="text-xs tabular-nums text-muted-foreground shrink-0 font-normal">
+                <Trans>{availableDishes.length} 项</Trans>
+              </span>
+              <ChevronDown
+                className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open/menu:rotate-180 motion-reduce:transition-none"
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="min-h-0 overflow-clip">
+              <div className="sticky top-0 z-10 bg-card pb-2 mt-2">
+                {availableDishes.length > 0 ? (
+                  <div className="mt-2 shrink-0">
+                    <BbqSearch
+                      value={search}
+                      onChange={setSearch}
+                      label={t`搜索项目名称…`}
+                    />
+                  </div>
+                ) : null}
               </div>
-              {availableDishes.length > 0 ? (
-                <div className="mt-2 shrink-0">
-                  <BbqSearch
-                    value={search}
-                    onChange={setSearch}
-                    label={t`搜索项目名称…`}
+              {availableDishes.length === 0 ? (
+                <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                  <UtensilsCrossed
+                    className="size-7 text-muted-foreground/60"
+                    aria-hidden="true"
                   />
-                </div>
-              ) : null}
-            </div>
-            {availableDishes.length === 0 ? (
-              <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
-                <UtensilsCrossed
-                  className="size-7 text-muted-foreground/60"
-                  aria-hidden="true"
-                />
-                <p className="mt-2 text-sm font-medium text-foreground">
-                  <Trans>先添几个常用项目</Trans>
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  <Trans>比如早餐、咖啡，或一次跑步。</Trans>
-                </p>
-                <Button asChild size="sm" variant="outline" className="mt-3">
-                  <Link href={bbqMenuPath()}>
-                    <Trans>添加常用项目</Trans>
-                  </Link>
-                </Button>
-              </div>
-            ) : filteredDishes.length === 0 ? (
-              <p
-                className="py-8 text-center text-sm text-muted-foreground"
-                role="status"
-              >
-                <Trans>没有匹配的项目，请换个关键词</Trans>
-              </p>
-            ) : (
-              <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1">
-                {filteredDishes.map((dish) => (
-                  <Button
-                    key={dish.id}
-                    type="button"
-                    variant="ghost"
-                    className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-3 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-normal ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
-                    aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
-                    onClick={() => addDish(dish)}
-                  >
-                    <span className="min-w-0">
-                      <span className="block break-words">{dish.name}</span>
-                      <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                        {formatYuan(dish.priceCents)}/{dish.unit}
-                      </span>
-                      {dish.caloriesKcal != null ? (
-                        <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground">
-                          {formatCalories(
-                            i18n,
-                            summarizeCalories([{ ...dish, quantity: 1 }]),
-                          )}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className="flex shrink-0 flex-col items-center gap-1">
-                      <Plus className="size-4" aria-hidden="true" />
-                      {selectedQuantities.has(dish.id) ? (
-                        <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
-                          {selectedQuantities.get(dish.id)}
-                        </span>
-                      ) : null}
-                    </span>
+                  <p className="mt-2 text-sm font-medium text-foreground">
+                    <Trans>先添几个常用项目</Trans>
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    <Trans>比如早餐、咖啡，或一次跑步。</Trans>
+                  </p>
+                  <Button asChild size="sm" variant="outline" className="mt-3">
+                    <Link href={bbqMenuPath()}>
+                      <Trans>添加常用项目</Trans>
+                    </Link>
                   </Button>
-                ))}
-              </div>
-            )}
-          </section>
+                </div>
+              ) : filteredDishes.length === 0 ? (
+                <p
+                  className="py-8 text-center text-sm text-muted-foreground"
+                  role="status"
+                >
+                  <Trans>没有匹配的项目，请换个关键词</Trans>
+                </p>
+              ) : (
+                <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1 max-h-[min(16rem,40dvh)] overflow-y-auto overscroll-y-contain">
+                  {filteredDishes.map((dish) => (
+                    <Button
+                      key={dish.id}
+                      type="button"
+                      variant="ghost"
+                      className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
+                      aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
+                      onClick={() => addDish(dish)}
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate" title={dish.name}>
+                          {dish.name}
+                        </span>
+                        <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
+                          {formatYuan(dish.priceCents)}/{dish.unit}
+                          {dish.caloriesKcal != null ? (
+                            <>
+                              <span className="mx-1" aria-hidden="true">
+                                ·
+                              </span>
+                              {formatCalories(
+                                i18n,
+                                summarizeCalories([{ ...dish, quantity: 1 }]),
+                              )}
+                            </>
+                          ) : null}
+                        </span>
+                      </span>
+                      <span className="flex shrink-0 flex-col items-center gap-0.5">
+                        <Plus className="size-4" aria-hidden="true" />
+                        {selectedQuantities.has(dish.id) ? (
+                          <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
+                            {selectedQuantities.get(dish.id)}
+                          </span>
+                        ) : null}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </details>
           <section className={editorOrderPaneCls}>
             <div className={editorOrderBodyCls}>
               <section>
