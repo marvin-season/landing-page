@@ -43,14 +43,14 @@ async function main() {
     .toFile(new URL("icon-maskable-512.png", output).pathname);
 
   const manifest: MetadataRoute.Manifest = {
-    // A stable app identity, separate from the personal site's PWA.
+    // Keep the installed app identity stable when its start URL changes.
     id: "/admin/bbq",
     name: "Loopy 记账",
     short_name: "Loopy 记账",
     description: "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
     lang: "zh-CN",
-    start_url: "/zh/admin/bbq",
-    scope: "/zh/admin/bbq",
+    start_url: "/zh/bookkeeping",
+    scope: "/zh/bookkeeping",
     display: "standalone",
     background_color: "#fff5f7",
     theme_color: "#fff5f7",

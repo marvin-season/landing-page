@@ -78,7 +78,7 @@ flowchart TB
 ### 3.1 多语言站点 `src/app/[lang]/`
 
 - 动态段 `[lang]` 与 `src/lib/i18n/locales.ts` 中的 `locales` 对齐；`generateStaticParams` 在根 layout 中为每种语言生成静态参数。`lingui.config.ts` 从同一文件读取。
-- 子路由示例：`(home)/` 首页、`resume/` 简历页、`auth/` 授权页等。
+- 子路由示例：`(home)/` 首页、`resume/` 简历页、`auth/` 授权页、`bookkeeping/` 公开记账工具等。记账默认入口跳转至 `/zh/bookkeeping`，旧 `/admin/bbq` 及其子路由永久跳转至对应的新路径。
 - 根 layout 负责：`Lingui` 服务端/客户端、`ThemeProvider`、全局样式与 `SettingsMenu`。
 
 ### 3.2 Agent `src/app/agent/`

@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import type { TurbopackRuleConfigCollection } from "next/dist/server/config-shared";
+import { locales } from "./src/lib/i18n/locales";
 
 const rules: Record<string, TurbopackRuleConfigCollection> = {
   "*.po": {
@@ -36,6 +37,20 @@ const nextConfig: NextConfig = {
   },
   turbopack: {
     rules,
+  },
+  async redirects() {
+    return [
+      {
+        source: "/admin/bbq/:path*",
+        destination: "/zh/bookkeeping/:path*",
+        permanent: true,
+      },
+      ...locales.map((locale) => ({
+        source: `/${locale}/admin/bbq/:path*`,
+        destination: `/${locale}/bookkeeping/:path*`,
+        permanent: true,
+      })),
+    ];
   },
   // ... 其他配置
   async rewrites() {

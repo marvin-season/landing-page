@@ -28,6 +28,27 @@ describe("isProtectedPath", () => {
   });
 
   it("keeps BBQ pages public with and without locale prefix", () => {
+    for (const prefix of [
+      "",
+      "/zh",
+      "/en",
+      "/ja",
+      "/ko",
+      "/ru",
+      "/fr",
+      "/ar",
+      "/ug",
+    ]) {
+      for (const path of [
+        "",
+        "/menu",
+        "/settings",
+        "/orders/new",
+        "/orders/order-1",
+      ]) {
+        assert.equal(isProtectedPath(`${prefix}/bookkeeping${path}`), false);
+      }
+    }
     assert.equal(isProtectedPath("/admin/bbq"), false);
     assert.equal(isProtectedPath("/admin/bbq/menu"), false);
     assert.equal(isProtectedPath("/admin/bbq/orders/new"), false);
@@ -67,6 +88,8 @@ describe("getSafeReturnTo", () => {
 
   it("rejects public, absolute, and protocol-relative values", () => {
     assert.equal(getSafeReturnTo("/"), "/");
+    assert.equal(getSafeReturnTo("/bookkeeping"), "/");
+    assert.equal(getSafeReturnTo("/zh/bookkeeping/menu"), "/");
     assert.equal(getSafeReturnTo("/admin/bbq"), "/");
     assert.equal(getSafeReturnTo("/zh/admin/bbq/menu"), "/");
     assert.equal(getSafeReturnTo("https://evil.test/resume"), "/");

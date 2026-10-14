@@ -1,29 +1,37 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { availableLocales, isBbqPath, withLocalePrefix } from "./locales";
+import {
+  availableLocales,
+  isBookkeepingPath,
+  withLocalePrefix,
+} from "./locales";
 
 test("only unprefixed BBQ routes need the Chinese redirect", () => {
-  for (const path of ["/admin/bbq", "/admin/bbq/", "/admin/bbq/orders/123"]) {
-    assert.equal(isBbqPath(path), true, path);
+  for (const path of [
+    "/bookkeeping",
+    "/bookkeeping/",
+    "/bookkeeping/orders/123",
+  ]) {
+    assert.equal(isBookkeepingPath(path), true, path);
   }
   for (const path of [
     "/admin",
-    "/admin/bbq-other",
-    ...availableLocales.map((locale) => `/${locale}/admin/bbq/menu`),
+    "/bookkeeping-other",
+    ...availableLocales.map((locale) => `/${locale}/bookkeeping/menu`),
   ]) {
-    assert.equal(isBbqPath(path), false, path);
+    assert.equal(isBookkeepingPath(path), false, path);
   }
 });
 
 test("BBQ links retain every selected locale, query and hash", () => {
   for (const locale of availableLocales) {
     for (const path of [
-      "/admin/bbq",
-      "/admin/bbq/menu",
-      "/admin/bbq/orders/new",
-      "/admin/bbq/orders/123",
-      "/admin/bbq/settings",
-      "/admin/bbq?day=2026-10-13%23off#details",
+      "/bookkeeping",
+      "/bookkeeping/menu",
+      "/bookkeeping/orders/new",
+      "/bookkeeping/orders/123",
+      "/bookkeeping/settings",
+      "/bookkeeping?day=2026-10-13%23off#details",
     ]) {
       const localized = `/${locale}${path}`;
       assert.equal(withLocalePrefix(path, locale), localized);
@@ -37,7 +45,7 @@ test("non-BBQ links keep existing locale behavior", () => {
     "/",
     "/knowledge?tab=chat",
     "/admin",
-    "/admin/bbq-other",
+    "/bookkeeping-other",
   ]) {
     assert.equal(withLocalePrefix(path, "en"), path);
   }

@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
+import { getBookkeepingAlternates } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getSiteOrigin } from "@/lib/site-origin";
 import { BbqInstallProvider } from "./_components/bbq-install-button";
@@ -19,8 +20,8 @@ export async function generateMetadata({
     metadataBase: new URL(await getSiteOrigin()),
     title: { absolute: title },
     description,
-    robots: { index: true, follow: true },
-    alternates: { canonical: "/zh/admin/bbq" },
+    robots: { index: lang !== "pseudo", follow: true },
+    alternates: getBookkeepingAlternates(lang),
     keywords: [
       i18n._(msg`Loopy 记账`),
       i18n._(msg`个人记账`),
@@ -33,7 +34,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: "/zh/admin/bbq",
+      url: `/${lang}/bookkeeping`,
       siteName: i18n._(msg`Loopy 记账`),
       type: "website",
       locale: lang === "zh" ? "zh_CN" : lang,

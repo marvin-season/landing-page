@@ -9,6 +9,7 @@ export type ProtectedPage = {
 export const protectedPages: ProtectedPage[] = [
   { path: "/resume", locale: true },
   { path: "/agent", locale: false },
+  // Legacy bookkeeping URLs stay public until their permanent redirect is applied.
   { path: "/admin", locale: true, excludedPaths: ["/admin/bbq"] },
 ];
 

@@ -21,13 +21,13 @@ function renderPage(pathname: string) {
 
 test("BBQ pages keep navigation outside opacity and transform transitions", () => {
   for (const path of [
-    "/admin/bbq",
-    "/admin/bbq/menu",
-    "/admin/bbq/orders/new",
-    "/admin/bbq/orders/123",
-    "/zh/admin/bbq/menu",
-    "/en/admin/bbq",
-    "/ar/admin/bbq/orders/new",
+    "/bookkeeping",
+    "/bookkeeping/menu",
+    "/bookkeeping/orders/new",
+    "/bookkeeping/orders/123",
+    "/zh/bookkeeping/menu",
+    "/en/bookkeeping",
+    "/ar/bookkeeping/orders/new",
   ]) {
     assert.equal(renderPage(path), "<nav>首页 / 记账 / 菜单</nav>", path);
   }
@@ -39,8 +39,8 @@ test("other pages retain their existing entry animation", () => {
     "/knowledge",
     "/zh/knowledge",
     "/admin",
-    "/admin/bbq-other",
-    "/unknown/admin/bbq",
+    "/bookkeeping-other",
+    "/unknown/bookkeeping",
   ]) {
     assert.match(renderPage(path), /opacity:0/, path);
   }

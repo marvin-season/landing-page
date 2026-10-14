@@ -53,7 +53,7 @@ export function PageFade({ children }: { children: ReactNode }) {
   const route = isLocale(segments[0] ?? "") ? segments.slice(1) : segments;
 
   // BBQ 的共享导航必须随 layout 常驻；路径动画会重挂载导航，且 transform 会改变 fixed 定位。
-  if (route[0] === "admin" && route[1] === "bbq") return children;
+  if (route[0] === "bookkeeping") return children;
 
   return <AnimatedPageFade>{children}</AnimatedPageFade>;
 }
