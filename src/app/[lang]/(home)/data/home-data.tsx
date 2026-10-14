@@ -10,11 +10,8 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
-export const profile = {
+const shinchanProfile = {
   name: <Trans>Crayon Shin-chan</Trans>,
-  // Character artwork: https://manga-shinchan.com/character/shinchan
-  avatar: "/shinchan.png",
-  avatarAlt: "Crayon Shin-chan",
   eyebrow: <Trans>A little mischief, a lot of joy</Trans>,
   title: <Trans>Shinnosuke Nohara</Trans>,
   subtitle: (
@@ -30,9 +27,23 @@ export const profile = {
   ),
 };
 
-export const homeProfiles = [
-  {
-    theme: "default",
+export type HomeProfile = {
+  name: ReactNode;
+  eyebrow: ReactNode;
+  title: ReactNode;
+  subtitle: ReactNode;
+  summary: ReactNode;
+  avatar?: { src: string; alt: string; rounded: boolean };
+  action: {
+    href: string;
+    label: ReactNode;
+    analyticsId: string;
+    external: boolean;
+  };
+};
+
+export const homeProfiles = {
+  default: {
     name: <Trans>Explore AI</Trans>,
     eyebrow: <Trans>Ideas start with curiosity</Trans>,
     title: <Trans>Your AI workspace</Trans>,
@@ -50,9 +61,9 @@ export const homeProfiles = [
       external: false,
     },
   },
-  {
-    theme: "shinchan",
-    ...profile,
+  shinchan: {
+    ...shinchanProfile,
+    avatar: { src: "/shinchan.png", alt: "Crayon Shin-chan", rounded: true },
     action: {
       href: "https://www.tv-asahi.co.jp/shinchan/character/",
       label: <Trans>Meet Shin-chan</Trans>,
@@ -60,8 +71,12 @@ export const homeProfiles = [
       external: true,
     },
   },
-  {
-    theme: "loopy",
+  loopy: {
+    avatar: {
+      src: "/bbq/companions/hello-still.png",
+      alt: "Loopy",
+      rounded: false,
+    },
     name: "Loopy",
     eyebrow: <Trans>Take it easy, enjoy the little things</Trans>,
     title: <Trans>Gentle, curious, and a little playful</Trans>,
@@ -79,7 +94,7 @@ export const homeProfiles = [
       external: false,
     },
   },
-] as const;
+} satisfies Record<string, HomeProfile>;
 
 export type HomeNavLink = {
   href: string;
