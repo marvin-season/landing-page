@@ -25,7 +25,13 @@ import {
   formatYuan,
   parseYuanToCents,
 } from "@/lib/bbq/money";
-import type { Category, Dish } from "@/lib/bbq/types";
+import {
+  DEFAULT_TAG,
+  getDishTagIds,
+  matchesTag,
+  resolveTagFilter,
+} from "@/lib/bbq/tags";
+import type { Category, Dish, ItemTag } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
 import { formatCalories } from "./bbq-i18n";
@@ -38,6 +44,7 @@ import {
 } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
+import { ItemTagBadge, ItemTagFilter, ItemTagSelect } from "./item-tags";
 
 const dishGridCls = cls`grid grid-cols-3 gap-2 min-w-0`;
 const dishRowCls = cls`rounded-lg border bg-card p-2.5`;
@@ -50,15 +57,17 @@ const dishInputCls = cls`
 export function MenuEditor() {
   const { i18n, t } = useLingui();
   const [menu, setMenu] = useState<Category | null>(null);
+  const [tags, setTags] = useState<ItemTag[]>([]);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    const [categories, nextDishes] = await Promise.all([
+    const [categories, nextDishes, nextTags] = await Promise.all([
       bbqStore.listCategories(),
       bbqStore.listDishes(),
+      bbqStore.listTags(),
     ]);
     const category =
       categories[0] ??
@@ -69,6 +78,10 @@ export function MenuEditor() {
       }));
     setMenu(category);
     setDishes(nextDishes);
+    setTags(nextTags);
+  }, []);
+  const reloadTags = useCallback(async () => {
+    setTags(await bbqStore.listTags());
   }, []);
   const handleSaved = useCallback(async () => {
     setMessage(null);
@@ -152,6 +165,8 @@ export function MenuEditor() {
           <DishList
             categoryId={menu.id}
             dishes={dishes}
+            tags={tags}
+            onTagsChanged={reloadTags}
             onSaved={handleSaved}
             onError={setMessage}
           />
@@ -164,20 +179,28 @@ export function MenuEditor() {
 function DishList({
   categoryId,
   dishes,
+  tags,
+  onTagsChanged,
   onSaved,
   onError,
 }: {
   categoryId: string;
   dishes: Dish[];
+  tags: ItemTag[];
+  onTagsChanged: () => Promise<void>;
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
   const { t } = useLingui();
+  const [tagFilter, setTagFilter] = useState("all");
+  const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const [search, setSearch] = useState("");
   const [adding, setAdding] = useState(dishes.length === 0);
   const query = search.trim().toLocaleLowerCase();
-  const matches = dishes.filter((dish) =>
-    dish.name.toLocaleLowerCase().includes(query),
+  const matches = dishes.filter(
+    (dish) =>
+      dish.name.toLocaleLowerCase().includes(query) &&
+      matchesTag(dish, activeTagFilter),
   );
   return (
     <div className="flex flex-col gap-3">
@@ -201,6 +224,8 @@ function DishList({
             </p>
             <DishRow
               key="new"
+              tags={tags}
+              onTagsChanged={onTagsChanged}
               categoryId={categoryId}
               onSaved={onSaved}
               onError={onError}
@@ -213,13 +238,22 @@ function DishList({
           <h2 className="text-xs font-medium text-muted-foreground">
             <Trans>我的常用</Trans>
           </h2>
-          {dishes.length > 0 ? (
-            <BbqSearch
-              value={search}
-              onChange={setSearch}
-              label={t`搜索已有项目…`}
+          <div className="flex min-w-0 items-center gap-1.5">
+            <ItemTagFilter
+              tags={tags}
+              value={activeTagFilter}
+              onChange={setTagFilter}
             />
-          ) : null}
+            {dishes.length > 0 ? (
+              <div className="min-w-0 flex-1">
+                <BbqSearch
+                  value={search}
+                  onChange={setSearch}
+                  label={t`搜索已有项目…`}
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
         {dishes.length > 0 && matches.length === 0 ? (
           <p
@@ -245,13 +279,16 @@ function DishList({
               <div
                 key={dish.id}
                 className={
-                  dish.name.toLocaleLowerCase().includes(query)
+                  dish.name.toLocaleLowerCase().includes(query) &&
+                  matchesTag(dish, activeTagFilter)
                     ? "border-b border-border/60 last:border-b-0"
                     : "hidden"
                 }
               >
                 <DishRow
                   dish={dish}
+                  tags={tags}
+                  onTagsChanged={onTagsChanged}
                   categoryId={categoryId}
                   onSaved={onSaved}
                   onError={onError}
@@ -267,17 +304,24 @@ function DishList({
 
 function DishRow({
   dish,
+  tags,
+  onTagsChanged,
   categoryId,
   onSaved,
   onError,
 }: {
   dish?: Dish;
+  tags: ItemTag[];
+  onTagsChanged: () => Promise<void>;
   categoryId: string;
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
 }) {
   const { i18n, t } = useLingui();
   const isNew = dish === undefined;
+  const [tagIds, setTagIds] = useState<string[]>(
+    dish ? getDishTagIds(dish) : [DEFAULT_TAG.id],
+  );
   const fieldLabelCls = cls`text-muted-foreground text-xs`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
@@ -291,12 +335,14 @@ function DishRow({
   const [listed, setListed] = useState(dish?.listed ?? true);
   const [editing, setEditing] = useState(isNew);
   const savingRef = useRef(false);
+  const [tagPending, setTagPending] = useState(false);
   const [pending, setPending] = useState<"save" | "delete" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!dish) return;
+    setTagIds(getDishTagIds(dish));
     setName(dish.name);
     setPrice(centsToYuanInput(dish.priceCents));
     setCalories(dish.caloriesKcal?.toString() ?? "");
@@ -306,7 +352,7 @@ function DishRow({
   }, [dish]);
 
   async function commit() {
-    if (savingRef.current) return;
+    if (savingRef.current || tagPending) return;
     setError(null);
     const priceCents = parseYuanToCents(price.trim() || "0");
     const normalizedUnit = unit.trim() || "份";
@@ -341,7 +387,9 @@ function DishRow({
       caloriesKcal === (dish.caloriesKcal ?? null) &&
       normalizedUnit === dish.unit &&
       parsedSort === dish.sort &&
-      listed === dish.listed
+      listed === dish.listed &&
+      tagIds.length === getDishTagIds(dish).length &&
+      tagIds.every((id) => getDishTagIds(dish).includes(id))
     ) {
       setEditing(false);
       return;
@@ -352,6 +400,10 @@ function DishRow({
     try {
       await bbqStore.saveDish({
         id: dish?.id,
+        tagIds:
+          dish && getDishTagIds(dish).length === 0 && tagIds.length === 0
+            ? undefined
+            : tagIds,
         categoryId: dish?.categoryId ?? categoryId,
         name,
         priceCents,
@@ -361,6 +413,7 @@ function DishRow({
         listed,
       });
       if (isNew) {
+        setTagIds([DEFAULT_TAG.id]);
         setName("");
         setPrice("0");
         setCalories("");
@@ -404,6 +457,7 @@ function DishRow({
   function cancelEditing() {
     if (!dish || pending) return;
     setError(null);
+    setTagIds(getDishTagIds(dish));
     setName(dish.name);
     setPrice(centsToYuanInput(dish.priceCents));
     setCalories(dish.caloriesKcal?.toString() ?? "");
@@ -424,6 +478,13 @@ function DishRow({
             >
               {dish.name}
             </h3>
+            <div className="flex min-w-0 flex-wrap gap-1">
+              {tags
+                .filter((tag) => getDishTagIds(dish).includes(tag.id))
+                .map((tag) => (
+                  <ItemTagBadge key={tag.id} tag={tag} />
+                ))}
+            </div>
             <span
               className={
                 dish.listed
@@ -491,8 +552,8 @@ function DishRow({
 
   return (
     <fieldset
-      disabled={pending !== null}
-      aria-busy={pending !== null}
+      disabled={pending !== null || tagPending}
+      aria-busy={pending !== null || tagPending}
       className={`${dishGridCls} ${isNew ? "" : dishRowCls}`}
     >
       <label className="col-span-3 flex min-w-0 flex-col gap-1">
@@ -509,6 +570,19 @@ function DishRow({
           placeholder={isNew ? t`新项目` : undefined}
         />
       </label>
+      <div className="col-span-3 flex min-w-0 flex-col gap-1">
+        <span className={fieldLabelCls}>
+          <Trans>标签</Trans>
+        </span>
+        <ItemTagSelect
+          tags={tags}
+          value={tagIds}
+          onChange={setTagIds}
+          onTagsChanged={onTagsChanged}
+          onPendingChange={setTagPending}
+          disabled={pending !== null}
+        />
+      </div>
       <label className="col-span-3 flex min-w-0 flex-col gap-1">
         <span className={fieldLabelCls}>
           <Trans>热量 kcal / 单位</Trans>

@@ -7,11 +7,13 @@ import {
   totalCents,
 } from "./money";
 import { BbqStoreError } from "./store";
+import { DEFAULT_TAG, getDishTagIds, getLineTags } from "./tags";
 import type {
   BbqBackup,
   BbqBackupExportOptions,
   Category,
   Dish,
+  ItemTag,
   Order,
   OrderLine,
   OrderPhoto,
@@ -22,6 +24,7 @@ import type {
 } from "./types";
 
 export type BbqDocument = {
+  tags?: ItemTag[];
   categories: Category[];
   dishes: Dish[];
   orders: Order[];
@@ -62,6 +65,56 @@ function replaceById<T extends { id: string }>(items: T[], next: T): T[] {
   const index = items.findIndex((item) => item.id === next.id);
   if (index === -1) return [...items, next];
   return items.map((item, itemIndex) => (itemIndex === index ? next : item));
+}
+
+export function listTags(document: Pick<BbqDocument, "tags">): ItemTag[] {
+  return (document.tags ?? []).toSorted((left, right) =>
+    left.name.localeCompare(right.name, "zh-CN"),
+  );
+}
+
+export function addTag(
+  document: BbqDocument,
+  name: string,
+  createId: () => string,
+): { document: BbqDocument; tag: ItemTag } {
+  const normalized = requireName(name);
+  if (
+    (document.tags ?? []).some(
+      (tag) => tag.name.toLocaleLowerCase() === normalized.toLocaleLowerCase(),
+    )
+  ) {
+    throw new BbqStoreError("tag_exists");
+  }
+  const tag =
+    normalized === DEFAULT_TAG.name
+      ? { ...DEFAULT_TAG }
+      : { id: createId(), name: normalized };
+  return {
+    document: { ...document, tags: [...(document.tags ?? []), tag] },
+    tag,
+  };
+}
+
+export function deleteTag(document: BbqDocument, id: string): BbqDocument {
+  if (!(document.tags ?? []).some((tag) => tag.id === id)) {
+    throw new BbqStoreError("tag_not_found");
+  }
+  // 停用项目、历史明细也属于引用，不能只检查当前可选项目。
+  if (
+    document.dishes.some((dish) => getDishTagIds(dish).includes(id)) ||
+    document.orders.some((order) =>
+      order.lines.some((line) =>
+        getLineTags(line).some((tag) => tag.id === id),
+      ),
+    )
+  ) {
+    throw new BbqStoreError("tag_in_use");
+  }
+  return {
+    ...document,
+    tags: (document.tags ?? []).filter((tag) => tag.id !== id),
+  };
 }
 
 export function listCategories(document: BbqDocument): Category[] {
@@ -115,7 +168,27 @@ export function saveDish(
   ) {
     throw new BbqStoreError("category_not_found");
   }
+  const existing = document.dishes.find((dish) => dish.id === input.id);
+  // 不回填历史数据；新项目留空才使用默认标签。
+  const preserveTags =
+    input.tagIds === undefined && input.tagId === undefined && existing;
+  const requestedIds =
+    input.tagIds ?? (input.tagId?.trim() ? [input.tagId.trim()] : []);
+  const tagIds = preserveTags
+    ? getDishTagIds(existing)
+    : [...new Set(requestedIds.length ? requestedIds : [DEFAULT_TAG.id])];
+  let tags = document.tags ?? [];
+  if (
+    tagIds.includes(DEFAULT_TAG.id) &&
+    !tags.some((tag) => tag.id === DEFAULT_TAG.id)
+  ) {
+    tags = [...tags, { ...DEFAULT_TAG }];
+  }
+  if (tagIds.some((id) => !tags.some((tag) => tag.id === id))) {
+    throw new BbqStoreError("tag_not_found");
+  }
   const dish: Dish = {
+    ...(tagIds.length ? { tagIds } : {}),
     id: input.id ?? createId(),
     categoryId: input.categoryId,
     name: requireName(input.name),
@@ -126,7 +199,7 @@ export function saveDish(
     listed: input.listed,
   };
   return {
-    document: { ...document, dishes: replaceById(document.dishes, dish) },
+    document: { ...document, tags, dishes: replaceById(document.dishes, dish) },
     dish,
   };
 }
@@ -187,6 +260,13 @@ export function saveOrder(
     return {
       id: clock.createId(),
       dishId: dish.id,
+      ...(getDishTagIds(dish).length
+        ? {
+            tags: (document.tags ?? []).filter((tag) =>
+              getDishTagIds(dish).includes(tag.id),
+            ),
+          }
+        : {}),
       name: dish.name,
       priceCents: dish.priceCents,
       // Like price/unit, calories are a snapshot; later menu edits cannot rewrite history.
@@ -261,6 +341,7 @@ export function exportBackup(
   const orders = listAllOrders(document);
   return {
     version: 1,
+    tags: listTags(document),
     categories: listCategories(document),
     dishes: listDishes(document),
     orders: options.includePhotos
@@ -349,14 +430,29 @@ function parseDish(
   value: unknown,
   seen: Set<string>,
   categoryIds: Set<string>,
+  tagIds: Set<string>,
 ): Dish {
   if (!isRecord(value)) invalidBackup();
+  if (value.tagIds !== undefined && !Array.isArray(value.tagIds))
+    invalidBackup();
+  const selectedIds =
+    value.tagIds === undefined
+      ? value.tagId == null
+        ? []
+        : [requireText(value.tagId)]
+      : value.tagIds.map(requireText);
+  if (
+    new Set(selectedIds).size !== selectedIds.length ||
+    selectedIds.some((id) => !tagIds.has(id))
+  )
+    invalidBackup();
   const categoryId = requireText(value.categoryId);
   if (!categoryIds.has(categoryId)) invalidBackup();
   const priceCents = requireInteger(value.priceCents, 0);
   return {
     id: requireId(value.id, seen),
     categoryId,
+    ...(selectedIds.length ? { tagIds: selectedIds } : {}),
     name: requireBackupName(value.name),
     priceCents,
     caloriesKcal: requireBackupCalories(value.caloriesKcal),
@@ -366,15 +462,40 @@ function parseDish(
   };
 }
 
-function parseLine(value: unknown, seen: Set<string>): OrderLine {
+function parseTag(value: unknown, seen: Set<string>): ItemTag {
+  if (!isRecord(value)) invalidBackup();
+  const tag = {
+    id: requireId(value.id, seen),
+    name: requireBackupName(value.name),
+  };
+  if (tag.id === DEFAULT_TAG.id && tag.name !== DEFAULT_TAG.name)
+    invalidBackup();
+  return tag;
+}
+
+function parseLine(
+  value: unknown,
+  seen: Set<string>,
+  tagIds: Set<string>,
+): OrderLine {
   if (!isRecord(value)) invalidBackup();
   const priceCents = requireInteger(value.priceCents, 0);
   const quantity = requireInteger(value.quantity, 1);
+  if (value.tags !== undefined && !Array.isArray(value.tags)) invalidBackup();
+  const seenTags = new Set<string>();
+  const tags =
+    value.tags === undefined
+      ? value.tag == null
+        ? []
+        : [parseTag(value.tag, seenTags)]
+      : value.tags.map((tag) => parseTag(tag, seenTags));
+  if (tags.some((tag) => !tagIds.has(tag.id))) invalidBackup();
   const lineTotal = requireInteger(value.lineCents, 0);
   if (lineTotal !== priceCents * quantity) invalidBackup();
   return {
     id: requireId(value.id, seen),
     dishId: requireDishId(value.dishId),
+    ...(tags.length ? { tags } : {}),
     name: requireBackupName(value.name),
     priceCents,
     caloriesKcal: requireBackupCalories(value.caloriesKcal),
@@ -402,7 +523,11 @@ function parsePhotos(value: unknown): OrderPhoto[] {
   });
 }
 
-function parseOrder(value: unknown, seen: Set<string>): Order {
+function parseOrder(
+  value: unknown,
+  seen: Set<string>,
+  tagIds: Set<string>,
+): Order {
   if (!isRecord(value)) invalidBackup();
   if (!Array.isArray(value.lines)) invalidBackup();
   const lineIds = new Set<string>();
@@ -410,7 +535,7 @@ function parseOrder(value: unknown, seen: Set<string>): Order {
     value.groupingEnabled === undefined
       ? true
       : requireBoolean(value.groupingEnabled);
-  const lines = value.lines.map((line) => parseLine(line, lineIds));
+  const lines = value.lines.map((line) => parseLine(line, lineIds, tagIds));
   const seat = requireSeatValue(value.seat);
   return {
     id: requireId(value.id, seen),
@@ -444,6 +569,12 @@ function parseBackup(value: unknown, current: BbqDocument): BbqBackup {
     invalidBackup();
   }
   if (!Array.isArray(value.orders)) invalidBackup();
+  if (value.tags !== undefined && !Array.isArray(value.tags)) invalidBackup();
+  const tagIds = new Set<string>();
+  const tags = (value.tags ?? []).map((item: unknown) =>
+    parseTag(item, tagIds),
+  );
+  for (const tag of current.tags ?? []) tagIds.add(tag.id);
   const categoryIds = new Set<string>();
   const categories = value.categories.map((item) =>
     parseCategory(item, categoryIds),
@@ -451,11 +582,11 @@ function parseBackup(value: unknown, current: BbqDocument): BbqBackup {
   for (const category of current.categories) categoryIds.add(category.id);
   const dishIds = new Set<string>();
   const dishes = value.dishes.map((item) =>
-    parseDish(item, dishIds, categoryIds),
+    parseDish(item, dishIds, categoryIds, tagIds),
   );
   const orderIds = new Set<string>();
-  const orders = value.orders.map((item) => parseOrder(item, orderIds));
-  return { version: 1, categories, dishes, orders };
+  const orders = value.orders.map((item) => parseOrder(item, orderIds, tagIds));
+  return { version: 1, tags, categories, dishes, orders };
 }
 
 function recalculate(order: Order): Order {
@@ -505,6 +636,7 @@ export function mergeBackup(
 ): BbqDocument {
   const backup = parseBackup(incoming, current);
   return {
+    tags: mergeById(current.tags ?? [], backup.tags ?? []),
     categories: mergeById(current.categories, backup.categories),
     dishes: mergeById(current.dishes, backup.dishes),
     orders: mergeOrders(current.orders, backup.orders),

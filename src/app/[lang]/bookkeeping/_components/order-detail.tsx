@@ -9,9 +9,11 @@ import { useRef, useState } from "react";
 import { Link } from "@/components/link/link";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
+import { getLineTags } from "@/lib/bbq/tags";
 import type { Order, OrderPhoto } from "@/lib/bbq/types";
 import { formatCalories } from "./bbq-i18n";
 import { bbqOrderPath } from "./bbq-paths";
+import { ItemTagBadge } from "./item-tags";
 
 export function OrderDetail({
   order,
@@ -49,6 +51,9 @@ export function OrderDetail({
                   <p className="truncate text-foreground font-medium">
                     {line.name}
                   </p>
+                  {getLineTags(line).map((tag) => (
+                    <ItemTagBadge key={tag.id} tag={tag} />
+                  ))}
                   <p className="mt-0.5 tabular-nums text-muted-foreground text-xs">
                     {formatYuan(line.priceCents)} × {line.quantity}
                   </p>

@@ -1853,3 +1853,61 @@ msgstr "سانلىق مەلۇماتلىرىڭىز پەقەت بۇ ئۈسكۈنى
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
 msgid "关闭"
 msgstr "تاقاش"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:104
+msgid "全部标签"
+msgstr "بارلىق بەلگىلەر"
+
+#. placeholder {0}: tag.name
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:200
+msgid "删除标签 {0}"
+msgstr "{0} بەلگىسىنى ئۆچۈرۈش"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:98
+msgid "按标签筛选"
+msgstr "بەلگە بويىچە سۈزۈش"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:67
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:107
+msgid "未设置标签"
+msgstr "بەلگە قويۇلمىغان"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:557
+msgid "标签"
+msgstr "بەلگە"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
+msgid "标签不存在，请重新选择"
+msgstr "بەلگە مەۋجۇت ئەمەس، قايتا تاللاڭ"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+msgid "标签仍有项目或历史明细使用，无法删除"
+msgstr "بۇ بەلگە تۈر ياكى بۇرۇنقى خاتىرىلەرنىڭ تەپسىلاتىدا ئىشلىتىلگەن، ئۆچۈرگىلى بولمايدۇ"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:169
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:170
+msgid "标签名称"
+msgstr "بەلگە نامى"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
+msgid "标签已存在"
+msgstr "بەلگە ئاللىبۇرۇن مەۋجۇت"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:182
+msgid "添加标签"
+msgstr "بەلگە قوشۇش"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:60
+msgid "项目标签"
+msgstr "تۈر بەلگىسى"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:33
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:71
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:111
+msgid "默认"
+msgstr "سۈكۈتتىكى"
+
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx
+msgid "选择标签"
+msgstr "بەلگە تاللاش"

@@ -29,7 +29,19 @@ import { summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { formatYuan, lineCents, totalCents } from "@/lib/bbq/money";
 import { createOrderPhoto, MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
-import type { Dish, Order, OrderPhoto, OrderStatus } from "@/lib/bbq/types";
+import {
+  getDishTagIds,
+  getLineTags,
+  matchesTag,
+  resolveTagFilter,
+} from "@/lib/bbq/tags";
+import type {
+  Dish,
+  ItemTag,
+  Order,
+  OrderPhoto,
+  OrderStatus,
+} from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
 import { formatCalories } from "./bbq-i18n";
@@ -46,6 +58,7 @@ import {
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
+import { ItemTagBadge, ItemTagFilter } from "./item-tags";
 import { useBbqNavigate } from "./use-bbq-nav";
 
 const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -79,6 +92,7 @@ const photoActionCls = cls`
 
 type DraftLine = {
   key: string;
+  tags?: ItemTag[];
   id?: string;
   dishId: string | null;
   name: string;
@@ -88,13 +102,19 @@ type DraftLine = {
   quantity: number;
 };
 
-function readMenu() {
-  return bbqStore.listDishes();
+async function readMenu() {
+  const [dishes, tags] = await Promise.all([
+    bbqStore.listDishes(),
+    bbqStore.listTags(),
+  ]);
+  return { dishes, tags };
 }
 
 export function OrderEditor({ orderId }: { orderId?: string }) {
   const { i18n, t } = useLingui();
   const navigate = useBbqNavigate();
+  const [tags, setTags] = useState<ItemTag[]>([]);
+  const [tagFilter, setTagFilter] = useState("all");
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
   const [groupingEnabled, setGroupingEnabled] = useState(false);
@@ -121,7 +141,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           setPhase("missing");
           return;
         }
-        setDishes(menu);
+        setDishes(menu.dishes);
+        setTags(menu.tags);
         if (existing) {
           setOrder(existing);
           setGroupingEnabled(existing.groupingEnabled ?? true);
@@ -131,6 +152,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           setLines(
             existing.lines.map((line) => ({
               key: line.id,
+              tags: getLineTags(line),
               id: line.id,
               dishId: line.dishId,
               name: line.name,
@@ -159,7 +181,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
       void readMenu()
         .then((menu) => {
           if (cancelled) return;
-          setDishes(menu);
+          setDishes(menu.dishes);
+          setTags(menu.tags);
         })
         .catch((error: unknown) => {
           if (!cancelled) setMessage(bbqErrorMessage(i18n, error));
@@ -172,10 +195,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     };
   }, [i18n]);
 
+  const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const availableDishes = dishes.filter((dish) => dish.listed);
 
-  const filteredDishes = availableDishes.filter((dish) =>
-    dish.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
+  const filteredDishes = availableDishes.filter(
+    (dish) =>
+      dish.name
+        .toLocaleLowerCase()
+        .includes(search.trim().toLocaleLowerCase()) &&
+      matchesTag(dish, activeTagFilter),
   );
   const selectedQuantities = new Map<string, number>();
   for (const line of lines) {
@@ -202,6 +230,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           ...current,
           {
             key: `new:${dish.id}`,
+            tags: tags.filter((tag) => getDishTagIds(dish).includes(tag.id)),
             dishId: dish.id,
             name: dish.name,
             priceCents: dish.priceCents,
@@ -448,9 +477,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <ChevronDown className={detailsChevronCls} aria-hidden="true" />
             </summary>
             <div className="min-h-0 overflow-clip">
-              <div className="sticky top-0 z-10 bg-card pb-2 mt-2">
+              <div className="sticky top-0 z-10 bg-card pb-2 mt-2 flex min-w-0 items-center gap-1.5">
+                <ItemTagFilter
+                  tags={tags}
+                  value={activeTagFilter}
+                  onChange={setTagFilter}
+                />
                 {availableDishes.length > 0 ? (
-                  <div className="mt-2 shrink-0">
+                  <div className="min-w-0 flex-1">
                     <BbqSearch
                       value={search}
                       onChange={setSearch}
@@ -499,6 +533,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         <span className="block truncate" title={dish.name}>
                           {dish.name}
                         </span>
+                        {tags
+                          .filter((tag) => getDishTagIds(dish).includes(tag.id))
+                          .map((tag) => (
+                            <ItemTagBadge key={tag.id} tag={tag} />
+                          ))}
                         <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
                           {formatYuan(dish.priceCents)}/{dish.unit}
                           {dish.caloriesKcal != null ? (
@@ -567,6 +606,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           <p className="truncate text-sm font-medium text-foreground">
                             {line.name}
                           </p>
+                          {line.tags?.map((tag) => (
+                            <ItemTagBadge key={tag.id} tag={tag} />
+                          ))}
                           <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
                             {formatYuan(line.priceCents)}/{line.unit}
                             <span className="mx-1.5" aria-hidden="true">

@@ -3,6 +3,7 @@ import type {
   BbqBackupExportOptions,
   Category,
   Dish,
+  ItemTag,
   Order,
   SaveCategoryInput,
   SaveDishInput,
@@ -10,6 +11,9 @@ import type {
 } from "./types";
 
 export type BbqStoreErrorCode =
+  | "tag_in_use"
+  | "tag_not_found"
+  | "tag_exists"
   | "storage_failed"
   | "invalid_backup"
   | "not_found"
@@ -31,6 +35,9 @@ export class BbqStoreError extends Error {
 }
 
 export interface BbqStore {
+  listTags(): Promise<ItemTag[]>;
+  addTag(name: string): Promise<ItemTag>;
+  deleteTag(id: string): Promise<void>;
   listCategories(): Promise<Category[]>;
   saveCategory(input: SaveCategoryInput): Promise<Category>;
   listDishes(): Promise<Dish[]>;

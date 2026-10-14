@@ -1,20 +1,23 @@
 import Dexie from "dexie";
 import {
+  addTag as addTagDocument,
   deleteDish as deleteDishDocument,
   deleteOrder as deleteOrderDocument,
+  deleteTag as deleteTagDocument,
   exportBackup as exportBackupDocument,
   getOrder as getOrderDocument,
   listAllOrders as listAllOrdersDocument,
   listCategories as listCategoriesDocument,
   listDishes as listDishesDocument,
   listOrders as listOrdersDocument,
+  listTags as listTagsDocument,
   mergeBackup,
   saveCategory as saveCategoryDocument,
   saveDish as saveDishDocument,
   saveOrder as saveOrderDocument,
 } from "./document";
 import { type BbqStore, BbqStoreError } from "./store";
-import type { Category, Dish, Order, OrderPhoto } from "./types";
+import type { Category, Dish, ItemTag, Order, OrderPhoto } from "./types";
 
 type StoredDish = Omit<Dish, "unit"> & { unit?: string };
 type StoredOrder = Omit<Order, "lines" | "photos"> & {
@@ -30,6 +33,9 @@ db.version(1).stores({
   orders: "id, businessDayKey, status, openedAt, seat",
 });
 
+db.version(2).stores({ tags: "id, name" });
+
+const tagsTable = db.table<ItemTag, string>("tags");
 const categoriesTable = db.table<Category, string>("categories");
 const dishesTable = db.table<StoredDish, string>("dishes");
 const ordersTable = db.table<StoredOrder, string>("orders");
@@ -39,10 +45,11 @@ function createId(): string {
 }
 
 async function readDocument() {
-  const [categories, storedDishes, storedOrders] = await Promise.all([
+  const [categories, storedDishes, storedOrders, tags] = await Promise.all([
     categoriesTable.toArray(),
     dishesTable.toArray(),
     ordersTable.toArray(),
+    tagsTable.toArray(),
   ]);
   const dishes: Dish[] = storedDishes.map((dish) => ({
     ...dish,
@@ -56,7 +63,7 @@ async function readDocument() {
       unit: line.unit?.trim() || "份",
     })),
   }));
-  return { categories, dishes, orders };
+  return { categories, dishes, orders, tags };
 }
 
 async function guard<T>(work: () => Promise<T>): Promise<T> {
@@ -70,6 +77,28 @@ async function guard<T>(work: () => Promise<T>): Promise<T> {
 
 export function createIdbStore(): BbqStore {
   return {
+    listTags() {
+      return guard(async () =>
+        listTagsDocument({ tags: await tagsTable.toArray() }),
+      );
+    },
+    addTag(name) {
+      return guard(() =>
+        db.transaction("rw", db.tables, async () => {
+          const saved = addTagDocument(await readDocument(), name, createId);
+          await tagsTable.put(saved.tag);
+          return saved.tag;
+        }),
+      );
+    },
+    deleteTag(id) {
+      return guard(() =>
+        db.transaction("rw", db.tables, async () => {
+          deleteTagDocument(await readDocument(), id);
+          await tagsTable.delete(id);
+        }),
+      );
+    },
     listCategories() {
       return guard(async () => listCategoriesDocument(await readDocument()));
     },
@@ -88,11 +117,15 @@ export function createIdbStore(): BbqStore {
       return guard(async () => listDishesDocument(await readDocument()));
     },
     saveDish(input) {
-      return guard(async () => {
-        const saved = saveDishDocument(await readDocument(), input, createId);
-        await dishesTable.put(saved.dish);
-        return saved.dish;
-      });
+      return guard(() =>
+        db.transaction("rw", db.tables, async () => {
+          const saved = saveDishDocument(await readDocument(), input, createId);
+          if (saved.document.tags?.length)
+            await tagsTable.bulkPut(saved.document.tags);
+          await dishesTable.put(saved.dish);
+          return saved.dish;
+        }),
+      );
     },
     deleteDish(id) {
       return guard(async () => {
@@ -112,14 +145,16 @@ export function createIdbStore(): BbqStore {
       return guard(async () => getOrderDocument(await readDocument(), id));
     },
     saveOrder(input) {
-      return guard(async () => {
-        const saved = saveOrderDocument(await readDocument(), input, {
-          now: new Date(),
-          createId,
-        });
-        await ordersTable.put(saved.order);
-        return saved.order;
-      });
+      return guard(() =>
+        db.transaction("rw", db.tables, async () => {
+          const saved = saveOrderDocument(await readDocument(), input, {
+            now: new Date(),
+            createId,
+          });
+          await ordersTable.put(saved.order);
+          return saved.order;
+        }),
+      );
     },
     deleteOrder(id) {
       return guard(async () => {
@@ -128,35 +163,32 @@ export function createIdbStore(): BbqStore {
       });
     },
     exportBackup(options) {
-      return guard(async () =>
-        exportBackupDocument(await readDocument(), options),
+      return guard(() =>
+        db.transaction("r", db.tables, async () =>
+          exportBackupDocument(await readDocument(), options),
+        ),
       );
     },
     importBackup(backup) {
-      return guard(async () => {
-        const current = await readDocument();
-        const next = mergeBackup(current, backup);
-        const categoryIds = new Set(backup.categories.map((item) => item.id));
-        const dishIds = new Set(backup.dishes.map((item) => item.id));
-        const orderIds = new Set(backup.orders.map((item) => item.id));
-        await db.transaction(
-          "rw",
-          categoriesTable,
-          dishesTable,
-          ordersTable,
-          async () => {
-            const categories = next.categories.filter((item) =>
-              categoryIds.has(item.id),
-            );
-            const dishes = next.dishes.filter((item) => dishIds.has(item.id));
-            const orders = next.orders.filter((item) => orderIds.has(item.id));
-            if (categories.length > 0)
-              await categoriesTable.bulkPut(categories);
-            if (dishes.length > 0) await dishesTable.bulkPut(dishes);
-            if (orders.length > 0) await ordersTable.bulkPut(orders);
-          },
-        );
-      });
+      return guard(() =>
+        db.transaction("rw", db.tables, async () => {
+          const next = mergeBackup(await readDocument(), backup);
+          const tagIds = new Set(backup.tags?.map((item) => item.id));
+          const categoryIds = new Set(backup.categories.map((item) => item.id));
+          const dishIds = new Set(backup.dishes.map((item) => item.id));
+          const orderIds = new Set(backup.orders.map((item) => item.id));
+          const tags = (next.tags ?? []).filter((item) => tagIds.has(item.id));
+          const categories = next.categories.filter((item) =>
+            categoryIds.has(item.id),
+          );
+          const dishes = next.dishes.filter((item) => dishIds.has(item.id));
+          const orders = next.orders.filter((item) => orderIds.has(item.id));
+          if (tags.length) await tagsTable.bulkPut(tags);
+          if (categories.length) await categoriesTable.bulkPut(categories);
+          if (dishes.length) await dishesTable.bulkPut(dishes);
+          if (orders.length) await ordersTable.bulkPut(orders);
+        }),
+      );
     },
   };
 }

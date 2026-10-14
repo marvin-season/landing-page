@@ -5,6 +5,12 @@ import { BbqStoreError } from "@/lib/bbq/store";
 export function bbqErrorMessage(i18n: I18n, error: unknown): string {
   if (!(error instanceof BbqStoreError)) return i18n._(msg`本机数据库打不开`);
   switch (error.code) {
+    case "tag_in_use":
+      return i18n._(msg`标签仍有项目或历史明细使用，无法删除`);
+    case "tag_not_found":
+      return i18n._(msg`标签不存在，请重新选择`);
+    case "tag_exists":
+      return i18n._(msg`标签已存在`);
     case "storage_failed":
       return i18n._(msg`本机数据库打不开`);
     case "invalid_backup":

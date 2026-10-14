@@ -1853,3 +1853,61 @@ msgstr "데이터는 현재 기기에만 저장됩니다. 데이터가 손실되
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
 msgid "关闭"
 msgstr "닫기"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:104
+msgid "全部标签"
+msgstr "모든 태그"
+
+#. placeholder {0}: tag.name
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:200
+msgid "删除标签 {0}"
+msgstr "태그 {0} 삭제"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:98
+msgid "按标签筛选"
+msgstr "태그로 필터링"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:67
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:107
+msgid "未设置标签"
+msgstr "태그 없음"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:557
+msgid "标签"
+msgstr "태그"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
+msgid "标签不存在，请重新选择"
+msgstr "태그가 없습니다. 다시 선택해 주세요"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+msgid "标签仍有项目或历史明细使用，无法删除"
+msgstr "이 태그는 항목이나 이전 내역에서 사용 중이므로 삭제할 수 없습니다"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:169
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:170
+msgid "标签名称"
+msgstr "태그 이름"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
+msgid "标签已存在"
+msgstr "이미 존재하는 태그입니다"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:182
+msgid "添加标签"
+msgstr "태그 추가"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:60
+msgid "项目标签"
+msgstr "항목 태그"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:33
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:71
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:111
+msgid "默认"
+msgstr "기본"
+
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx
+msgid "选择标签"
+msgstr "태그 선택"

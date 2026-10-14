@@ -1853,3 +1853,61 @@ msgstr "Данные хранятся только на этом устройс�
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
 msgid "关闭"
 msgstr "Закрыть"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:104
+msgid "全部标签"
+msgstr "Все теги"
+
+#. placeholder {0}: tag.name
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:200
+msgid "删除标签 {0}"
+msgstr "Удалить тег {0}"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:98
+msgid "按标签筛选"
+msgstr "Фильтр по тегу"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:67
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:107
+msgid "未设置标签"
+msgstr "Без тега"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:557
+msgid "标签"
+msgstr "Тег"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
+msgid "标签不存在，请重新选择"
+msgstr "Тег не найден. Выберите другой."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+msgid "标签仍有项目或历史明细使用，无法删除"
+msgstr "Этот тег используется в позициях или истории записей и не может быть удалён"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:169
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:170
+msgid "标签名称"
+msgstr "Название тега"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
+msgid "标签已存在"
+msgstr "Тег уже существует"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:182
+msgid "添加标签"
+msgstr "Добавить тег"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:60
+msgid "项目标签"
+msgstr "Тег позиции"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:33
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:71
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:111
+msgid "默认"
+msgstr "По умолчанию"
+
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx
+msgid "选择标签"
+msgstr "Выбрать теги"

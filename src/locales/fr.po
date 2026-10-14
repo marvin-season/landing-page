@@ -1853,3 +1853,61 @@ msgstr "Vos données sont stockées uniquement sur cet appareil. Sauvegardez-les
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
 msgid "关闭"
 msgstr "Fermer"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:104
+msgid "全部标签"
+msgstr "Tous les tags"
+
+#. placeholder {0}: tag.name
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:200
+msgid "删除标签 {0}"
+msgstr "Supprimer le tag {0}"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:98
+msgid "按标签筛选"
+msgstr "Filtrer par tag"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:67
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:107
+msgid "未设置标签"
+msgstr "Sans tag"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:557
+msgid "标签"
+msgstr "Tag"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
+msgid "标签不存在，请重新选择"
+msgstr "Ce tag n’existe plus. Veuillez en choisir un autre."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+msgid "标签仍有项目或历史明细使用，无法删除"
+msgstr "Ce tag est utilisé par des éléments ou des écritures historiques et ne peut pas être supprimé"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:169
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:170
+msgid "标签名称"
+msgstr "Nom du tag"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
+msgid "标签已存在"
+msgstr "Ce tag existe déjà"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:182
+msgid "添加标签"
+msgstr "Ajouter un tag"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:60
+msgid "项目标签"
+msgstr "Tag de l’élément"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:33
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:71
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:111
+msgid "默认"
+msgstr "Par défaut"
+
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx
+msgid "选择标签"
+msgstr "Choisir des tags"

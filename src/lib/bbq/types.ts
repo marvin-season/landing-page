@@ -7,7 +7,16 @@ export type Category = {
   listed: boolean;
 };
 
+export type ItemTag = {
+  id: string;
+  name: string;
+};
+
 export type Dish = {
+  /** 历史项目未关联标签时保持为空。 */
+  tagIds?: string[];
+  /** 兼容早期单标签数据。 */
+  tagId?: string | null;
   id: string;
   categoryId: string;
   name: string;
@@ -20,6 +29,10 @@ export type Dish = {
 };
 
 export type OrderLine = {
+  /** 记录保存时的标签快照，不随常用项目修改。 */
+  tags?: ItemTag[];
+  /** 兼容早期单标签快照。 */
+  tag?: ItemTag | null;
   id: string;
   dishId: string | null;
   name: string;
@@ -59,6 +72,10 @@ export type SaveCategoryInput = {
 };
 
 export type SaveDishInput = {
+  /** undefined 保留旧关联；空数组使用默认标签。 */
+  tagIds?: string[];
+  /** 兼容早期单标签数据。 */
+  tagId?: string | null;
   id?: string;
   categoryId: string;
   name: string;
@@ -82,6 +99,7 @@ export type SaveOrderLineInput = {
 };
 
 export type BbqBackup = {
+  tags?: ItemTag[];
   version: 1;
   categories: Category[];
   dishes: Dish[];
