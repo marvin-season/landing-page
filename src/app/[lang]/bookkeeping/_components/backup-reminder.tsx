@@ -5,19 +5,30 @@ import { useLingui } from "@lingui/react/macro";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
+import { Link } from "@/components/link/link";
 import { getLocaleDir } from "@/lib/i18n/locales";
+import { bbqSettingsPath } from "./bbq-paths";
 
 export function BackupReminder() {
   const { i18n, t } = useLingui();
   const { resolvedTheme } = useTheme();
   const title = t`记得备份数据`;
   const description = t`数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。`;
+  const actionLabel = t`去备份`;
 
   useEffect(() => {
     const id = toast.info(title, {
       id: "bookkeeping-backup-reminder",
       description,
-      duration: 10_000,
+      action: (
+        <Link
+          href={bbqSettingsPath()}
+          className="shrink-0 text-xs font-medium text-primary underline underline-offset-4"
+        >
+          {actionLabel}
+        </Link>
+      ),
+      duration: 5_000,
       icon: (
         <Image
           unoptimized
@@ -34,7 +45,7 @@ export function BackupReminder() {
     return () => {
       toast.dismiss(id);
     };
-  }, [title, description]);
+  }, [title, description, actionLabel]);
 
   return (
     <Toaster
