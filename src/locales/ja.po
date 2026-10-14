@@ -1841,3 +1841,15 @@ msgstr "毎日に小さな喜びを。"
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
 msgstr "Loopyの心温まる場所へようこそ。少しゆっくりして、新しいことを探し、笑顔になれる小さな瞬間を残しましょう。"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:15
+msgid "记得备份数据"
+msgstr "データのバックアップをお忘れなく"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:16
+msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
+msgstr "データはこの端末にのみ保存されています。データを失わないよう、アプリを削除する前にバックアップしてください。"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
+msgid "关闭"
+msgstr "閉じる"

@@ -93,7 +93,10 @@ export function NavCard({
         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/5 text-primary transition-colors duration-300 group-hover:text-primary group-hover:bg-primary/10">
           <Icon className="size-4" aria-hidden="true" />
         </span>
-        <span className="rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[10px] font-medium uppercase text-muted-foreground tracking-[0.16em] group-data-[featured=true]:border-primary/25 group-data-[featured=true]:bg-primary group-data-[featured=true]:text-primary-foreground">
+        <span
+          data-new={badge === "NEW" || undefined}
+          className="rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[10px] font-medium uppercase text-muted-foreground tracking-[0.16em] group-data-[featured=true]:border-primary/25 group-data-[featured=true]:bg-primary group-data-[featured=true]:text-primary-foreground data-[new=true]:border-primary data-[new=true]:bg-primary data-[new=true]:text-primary-foreground data-[new=true]:font-bold data-[new=true]:ring-2 data-[new=true]:ring-primary/20 data-[new=true]:shadow-sm data-[new=true]:shadow-primary/25"
+        >
           {badge}
         </span>
       </div>

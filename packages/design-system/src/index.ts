@@ -1,4 +1,5 @@
 // biome-ignore lint/performance/noBarrelFile: package public API entrypoint.
+export { toast } from "sonner";
 export { Alert, AlertDescription, AlertTitle } from "./alert";
 export { Button, type ButtonProps, buttonVariants } from "./button";
 export {
@@ -66,6 +67,7 @@ export {
   SheetTitle,
   SheetTrigger,
 } from "./sheet";
+export { Toaster } from "./sonner";
 export { Switch } from "./switch";
 export { default, Tag, type TagProps } from "./tag";
 export {

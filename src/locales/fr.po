@@ -1841,3 +1841,15 @@ msgstr "Faites une place aux petits bonheurs de chaque jour."
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
 msgstr "Bienvenue dans le petit cocon de Loopy. Ralentissez, découvrez de nouvelles choses et gardez les petits instants qui vous font sourire."
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:15
+msgid "记得备份数据"
+msgstr "Pensez à sauvegarder vos données"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:16
+msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
+msgstr "Vos données sont stockées uniquement sur cet appareil. Sauvegardez-les avant de supprimer l’application pour éviter de les perdre."
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
+msgid "关闭"
+msgstr "Fermer"

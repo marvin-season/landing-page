@@ -1841,3 +1841,15 @@ msgstr "매일 작은 기쁨을 위한 여유를 가져요."
 #: src/app/[lang]/(home)/data/home-data.tsx:70
 msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
 msgstr "루피의 포근한 공간에 오신 것을 환영해요. 잠시 속도를 늦추고 새로운 것을 탐색하며 미소 짓게 하는 작은 순간들을 기록해 보세요."
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:15
+msgid "记得备份数据"
+msgstr "데이터 백업을 잊지 마세요"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:16
+msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
+msgstr "데이터는 현재 기기에만 저장됩니다. 데이터가 손실되지 않도록 앱을 삭제하기 전에 백업해 주세요."
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
+msgid "关闭"
+msgstr "닫기"
