@@ -17,12 +17,6 @@
 }
 
 @layer components {
-  @keyframes home-navigation-scroll {
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
   @keyframes home-reveal {
     from {
       opacity: 0;
