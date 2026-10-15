@@ -204,3 +204,133 @@ describe("targeted IndexedDB reads", () => {
     );
   });
 });
+
+describe("date-scoped cleanup", () => {
+  beforeEach(async () => {
+    await seedDb.table("orders").clear();
+    await seedDb.table("orders").bulkPut([
+      { ...order, id: "before", businessDayKey: "2026-10-14" },
+      { ...order, id: "start", businessDayKey: "2026-10-15" },
+      { ...order, id: "start-off", businessDayKey: "2026-10-15#off" },
+      { ...order, id: "end", businessDayKey: "2026-10-16", status: "done" },
+      { ...order, id: "end-off", businessDayKey: "2026-10-16#off" },
+      { ...order, id: "after", businessDayKey: "2026-10-17" },
+      {
+        ...order,
+        id: "legacy",
+        businessDayKey: "2026-10-15",
+        photos: undefined,
+      },
+    ]);
+  });
+
+  const range = { startDate: "2026-10-15", endDate: "2026-10-16" };
+
+  it("removes only photos within both inclusive dates, preserving every other field", async () => {
+    const before = await seedDb.table("orders").toArray();
+    assert.deepEqual(
+      await bbqStore.cleanupOrders({ ...range, photosOnly: true }),
+      {
+        orderCount: 4,
+        photoCount: 4,
+      },
+    );
+    const after = await seedDb.table("orders").toArray();
+    assert.deepEqual(
+      after,
+      before.map((item) =>
+        ["start", "start-off", "end", "end-off"].includes(item.id)
+          ? { ...item, photos: [] }
+          : item,
+      ),
+    );
+    assert.deepEqual(
+      await bbqStore.cleanupOrders({ ...range, photosOnly: true }),
+      {
+        orderCount: 0,
+        photoCount: 0,
+      },
+    );
+  });
+
+  it("deletes matching open/done records including legacy rows, keeping menu and tags intact", async () => {
+    const tables = ["categories", "dishes", "tags"];
+    const before = await Promise.all(
+      tables.map((name) => seedDb.table(name).toArray()),
+    );
+    assert.deepEqual(
+      await bbqStore.cleanupOrders({ ...range, photosOnly: false }),
+      {
+        orderCount: 5,
+        photoCount: 4,
+      },
+    );
+    assert.deepEqual(
+      (await seedDb.table("orders").toArray()).map((item) => item.id),
+      ["after", "before"],
+    );
+    assert.deepEqual(
+      await Promise.all(tables.map((name) => seedDb.table(name).toArray())),
+      before,
+    );
+  });
+
+  it("supports a single day and leaves adjacent days untouched", async () => {
+    assert.deepEqual(
+      await bbqStore.cleanupOrders({
+        startDate: range.startDate,
+        endDate: range.startDate,
+        photosOnly: false,
+      }),
+      {
+        orderCount: 3,
+        photoCount: 2,
+      },
+    );
+    assert.equal(await seedDb.table("orders").count(), 4);
+  });
+
+  it("rejects invalid or reversed ranges without modifying any records", async () => {
+    const before = await seedDb.table("orders").toArray();
+    for (const [startDate, endDate] of [
+      ["", "2026-10-16"],
+      ["2026-10-17", "2026-10-16"],
+      ["2026-02-30", "2026-10-16"],
+      ["2026-10-15#off", "2026-10-16"],
+    ]) {
+      await assert.rejects(
+        bbqStore.cleanupOrders({ startDate, endDate, photosOnly: false }),
+        /invalid_cleanup_range/,
+      );
+    }
+    assert.deepEqual(await seedDb.table("orders").toArray(), before);
+    assert.deepEqual(
+      await bbqStore.cleanupOrders({
+        startDate: "2000-01-01",
+        endDate: "2000-01-02",
+        photosOnly: false,
+      }),
+      { orderCount: 0, photoCount: 0 },
+    );
+  });
+
+  it("rolls back earlier photo removals when a later write fails", async () => {
+    const before = await seedDb.table("orders").toArray();
+    const original = IDBObjectStore.prototype.put;
+    let writes = 0;
+    mock.method(
+      IDBObjectStore.prototype,
+      "put",
+      function (this: IDBObjectStore, ...args: Parameters<typeof original>) {
+        if (this.name === "orders" && ++writes === 2)
+          throw new Error("write failed");
+        return original.apply(this, args);
+      },
+    );
+    await assert.rejects(
+      bbqStore.cleanupOrders({ ...range, photosOnly: true }),
+      /storage_failed/,
+    );
+    assert.deepEqual(await seedDb.table("orders").toArray(), before);
+  });
+});

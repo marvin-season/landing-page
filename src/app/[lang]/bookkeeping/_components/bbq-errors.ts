@@ -5,6 +5,8 @@ import { BbqStoreError } from "@/lib/bbq/store";
 export function bbqErrorMessage(i18n: I18n, error: unknown): string {
   if (!(error instanceof BbqStoreError)) return i18n._(msg`本机数据库打不开`);
   switch (error.code) {
+    case "invalid_cleanup_range":
+      return i18n._(msg`请选择有效的起止日期，开始日期不能晚于结束日期`);
     case "tag_in_use":
       return i18n._(msg`标签仍有项目或历史明细使用，无法删除`);
     case "tag_not_found":

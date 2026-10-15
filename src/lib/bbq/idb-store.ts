@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+import { isValidCleanupRange } from "./cleanup";
 import {
   addTag as addTagDocument,
   deleteDish as deleteDishDocument,
@@ -195,6 +196,35 @@ export function createIdbStore(): BbqStore {
       return guard(async () => {
         deleteOrderDocument(await readDocument(), id);
         await ordersTable.delete(id);
+      });
+    },
+    cleanupOrders({ startDate, endDate, photosOnly }) {
+      return guard(() => {
+        if (
+          !isValidCleanupRange(startDate, endDate) ||
+          typeof photosOnly !== "boolean"
+        ) {
+          throw new BbqStoreError("invalid_cleanup_range");
+        }
+        return db.transaction("rw", ordersTable, async () => {
+          const result = { orderCount: 0, photoCount: 0 };
+          // 按记账日期筛选；上界同时包含当天的 #off 休息时段。
+          await ordersTable
+            .where("businessDayKey")
+            .between(startDate, `${endDate}\uffff`, true, false)
+            .modify((order, context: { value?: StoredOrder }) => {
+              const photoCount = order.photos?.length ?? 0;
+              if (photosOnly && photoCount === 0) return false;
+              result.orderCount += 1;
+              result.photoCount += photoCount;
+              if (photosOnly) {
+                order.photos = [];
+              } else {
+                delete context.value;
+              }
+            });
+          return result;
+        });
       });
     },
     exportBackup(options) {

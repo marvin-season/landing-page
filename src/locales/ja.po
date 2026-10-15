@@ -1911,3 +1911,85 @@ msgstr "デフォルト"
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx
 msgid "选择标签"
 msgstr "タグを選択"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:214
+msgid "不含图片"
+msgstr "画像を含めない"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:339
+msgid "仅移除图片，保留账目"
+msgstr "画像のみ削除し、記録は保持"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:225
+msgid "包含图片"
+msgstr "画像を含める"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:202
+msgid "导出图片"
+msgstr "画像のエクスポート"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:236
+msgid "导出备份"
+msgstr "バックアップをエクスポート"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:137
+msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
+msgstr "{orderCount} 件の記録と {photoCount} 枚の画像を削除しました"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:136
+msgid "已移除 {photoCount} 张图片，账目已保留"
+msgstr "画像を {photoCount} 枚削除しました。記録は保持されています"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:303
+msgid "开始日期"
+msgstr "開始日"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:134
+msgid "所选范围内没有需要清理的数据"
+msgstr "選択した期間に削除対象のデータはありません"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:297
+msgid "按记账日期筛选，包含起止日期；常用项目与标签保留。"
+msgstr "記帳日で絞り込みます。開始日と終了日を含み、よく使う項目とタグは保持されます。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
+msgid "清理中…"
+msgstr "削除中…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:327
+msgid "清理内容"
+msgstr "削除対象"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:355
+msgid "清理后无法撤销，建议先导出包含图片的备份。"
+msgstr "削除は元に戻せません。先に画像を含むバックアップを作成してください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
+msgid "清理所选范围"
+msgstr "選択した期間を削除"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:283
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:294
+msgid "清理瘦身"
+msgstr "ストレージを整理"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:121
+msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
+msgstr "{startDate} から {endDate} まで（両日を含む）のすべての記録と画像を削除しますか？元に戻せません。先にバックアップしてください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:120
+msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
+msgstr "{startDate} から {endDate} まで（両日を含む）の記録の画像を削除しますか？記録は保持されます。画像の削除は元に戻せません。先にバックアップしてください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:350
+msgid "移除记录及图片"
+msgstr "記録と画像を削除"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:314
+msgid "结束日期"
+msgstr "終了日"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
+msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
+msgstr "有効な開始日と終了日を選択してください。開始日は終了日以前にしてください"

@@ -1911,3 +1911,85 @@ msgstr "Par défaut"
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx
 msgid "选择标签"
 msgstr "Choisir des tags"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:214
+msgid "不含图片"
+msgstr "Sans images"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:339
+msgid "仅移除图片，保留账目"
+msgstr "Supprimer uniquement les images, conserver les écritures"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:225
+msgid "包含图片"
+msgstr "Avec les images"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:202
+msgid "导出图片"
+msgstr "Exporter les images"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:236
+msgid "导出备份"
+msgstr "Exporter la sauvegarde"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:137
+msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
+msgstr "{orderCount} écritures et {photoCount} images supprimées"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:136
+msgid "已移除 {photoCount} 张图片，账目已保留"
+msgstr "{photoCount} images supprimées ; écritures conservées"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:303
+msgid "开始日期"
+msgstr "Date de début"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:134
+msgid "所选范围内没有需要清理的数据"
+msgstr "Aucune donnée à supprimer dans la période sélectionnée"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:297
+msgid "按记账日期筛选，包含起止日期；常用项目与标签保留。"
+msgstr "Filtre par date comptable, bornes incluses. Les éléments favoris et les étiquettes sont conservés."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
+msgid "清理中…"
+msgstr "Nettoyage…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:327
+msgid "清理内容"
+msgstr "Données à supprimer"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:355
+msgid "清理后无法撤销，建议先导出包含图片的备份。"
+msgstr "Le nettoyage est irréversible. Exportez d’abord une sauvegarde avec les images."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
+msgid "清理所选范围"
+msgstr "Nettoyer la période sélectionnée"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:283
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:294
+msgid "清理瘦身"
+msgstr "Libérer de l’espace"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:121
+msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
+msgstr "Supprimer toutes les écritures et images du {startDate} au {endDate}, bornes incluses ? Cette action est irréversible. Faites d’abord une sauvegarde."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:120
+msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
+msgstr "Supprimer les images des écritures du {startDate} au {endDate}, bornes incluses ? Les écritures seront conservées. La suppression des images est irréversible. Faites d’abord une sauvegarde."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:350
+msgid "移除记录及图片"
+msgstr "Supprimer les écritures et les images"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:314
+msgid "结束日期"
+msgstr "Date de fin"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
+msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
+msgstr "Choisissez des dates valides. La date de début ne doit pas être postérieure à la date de fin"

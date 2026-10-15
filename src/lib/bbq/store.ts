@@ -1,6 +1,8 @@
 import type {
   BbqBackup,
   BbqBackupExportOptions,
+  BbqCleanupOptions,
+  BbqCleanupResult,
   Category,
   Dish,
   ItemTag,
@@ -11,6 +13,7 @@ import type {
 } from "./types";
 
 export type BbqStoreErrorCode =
+  | "invalid_cleanup_range"
   | "tag_in_use"
   | "tag_not_found"
   | "tag_exists"
@@ -48,6 +51,7 @@ export interface BbqStore {
   getOrder(id: string): Promise<Order | null>;
   saveOrder(input: SaveOrderInput): Promise<Order>;
   deleteOrder(id: string): Promise<void>;
+  cleanupOrders(options: BbqCleanupOptions): Promise<BbqCleanupResult>;
   exportBackup(options?: BbqBackupExportOptions): Promise<BbqBackup>;
   importBackup(backup: BbqBackup): Promise<void>;
 }

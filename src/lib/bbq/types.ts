@@ -110,6 +110,17 @@ export type BbqBackupExportOptions = {
   includePhotos?: boolean;
 };
 
+export type BbqCleanupOptions = {
+  startDate: string;
+  endDate: string;
+  photosOnly: boolean;
+};
+
+export type BbqCleanupResult = {
+  orderCount: number;
+  photoCount: number;
+};
+
 export type SaveOrderInput = {
   /** 新建时默认关闭；编辑时未传则保留原状态。 */
   groupingEnabled?: boolean;
