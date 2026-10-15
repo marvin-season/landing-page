@@ -8,7 +8,7 @@
 - iPhone / iPad：Safari → 分享 → 添加到主屏幕。
 - Android：Chrome → 菜单 → 添加到主屏幕 / 安装应用。
 - 电脑：Chrome / Edge → 地址栏或菜单 → 安装应用。
-- 安装清单只提供中文，从 `/zh/bookkeeping` 安装，启动地址固定为 `/zh/bookkeeping`，应用 ID 保留 `/admin/bbq`，避免已安装应用被识别为新应用，与个人站点的应用区分。中文、英文、日文网页的离线支持独立于安装清单，见下文。
+- 安装清单只提供中文，从 `/zh/bookkeeping` 安装，启动地址固定为 `/zh/bookkeeping`，应用 ID 使用当前记账入口 `/bookkeeping`，与个人站点的应用区分。中文、英文、日文网页的离线支持独立于安装清单，见下文。
 - manifest 的作用域仅覆盖 `/zh/bookkeeping` 路径。离开中文 BBQ 路径时，浏览器可能显示站外导航栏。
 - 订单、菜单、照片继续使用现有 IndexedDB；安装不会触发数据导出、迁移或清空。不同浏览器、设备及部分系统的主屏幕应用可能使用独立存储，需要通过原有备份功能迁移；照片需选择“导出备份（包含照片）”。
 
@@ -73,7 +73,7 @@ BOOKKEEPING_PWA_TEST_ORIGIN=http://localhost:3001 nr test:bookkeeping-pwa
 
 `nr bbq:pwa:assets` 生成 `public/bbq-pwa/` 下的中文静态 manifest 和图标。图标使用 `public/bbq-pwa/loopy-source.png` 中的完整 Loopy 角色，由 `scripts/generate-bbq-pwa.ts` 去除透明留白后生成 SVG、16/32/192/512 PNG、180 Apple touch icon 和独立的 maskable 图标，原配图保持不变。使用 Next 已安装的 Sharp，无额外依赖。修改品牌时重新运行此命令；替换图标时同步递增脚本与 BBQ metadata 的图标版本参数。
 
-主题菜单新增 `Loopy · 奶油粉`，沿用现有主题偏好保存机制。PWA 的背景与浏览器主题色使用同款奶油粉，应用 ID 保持原值，启动地址和作用域已迁至 `/zh/bookkeeping`。旧启动地址通过永久跳转兼容。
+主题菜单新增 `Loopy · 奶油粉`，沿用现有主题偏好保存机制。PWA 的背景与浏览器主题色使用同款奶油粉，应用 ID 为 `/bookkeeping`，启动地址和作用域为 `/zh/bookkeeping`。旧启动地址通过永久跳转兼容。使用旧 ID 安装的应用可能被浏览器视为另一个应用，需要重新安装以使用新 ID；迁移前可先导出备份。
 
 `src/proxy.ts` 仅为 `/bbq-pwa/` 静态资源添加 locale 重写豁免，不改变页面登录规则。
 

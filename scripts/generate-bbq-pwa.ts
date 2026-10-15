@@ -43,8 +43,7 @@ async function main() {
     .toFile(new URL("icon-maskable-512.png", output).pathname);
 
   const manifest: MetadataRoute.Manifest = {
-    // Keep the installed app identity stable when its start URL changes.
-    id: "/admin/bbq",
+    id: "/bookkeeping",
     name: "Loopy 记账",
     short_name: "Loopy 记账",
     description: "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
