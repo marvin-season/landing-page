@@ -20,6 +20,7 @@ import {
   LoaderCircle,
   Minus,
   Plus,
+  ReceiptText,
   Save,
   Trash2,
   UtensilsCrossed,
@@ -55,12 +56,12 @@ import {
   detailsMotionCls,
   pageShellCls,
   pageTitleCls,
-  totalBarCls,
   touchCls,
 } from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath, bbqSettingsPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
+import { settingsCardCls, settingsSummaryCls } from "./bbq-settings-styles";
 import { ItemTagBadge, ItemTagFilter } from "./item-tags";
 import { useBbqNavigate } from "./use-bbq-nav";
 import { useGroupingSettings } from "./use-grouping-settings";
@@ -71,18 +72,14 @@ const editorWorkspaceCls = cls`
 `;
 
 const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 ${detailsMotionCls} shrink-0
+  min-h-0 min-w-0 ${detailsMotionCls} ${settingsCardCls}
 `;
 
-const editorMenuSummaryCls = cls`
-  flex min-h-11 cursor-pointer items-center gap-2 py-2 text-sm font-medium
-  list-none [&::-webkit-details-marker]:hidden text-foreground
-  transition-colors hover:text-primary focus-visible:outline-none
-  focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 rounded-lg
-  bg-muted/30 px-2.5
-`;
+const editorSectionCls = cls`${settingsCardCls} p-3`;
 
-const editorOrderBodyCls = cls`min-h-0 flex flex-col gap-5 shrink-0`;
+const editorOrderBodyCls = cls`min-h-0 flex flex-col gap-3 shrink-0`;
+
+const editorTotalBarCls = cls`${settingsCardCls} px-3 py-2.5 w-full`;
 
 const editorControlCls = cls`
   rounded-lg shadow-none transition-colors
@@ -92,10 +89,11 @@ const editorControlCls = cls`
 `;
 
 const photoActionCls = cls`
-  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-muted/40
+  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-muted/30
   px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
   has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1
   has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11 min-w-0 text-center
+  border border-border/60
 `;
 
 type DraftLine = {
@@ -404,7 +402,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
 
   return (
     <div className={`${pageShellCls} min-h-0 overflow-hidden flex-1`}>
-      <header className="flex shrink-0 flex-col gap-1 px-3">
+      <header className="flex shrink-0 flex-col gap-1">
         <h1 className={pageTitleCls}>
           {order
             ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
@@ -435,9 +433,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         disabled={saving}
         aria-busy={saving}
       >
-        <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-5 px-3 pb-5">
+        <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-3 pb-3">
           {groupingEnabled ? (
-            <section className="shrink-0">
+            <section className={editorSectionCls}>
               <div className="flex items-center gap-3">
                 <label
                   htmlFor="order-group"
@@ -465,7 +463,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 >
                   <SelectTrigger
                     id="order-group"
-                    className="min-w-0 h-11 bg-muted/40 flex-1 data-[size=default]:h-11 border-0 shadow-none rounded-lg"
+                    className="min-w-0 h-11 bg-muted/30 flex-1 data-[size=default]:h-11 border-border/60 shadow-none rounded-lg"
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -511,7 +509,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 setMenuRequest((request) => request || 1);
             }}
           >
-            <summary className={editorMenuSummaryCls}>
+            <summary className={settingsSummaryCls}>
               <Plus
                 className="size-4 shrink-0 text-primary"
                 aria-hidden="true"
@@ -528,7 +526,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </span>
               <ChevronDown className={detailsChevronCls} aria-hidden="true" />
             </summary>
-            <div className="min-h-0 overflow-clip">
+            <div className="min-h-0 overflow-clip border-t border-border/60">
               {menuRequested ? (
                 menuPhase === "loading" ? (
                   <p
@@ -538,7 +536,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     <Trans>读取常用项目中…</Trans>
                   </p>
                 ) : menuPhase === "error" ? (
-                  <div className="py-3">
+                  <div className="p-3 flex flex-col items-start gap-3">
                     <p role="alert">{menuError}</p>
                     <Button
                       type="button"
@@ -549,8 +547,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     </Button>
                   </div>
                 ) : (
-                  <>
-                    <div className="bg-muted/40 mt-1 flex min-w-0 items-center gap-2 rounded-lg [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:bg-transparent [&_[data-slot=select-trigger]]:border-0 [&_[data-slot=select-trigger]]:bg-transparent">
+                  <div className="p-2.5">
+                    <div className="bg-muted/30 flex min-w-0 items-center gap-2 rounded-lg [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:bg-transparent [&_[data-slot=select-trigger]]:border-0 [&_[data-slot=select-trigger]]:bg-transparent border border-border/60">
                       {availableDishes.length > 0 ? (
                         <div className="min-w-0 flex-1">
                           <BbqSearch
@@ -567,7 +565,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       />
                     </div>
                     {availableDishes.length === 0 ? (
-                      <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center">
+                      <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
                         <UtensilsCrossed
                           className="size-7 text-muted-foreground/60"
                           aria-hidden="true"
@@ -607,7 +605,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                                 ? "subtle"
                                 : "outline"
                             }
-                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2 border border-border data-[selected=true]:border-primary/50 flex-wrap`}
+                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 flex-wrap data-[selected=true]:bg-primary/5`}
                             data-selected={selectedQuantities.has(dish.id)}
                             aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                             onClick={() => addDish(dish)}
@@ -651,31 +649,35 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         ))}
                       </div>
                     )}
-                  </>
+                  </div>
                 )
               ) : null}
             </div>
           </details>
           <div className={editorOrderBodyCls}>
-            <section className="border-t border-border/60 pt-4">
-              <div className="flex items-center justify-between gap-3 pb-1">
-                <h2 className="text-sm font-medium text-foreground">
+            <section className={editorSectionCls}>
+              <div className="flex items-center justify-between gap-3 pb-2">
+                <h2 className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                  <ReceiptText
+                    className="size-4 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
                   <Trans>这一笔</Trans>
                 </h2>
                 <span className="text-xs tabular-nums text-muted-foreground text-right">
                   {t`${lines.length} 项 · ${itemCount} 件`}
                 </span>
               </div>
-              <p className="text-xs tabular-nums text-muted-foreground break-words">
+              <p className="text-xs tabular-nums text-muted-foreground break-words rounded-lg bg-muted/30 px-2.5 py-2">
                 <Trans>
                   热量 {formatCalories(i18n, summarizeCalories(lines))}
                 </Trans>
               </p>
               {lines.length === 0 ? (
-                <div className="mt-3 flex min-h-20 flex-row items-center justify-center gap-3 text-center">
+                <div className="mt-3 flex min-h-28 flex-col items-center justify-center gap-2 text-center py-2">
                   <BbqCompanion
                     mood={groupingEnabled ? "chef" : "hello"}
-                    className="block size-12 shrink-0"
+                    className="block size-16 shrink-0"
                   />
                   <p className="text-xs text-muted-foreground">
                     <Trans>还没有添加项目</Trans>
@@ -686,7 +688,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   {lines.map((line) => (
                     <li
                       key={line.key}
-                      className="grid items-center gap-1 border-b border-border/40 py-3 last:border-b-0 grid-cols-[minmax(0,1fr)_2.75rem_minmax(1.5rem,auto)_2.75rem] sm:gap-2"
+                      className="grid items-center gap-1 border-b border-border/40 py-3 last:border-b-0 grid-cols-[minmax(0,1fr)_2.75rem_minmax(1.5rem,auto)_2.75rem] sm:gap-2 last:pb-0"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">
@@ -749,10 +751,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 </ul>
               )}
             </section>
-            <section className="border-t border-border/60 pt-4">
+            <section className={editorSectionCls}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-medium text-foreground">
+                  <h2 className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                    <Camera
+                      className="size-4 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
                     <Trans>附张照片</Trans>
                   </h2>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
@@ -769,7 +775,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   </span>
                 </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 <label className={photoActionCls}>
                   <Camera className="size-4" aria-hidden="true" />
                   {processingPhotos ? t`处理照片中…` : t`拍照`}
@@ -855,7 +861,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </div>
         </div>
-        <div className={totalBarCls}>
+        <div className={editorTotalBarCls}>
           <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_minmax(7rem,auto)] items-center gap-3">
             <p
               className="text-xl font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
