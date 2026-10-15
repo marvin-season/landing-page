@@ -597,19 +597,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                                 ))}
                               <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
                                 {formatYuan(dish.priceCents)}/{dish.unit}
-                                {dish.caloriesKcal != null ? (
-                                  <>
-                                    <span className="mx-1" aria-hidden="true">
-                                      ·
-                                    </span>
-                                    {formatCalories(
-                                      i18n,
-                                      summarizeCalories([
-                                        { ...dish, quantity: 1 },
-                                      ]),
-                                    )}
-                                  </>
-                                ) : null}
+                                <span className="mx-1" aria-hidden="true">
+                                  ·
+                                </span>
+                                {formatCalories(
+                                  i18n,
+                                  summarizeCalories([{ ...dish, quantity: 1 }]),
+                                )}
                               </span>
                             </span>
                             <span className="flex shrink-0 flex-col items-center gap-0.5">
@@ -837,28 +831,28 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </section>
         </div>
         <div className={totalBarCls}>
-          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
             <p
-              className="text-xl font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
+              className="text-lg font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
               title={formatYuan(total)}
             >
               {formatYuan(total)}
             </p>
             <Button
               type="button"
-              className={`px-3 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full`}
+              className={`px-2.5 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-9 w-full h-9 text-xs gap-1.5`}
               disabled={!canSave}
               onClick={() => void save()}
             >
               {saving ? (
                 <LoaderCircle
-                  className="size-4 animate-spin motion-reduce:animate-none"
+                  className="size-3.5 animate-spin motion-reduce:animate-none"
                   aria-hidden="true"
                 />
               ) : done ? (
-                <CheckCircle2 className="size-4" aria-hidden="true" />
+                <CheckCircle2 className="size-3.5" aria-hidden="true" />
               ) : (
-                <Save className="size-4" aria-hidden="true" />
+                <Save className="size-3.5" aria-hidden="true" />
               )}
               {saving
                 ? t`保存中…`

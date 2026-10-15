@@ -6,8 +6,12 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { Link } from "@/components/link/link";
+import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { getLocaleDir } from "@/lib/i18n/locales";
 import { bbqSettingsPath } from "./bbq-paths";
+
+const reminderStorageKey = "bookkeeping-backup-reminder:last-shown-day";
+let lastShownDay: string | null = null;
 
 export function BackupReminder() {
   const { i18n, t } = useLingui();
@@ -17,33 +21,52 @@ export function BackupReminder() {
   const actionLabel = t`去备份`;
 
   useEffect(() => {
-    const id = toast.info(title, {
-      id: "bookkeeping-backup-reminder",
-      description,
-      action: (
-        <Link
-          href={bbqSettingsPath()}
-          className="shrink-0 text-xs font-medium text-primary underline underline-offset-4"
-        >
-          {actionLabel}
-        </Link>
-      ),
-      duration: 5_000,
-      icon: (
-        <Image
-          unoptimized
-          src="/bbq/companions/hello.gif"
-          alt=""
-          width={56}
-          height={56}
-          className="size-14 object-contain"
-        />
-      ),
-      classNames: { icon: "size-14! shrink-0" },
-    });
+    let id: string | number | undefined;
+    // 延后触发，避免 Strict Mode 的 effect 重放先记下日期又立即关闭提示。
+    const timer = window.setTimeout(() => {
+      const today = formatShanghaiDate(new Date());
+      if (lastShownDay === today) return;
+      try {
+        if (window.localStorage.getItem(reminderStorageKey) === today) return;
+      } catch {
+        // 存储不可用时，当前页面会话内仍保持每天一次。
+      }
+
+      id = toast.info(title, {
+        id: "bookkeeping-backup-reminder",
+        description,
+        action: (
+          <Link
+            href={bbqSettingsPath()}
+            className="shrink-0 text-xs font-medium text-primary underline underline-offset-4"
+          >
+            {actionLabel}
+          </Link>
+        ),
+        duration: 8_000,
+        icon: (
+          <Image
+            unoptimized
+            src="/bbq/companions/hello.gif"
+            alt=""
+            width={56}
+            height={56}
+            className="size-14 object-contain"
+          />
+        ),
+        classNames: { icon: "size-14! shrink-0" },
+      });
+      lastShownDay = today;
+      try {
+        window.localStorage.setItem(reminderStorageKey, today);
+      } catch {
+        // 日期已保存在内存中，不阻断提醒。
+      }
+    }, 0);
 
     return () => {
-      toast.dismiss(id);
+      window.clearTimeout(timer);
+      if (id !== undefined) toast.dismiss(id);
     };
   }, [title, description, actionLabel]);
 

@@ -47,11 +47,19 @@ import { BbqSearch } from "./bbq-search";
 import { ItemTagBadge, ItemTagFilter, ItemTagSelect } from "./item-tags";
 
 const dishGridCls = cls`grid grid-cols-3 gap-2 min-w-0`;
-const dishRowCls = cls`rounded-lg border bg-card p-2.5`;
+const dishRowCls = cls`rounded-lg border bg-muted/30 p-2.5 border-border/60`;
 const dishInputCls = cls`
-  w-full min-w-0 rounded-lg border bg-background shadow-none h-11 px-2 text-base
+  w-full min-w-0 rounded-lg border bg-card shadow-none h-11 px-2 text-base
   focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50
-  focus-visible:ring-offset-0 placeholder:text-sm
+  focus-visible:ring-offset-0 placeholder:text-sm text-card-foreground
+`;
+
+// 仅统一常用项目页的控件底色和标签色，不改变共享组件在其他页面的配色。
+const menuColorsCls = cls`
+  [&_[data-slot=input]]:bg-card [&_[data-slot=select-trigger]]:bg-card
+  [&_[data-slot=item-tag]]:bg-secondary/50
+  [&_[data-slot=item-tag]]:text-secondary-foreground!
+  [&_[data-slot=item-tag]]:border-border!
 `;
 
 export function MenuEditor() {
@@ -132,7 +140,9 @@ export function MenuEditor() {
   const listedCount = dishes.filter((dish) => dish.listed).length;
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden">
+    <div
+      className={`mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden ${menuColorsCls}`}
+    >
       <header className="flex gap-2 flex-row items-start justify-between shrink-0">
         <div>
           <div className="flex items-center gap-1.5">
@@ -212,7 +222,7 @@ function DishList({
           // 首次展开才挂载表单，随后收起时保留未保存的输入。
           if (event.currentTarget.open) setAddFormRequested(true);
         }}
-        className={`overflow-hidden rounded-xl bg-card ${detailsMotionCls}`}
+        className={`overflow-hidden rounded-xl bg-card ${detailsMotionCls} ring-1 ring-inset ring-border/60 [&>summary]:bg-card [&>summary:hover]:bg-muted/40 [&[open]>summary]:bg-primary/5`}
       >
         <summary className={detailsSummaryCls}>
           <Plus className="size-4 text-primary" aria-hidden="true" />
@@ -224,7 +234,7 @@ function DishList({
         </summary>
         <div className="min-h-0 overflow-clip">
           {addFormRequested ? (
-            <div className="p-2.5 border-t">
+            <div className="p-2.5 border-t bg-muted/30 border-border/60">
               <p className="text-muted-foreground text-[11px] mb-2">
                 <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
               </p>
@@ -246,11 +256,6 @@ function DishList({
             <Trans>我的常用</Trans>
           </h2>
           <div className="flex min-w-0 items-center gap-1.5">
-            <ItemTagFilter
-              tags={tags}
-              value={activeTagFilter}
-              onChange={setTagFilter}
-            />
             {dishes.length > 0 ? (
               <div className="min-w-0 flex-1">
                 <BbqSearch
@@ -260,6 +265,11 @@ function DishList({
                 />
               </div>
             ) : null}
+            <ItemTagFilter
+              tags={tags}
+              value={activeTagFilter}
+              onChange={setTagFilter}
+            />
           </div>
         </div>
         {dishes.length > 0 && matches.length === 0 ? (
@@ -281,7 +291,7 @@ function DishList({
             </p>
           </div>
         ) : (
-          <div className="flex flex-col rounded-xl bg-card overflow-hidden">
+          <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
             {dishes.map((dish) => (
               <div
                 key={dish.id}
@@ -329,7 +339,7 @@ function DishRow({
   const [tagIds, setTagIds] = useState<string[]>(
     dish ? getDishTagIds(dish) : [DEFAULT_TAG.id],
   );
-  const fieldLabelCls = cls`text-muted-foreground text-xs`;
+  const fieldLabelCls = cls`text-foreground/80 text-xs`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "0",
@@ -476,16 +486,16 @@ function DishRow({
 
   if (dish && !editing) {
     return (
-      <article className="flex gap-2 bg-card flex-row items-center p-3">
+      <article className="flex gap-1.5 bg-card flex-row items-center px-2.5 py-1.5 text-card-foreground">
         <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1.5">
             <h3
               className="truncate text-sm font-medium text-foreground"
               title={dish.name}
             >
               {dish.name}
             </h3>
-            <div className="flex min-w-0 flex-wrap gap-1">
+            <div className="flex min-w-0 flex-wrap gap-1 [&_[data-slot=item-tag]]:px-1.5 [&_[data-slot=item-tag]]:py-0 [&_[data-slot=item-tag]]:text-[10px] [&_[data-slot=item-tag]]:leading-4">
               {tags
                 .filter((tag) => getDishTagIds(dish).includes(tag.id))
                 .map((tag) => (
@@ -502,12 +512,12 @@ function DishRow({
               {dish.listed ? t`已启用` : t`未启用`}
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground break-words">
+          <p className="mt-0.5 text-xs text-muted-foreground break-words leading-4">
             <span className="tabular-nums text-foreground">
               {formatYuan(dish.priceCents)}
             </span>
             /{dish.unit}
-            <span className="mx-2">·</span>
+            <span className="mx-1.5">·</span>
             <Trans>
               热量{" "}
               {formatCalories(
@@ -521,8 +531,8 @@ function DishRow({
         <div className="flex shrink-0 gap-0.5">
           <Button
             type="button"
-            variant="outline"
-            className="size-11 flex-none rounded-lg px-0 shadow-none hover:bg-muted/70 hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
+            variant="subtle"
+            className="size-9 flex-none rounded-lg px-0 shadow-none hover:bg-primary/15 hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
             aria-label={t`编辑 ${dish.name}`}
             onClick={() => setEditing(true)}
@@ -535,7 +545,7 @@ function DishRow({
           <Button
             type="button"
             variant="ghost"
-            className="text-destructive size-11 flex-none rounded-lg px-0 hover:bg-destructive/10 hover:text-destructive focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-destructive/50 focus-visible:ring-offset-0"
+            className="text-destructive size-9 flex-none rounded-lg px-0 hover:bg-destructive/10 hover:text-destructive focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-destructive/50 focus-visible:ring-offset-0"
             disabled={pending !== null}
             aria-label={t`删除 ${dish.name}`}
             onClick={() => void remove()}
@@ -602,7 +612,7 @@ function DishRow({
           className={`${dishInputCls} tabular-nums`}
           autoComplete="off"
           aria-label={t`每单位热量（kcal，选填）`}
-          placeholder={t`如 300 / -200`}
+          placeholder="0"
         />
       </label>
       <label className="flex min-w-0 flex-col gap-1">
@@ -664,7 +674,7 @@ function DishRow({
             type="button"
             size="icon"
             variant="ghost"
-            className="shrink-0 size-11"
+            className="shrink-0 size-11 text-muted-foreground hover:text-foreground"
             aria-label={t`取消编辑`}
             title={t`取消编辑`}
             onClick={cancelEditing}

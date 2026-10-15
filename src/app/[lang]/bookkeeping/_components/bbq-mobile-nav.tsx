@@ -65,7 +65,7 @@ export function BbqMobileNav() {
   return (
     <nav
       aria-label={t`Loopy 记账主导航`}
-      className="relative z-30 bg-background shrink-0 mt-2 border-t"
+      className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t`}
     >
       <div className="mx-auto grid grid-cols-4 gap-1 py-1.5">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {

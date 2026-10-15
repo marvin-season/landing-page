@@ -4,7 +4,7 @@ import type { CalorieSummary } from "@/lib/bbq/calories";
 
 // Translate presentation only; keep saved dates, units and calorie values intact.
 export function formatCalories(i18n: I18n, summary: CalorieSummary): string {
-  if (summary.recordedLineCount === 0) return i18n._(msg`未记录`);
+  if (summary.recordedLineCount === 0) return `${i18n.number(0)} kcal`;
   const value = i18n.number(Number(summary.totalKcal.toFixed(2)));
   return summary.missingLineCount > 0
     ? i18n._(msg`${value} kcal（部分）`)

@@ -30,7 +30,12 @@ export function ItemTagBadge({ tag }: { tag?: ItemTag | null }) {
   const { t } = useLingui();
   if (!tag) return null;
   return (
-    <Tag size="compact" className="max-w-full truncate" title={tag.name}>
+    <Tag
+      data-slot="item-tag"
+      size="compact"
+      className="max-w-full truncate"
+      title={tag.name}
+    >
       {tag.id === DEFAULT_TAG.id ? t`默认` : tag.name}
     </Tag>
   );
