@@ -46,6 +46,7 @@ import {
 import { BbqSupportCard } from "./bbq-support-card";
 import { CompanionAlbumSettings } from "./companion-album-settings";
 import { GroupingSettingsCard } from "./grouping-settings";
+import { LocalDataNotice } from "./local-data-notice";
 
 const radioOptionCls = cls`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-checked:border-primary/40 has-checked:bg-primary/5 has-disabled:cursor-not-allowed has-disabled:opacity-50 border-border/60 bg-muted/30 text-foreground transition-colors hover:bg-muted/50 has-focus-visible:ring-1 has-focus-visible:ring-primary/50`;
 const radioInputCls = cls`size-4 shrink-0 accent-primary`;
@@ -183,6 +184,7 @@ export function BbqSettings() {
 
   return (
     <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
+      <LocalDataNotice />
       <header className="shrink-0">
         <div className="flex items-center gap-1.5">
           <h1 className={pageTitleCls}>

@@ -1019,10 +1019,6 @@ msgstr "人前"
 msgid "休息时段"
 msgstr "休止時間帯"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:43
-msgid "休息状态"
-msgstr "休憩中"
-
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
 msgid "保存"
 msgstr "保存"
@@ -1241,10 +1237,6 @@ msgstr "グループ分けを有効にする"
 msgid "回到当前时段"
 msgstr "現在の時間帯へ"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:201
-msgid "图片场景"
-msgstr "画像のシーン"
-
 #: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:109
 msgid "图集已导入，页面配图已更新。"
 msgstr "画像セットを読み込み、ページの画像を更新しました。"
@@ -1295,10 +1287,6 @@ msgstr "バックアップを作成しました。ブラウザーのダウンロ
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:103
 msgid "备份文件不正确"
 msgstr "無効なバックアップファイルです"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:44
-msgid "安装与引导"
-msgstr "インストールと案内"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:118
 msgid "安装应用"
@@ -1391,10 +1379,6 @@ msgstr "完了分の合計"
 msgid "已完成热量 {0}"
 msgstr "完了分のカロリー {0}"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:48
-msgid "已完成记录"
-msgstr "完了した記録"
-
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:153
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:253
 msgid "已完成金额"
@@ -1405,8 +1389,8 @@ msgid "已移除 {photoCount} 张图片，账目已保留"
 msgstr "画像を {photoCount} 枚削除しました。記録は保持されています"
 
 #: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:172
-msgid "已配置 {count} / 13 个场景"
-msgstr "13シーン中 {count} シーンを設定済み"
+msgid "已配置 {configuredCount} / {sceneCount} 个场景"
+msgstr "{configuredCount} / {sceneCount} シーンを設定済み"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:28
 msgid "常用"
@@ -1419,10 +1403,6 @@ msgstr "よく使う項目"
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:112
 msgid "常用项目已保存"
 msgstr "よく使う項目を保存しました"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:39
-msgid "常用项目空状态"
-msgstr "よく使う項目がないとき"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:148
 msgid "常记的放这里 · {listedCount} 项可选"
@@ -1455,10 +1435,6 @@ msgstr "現在の時間帯"
 #: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:55
 msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
 msgstr "このブラウザー、アドレス、言語ではオフラインの準備に対応していません。HTTPS の中国語、英語、日本語ページをご利用ください。"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:49
-msgid "待完成记录"
-msgstr "未完了の記録"
 
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:128
 msgid "恢复进行中"
@@ -1554,10 +1530,6 @@ msgstr "数字が大きいほど先に表示"
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:20
 msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
 msgstr "データはこの端末にのみ保存されています。データを失わないよう、アプリを削除する前にバックアップしてください。"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:47
-msgid "数量统计"
-msgstr "件数の統計"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
 #: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
@@ -1659,10 +1631,6 @@ msgstr "タグ名"
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:21
 msgid "标签已存在"
 msgstr "タグはすでに存在します"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:38
-msgid "欢迎与提醒"
-msgstr "歓迎とリマインダー"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:50
 msgid "正在准备离线资源，请保持联网…"
@@ -1814,10 +1782,6 @@ msgstr "カロリーは有効な数値（kcal）を入力してください。�
 msgid "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 msgstr "単位あたりのカロリー：摂取は正数、消費は負数。空欄も可能です"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:41
-msgid "热量统计"
-msgstr "カロリー統計"
-
 #: src/app/[lang]/(home)/data/home-data.tsx:124
 #: src/app/[lang]/bookkeeping/layout.tsx:33
 msgid "热量记录"
@@ -1968,10 +1932,6 @@ msgstr "日々の支出と注文を記録し、項目の選択や数量の調整
 msgid "记录明细"
 msgstr "記録の明細"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:50
-msgid "记录照片"
-msgstr "記録の写真"
-
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:114
 msgid "记录状态"
 msgstr "記録の状態"
@@ -1993,10 +1953,6 @@ msgstr "記録の写真（拡大）"
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:161
 msgid "记录的照片大图，可按 Esc 或关闭按钮返回记录详情"
 msgstr "記録の写真の拡大表示です。Esc キーまたは閉じるボタンで記録の詳細に戻れます"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:42
-msgid "记录空状态"
-msgstr "記録がないとき"
 
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:19
 msgid "记得备份数据"
@@ -2081,10 +2037,6 @@ msgstr "推移の指標"
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:92
 msgid "输入分组名称"
 msgstr "グループ名を入力"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:45
-msgid "运动记录"
-msgstr "運動の記録"
 
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:162
 msgid "还没有完成的记录"
@@ -2204,12 +2156,56 @@ msgstr "項目を有効化"
 msgid "项目标签"
 msgstr "項目のタグ"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:40
-msgid "饮食记录"
-msgstr "食事の記録"
-
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:39
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:157
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:270
 msgid "默认"
 msgstr "デフォルト"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:39
+msgid "备份提醒 / 未选项目 / 暂无进行中记录"
+msgstr "バックアップ通知 / 項目未選択 / 進行中の記録なし"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:40
+msgid "常用 · 暂无项目 / 记录 · 进行中列表顶部"
+msgstr "よく使う項目 · 項目なし / 記録 · 進行中一覧の上部"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:41
+msgid "常用 · 添加项目 / 记一笔 · 分组下未选项目"
+msgstr "よく使う項目 · 項目追加 / 記録する · グループ利用時の項目未選択"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:42
+msgid "统计 · 热量图表旁"
+msgstr "統計 · カロリーグラフの横"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:43
+msgid "记录 · 暂无已完成记录"
+msgstr "記録 · 完了した記録なし"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:45
+msgid "设置 · 安装应用卡片"
+msgstr "設定 · アプリのインストールカード"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:47
+msgid "统计 · 金额图表旁"
+msgstr "統計 · 金額グラフの横"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:48
+msgid "统计 · 记录数图表旁 / 暂无数据"
+msgstr "統計 · 記録数グラフの横 / データなし"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:49
+msgid "记录 · 已完成列表顶部"
+msgstr "記録 · 完了一覧の上部"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:202
+msgid "选择要更换图片的位置"
+msgstr "画像を変更する場所を選択"
+
+#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx
+msgid "数据存储与备份"
+msgstr "データの保存とバックアップ"
+
+#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx
+msgid "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
+msgstr "記帳データはこの端末のブラウザー内にのみ保存され、自動アップロードやクラウド同期は行われません。ブラウザーのデータ削除や端末変更による記録の消失を防ぐため、定期的にバックアップをエクスポートしてください。"

@@ -18,7 +18,6 @@ import { useRef, useState } from "react";
 import {
   blobDataUrl,
   type CompanionAlbum,
-  type CompanionMood,
   companionMoods,
   imageBlob,
   maxAlbumBytes,
@@ -36,25 +35,25 @@ import { settingsCardCls, settingsSummaryCls } from "./bbq-settings-styles";
 import { useCompanionAlbum } from "./companion-album-provider";
 
 const moodLabels = {
-  hello: msg`欢迎与提醒`,
-  dance: msg`常用项目空状态`,
-  chef: msg`饮食记录`,
-  exercise: msg`热量统计`,
-  shy: msg`记录空状态`,
-  tumble: msg`休息状态`,
-  wave: msg`安装与引导`,
-  workout: msg`运动记录`,
-  busy: msg`支出统计`,
-  ponder: msg`数量统计`,
-  happy: msg`已完成记录`,
-  care: msg`待完成记录`,
-  "photo-pose": msg`记录照片`,
+  hello: msg`备份提醒 / 未选项目 / 暂无进行中记录`,
+  dance: msg`常用 · 暂无项目 / 记录 · 进行中列表顶部`,
+  chef: msg`常用 · 添加项目 / 记一笔 · 分组下未选项目`,
+  exercise: msg`统计 · 热量图表旁`,
+  shy: msg`记录 · 暂无已完成记录`,
+  wave: msg`设置 · 安装应用卡片`,
+  busy: msg`统计 · 金额图表旁`,
+  ponder: msg`统计 · 记录数图表旁 / 暂无数据`,
+  happy: msg`记录 · 已完成列表顶部`,
 };
+type SelectableMood = keyof typeof moodLabels;
+// Only offer images used by the UI; keep legacy moods compatible with saved packs.
+const selectableMoods = Object.keys(moodLabels) as SelectableMood[];
+const sceneCount = selectableMoods.length;
 
 export function CompanionAlbumSettings() {
   const { t, i18n } = useLingui();
   const { images, loading, error } = useCompanionAlbum();
-  const [mood, setMood] = useState<CompanionMood>("hello");
+  const [mood, setMood] = useState<SelectableMood>("hello");
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -62,6 +61,7 @@ export function CompanionAlbumSettings() {
   const albumInput = useRef<HTMLInputElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const count = Object.keys(images).length;
+  const configuredCount = selectableMoods.filter((id) => images[id]).length;
 
   async function run(action: () => Promise<void>, success: string) {
     if (busyRef.current) return;
@@ -170,7 +170,9 @@ export function CompanionAlbumSettings() {
             </Trans>
           </p>
           <p className="text-xs" role="status">
-            {loading ? t`读取图集中…` : t`已配置 ${count} / 13 个场景`}
+            {loading
+              ? t`读取图集中…`
+              : t`已配置 ${configuredCount} / ${sceneCount} 个场景`}
           </p>
           <div className="grid grid-cols-2 gap-2">
             <Button
@@ -199,10 +201,10 @@ export function CompanionAlbumSettings() {
             </Trans>
           </p>
           <label className="flex flex-col gap-2 text-xs">
-            <Trans>图片场景</Trans>
+            <Trans>选择要更换图片的位置</Trans>
             <Select
               value={mood}
-              onValueChange={(value) => setMood(value as CompanionMood)}
+              onValueChange={(value) => setMood(value as SelectableMood)}
               disabled={busy || loading || error}
             >
               <SelectTrigger className="w-full">
@@ -210,7 +212,7 @@ export function CompanionAlbumSettings() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {companionMoods.map((id) => (
+                  {selectableMoods.map((id) => (
                     <SelectItem key={id} value={id}>
                       {i18n._(moodLabels[id])}
                     </SelectItem>
