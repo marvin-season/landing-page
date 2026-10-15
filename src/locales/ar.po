@@ -2001,3 +2001,71 @@ msgstr "اللغة"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "主题"
 msgstr "السمة"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx
+msgid "展开查看全部项目"
+msgstr "وسّع لعرض جميع العناصر"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称不能为空，最多 10 个字符"
+msgstr "يجب أن يتكون اسم المجموعة من حرف واحد إلى 10 أحرف"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组设置不正确"
+msgstr "إعدادات المجموعات غير صحيحة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组已存在"
+msgstr "هذه المجموعة موجودة بالفعل"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "启用分组"
+msgstr "تفعيل المجموعات"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "自定义分组"
+msgstr "مجموعات مخصصة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "名称最多 10 个字符，支持任意文字和符号。"
+msgstr "حتى 10 أحرف. يمكن استخدام أي نص أو رموز."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称"
+msgstr "اسم المجموعة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "输入分组名称"
+msgstr "أدخل اسم المجموعة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组"
+msgstr "إضافة مجموعة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组 {group}"
+msgstr "حذف المجموعة {group}"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组后，即可在记账时选择。"
+msgstr "أضف مجموعات لتتمكن من اختيارها عند تسجيل قيد."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组不会影响已有记录。"
+msgstr "حذف مجموعة لا يؤثر على السجلات الموجودة."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组"
+msgstr "المجموعة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "不分组"
+msgstr "بلا مجموعة"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "到设置中添加分组"
+msgstr "إضافة مجموعات في الإعدادات"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "选择分组和项目后保存订单"
+msgstr "اختر مجموعة وعناصر ثم احفظ الطلب"

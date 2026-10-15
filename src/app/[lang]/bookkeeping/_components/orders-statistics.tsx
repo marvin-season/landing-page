@@ -50,6 +50,7 @@ export function OrdersStatistics({
 }) {
   const { i18n, t } = useLingui();
   const [chartMode, setChartMode] = useState<ChartMode>("revenue");
+  const [periodsRequested, setPeriodsRequested] = useState(false);
 
   if (statistics.length === 0) {
     return (
@@ -122,7 +123,7 @@ export function OrdersStatistics({
             </div>
             <BbqCompanion
               mood={chartCompanionMoods[chartMode]}
-              className="block size-16 shrink-0"
+              className="block size-10 shrink-0"
             />
           </div>
           <div
@@ -183,70 +184,81 @@ export function OrdersStatistics({
             </p>
           </div>
         </details>
-        <section className="border-t" aria-label={t`时段明细`}>
-          <div className="flex items-center justify-between gap-2 bg-muted/30 px-3 py-2">
-            <h3 className="text-sm font-medium text-foreground">
+        <details
+          className={`border-t ${detailsMotionCls}`}
+          aria-label={t`时段明细`}
+          onToggle={(event) => {
+            if (event.currentTarget.open) setPeriodsRequested(true);
+          }}
+        >
+          <summary className={detailsSummaryCls}>
+            <h3 className="text-sm font-medium text-foreground flex-1">
               <Trans>时段明细</Trans>
             </h3>
             <span className="text-xs text-muted-foreground">
               <Trans>最近时段在前</Trans>
             </span>
+            <ChevronDown className={detailsChevronCls} aria-hidden="true" />
+          </summary>
+          <div className="min-h-0 overflow-clip">
+            {periodsRequested ? (
+              <ul className="divide-y px-3">
+                {statistics.toReversed().map((item) => (
+                  <li key={item.businessDayKey} className="py-3">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                      <Link
+                        href={bbqHomePath(item.businessDayKey)}
+                        onNavigate={onSelectDay}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                      >
+                        {item.businessDayKey.slice(0, 10)}
+                        <span className="text-xs">
+                          <Trans>查看记录 →</Trans>
+                        </span>
+                      </Link>
+                      <span className="text-xs text-muted-foreground">
+                        {item.businessDayKey.endsWith("#off")
+                          ? t`休息时段`
+                          : t`记账时段`}
+                      </span>
+                    </div>
+                    <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground">
+                          <Trans>记录</Trans>
+                        </dt>
+                        <dd className="mt-0.5 tabular-nums text-foreground">
+                          <Trans>{item.orderCount} 条</Trans>
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground">
+                          <Trans>已完成</Trans>
+                        </dt>
+                        <dd className="mt-0.5 tabular-nums text-foreground">
+                          <Trans>{item.settledOrderCount} 条</Trans>
+                        </dd>
+                      </div>
+                      <div className="min-w-0 text-right">
+                        <dt className="text-muted-foreground">
+                          <Trans>已完成金额</Trans>
+                        </dt>
+                        <dd className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground">
+                          {formatYuan(item.settledTotalCents)}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="mt-2 text-xs tabular-nums text-muted-foreground">
+                      <Trans>
+                        已完成热量 {formatCalories(i18n, item.settledCalories)}
+                      </Trans>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
-          <ul className="divide-y px-3">
-            {statistics.toReversed().map((item) => (
-              <li key={item.businessDayKey} className="py-3">
-                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                  <Link
-                    href={bbqHomePath(item.businessDayKey)}
-                    onNavigate={onSelectDay}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                  >
-                    {item.businessDayKey.slice(0, 10)}
-                    <span className="text-xs">
-                      <Trans>查看记录 →</Trans>
-                    </span>
-                  </Link>
-                  <span className="text-xs text-muted-foreground">
-                    {item.businessDayKey.endsWith("#off")
-                      ? t`休息时段`
-                      : t`记账时段`}
-                  </span>
-                </div>
-                <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
-                  <div className="min-w-0">
-                    <dt className="text-muted-foreground">
-                      <Trans>记录</Trans>
-                    </dt>
-                    <dd className="mt-0.5 tabular-nums text-foreground">
-                      <Trans>{item.orderCount} 条</Trans>
-                    </dd>
-                  </div>
-                  <div className="min-w-0">
-                    <dt className="text-muted-foreground">
-                      <Trans>已完成</Trans>
-                    </dt>
-                    <dd className="mt-0.5 tabular-nums text-foreground">
-                      <Trans>{item.settledOrderCount} 条</Trans>
-                    </dd>
-                  </div>
-                  <div className="min-w-0 text-right">
-                    <dt className="text-muted-foreground">
-                      <Trans>已完成金额</Trans>
-                    </dt>
-                    <dd className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground">
-                      {formatYuan(item.settledTotalCents)}
-                    </dd>
-                  </div>
-                </dl>
-                <p className="mt-2 text-xs tabular-nums text-muted-foreground">
-                  <Trans>
-                    已完成热量 {formatCalories(i18n, item.settledCalories)}
-                  </Trans>
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        </details>
       </section>
     </div>
   );

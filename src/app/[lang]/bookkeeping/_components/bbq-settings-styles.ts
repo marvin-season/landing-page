@@ -1,6 +1,6 @@
 import { cls } from "./bbq-layout";
 
-// 仅供设置页使用，避免改变其他页面的折叠区域配色。
+// 设置页的样式基准；常用项目复用卡片和标题样式，保持折叠入口一致。
 export const settingsCardCls = cls`
   overflow-hidden rounded-xl bg-card shrink-0 border border-border/60
   text-card-foreground shadow-none

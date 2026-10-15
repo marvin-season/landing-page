@@ -1,5 +1,10 @@
 export type OrderStatus = "open" | "done";
 
+export type GroupingSettings = {
+  enabled: boolean;
+  names: string[];
+};
+
 export type Category = {
   id: string;
   name: string;
@@ -53,6 +58,8 @@ export type OrderPhoto = {
 export type Order = {
   /** 记录自身的分组开关；未设置的旧记录按店铺订单处理。 */
   groupingEnabled?: boolean;
+  /** 自定义分组名称快照；undefined 兼容旧座号，null 表示不分组。 */
+  groupName?: string | null;
   id: string;
   businessDayKey: string;
   seq: number;
@@ -99,6 +106,7 @@ export type SaveOrderLineInput = {
 };
 
 export type BbqBackup = {
+  groupingSettings?: GroupingSettings;
   tags?: ItemTag[];
   version: 1;
   categories: Category[];
@@ -122,6 +130,7 @@ export type BbqCleanupResult = {
 };
 
 export type SaveOrderInput = {
+  groupName?: string | null;
   /** 新建时默认关闭；编辑时未传则保留原状态。 */
   groupingEnabled?: boolean;
   id?: string;

@@ -2001,3 +2001,71 @@ msgstr "Language"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "主题"
 msgstr "Theme"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx
+msgid "展开查看全部项目"
+msgstr "Expand to view all items"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称不能为空，最多 10 个字符"
+msgstr "Group names must contain 1–10 characters"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组设置不正确"
+msgstr "Invalid grouping settings"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组已存在"
+msgstr "This group already exists"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "启用分组"
+msgstr "Enable grouping"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "自定义分组"
+msgstr "Custom groups"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "名称最多 10 个字符，支持任意文字和符号。"
+msgstr "Up to 10 characters. Any text or symbols are supported."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称"
+msgstr "Group name"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "输入分组名称"
+msgstr "Enter a group name"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组"
+msgstr "Add group"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组 {group}"
+msgstr "Delete group {group}"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组后，即可在记账时选择。"
+msgstr "Add groups to select them when recording an entry."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组不会影响已有记录。"
+msgstr "Deleting a group does not affect existing records."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组"
+msgstr "Group"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "不分组"
+msgstr "No group"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "到设置中添加分组"
+msgstr "Add groups in settings"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "选择分组和项目后保存订单"
+msgstr "Choose a group and items, then save the order"

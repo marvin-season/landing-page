@@ -1,5 +1,6 @@
 import { businessDayKey } from "./business-day";
 import { assertCaloriesKcal } from "./calories";
+import { requireGroupingSettings, requireGroupName } from "./grouping";
 import {
   assertPriceCents,
   assertQuantity,
@@ -13,6 +14,7 @@ import type {
   BbqBackupExportOptions,
   Category,
   Dish,
+  GroupingSettings,
   ItemTag,
   Order,
   OrderLine,
@@ -24,6 +26,7 @@ import type {
 } from "./types";
 
 export type BbqDocument = {
+  groupingSettings?: GroupingSettings;
   tags?: ItemTag[];
   categories: Category[];
   dishes: Dish[];
@@ -280,7 +283,16 @@ export function saveOrder(
   const groupingEnabled =
     input.groupingEnabled ??
     (existing ? (existing.groupingEnabled ?? true) : false);
-  const seat = groupingEnabled ? requireSeat(input.seat) : null;
+  const requestedGroup =
+    input.groupName === undefined ? existing?.groupName : input.groupName;
+  const groupName =
+    requestedGroup === undefined
+      ? undefined
+      : groupingEnabled && requestedGroup !== null
+        ? requireGroupName(requestedGroup)
+        : null;
+  const seat =
+    groupingEnabled && groupName === undefined ? requireSeat(input.seat) : null;
   const orderTotal = totalCents(lines);
   const photos = input.photos ?? existing?.photos ?? [];
 
@@ -288,6 +300,7 @@ export function saveOrder(
     const order: Order = {
       ...existing,
       groupingEnabled,
+      ...(groupName === undefined ? {} : { groupName }),
       seat,
       status: input.status,
       lines,
@@ -310,6 +323,7 @@ export function saveOrder(
     id: input.id ?? clock.createId(),
     businessDayKey: dayKey,
     groupingEnabled,
+    ...(groupName === undefined ? {} : { groupName }),
     seq,
     seat,
     status: input.status,
@@ -341,6 +355,9 @@ export function exportBackup(
   const orders = listAllOrders(document);
   return {
     version: 1,
+    ...(document.groupingSettings
+      ? { groupingSettings: document.groupingSettings }
+      : {}),
     tags: listTags(document),
     categories: listCategories(document),
     dishes: listDishes(document),
@@ -537,12 +554,24 @@ function parseOrder(
       : requireBoolean(value.groupingEnabled);
   const lines = value.lines.map((line) => parseLine(line, lineIds, tagIds));
   const seat = requireSeatValue(value.seat);
+  let groupName: string | null | undefined;
+  if (value.groupName !== undefined) {
+    try {
+      groupName =
+        value.groupName === null ? null : requireGroupName(value.groupName);
+    } catch {
+      invalidBackup();
+    }
+  }
   return {
     id: requireId(value.id, seen),
     businessDayKey: requireText(value.businessDayKey),
     seq: requireInteger(value.seq, 1),
     groupingEnabled,
-    seat: groupingEnabled ? seat : null,
+    ...(groupName === undefined
+      ? {}
+      : { groupName: groupingEnabled ? groupName : null }),
+    seat: groupingEnabled && groupName === undefined ? seat : null,
     status: requireStatus(value.status),
     openedAt: requireOpenedAt(value.openedAt),
     lines,
@@ -586,7 +615,22 @@ function parseBackup(value: unknown, current: BbqDocument): BbqBackup {
   );
   const orderIds = new Set<string>();
   const orders = value.orders.map((item) => parseOrder(item, orderIds, tagIds));
-  return { version: 1, tags, categories, dishes, orders };
+  let groupingSettings: GroupingSettings | undefined;
+  if (value.groupingSettings !== undefined) {
+    try {
+      groupingSettings = requireGroupingSettings(value.groupingSettings);
+    } catch {
+      invalidBackup();
+    }
+  }
+  return {
+    version: 1,
+    tags,
+    categories,
+    dishes,
+    orders,
+    ...(groupingSettings ? { groupingSettings } : {}),
+  };
 }
 
 function recalculate(order: Order): Order {
@@ -618,6 +662,7 @@ function mergeOrders(current: Order[], incoming: Order[]): Order[] {
         ...local,
         seat: order.seat,
         groupingEnabled: order.groupingEnabled,
+        groupName: order.groupName,
         status: order.status,
         openedAt: order.openedAt,
         businessDayKey: order.businessDayKey,
@@ -635,7 +680,19 @@ export function mergeBackup(
   incoming: unknown,
 ): BbqDocument {
   const backup = parseBackup(incoming, current);
+  const groupingSettings = backup.groupingSettings
+    ? {
+        ...backup.groupingSettings,
+        names: [
+          ...new Set([
+            ...(current.groupingSettings?.names ?? []),
+            ...backup.groupingSettings.names,
+          ]),
+        ],
+      }
+    : current.groupingSettings;
   return {
+    ...(groupingSettings ? { groupingSettings } : {}),
     tags: mergeById(current.tags ?? [], backup.tags ?? []),
     categories: mergeById(current.categories, backup.categories),
     dishes: mergeById(current.dishes, backup.dishes),

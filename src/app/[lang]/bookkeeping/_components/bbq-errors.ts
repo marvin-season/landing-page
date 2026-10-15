@@ -5,6 +5,12 @@ import { BbqStoreError } from "@/lib/bbq/store";
 export function bbqErrorMessage(i18n: I18n, error: unknown): string {
   if (!(error instanceof BbqStoreError)) return i18n._(msg`本机数据库打不开`);
   switch (error.code) {
+    case "invalid_group_name":
+      return i18n._(msg`分组名称不能为空，最多 10 个字符`);
+    case "invalid_group_settings":
+      return i18n._(msg`分组设置不正确`);
+    case "group_exists":
+      return i18n._(msg`分组已存在`);
     case "invalid_cleanup_range":
       return i18n._(msg`请选择有效的起止日期，开始日期不能晚于结束日期`);
     case "tag_in_use":

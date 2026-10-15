@@ -2001,3 +2001,71 @@ msgstr "语言"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "主题"
 msgstr "主题"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx
+msgid "展开查看全部项目"
+msgstr "展开查看全部项目"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称不能为空，最多 10 个字符"
+msgstr "分组名称不能为空，最多 10 个字符"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组设置不正确"
+msgstr "分组设置不正确"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组已存在"
+msgstr "分组已存在"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "启用分组"
+msgstr "启用分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "自定义分组"
+msgstr "自定义分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "名称最多 10 个字符，支持任意文字和符号。"
+msgstr "名称最多 10 个字符，支持任意文字和符号。"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称"
+msgstr "分组名称"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "输入分组名称"
+msgstr "输入分组名称"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组"
+msgstr "添加分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组 {group}"
+msgstr "删除分组 {group}"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组后，即可在记账时选择。"
+msgstr "添加分组后，即可在记账时选择。"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组不会影响已有记录。"
+msgstr "删除分组不会影响已有记录。"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组"
+msgstr "分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "不分组"
+msgstr "不分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "到设置中添加分组"
+msgstr "到设置中添加分组"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "选择分组和项目后保存订单"
+msgstr "选择分组和项目后保存订单"

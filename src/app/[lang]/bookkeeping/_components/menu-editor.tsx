@@ -9,6 +9,7 @@ import {
 } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+  Bookmark,
   ChevronDown,
   LoaderCircle,
   Pencil,
@@ -39,11 +40,11 @@ import {
   cls,
   detailsChevronCls,
   detailsMotionCls,
-  detailsSummaryCls,
   pageTitleCls,
 } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 import { BbqSearch } from "./bbq-search";
+import { settingsCardCls, settingsSummaryCls } from "./bbq-settings-styles";
 import { ItemTagBadge, ItemTagFilter, ItemTagSelect } from "./item-tags";
 
 const dishGridCls = cls`grid grid-cols-3 gap-2 min-w-0`;
@@ -66,28 +67,41 @@ export function MenuEditor() {
   const { i18n, t } = useLingui();
   const [menu, setMenu] = useState<Category | null>(null);
   const [tags, setTags] = useState<ItemTag[]>([]);
-  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [dishes, setDishes] = useState<Dish[] | null>(null);
+  const [loadRequest, setLoadRequest] = useState(0);
+  const [listRequested, setListRequested] = useState(false);
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const categoryRequest = useRef<Promise<Category> | null>(null);
 
   const reload = useCallback(async () => {
-    const [categories, nextDishes, nextTags] = await Promise.all([
-      bbqStore.listCategories(),
-      bbqStore.listDishes(),
+    // 两个区域同时首次展开时，共用分类初始化，避免空库重复创建菜单。
+    categoryRequest.current ??= bbqStore
+      .listCategories()
+      .then(
+        (categories) =>
+          categories[0] ??
+          bbqStore.saveCategory({
+            name: "菜单",
+            sort: 0,
+            listed: true,
+          }),
+      )
+      .catch((error: unknown) => {
+        categoryRequest.current = null;
+        throw error;
+      });
+    const [category, nextDishes, nextTags] = await Promise.all([
+      categoryRequest.current,
+      // 新增表单只需要分类和标签；列表首次展开后才读取项目。
+      listRequested ? bbqStore.listDishes() : Promise.resolve(null),
       bbqStore.listTags(),
     ]);
-    const category =
-      categories[0] ??
-      (await bbqStore.saveCategory({
-        name: "菜单",
-        sort: 0,
-        listed: true,
-      }));
     setMenu(category);
-    setDishes(nextDishes);
+    if (nextDishes !== null) setDishes(nextDishes);
     setTags(nextTags);
-  }, []);
+  }, [listRequested]);
   const reloadTags = useCallback(async () => {
     setTags(await bbqStore.listTags());
   }, []);
@@ -99,7 +113,10 @@ export function MenuEditor() {
   }, [reload, t]);
 
   useEffect(() => {
+    if (loadRequest === 0) return;
     let cancelled = false;
+    setPhase("loading");
+    setMessage(null);
     void reload()
       .then(() => {
         if (!cancelled) setPhase("ready");
@@ -112,32 +129,9 @@ export function MenuEditor() {
     return () => {
       cancelled = true;
     };
-  }, [reload, i18n]);
+  }, [loadRequest, reload, i18n]);
 
-  if (phase === "loading") {
-    return (
-      <div
-        className="flex min-h-64 items-center justify-center text-sm text-muted-foreground"
-        role="status"
-      >
-        <Trans>读取常用项目中…</Trans>
-      </div>
-    );
-  }
-
-  if (phase === "error") {
-    return (
-      <div className="mx-auto flex min-h-48 w-full max-w-xl flex-col justify-center gap-3">
-        <Alert className="border-destructive/30 bg-destructive/5 p-3">
-          <AlertDescription className="text-destructive">
-            {message}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  const listedCount = dishes.filter((dish) => dish.listed).length;
+  const listedCount = dishes?.filter((dish) => dish.listed).length ?? "—";
 
   return (
     <div
@@ -171,16 +165,22 @@ export function MenuEditor() {
         </Alert>
       ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-3">
-        {menu ? (
-          <DishList
-            categoryId={menu.id}
-            dishes={dishes}
-            tags={tags}
-            onTagsChanged={reloadTags}
-            onSaved={handleSaved}
-            onError={setMessage}
-          />
-        ) : null}
+        <DishList
+          categoryId={menu?.id ?? null}
+          dishes={dishes}
+          tags={tags}
+          phase={phase}
+          listRequested={listRequested}
+          onRequest={() => setLoadRequest((request) => request || 1)}
+          onRequestList={() => {
+            setListRequested(true);
+            setLoadRequest((request) => request || 1);
+          }}
+          onRetry={() => setLoadRequest((request) => request + 1)}
+          onTagsChanged={reloadTags}
+          onSaved={handleSaved}
+          onError={setMessage}
+        />
       </div>
     </div>
   );
@@ -190,13 +190,23 @@ function DishList({
   categoryId,
   dishes,
   tags,
+  phase,
+  listRequested,
+  onRequest,
+  onRequestList,
+  onRetry,
   onTagsChanged,
   onSaved,
   onError,
 }: {
-  categoryId: string;
-  dishes: Dish[];
+  categoryId: string | null;
+  dishes: Dish[] | null;
   tags: ItemTag[];
+  phase: "loading" | "ready" | "error";
+  listRequested: boolean;
+  onRequest: () => void;
+  onRequestList: () => void;
+  onRetry: () => void;
   onTagsChanged: () => Promise<void>;
   onSaved: () => Promise<void>;
   onError: (message: string) => void;
@@ -205,10 +215,10 @@ function DishList({
   const [tagFilter, setTagFilter] = useState("all");
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const [search, setSearch] = useState("");
-  const [adding, setAdding] = useState(dishes.length === 0);
-  const [addFormRequested, setAddFormRequested] = useState(dishes.length === 0);
+  const [adding, setAdding] = useState(false);
+  const [addFormRequested, setAddFormRequested] = useState(false);
   const query = search.trim().toLocaleLowerCase();
-  const matches = dishes.filter(
+  const matches = dishes?.filter(
     (dish) =>
       dish.name.toLocaleLowerCase().includes(query) &&
       matchesTag(dish, activeTagFilter),
@@ -220,90 +230,32 @@ function DishList({
         onToggle={(event) => {
           setAdding(event.currentTarget.open);
           // 首次展开才挂载表单，随后收起时保留未保存的输入。
-          if (event.currentTarget.open) setAddFormRequested(true);
+          if (event.currentTarget.open) {
+            setAddFormRequested(true);
+            onRequest();
+          }
         }}
-        className={`overflow-hidden rounded-xl bg-card ${detailsMotionCls} ring-1 ring-inset ring-border/60 [&>summary]:bg-card [&>summary:hover]:bg-muted/40 [&[open]>summary]:bg-primary/5`}
+        className={`${settingsCardCls} ${detailsMotionCls}`}
       >
-        <summary className={detailsSummaryCls}>
+        <summary className={settingsSummaryCls}>
           <Plus className="size-4 text-primary" aria-hidden="true" />
           <span className="text-sm font-medium text-foreground flex-1">
             <Trans>添加常用项目</Trans>
           </span>
-          <BbqCompanion mood="chef" className="block size-10 shrink-0" />
+          <BbqCompanion mood="chef" className="block size-8 shrink-0" />
           <ChevronDown className={detailsChevronCls} aria-hidden="true" />
         </summary>
         <div className="min-h-0 overflow-clip">
           {addFormRequested ? (
-            <div className="p-2.5 border-t bg-muted/30 border-border/60">
-              <p className="text-muted-foreground text-[11px] mb-2">
-                <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
-              </p>
-              <DishRow
-                key="new"
-                tags={tags}
-                onTagsChanged={onTagsChanged}
-                categoryId={categoryId}
-                onSaved={onSaved}
-                onError={onError}
-              />
-            </div>
-          ) : null}
-        </div>
-      </details>
-      <section className="flex flex-col gap-2">
-        <div className="sticky top-0 z-10 bg-background py-2 flex flex-col gap-2">
-          <h2 className="text-xs font-medium text-muted-foreground">
-            <Trans>我的常用</Trans>
-          </h2>
-          <div className="flex min-w-0 items-center gap-1.5">
-            {dishes.length > 0 ? (
-              <div className="min-w-0 flex-1">
-                <BbqSearch
-                  value={search}
-                  onChange={setSearch}
-                  label={t`搜索已有项目…`}
-                />
-              </div>
-            ) : null}
-            <ItemTagFilter
-              tags={tags}
-              value={activeTagFilter}
-              onChange={setTagFilter}
-            />
-          </div>
-        </div>
-        {dishes.length > 0 && matches.length === 0 ? (
-          <p
-            className="py-6 text-center text-sm text-muted-foreground"
-            role="status"
-          >
-            <Trans>没有匹配的项目，请换个关键词</Trans>
-          </p>
-        ) : null}
-        {dishes.length === 0 ? (
-          <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
-            <BbqCompanion mood="dance" className="block size-32 shrink-0" />
-            <p className="mt-2 text-sm font-medium text-foreground">
-              <Trans>还没有项目</Trans>
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
-            {dishes.map((dish) => (
-              <div
-                key={dish.id}
-                className={
-                  dish.name.toLocaleLowerCase().includes(query) &&
-                  matchesTag(dish, activeTagFilter)
-                    ? "border-b border-border/60 last:border-b-0"
-                    : "hidden"
-                }
-              >
+            categoryId ? (
+              <div className="p-2.5 border-t bg-muted/30 border-border/60">
+                <p className="text-muted-foreground text-[11px] mb-2">
+                  <Trans>
+                    热量按每单位填写：摄入填正数，消耗填负数，可留空
+                  </Trans>
+                </p>
                 <DishRow
-                  dish={dish}
+                  key="new"
                   tags={tags}
                   onTagsChanged={onTagsChanged}
                   categoryId={categoryId}
@@ -311,10 +263,128 @@ function DishList({
                   onError={onError}
                 />
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+            ) : (
+              <MenuLoadStatus phase={phase} onRetry={onRetry} />
+            )
+          ) : null}
+        </div>
+      </details>
+      <details
+        className={`${settingsCardCls} ${detailsMotionCls}`}
+        onToggle={(event) => {
+          if (event.currentTarget.open) onRequestList();
+        }}
+      >
+        <summary className={settingsSummaryCls}>
+          <Bookmark
+            className="size-4 shrink-0 text-primary"
+            aria-hidden="true"
+          />
+          <h2 className="text-sm font-medium text-foreground flex-1">
+            <Trans>我的常用</Trans>
+          </h2>
+          <span className="text-xs font-normal text-muted-foreground group-open/details:hidden">
+            <Trans>展开查看全部项目</Trans>
+          </span>
+          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
+        </summary>
+        <div className="min-h-0 overflow-clip">
+          {listRequested ? (
+            dishes ? (
+              <>
+                <div className="sticky top-0 z-10 bg-background py-3 flex flex-col gap-2 px-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    {dishes.length > 0 ? (
+                      <div className="min-w-0 flex-1">
+                        <BbqSearch
+                          value={search}
+                          onChange={setSearch}
+                          label={t`搜索已有项目…`}
+                        />
+                      </div>
+                    ) : null}
+                    <ItemTagFilter
+                      tags={tags}
+                      value={activeTagFilter}
+                      onChange={setTagFilter}
+                    />
+                  </div>
+                </div>
+                {dishes.length > 0 && matches?.length === 0 ? (
+                  <p
+                    className="py-6 text-center text-sm text-muted-foreground"
+                    role="status"
+                  >
+                    <Trans>没有匹配的项目，请换个关键词</Trans>
+                  </p>
+                ) : null}
+                {dishes.length === 0 ? (
+                  <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
+                    <BbqCompanion
+                      mood="dance"
+                      className="block size-32 shrink-0"
+                    />
+                    <p className="mt-2 text-sm font-medium text-foreground">
+                      <Trans>还没有项目</Trans>
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
+                    {dishes.map((dish) => (
+                      <div
+                        key={dish.id}
+                        className={
+                          dish.name.toLocaleLowerCase().includes(query) &&
+                          matchesTag(dish, activeTagFilter)
+                            ? "border-b border-border/60 last:border-b-0"
+                            : "hidden"
+                        }
+                      >
+                        <DishRow
+                          dish={dish}
+                          tags={tags}
+                          onTagsChanged={onTagsChanged}
+                          categoryId={dish.categoryId}
+                          onSaved={onSaved}
+                          onError={onError}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <MenuLoadStatus phase={phase} onRetry={onRetry} />
+            )
+          ) : null}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+function MenuLoadStatus({
+  phase,
+  onRetry,
+}: {
+  phase: "loading" | "ready" | "error";
+  onRetry: () => void;
+}) {
+  return (
+    <div
+      className="py-6 text-center text-sm text-muted-foreground"
+      role="status"
+    >
+      {phase === "error" ? (
+        <Button type="button" variant="outline" onClick={onRetry}>
+          <Trans>Retry</Trans>
+        </Button>
+      ) : (
+        <Trans>读取常用项目中…</Trans>
+      )}
     </div>
   );
 }

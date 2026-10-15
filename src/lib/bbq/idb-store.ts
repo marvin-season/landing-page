@@ -17,8 +17,16 @@ import {
   saveDish as saveDishDocument,
   saveOrder as saveOrderDocument,
 } from "./document";
+import { requireGroupingSettings } from "./grouping";
 import { type BbqStore, BbqStoreError } from "./store";
-import type { Category, Dish, ItemTag, Order, OrderPhoto } from "./types";
+import type {
+  Category,
+  Dish,
+  GroupingSettings,
+  ItemTag,
+  Order,
+  OrderPhoto,
+} from "./types";
 
 type StoredDish = Omit<Dish, "unit"> & { unit?: string };
 type StoredOrder = Omit<Order, "lines" | "photos"> & {
@@ -35,11 +43,15 @@ db.version(1).stores({
 });
 
 db.version(2).stores({ tags: "id, name" });
+db.version(3).stores({ settings: "id" });
 
 const tagsTable = db.table<ItemTag, string>("tags");
 const categoriesTable = db.table<Category, string>("categories");
 const dishesTable = db.table<StoredDish, string>("dishes");
 const ordersTable = db.table<StoredOrder, string>("orders");
+const settingsTable = db.table<GroupingSettings & { id: string }, string>(
+  "settings",
+);
 
 function createId(): string {
   return crypto.randomUUID();
@@ -61,15 +73,30 @@ function normalizeOrder(order: StoredOrder): Order {
 }
 
 async function readDocument() {
-  const [categories, storedDishes, storedOrders, tags] = await Promise.all([
-    categoriesTable.toArray(),
-    dishesTable.toArray(),
-    ordersTable.toArray(),
-    tagsTable.toArray(),
-  ]);
+  const [categories, storedDishes, storedOrders, tags, groupingSettings] =
+    await Promise.all([
+      categoriesTable.toArray(),
+      dishesTable.toArray(),
+      ordersTable.toArray(),
+      tagsTable.toArray(),
+      settingsTable.get("grouping"),
+    ]);
   const dishes = storedDishes.map(normalizeDish);
   const orders = storedOrders.map(normalizeOrder);
-  return { categories, dishes, orders, tags };
+  return {
+    categories,
+    dishes,
+    orders,
+    tags,
+    ...(groupingSettings
+      ? {
+          groupingSettings: {
+            enabled: groupingSettings.enabled,
+            names: groupingSettings.names,
+          },
+        }
+      : {}),
+  };
 }
 
 async function guard<T>(work: () => Promise<T>): Promise<T> {
@@ -83,6 +110,21 @@ async function guard<T>(work: () => Promise<T>): Promise<T> {
 
 export function createIdbStore(): BbqStore {
   return {
+    getGroupingSettings() {
+      return guard(async () => {
+        const settings = await settingsTable.get("grouping");
+        return settings
+          ? { enabled: settings.enabled, names: settings.names }
+          : { enabled: false, names: [] };
+      });
+    },
+    saveGroupingSettings(input) {
+      return guard(async () => {
+        const settings = requireGroupingSettings(input);
+        await settingsTable.put({ id: "grouping", ...settings });
+        return settings;
+      });
+    },
     listTags() {
       return guard(async () =>
         listTagsDocument({ tags: await tagsTable.toArray() }),
@@ -252,6 +294,11 @@ export function createIdbStore(): BbqStore {
           if (categories.length) await categoriesTable.bulkPut(categories);
           if (dishes.length) await dishesTable.bulkPut(dishes);
           if (orders.length) await ordersTable.bulkPut(orders);
+          if (next.groupingSettings)
+            await settingsTable.put({
+              id: "grouping",
+              ...next.groupingSettings,
+            });
         }),
       );
     },

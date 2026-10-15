@@ -4,6 +4,12 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -14,7 +20,6 @@ import {
   ImagePlus,
   LoaderCircle,
   Minus,
-  Package,
   Plus,
   Save,
   Trash2,
@@ -56,12 +61,11 @@ import {
   touchCls,
 } from "./bbq-layout";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
-import { bbqHomePath, bbqMenuPath } from "./bbq-paths";
+import { bbqHomePath, bbqMenuPath, bbqSettingsPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
 import { ItemTagBadge, ItemTagFilter } from "./item-tags";
 import { useBbqNavigate } from "./use-bbq-nav";
-
-const SEATS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+import { useGroupingSettings } from "./use-grouping-settings";
 
 const editorWorkspaceCls = cls`
   grid min-h-0 flex-1 overflow-hidden rounded-xl bg-card
@@ -117,8 +121,16 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [tagFilter, setTagFilter] = useState("all");
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
-  const [groupingEnabled, setGroupingEnabled] = useState(false);
-  const [seat, setSeat] = useState<number | null>(null);
+  const { settings: groupingSettings, error: groupingError } =
+    useGroupingSettings();
+  const groupingEnabled = groupingSettings?.enabled ?? false;
+  const [groupName, setGroupName] = useState<string | null | undefined>(null);
+  const groupOptions = [
+    ...new Set([
+      ...(groupingSettings?.names ?? []),
+      ...(groupName ? [groupName] : []),
+    ]),
+  ];
   const [done, setDone] = useState(false);
   const [lines, setLines] = useState<DraftLine[]>([]);
   const [photos, setPhotos] = useState<OrderPhoto[]>([]);
@@ -149,8 +161,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         }
         if (existing) {
           setOrder(existing);
-          setGroupingEnabled(existing.groupingEnabled ?? true);
-          setSeat(existing.groupingEnabled === false ? null : existing.seat);
+          setGroupName(
+            existing.groupingEnabled === false ? null : existing.groupName,
+          );
           setDone(existing.status === "done");
           setPhotos(existing.photos);
           setLines(
@@ -236,7 +249,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     })),
   );
   const itemCount = lines.reduce((count, line) => count + line.quantity, 0);
-  const canSave = lines.length > 0 && !saving && !processingPhotos;
+  const canSave =
+    lines.length > 0 &&
+    !saving &&
+    !processingPhotos &&
+    groupingSettings !== null &&
+    !groupingError;
 
   function addDish(dish: Dish) {
     setLines((current) => {
@@ -315,8 +333,16 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     try {
       const saved = await bbqStore.saveOrder({
         id: order?.id,
-        groupingEnabled,
-        seat: groupingEnabled ? seat : null,
+        // 关闭全局分组只隐藏选择器；编辑旧记录时保留其历史分组。
+        ...(groupingEnabled
+          ? { groupingEnabled: true, groupName }
+          : order
+            ? {}
+            : { groupingEnabled: false, groupName: null }),
+        seat:
+          groupingEnabled && groupName !== undefined
+            ? null
+            : (order?.seat ?? null),
         status,
         photos,
         lines: lines.map((line) => ({
@@ -390,19 +416,19 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               {order
                 ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
                 : groupingEnabled
-                  ? t`选择打包或座号和项目后保存订单`
+                  ? t`选择分组和项目后保存订单`
                   : t`这次记点什么？`}
             </p>
           </div>
         </div>
       </header>
-      {message ? (
+      {message || groupingError ? (
         <Alert
           className="max-h-20 shrink-0 overflow-auto border-destructive/30 bg-destructive/5 p-2"
           role="alert"
         >
           <AlertDescription className="text-destructive">
-            {message}
+            {message ?? bbqErrorMessage(i18n, groupingError)}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -414,32 +440,63 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3">
           <section className="border-b px-3 py-2.5">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-2 flex-wrap">
-                <label
-                  htmlFor="order-grouping"
-                  className="text-sm font-medium text-foreground"
-                >
-                  <Trans>按座号分组</Trans>
-                </label>
-                <Switch
-                  id="order-grouping"
-                  checked={groupingEnabled}
-                  disabled={saving}
-                  aria-label={t`启用分组（打包或座号）`}
-                  onCheckedChange={(enabled) => {
-                    setGroupingEnabled(enabled);
-                    if (!enabled) setSeat(null);
-                  }}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {groupingEnabled
-                    ? seat === null
-                      ? t`当前选择打包`
-                      : t`当前选择 ${seat} 号座`
-                    : t`选填`}
-                </p>
-              </div>
-              <label className="inline-flex min-h-9 shrink-0 items-center gap-2">
+              {groupingEnabled ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <label
+                    htmlFor="order-group"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    <Trans>分组</Trans>
+                  </label>
+                  <Select
+                    value={
+                      groupName === undefined
+                        ? "legacy"
+                        : groupName === null
+                          ? "none"
+                          : `group:${groupName}`
+                    }
+                    onValueChange={(value) =>
+                      setGroupName(
+                        value === "legacy"
+                          ? undefined
+                          : value === "none"
+                            ? null
+                            : value.slice(6),
+                      )
+                    }
+                  >
+                    <SelectTrigger
+                      id="order-group"
+                      className="min-w-36 h-9 bg-background"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="none">
+                          <Trans>不分组</Trans>
+                        </SelectItem>
+                        {order &&
+                        order.groupingEnabled !== false &&
+                        order.groupName === undefined ? (
+                          <SelectItem value="legacy">
+                            {order.seat === null
+                              ? t`打包`
+                              : t`${order.seat} 号座`}
+                          </SelectItem>
+                        ) : null}
+                        {groupOptions.map((name) => (
+                          <SelectItem key={name} value={`group:${name}`}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+              <label className="inline-flex min-h-9 shrink-0 items-center gap-2 ml-auto">
                 <span className="text-xs font-medium text-foreground">
                   {done ? t`已完成` : t`进行中`}
                 </span>
@@ -451,31 +508,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 />
               </label>
             </div>
-            {groupingEnabled ? (
-              <div className="mt-2 grid grid-cols-5 gap-1.5">
-                <Button
-                  type="button"
-                  variant={seat === null ? "default" : "outline"}
-                  aria-pressed={seat === null}
-                  className={`${touchCls} col-span-2 min-w-0 text-sm ${editorControlCls} px-2 ${seat === null ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                  onClick={() => setSeat(null)}
+            {groupingEnabled && groupingSettings?.names.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                <Link
+                  href={bbqSettingsPath()}
+                  className="text-primary underline underline-offset-4"
                 >
-                  <Package className="size-4" aria-hidden="true" />
-                  <Trans>打包</Trans>
-                </Button>
-                {SEATS.map((number) => (
-                  <Button
-                    key={number}
-                    type="button"
-                    variant={seat === number ? "default" : "outline"}
-                    aria-pressed={seat === number}
-                    className={`${touchCls} min-w-0 text-sm ${editorControlCls} px-2 ${seat === number ? "focus-visible:ring-primary-foreground/70" : "hover:bg-muted/70"}`}
-                    onClick={() => setSeat(number)}
-                  >
-                    {number}
-                  </Button>
-                ))}
-              </div>
+                  <Trans>到设置中添加分组</Trans>
+                </Link>
+              </p>
             ) : null}
           </section>
           <details
@@ -645,7 +686,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
                     <BbqCompanion
                       mood={groupingEnabled ? "chef" : "hello"}
-                      className="block size-12 shrink-0"
+                      className="block size-8 shrink-0"
                     />
                     <p className="text-xs text-muted-foreground">
                       <Trans>还没有添加项目</Trans>

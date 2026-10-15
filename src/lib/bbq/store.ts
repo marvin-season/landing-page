@@ -5,6 +5,7 @@ import type {
   BbqCleanupResult,
   Category,
   Dish,
+  GroupingSettings,
   ItemTag,
   Order,
   SaveCategoryInput,
@@ -13,6 +14,9 @@ import type {
 } from "./types";
 
 export type BbqStoreErrorCode =
+  | "invalid_group_name"
+  | "invalid_group_settings"
+  | "group_exists"
   | "invalid_cleanup_range"
   | "tag_in_use"
   | "tag_not_found"
@@ -38,6 +42,8 @@ export class BbqStoreError extends Error {
 }
 
 export interface BbqStore {
+  getGroupingSettings(): Promise<GroupingSettings>;
+  saveGroupingSettings(settings: GroupingSettings): Promise<GroupingSettings>;
   listTags(): Promise<ItemTag[]>;
   addTag(name: string): Promise<ItemTag>;
   deleteTag(id: string): Promise<void>;

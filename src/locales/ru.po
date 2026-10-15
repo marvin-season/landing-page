@@ -2001,3 +2001,71 @@ msgstr "Язык"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "主题"
 msgstr "Тема"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx
+msgid "展开查看全部项目"
+msgstr "Разверните, чтобы увидеть все позиции"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称不能为空，最多 10 个字符"
+msgstr "Название группы должно содержать от 1 до 10 символов"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组设置不正确"
+msgstr "Неверные настройки группировки"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组已存在"
+msgstr "Такая группа уже существует"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "启用分组"
+msgstr "Включить группировку"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "自定义分组"
+msgstr "Свои группы"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "名称最多 10 个字符，支持任意文字和符号。"
+msgstr "Не более 10 символов. Можно использовать любой текст и знаки."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组名称"
+msgstr "Название группы"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "输入分组名称"
+msgstr "Введите название группы"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组"
+msgstr "Добавить группу"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组 {group}"
+msgstr "Удалить группу {group}"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "添加分组后，即可在记账时选择。"
+msgstr "Добавьте группы, чтобы выбирать их при создании записи."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "删除分组不会影响已有记录。"
+msgstr "Удаление группы не влияет на существующие записи."
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "分组"
+msgstr "Группа"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "不分组"
+msgstr "Без группы"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "到设置中添加分组"
+msgstr "Добавить группы в настройках"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+msgid "选择分组和项目后保存订单"
+msgstr "Выберите группу и позиции, затем сохраните заказ"

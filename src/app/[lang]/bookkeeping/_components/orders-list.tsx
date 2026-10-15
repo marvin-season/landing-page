@@ -327,14 +327,16 @@ function OrderSummary({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium text-foreground">
-            {order.groupingEnabled === false
-              ? new Intl.ListFormat(
-                  i18n.locale === "pseudo" ? "en" : i18n.locale,
-                  { style: "short", type: "unit" },
-                ).format(order.lines.map((line) => line.name)) || t`日常记账`
-              : order.seat === null
-                ? t`打包`
-                : t`${order.seat} 号座`}
+            {order.groupingEnabled !== false && order.groupName
+              ? order.groupName
+              : order.groupingEnabled === false || order.groupName === null
+                ? new Intl.ListFormat(
+                    i18n.locale === "pseudo" ? "en" : i18n.locale,
+                    { style: "short", type: "unit" },
+                  ).format(order.lines.map((line) => line.name)) || t`日常记账`
+                : order.seat === null
+                  ? t`打包`
+                  : t`${order.seat} 号座`}
           </p>
           {order.groupingEnabled !== false ? (
             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
