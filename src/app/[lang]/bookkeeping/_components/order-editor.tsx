@@ -605,9 +605,10 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                             variant={
                               selectedQuantities.has(dish.id)
                                 ? "subtle"
-                                : "ghost"
+                                : "outline"
                             }
-                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2`}
+                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2 border border-border data-[selected=true]:border-primary/50 flex-wrap`}
+                            data-selected={selectedQuantities.has(dish.id)}
                             aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                             onClick={() => addDish(dish)}
                           >
@@ -617,15 +618,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                                 title={dish.name}
                               >
                                 {dish.name}
-                              </span>
-                              <span className="flex min-w-0 flex-wrap gap-1 empty:hidden mt-1">
-                                {tags
-                                  .filter((tag) =>
-                                    getDishTagIds(dish).includes(tag.id),
-                                  )
-                                  .map((tag) => (
-                                    <ItemTagBadge key={tag.id} tag={tag} />
-                                  ))}
                               </span>
                               <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
                                 {formatYuan(dish.priceCents)}/{dish.unit}
@@ -645,6 +637,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                                   {selectedQuantities.get(dish.id)}
                                 </span>
                               ) : null}
+                            </span>
+                            <span className="flex min-w-0 flex-wrap gap-1 empty:hidden w-full">
+                              {tags
+                                .filter((tag) =>
+                                  getDishTagIds(dish).includes(tag.id),
+                                )
+                                .map((tag) => (
+                                  <ItemTagBadge key={tag.id} tag={tag} />
+                                ))}
                             </span>
                           </Button>
                         ))}

@@ -34,7 +34,7 @@ function orderTotalCls(status: Order["status"]): string {
 
 const orderTabCls = cls`
   inline-flex items-center justify-center gap-1.5 rounded-lg px-3 text-xs
-  font-medium transition-colors min-h-11 focus-visible:outline-none focus-visible:ring-2
+  font-medium transition-colors min-h-10 focus-visible:outline-none focus-visible:ring-2
   focus-visible:ring-inset focus-visible:ring-primary/50
   duration-150 active:bg-primary/10 touch-manipulation motion-reduce:transition-none
 `;
@@ -86,16 +86,16 @@ export function OrdersList({
       className="min-h-0 min-w-0 overflow-hidden rounded-2xl bg-card flex flex-col flex-1 border border-border/60"
       aria-label={t`记录列表`}
     >
-      <div className="flex flex-col gap-3 border-b bg-primary/5 px-4 py-3 shrink-0">
-        <div className="flex items-end justify-between gap-x-3 gap-y-1">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-xs text-muted-foreground">
+      <div className="flex flex-col gap-2.5 border-b bg-card px-3 py-2.5 shrink-0">
+        <div className="flex items-center justify-between gap-x-3 gap-y-1">
+          <div className="min-w-0 flex-1 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2 gap-y-0.5">
+            <h2 className="text-xs text-muted-foreground whitespace-nowrap">
               <Trans>已完成合计</Trans>
             </h2>
-            <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight break-all">
+            <p className="text-2xl font-semibold tabular-nums tracking-tight break-all">
               {loading ? "—" : formatYuan(settledTotal)}
             </p>
-            <p className="text-xs text-muted-foreground tabular-nums mt-1">
+            <p className="text-xs text-muted-foreground tabular-nums col-span-2">
               <Trans>
                 热量 {loading ? "—" : formatCalories(i18n, settledCalories)}
               </Trans>
@@ -104,12 +104,12 @@ export function OrdersList({
           {!loading && visibleOrders.length > 0 ? (
             <BbqCompanion
               mood={statusFilter === "open" ? "dance" : "happy"}
-              className="block size-16 shrink-0"
+              className="block size-12 shrink-0"
             />
           ) : null}
         </div>
         <div
-          className="grid gap-1 grid-cols-2 rounded-xl bg-background/70 p-1"
+          className="grid gap-1 grid-cols-2 rounded-xl bg-muted/60 p-1"
           role="group"
           aria-label={t`记录状态`}
         >
@@ -118,7 +118,7 @@ export function OrdersList({
             aria-pressed={statusFilter === "open"}
             className={`${orderTabCls} ${
               statusFilter === "open"
-                ? "bg-primary/10 text-primary"
+                ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
             onClick={() => changeFilter("open")}
@@ -130,7 +130,7 @@ export function OrdersList({
             aria-pressed={statusFilter === "done"}
             className={`${orderTabCls} ${
               statusFilter === "done"
-                ? "bg-primary/10 text-primary"
+                ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
             onClick={() => changeFilter("done")}
