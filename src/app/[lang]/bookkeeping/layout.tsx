@@ -16,7 +16,7 @@ export async function generateMetadata({
 }: PageLangParam): Promise<Metadata> {
   const { lang } = await params;
   const i18n = getI18nInstance(lang);
-  const title = i18n._(msg`露记 · 支出与热量统计`);
+  const title = i18n._(msg`记露 · 支出与热量统计`);
   const description = i18n._(bbqSearchDescription);
 
   return {
@@ -26,7 +26,7 @@ export async function generateMetadata({
     robots: { index: lang !== "pseudo", follow: true },
     alternates: getBookkeepingAlternates(lang),
     keywords: [
-      i18n._(msg`露记`),
+      i18n._(msg`记露`),
       i18n._(msg`个人记账`),
       i18n._(msg`支出统计`),
       i18n._(msg`日常消费`),
@@ -38,16 +38,16 @@ export async function generateMetadata({
       title,
       description,
       url: `/${lang}/bookkeeping`,
-      siteName: i18n._(msg`露记`),
+      siteName: i18n._(msg`记露`),
       type: "website",
       locale: lang === "zh" ? "zh_CN" : lang,
     },
     twitter: { card: "summary", title, description },
-    applicationName: i18n._(msg`露记`),
+    applicationName: i18n._(msg`记露`),
     manifest: "/bbq-pwa/manifest.webmanifest",
     appleWebApp: {
       capable: true,
-      title: i18n._(msg`露记`),
+      title: i18n._(msg`记露`),
       statusBarStyle: "default",
     },
     icons: {

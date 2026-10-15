@@ -123,7 +123,7 @@ export function BbqInstallButton() {
         <Dialog.Content className="fixed top-1/2 left-1/2 z-110 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-auto overscroll-contain rounded-xl border bg-card p-4 text-foreground shadow-lg focus:outline-none">
           <div className="flex items-center justify-between gap-3">
             <Dialog.Title className="text-base font-semibold">
-              <Trans>安装露记</Trans>
+              <Trans>安装记露</Trans>
             </Dialog.Title>
             <Dialog.Close asChild>
               <Button

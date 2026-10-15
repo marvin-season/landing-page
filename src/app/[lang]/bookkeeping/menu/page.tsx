@@ -13,7 +13,7 @@ export async function generateMetadata({
     ...getBookkeepingPageMetadata(
       lang,
       "/menu",
-      i18n._(msg`菜单管理 · 露记`),
+      i18n._(msg`菜单管理 · 记露`),
       i18n._(
         msg`管理常用消费项目与餐饮菜单，设置单价、单位、每单位热量和启用状态。`,
       ),

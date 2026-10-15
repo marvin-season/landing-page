@@ -19,13 +19,13 @@ export function BbqApp({ children }: PropsWithChildren) {
   const title =
     route?.page === "editor"
       ? route.orderId
-        ? t`编辑记录 · 露记`
-        : t`新增记录 · 露记`
+        ? t`编辑记录 · 记露`
+        : t`新增记录 · 记露`
       : route?.page === "menu"
-        ? t`菜单管理 · 露记`
+        ? t`菜单管理 · 记露`
         : route?.page === "settings"
-          ? t`设置 · 露记`
-          : t`露记 · 支出与热量统计`;
+          ? t`设置 · 记露`
+          : t`记露 · 支出与热量统计`;
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {

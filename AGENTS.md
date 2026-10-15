@@ -54,6 +54,8 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 除非特别说明，多语言相关改动默认只需处理中文（`zh`）、英文（`en`）和日文（`ja`）。
 
+除非特别说明，否则不需要考虑无障碍兼容。
+
 When asked to record changes, follow `.changelog/README.md`: use `.changelog/YYYYMMDD/index.md` and append a timestamped entry.
 
 <!-- BEGIN:nextjs-agent-rules -->

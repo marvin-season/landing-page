@@ -72,7 +72,7 @@ export const homeProfiles = {
     },
   },
   loopy: {
-    name: <Trans>露记</Trans>,
+    name: <Trans>记露</Trans>,
     eyebrow: <Trans>Take it easy, enjoy the little things</Trans>,
     title: <Trans>Gentle, curious, and a little playful</Trans>,
     subtitle: <Trans>Make room for small joys every day.</Trans>,
@@ -84,7 +84,7 @@ export const homeProfiles = {
     ),
     action: {
       href: "/bookkeeping",
-      label: <Trans>露记</Trans>,
+      label: <Trans>记露</Trans>,
       analyticsId: "bookkeeping",
       external: false,
     },
@@ -117,7 +117,7 @@ export const navLinks: HomeNavLink[] = [
   {
     href: "/bookkeeping",
     analyticsId: "bookkeeping",
-    title: <Trans>露记</Trans>,
+    title: <Trans>记露</Trans>,
     description: (
       <>
         <Trans>个人记账</Trans> · <Trans>支出统计</Trans> ·{" "}

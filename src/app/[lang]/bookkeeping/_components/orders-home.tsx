@@ -155,7 +155,7 @@ export function OrdersHome() {
       <header className="flex shrink-0 flex-col gap-1.5">
         <div>
           <h1 className={pageTitleCls}>
-            <Trans>露记</Trans>
+            <Trans>记露</Trans>
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
             <Trans>我的日常账本</Trans>

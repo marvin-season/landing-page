@@ -1305,7 +1305,7 @@ msgid "安装应用"
 msgstr "アプリをインストール"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:126
-msgid "安装露记"
+msgid "安装记露"
 msgstr "露記をインストール"
 
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:127
@@ -1325,7 +1325,7 @@ msgid "导入示例数据"
 msgstr "サンプルデータを読み込む"
 
 #: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:194
-msgid "导入露记图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
+msgid "导入记露图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
 msgstr "露記の画像セット JSON（最大100 MB）を読み込むか、シーンを選んで画像をアップロードできます（GIF・PNG・JPEG・WebP、1枚最大12 MB）。"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
@@ -1561,7 +1561,7 @@ msgstr "件数の統計"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
 #: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
-msgid "新增记录 · 露记"
+msgid "新增记录 · 记露"
 msgstr "記録を追加 · 露記"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:410
@@ -1899,7 +1899,7 @@ msgstr "{0} を編集"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:22
 #: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:19
-msgid "编辑记录 · 露记"
+msgid "编辑记录 · 记露"
 msgstr "記録を編集 · 露記"
 
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:82
@@ -1917,7 +1917,7 @@ msgstr "メニュー管理"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
 #: src/app/[lang]/bookkeeping/menu/page.tsx:16
-msgid "菜单管理 · 露记"
+msgid "菜单管理 · 记露"
 msgstr "メニュー管理 · 露記"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
@@ -2026,7 +2026,7 @@ msgstr "設定"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
 #: src/app/[lang]/bookkeeping/settings/page.tsx:16
-msgid "设置 · 露记"
+msgid "设置 · 记露"
 msgstr "設定 · 露記"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:218
@@ -2176,20 +2176,20 @@ msgstr "写真を添付"
 #: src/app/[lang]/bookkeeping/layout.tsx:41
 #: src/app/[lang]/bookkeeping/layout.tsx:46
 #: src/app/[lang]/bookkeeping/layout.tsx:50
-msgid "露记"
+msgid "记露"
 msgstr "露記"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
 #: src/app/[lang]/bookkeeping/layout.tsx:19
-msgid "露记 · 支出与热量统计"
+msgid "记露 · 支出与热量统计"
 msgstr "露記 · 支出とカロリーの統計"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
-msgid "露记：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+msgid "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
 msgstr "露記：個人の家計簿、支出統計、日々の消費、カロリー記録、メニュー管理、注文記録。"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
-msgid "露记主导航"
+msgid "记露主导航"
 msgstr "露記のメインナビゲーション"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656

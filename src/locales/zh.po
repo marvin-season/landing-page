@@ -922,7 +922,7 @@ msgstr "Web 开发工程师"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:80
 msgid "Welcome to Luji's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
-msgstr "欢迎来到露记的温馨角落。慢下来，探索新事物，收藏让你微笑的小小瞬间。"
+msgstr "欢迎来到记露的温馨角落。慢下来，探索新事物，收藏让你微笑的小小瞬间。"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:23
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
@@ -1305,8 +1305,8 @@ msgid "安装应用"
 msgstr "安装应用"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:126
-msgid "安装露记"
-msgstr "安装露记"
+msgid "安装记露"
+msgstr "安装记露"
 
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:127
 msgid "完成记录"
@@ -1325,8 +1325,8 @@ msgid "导入示例数据"
 msgstr "导入示例数据"
 
 #: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:194
-msgid "导入露记图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
-msgstr "导入露记图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
+msgid "导入记露图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
+msgstr "导入记露图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
 msgid "导出中…"
@@ -1561,8 +1561,8 @@ msgstr "数量统计"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
 #: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
-msgid "新增记录 · 露记"
-msgstr "新增记录 · 露记"
+msgid "新增记录 · 记露"
+msgstr "新增记录 · 记露"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:410
 msgid "新建订单"
@@ -1899,8 +1899,8 @@ msgstr "编辑 {0}"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:22
 #: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:19
-msgid "编辑记录 · 露记"
-msgstr "编辑记录 · 露记"
+msgid "编辑记录 · 记露"
+msgstr "编辑记录 · 记露"
 
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:82
 msgid "自定义分组"
@@ -1917,8 +1917,8 @@ msgstr "菜单管理"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
 #: src/app/[lang]/bookkeeping/menu/page.tsx:16
-msgid "菜单管理 · 露记"
-msgstr "菜单管理 · 露记"
+msgid "菜单管理 · 记露"
+msgstr "菜单管理 · 记露"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
 msgid "订单"
@@ -2026,8 +2026,8 @@ msgstr "设置"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
 #: src/app/[lang]/bookkeeping/settings/page.tsx:16
-msgid "设置 · 露记"
-msgstr "设置 · 露记"
+msgid "设置 · 记露"
+msgstr "设置 · 记露"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:218
 msgid "语言"
@@ -2176,21 +2176,21 @@ msgstr "附张照片"
 #: src/app/[lang]/bookkeeping/layout.tsx:41
 #: src/app/[lang]/bookkeeping/layout.tsx:46
 #: src/app/[lang]/bookkeeping/layout.tsx:50
-msgid "露记"
-msgstr "露记"
+msgid "记露"
+msgstr "记露"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
 #: src/app/[lang]/bookkeeping/layout.tsx:19
-msgid "露记 · 支出与热量统计"
-msgstr "露记 · 支出与热量统计"
+msgid "记露 · 支出与热量统计"
+msgstr "记露 · 支出与热量统计"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
-msgid "露记：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
-msgstr "露记：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+msgid "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+msgstr "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
-msgid "露记主导航"
-msgstr "露记主导航"
+msgid "记露主导航"
+msgstr "记露主导航"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656
 msgid "项目名称"

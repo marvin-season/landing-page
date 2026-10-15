@@ -193,7 +193,7 @@ export function CompanionAlbumSettings() {
           </div>
           <p className="text-xs text-muted-foreground">
             <Trans>
-              导入露记图集 JSON（最大 100
+              导入记露图集 JSON（最大 100
               MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12
               MB）。
             </Trans>

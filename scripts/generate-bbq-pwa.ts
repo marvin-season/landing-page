@@ -46,8 +46,8 @@ async function main() {
 
   const manifest: MetadataRoute.Manifest = {
     id: "/bookkeeping",
-    name: "露记",
-    short_name: "露记",
+    name: "记露",
+    short_name: "记露",
     description: "记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
     lang: "zh-CN",
     start_url: "/zh/bookkeeping",

@@ -1,4 +1,4 @@
-# 露记 PWA
+# 记露 PWA
 
 `/bookkeeping` 及其子页面使用独立的应用名称、图标和 manifest，原站点的 PWA 配置不变。设置页“安装应用”在支持安装提示的浏览器中打开原生提示，其他浏览器显示操作说明；以独立窗口运行时隐藏按钮。
 
@@ -77,7 +77,7 @@ BOOKKEEPING_PWA_TEST_ORIGIN=http://localhost:3001 nr test:bookkeeping-pwa
 
 ## 自定义图集
 
-设置 → 自定义图集，可一键导入露记图集 JSON，或按场景上传 GIF、PNG、JPEG、WebP；单张最大 12 MB，图集文件最大 100 MB。图片只在浏览器内处理并保存，不发送到服务器。场景未配置时留空。动图保持原始字节，单图上传会生成减少动态效果时使用的 PNG 静帧。
+设置 → 自定义图集，可一键导入记露图集 JSON，或按场景上传 GIF、PNG、JPEG、WebP；单张最大 12 MB，图集文件最大 100 MB。图片只在浏览器内处理并保存，不发送到服务器。场景未配置时留空。动图保持原始字节，单图上传会生成减少动态效果时使用的 PNG 静帧。
 
 图集格式为 `{ "format": "luji-companions", "version": 1, "images": { "hello": { "src": "data:image/gif;base64,...", "still": "data:image/png;base64,..." } } }`。可用场景以 `src/lib/bbq/companion-album.ts` 的 `companionMoods` 为准。`still` 可省略，由导入流程生成。仅支持内嵌图片，不读取远程图片地址。
 

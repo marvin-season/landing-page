@@ -16,7 +16,7 @@ export async function generateMetadata({
     ...getBookkeepingPageMetadata(
       lang,
       `/orders/${encodeURIComponent(id)}`,
-      i18n._(msg`编辑记录 · 露记`),
+      i18n._(msg`编辑记录 · 记露`),
       i18n._(
         msg`查看和修改消费记录、数量、完成状态与留存照片，核对金额及热量。`,
       ),
