@@ -200,6 +200,23 @@ export function CompanionAlbumSettings() {
               MB）。
             </Trans>
           </p>
+          <div className="flex flex-col items-start gap-1">
+            <Button asChild variant="ghost" size="sm">
+              <a
+                href="https://github.com/marvin-season/landing-page/releases/download/luji-companions-v1/luji-companions.json"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FileDown data-icon="inline-start" />
+                <Trans>下载示例图集</Trans>
+              </a>
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              <Trans>
+                约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。
+              </Trans>
+            </p>
+          </div>
           <label className="flex flex-col gap-2 text-xs">
             <Trans>选择要更换图片的位置</Trans>
             <Select

@@ -2209,3 +2209,11 @@ msgstr "データの保存とバックアップ"
 #: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx
 msgid "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
 msgstr "記帳データはこの端末のブラウザー内にのみ保存され、自動アップロードやクラウド同期は行われません。ブラウザーのデータ削除や端末変更による記録の消失を防ぐため、定期的にバックアップをエクスポートしてください。"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:213
+msgid "下载示例图集"
+msgstr "サンプル画像集をダウンロード"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:217
+msgid "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
+msgstr "約 50 MB。ダウンロード後、「画像集をインポート」をクリックして、ダウンロードした JSON ファイルを選択してください。"
