@@ -6,6 +6,7 @@ import { Fragment, type PropsWithChildren, useEffect, useState } from "react";
 import { readBookkeepingRoute } from "@/lib/bookkeeping-pwa/routes";
 import { BackupReminder } from "./backup-reminder";
 import { BbqSettings } from "./bbq-settings";
+import { CompanionAlbumReminder } from "./companion-album-reminder";
 import { MenuEditor } from "./menu-editor";
 import { OrderEditor } from "./order-editor";
 import { OrdersHome } from "./orders-home";
@@ -47,6 +48,7 @@ export function BbqApp({ children }: PropsWithChildren) {
       ) : (
         <>
           <BackupReminder />
+          <CompanionAlbumReminder />
           <OrdersHome />
         </>
       )}

@@ -2217,3 +2217,23 @@ msgstr "サンプル画像集をダウンロード"
 #: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:217
 msgid "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
 msgstr "約 50 MB。ダウンロード後、「画像集をインポート」をクリックして、ダウンロードした JSON ファイルを選択してください。"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:16
+msgid "给账本换上喜欢的配图"
+msgstr "お気に入りの画像で帳簿を彩ろう"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:18
+msgid "在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。"
+msgstr "設定の「カスタム画像集」で好きな画像をアップロードできます。サンプル画像集をダウンロードしてインポートすることもできます。"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:24
+msgid "去换配图"
+msgstr "画像を変更"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:265
+msgid "图集说明"
+msgstr "画像集について"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:254
+msgid "移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。"
+msgstr "この画像を削除しますか？この画像を使用しているすべての場所で画像が表示されなくなります。記帳データには影響しません。"
