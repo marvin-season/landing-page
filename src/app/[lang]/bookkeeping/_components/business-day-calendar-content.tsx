@@ -5,7 +5,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "@/components/link/link";
 import {
   currentBusinessDayKey,
   formatShanghaiDate,
@@ -14,6 +13,7 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { bbqErrorMessage } from "./bbq-errors";
 import { businessDayLabel } from "./bbq-i18n";
 import { cls } from "./bbq-layout";
+import { BbqLink as Link } from "./bbq-link";
 import { bbqHomePath } from "./bbq-paths";
 
 const calendarControlCls = cls`

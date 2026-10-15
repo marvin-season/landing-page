@@ -2081,3 +2081,47 @@ msgstr "示例数据已导入，已有数据保留。"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 msgstr "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
+msgstr "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "正在准备离线资源，请保持联网…"
+msgstr "正在准备离线资源，请保持联网…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "离线资源尚未准备完成，请联网后重试。"
+msgstr "离线资源尚未准备完成，请联网后重试。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "开发模式不启用离线缓存，请在正式部署后使用。"
+msgstr "开发模式不启用离线缓存，请在正式部署后使用。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
+msgstr "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "重新准备离线资源"
+msgstr "重新准备离线资源"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
+msgstr "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已启用持久存储。清除浏览器数据仍会删除账本，请定期导出备份。"
+msgstr "已启用持久存储。清除浏览器数据仍会删除账本，请定期导出备份。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "保护本机存储"
+msgstr "保护本机存储"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "浏览器暂未授予持久存储，请继续定期导出备份。"
+msgstr "浏览器暂未授予持久存储，请继续定期导出备份。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"
+msgstr "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"

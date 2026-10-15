@@ -6,7 +6,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "@/components/link/link";
 import { formatYuan } from "@/lib/bbq/money";
 import {
   type BusinessDayStatistics,
@@ -24,6 +23,7 @@ import {
   detailsMotionCls,
   detailsSummaryCls,
 } from "./bbq-layout";
+import { BbqLink as Link } from "./bbq-link";
 import { bbqHomePath } from "./bbq-paths";
 
 type ChartMode = "revenue" | "orders" | "calories";

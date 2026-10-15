@@ -160,7 +160,7 @@ export function BbqInstallButton() {
           <p className="mt-4 text-xs text-muted-foreground">
             <Trans>
               请使用 HTTPS
-              网站地址。当前启动和切换页面需要联网；数据保存在本机，迁移设备或浏览器前请导出备份。
+              网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。
             </Trans>
           </p>
         </Dialog.Content>

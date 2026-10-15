@@ -4,11 +4,11 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 
 import { Bookmark, BookOpen, NotebookPen, Settings } from "lucide-react";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Link } from "@/components/link/link";
 import { isBusinessHours } from "@/lib/bbq/business-day";
 import { cls } from "./bbq-layout";
+import { BbqLink as Link } from "./bbq-link";
 import {
   bbqHomePath,
   bbqMenuPath,
@@ -48,7 +48,8 @@ const mobileNavLinkCls = cls`
 
 export function BbqMobileNav() {
   const { t, i18n } = useLingui();
-  const segment = useSelectedLayoutSegment();
+  const pathname = usePathname();
+  const segment = pathname.split("/bookkeeping/")[1]?.split("/")[0] ?? null;
   const [canCreate, setCanCreate] = useState<boolean | null>(null);
 
   useEffect(() => {

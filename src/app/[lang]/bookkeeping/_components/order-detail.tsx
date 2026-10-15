@@ -6,12 +6,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Camera, CheckCircle2, Pencil, RotateCcw, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { Link } from "@/components/link/link";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import { getLineTags } from "@/lib/bbq/tags";
 import type { Order, OrderPhoto } from "@/lib/bbq/types";
 import { formatCalories } from "./bbq-i18n";
+import { BbqLink as Link } from "./bbq-link";
 import { bbqOrderPath } from "./bbq-paths";
 import { ItemTagBadge } from "./item-tags";
 

@@ -12,7 +12,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
@@ -20,6 +19,7 @@ import type { Order } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { formatCalories } from "./bbq-i18n";
 import { cls, touchCls } from "./bbq-layout";
+import { BbqLink as Link } from "./bbq-link";
 import { bbqNewOrderPath } from "./bbq-paths";
 import { OrderDetail } from "./order-detail";
 

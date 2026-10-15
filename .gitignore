@@ -17,6 +17,7 @@ node_modules
 /.next/
 /out/
 /public/pdfjs/
+/public/bbq-pwa/sw.js
 
 # production
 /build

@@ -2081,3 +2081,47 @@ msgstr "サンプルデータを読み込みました。既存のデータは保
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 msgstr "よく使う項目3件と直近3日間の記録4件。既存のデータを保持し、読み込み済みのサンプルは重複追加しません。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
+msgstr "オフラインで利用できます。アプリを閉じて開き直しても、記帳や端末内のデータの確認ができます。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "正在准备离线资源，请保持联网…"
+msgstr "オフライン用のデータを準備しています。接続を維持してください…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "离线资源尚未准备完成，请联网后重试。"
+msgstr "オフラインの準備が完了していません。インターネットに接続して再試行してください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "开发模式不启用离线缓存，请在正式部署后使用。"
+msgstr "開発モードではオフラインキャッシュは無効です。本番環境でご利用ください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
+msgstr "このブラウザー、アドレス、言語ではオフラインの準備に対応していません。HTTPS の中国語、英語、日本語ページをご利用ください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "重新准备离线资源"
+msgstr "オフラインの準備を再試行"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
+msgstr "新しいバージョンの準備ができました。記帳アプリのすべてのウィンドウを閉じてから開き直すと更新されます。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已启用持久存储。清除浏览器数据仍会删除账本，请定期导出备份。"
+msgstr "永続ストレージが有効です。ブラウザーのデータを消去すると帳簿も削除されます。定期的にバックアップを書き出してください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "保护本机存储"
+msgstr "端末内のストレージを保護"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "浏览器暂未授予持久存储，请继续定期导出备份。"
+msgstr "ブラウザーが永続ストレージを許可していません。引き続き定期的にバックアップを書き出してください。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"
+msgstr "HTTPS のアドレスを使用してください。初回のオンライン準備が完了すると、オフラインでも起動や記帳ができます。データは端末内に保存されるため、端末やブラウザーを変更する前にバックアップを書き出してください。"

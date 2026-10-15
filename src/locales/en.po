@@ -2081,3 +2081,47 @@ msgstr "Sample data imported. Existing data has been kept."
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
 msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 msgstr "3 favorite items and 4 records over the last three days. Keeps existing data and skips samples already imported."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
+msgstr "Ready for offline use: reopen the app to record expenses and view local data, even without internet."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "正在准备离线资源，请保持联网…"
+msgstr "Preparing offline resources. Please stay connected…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "离线资源尚未准备完成，请联网后重试。"
+msgstr "Offline resources are not ready. Connect to the internet and try again."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "开发模式不启用离线缓存，请在正式部署后使用。"
+msgstr "Offline caching is disabled in development. Use a production deployment."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
+msgstr "Offline preparation is unavailable for this browser, address or language. Use a Chinese, English or Japanese page over HTTPS."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "重新准备离线资源"
+msgstr "Retry offline preparation"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
+msgstr "An update is ready. Close all bookkeeping windows, then reopen the app to update."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "已启用持久存储。清除浏览器数据仍会删除账本，请定期导出备份。"
+msgstr "Persistent storage is enabled. Clearing browser data still deletes your records. Export backups regularly."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "保护本机存储"
+msgstr "Protect local storage"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "浏览器暂未授予持久存储，请继续定期导出备份。"
+msgstr "The browser has not granted persistent storage. Keep exporting backups regularly."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx
+msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"
+msgstr "Use an HTTPS address. After the initial online preparation, you can launch the app and record expenses offline. Data stays on this device; export a backup before switching devices or browsers."

@@ -1,11 +1,13 @@
 import { msg } from "@lingui/core/macro";
 import type { Metadata, Viewport } from "next";
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren, Suspense } from "react";
 import { getBookkeepingAlternates } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getSiteOrigin } from "@/lib/site-origin";
+import { BbqApp } from "./_components/bbq-app";
 import { BbqInstallProvider } from "./_components/bbq-install-button";
 import { BbqMobileNav } from "./_components/bbq-mobile-nav";
+import { BbqOfflineProvider } from "./_components/bbq-offline-provider";
 import { bbqSearchDescription } from "./_components/bbq-search-copy";
 
 export async function generateMetadata({
@@ -82,7 +84,11 @@ export default function BbqLayout({ children }: PropsWithChildren) {
     <BbqInstallProvider>
       <div className="min-w-0 flex flex-col mx-auto w-full max-w-xl flex-none pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
         <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2">
-          {children}
+          <Suspense fallback={null}>
+            <BbqOfflineProvider>
+              <BbqApp>{children}</BbqApp>
+            </BbqOfflineProvider>
+          </Suspense>
         </div>
         <BbqMobileNav />
       </div>

@@ -36,6 +36,7 @@ import {
   pageTitleCls,
 } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
+import { BbqOfflineStatus } from "./bbq-offline-status";
 import {
   settingsActionCls,
   settingsCardCls,
@@ -460,6 +461,7 @@ export function BbqSettings() {
           <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none [&>button]:border-border/60 [&>button]:bg-muted/30 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button:hover]:shadow-none">
             <BbqInstallButton />
           </div>
+          <BbqOfflineStatus />
         </section>
         <BbqSupportCard />
       </div>

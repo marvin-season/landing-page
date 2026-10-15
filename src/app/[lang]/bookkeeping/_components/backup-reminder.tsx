@@ -5,9 +5,9 @@ import { useLingui } from "@lingui/react/macro";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
-import { Link } from "@/components/link/link";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { getLocaleDir } from "@/lib/i18n/locales";
+import { BbqLink as Link } from "./bbq-link";
 import { bbqSettingsPath } from "./bbq-paths";
 
 const reminderStorageKey = "bookkeeping-backup-reminder:last-shown-day";

@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Link } from "@/components/link/link";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
@@ -58,6 +57,7 @@ import {
   pageTitleCls,
   touchCls,
 } from "./bbq-layout";
+import { BbqLink as Link } from "./bbq-link";
 import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
 import { bbqHomePath, bbqMenuPath, bbqSettingsPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
