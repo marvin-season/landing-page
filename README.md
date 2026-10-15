@@ -21,6 +21,7 @@ Next.js 全栈落地页与 Agent 演示项目。版本以根目录 `package.json
 
 - [架构说明](./docs/architecture.md)
 - [文档索引](./docs/README.md)
+- [记账 PWA：离线使用、构建与验收](./docs/bbq-pwa.md)
 - [Cursor Agent 导航](./AGENTS.md)
 
 工作区包：

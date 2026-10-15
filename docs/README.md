@@ -10,6 +10,7 @@
 | [docs/auth.md](./auth.md) | 人 / Agent | 登录、页面门闩、角色与 API 鉴权 |
 | [docs/tech-stack.md](./tech-stack.md) | 人 | 技术栈表（版本以 package.json 为准） |
 | [docs/i18n.md](./i18n.md) | 人 / Agent | Lingui 与国际化流程 |
+| [docs/bbq-pwa.md](./bbq-pwa.md) | 人 / Agent | 记账 PWA 安装、离线架构、构建部署、数据保护与验收 |
 | [.changelog/README.md](../.changelog/README.md) | 人 | 变更历史目录约定（摘要） |
 | [.cursor/README.md](../.cursor/README.md) | 人 / Agent | Cursor `rules/` 与 `skills/` 说明 |
 | [mastra-server/README.md](../mastra-server/README.md) | 人 / Agent | Mastra 目录结构与 Chat 集成 |

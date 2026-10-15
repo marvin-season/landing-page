@@ -81,6 +81,12 @@ flowchart TB
 - 子路由示例：`(home)/` 首页、`resume/` 简历页、`auth/` 授权页、`bookkeeping/` 公开记账工具等。记账默认入口跳转至 `/zh/bookkeeping`，旧 `/admin/bbq` 及其子路由永久跳转至对应的新路径。
 - 根 layout 负责：`Lingui` 服务端/客户端、`ThemeProvider`、全局样式与 `SettingsMenu`。
 
+#### 记账区离线 PWA
+
+记账业务数据由 `src/lib/bbq/idb-store.ts` 使用 Dexie 存入 IndexedDB。`bookkeeping/layout.tsx` 挂载 `BbqApp` 客户端页面壳，同源、同语言的记账区内导航通过 Next 支持的 History API 更新地址，原有页面组件按地址渲染；动态记录 ID 直接用于本机数据查询，不依赖服务器返回每条记录的 RSC 页面。
+
+生产构建后生成 `public/bbq-pwa/sw.js`。Serwist 预缓存构建资源和通用 `/{lang}/bookkeeping/offline` 文档，使未访问过的本机记录网址也能离线启动。Worker 分别控制中文、英文、日文记账路径，不缓存登录、管理、API 或 RSC 响应；新版本等待对应窗口关闭后激活，页面缓存更新不删除账本。安装清单仍使用中文启动地址。构建、资源策略、存储边界和验收步骤见 [记账 PWA](./bbq-pwa.md)。
+
 ### 3.2 Agent `src/app/agent/`
 
 - 独立 `layout.tsx`：全屏布局，读取 NextAuth 会话给侧边栏用，**不在 layout 里做登录跳转**。

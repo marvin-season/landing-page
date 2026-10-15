@@ -8,7 +8,7 @@
 - iPhone / iPad：Safari → 分享 → 添加到主屏幕。
 - Android：Chrome → 菜单 → 添加到主屏幕 / 安装应用。
 - 电脑：Chrome / Edge → 地址栏或菜单 → 安装应用。
-- 只提供中文 PWA，从 `/zh/bookkeeping` 安装，启动地址固定为 `/zh/bookkeeping`，应用 ID 保留 `/admin/bbq`，避免已安装应用被识别为新应用，与个人站点的应用区分。
+- 安装清单只提供中文，从 `/zh/bookkeeping` 安装，启动地址固定为 `/zh/bookkeeping`，应用 ID 保留 `/admin/bbq`，避免已安装应用被识别为新应用，与个人站点的应用区分。中文、英文、日文网页的离线支持独立于安装清单，见下文。
 - manifest 的作用域仅覆盖 `/zh/bookkeeping` 路径。离开中文 BBQ 路径时，浏览器可能显示站外导航栏。
 - 订单、菜单、照片继续使用现有 IndexedDB；安装不会触发数据导出、迁移或清空。不同浏览器、设备及部分系统的主屏幕应用可能使用独立存储，需要通过原有备份功能迁移；照片需选择“导出备份（包含照片）”。
 
@@ -29,6 +29,45 @@
 离线页面壳位于 `/{lang}/bookkeeping/offline`，仅用于缓存，无搜索收录。安装会验证页面壳标记和它引用的静态资源与当前构建一致，避免把错误页或不同版本页面当作离线就绪。首次安装未完成时依然可正常在线记账；失败后可从设置页重试，恢复联网时也会重新检查。
 
 `nr test:bookkeeping-pwa` 在 Node 中运行真实打包后的 Worker，验证离线导航、未访问的记录 ID、缓存隔离、资源回收后的恢复、动图静帧回退及更新等待策略。这不能替代手机端的安装和离线验收。
+
+## 实现入口
+
+- `src/app/[lang]/bookkeeping/layout.tsx`：挂载离线状态 Provider 和客户端页面壳，保留既有服务端页面与 metadata。
+- `src/app/[lang]/bookkeeping/_components/bbq-app.tsx`：根据实际浏览器地址渲染账本、项目管理、设置和编辑器，复用原有组件与数据操作。首次 hydration 保留服务端内容，之后切换到本地页面壳。
+- `_components/bbq-link.tsx`、`_components/use-bbq-nav.ts`：仅对同源、同语言的已知记账页面使用 History API；修改键点击保留链接行为，其他导航沿用原有路由。`src/lib/bookkeeping-pwa/routes.ts` 统一解析页面和本机记录 ID。
+- `_components/bbq-offline-provider.tsx`、`_components/bbq-offline-status.tsx`：注册 Worker、检查资源完整性、恢复联网后重试、提示等待中的更新，以及申请持久存储。以上 `_components` 路径均位于 `src/app/[lang]/bookkeeping/`。
+- `src/app/[lang]/bookkeeping/offline/page.tsx`：通用离线文档入口，不嵌入具体账目，不参与搜索收录。
+- `src/lib/bookkeeping-pwa/worker.ts`：Serwist 缓存规则；使用 `bookkeeping-{locale}-precache` 和 `bookkeeping-{locale}-animations` 隔离语言缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
+- `scripts/build-bookkeeping-pwa.mjs`：读取 `.next/BUILD_ID`、收集构建资源及图标/静帧、注入资源清单并生成 Worker。`nr bookkeeping:pwa:build` 可针对已有的当前生产构建单独重新生成 Worker；修改页面代码后仍须运行完整 `nr build`。
+- `next.config.ts`：为 Worker 返回 `Service-Worker-Allowed: /` 和禁止 HTTP 缓存的响应头；实际注册作用域仍限制为 `/{lang}/bookkeeping`。
+- `src/lib/bookkeeping-pwa/routes.test.ts`、`worker.test.ts`：路由边界、真实打包 Worker 的模拟离线测试，以及可选的生产资源集成测试。
+
+## 自动检查与生产资源验证
+
+常规检查：
+
+```bash
+nr check
+nr test:bbq
+nr test:bookkeeping-pwa
+```
+
+默认离线测试包含 8 项自动检查，另有 1 项需要运行中的生产服务，默认跳过。验证生产产物时，停止占用 3001 端口的开发服务，在一个终端运行：
+
+```bash
+nr build
+nr start
+```
+
+另一个终端运行：
+
+```bash
+BOOKKEEPING_PWA_TEST_ORIGIN=http://localhost:3001 nr test:bookkeeping-pwa
+```
+
+该集成测试读取生成的 `public/bbq-pwa/sw.js`，从本机生产服务获取真实资源，分别安装中文、英文、日文的缓存，然后模拟断网访问未打开过的记录网址。它使用 Node 中的 Worker/CacheStorage 测试环境，不会操作浏览器界面或用户的 IndexedDB。
+
+2026-10-15 改造验证记录：生产构建、TypeScript 检查、`nr check`、81 项既有记账测试、包含生产资源集成检查的 9 项离线测试均通过。HTTP 检查确认 Worker 响应头、离线页面壳标记和引用资源匹配。该次构建生成 144 个预缓存条目，其中 Next 构建静态资源约 5.4 MB，数量和体积随后续构建变化；不把此数字作为固定验收条件。未运行 headless Chrome，手机安装、真实断网启动与浏览器交互仍需按下方步骤手动验收。
 
 ## 维护与验收
 
