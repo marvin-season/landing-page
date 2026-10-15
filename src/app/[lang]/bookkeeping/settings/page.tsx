@@ -13,7 +13,7 @@ export async function generateMetadata({
     ...getBookkeepingPageMetadata(
       lang,
       "/settings",
-      i18n._(msg`设置 · Loopy 记账`),
+      i18n._(msg`设置 · 露记`),
       i18n._(msg`管理记账数据备份与应用安装。`),
     ),
     // Local account tools and records are not search landing pages.

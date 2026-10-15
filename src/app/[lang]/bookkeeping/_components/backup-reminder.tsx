@@ -2,11 +2,11 @@
 
 import { Toaster, toast } from "@landing-page/design-system";
 import { useLingui } from "@lingui/react/macro";
-import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { getLocaleDir } from "@/lib/i18n/locales";
+import { BbqCompanion } from "./bbq-companion";
 import { BbqLink as Link } from "./bbq-link";
 import { bbqSettingsPath } from "./bbq-paths";
 
@@ -45,14 +45,7 @@ export function BackupReminder() {
         ),
         duration: 8_000,
         icon: (
-          <Image
-            unoptimized
-            src="/bbq/companions/hello.gif"
-            alt=""
-            width={56}
-            height={56}
-            className="size-14 object-contain"
-          />
+          <BbqCompanion mood="hello" className="block size-14 object-contain" />
         ),
         classNames: { icon: "size-14! shrink-0" },
       });

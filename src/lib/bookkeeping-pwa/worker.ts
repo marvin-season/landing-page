@@ -2,7 +2,6 @@
 
 import {
   CacheFirst,
-  ExpirationPlugin,
   type PrecacheEntry,
   Serwist,
   type SerwistPlugin,
@@ -74,29 +73,10 @@ serwist.registerCapture(
   serwist.createHandlerBoundToUrl(new URL(shell, self.location.origin).href),
 );
 
-const animations = new CacheFirst({
-  cacheName: `bookkeeping-${locale}-animations`,
-  plugins: [
-    new ExpirationPlugin({ maxEntries: 16, maxAgeSeconds: 30 * 86400 }),
-  ],
+// Imported artwork lives in IndexedDB. Remove only the retired built-in GIF cache.
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.delete(`bookkeeping-${locale}-animations`));
 });
-serwist.registerCapture(
-  ({ sameOrigin, url }) =>
-    sameOrigin && /^\/bbq\/companions\/[a-z-]+\.gif$/.test(url.pathname),
-  async (options) => {
-    try {
-      const response = await animations.handle(options);
-      if (!response.ok) throw new Error("Animation unavailable");
-      return response;
-    } catch {
-      const still = new URL(options.request.url).pathname.replace(
-        /\.gif$/,
-        "-still.png",
-      );
-      return (await serwist.matchPrecache(still)) ?? Response.error();
-    }
-  },
-);
 
 // Next can still request RSC on language changes or external entry. Never feed
 // document HTML into the RSC decoder, or cache account/API/auth responses.

@@ -26,7 +26,7 @@ const themeShortNames: Record<Theme, string> = {
   system: "System",
   shinchan: "Shin",
   apple: "Apple",
-  loopy: "Loopy",
+  loopy: "Pink",
 };
 
 export function ThemePicker({

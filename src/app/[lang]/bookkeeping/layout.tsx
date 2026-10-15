@@ -9,13 +9,14 @@ import { BbqInstallProvider } from "./_components/bbq-install-button";
 import { BbqMobileNav } from "./_components/bbq-mobile-nav";
 import { BbqOfflineProvider } from "./_components/bbq-offline-provider";
 import { bbqSearchDescription } from "./_components/bbq-search-copy";
+import { CompanionAlbumProvider } from "./_components/companion-album-provider";
 
 export async function generateMetadata({
   params,
 }: PageLangParam): Promise<Metadata> {
   const { lang } = await params;
   const i18n = getI18nInstance(lang);
-  const title = i18n._(msg`Loopy 记账 · 支出与热量统计`);
+  const title = i18n._(msg`露记 · 支出与热量统计`);
   const description = i18n._(bbqSearchDescription);
 
   return {
@@ -25,7 +26,7 @@ export async function generateMetadata({
     robots: { index: lang !== "pseudo", follow: true },
     alternates: getBookkeepingAlternates(lang),
     keywords: [
-      i18n._(msg`Loopy 记账`),
+      i18n._(msg`露记`),
       i18n._(msg`个人记账`),
       i18n._(msg`支出统计`),
       i18n._(msg`日常消费`),
@@ -37,39 +38,39 @@ export async function generateMetadata({
       title,
       description,
       url: `/${lang}/bookkeeping`,
-      siteName: i18n._(msg`Loopy 记账`),
+      siteName: i18n._(msg`露记`),
       type: "website",
       locale: lang === "zh" ? "zh_CN" : lang,
     },
     twitter: { card: "summary", title, description },
-    applicationName: i18n._(msg`Loopy 记账`),
+    applicationName: i18n._(msg`露记`),
     manifest: "/bbq-pwa/manifest.webmanifest",
     appleWebApp: {
       capable: true,
-      title: i18n._(msg`Loopy 记账`),
+      title: i18n._(msg`露记`),
       statusBarStyle: "default",
     },
     icons: {
       icon: [
         {
-          url: "/bbq-pwa/icon-16.png?v=loopy-2",
+          url: "/bbq-pwa/icon-16.png?v=luji-1",
           sizes: "16x16",
           type: "image/png",
         },
         {
-          url: "/bbq-pwa/icon-32.png?v=loopy-2",
+          url: "/bbq-pwa/icon-32.png?v=luji-1",
           sizes: "32x32",
           type: "image/png",
         },
         {
-          url: "/bbq-pwa/icon-192.png?v=loopy-2",
+          url: "/bbq-pwa/icon-192.png?v=luji-1",
           sizes: "192x192",
           type: "image/png",
         },
       ],
-      shortcut: "/bbq-pwa/icon-32.png?v=loopy-2",
+      shortcut: "/bbq-pwa/icon-32.png?v=luji-1",
       apple: [
-        { url: "/bbq-pwa/apple-touch-icon.png?v=loopy-2", sizes: "180x180" },
+        { url: "/bbq-pwa/apple-touch-icon.png?v=luji-1", sizes: "180x180" },
       ],
     },
   };
@@ -81,17 +82,19 @@ export const viewport: Viewport = {
 
 export default function BbqLayout({ children }: PropsWithChildren) {
   return (
-    <BbqInstallProvider>
-      <div className="min-w-0 flex flex-col mx-auto w-full max-w-xl flex-none pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
-        <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2">
-          <Suspense fallback={null}>
-            <BbqOfflineProvider>
-              <BbqApp>{children}</BbqApp>
-            </BbqOfflineProvider>
-          </Suspense>
+    <CompanionAlbumProvider>
+      <BbqInstallProvider>
+        <div className="min-w-0 flex flex-col mx-auto w-full max-w-xl flex-none pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
+          <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2">
+            <Suspense fallback={null}>
+              <BbqOfflineProvider>
+                <BbqApp>{children}</BbqApp>
+              </BbqOfflineProvider>
+            </Suspense>
+          </div>
+          <BbqMobileNav />
         </div>
-        <BbqMobileNav />
-      </div>
-    </BbqInstallProvider>
+      </BbqInstallProvider>
+    </CompanionAlbumProvider>
   );
 }

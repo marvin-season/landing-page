@@ -1,4 +1,4 @@
-# Loopy 记账 PWA
+# 露记 PWA
 
 `/bookkeeping` 及其子页面使用独立的应用名称、图标和 manifest，原站点的 PWA 配置不变。设置页“安装应用”在支持安装提示的浏览器中打开原生提示，其他浏览器显示操作说明；以独立窗口运行时隐藏按钮。
 
@@ -17,7 +17,7 @@
 - 生产环境首次联网访问中文、英文或日文记账页面时，会注册仅控制该语言记账路径的 Service Worker。设置页“放到主屏幕”区域显示准备状态；出现“已可离线使用”后，支持断网启动、刷新、切页、记账、编辑任意本机记录、查看统计、照片和导入导出备份。不需要先访问每个页面或每条记录。
 - 每种语言分别准备；首次切换到尚未准备的语言需要联网。其他语言保留在线使用，安装入口仍固定为中文。
 - 页面壳和构建静态资源使用 Serwist 预缓存，包括统计、日历、备份等延迟加载代码及字体。记账区内通过 Next 支持的 History API 本地导航，保留现有 URL、日期查询参数、返回/前进和数据库结构；记录 ID 从地址解析后交给原有编辑器读取 IndexedDB。
-- 首次准备不下载几十 MB 动图。GIF 按访问缓存，离线没有对应 GIF 时返回已有静帧；不修改原素材。用户账目、照片仍只在原有 IndexedDB 中，不放入页面缓存。
+- 不内置表情图集。设置页导入的动图和静帧保存在独立 IndexedDB `luji-companions` 中，导入后可离线显示，缺少的场景留空。旧版动图缓存会在新版 Worker 激活时移除；用户账目、照片不受影响。
 - 新版本下载完毕后显示提示，关闭所有对应语言的记账窗口，再打开即可生效。不会在编辑期间强制刷新。缓存版本更新不删除 IndexedDB，也不清理其他应用的缓存。
 - 可点击“保护本机存储”申请持久存储。浏览器可能拒绝，用户清除站点数据也仍会删除账本，因此仍需定期导出含照片的备份。请保持同一域名、协议和端口；更换来源无法直接读取旧 IndexedDB。
 - 不缓存登录、管理、API 或 Next.js RSC 响应。站外页面和首次访问的其他语言仍需要网络。开发模式不注册 Service Worker。
@@ -28,7 +28,7 @@
 
 离线页面壳位于 `/{lang}/bookkeeping/offline`，仅用于缓存，无搜索收录。安装会验证页面壳标记和它引用的静态资源与当前构建一致，避免把错误页或不同版本页面当作离线就绪。首次安装未完成时依然可正常在线记账；失败后可从设置页重试，恢复联网时也会重新检查。
 
-`nr test:bookkeeping-pwa` 在 Node 中运行真实打包后的 Worker，验证离线导航、未访问的记录 ID、缓存隔离、资源回收后的恢复、动图静帧回退及更新等待策略。这不能替代手机端的安装和离线验收。
+`nr test:bookkeeping-pwa` 在 Node 中运行真实打包后的 Worker，验证离线导航、未访问的记录 ID、缓存隔离、资源回收后的恢复、不缓存旧版内置图集及更新等待策略。这不能替代手机端的安装和离线验收。
 
 ## 实现入口
 
@@ -37,8 +37,8 @@
 - `_components/bbq-link.tsx`、`_components/use-bbq-nav.ts`：仅对同源、同语言的已知记账页面使用 History API；修改键点击保留链接行为，其他导航沿用原有路由。`src/lib/bookkeeping-pwa/routes.ts` 统一解析页面和本机记录 ID。
 - `_components/bbq-offline-provider.tsx`、`_components/bbq-offline-status.tsx`：注册 Worker、检查资源完整性、恢复联网后重试、提示等待中的更新，以及申请持久存储。以上 `_components` 路径均位于 `src/app/[lang]/bookkeeping/`。
 - `src/app/[lang]/bookkeeping/offline/page.tsx`：通用离线文档入口，不嵌入具体账目，不参与搜索收录。
-- `src/lib/bookkeeping-pwa/worker.ts`：Serwist 缓存规则；使用 `bookkeeping-{locale}-precache` 和 `bookkeeping-{locale}-animations` 隔离语言缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
-- `scripts/build-bookkeeping-pwa.mjs`：读取 `.next/BUILD_ID`、收集构建资源及图标/静帧、注入资源清单并生成 Worker。`nr bookkeeping:pwa:build` 可针对已有的当前生产构建单独重新生成 Worker；修改页面代码后仍须运行完整 `nr build`。
+- `src/lib/bookkeeping-pwa/worker.ts`：Serwist 缓存规则；使用 `bookkeeping-{locale}-precache` 隔离语言缓存，激活时清理旧版 `bookkeeping-{locale}-animations` 缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
+- `scripts/build-bookkeeping-pwa.mjs`：读取 `.next/BUILD_ID`、收集构建资源及应用图标、注入资源清单并生成 Worker。`nr bookkeeping:pwa:build` 可针对已有的当前生产构建单独重新生成 Worker；修改页面代码后仍须运行完整 `nr build`。
 - `next.config.ts`：为 Worker 返回 `Service-Worker-Allowed: /` 和禁止 HTTP 缓存的响应头；实际注册作用域仍限制为 `/{lang}/bookkeeping`。
 - `src/lib/bookkeeping-pwa/routes.test.ts`、`worker.test.ts`：路由边界、真实打包 Worker 的模拟离线测试，以及可选的生产资源集成测试。
 
@@ -71,9 +71,19 @@ BOOKKEEPING_PWA_TEST_ORIGIN=http://localhost:3001 nr test:bookkeeping-pwa
 
 ## 维护与验收
 
-`nr bbq:pwa:assets` 生成 `public/bbq-pwa/` 下的中文静态 manifest 和图标。图标使用 `public/bbq-pwa/loopy-source.png` 中的完整 Loopy 角色，由 `scripts/generate-bbq-pwa.ts` 去除透明留白后生成 SVG、16/32/192/512 PNG、180 Apple touch icon 和独立的 maskable 图标，原配图保持不变。使用 Next 已安装的 Sharp，无额外依赖。修改品牌时重新运行此命令；替换图标时同步递增脚本与 BBQ metadata 的图标版本参数。
+`nr bbq:pwa:assets` 生成 `public/bbq-pwa/` 下的中文静态 manifest 和图标。`scripts/generate-bbq-pwa.ts` 用原创笔记本 SVG 生成 16/32/192/512 PNG、180 Apple touch icon 和 maskable 图标，不依赖角色图片。使用 Next 已安装的 Sharp，无额外依赖。修改品牌时重新运行此命令；替换图标时同步递增脚本与记账 metadata 的图标版本参数。
 
-主题菜单新增 `Loopy · 奶油粉`，沿用现有主题偏好保存机制。PWA 的背景与浏览器主题色使用同款奶油粉，应用 ID 为 `/bookkeeping`，启动地址和作用域为 `/zh/bookkeeping`。旧启动地址通过永久跳转兼容。使用旧 ID 安装的应用可能被浏览器视为另一个应用，需要重新安装以使用新 ID；迁移前可先导出备份。
+奶油粉主题沿用原有偏好键 `loopy`，避免已保存的主题失效；界面名称不再显示角色名。PWA 应用 ID、启动地址和作用域保持不变，分别为 `/bookkeeping`、`/zh/bookkeeping` 和 `/zh/bookkeeping`。已安装的旧名称和图标由浏览器自行更新，可能需要重新安装；重装前先备份账本和图集。
+
+## 自定义图集
+
+设置 → 自定义图集，可一键导入露记图集 JSON，或按场景上传 GIF、PNG、JPEG、WebP；单张最大 12 MB，图集文件最大 100 MB。图片只在浏览器内处理并保存，不发送到服务器。场景未配置时留空。动图保持原始字节，单图上传会生成减少动态效果时使用的 PNG 静帧。
+
+图集格式为 `{ "format": "luji-companions", "version": 1, "images": { "hello": { "src": "data:image/gif;base64,...", "still": "data:image/png;base64,..." } } }`。可用场景以 `src/lib/bbq/companion-album.ts` 的 `companionMoods` 为准。`still` 可省略，由导入流程生成。仅支持内嵌图片，不读取远程图片地址。
+
+整包导入会替换图集，未包含的场景清空；逐场景上传只更新所选场景。所有图片通过格式和解码检查后，才以事务替换；失败保留旧图集。图集单独导出，不包含在账本备份里。清理账目不影响图集，清空图集不影响账目。
+
+原有图集已保存到本机忽略提交的 `.local/companion-album/luji-companions.json`，可通过设置页导入恢复原场景效果；原素材保存在同目录的 `originals/`。这些私人文件不属于网站公开资源，也不应随网站部署。新安装默认没有图集。
 
 `src/proxy.ts` 仅为 `/bbq-pwa/` 静态资源添加 locale 重写豁免，不改变页面登录规则。
 
@@ -83,7 +93,7 @@ BOOKKEEPING_PWA_TEST_ORIGIN=http://localhost:3001 nr test:bookkeeping-pwa
 2. HTTPS 环境安装后从桌面启动，确认直接进入中文 BBQ 首页，独立窗口中隐藏安装按钮。
 3. 在应用内完成开单、菜单编辑、查看订单和备份；关闭再打开，确认本机数据保留。
 4. 设置页显示“已可离线使用”后，关闭应用并开启飞行模式，再从桌面打开。验证四个导航入口、统计、日历、新建后编辑、刷新详情、返回/前进、照片和含照片备份。
-5. 在正常与减少动态效果两种系统设置下验证配图；首次离线打开未访问过的动图位置，应显示对应静帧。
+5. 未导入时所有场景留空。导入图集后，在正常与减少动态效果两种系统设置下检查动图与静帧；刷新、跨页面和离线访问应保留配图。分别验证单图替换、导出后重新导入、清空，以及损坏文件不覆盖现有图集。
 6. 恢复联网并部署新版本，编辑期间不应自动刷新；关闭所有记账窗口后重新打开，版本更新且账本保留。
 7. 首页仍使用原站点 manifest，其他 admin 页面仍要求登录。
 

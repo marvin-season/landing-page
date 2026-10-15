@@ -16,7 +16,7 @@ export const themeNames: Record<Theme, string> = {
   system: "System",
   shinchan: "Shin-chan · Matte",
   apple: "Apple · Glass",
-  loopy: "Loopy · 奶油粉",
+  loopy: "奶油粉",
 };
 
 export const themes: Theme[] = [

@@ -6,22 +6,24 @@ import type { MetadataRoute } from "next";
 const require = createRequire(import.meta.url);
 const sharp = createRequire(require.resolve("next"))("sharp");
 const output = new URL("../public/bbq-pwa/", import.meta.url);
-const portrait = new URL("../public/bbq-pwa/loopy-source.png", import.meta.url);
-const iconVersion = "loopy-2";
+const iconVersion = "luji-1";
 
-function iconSvg(portraitData: string, inset: number) {
+// Original notebook mark; no character artwork is shipped with the application.
+function iconSvg(inset: number) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#f9dce5"/>
-  <circle cx="256" cy="256" r="210" fill="#fff5f7"/>
-  <image x="${inset}" y="${inset}" width="${512 - inset * 2}" height="${512 - inset * 2}" href="data:image/png;base64,${portraitData}"/>
+  <rect width="512" height="512" fill="#fff5f7"/>
+  <g transform="translate(${inset} ${inset}) scale(${(512 - inset * 2) / 512})">
+    <rect x="100" y="60" width="320" height="392" rx="52" fill="#c75d80"/>
+    <path d="M172 60v392" stroke="#f5b3c8" stroke-width="16"/>
+    <path d="M232 168v152h116" fill="none" stroke="#fff5f7" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M284 74c-34 47-48 67-48 88a48 48 0 0 0 96 0c0-21-14-41-48-88Z" fill="#fff5f7" transform="translate(120 40) scale(.48)"/>
+  </g>
 </svg>`;
 }
 
 async function main() {
   await mkdir(output, { recursive: true });
-  // 生成时仅去除透明留白，保留完整角色；用户提供的源图保持不变。
-  const portraitData = await sharp(portrait.pathname).trim().png().toBuffer();
-  const icon = iconSvg(portraitData.toString("base64"), 42);
+  const icon = iconSvg(20);
   await writeFile(new URL("icon.svg", output), `${icon}\n`);
   await Promise.all(
     [16, 32, 192, 512, 180].map((size) =>
@@ -36,17 +38,17 @@ async function main() {
         ),
     ),
   );
-  // 单独留出 maskable 安全区，避免设备圆形裁切碰到角色的脸和耳朵。
-  await sharp(Buffer.from(iconSvg(portraitData.toString("base64"), 90)))
+  // Keep the notebook inside the maskable safe area.
+  await sharp(Buffer.from(iconSvg(70)))
     .resize(512, 512)
     .png()
     .toFile(new URL("icon-maskable-512.png", output).pathname);
 
   const manifest: MetadataRoute.Manifest = {
     id: "/bookkeeping",
-    name: "Loopy 记账",
-    short_name: "Loopy 记账",
-    description: "和粉色 Loopy 一起记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
+    name: "露记",
+    short_name: "露记",
+    description: "记录日常支出与饮食热量，收藏常用项目，保存照片与账本备份。",
     lang: "zh-CN",
     start_url: "/zh/bookkeeping",
     scope: "/zh/bookkeeping",

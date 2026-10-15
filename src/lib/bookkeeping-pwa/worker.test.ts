@@ -7,7 +7,7 @@ import { build } from "esbuild";
 const origin = process.env.BOOKKEEPING_PWA_TEST_ORIGIN ?? "https://example.com";
 const shell =
   '<span hidden data-bookkeeping-offline-shell="true"></span><script src="/_next/static/app.js"></script>';
-const assets = ["/_next/static/app.js", "/bbq/companions/hello-still.png"];
+const assets = ["/_next/static/app.js", "/bbq-pwa/icon-192.png"];
 
 // Exercise the real bundled Serwist worker with the standard Request/Response
 // APIs and an in-memory CacheStorage. No browser UI or project database is used.
@@ -235,14 +235,11 @@ test("auth, APIs, other languages, unknown routes and RSC never receive cached H
   );
 });
 
-test("uncached GIFs fall back to the matching bundled still offline", async () => {
+test("retired built-in illustrations are not served or cached", async () => {
   const worker = await harness();
   await worker.install();
   worker.state.online = false;
-  assert.equal(
-    await (await worker.fetch("/bbq/companions/hello.gif"))?.text(),
-    `asset:${assets[1]}`,
-  );
+  assert.equal(await worker.fetch("/bbq/companions/hello.gif"), undefined);
 });
 
 test("readiness detects eviction and retries missing files after connectivity returns", async () => {

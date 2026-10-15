@@ -89,7 +89,7 @@ msgstr "{date} · Recording period"
 msgid "{value} kcal"
 msgstr "{value} kcal"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:312
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:314
 msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 msgstr "3 favorite items and 4 records over the last three days. Keeps existing data and skips samples already imported."
 
@@ -118,11 +118,11 @@ msgstr "A mischievous five-year-old who turns everyday life into an adventure."
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:146
+#: src/app/[lang]/(home)/data/home-data.tsx:141
 msgid "About me in detail"
 msgstr "About me in detail"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:138
+#: src/app/[lang]/(home)/data/home-data.tsx:133
 msgid "Agent UI"
 msgstr "Agent UI"
 
@@ -236,11 +236,11 @@ msgstr "Default throttle mode, cannot be changed"
 msgid "Default workspace"
 msgstr "Default workspace"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:171
+#: src/app/[lang]/(home)/data/home-data.tsx:166
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "Design is not just what it looks like. Design is how it works."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:154
+#: src/app/[lang]/(home)/data/home-data.tsx:149
 msgid "Design System & Component Libs"
 msgstr "Design System & Component Libs"
 
@@ -335,7 +335,7 @@ msgstr "Document reading overview"
 msgid "Document workspace"
 msgstr "Document workspace"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:114
+#: src/app/[lang]/(home)/data/home-data.tsx:109
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "Documentation on frontend development, AI applications, and engineering practices"
 
@@ -359,7 +359,7 @@ msgstr "Enter to send · Shift + Enter for a new line · @ to mention"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:147
+#: src/app/[lang]/(home)/data/home-data.tsx:142
 msgid "Experience, projects, and personal profile"
 msgstr "Experience, projects, and personal profile"
 
@@ -383,7 +383,7 @@ msgstr "Find every quote in context"
 msgid "Fit to width"
 msgstr "Fit to width"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/(home)/data/home-data.tsx:77
 msgid "Gentle, curious, and a little playful"
 msgstr "Gentle, curious, and a little playful"
 
@@ -507,11 +507,11 @@ msgstr "Keep the passages that matter"
 msgid "Key Responsibilities"
 msgstr "Key Responsibilities"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:112
+#: src/app/[lang]/(home)/data/home-data.tsx:107
 msgid "Knowledge"
 msgstr "Knowledge"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:170
+#: src/app/[lang]/(home)/data/home-data.tsx:165
 msgid "Leveraging less data to generate greater insights."
 msgstr "Leveraging less data to generate greater insights."
 
@@ -527,34 +527,11 @@ msgstr "Loading preview…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "Locate a quote without storing selection geometry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:92
-#: src/app/[lang]/(home)/data/home-data.tsx:125
-#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:158
-#: src/app/[lang]/bookkeeping/layout.tsx:28
-#: src/app/[lang]/bookkeeping/layout.tsx:40
-#: src/app/[lang]/bookkeeping/layout.tsx:45
-#: src/app/[lang]/bookkeeping/layout.tsx:49
-msgid "Loopy 记账"
-msgstr "Loopy Ledger"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
-#: src/app/[lang]/bookkeeping/layout.tsx:18
-msgid "Loopy 记账 · 支出与热量统计"
-msgstr "Loopy Ledger · Expenses & Calories"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
-msgid "Loopy 记账：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
-msgstr "Loopy 记账：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
-msgid "Loopy 记账主导航"
-msgstr "Loopy Ledger main navigation"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:139
+#: src/app/[lang]/(home)/data/home-data.tsx:134
 msgid "Main chat flow powered by Mastra"
 msgstr "Main chat flow powered by Mastra"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:78
 msgid "Make room for small joys every day."
 msgstr "Make room for small joys every day."
 
@@ -661,7 +638,7 @@ msgstr "Please upload a PDF or Markdown file."
 msgid "Previous page"
 msgstr "Previous page"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:162
+#: src/app/[lang]/(home)/data/home-data.tsx:157
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
@@ -733,7 +710,7 @@ msgstr "Resume"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:155
+#: src/app/[lang]/(home)/data/home-data.tsx:150
 msgid "Reusable UI components and design references"
 msgstr "Reusable UI components and design references"
 
@@ -786,7 +763,7 @@ msgstr "Summarize"
 msgid "Summarize this passage."
 msgstr "Summarize this passage."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:81
+#: src/app/[lang]/(home)/data/home-data.tsx:76
 msgid "Take it easy, enjoy the little things"
 msgstr "Take it easy, enjoy the little things"
 
@@ -843,7 +820,7 @@ msgstr "This PDF could not be opened. Try another file."
 msgid "This PDF is password protected."
 msgstr "This PDF is password protected."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:163
+#: src/app/[lang]/(home)/data/home-data.tsx:158
 msgid "Three iterations of the Docs workspace"
 msgstr "Three iterations of the Docs workspace"
 
@@ -943,9 +920,9 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "Web Developer"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:85
-msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
-msgstr "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+#: src/app/[lang]/(home)/data/home-data.tsx:80
+msgid "Welcome to Luji's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "Welcome to Luji's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
 
 #: src/app/[lang]/(home)/data/home-data.tsx:23
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
@@ -979,6 +956,11 @@ msgstr "Zoom in"
 msgid "Zoom out"
 msgstr "Zoom out"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:181
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:273
+msgid "一键导入图集"
+msgstr "Import image pack"
+
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:166
 msgid "一顿饭、一杯咖啡，都可以记在这里。"
 msgstr "A meal or a cup of coffee — record it here."
@@ -986,6 +968,14 @@ msgstr "A meal or a cup of coffee — record it here."
 #: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:101
 msgid "上个月"
 msgstr "Previous month"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:236
+msgid "上传 / 替换"
+msgstr "Upload / replace"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:285
+msgid "上传场景图片"
+msgstr "Upload scene image"
 
 #: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:127
 msgid "下个月"
@@ -995,20 +985,20 @@ msgstr "Next month"
 msgid "不分组"
 msgstr "No group"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:269
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:271
 msgid "不含图片"
 msgstr "Without images"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:128
-#: src/app/[lang]/bookkeeping/layout.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:123
+#: src/app/[lang]/bookkeeping/layout.tsx:30
 msgid "个人记账"
 msgstr "Personal bookkeeping"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:226
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:227
 msgid "主题"
 msgstr "Theme"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:407
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:409
 msgid "仅移除图片，保留账目"
 msgstr "Remove images only, keep records"
 
@@ -1029,11 +1019,15 @@ msgstr "portion"
 msgid "休息时段"
 msgstr "Rest period"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:43
+msgid "休息状态"
+msgstr "Resting"
+
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
 msgid "保存"
 msgstr "Save"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:248
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:250
 msgid "保存一份记录和常用项目，换设备也能带走。"
 msgstr "Keep a copy of your records and favorites to take to another device."
 
@@ -1080,7 +1074,7 @@ msgstr "All past records · Stored only on this device"
 msgid "全部标签"
 msgstr "All tags"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:79
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:72
 msgid "关闭"
 msgstr "Close"
 
@@ -1173,7 +1167,7 @@ msgstr "Delete this record?"
 msgid "到设置中添加分组"
 msgstr "Add groups in settings"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:280
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:282
 msgid "包含图片"
 msgstr "Include images"
 
@@ -1247,6 +1241,30 @@ msgstr "Enable grouping"
 msgid "回到当前时段"
 msgstr "Current period"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:201
+msgid "图片场景"
+msgstr "Image scene"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:109
+msgid "图集已导入，页面配图已更新。"
+msgstr "Image pack imported. Illustrations updated."
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:145
+msgid "图集已导出，请在浏览器下载中查看。"
+msgstr "Image pack exported. Check your browser downloads."
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:262
+msgid "图集已清空。"
+msgstr "Image pack cleared."
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:117
+msgid "场景图片已保存。"
+msgstr "Scene image saved."
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:246
+msgid "场景图片已移除。"
+msgstr "Scene image removed."
+
 #. placeholder {0}: line.name
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:744
 msgid "增加 {0} 数量"
@@ -1261,56 +1279,68 @@ msgstr "Processing…"
 msgid "处理照片中…"
 msgstr "Processing photos…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:241
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:243
 msgid "备份&还原"
 msgstr "备份&还原"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:115
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
 msgid "备份已导入，记录和常用项目已更新"
 msgstr "Backup imported. Records and favorites updated."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:82
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:83
 msgid "备份已生成，请在浏览器下载中查看"
 msgstr "Backup created. Check your browser downloads."
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:25
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:102
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:103
 msgid "备份文件不正确"
 msgstr "Invalid backup file"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:126
-msgid "安装Loopy 记账"
-msgstr "Install Loopy Ledger"
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:44
+msgid "安装与引导"
+msgstr "Installation and guidance"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:118
 msgid "安装应用"
 msgstr "Install app"
 
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:126
+msgid "安装露记"
+msgstr "Install Luji"
+
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:127
 msgid "完成记录"
 msgstr "Complete record"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:341
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
 msgid "导入中…"
 msgstr "Importing…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:300
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:302
 msgid "导入完整备份"
 msgstr "Import full backup"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:309
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:311
 msgid "导入示例数据"
 msgstr "Import sample data"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:341
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:194
+msgid "导入露记图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
+msgstr "Import a Luji image pack JSON (up to 100 MB), or choose a scene and upload your own image (GIF, PNG, JPEG or WebP, up to 12 MB each)."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
 msgid "导出中…"
 msgstr "Exporting…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:257
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:259
 msgid "导出图片"
 msgstr "Export images"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:291
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:190
+msgid "导出图集"
+msgstr "Export image pack"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:293
 msgid "导出备份"
 msgstr "Export backup"
 
@@ -1326,7 +1356,7 @@ msgstr "Expand to view all items"
 msgid "左右滑动查看全部时段"
 msgstr "Swipe horizontally to see all periods"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:173
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:174
 msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
 msgstr "Deleted {orderCount} records and {photoCount} images"
 
@@ -1361,14 +1391,22 @@ msgstr "Completed total"
 msgid "已完成热量 {0}"
 msgstr "Completed calories {0}"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:48
+msgid "已完成记录"
+msgstr "Completed records"
+
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:153
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:253
 msgid "已完成金额"
 msgstr "Completed amount"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:172
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:173
 msgid "已移除 {photoCount} 张图片，账目已保留"
 msgstr "Removed {photoCount} images; records kept"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:172
+msgid "已配置 {count} / 13 个场景"
+msgstr "{count} / 13 scenes configured"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:28
 msgid "常用"
@@ -1381,6 +1419,10 @@ msgstr "Favorite items"
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:112
 msgid "常用项目已保存"
 msgstr "Favorites saved"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:39
+msgid "常用项目空状态"
+msgstr "No favorites yet"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:148
 msgid "常记的放这里 · {listedCount} 项可选"
@@ -1398,7 +1440,7 @@ msgstr "Order opened"
 msgid "开发模式不启用离线缓存，请在正式部署后使用。"
 msgstr "Offline caching is disabled in development. Use a production deployment."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:371
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:373
 msgid "开始日期"
 msgstr "Start date"
 
@@ -1414,6 +1456,10 @@ msgstr "Current period"
 msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
 msgstr "Offline preparation is unavailable for this browser, address or language. Use a Chinese, English or Japanese page over HTTPS."
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:49
+msgid "待完成记录"
+msgstr "Pending records"
+
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:128
 msgid "恢复进行中"
 msgstr "Mark as in progress"
@@ -1426,7 +1472,7 @@ msgstr "My favorites"
 msgid "我的日常账本"
 msgstr "My daily ledger"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:170
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:171
 msgid "所选范围内没有需要清理的数据"
 msgstr "No data to clean up in the selected range"
 
@@ -1439,7 +1485,7 @@ msgstr "Takeaway"
 msgid "打开日历"
 msgstr "Open calendar"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:107
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:108
 msgid "把备份按编号合并进当前记账数据？相同编号的数据会更新。"
 msgstr "Merge the backup into this ledger by ID? Data with matching IDs will be updated."
 
@@ -1455,7 +1501,7 @@ msgstr "Take photo"
 msgid "按标签筛选"
 msgstr "Filter by tag"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:365
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:367
 msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
 msgstr "Filter by bookkeeping date, including both dates. Only records or their photos are removed. Favorite items and tags are not deleted."
 
@@ -1479,8 +1525,13 @@ msgstr "Search existing items…"
 msgid "搜索项目名称…"
 msgstr "Search item names…"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:128
-#: src/app/[lang]/bookkeeping/layout.tsx:30
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:77
+msgid "操作失败。请检查文件格式、图片大小及本机存储空间，原图集不会因导入失败而被清空。"
+msgstr "Could not complete the operation. Check the file format, image size and available storage. A failed import leaves your existing image pack intact."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:123
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:46
+#: src/app/[lang]/bookkeeping/layout.tsx:31
 msgid "支出统计"
 msgstr "Expense statistics"
 
@@ -1492,7 +1543,7 @@ msgstr "Support open source"
 msgid "收起"
 msgstr "Collapse"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:453
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:455
 msgid "放到主屏幕"
 msgstr "Add to Home Screen"
 
@@ -1504,10 +1555,14 @@ msgstr "Higher numbers appear first"
 msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
 msgstr "Your data is stored only on this device. Back it up before removing the app to avoid losing it."
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:47
+msgid "数量统计"
+msgstr "Record counts"
+
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
 #: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
-msgid "新增记录 · Loopy 记账"
-msgstr "New Record · Loopy Ledger"
+msgid "新增记录 · 露记"
+msgstr "New record · Luji"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:410
 msgid "新建订单"
@@ -1521,7 +1576,11 @@ msgstr "An update is ready. Close all bookkeeping windows, then reopen the app t
 msgid "新项目"
 msgstr "New item"
 
-#: src/app/[lang]/bookkeeping/layout.tsx:31
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:301
+msgid "无法读取本机图集，请检查浏览器存储权限。"
+msgstr "Cannot read the local image pack. Check browser storage permissions."
+
+#: src/app/[lang]/bookkeeping/layout.tsx:32
 msgid "日常消费"
 msgstr "Daily expenses"
 
@@ -1549,6 +1608,10 @@ msgstr "No calorie data yet. Add calories to a favorite item, then complete a ne
 #: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:186
 msgid "有记录的日期显示记录数"
 msgstr "Dates with records show a count"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:167
+msgid "未上传的场景不显示配图。图片仅保存在当前浏览器，不会上传到服务器；换设备请单独导出图集，账本备份不包含图集。"
+msgstr "Scenes without an uploaded image stay empty. Images are saved only in this browser and never uploaded to a server. Export the image pack separately when switching devices; ledger backups do not include it."
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:582
 msgid "未启用"
@@ -1597,9 +1660,21 @@ msgstr "Tag name"
 msgid "标签已存在"
 msgstr "Tag already exists"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:38
+msgid "欢迎与提醒"
+msgstr "Welcome and reminders"
+
 #: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:50
 msgid "正在准备离线资源，请保持联网…"
 msgstr "Preparing offline resources. Please stay connected…"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:294
+msgid "正在处理图集…"
+msgstr "Processing image pack…"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:226
+msgid "此场景暂无图片"
+msgstr "No image for this scene"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:684
 msgid "每单位热量（kcal，选填）"
@@ -1647,7 +1722,7 @@ msgstr "Add group"
 msgid "添加分组后，即可在记账时选择。"
 msgstr "Add groups to select them when recording an entry."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:456
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:458
 msgid "添加到主屏幕，方便下次打开记账。"
 msgstr "Add to your Home Screen for quick access next time."
 
@@ -1669,30 +1744,38 @@ msgstr "Add tag"
 msgid "添加项目"
 msgstr "Add item"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:440
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:442
 msgid "清理中…"
 msgstr "Cleaning up…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:395
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:397
 msgid "清理内容"
 msgstr "What to remove"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:423
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:425
 msgid "清理后无法撤销，建议先导出包含图片的备份。"
 msgstr "Cleanup cannot be undone. Export a backup with images first."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:440
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:442
 msgid "清理所选范围"
 msgstr "Clean up selected range"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:351
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:362
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:353
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:364
 msgid "清理瘦身"
 msgstr "Free up storage"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:266
+msgid "清空图集"
+msgstr "Clear image pack"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-search.tsx:37
 msgid "清空搜索"
 msgstr "Clear search"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:260
+msgid "清空本机图集？所有场景将留空，账目不受影响。"
+msgstr "Clear the local image pack? All scenes will be empty. Your ledger will not be affected."
 
 #. placeholder {0}: formatCalories(i18n, summarizeCalories([line]))
 #. placeholder {0}: formatCalories(i18n, summarizeCalories(lines))
@@ -1731,10 +1814,18 @@ msgstr "Calories must be a valid number (kcal); use negative values for exercise
 msgid "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 msgstr "Calories per unit: positive for intake, negative for burning; optional"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:129
-#: src/app/[lang]/bookkeeping/layout.tsx:32
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:41
+msgid "热量统计"
+msgstr "Calorie statistics"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:124
+#: src/app/[lang]/bookkeeping/layout.tsx:33
 msgid "热量记录"
 msgstr "Calorie tracking"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:89
+msgid "用导入的图集替换当前图集？未包含的场景将留空。"
+msgstr "Replace the current image pack? Scenes missing from the imported pack will be empty."
 
 #: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:155
 msgid "电脑：在 Chrome / Edge 地址栏或菜单中选择“安装应用”。"
@@ -1744,15 +1835,15 @@ msgstr "Desktop: choose “Install app” in the Chrome / Edge address bar or me
 msgid "留存照片"
 msgstr "Saved photos"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:157
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:158
 msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
 msgstr "Delete all records and images from {startDate} to {endDate}, inclusive? This cannot be undone. Back up first."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:156
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:157
 msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
 msgstr "Remove record images from {startDate} to {endDate}, inclusive? Records will be kept. Image removal cannot be undone. Back up first."
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:138
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:139
 msgid "示例数据已导入，已有数据保留。"
 msgstr "Sample data imported. Existing data has been kept."
 
@@ -1760,12 +1851,16 @@ msgstr "Sample data imported. Existing data has been kept."
 msgid "离线资源尚未准备完成，请联网后重试。"
 msgstr "Offline resources are not ready. Connect to the internet and try again."
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:250
+msgid "移除"
+msgstr "Remove"
+
 #. placeholder {0}: line.name
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:725
 msgid "移除 {0}"
 msgstr "Remove {0}"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:418
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:420
 msgid "移除记录及图片"
 msgstr "Remove records and images"
 
@@ -1785,7 +1880,7 @@ msgstr "Total completed calories"
 msgid "累计已完成金额"
 msgstr "Total completed amount"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:382
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:384
 msgid "结束日期"
 msgstr "End date"
 
@@ -1804,27 +1899,32 @@ msgstr "Edit {0}"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:22
 #: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:19
-msgid "编辑记录 · Loopy 记账"
-msgstr "Edit Record · Loopy Ledger"
+msgid "编辑记录 · 露记"
+msgstr "Edit record · Luji"
 
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:82
 msgid "自定义分组"
 msgstr "Custom groups"
 
-#: src/app/[lang]/bookkeeping/layout.tsx:33
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:153
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:164
+msgid "自定义图集"
+msgstr "Custom image pack"
+
+#: src/app/[lang]/bookkeeping/layout.tsx:34
 msgid "菜单管理"
 msgstr "Menu management"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
 #: src/app/[lang]/bookkeeping/menu/page.tsx:16
-msgid "菜单管理 · Loopy 记账"
-msgstr "Menu Management · Loopy Ledger"
+msgid "菜单管理 · 露记"
+msgstr "Menu management · Luji"
 
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
 msgid "订单"
 msgstr "order"
 
-#: src/app/[lang]/bookkeeping/layout.tsx:34
+#: src/app/[lang]/bookkeeping/layout.tsx:35
 msgid "订单记录"
 msgstr "Order records"
 
@@ -1852,7 +1952,7 @@ msgstr "Record #{0} details"
 msgid "记录列表"
 msgstr "Record list"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:192
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:193
 msgid "记录存在这台设备，记得定期备份。"
 msgstr "Records are stored on this device. Remember to back up regularly."
 
@@ -1867,6 +1967,10 @@ msgstr "Record daily expenses and orders, select items, adjust quantities, and t
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:36
 msgid "记录明细"
 msgstr "Record details"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:50
+msgid "记录照片"
+msgstr "Record photos"
 
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:114
 msgid "记录状态"
@@ -1890,6 +1994,10 @@ msgstr "Full-size record photo"
 msgid "记录的照片大图，可按 Esc 或关闭按钮返回记录详情"
 msgstr "Full-size record photo. Press Esc or the close button to return to record details."
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:42
+msgid "记录空状态"
+msgstr "No records yet"
+
 #: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:19
 msgid "记得备份数据"
 msgstr "Remember to back up your data"
@@ -1912,16 +2020,16 @@ msgid "记账时段日历"
 msgstr "Recording period calendar"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:34
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:188
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:189
 msgid "设置"
 msgstr "Settings"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
 #: src/app/[lang]/bookkeeping/settings/page.tsx:16
-msgid "设置 · Loopy 记账"
-msgstr "Settings · Loopy Ledger"
+msgid "设置 · 露记"
+msgstr "Settings · Luji"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:217
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:218
 msgid "语言"
 msgstr "Language"
 
@@ -1930,7 +2038,7 @@ msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离
 msgstr "Use an HTTPS address. After the initial online preparation, you can launch the app and record expenses offline. Data stays on this device; export a backup before switching devices or browsers."
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:15
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:152
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:153
 msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
 msgstr "Choose valid dates. The start date must not be after the end date"
 
@@ -1939,6 +2047,10 @@ msgstr "Choose valid dates. The start date must not be after the end date"
 #: src/app/[lang]/bookkeeping/_components/orders-home.tsx:204
 msgid "读取全部时段数据中…"
 msgstr "Loading all periods…"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:172
+msgid "读取图集中…"
+msgstr "Loading image pack…"
 
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:386
 #: src/app/[lang]/bookkeeping/_components/order-editor.tsx:536
@@ -1969,6 +2081,10 @@ msgstr "Trend metric"
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:92
 msgid "输入分组名称"
 msgstr "Enter a group name"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:45
+msgid "运动记录"
+msgstr "Exercise records"
 
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:162
 msgid "还没有完成的记录"
@@ -2052,6 +2168,30 @@ msgstr "How are amounts and calories calculated?"
 msgid "附张照片"
 msgstr "Attach a photo"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:75
+#: src/app/[lang]/(home)/data/home-data.tsx:87
+#: src/app/[lang]/(home)/data/home-data.tsx:120
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:158
+#: src/app/[lang]/bookkeeping/layout.tsx:29
+#: src/app/[lang]/bookkeeping/layout.tsx:41
+#: src/app/[lang]/bookkeeping/layout.tsx:46
+#: src/app/[lang]/bookkeeping/layout.tsx:50
+msgid "露记"
+msgstr "Luji"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
+#: src/app/[lang]/bookkeeping/layout.tsx:19
+msgid "露记 · 支出与热量统计"
+msgstr "Luji · Expenses and calories"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
+msgid "露记：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+msgstr "Luji: personal bookkeeping, expense statistics, daily spending, calorie tracking, menu management and order records."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
+msgid "露记主导航"
+msgstr "Luji main navigation"
+
 #: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656
 msgid "项目名称"
 msgstr "Item name"
@@ -2063,6 +2203,10 @@ msgstr "Enable item"
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:139
 msgid "项目标签"
 msgstr "Item tag"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:40
+msgid "饮食记录"
+msgstr "Food records"
 
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:39
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:157

@@ -13,7 +13,7 @@ export async function generateMetadata({
     ...getBookkeepingPageMetadata(
       lang,
       "/orders/new",
-      i18n._(msg`新增记录 · Loopy 记账`),
+      i18n._(msg`新增记录 · 露记`),
       i18n._(msg`记录日常消费与订单，选择项目、调整数量，汇总金额与饮食热量。`),
     ),
     // Local account tools and records are not search landing pages.

@@ -72,24 +72,19 @@ export const homeProfiles = {
     },
   },
   loopy: {
-    avatar: {
-      src: "/bbq/companions/hello-still.png",
-      alt: "Loopy",
-      rounded: false,
-    },
-    name: "Loopy",
+    name: <Trans>露记</Trans>,
     eyebrow: <Trans>Take it easy, enjoy the little things</Trans>,
     title: <Trans>Gentle, curious, and a little playful</Trans>,
     subtitle: <Trans>Make room for small joys every day.</Trans>,
     summary: (
       <Trans>
-        Welcome to Loopy's cozy corner. Slow down, explore something new, and
+        Welcome to Luji's cozy corner. Slow down, explore something new, and
         keep the little moments that make you smile.
       </Trans>
     ),
     action: {
       href: "/bookkeeping",
-      label: <Trans>Loopy 记账</Trans>,
+      label: <Trans>露记</Trans>,
       analyticsId: "bookkeeping",
       external: false,
     },
@@ -122,7 +117,7 @@ export const navLinks: HomeNavLink[] = [
   {
     href: "/bookkeeping",
     analyticsId: "bookkeeping",
-    title: <Trans>Loopy 记账</Trans>,
+    title: <Trans>露记</Trans>,
     description: (
       <>
         <Trans>个人记账</Trans> · <Trans>支出统计</Trans> ·{" "}

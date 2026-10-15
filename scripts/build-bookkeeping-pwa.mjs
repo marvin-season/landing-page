@@ -10,12 +10,10 @@ const output = path.join(root, "public/bbq-pwa/sw.js");
 const bundled = path.join(root, ".next/bookkeeping-worker.js");
 const publicAssets = [];
 
-for (const directory of ["bbq-pwa", "bbq/companions"]) {
+for (const directory of ["bbq-pwa"]) {
   for (const file of await readdir(path.join(root, "public", directory))) {
     const needed =
-      directory === "bbq/companions"
-        ? file.endsWith("-still.png")
-        : /^(?:icon-[\w-]+\.png|apple-touch-icon\.png|manifest\.webmanifest)$/.test(file);
+      /^(?:icon-[\w-]+\.png|apple-touch-icon\.png|manifest\.webmanifest)$/.test(file);
     if (!needed) continue;
     const bytes = await readFile(path.join(root, "public", directory, file));
     publicAssets.push({
