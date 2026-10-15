@@ -16,17 +16,23 @@ import {
 
 type LanguageSwitcherProps = {
   currentLang?: string;
+  display?: "short" | "label";
 };
 
 function isAppLocale(value: string): value is AppLocale {
   return value in languageShortNames;
 }
 
-export const LanguageSwitcher = ({ currentLang }: LanguageSwitcherProps) => {
+export const LanguageSwitcher = ({
+  currentLang,
+  display = "short",
+}: LanguageSwitcherProps) => {
   const { currentLanguage, availableLanguages, setLanguage } =
     useLanguage(currentLang);
-  const shortName = isAppLocale(currentLanguage)
-    ? languageShortNames[currentLanguage]
+  const selectedLabel = isAppLocale(currentLanguage)
+    ? (display === "label" ? languageNames : languageShortNames)[
+        currentLanguage
+      ]
     : currentLanguage.toUpperCase();
 
   return (
@@ -37,7 +43,7 @@ export const LanguageSwitcher = ({ currentLang }: LanguageSwitcherProps) => {
           aria-label="Language"
           className="cursor-pointer bg-transparent p-0 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none"
         >
-          {shortName}
+          {selectedLabel}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-40">

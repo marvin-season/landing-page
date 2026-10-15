@@ -29,7 +29,11 @@ const themeShortNames: Record<Theme, string> = {
   loopy: "Loopy",
 };
 
-export function ThemePicker() {
+export function ThemePicker({
+  display = "short",
+}: {
+  display?: "short" | "label";
+}) {
   const { theme, themes, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -47,7 +51,7 @@ export function ThemePicker() {
           aria-label="Theme"
           className="cursor-pointer bg-transparent p-0 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none"
         >
-          {themeShortNames[resolvedTheme]}
+          {(display === "label" ? themeNames : themeShortNames)[resolvedTheme]}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44">

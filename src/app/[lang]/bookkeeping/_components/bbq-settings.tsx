@@ -49,7 +49,7 @@ const radioInputCls = cls`size-4 shrink-0 accent-primary`;
 const preferenceControlCls = cls`
   shrink-0 [&>button]:min-h-8 [&>button]:min-w-16 [&>button]:rounded-md
   [&>button]:border [&>button]:border-border/60 [&>button]:bg-muted/30
-  [&>button]:px-2 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button]:text-xs
+  [&>button]:px-2 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button]:text-sm
   [&>button:focus-visible]:ring-1 [&>button:focus-visible]:ring-primary/50
 `;
 
@@ -187,21 +187,21 @@ export function BbqSettings() {
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3">
         <section className={`${settingsCardCls} divide-y divide-border/60`}>
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-            <h2 className="flex items-center gap-1.5 text-xs font-medium">
-              <Languages className="size-3.5 text-primary" aria-hidden="true" />
+            <h2 className="flex items-center gap-1.5 text-sm font-medium">
+              <Languages className="size-4 text-primary" aria-hidden="true" />
               <Trans>语言</Trans>
             </h2>
             <div className={preferenceControlCls}>
-              <LanguageSwitcher currentLang={i18n.locale} />
+              <LanguageSwitcher currentLang={i18n.locale} display="label" />
             </div>
           </div>
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-            <h2 className="flex items-center gap-1.5 text-xs font-medium">
-              <Palette className="size-3.5 text-primary" aria-hidden="true" />
+            <h2 className="flex items-center gap-1.5 text-sm font-medium">
+              <Palette className="size-4 text-primary" aria-hidden="true" />
               <Trans>主题</Trans>
             </h2>
             <div className={preferenceControlCls}>
-              <ThemePicker />
+              <ThemePicker display="label" />
             </div>
           </div>
         </section>
