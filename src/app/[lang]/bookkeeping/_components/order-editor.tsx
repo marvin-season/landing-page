@@ -10,7 +10,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Switch,
 } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -54,7 +53,6 @@ import {
   cls,
   detailsChevronCls,
   detailsMotionCls,
-  detailsSummaryCls,
   pageShellCls,
   pageTitleCls,
   totalBarCls,
@@ -68,17 +66,23 @@ import { useBbqNavigate } from "./use-bbq-nav";
 import { useGroupingSettings } from "./use-grouping-settings";
 
 const editorWorkspaceCls = cls`
-  grid min-h-0 flex-1 overflow-hidden rounded-xl bg-card
+  grid min-h-0 flex-1 overflow-hidden
   grid-rows-[minmax(0,1fr)_auto]
 `;
 
 const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 border-b p-3 ${detailsMotionCls}
+  min-h-0 min-w-0 ${detailsMotionCls} shrink-0
 `;
 
-const editorOrderPaneCls = cls`flex min-h-0 min-w-0 flex-col`;
+const editorMenuSummaryCls = cls`
+  flex min-h-11 cursor-pointer items-center gap-2 py-2 text-sm font-medium
+  list-none [&::-webkit-details-marker]:hidden text-foreground
+  transition-colors hover:text-primary focus-visible:outline-none
+  focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 rounded-lg
+  bg-muted/30 px-2.5
+`;
 
-const editorOrderBodyCls = cls`min-h-0 p-3 pb-5`;
+const editorOrderBodyCls = cls`min-h-0 flex flex-col gap-5 shrink-0`;
 
 const editorControlCls = cls`
   rounded-lg shadow-none transition-colors
@@ -88,10 +92,10 @@ const editorControlCls = cls`
 `;
 
 const photoActionCls = cls`
-  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border bg-card
-  px-2.5 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
+  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-muted/40
+  px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
   has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1
-  has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11
+  has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11 min-w-0 text-center
 `;
 
 type DraftLine = {
@@ -400,27 +404,21 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
 
   return (
     <div className={`${pageShellCls} min-h-0 overflow-hidden flex-1`}>
-      <header className="flex shrink-0 flex-col gap-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className={pageTitleCls}>
-                {order
-                  ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
-                  : groupingEnabled
-                    ? t`新建订单`
-                    : t`记一笔`}
-              </h1>
-            </div>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {order
-                ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
-                : groupingEnabled
-                  ? t`选择分组和项目后保存订单`
-                  : t`这次记点什么？`}
-            </p>
-          </div>
-        </div>
+      <header className="flex shrink-0 flex-col gap-1 px-3">
+        <h1 className={pageTitleCls}>
+          {order
+            ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
+            : groupingEnabled
+              ? t`新建订单`
+              : t`记一笔`}
+        </h1>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {order
+            ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
+            : groupingEnabled
+              ? t`选择分组和项目后保存订单`
+              : t`这次记点什么？`}
+        </p>
       </header>
       {message || groupingError ? (
         <Alert
@@ -437,88 +435,75 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         disabled={saving}
         aria-busy={saving}
       >
-        <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3">
-          <section className="border-b px-3 py-2.5">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              {groupingEnabled ? (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <label
-                    htmlFor="order-group"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    <Trans>分组</Trans>
-                  </label>
-                  <Select
-                    value={
-                      groupName === undefined
-                        ? "legacy"
-                        : groupName === null
-                          ? "none"
-                          : `group:${groupName}`
-                    }
-                    onValueChange={(value) =>
-                      setGroupName(
-                        value === "legacy"
-                          ? undefined
-                          : value === "none"
-                            ? null
-                            : value.slice(6),
-                      )
-                    }
-                  >
-                    <SelectTrigger
-                      id="order-group"
-                      className="min-w-36 h-9 bg-background"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="none">
-                          <Trans>不分组</Trans>
-                        </SelectItem>
-                        {order &&
-                        order.groupingEnabled !== false &&
-                        order.groupName === undefined ? (
-                          <SelectItem value="legacy">
-                            {order.seat === null
-                              ? t`打包`
-                              : t`${order.seat} 号座`}
-                          </SelectItem>
-                        ) : null}
-                        {groupOptions.map((name) => (
-                          <SelectItem key={name} value={`group:${name}`}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : null}
-              <label className="inline-flex min-h-9 shrink-0 items-center gap-2 ml-auto">
-                <span className="text-xs font-medium text-foreground">
-                  {done ? t`已完成` : t`进行中`}
-                </span>
-                <Switch
-                  checked={done}
-                  disabled={saving}
-                  aria-label={t`切换记录状态`}
-                  onCheckedChange={setDone}
-                />
-              </label>
-            </div>
-            {groupingEnabled && groupingSettings?.names.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                <Link
-                  href={bbqSettingsPath()}
-                  className="text-primary underline underline-offset-4"
+        <div className="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-5 px-3 pb-5">
+          {groupingEnabled ? (
+            <section className="shrink-0">
+              <div className="flex items-center gap-3">
+                <label
+                  htmlFor="order-group"
+                  className="text-sm font-medium text-foreground shrink-0"
                 >
-                  <Trans>到设置中添加分组</Trans>
-                </Link>
-              </p>
-            ) : null}
-          </section>
+                  <Trans>分组</Trans>
+                </label>
+                <Select
+                  value={
+                    groupName === undefined
+                      ? "legacy"
+                      : groupName === null
+                        ? "none"
+                        : `group:${groupName}`
+                  }
+                  onValueChange={(value) =>
+                    setGroupName(
+                      value === "legacy"
+                        ? undefined
+                        : value === "none"
+                          ? null
+                          : value.slice(6),
+                    )
+                  }
+                >
+                  <SelectTrigger
+                    id="order-group"
+                    className="min-w-0 h-11 bg-muted/40 flex-1 data-[size=default]:h-11 border-0 shadow-none rounded-lg"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="none">
+                        <Trans>不分组</Trans>
+                      </SelectItem>
+                      {order &&
+                      order.groupingEnabled !== false &&
+                      order.groupName === undefined ? (
+                        <SelectItem value="legacy">
+                          {order.seat === null
+                            ? t`打包`
+                            : t`${order.seat} 号座`}
+                        </SelectItem>
+                      ) : null}
+                      {groupOptions.map((name) => (
+                        <SelectItem key={name} value={`group:${name}`}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              {groupingSettings?.names.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  <Link
+                    href={bbqSettingsPath()}
+                    className="text-primary underline underline-offset-4"
+                  >
+                    <Trans>到设置中添加分组</Trans>
+                  </Link>
+                </p>
+              ) : null}
+            </section>
+          ) : null}
           <details
             className={editorMenuPaneCls}
             onToggle={(event) => {
@@ -526,7 +511,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 setMenuRequest((request) => request || 1);
             }}
           >
-            <summary className={detailsSummaryCls}>
+            <summary className={editorMenuSummaryCls}>
               <Plus
                 className="size-4 shrink-0 text-primary"
                 aria-hidden="true"
@@ -565,12 +550,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   </div>
                 ) : (
                   <>
-                    <div className="sticky top-0 z-10 bg-card pb-2 mt-2 flex min-w-0 items-center gap-1.5">
-                      <ItemTagFilter
-                        tags={tags}
-                        value={activeTagFilter}
-                        onChange={setTagFilter}
-                      />
+                    <div className="bg-muted/40 mt-1 flex min-w-0 items-center gap-2 rounded-lg [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:bg-transparent [&_[data-slot=select-trigger]]:border-0 [&_[data-slot=select-trigger]]:bg-transparent">
                       {availableDishes.length > 0 ? (
                         <div className="min-w-0 flex-1">
                           <BbqSearch
@@ -580,9 +560,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           />
                         </div>
                       ) : null}
+                      <ItemTagFilter
+                        tags={tags}
+                        value={activeTagFilter}
+                        onChange={setTagFilter}
+                      />
                     </div>
                     {availableDishes.length === 0 ? (
-                      <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                      <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center">
                         <UtensilsCrossed
                           className="size-7 text-muted-foreground/60"
                           aria-hidden="true"
@@ -617,8 +602,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           <Button
                             key={dish.id}
                             type="button"
-                            variant="ghost"
-                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
+                            variant={
+                              selectedQuantities.has(dish.id)
+                                ? "subtle"
+                                : "ghost"
+                            }
+                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2`}
                             aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
                             onClick={() => addDish(dish)}
                           >
@@ -629,13 +618,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                               >
                                 {dish.name}
                               </span>
-                              {tags
-                                .filter((tag) =>
-                                  getDishTagIds(dish).includes(tag.id),
-                                )
-                                .map((tag) => (
-                                  <ItemTagBadge key={tag.id} tag={tag} />
-                                ))}
+                              <span className="flex min-w-0 flex-wrap gap-1 empty:hidden mt-1">
+                                {tags
+                                  .filter((tag) =>
+                                    getDishTagIds(dish).includes(tag.id),
+                                  )
+                                  .map((tag) => (
+                                    <ItemTagBadge key={tag.id} tag={tag} />
+                                  ))}
+                              </span>
                               <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
                                 {formatYuan(dish.priceCents)}/{dish.unit}
                                 <span className="mx-1" aria-hidden="true">
@@ -647,7 +638,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                                 )}
                               </span>
                             </span>
-                            <span className="flex shrink-0 flex-col items-center gap-0.5">
+                            <span className="flex shrink-0 flex-col items-center gap-1 pt-0.5">
                               <Plus className="size-4" aria-hidden="true" />
                               {selectedQuantities.has(dish.id) ? (
                                 <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
@@ -664,224 +655,216 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               ) : null}
             </div>
           </details>
-          <section className={editorOrderPaneCls}>
-            <div className={editorOrderBodyCls}>
-              <section>
-                <div className="flex items-end justify-between gap-3 sticky top-0 z-10 bg-card pb-2">
-                  <div>
-                    <h2 className="text-sm font-medium text-foreground">
-                      <Trans>这一笔</Trans>
-                    </h2>
-                  </div>
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {t`${lines.length} 项 · ${itemCount} 件`}
-                  </span>
+          <div className={editorOrderBodyCls}>
+            <section className="border-t border-border/60 pt-4">
+              <div className="flex items-center justify-between gap-3 pb-1">
+                <h2 className="text-sm font-medium text-foreground">
+                  <Trans>这一笔</Trans>
+                </h2>
+                <span className="text-xs tabular-nums text-muted-foreground text-right">
+                  {t`${lines.length} 项 · ${itemCount} 件`}
+                </span>
+              </div>
+              <p className="text-xs tabular-nums text-muted-foreground break-words">
+                <Trans>
+                  热量 {formatCalories(i18n, summarizeCalories(lines))}
+                </Trans>
+              </p>
+              {lines.length === 0 ? (
+                <div className="mt-3 flex min-h-20 flex-row items-center justify-center gap-3 text-center">
+                  <BbqCompanion
+                    mood={groupingEnabled ? "chef" : "hello"}
+                    className="block size-12 shrink-0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    <Trans>还没有添加项目</Trans>
+                  </p>
                 </div>
-                <p className="text-xs tabular-nums text-muted-foreground break-words">
-                  <Trans>
-                    热量 {formatCalories(i18n, summarizeCalories(lines))}
-                  </Trans>
-                </p>
-                {lines.length === 0 ? (
-                  <div className="mt-2 flex min-h-16 flex-row items-center justify-center gap-2 rounded-lg bg-muted/40 px-3 text-center">
-                    <BbqCompanion
-                      mood={groupingEnabled ? "chef" : "hello"}
-                      className="block size-8 shrink-0"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      <Trans>还没有添加项目</Trans>
-                    </p>
-                  </div>
-                ) : (
-                  <ul className="mt-2 flex flex-col gap-1.5">
-                    {lines.map((line) => (
-                      <li
-                        key={line.key}
-                        className="flex items-center gap-1.5 border-b border-border/60 px-0.5 py-2 last:border-b-0"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">
-                            {line.name}
-                          </p>
+              ) : (
+                <ul className="mt-2 flex flex-col">
+                  {lines.map((line) => (
+                    <li
+                      key={line.key}
+                      className="grid items-center gap-1 border-b border-border/40 py-3 last:border-b-0 grid-cols-[minmax(0,1fr)_2.75rem_minmax(1.5rem,auto)_2.75rem] sm:gap-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {line.name}
+                        </p>
+                        <div className="flex min-w-0 flex-wrap gap-1 empty:hidden mt-1">
                           {line.tags?.map((tag) => (
                             <ItemTagBadge key={tag.id} tag={tag} />
                           ))}
-                          <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                            {formatYuan(line.priceCents)}/{line.unit}
-                            <span className="mx-1.5" aria-hidden="true">
-                              ·
-                            </span>
-                            {formatYuan(
-                              lineCents(line.priceCents, line.quantity),
-                            )}
-                          </p>
-                          <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                            <Trans>
-                              热量{" "}
-                              {formatCalories(i18n, summarizeCalories([line]))}
-                            </Trans>
-                          </p>
                         </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
-                          aria-label={
-                            line.quantity === 1
-                              ? t`移除 ${line.name}`
-                              : t`减少 ${line.name} 数量`
-                          }
-                          onClick={() => changeQuantity(line.key, -1)}
-                        >
-                          {line.quantity === 1 ? (
-                            <Trash2 className="size-4" aria-hidden="true" />
-                          ) : (
-                            <Minus className="size-4" aria-hidden="true" />
+                        <p className="mt-1 text-xs tabular-nums text-muted-foreground wrap-anywhere">
+                          {formatYuan(line.priceCents)}/{line.unit}
+                          <span className="mx-1.5" aria-hidden="true">
+                            ·
+                          </span>
+                          {formatYuan(
+                            lineCents(line.priceCents, line.quantity),
                           )}
-                        </Button>
-                        <span className="min-w-6 text-center text-sm font-medium tabular-nums">
-                          {line.quantity}
-                        </span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
-                          aria-label={t`增加 ${line.name} 数量`}
-                          onClick={() => changeQuantity(line.key, 1)}
-                        >
-                          <Plus className="size-4" aria-hidden="true" />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-              <section className="mt-3 border-t pt-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <Camera
-                        className="size-4 text-primary"
-                        aria-hidden="true"
-                      />
-                      <h2 className="text-sm font-medium text-foreground">
-                        <Trans>附张照片</Trans>
-                      </h2>
-                    </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      <Trans>小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张</Trans>
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    {/* <BbqCompanion
+                        </p>
+                        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground wrap-anywhere">
+                          <Trans>
+                            热量{" "}
+                            {formatCalories(i18n, summarizeCalories([line]))}
+                          </Trans>
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
+                        aria-label={
+                          line.quantity === 1
+                            ? t`移除 ${line.name}`
+                            : t`减少 ${line.name} 数量`
+                        }
+                        onClick={() => changeQuantity(line.key, -1)}
+                      >
+                        {line.quantity === 1 ? (
+                          <Trash2 className="size-4" aria-hidden="true" />
+                        ) : (
+                          <Minus className="size-4" aria-hidden="true" />
+                        )}
+                      </Button>
+                      <span className="min-w-6 text-center text-sm font-medium tabular-nums">
+                        {line.quantity}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
+                        aria-label={t`增加 ${line.name} 数量`}
+                        onClick={() => changeQuantity(line.key, 1)}
+                      >
+                        <Plus className="size-4" aria-hidden="true" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className="border-t border-border/60 pt-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-medium text-foreground">
+                    <Trans>附张照片</Trans>
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                    <Trans>小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张</Trans>
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  {/* <BbqCompanion
                       mood="photo-pose"
                       className="block size-14 shrink-0"
                     /> */}
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {photos.length}/{MAX_ORDER_PHOTOS}
-                    </span>
-                  </div>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {photos.length}/{MAX_ORDER_PHOTOS}
+                  </span>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  <label className={photoActionCls}>
-                    <Camera className="size-4" aria-hidden="true" />
-                    {processingPhotos ? t`处理照片中…` : t`拍照`}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      disabled={
-                        processingPhotos || photos.length >= MAX_ORDER_PHOTOS
-                      }
-                      className="sr-only"
-                      onChange={(event) => {
-                        const input = event.currentTarget;
-                        void addPhotos(input.files).finally(() => {
-                          input.value = "";
-                        });
-                      }}
-                    />
-                  </label>
-                  <label className={photoActionCls}>
-                    <ImagePlus className="size-4" aria-hidden="true" />
-                    {processingPhotos ? t`处理照片中…` : t`从相册选择`}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      disabled={
-                        processingPhotos || photos.length >= MAX_ORDER_PHOTOS
-                      }
-                      className="sr-only"
-                      onChange={(event) => {
-                        const input = event.currentTarget;
-                        void addPhotos(input.files).finally(() => {
-                          input.value = "";
-                        });
-                      }}
-                    />
-                  </label>
-                </div>
-                {photos.length > 0 ? (
-                  <ul className="mt-2 grid grid-cols-3 gap-2">
-                    {photos.map((photo, index) => (
-                      <li
-                        key={photo.id}
-                        className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <label className={photoActionCls}>
+                  <Camera className="size-4" aria-hidden="true" />
+                  {processingPhotos ? t`处理照片中…` : t`拍照`}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    disabled={
+                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                    }
+                    className="sr-only"
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      void addPhotos(input.files).finally(() => {
+                        input.value = "";
+                      });
+                    }}
+                  />
+                </label>
+                <label className={photoActionCls}>
+                  <ImagePlus className="size-4" aria-hidden="true" />
+                  {processingPhotos ? t`处理照片中…` : t`从相册选择`}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={
+                      processingPhotos || photos.length >= MAX_ORDER_PHOTOS
+                    }
+                    className="sr-only"
+                    onChange={(event) => {
+                      const input = event.currentTarget;
+                      void addPhotos(input.files).finally(() => {
+                        input.value = "";
+                      });
+                    }}
+                  />
+                </label>
+              </div>
+              {photos.length > 0 ? (
+                <ul className="mt-3 grid grid-cols-3 gap-2">
+                  {photos.map((photo, index) => (
+                    <li
+                      key={photo.id}
+                      className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
+                    >
+                      <Image
+                        src={photo.dataUrl}
+                        alt={t`记录留存照片 ${index + 1}`}
+                        fill
+                        sizes="(max-width: 767px) 25vw, 7rem"
+                        unoptimized
+                        className="size-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="soft"
+                        size="icon"
+                        className="absolute top-1 right-1 shadow-sm size-11"
+                        aria-label={t`删除第 ${index + 1} 张照片`}
+                        onClick={() => removePhoto(photo.id)}
                       >
-                        <Image
-                          src={photo.dataUrl}
-                          alt={t`记录留存照片 ${index + 1}`}
-                          fill
-                          sizes="(max-width: 767px) 25vw, 7rem"
-                          unoptimized
-                          className="size-full object-cover"
-                        />
-                        <Button
-                          type="button"
-                          variant="soft"
-                          size="icon"
-                          className="absolute top-1 right-1 shadow-sm size-11"
-                          aria-label={t`删除第 ${index + 1} 张照片`}
-                          onClick={() => removePhoto(photo.id)}
-                        >
-                          <X className="size-3.5" aria-hidden="true" />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </section>
-              {order ? (
-                <section className="mt-4 border-t pt-3">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    disabled={saving}
-                    onClick={() => void removeOrder()}
-                  >
-                    <Trash2 className="size-4" aria-hidden="true" />
-                    <Trans>删除这条记录</Trans>
-                  </Button>
-                </section>
+                        <X className="size-3.5" aria-hidden="true" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
               ) : null}
-            </div>
-          </section>
+            </section>
+            {order ? (
+              <section className="pt-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive w-full min-h-11"
+                  disabled={saving}
+                  onClick={() => void removeOrder()}
+                >
+                  <Trash2 className="size-4" aria-hidden="true" />
+                  <Trans>删除这条记录</Trans>
+                </Button>
+              </section>
+            ) : null}
+          </div>
         </div>
         <div className={totalBarCls}>
-          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_minmax(7rem,auto)] items-center gap-3">
             <p
-              className="text-lg font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
+              className="text-xl font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
               title={formatYuan(total)}
             >
               {formatYuan(total)}
             </p>
             <Button
               type="button"
-              className={`px-2.5 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-9 w-full h-9 text-xs gap-1.5`}
+              className={`px-4 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full h-11 text-sm gap-1.5`}
               disabled={!canSave}
               onClick={() => void save()}
             >

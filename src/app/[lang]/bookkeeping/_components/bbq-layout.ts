@@ -40,7 +40,7 @@ export const detailsChevronCls = cls`
 
 // 保存栏参与布局，由上方内容区承担滚动，不再计算导航和安全区的 fixed 偏移。
 export const totalBarCls = cls`
-  border-t bg-background px-2.5 pt-1.5 pb-1.5 w-full shrink-0
+  border-t bg-background px-3 pt-2.5 pb-2.5 w-full shrink-0
 `;
 
 export const touchCls = cls`min-h-11`;

@@ -256,7 +256,7 @@ export function ItemTagFilter({
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
-        className="h-11 w-30 min-w-0 max-w-[45%] shrink-0 px-2 text-xs [&>span]:truncate"
+        className="h-11 w-30 min-w-0 max-w-[45%] shrink-0 px-3 text-sm [&>span]:truncate data-[size=default]:h-11 rounded-lg bg-background border-border/60 shadow-none shinchan:bg-card/80 apple:rounded-xl apple:bg-card/70 apple:backdrop-blur-xl"
         aria-label={t`按标签筛选`}
       >
         <SelectValue />

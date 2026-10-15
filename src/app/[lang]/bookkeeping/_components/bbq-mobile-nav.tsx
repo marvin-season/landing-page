@@ -39,10 +39,10 @@ const items = [
 ];
 
 const mobileNavLinkCls = cls`
-  flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-xs
+  flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs
   font-medium text-muted-foreground transition-colors hover:bg-muted/70
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset
-  focus-visible:ring-primary/50 aria-[current=page]:bg-primary/5
+  focus-visible:ring-primary/50 aria-[current=page]:bg-primary/10
   aria-[current=page]:text-primary aria-disabled:opacity-40 touch-manipulation
 `;
 
@@ -67,7 +67,7 @@ export function BbqMobileNav() {
       aria-label={t`Loopy 记账主导航`}
       className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t`}
     >
-      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5">
+      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
           const disabled = itemSegment === "orders" && !canCreate && !active;

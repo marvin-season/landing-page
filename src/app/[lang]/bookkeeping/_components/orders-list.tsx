@@ -29,12 +29,12 @@ function statusLabel(i18n: I18n, status: Order["status"]): string {
 
 function orderTotalCls(status: Order["status"]): string {
   const tone = status === "done" ? "text-muted-foreground" : "text-foreground";
-  return `text-lg font-semibold tabular-nums ${tone}`;
+  return cls`text-base font-semibold tabular-nums ${tone} break-all sm:text-lg`;
 }
 
 const orderTabCls = cls`
-  inline-flex items-center justify-center gap-1.5 rounded-full px-3 text-xs
-  font-medium transition-colors min-h-9 focus-visible:outline-none focus-visible:ring-2
+  inline-flex items-center justify-center gap-1.5 rounded-lg px-3 text-xs
+  font-medium transition-colors min-h-11 focus-visible:outline-none focus-visible:ring-2
   focus-visible:ring-inset focus-visible:ring-primary/50
   duration-150 active:bg-primary/10 touch-manipulation motion-reduce:transition-none
 `;
@@ -83,10 +83,10 @@ export function OrdersList({
 
   return (
     <section
-      className="min-h-0 min-w-0 overflow-hidden rounded-xl bg-card flex flex-col flex-1"
+      className="min-h-0 min-w-0 overflow-hidden rounded-2xl bg-card flex flex-col flex-1 border border-border/60"
       aria-label={t`记录列表`}
     >
-      <div className="flex flex-col gap-3 border-b bg-card/95 px-4 py-3 shrink-0">
+      <div className="flex flex-col gap-3 border-b bg-primary/5 px-4 py-3 shrink-0">
         <div className="flex items-end justify-between gap-x-3 gap-y-1">
           <div className="min-w-0 flex-1">
             <h2 className="text-xs text-muted-foreground">
@@ -108,13 +108,17 @@ export function OrdersList({
             />
           ) : null}
         </div>
-        <div className="flex gap-1" role="group" aria-label={t`记录状态`}>
+        <div
+          className="grid gap-1 grid-cols-2 rounded-xl bg-background/70 p-1"
+          role="group"
+          aria-label={t`记录状态`}
+        >
           <button
             type="button"
             aria-pressed={statusFilter === "open"}
             className={`${orderTabCls} ${
               statusFilter === "open"
-                ? "bg-muted text-foreground"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
             onClick={() => changeFilter("open")}
@@ -126,7 +130,7 @@ export function OrdersList({
             aria-pressed={statusFilter === "done"}
             className={`${orderTabCls} ${
               statusFilter === "done"
-                ? "bg-muted text-foreground"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
             onClick={() => changeFilter("done")}
@@ -172,7 +176,7 @@ export function OrdersList({
             ) : null}
           </div>
         ) : (
-          <ul className="p-2 flex-1 flex flex-col gap-0.5">
+          <ul className="p-2 flex-1 flex flex-col gap-2">
             {visibleOrders.map((order) => (
               <OrderListItem
                 key={order.id}
@@ -275,7 +279,7 @@ function OrderListItem({
       className={`relative h-[var(--row-height)] transition-opacity duration-200 motion-reduce:transition-none ${hidden ? "opacity-0 pointer-events-none" : "opacity-100"} ${expanded || showDetail ? "z-10" : "z-0"} shrink-0`}
     >
       <div
-        className={`overflow-hidden rounded-lg border bg-card min-h-0 flex flex-col transition-[transform,height,border-color] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${expanded ? "h-[var(--detail-height)] [transform:translateY(var(--row-offset))] border-primary/35" : "h-[var(--row-height)] transform-none border-transparent"}`}
+        className={`overflow-hidden rounded-lg border bg-card min-h-0 flex flex-col transition-[transform,height,border-color] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${expanded ? "h-[var(--detail-height)] [transform:translateY(var(--row-offset))] border-primary/35" : "h-[var(--row-height)] transform-none border-border/60"}`}
       >
         <button
           ref={summaryRef}
@@ -324,7 +328,7 @@ function OrderSummary({
   const { i18n, t } = useLingui();
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium text-foreground">
             {order.groupingEnabled !== false && order.groupName
@@ -372,13 +376,13 @@ function OrderSummary({
           ) : null}
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2 max-w-[45%] text-right">
         <p className={orderTotalCls(order.status)}>
           {formatYuan(order.totalCents)}
         </p>
         {showChevron ? (
           <ChevronRight
-            className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${isSelected ? "rotate-90 text-primary" : "text-muted-foreground"}`}
+            className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${isSelected ? "rotate-90 text-primary" : "text-muted-foreground"} shrink-0`}
             aria-hidden="true"
           />
         ) : null}
