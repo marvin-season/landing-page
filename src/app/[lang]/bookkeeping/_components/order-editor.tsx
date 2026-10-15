@@ -123,26 +123,30 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [lines, setLines] = useState<DraftLine[]>([]);
   const [photos, setPhotos] = useState<OrderPhoto[]>([]);
   const [phase, setPhase] = useState<"loading" | "ready" | "missing" | "error">(
+    orderId ? "loading" : "ready",
+  );
+  const [menuRequest, setMenuRequest] = useState(0);
+  const menuRequested = menuRequest > 0;
+  const [menuPhase, setMenuPhase] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [menuError, setMenuError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [processingPhotos, setProcessingPhotos] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    if (!orderId) return;
     let cancelled = false;
     void (async () => {
       try {
-        const menu = await readMenu();
-        const existing = orderId ? await bbqStore.getOrder(orderId) : null;
+        const existing = await bbqStore.getOrder(orderId);
         if (cancelled) return;
         if (orderId && !existing) {
           setPhase("missing");
           return;
         }
-        setDishes(menu.dishes);
-        setTags(menu.tags);
         if (existing) {
           setOrder(existing);
           setGroupingEnabled(existing.groupingEnabled ?? true);
@@ -176,24 +180,36 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }, [orderId, i18n]);
 
   useEffect(() => {
+    // 原生 details 收起不会延后读取；只在首次展开后加载并保留菜单状态。
+    if (menuRequest === 0) return;
     let cancelled = false;
-    const refreshMenu = () => {
-      void readMenu()
-        .then((menu) => {
-          if (cancelled) return;
-          setDishes(menu.dishes);
-          setTags(menu.tags);
-        })
-        .catch((error: unknown) => {
-          if (!cancelled) setMessage(bbqErrorMessage(i18n, error));
-        });
-    };
-    window.addEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
+    setMenuPhase("loading");
+    setMenuError(null);
+    void readMenu()
+      .then((menu) => {
+        if (cancelled) return;
+        setDishes(menu.dishes);
+        setTags(menu.tags);
+        setMenuPhase("ready");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setMenuError(bbqErrorMessage(i18n, error));
+        setMenuPhase("error");
+      });
     return () => {
       cancelled = true;
+    };
+  }, [menuRequest, i18n]);
+
+  useEffect(() => {
+    if (!menuRequested) return;
+    const refreshMenu = () => setMenuRequest((revision) => revision + 1);
+    window.addEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
+    return () => {
       window.removeEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
     };
-  }, [i18n]);
+  }, [menuRequested]);
 
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const availableDishes = dishes.filter((dish) => dish.listed);
@@ -462,7 +478,13 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </div>
             ) : null}
           </section>
-          <details className={editorMenuPaneCls}>
+          <details
+            className={editorMenuPaneCls}
+            onToggle={(event) => {
+              if (event.currentTarget.open)
+                setMenuRequest((request) => request || 1);
+            }}
+          >
             <summary className={detailsSummaryCls}>
               <Plus
                 className="size-4 shrink-0 text-primary"
@@ -472,99 +494,139 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <Trans>选择项目</Trans>
               </span>
               <span className="text-xs tabular-nums text-muted-foreground shrink-0 font-normal">
-                <Trans>{availableDishes.length} 项</Trans>
+                {menuPhase === "ready" ? (
+                  <Trans>{availableDishes.length} 项</Trans>
+                ) : (
+                  "—"
+                )}
               </span>
               <ChevronDown className={detailsChevronCls} aria-hidden="true" />
             </summary>
             <div className="min-h-0 overflow-clip">
-              <div className="sticky top-0 z-10 bg-card pb-2 mt-2 flex min-w-0 items-center gap-1.5">
-                <ItemTagFilter
-                  tags={tags}
-                  value={activeTagFilter}
-                  onChange={setTagFilter}
-                />
-                {availableDishes.length > 0 ? (
-                  <div className="min-w-0 flex-1">
-                    <BbqSearch
-                      value={search}
-                      onChange={setSearch}
-                      label={t`搜索项目名称…`}
-                    />
-                  </div>
-                ) : null}
-              </div>
-              {availableDishes.length === 0 ? (
-                <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
-                  <UtensilsCrossed
-                    className="size-7 text-muted-foreground/60"
-                    aria-hidden="true"
-                  />
-                  <p className="mt-2 text-sm font-medium text-foreground">
-                    <Trans>先添几个常用项目</Trans>
+              {menuRequested ? (
+                menuPhase === "loading" ? (
+                  <p
+                    className="py-8 text-center text-sm text-muted-foreground"
+                    role="status"
+                  >
+                    <Trans>读取常用项目中…</Trans>
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    <Trans>比如早餐、咖啡，或一次跑步。</Trans>
-                  </p>
-                  <Button asChild size="sm" variant="outline" className="mt-3">
-                    <Link href={bbqMenuPath()}>
-                      <Trans>添加常用项目</Trans>
-                    </Link>
-                  </Button>
-                </div>
-              ) : filteredDishes.length === 0 ? (
-                <p
-                  className="py-8 text-center text-sm text-muted-foreground"
-                  role="status"
-                >
-                  <Trans>没有匹配的项目，请换个关键词</Trans>
-                </p>
-              ) : (
-                <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1 max-h-[min(16rem,40dvh)] overflow-y-auto overscroll-y-contain">
-                  {filteredDishes.map((dish) => (
+                ) : menuPhase === "error" ? (
+                  <div className="py-3">
+                    <p role="alert">{menuError}</p>
                     <Button
-                      key={dish.id}
                       type="button"
-                      variant="ghost"
-                      className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
-                      aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
-                      onClick={() => addDish(dish)}
+                      variant="outline"
+                      onClick={() => setMenuRequest((revision) => revision + 1)}
                     >
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate" title={dish.name}>
-                          {dish.name}
-                        </span>
-                        {tags
-                          .filter((tag) => getDishTagIds(dish).includes(tag.id))
-                          .map((tag) => (
-                            <ItemTagBadge key={tag.id} tag={tag} />
-                          ))}
-                        <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
-                          {formatYuan(dish.priceCents)}/{dish.unit}
-                          {dish.caloriesKcal != null ? (
-                            <>
-                              <span className="mx-1" aria-hidden="true">
-                                ·
-                              </span>
-                              {formatCalories(
-                                i18n,
-                                summarizeCalories([{ ...dish, quantity: 1 }]),
-                              )}
-                            </>
-                          ) : null}
-                        </span>
-                      </span>
-                      <span className="flex shrink-0 flex-col items-center gap-0.5">
-                        <Plus className="size-4" aria-hidden="true" />
-                        {selectedQuantities.has(dish.id) ? (
-                          <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
-                            {selectedQuantities.get(dish.id)}
-                          </span>
-                        ) : null}
-                      </span>
+                      <Trans>Retry</Trans>
                     </Button>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="sticky top-0 z-10 bg-card pb-2 mt-2 flex min-w-0 items-center gap-1.5">
+                      <ItemTagFilter
+                        tags={tags}
+                        value={activeTagFilter}
+                        onChange={setTagFilter}
+                      />
+                      {availableDishes.length > 0 ? (
+                        <div className="min-w-0 flex-1">
+                          <BbqSearch
+                            value={search}
+                            onChange={setSearch}
+                            label={t`搜索项目名称…`}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                    {availableDishes.length === 0 ? (
+                      <div className="mt-3 flex min-h-36 flex-col items-center justify-center rounded-lg bg-muted/40 px-4 text-center">
+                        <UtensilsCrossed
+                          className="size-7 text-muted-foreground/60"
+                          aria-hidden="true"
+                        />
+                        <p className="mt-2 text-sm font-medium text-foreground">
+                          <Trans>先添几个常用项目</Trans>
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          <Trans>比如早餐、咖啡，或一次跑步。</Trans>
+                        </p>
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="mt-3"
+                        >
+                          <Link href={bbqMenuPath()}>
+                            <Trans>添加常用项目</Trans>
+                          </Link>
+                        </Button>
+                      </div>
+                    ) : filteredDishes.length === 0 ? (
+                      <p
+                        className="py-8 text-center text-sm text-muted-foreground"
+                        role="status"
+                      >
+                        <Trans>没有匹配的项目，请换个关键词</Trans>
+                      </p>
+                    ) : (
+                      <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1 max-h-[min(16rem,40dvh)] overflow-y-auto overscroll-y-contain">
+                        {filteredDishes.map((dish) => (
+                          <Button
+                            key={dish.id}
+                            type="button"
+                            variant="ghost"
+                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap ${selectedQuantities.has(dish.id) ? "bg-primary/5" : "bg-muted/40"}`}
+                            aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
+                            onClick={() => addDish(dish)}
+                          >
+                            <span className="min-w-0 flex-1">
+                              <span
+                                className="block truncate"
+                                title={dish.name}
+                              >
+                                {dish.name}
+                              </span>
+                              {tags
+                                .filter((tag) =>
+                                  getDishTagIds(dish).includes(tag.id),
+                                )
+                                .map((tag) => (
+                                  <ItemTagBadge key={tag.id} tag={tag} />
+                                ))}
+                              <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
+                                {formatYuan(dish.priceCents)}/{dish.unit}
+                                {dish.caloriesKcal != null ? (
+                                  <>
+                                    <span className="mx-1" aria-hidden="true">
+                                      ·
+                                    </span>
+                                    {formatCalories(
+                                      i18n,
+                                      summarizeCalories([
+                                        { ...dish, quantity: 1 },
+                                      ]),
+                                    )}
+                                  </>
+                                ) : null}
+                              </span>
+                            </span>
+                            <span className="flex shrink-0 flex-col items-center gap-0.5">
+                              <Plus className="size-4" aria-hidden="true" />
+                              {selectedQuantities.has(dish.id) ? (
+                                <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
+                                  {selectedQuantities.get(dish.id)}
+                                </span>
+                              ) : null}
+                            </span>
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )
+              ) : null}
             </div>
           </details>
           <section className={editorOrderPaneCls}>

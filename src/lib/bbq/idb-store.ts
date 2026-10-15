@@ -4,8 +4,8 @@ import {
   deleteDish as deleteDishDocument,
   deleteOrder as deleteOrderDocument,
   deleteTag as deleteTagDocument,
+  emptyDocument,
   exportBackup as exportBackupDocument,
-  getOrder as getOrderDocument,
   listAllOrders as listAllOrdersDocument,
   listCategories as listCategoriesDocument,
   listDishes as listDishesDocument,
@@ -44,6 +44,21 @@ function createId(): string {
   return crypto.randomUUID();
 }
 
+function normalizeDish(dish: StoredDish): Dish {
+  return { ...dish, unit: dish.unit?.trim() || "份" };
+}
+
+function normalizeOrder(order: StoredOrder): Order {
+  return {
+    ...order,
+    photos: order.photos ?? [],
+    lines: order.lines.map((line) => ({
+      ...line,
+      unit: line.unit?.trim() || "份",
+    })),
+  };
+}
+
 async function readDocument() {
   const [categories, storedDishes, storedOrders, tags] = await Promise.all([
     categoriesTable.toArray(),
@@ -51,18 +66,8 @@ async function readDocument() {
     ordersTable.toArray(),
     tagsTable.toArray(),
   ]);
-  const dishes: Dish[] = storedDishes.map((dish) => ({
-    ...dish,
-    unit: dish.unit?.trim() || "份",
-  }));
-  const orders: Order[] = storedOrders.map((order) => ({
-    ...order,
-    photos: order.photos ?? [],
-    lines: order.lines.map((line) => ({
-      ...line,
-      unit: line.unit?.trim() || "份",
-    })),
-  }));
+  const dishes = storedDishes.map(normalizeDish);
+  const orders = storedOrders.map(normalizeOrder);
   return { categories, dishes, orders, tags };
 }
 
@@ -100,7 +105,13 @@ export function createIdbStore(): BbqStore {
       );
     },
     listCategories() {
-      return guard(async () => listCategoriesDocument(await readDocument()));
+      // 页面查询只读需要的表；完整文档仍供写入校验和备份使用。
+      return guard(async () =>
+        listCategoriesDocument({
+          ...emptyDocument(),
+          categories: await categoriesTable.toArray(),
+        }),
+      );
     },
     saveCategory(input) {
       return guard(async () => {
@@ -114,7 +125,12 @@ export function createIdbStore(): BbqStore {
       });
     },
     listDishes() {
-      return guard(async () => listDishesDocument(await readDocument()));
+      return guard(async () =>
+        listDishesDocument({
+          ...emptyDocument(),
+          dishes: (await dishesTable.toArray()).map(normalizeDish),
+        }),
+      );
     },
     saveDish(input) {
       return guard(() =>
@@ -135,14 +151,33 @@ export function createIdbStore(): BbqStore {
     },
     listOrders(businessDayKey) {
       return guard(async () =>
-        listOrdersDocument(await readDocument(), businessDayKey),
+        listOrdersDocument(
+          {
+            ...emptyDocument(),
+            orders: (
+              await ordersTable
+                .where("businessDayKey")
+                .equals(businessDayKey)
+                .toArray()
+            ).map(normalizeOrder),
+          },
+          businessDayKey,
+        ),
       );
     },
     listAllOrders() {
-      return guard(async () => listAllOrdersDocument(await readDocument()));
+      return guard(async () =>
+        listAllOrdersDocument({
+          ...emptyDocument(),
+          orders: (await ordersTable.toArray()).map(normalizeOrder),
+        }),
+      );
     },
     getOrder(id) {
-      return guard(async () => getOrderDocument(await readDocument(), id));
+      return guard(async () => {
+        const order = await ordersTable.get(id);
+        return order ? normalizeOrder(order) : null;
+      });
     },
     saveOrder(input) {
       return guard(() =>

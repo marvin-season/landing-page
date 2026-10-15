@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
-import { bbqStore } from "@/lib/bbq/idb-store";
 import type { BbqBackup } from "@/lib/bbq/types";
 import { BbqCompanion } from "./bbq-companion";
 import { bbqErrorMessage } from "./bbq-errors";
@@ -43,6 +42,7 @@ export function BbqSettings() {
     setMessage(null);
     setNotice(null);
     try {
+      const { bbqStore } = await import("@/lib/bbq/idb-store");
       const backup = await bbqStore.exportBackup({ includePhotos });
       downloadBackup(backup, includePhotos);
       setNotice(t`备份已生成，请在浏览器下载中查看`);
@@ -72,6 +72,7 @@ export function BbqSettings() {
     setNotice(null);
     setMessage(null);
     try {
+      const { bbqStore } = await import("@/lib/bbq/idb-store");
       await bbqStore.importBackup(parsed as BbqBackup);
       notifyBbqMenuChanged();
       setMessage(null);

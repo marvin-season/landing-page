@@ -3,6 +3,7 @@
 import { Alert, AlertDescription } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { motion, useReducedMotion } from "motion/react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -17,7 +18,17 @@ import { pageShellCls, pageTitleCls } from "./bbq-layout";
 import { bbqSearchDescription } from "./bbq-search-copy";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
-import { OrdersStatistics } from "./orders-statistics";
+
+const OrdersStatistics = dynamic(
+  () => import("./orders-statistics").then((module) => module.OrdersStatistics),
+  {
+    loading: () => (
+      <p role="status">
+        <Trans>读取全部时段数据中…</Trans>
+      </p>
+    ),
+  },
+);
 
 export function OrdersHome() {
   const { i18n } = useLingui();
@@ -135,7 +146,10 @@ export function OrdersHome() {
     }
   }
 
-  const statistics = summarizeOrdersByBusinessDay(allOrders ?? []);
+  const statistics =
+    homeView === "statistics"
+      ? summarizeOrdersByBusinessDay(allOrders ?? [])
+      : [];
 
   return (
     <div className={`${pageShellCls} overflow-hidden flex-1`}>

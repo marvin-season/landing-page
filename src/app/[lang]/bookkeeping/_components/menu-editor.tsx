@@ -196,6 +196,7 @@ function DishList({
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const [search, setSearch] = useState("");
   const [adding, setAdding] = useState(dishes.length === 0);
+  const [addFormRequested, setAddFormRequested] = useState(dishes.length === 0);
   const query = search.trim().toLocaleLowerCase();
   const matches = dishes.filter(
     (dish) =>
@@ -206,7 +207,11 @@ function DishList({
     <div className="flex flex-col gap-3">
       <details
         open={adding}
-        onToggle={(event) => setAdding(event.currentTarget.open)}
+        onToggle={(event) => {
+          setAdding(event.currentTarget.open);
+          // 首次展开才挂载表单，随后收起时保留未保存的输入。
+          if (event.currentTarget.open) setAddFormRequested(true);
+        }}
         className={`overflow-hidden rounded-xl bg-card ${detailsMotionCls}`}
       >
         <summary className={detailsSummaryCls}>
@@ -218,19 +223,21 @@ function DishList({
           <ChevronDown className={detailsChevronCls} aria-hidden="true" />
         </summary>
         <div className="min-h-0 overflow-clip">
-          <div className="p-2.5 border-t">
-            <p className="text-muted-foreground text-[11px] mb-2">
-              <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
-            </p>
-            <DishRow
-              key="new"
-              tags={tags}
-              onTagsChanged={onTagsChanged}
-              categoryId={categoryId}
-              onSaved={onSaved}
-              onError={onError}
-            />
-          </div>
+          {addFormRequested ? (
+            <div className="p-2.5 border-t">
+              <p className="text-muted-foreground text-[11px] mb-2">
+                <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
+              </p>
+              <DishRow
+                key="new"
+                tags={tags}
+                onTagsChanged={onTagsChanged}
+                categoryId={categoryId}
+                onSaved={onSaved}
+                onError={onError}
+              />
+            </div>
+          ) : null}
         </div>
       </details>
       <section className="flex flex-col gap-2">
