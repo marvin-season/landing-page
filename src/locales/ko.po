@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:65
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:65
 msgid " 休息"
 msgstr " 휴식"
 
@@ -21,76 +21,77 @@ msgstr " 휴식"
 msgid ", I'am skilled in<0> React & Next.js </0>TypeScript, Tailwind CSS, Shadcn UI."
 msgstr ", <0>React & Next.js</0> TypeScript, Tailwind CSS, Shadcn UI에 능숙합니다."
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:212
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:170
 msgid "，{count} 条记录"
 msgstr ", 기록 수: {count}"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:212
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:170
 msgid "，已选中"
 msgstr ", 선택됨"
 
 #. placeholder {0}: statistics.length
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:99
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:112
 msgid "{0} 个时段 · {totalOrders} 笔记录 · 已完成 {settledOrders} 笔"
 msgstr "기간: {0} · 기록: {totalOrders} · 완료: {settledOrders}"
 
 #. placeholder {0}: order.seat
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:337
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:481
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:343
 msgid "{0} 号座"
 msgstr "좌석 {0}번"
 
 #. placeholder {0}: order.photos.length
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:77
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:82
 msgid "{0} 张"
 msgstr "사진 {0}장"
 
 #. placeholder {0}: item.orderCount
 #. placeholder {0}: item.settledOrderCount
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:208
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:216
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:240
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:248
 msgid "{0} 条"
 msgstr "{0}건"
 
 #. placeholder {0}: item.orderCount
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:391
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:434
 msgid "{0} 条记录"
 msgstr "기록 {0}건"
 
 #. placeholder {0}: availableDishes.length
 #. placeholder {0}: order.lines.length
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:417
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:360
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:522
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:366
 msgid "{0} 项"
 msgstr "항목 {0}개"
 
 #. placeholder {0}: lines.length
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:708
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:668
 msgid "{0} 项 · {itemCount} 件"
 msgstr "항목 {0}개 · 수량 {itemCount}"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:218
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:176
 msgid "{count} 条"
 msgstr "{count}건"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:437
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:492
 msgid "{date} 休息"
 msgstr "{date} 휴식"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-i18n.ts:22
+#: src/app/[lang]/bookkeeping/_components/bbq-i18n.ts:36
 msgid "{date} 休息时段"
 msgstr "{date} 휴식 시간대"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-i18n.ts:23
+#: src/app/[lang]/bookkeeping/_components/bbq-i18n.ts:37
 msgid "{date} 记账时段"
 msgstr "{date} 기록 시간대"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:503
-msgid "{itemCount} 件"
-msgstr "수량 {itemCount}"
+#: src/app/[lang]/bookkeeping/_components/bbq-i18n.ts:16
+msgid "{value} kcal"
+msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/bbq-i18n.ts:10
-msgid "{value} kcal（部分）"
-msgstr "{value} kcal (일부)"
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:312
+msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
+msgstr "자주 쓰는 항목 3개와 최근 3일간의 기록 4개입니다. 기존 데이터를 유지하며 이미 가져온 예시는 중복 추가하지 않습니다."
 
 #: src/app/[lang]/resume/layout.tsx:31
 msgid "A comprehensive overview of my work experience, projects, and technical expertise."
@@ -100,7 +101,7 @@ msgstr "경력, 프로젝트, 기술 역량을 한눈에 볼 수 있는 소개�
 msgid "A conversation with your document"
 msgstr "문서와 대화하기"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:17
+#: src/app/[lang]/(home)/data/home-data.tsx:15
 msgid "A little mischief, a lot of joy"
 msgstr "약간의 장난, 가득한 즐거움"
 
@@ -108,7 +109,7 @@ msgstr "약간의 장난, 가득한 즐거움"
 msgid "A Mastra knowledge agent streams the reply; throttle mode keeps conversations from overlapping"
 msgstr "Mastra 지식 에이전트가 스트리밍으로 답변합니다. 스로틀 모드로 대화가 겹치지 않게 합니다"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:20
+#: src/app/[lang]/(home)/data/home-data.tsx:18
 #: src/app/[lang]/layout.tsx:40
 msgid "A mischievous five-year-old who turns everyday life into an adventure."
 msgstr "평범한 하루를 모험으로 바꾸는 장난기 가득한 다섯 살."
@@ -117,11 +118,11 @@ msgstr "평범한 하루를 모험으로 바꾸는 장난기 가득한 다섯 �
 msgid "A selected passage can be translated or summarized without quoting it into the composer first. The knowledge agent receives only the excerpt and the instruction."
 msgstr "선택한 문장을 입력창에 먼저 인용하지 않아도 번역하거나 요약할 수 있습니다. 지식 에이전트는 발췌문과 지시만 받습니다."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:66
+#: src/app/[lang]/(home)/data/home-data.tsx:146
 msgid "About me in detail"
 msgstr "자세한 소개"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:58
+#: src/app/[lang]/(home)/data/home-data.tsx:138
 msgid "Agent UI"
 msgstr "에이전트 UI"
 
@@ -133,7 +134,7 @@ msgstr "AI PC"
 msgid "AI reply"
 msgstr "AI 답변"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:150
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:150
 msgid "Android：在 Chrome 菜单中选择“添加到主屏幕”或“安装应用”。"
 msgstr "Android: Chrome 메뉴에서 '홈 화면에 추가' 또는 '앱 설치'를 선택하세요."
 
@@ -148,6 +149,10 @@ msgstr "이 인용문에 대해 질문하기…"
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:337
 msgid "Ask about your document…"
 msgstr "문서에 대해 질문하기…"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:50
+msgid "Ask, learn, and create with AI."
+msgstr "AI와 함께 묻고, 배우고, 만들어 보세요."
 
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:248
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:272
@@ -192,6 +197,10 @@ msgstr "업데이트 기록"
 msgid "Chat"
 msgstr "채팅"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:59
+msgid "Chat with AI"
+msgstr "AI와 대화하기"
+
 #: src/app/[lang]/changelog/_components/changelog-data.tsx:40
 msgid "Choose English, Japanese, Korean, or Simplified Chinese as the translation target"
 msgstr "번역 대상으로 영어, 일본어, 한국어, 간체 중국어를 선택할 수 있습니다"
@@ -204,7 +213,7 @@ msgstr "PDF 인용을 클릭하면 해당 페이지로 돌아가 원문이 강�
 msgid "Conversations can start with a sample citation for demos"
 msgstr "데모용 샘플 인용으로 대화를 시작할 수 있습니다"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:13
+#: src/app/[lang]/(home)/data/home-data.tsx:14
 #: src/app/[lang]/layout.tsx:32
 msgid "Crayon Shin-chan"
 msgstr "짱구는 못말려"
@@ -227,11 +236,11 @@ msgstr "기본 스로틀 모드이며 변경할 수 없습니다"
 msgid "Default workspace"
 msgstr "기본 작업 공간"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:91
+#: src/app/[lang]/(home)/data/home-data.tsx:171
 msgid "Design is not just what it looks like. Design is how it works."
 msgstr "디자인은 겉모습만이 아닙니다. 디자인은 작동 방식입니다."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:74
+#: src/app/[lang]/(home)/data/home-data.tsx:154
 msgid "Design System & Component Libs"
 msgstr "디자인 시스템 & 컴포넌트 라이브러리"
 
@@ -326,7 +335,7 @@ msgstr "문서 읽기 개요"
 msgid "Document workspace"
 msgstr "문서 작업 공간"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:47
+#: src/app/[lang]/(home)/data/home-data.tsx:114
 msgid "Documentation on frontend development, AI applications, and engineering practices"
 msgstr "프론트엔드 개발, AI 애플리케이션, 엔지니어링 실천에 대한 문서"
 
@@ -350,9 +359,17 @@ msgstr "Enter로 전송 · Shift + Enter로 줄바꿈 · @로 인용"
 msgid "Enterprise-level AI application one-stop construction and management platform that fully integrates model, data, application, and computing power."
 msgstr "모델, 데이터, 애플리케이션, 컴퓨팅 파워를 통합한 엔터프라이즈 AI 애플리케이션 구축·관리 플랫폼."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:67
+#: src/app/[lang]/(home)/data/home-data.tsx:147
 msgid "Experience, projects, and personal profile"
 msgstr "경력, 프로젝트, 개인 프로필"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:47
+msgid "Explore AI"
+msgstr "AI 탐색하기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:52
+msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
+msgstr "AI 대화와 창작 도구로 지식을 탐색하고 질문을 풀어 가며 아이디어를 유용한 결과물로 만들어 보세요."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:59
 msgid "ExpressJs, React18, Prisma, PostgresSQL, RAG, TailwindCSS"
@@ -365,6 +382,10 @@ msgstr "모든 인용을 원문 맥락에서 찾기"
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:211
 msgid "Fit to width"
 msgstr "너비에 맞추기"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:82
+msgid "Gentle, curious, and a little playful"
+msgstr "다정하고 호기심 많고, 조금은 장난스러운"
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:94
 msgid "Health management software providing health management services for users."
@@ -406,6 +427,10 @@ msgstr "베이징 헬스 플래닛, 선전 자오리 테크놀로지, 디지털�
 msgid "I pulled a passage from this document. Click it to highlight the original text."
 msgstr "이 문서에서 한 구절을 가져왔습니다. 클릭하면 원문이 강조됩니다."
 
+#: src/app/[lang]/(home)/data/home-data.tsx:48
+msgid "Ideas start with curiosity"
+msgstr "호기심에서 시작되는 아이디어"
+
 #: src/app/[lang]/resume/hooks/use-experience.ts:99
 msgid "Implemented member information statistics functionality"
 msgstr "회원 정보 통계 기능을 구현했습니다"
@@ -438,7 +463,7 @@ msgstr "대규모 언어 모델 기반 지능형 Q&A 시스템으로, 클라우�
 msgid "Introduction"
 msgstr "소개"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:145
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:145
 msgid "iPhone / iPad：在 Safari 中打开，点击分享 → 添加到主屏幕。"
 msgstr "iPhone / iPad: Safari에서 열고 공유 → 홈 화면에 추가를 누르세요."
 
@@ -482,11 +507,11 @@ msgstr "중요한 문장을 남겨 두기"
 msgid "Key Responsibilities"
 msgstr "주요 업무"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:45
+#: src/app/[lang]/(home)/data/home-data.tsx:112
 msgid "Knowledge"
 msgstr "지식 베이스"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:90
+#: src/app/[lang]/(home)/data/home-data.tsx:170
 msgid "Leveraging less data to generate greater insights."
 msgstr "더 적은 데이터로 더 큰 통찰을 만듭니다."
 
@@ -502,35 +527,42 @@ msgstr "미리보기 불러오는 중…"
 msgid "Locate a quote without storing selection geometry"
 msgstr "선택 영역 좌표를 저장하지 않고 인용 위치 찾기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:145
-#: src/app/[lang]/admin/bbq/layout.tsx:25
-#: src/app/[lang]/admin/bbq/layout.tsx:37
-#: src/app/[lang]/admin/bbq/layout.tsx:42
-#: src/app/[lang]/admin/bbq/layout.tsx:46
+#: src/app/[lang]/(home)/data/home-data.tsx:92
+#: src/app/[lang]/(home)/data/home-data.tsx:125
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:158
+#: src/app/[lang]/bookkeeping/layout.tsx:28
+#: src/app/[lang]/bookkeeping/layout.tsx:40
+#: src/app/[lang]/bookkeeping/layout.tsx:45
+#: src/app/[lang]/bookkeeping/layout.tsx:49
 msgid "Loopy 记账"
 msgstr "Loopy 가계부"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:15
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
+#: src/app/[lang]/bookkeeping/layout.tsx:18
 msgid "Loopy 记账 · 支出与热量统计"
 msgstr "Loopy 가계부 · 지출 및 칼로리 통계"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-search-copy.ts:3
+#: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
 msgid "Loopy 记账：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
 msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:67
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
 msgid "Loopy 记账主导航"
 msgstr "Loopy 가계부 기본 탐색"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:59
+#: src/app/[lang]/(home)/data/home-data.tsx:139
 msgid "Main chat flow powered by Mastra"
 msgstr "Mastra가 구동하는 주요 채팅 흐름"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:83
+msgid "Make room for small joys every day."
+msgstr "매일 작은 기쁨을 위한 여유를 가져요."
 
 #: src/app/[lang]/resume/hooks/use-experience.ts:24
 msgid "May 2025 - Present"
 msgstr "2025년 5월 - 현재"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:50
+#: src/app/[lang]/(home)/data/home-data.tsx:69
 msgid "Meet Shin-chan"
 msgstr "짱구를 만나보세요"
 
@@ -542,7 +574,7 @@ msgstr "메시지"
 msgid "My professional experience and skills"
 msgstr "전문 경력과 기술"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:74
+#: src/app/[lang]/(home)/_components/home-content.tsx:20
 msgid "Navigation"
 msgstr "탐색"
 
@@ -578,11 +610,11 @@ msgstr "계정 없이 PDF 또는 Markdown을 여세요. 문장을 선택해 문�
 msgid "Open Docs workspace"
 msgstr "문서 작업 공간 열기"
 
-#: src/app/[lang]/(home)/_components/index.tsx:129
+#: src/app/[lang]/(home)/_components/index.tsx:110
 msgid "Open page"
 msgstr "페이지 열기"
 
-#: src/app/[lang]/(home)/_components/index.tsx:129
+#: src/app/[lang]/(home)/_components/index.tsx:110
 msgid "Open reference"
 msgstr "참고 자료 열기"
 
@@ -629,7 +661,7 @@ msgstr "PDF 또는 Markdown 파일을 업로드하세요."
 msgid "Previous page"
 msgstr "이전 페이지"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:82
+#: src/app/[lang]/(home)/data/home-data.tsx:162
 #: src/app/[lang]/changelog/_components/changelog-content.tsx:24
 #: src/app/[lang]/changelog/page.tsx:7
 msgid "Product updates"
@@ -695,11 +727,13 @@ msgstr "교체"
 msgid "Resume"
 msgstr "이력서"
 
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:383
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:546
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:308
 msgid "Retry"
 msgstr "다시 시도"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
+#: src/app/[lang]/(home)/data/home-data.tsx:155
 msgid "Reusable UI components and design references"
 msgstr "재사용 가능한 UI 컴포넌트와 디자인 참고"
 
@@ -736,11 +770,7 @@ msgstr "선택 인식 AI"
 msgid "Send message"
 msgstr "메시지 보내기"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:78
-msgid "Sentences"
-msgstr "문장"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:18
+#: src/app/[lang]/(home)/data/home-data.tsx:16
 msgid "Shinnosuke Nohara"
 msgstr "노하라 신노스케"
 
@@ -755,6 +785,10 @@ msgstr "요약"
 #: src/app/[lang]/knowledge/_components/document/preview.tsx:315
 msgid "Summarize this passage."
 msgstr "이 문장을 간결하게 요약하세요."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:81
+msgid "Take it easy, enjoy the little things"
+msgstr "천천히, 작은 행복을 즐겨요"
 
 #: src/app/[lang]/resume/_components/experience.tsx:42
 msgid "Tech Stack"
@@ -809,7 +843,7 @@ msgstr "이 PDF를 열 수 없습니다. 다른 파일을 시도하세요."
 msgid "This PDF is password protected."
 msgstr "이 PDF는 비밀번호로 보호되어 있습니다."
 
-#: src/app/[lang]/(home)/data/home-data.tsx:83
+#: src/app/[lang]/(home)/data/home-data.tsx:163
 msgid "Three iterations of the Docs workspace"
 msgstr "Docs 작업 공간의 세 차례 업데이트"
 
@@ -879,7 +913,7 @@ msgstr "번역 대상"
 msgid "Try a sample document"
 msgstr "샘플 문서 체험하기"
 
-#: src/app/[lang]/(home)/_components/home-content.tsx:36
+#: src/app/[lang]/(home)/_components/home-hero.tsx:36
 msgid "Try Knowledge"
 msgstr "지식 베이스 체험하기"
 
@@ -909,7 +943,11 @@ msgstr "Vue2, UniApp, Vuex, VantUI"
 msgid "Web Developer"
 msgstr "웹 개발자"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:25
+#: src/app/[lang]/(home)/data/home-data.tsx:85
+msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
+msgstr "루피의 포근한 공간에 오신 것을 환영해요. 잠시 속도를 늦추고 새로운 것을 탐색하며 미소 짓게 하는 작은 순간들을 기록해 보세요."
+
+#: src/app/[lang]/(home)/data/home-data.tsx:23
 msgid "With his family and friends, Shin-chan fills ordinary days with playful antics, unexpected surprises, and plenty of laughter."
 msgstr "가족과 친구들과 함께, 짱구는 장난과 뜻밖의 놀라움, 웃음으로 평범한 하루를 채웁니다."
 
@@ -929,6 +967,10 @@ msgstr "나"
 msgid "You can contact me via:<0><1>mrvnseason@gmail.com</1><2>or phone: +86 15623192717</2></0>"
 msgstr "연락처:<0><1>mrvnseason@gmail.com</1><2>또는 전화: +86 15623192717</2></0>"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:49
+msgid "Your AI workspace"
+msgstr "나만의 AI 작업 공간"
+
 #: src/app/[lang]/knowledge/_components/document/pdf/preview.tsx:221
 msgid "Zoom in"
 msgstr "확대"
@@ -937,1147 +979,1093 @@ msgstr "확대"
 msgid "Zoom out"
 msgstr "축소"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:162
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:166
 msgid "一顿饭、一杯咖啡，都可以记在这里。"
 msgstr "식사 한 끼, 커피 한 잔도 여기에 기록하세요."
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:143
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:101
 msgid "上个月"
 msgstr "이전 달"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:169
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:127
 msgid "下个月"
 msgstr "다음 달"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:26
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:473
+msgid "不分组"
+msgstr "그룹 없음"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:269
+msgid "不含图片"
+msgstr "이미지 제외"
+
+#: src/app/[lang]/(home)/data/home-data.tsx:128
+#: src/app/[lang]/bookkeeping/layout.tsx:29
 msgid "个人记账"
 msgstr "개인 가계부"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:627
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:226
+msgid "主题"
+msgstr "테마"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:407
+msgid "仅移除图片，保留账目"
+msgstr "이미지만 삭제하고 기록 유지"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:800
 msgid "从相册选择"
 msgstr "앨범에서 선택"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:53
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:64
 msgid "从第一笔开始"
 msgstr "첫 기록부터 시작하세요"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:546
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:712
 msgid "份"
 msgstr "인분"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:190
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:198
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:148
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:230
 msgid "休息时段"
 msgstr "휴식 시간대"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-support-card.tsx:55
-msgid "作者的微信收款码"
-msgstr "개발자의 WeChat 결제 QR 코드"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:603
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
 msgid "保存"
 msgstr "저장"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:128
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:248
 msgid "保存一份记录和常用项目，换设备也能带走。"
 msgstr "기록과 자주 쓰는 항목을 백업해 다른 기기로 옮기세요."
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:603
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:750
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:889
 msgid "保存中…"
 msgstr "저장 중…"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:752
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:891
 msgid "保存修改"
 msgstr "변경 사항 저장"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:754
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:893
 msgid "保存订单"
 msgstr "주문 저장"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:755
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:894
 msgid "保存记录"
 msgstr "기록 저장"
 
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:84
+msgid "保护本机存储"
+msgstr ""
+
 #. placeholder {0}: groupingEnabled ? t`订单` : t`记录`
 #. placeholder {1}: order.seq
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:331
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
 msgid "修改{0} #{1}"
 msgstr "{0} #{1} 수정"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:132
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:137
 msgid "修改记录"
 msgstr "기록 수정"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:437
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:574
 msgid "先添几个常用项目"
 msgstr "자주 쓰는 항목부터 추가하세요"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:86
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:86
 msgid "全部历史记录 · 仅保存在这台设备"
 msgstr "전체 기록 · 이 기기에만 저장됨"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:134
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:267
+msgid "全部标签"
+msgstr "모든 태그"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:79
+msgid "关闭"
+msgstr "닫기"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:134
 msgid "关闭安装说明"
 msgstr "설치 안내 닫기"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:58
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar.tsx:57
 msgid "关闭日历"
 msgstr "달력 닫기"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:174
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:179
 msgid "关闭照片预览"
 msgstr "사진 미리보기 닫기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:179
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:208
 msgid "最近时段在前"
 msgstr "최근 시간대부터 표시"
 
 #. placeholder {0}: line.name
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:551
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:726
 msgid "减少 {0} 数量"
 msgstr "{0} 수량 줄이기"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:21
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:35
 msgid "分类不存在"
 msgstr "분류를 찾을 수 없습니다"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:729
-msgid "切换记录状态"
-msgstr "기록 상태 전환"
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:444
+msgid "分组"
+msgstr "그룹"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:479
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:91
+msgid "分组名称"
+msgstr "그룹 이름"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
+msgid "分组名称不能为空，最多 10 个字符"
+msgstr "그룹 이름은 1~10자로 입력해 주세요"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
+msgid "分组已存在"
+msgstr "이미 있는 그룹입니다"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
+msgid "分组设置不正确"
+msgstr "그룹 설정이 올바르지 않습니다"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:632
 msgid "删除"
 msgstr "삭제"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:467
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:620
 msgid "删除 {0}"
 msgstr "{0} 삭제"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:384
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:529
 msgid "删除“{0}”？已有记录中的项目明细会保留。"
 msgstr "'{0}'을(를) 삭제할까요? 기존 기록의 항목 내역은 유지됩니다."
 
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:131
+msgid "删除分组 {group}"
+msgstr "{group} 그룹 삭제"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:150
+msgid "删除分组不会影响已有记录。"
+msgstr "그룹을 삭제해도 기존 기록에는 영향이 없습니다."
+
+#. placeholder {0}: tag.name
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:164
+msgid "删除标签 {0}"
+msgstr "태그 {0} 삭제"
+
 #. placeholder {0}: index + 1
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:665
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:838
 msgid "删除第 {0} 张照片"
 msgstr "사진 {0} 삭제"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:685
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:858
 msgid "删除这条记录"
 msgstr "이 기록 삭제"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:289
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:369
 msgid "删除这条记录？"
 msgstr "이 기록을 삭제할까요?"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:532
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:499
+msgid "到设置中添加分组"
+msgstr "설정에서 그룹 추가"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:280
+msgid "包含图片"
+msgstr "이미지 포함"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:698
 msgid "单价（选填，默认 0 元）"
 msgstr "단가 (선택, 기본값 0위안)"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:524
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:690
 msgid "单价（选填）"
 msgstr "단가 (선택)"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:545
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:711
 msgid "单位（选填，默认份）"
 msgstr "단위 (선택, 기본값 份)"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:538
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:704
 msgid "单位（选填）"
 msgstr "단위 (선택)"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:582
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:583
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:21
+msgid "去备份"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:225
+msgid "取消"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:748
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:749
 msgid "取消编辑"
 msgstr "수정 취소"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:110
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:123
 msgid "变化趋势"
 msgstr "변화 추이"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:337
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:380
 msgid "各时段已完成热量趋势（kcal）"
 msgstr "시간대별 완료 칼로리 추이 (kcal)"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:334
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:377
 msgid "各时段已完成金额趋势"
 msgstr "시간대별 완료 금액 추이"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:336
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:379
 msgid "各时段记录数趋势"
 msgstr "시간대별 기록 수 추이"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:495
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:648
 msgid "名称"
 msgstr "이름"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:13
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:320
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:27
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:458
 msgid "名称不能为空"
 msgstr "이름을 입력하세요"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:565
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:85
+msgid "名称最多 10 个字符，支持任意文字和符号。"
+msgstr "최대 10자이며 모든 문자와 기호를 사용할 수 있습니다."
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:731
 msgid "启用"
 msgstr "사용"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:366
-msgid "启用分组（打包或座号）"
-msgstr "그룹 사용 (포장 또는 좌석)"
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:64
+msgid "启用分组"
+msgstr "그룹 사용"
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:238
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:196
 msgid "回到当前时段"
 msgstr "현재 시간대로"
 
 #. placeholder {0}: line.name
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:569
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:744
 msgid "增加 {0} 数量"
 msgstr "{0} 수량 늘리기"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:120
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:125
 msgid "处理中…"
 msgstr "처리 중…"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:608
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:627
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:781
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:800
 msgid "处理照片中…"
 msgstr "사진 처리 중…"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:78
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:241
+msgid "备份&还原"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:115
 msgid "备份已导入，记录和常用项目已更新"
 msgstr "백업을 가져와 기록과 자주 쓰는 항목을 업데이트했습니다"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:48
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:82
 msgid "备份已生成，请在浏览器下载中查看"
 msgstr "백업이 생성되었습니다. 브라우저 다운로드를 확인하세요"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:11
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:63
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:25
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:102
 msgid "备份文件不正确"
 msgstr "올바르지 않은 백업 파일입니다"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:125
-msgid "备份账本"
-msgstr "가계부 백업"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:519
-msgid "如 300 / -200"
-msgstr "예: 300 / -200"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-support-card.tsx:48
-msgid "如果这个小工具对你有帮助，欢迎自愿打赏，支持开源维护。你的使用和反馈同样珍贵。"
-msgstr "이 작은 도구가 도움이 되었다면 자발적인 후원으로 오픈 소스 유지 관리를 응원해 주세요. 사용해 주시는 것과 의견을 나누는 것만으로도 큰 힘이 됩니다."
-
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:126
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:126
 msgid "安装Loopy 记账"
 msgstr "Loopy 가계부 설치"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:118
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:118
 msgid "安装应用"
 msgstr "앱 설치"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:122
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:127
 msgid "完成记录"
 msgstr "기록 완료"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:188
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:341
 msgid "导入中…"
 msgstr "가져오는 중…"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:163
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:300
 msgid "导入完整备份"
 msgstr "전체 백업 가져오기"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:188
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:309
+msgid "导入示例数据"
+msgstr "예시 데이터 가져오기"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:341
 msgid "导出中…"
 msgstr "내보내는 중…"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:145
-msgid "导出备份（不含照片）"
-msgstr "백업 내보내기 (사진 제외)"
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:257
+msgid "导出图片"
+msgstr "이미지 내보내기"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:154
-msgid "导出备份（包含照片）"
-msgstr "백업 내보내기 (사진 포함)"
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:291
+msgid "导出备份"
+msgstr "백업 내보내기"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:592
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:765
 msgid "小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张"
 msgstr "영수증이나 사진, 최대 {MAX_ORDER_PHOTOS}장"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:417
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:287
+msgid "展开查看全部项目"
+msgstr "펼쳐서 모든 항목 보기"
+
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:460
 msgid "左右滑动查看全部时段"
 msgstr "좌우로 밀어 모든 시간대 보기"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:429
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:173
+msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
+msgstr "기록 {orderCount}개와 이미지 {photoCount}개를 삭제했습니다"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:48
+msgid "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:582
 msgid "已启用"
 msgstr "사용 중"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:100
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:72
+msgid "已启用持久存储。清除浏览器数据仍会删除账本，请定期导出备份。"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:100
 msgid "已安装到主屏幕"
 msgstr "홈 화면에 추가됨"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:723
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:27
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:134
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:213
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:27
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:138
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:245
 msgid "已完成"
 msgstr "완료"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:93
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:93
 msgid "已完成合计"
 msgstr "완료 합계"
 
-#. placeholder {0}: formatCalories(i18n, item.settledCalories)
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:229
+#. placeholder {0}: formatCalories(i18n, item.settledCalories, { compact: true, })
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:267
 msgid "已完成热量 {0}"
 msgstr "완료 칼로리 {0}"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:137
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:221
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:153
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:253
 msgid "已完成金额"
 msgstr "완료 금액"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:28
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:172
+msgid "已移除 {photoCount} 张图片，账目已保留"
+msgstr "이미지 {photoCount}개를 삭제하고 기록은 유지했습니다"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:28
 msgid "常用"
 msgstr "자주 쓰는"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:121
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:413
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:144
 msgid "常用项目"
 msgstr "자주 쓰는 항목"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:71
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:112
 msgid "常用项目已保存"
 msgstr "자주 쓰는 항목을 저장했습니다"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:125
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:148
 msgid "常记的放这里 · {listedCount} 项可选"
 msgstr "자주 쓰는 항목을 모아두세요 · {listedCount}개 선택 가능"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:15
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:29
 msgid "座号只能空着或选 1 到 8"
 msgstr "좌석을 비워두거나 1~8 중 선택하세요"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:339
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:415
 msgid "开单"
 msgstr "주문 시작"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:82
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:54
+msgid "开发模式不启用离线缓存，请在正式部署后使用。"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:371
+msgid "开始日期"
+msgstr "시작 날짜"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:83
 msgid "当前为休息时段，06:00 后可记账"
 msgstr "현재 휴식 시간입니다. 06:00 이후 기록할 수 있습니다"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:42
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:42
 msgid "当前时段"
 msgstr "현재 시간대"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:376
-msgid "当前选择 {seat} 号座"
-msgstr "좌석 {seat}번 선택됨"
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:55
+msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
+msgstr ""
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:375
-msgid "当前选择打包"
-msgstr "포장 선택됨"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-support-card.tsx:62
-msgid "微信扫码打赏"
-msgstr "WeChat으로 스캔하여 후원하기"
-
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:123
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:128
 msgid "恢复进行中"
 msgstr "진행 중으로 변경"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:209
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:284
 msgid "我的常用"
 msgstr "내 즐겨찾기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:148
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:161
 msgid "我的日常账本"
 msgstr "나의 일상 가계부"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:391
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:336
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:170
+msgid "所选范围内没有需要清理的数据"
+msgstr "선택한 기간에 정리할 데이터가 없습니다"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:480
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:342
 msgid "打包"
 msgstr "포장"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:42
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:42
 msgid "打开日历"
 msgstr "달력 열기"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:67
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:107
 msgid "把备份按编号合并进当前记账数据？相同编号的数据会更新。"
 msgstr "번호를 기준으로 백업을 현재 가계부에 병합할까요? 번호가 같은 데이터는 업데이트됩니다."
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:163
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:167
 msgid "把记录标为完成，就会计入上面的合计。"
 msgstr "기록을 완료로 표시하면 위 합계에 포함됩니다."
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:608
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:781
 msgid "拍照"
 msgstr "사진 촬영"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:360
-msgid "按座号分组"
-msgstr "좌석별 그룹화"
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:260
+msgid "按标签筛选"
+msgstr "태그로 필터링"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:551
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:365
+msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
+msgstr "기록 날짜로 필터링하며 시작일과 종료일을 포함합니다. 기록 또는 기록에 첨부된 사진만 삭제되며, 자주 쓰는 항목과 태그 데이터는 삭제되지 않습니다."
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:717
 msgid "排序"
 msgstr "정렬 순서"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:559
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:725
 msgid "排序（数字越大越靠前）"
 msgstr "정렬 순서 (큰 숫자 우선)"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:329
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:467
 msgid "排序要是整数"
 msgstr "정렬 순서는 정수여야 합니다"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:215
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:302
 msgid "搜索已有项目…"
 msgstr "기존 항목 검색…"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:425
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:557
 msgid "搜索项目名称…"
 msgstr "항목 이름 검색…"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:27
+#: src/app/[lang]/(home)/data/home-data.tsx:128
+#: src/app/[lang]/bookkeeping/layout.tsx:30
 msgid "支出统计"
 msgstr "지출 통계"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-support-card.tsx:34
+#: src/app/[lang]/bookkeeping/_components/bbq-support-card.tsx:19
 msgid "支持开源"
 msgstr "오픈 소스 응원하기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:346
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:352
 msgid "收起"
 msgstr "접기"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:200
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:453
 msgid "放到主屏幕"
 msgstr "홈 화면에 추가"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:560
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:726
 msgid "数字越大越靠前"
 msgstr "숫자가 클수록 앞에 표시됩니다"
 
-#: src/app/[lang]/admin/bbq/orders/new/page.tsx:12
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:20
+msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
+msgstr "데이터는 현재 기기에만 저장됩니다. 데이터가 손실되지 않도록 앱을 삭제하기 전에 백업해 주세요."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
+#: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
 msgid "新增记录 · Loopy 记账"
 msgstr "기록 추가 · Loopy 가계부"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:333
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:410
 msgid "新建订单"
 msgstr "새 주문"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:504
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:67
+msgid "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:657
 msgid "新项目"
 msgstr "새 항목"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:28
+#: src/app/[lang]/bookkeeping/layout.tsx:31
 msgid "日常消费"
 msgstr "일일 지출"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:334
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:340
 msgid "日常记账"
 msgstr "일상 기록"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:234
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:331
 msgid "早餐、咖啡、跑步，从常记的开始。"
 msgstr "아침 식사, 커피, 달리기부터 기록해 보세요."
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:173
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:176
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:198
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:205
 msgid "时段明细"
 msgstr "시간대별 내역"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:57
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:57
 msgid "明细"
 msgstr "내역"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:270
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:313
 msgid "暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。"
 msgstr "칼로리 데이터가 없습니다. 자주 쓰는 항목에 칼로리를 입력하고 새 기록을 완료하세요."
 
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:228
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:186
 msgid "有记录的日期显示记录数"
 msgstr "기록이 있는 날짜에 건수가 표시됩니다"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:429
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:582
 msgid "未启用"
 msgstr "사용 안 함"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-i18n.ts:7
-msgid "未记录"
-msgstr "미기록"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:6
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:9
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:6
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:23
 msgid "本机数据库打不开"
 msgstr "로컬 데이터베이스를 열 수 없습니다"
 
-#: src/app/[lang]/admin/bbq/orders/[id]/page.tsx:15
+#: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:21
 msgid "查看和修改消费记录、数量、完成状态与留存照片，核对金额及热量。"
 msgstr "지출, 수량, 완료 상태와 사진을 확인·수정하고 금액과 칼로리를 확인하세요."
 
 #. placeholder {0}: index + 1
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:86
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:91
 msgid "查看第 {0} 张留存照片"
 msgstr "저장된 사진 {0} 보기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:42
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:42
 msgid "查看记录"
 msgstr "기록 보기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:193
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:225
 msgid "查看记录 →"
 msgstr "기록 보기 →"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:518
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:662
+msgid "标签"
+msgstr "태그"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:19
+msgid "标签不存在，请重新选择"
+msgstr "태그가 없습니다. 다시 선택해 주세요"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:17
+msgid "标签仍有项目或历史明细使用，无法删除"
+msgstr "이 태그는 항목이나 이전 내역에서 사용 중이므로 삭제할 수 없습니다"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:198
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:199
+msgid "标签名称"
+msgstr "태그 이름"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:21
+msgid "标签已存在"
+msgstr "이미 존재하는 태그입니다"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:50
+msgid "正在准备离线资源，请保持联网…"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:684
 msgid "每单位热量（kcal，选填）"
 msgstr "단위당 칼로리 (kcal, 선택)"
 
-#. placeholder {0}: formatYuan(averagePerPeriod)
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:114
+#. placeholder {0}: formatStatisticYuan(i18n, averagePerPeriod)
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:130
 msgid "每时段平均已完成金额 {0}"
 msgstr "시간대별 평균 완료 금액 {0}"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:229
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:247
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:301
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:319
 msgid "每条记录最多留存 {MAX_ORDER_PHOTOS} 张照片"
 msgstr "기록당 최대 {MAX_ORDER_PHOTOS}장의 사진을 저장할 수 있습니다"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:440
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:577
 msgid "比如早餐、咖啡，或一次跑步。"
 msgstr "예를 들어 아침 식사, 커피 또는 달리기."
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:224
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:453
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:318
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:595
 msgid "没有匹配的项目，请换个关键词"
 msgstr "일치하는 항목이 없습니다. 다른 검색어를 입력하세요"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:25
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:316
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:39
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:396
 msgid "没有找到这条记录"
 msgstr "기록을 찾을 수 없습니다"
 
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:88
+msgid "浏览器暂未授予持久存储，请继续定期导出备份。"
+msgstr ""
+
 #. placeholder {0}: dish.name
 #. placeholder {1}: selectedQuantities.get(dish.id) ?? 0
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:463
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:610
 msgid "添加 {0}，已选 {1} 件"
 msgstr "{0} 추가, 선택 수량: {1}"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:203
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:109
+msgid "添加分组"
+msgstr "그룹 추가"
+
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:146
+msgid "添加分组后，即可在记账时选择。"
+msgstr "그룹을 추가하면 기록할 때 선택할 수 있습니다."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:456
 msgid "添加到主屏幕，方便下次打开记账。"
 msgstr "홈 화면에 추가하면 다음에 쉽게 열 수 있습니다."
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:141
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:141
 msgid "添加到主屏幕后，可通过专属图标直接打开记账页面。"
 msgstr "홈 화면에 추가한 전용 아이콘으로 가계부를 바로 여세요."
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:186
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:444
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:243
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:586
 msgid "添加常用项目"
 msgstr "자주 쓰는 항목 추가"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:603
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:181
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:214
+msgid "添加标签"
+msgstr "태그 추가"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
 msgid "添加项目"
 msgstr "항목 추가"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-search.tsx:37
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:440
+msgid "清理中…"
+msgstr "정리 중…"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:395
+msgid "清理内容"
+msgstr "삭제할 데이터"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:423
+msgid "清理后无法撤销，建议先导出包含图片的备份。"
+msgstr "삭제 후에는 되돌릴 수 없습니다. 먼저 이미지가 포함된 백업을 내보내세요."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:440
+msgid "清理所选范围"
+msgstr "선택한 기간 정리"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:351
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:362
+msgid "清理瘦身"
+msgstr "저장 공간 정리"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-search.tsx:37
 msgid "清空搜索"
 msgstr "검색 지우기"
 
 #. placeholder {0}: formatCalories(i18n, summarizeCalories([line]))
 #. placeholder {0}: formatCalories(i18n, summarizeCalories(lines))
 #. placeholder {0}: formatCalories(i18n, summarizeCalories(order.lines))
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:37
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:56
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:537
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:714
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:99
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:39
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:61
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:672
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:712
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:99
 msgid "热量 {0}"
 msgstr "칼로리 {0}"
 
 #. placeholder {0}: formatCalories( i18n, summarizeCalories([{ ...dish, quantity: 1 }]), )
 #. placeholder {1}: dish.unit
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:438
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:591
 msgid "热量 {0}/{1}"
 msgstr "칼로리 {0}/{1}"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:509
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:675
 msgid "热量 kcal / 单位"
 msgstr "칼로리 kcal / 단위"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:157
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:173
 msgid "热量（kcal）"
 msgstr "칼로리 (kcal)"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:17
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:31
 msgid "热量应为有效数字（kcal），支持负数"
 msgstr "칼로리는 유효한 숫자(kcal)여야 하며 음수도 가능합니다"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:316
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:454
 msgid "热量应为有效数字（kcal），运动消耗可填负数"
 msgstr "칼로리는 유효한 숫자(kcal)여야 하며 운동 소비량은 음수로 입력하세요"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:196
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:253
 msgid "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 msgstr "단위당 칼로리: 섭취는 양수, 소비는 음수로 입력하며 생략할 수 있습니다"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:29
+#: src/app/[lang]/(home)/data/home-data.tsx:129
+#: src/app/[lang]/bookkeeping/layout.tsx:32
 msgid "热量记录"
 msgstr "칼로리 기록"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:155
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:155
 msgid "电脑：在 Chrome / Edge 地址栏或菜单中选择“安装应用”。"
 msgstr "컴퓨터: Chrome / Edge 주소창이나 메뉴에서 '앱 설치'를 선택하세요."
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:73
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:78
 msgid "留存照片"
 msgstr "저장된 사진"
 
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:157
+msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
+msgstr "{startDate}부터 {endDate}까지(시작일과 종료일 포함)의 모든 기록과 이미지를 삭제할까요? 되돌릴 수 없습니다. 먼저 백업하세요."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:156
+msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
+msgstr "{startDate}부터 {endDate}까지(시작일과 종료일 포함)의 기록 이미지를 삭제할까요? 기록은 유지됩니다. 이미지 삭제는 되돌릴 수 없습니다. 먼저 백업하세요."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:138
+msgid "示例数据已导入，已有数据保留。"
+msgstr "예시 데이터를 가져왔습니다. 기존 데이터는 유지됩니다."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:52
+msgid "离线资源尚未准备完成，请联网后重试。"
+msgstr ""
+
 #. placeholder {0}: line.name
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:550
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:725
 msgid "移除 {0}"
 msgstr "{0} 제거"
 
-#: src/app/[lang]/admin/bbq/menu/page.tsx:14
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:418
+msgid "移除记录及图片"
+msgstr "기록 및 이미지 삭제"
+
+#: src/app/[lang]/bookkeeping/menu/page.tsx:18
 msgid "管理常用消费项目与餐饮菜单，设置单价、单位、每单位热量和启用状态。"
 msgstr "자주 쓰는 지출 항목과 메뉴의 단가, 단위, 단위당 칼로리 및 사용 여부를 관리하세요."
 
-#: src/app/[lang]/admin/bbq/settings/page.tsx:13
+#: src/app/[lang]/bookkeeping/settings/page.tsx:17
 msgid "管理记账数据备份与应用安装。"
 msgstr "가계부 백업과 앱 설치를 관리하세요."
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:94
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:106
 msgid "累计已完成热量"
 msgstr "누적 완료 칼로리"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:90
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:101
 msgid "累计已完成金额"
 msgstr "누적 완료 금액"
 
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:81
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:382
+msgid "结束日期"
+msgstr "종료 날짜"
+
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:81
 msgid "统计"
 msgstr "통계"
 
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:459
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:612
 msgid "编辑"
 msgstr "수정"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:454
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:607
 msgid "编辑 {0}"
 msgstr "{0} 수정"
 
-#: src/app/[lang]/admin/bbq/orders/[id]/page.tsx:13
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:22
+#: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:19
 msgid "编辑记录 · Loopy 记账"
 msgstr "기록 수정 · Loopy 가계부"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:30
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:82
+msgid "自定义分组"
+msgstr "사용자 지정 그룹"
+
+#: src/app/[lang]/bookkeeping/layout.tsx:33
 msgid "菜单管理"
 msgstr "메뉴 관리"
 
-#: src/app/[lang]/admin/bbq/menu/page.tsx:12
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
+#: src/app/[lang]/bookkeeping/menu/page.tsx:16
 msgid "菜单管理 · Loopy 记账"
 msgstr "메뉴 관리 · Loopy 가계부"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:331
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
 msgid "订单"
 msgstr "주문"
 
-#: src/app/[lang]/admin/bbq/layout.tsx:31
+#: src/app/[lang]/bookkeeping/layout.tsx:34
 msgid "订单记录"
 msgstr "주문 기록"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:22
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:334
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:169
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:22
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:411
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:173
 msgid "记一笔"
 msgstr "기록하기"
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:56
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:67
 msgid "记下日常，就能在这里回看金额和热量的变化。"
 msgstr "일상을 기록하면 지출과 칼로리 변화를 여기서 확인할 수 있습니다."
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:331
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:205
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:237
 msgid "记录"
 msgstr "기록"
 
 #. placeholder {0}: order.seq
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:296
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:300
 msgid "记录 #{0} 详情"
 msgstr "기록 #{0} 상세"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:87
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:87
 msgid "记录列表"
 msgstr "기록 목록"
 
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:96
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:192
 msgid "记录存在这台设备，记得定期备份。"
 msgstr "기록은 이 기기에 저장됩니다. 정기적으로 백업하세요."
 
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:149
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:165
 msgid "记录数"
 msgstr "기록 수"
 
-#: src/app/[lang]/admin/bbq/orders/new/page.tsx:14
+#: src/app/[lang]/bookkeeping/orders/new/page.tsx:17
 msgid "记录日常消费与订单，选择项目、调整数量，汇总金额与饮食热量。"
 msgstr "일일 지출과 주문을 기록하고, 항목과 수량을 선택해 금액과 칼로리를 합산하세요."
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:34
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:36
 msgid "记录明细"
 msgstr "기록 상세"
 
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:111
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:114
 msgid "记录状态"
 msgstr "기록 상태"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:153
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:158
 msgid "记录留存照片"
 msgstr "기록 사진"
 
 #. placeholder {0}: index + 1
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:94
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:654
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:99
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:827
 msgid "记录留存照片 {0}"
 msgstr "기록 사진 {0}"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:161
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:166
 msgid "记录留存照片大图"
 msgstr "기록 사진 원본 크기"
 
-#: src/app/[lang]/admin/bbq/_components/order-detail.tsx:156
+#: src/app/[lang]/bookkeeping/_components/order-detail.tsx:161
 msgid "记录的照片大图，可按 Esc 或关闭按钮返回记录详情"
 msgstr "기록 사진 확대 보기입니다. Esc 또는 닫기 버튼으로 기록 상세로 돌아갑니다"
 
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:339
-msgid "记账"
-msgstr "기록됨"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:91
-msgid "记账·休息中"
-msgstr "기록 · 휴식 중"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:190
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:199
-msgid "记账时段"
-msgstr "기록 시간대"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:50
-msgid "记账时段日历"
-msgstr "기록 시간대 달력"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:34
-#: src/app/[lang]/admin/bbq/_components/bbq-settings.tsx:92
-msgid "设置"
-msgstr "설정"
-
-#: src/app/[lang]/admin/bbq/settings/page.tsx:12
-msgid "设置 · Loopy 记账"
-msgstr "설정 · Loopy 가계부"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-support-card.tsx:68
-msgid "说明：打赏完全自愿，不影响任何功能。款项由作者个人收取，不属于商品或服务购买，也不承诺额外权益或更新进度。请量力而行，付款前确认金额与收款人。"
-msgstr "안내: 후원은 전적으로 자율이며 기능 이용에 영향을 주지 않습니다. 후원금은 개발자 개인이 받으며 상품이나 서비스 구매가 아닙니다. 추가 혜택이나 업데이트 일정도 보장하지 않습니다. 부담 없는 범위에서 후원하고 결제 전 금액과 수취인을 확인해 주세요."
-
-#: src/app/[lang]/admin/bbq/_components/bbq-install-button.tsx:161
-msgid "请使用 HTTPS 网站地址。当前启动和切换页面需要联网；数据保存在本机，迁移设备或浏览器前请导出备份。"
-msgstr "HTTPS 주소를 사용하세요. 현재 앱 실행과 페이지 이동에는 인터넷 연결이 필요합니다. 데이터는 기기에 저장되므로 기기나 브라우저를 바꾸기 전에 백업을 내보내세요."
-
-#: src/app/[lang]/admin/bbq/_components/orders-home.tsx:194
-msgid "读取全部时段数据中…"
-msgstr "모든 시간대 불러오는 중…"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:96
-msgid "读取常用项目中…"
-msgstr "자주 쓰는 항목 불러오는 중…"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:306
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:147
-msgid "读取记录中…"
-msgstr "기록 불러오는 중…"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:228
-msgid "读取记账时段记录中…"
-msgstr "시간대별 기록 불러오는 중…"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-mobile-nav.tsx:20
-msgid "账本"
-msgstr "가계부"
-
-#: src/app/[lang]/admin/bbq/_components/orders-home-tabs.tsx:35
-msgid "账本视图"
-msgstr "가계부 보기"
-
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:125
-msgid "趋势指标"
-msgstr "추이 지표"
-
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:158
-msgid "还没有完成的记录"
-msgstr "완료한 기록이 없습니다"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:513
-msgid "还没有添加项目"
-msgstr "추가된 항목이 없습니다"
-
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:157
-msgid "还没有进行中的记录"
-msgstr "진행 중인 기록이 없습니다"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:231
-msgid "还没有项目"
-msgstr "아직 항목이 없습니다"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:499
-msgid "这一笔"
-msgstr "이번 기록"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:23
-msgid "这个项目当前不可用"
-msgstr "현재 사용할 수 없는 항목입니다"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:342
-msgid "这次记点什么？"
-msgstr "무엇을 기록할까요?"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:723
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:27
-#: src/app/[lang]/admin/bbq/_components/orders-list.tsx:122
-msgid "进行中"
-msgstr "진행 중"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:377
-msgid "选填"
-msgstr "선택"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:341
-msgid "选择打包或座号和项目后保存订单"
-msgstr "포장 또는 좌석과 항목을 선택한 후 주문을 저장하세요"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:65
-msgid "选择日期查看记录 · 记账时段 06:00 至次日 03:00"
-msgstr "날짜를 선택해 기록 보기 · 기록 시간대 06:00~다음 날 03:00"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:178
-msgid "选择时段类型"
-msgstr "시간대 유형 선택"
-
-#: src/app/[lang]/admin/bbq/_components/business-day-calendar.tsx:149
-msgid "选择月份"
-msgstr "월 선택"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:707
-msgid "选择项目后保存"
-msgstr "항목을 선택한 후 저장하세요"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:245
-msgid "部分照片读取失败，请选择浏览器可读取的图片"
-msgstr "일부 사진을 읽을 수 없습니다. 브라우저가 지원하는 이미지를 선택하세요"
-
-#: src/app/[lang]/admin/bbq/_components/bbq-errors.ts:19
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:325
-msgid "金额不正确"
-msgstr "올바르지 않은 금액입니다"
-
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:167
-msgid "金额与热量仅统计已完成记录；热量按每单位 × 数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。"
-msgstr "금액과 칼로리는 완료된 기록만 집계합니다. 칼로리는 단위당 값 × 수량이며, 양수는 섭취, 음수는 소비, 합계는 순 칼로리입니다. 미입력 항목은 제외하고, 누락 항목이 있으면 '일부'로 표시합니다."
-
-#: src/app/[lang]/admin/bbq/_components/orders-statistics.tsx:164
-msgid "金额和热量怎么算？"
-msgstr "금액과 칼로리는 어떻게 계산하나요?"
-
-#: src/app/[lang]/admin/bbq/_components/order-editor.tsx:588
-msgid "附张照片"
-msgstr "사진 첨부"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:503
-msgid "项目名称"
-msgstr "항목 이름"
-
-#: src/app/[lang]/admin/bbq/_components/menu-editor.tsx:570
-msgid "项目启用"
-msgstr "항목 사용"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:36
-msgid "Explore AI"
-msgstr "AI 탐색하기"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:37
-msgid "Ideas start with curiosity"
-msgstr "호기심에서 시작되는 아이디어"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:38
-msgid "Your AI workspace"
-msgstr "나만의 AI 작업 공간"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:39
-msgid "Ask, learn, and create with AI."
-msgstr "AI와 함께 묻고, 배우고, 만들어 보세요."
-
-#: src/app/[lang]/(home)/data/home-data.tsx:41
-msgid "Explore knowledge, work through questions, and turn ideas into something useful with AI conversations and creative tools."
-msgstr "AI 대화와 창작 도구로 지식을 탐색하고 질문을 풀어 가며 아이디어를 유용한 결과물로 만들어 보세요."
-
-#: src/app/[lang]/(home)/data/home-data.tsx:48
-msgid "Chat with AI"
-msgstr "AI와 대화하기"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:66
-msgid "Take it easy, enjoy the little things"
-msgstr "천천히, 작은 행복을 즐겨요"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:67
-msgid "Gentle, curious, and a little playful"
-msgstr "다정하고 호기심 많고, 조금은 장난스러운"
-
-#: src/app/[lang]/(home)/data/home-data.tsx:68
-msgid "Make room for small joys every day."
-msgstr "매일 작은 기쁨을 위한 여유를 가져요."
-
-#: src/app/[lang]/(home)/data/home-data.tsx:70
-msgid "Welcome to Loopy's cozy corner. Slow down, explore something new, and keep the little moments that make you smile."
-msgstr "루피의 포근한 공간에 오신 것을 환영해요. 잠시 속도를 늦추고 새로운 것을 탐색하며 미소 짓게 하는 작은 순간들을 기록해 보세요."
-
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:15
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:19
 msgid "记得备份数据"
 msgstr "데이터 백업을 잊지 마세요"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:16
-msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
-msgstr "데이터는 현재 기기에만 저장됩니다. 데이터가 손실되지 않도록 앱을 삭제하기 전에 백업해 주세요."
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:415
+msgid "记账"
+msgstr "기록됨"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:53
-msgid "关闭"
-msgstr "닫기"
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:92
+msgid "记账·休息中"
+msgstr "기록 · 휴식 중"
 
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:104
-msgid "全部标签"
-msgstr "모든 태그"
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:148
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:231
+msgid "记账时段"
+msgstr "기록 시간대"
 
-#. placeholder {0}: tag.name
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:200
-msgid "删除标签 {0}"
-msgstr "태그 {0} 삭제"
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar.tsx:49
+msgid "记账时段日历"
+msgstr "기록 시간대 달력"
 
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:98
-msgid "按标签筛选"
-msgstr "태그로 필터링"
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:34
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:188
+msgid "设置"
+msgstr "설정"
 
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:67
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:107
-msgid "未设置标签"
-msgstr "태그 없음"
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
+#: src/app/[lang]/bookkeeping/settings/page.tsx:16
+msgid "设置 · Loopy 记账"
+msgstr "설정 · Loopy 가계부"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:557
-msgid "标签"
-msgstr "태그"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:11
-msgid "标签不存在，请重新选择"
-msgstr "태그가 없습니다. 다시 선택해 주세요"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
-msgid "标签仍有项目或历史明细使用，无法删除"
-msgstr "이 태그는 항목이나 이전 내역에서 사용 중이므로 삭제할 수 없습니다"
-
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:169
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:170
-msgid "标签名称"
-msgstr "태그 이름"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:13
-msgid "标签已存在"
-msgstr "이미 존재하는 태그입니다"
-
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:182
-msgid "添加标签"
-msgstr "태그 추가"
-
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:60
-msgid "项目标签"
-msgstr "항목 태그"
-
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:33
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:71
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:111
-msgid "默认"
-msgstr "기본"
-
-
-#: src/app/[lang]/bookkeeping/_components/item-tags.tsx
-msgid "选择标签"
-msgstr "태그 선택"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:214
-msgid "不含图片"
-msgstr "이미지 제외"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:339
-msgid "仅移除图片，保留账目"
-msgstr "이미지만 삭제하고 기록 유지"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:225
-msgid "包含图片"
-msgstr "이미지 포함"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:202
-msgid "导出图片"
-msgstr "이미지 내보내기"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:236
-msgid "导出备份"
-msgstr "백업 내보내기"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:137
-msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
-msgstr "기록 {orderCount}개와 이미지 {photoCount}개를 삭제했습니다"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:136
-msgid "已移除 {photoCount} 张图片，账目已保留"
-msgstr "이미지 {photoCount}개를 삭제하고 기록은 유지했습니다"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:303
-msgid "开始日期"
-msgstr "시작 날짜"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:134
-msgid "所选范围内没有需要清理的数据"
-msgstr "선택한 기간에 정리할 데이터가 없습니다"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:297
-msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
-msgstr "기록 날짜로 필터링하며 시작일과 종료일을 포함합니다. 기록 또는 기록에 첨부된 사진만 삭제되며, 자주 쓰는 항목과 태그 데이터는 삭제되지 않습니다."
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
-msgid "清理中…"
-msgstr "정리 중…"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:327
-msgid "清理内容"
-msgstr "삭제할 데이터"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:355
-msgid "清理后无法撤销，建议先导出包含图片的备份。"
-msgstr "삭제 후에는 되돌릴 수 없습니다. 먼저 이미지가 포함된 백업을 내보내세요."
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
-msgid "清理所选范围"
-msgstr "선택한 기간 정리"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:283
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:294
-msgid "清理瘦身"
-msgstr "저장 공간 정리"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:121
-msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
-msgstr "{startDate}부터 {endDate}까지(시작일과 종료일 포함)의 모든 기록과 이미지를 삭제할까요? 되돌릴 수 없습니다. 먼저 백업하세요."
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:120
-msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
-msgstr "{startDate}부터 {endDate}까지(시작일과 종료일 포함)의 기록 이미지를 삭제할까요? 기록은 유지됩니다. 이미지 삭제는 되돌릴 수 없습니다. 먼저 백업하세요."
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:350
-msgid "移除记录及图片"
-msgstr "기록 및 이미지 삭제"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:314
-msgid "结束日期"
-msgstr "종료 날짜"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:9
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
-msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
-msgstr "올바른 날짜를 선택하세요. 시작 날짜는 종료 날짜보다 늦을 수 없습니다"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:217
 msgid "语言"
 msgstr "언어"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
-msgid "主题"
-msgstr "테마"
+#: src/app/[lang]/bookkeeping/_components/bbq-install-button.tsx:161
+msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"
+msgstr ""
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx
-msgid "展开查看全部项目"
-msgstr "펼쳐서 모든 항목 보기"
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:15
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:152
+msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
+msgstr "올바른 날짜를 선택하세요. 시작 날짜는 종료 날짜보다 늦을 수 없습니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "分组名称不能为空，最多 10 个字符"
-msgstr "그룹 이름은 1~10자로 입력해 주세요"
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar.tsx:25
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:26
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:204
+msgid "读取全部时段数据中…"
+msgstr "모든 시간대 불러오는 중…"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "分组设置不正确"
-msgstr "그룹 설정이 올바르지 않습니다"
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:386
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:536
+msgid "读取常用项目中…"
+msgstr "자주 쓰는 항목 불러오는 중…"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "分组已存在"
-msgstr "이미 있는 그룹입니다"
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:386
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:151
+msgid "读取记录中…"
+msgstr "기록 불러오는 중…"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "启用分组"
-msgstr "그룹 사용"
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:186
+msgid "读取记账时段记录中…"
+msgstr "시간대별 기록 불러오는 중…"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "自定义分组"
-msgstr "사용자 지정 그룹"
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:20
+msgid "账本"
+msgstr "가계부"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "名称最多 10 个字符，支持任意文字和符号。"
-msgstr "최대 10자이며 모든 문자와 기호를 사용할 수 있습니다."
+#: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:35
+msgid "账本视图"
+msgstr "가계부 보기"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "分组名称"
-msgstr "그룹 이름"
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:141
+msgid "趋势指标"
+msgstr "추이 지표"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:92
 msgid "输入分组名称"
 msgstr "그룹 이름 입력"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "添加分组"
-msgstr "그룹 추가"
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:162
+msgid "还没有完成的记录"
+msgstr "완료한 기록이 없습니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "删除分组 {group}"
-msgstr "{group} 그룹 삭제"
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:683
+msgid "还没有添加项目"
+msgstr "추가된 항목이 없습니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "添加分组后，即可在记账时选择。"
-msgstr "그룹을 추가하면 기록할 때 선택할 수 있습니다."
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:161
+msgid "还没有进行中的记录"
+msgstr "진행 중인 기록이 없습니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "删除分组不会影响已有记录。"
-msgstr "그룹을 삭제해도 기존 기록에는 영향이 없습니다."
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:328
+msgid "还没有项目"
+msgstr "아직 항목이 없습니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "分组"
-msgstr "그룹"
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:665
+msgid "这一笔"
+msgstr "이번 기록"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "不分组"
-msgstr "그룹 없음"
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:37
+msgid "这个项目当前不可用"
+msgstr "현재 사용할 수 없는 항목입니다"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
-msgid "到设置中添加分组"
-msgstr "설정에서 그룹 추가"
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:418
+msgid "这次记点什么？"
+msgstr "무엇을 기록할까요?"
 
-#: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:27
+#: src/app/[lang]/bookkeeping/_components/orders-list.tsx:126
+msgid "进行中"
+msgstr "진행 중"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:417
 msgid "选择分组和项目后保存订单"
 msgstr "그룹과 항목을 선택한 후 주문을 저장하세요"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
-msgid "导入示例数据"
-msgstr "예시 데이터 가져오기"
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar.tsx:64
+msgid "选择日期查看记录 · 记账时段 06:00 至次日 03:00"
+msgstr "날짜를 선택해 기록 보기 · 기록 시간대 06:00~다음 날 03:00"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
-msgid "示例数据已导入，已有数据保留。"
-msgstr "예시 데이터를 가져왔습니다. 기존 데이터는 유지됩니다."
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:136
+msgid "选择时段类型"
+msgstr "시간대 유형 선택"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
-msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
-msgstr "자주 쓰는 항목 3개와 최근 3일간의 기록 4개입니다. 기존 데이터를 유지하며 이미 가져온 예시는 중복 추가하지 않습니다."
+#: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:107
+msgid "选择月份"
+msgstr "월 선택"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:141
+msgid "选择标签"
+msgstr "태그 선택"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:518
+msgid "选择项目"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:317
+msgid "部分照片读取失败，请选择浏览器可读取的图片"
+msgstr "일부 사진을 읽을 수 없습니다. 브라우저가 지원하는 이미지를 선택하세요"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:62
+msgid "重新准备离线资源"
+msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:33
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:463
+msgid "金额不正确"
+msgstr "올바르지 않은 금액입니다"
+
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:189
+msgid "金额与热量仅统计已完成记录；热量按每单位 × 数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。"
+msgstr "금액과 칼로리는 완료된 기록만 집계합니다. 칼로리는 단위당 값 × 수량이며, 양수는 섭취, 음수는 소비, 합계는 순 칼로리입니다. 미입력 항목은 제외하고, 누락 항목이 있으면 '일부'로 표시합니다."
+
+#: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:183
+msgid "金额和热量怎么算？"
+msgstr "금액과 칼로리는 어떻게 계산하나요?"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:762
+msgid "附张照片"
+msgstr "사진 첨부"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656
+msgid "项目名称"
+msgstr "항목 이름"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:736
+msgid "项目启用"
+msgstr "항목 사용"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:139
+msgid "项目标签"
+msgstr "항목 태그"
+
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:39
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:157
+#: src/app/[lang]/bookkeeping/_components/item-tags.tsx:270
+msgid "默认"
+msgstr "기본"
