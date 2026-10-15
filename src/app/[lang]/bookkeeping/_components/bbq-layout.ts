@@ -14,7 +14,7 @@ export function cls(
 // BBQ 各页面与底部操作区共用窄屏宽度，PC 直接复用 H5 布局。
 export const pageShellCls = cls`flex flex-col gap-3`;
 
-export const pageTitleCls = cls`text-2xl font-semibold text-foreground pr-24 tracking-tight`;
+export const pageTitleCls = cls`text-2xl font-semibold text-foreground tracking-tight`;
 
 export const detailsMotionCls = cls`
   group/details

@@ -1993,3 +1993,11 @@ msgstr "終了日"
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
 msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
 msgstr "有効な開始日と終了日を選択してください。開始日は終了日以前にしてください"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "语言"
+msgstr "言語"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "主题"
+msgstr "テーマ"

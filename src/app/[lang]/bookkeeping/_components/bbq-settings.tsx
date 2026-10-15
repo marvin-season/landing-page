@@ -12,11 +12,15 @@ import {
   DatabaseBackup,
   FileDown,
   FileUp,
+  Languages,
   LoaderCircle,
+  Palette,
   Smartphone,
   Trash2,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import { LanguageSwitcher } from "@/components/language/language-switcher";
+import { ThemePicker } from "@/components/theme/theme-picker";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { isValidCleanupRange } from "@/lib/bbq/cleanup";
 import type { BbqBackup } from "@/lib/bbq/types";
@@ -27,20 +31,26 @@ import {
   cls,
   detailsChevronCls,
   detailsMotionCls,
-  detailsSummaryCls,
   pageShellCls,
   pageTitleCls,
 } from "./bbq-layout";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
+import {
+  settingsActionCls,
+  settingsCardCls,
+  settingsInputCls,
+  settingsSummaryCls,
+} from "./bbq-settings-styles";
 import { BbqSupportCard } from "./bbq-support-card";
 
-const settingsActionCls = cls`
-  min-h-11 w-full justify-start rounded-none px-3 text-sm shadow-none
-  hover:bg-muted/70 hover:shadow-none focus-visible:ring-inset
-`;
-
-const radioOptionCls = cls`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-checked:border-primary has-checked:bg-primary/5 has-disabled:cursor-not-allowed has-disabled:opacity-50`;
+const radioOptionCls = cls`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-checked:border-primary/40 has-checked:bg-primary/5 has-disabled:cursor-not-allowed has-disabled:opacity-50 border-border/60 bg-muted/30 text-foreground transition-colors hover:bg-muted/50 has-focus-visible:ring-1 has-focus-visible:ring-primary/50`;
 const radioInputCls = cls`size-4 shrink-0 accent-primary`;
+const preferenceControlCls = cls`
+  shrink-0 [&>button]:min-h-8 [&>button]:min-w-16 [&>button]:rounded-md
+  [&>button]:border [&>button]:border-border/60 [&>button]:bg-muted/30
+  [&>button]:px-2 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button]:text-xs
+  [&>button:focus-visible]:ring-1 [&>button:focus-visible]:ring-primary/50
+`;
 
 export function BbqSettings() {
   const { i18n, t } = useLingui();
@@ -173,11 +183,29 @@ export function BbqSettings() {
           {notice}
         </p>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-4 pb-3">
-        <details
-          className={`overflow-hidden rounded-xl bg-card shrink-0 ${detailsMotionCls}`}
-        >
-          <summary className={detailsSummaryCls}>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3">
+        <section className={`${settingsCardCls} divide-y divide-border/60`}>
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5">
+            <h2 className="flex items-center gap-1.5 text-xs font-medium">
+              <Languages className="size-3.5 text-primary" aria-hidden="true" />
+              <Trans>语言</Trans>
+            </h2>
+            <div className={preferenceControlCls}>
+              <LanguageSwitcher currentLang={i18n.locale} />
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5">
+            <h2 className="flex items-center gap-1.5 text-xs font-medium">
+              <Palette className="size-3.5 text-primary" aria-hidden="true" />
+              <Trans>主题</Trans>
+            </h2>
+            <div className={preferenceControlCls}>
+              <ThemePicker />
+            </div>
+          </div>
+        </section>
+        <details className={`${settingsCardCls} ${detailsMotionCls}`}>
+          <summary className={settingsSummaryCls}>
             <DatabaseBackup
               className="size-4 text-primary"
               aria-hidden="true"
@@ -185,14 +213,14 @@ export function BbqSettings() {
             <h2 className="min-w-0 flex-1">
               <Trans>备份账本</Trans>
             </h2>
-            <BbqCompanion mood="care" className="block size-10 shrink-0" />
             <ChevronDown className={detailsChevronCls} aria-hidden="true" />
           </summary>
           <div className="min-h-0 overflow-clip">
-            <div className="flex flex-col gap-3 p-3">
+            <div className="flex flex-col gap-4 p-3 border-t border-border/60">
               <p className="text-xs text-muted-foreground">
                 <Trans>保存一份记录和常用项目，换设备也能带走。</Trans>
               </p>
+
               <fieldset
                 disabled={task !== null}
                 aria-busy={task === "import" || task === "export"}
@@ -225,7 +253,7 @@ export function BbqSettings() {
                     <Trans>包含图片</Trans>
                   </label>
                 </div>
-                <div className="mt-3 flex flex-col divide-y">
+                <div className="mt-3 flex flex-col gap-2">
                   <Button
                     type="button"
                     variant="ghost"
@@ -243,6 +271,10 @@ export function BbqSettings() {
                   >
                     <FileUp className="size-4" aria-hidden="true" />
                     <Trans>导入完整备份</Trans>
+                    <BbqCompanion
+                      mood="care"
+                      className="inline-block size-10 shrink-0"
+                    />
                   </Button>
                 </div>
               </fieldset>
@@ -274,10 +306,8 @@ export function BbqSettings() {
             </div>
           </div>
         </details>
-        <details
-          className={`overflow-hidden rounded-xl bg-card shrink-0 ${detailsMotionCls}`}
-        >
-          <summary className={detailsSummaryCls}>
+        <details className={`${settingsCardCls} ${detailsMotionCls}`}>
+          <summary className={settingsSummaryCls}>
             <Trash2 className="size-4 text-primary" aria-hidden="true" />
             <h2 className="min-w-0 flex-1">
               <Trans>清理瘦身</Trans>
@@ -288,7 +318,7 @@ export function BbqSettings() {
             <fieldset
               disabled={task !== null}
               aria-busy={task === "cleanup"}
-              className="flex min-w-0 flex-col gap-3 p-3"
+              className="flex min-w-0 flex-col gap-4 p-3 border-t border-border/60"
             >
               <legend className="sr-only">
                 <Trans>清理瘦身</Trans>
@@ -306,7 +336,7 @@ export function BbqSettings() {
                     value={startDate}
                     max={endDate || undefined}
                     onChange={(event) => setStartDate(event.target.value)}
-                    className="h-11"
+                    className={settingsInputCls}
                     required
                   />
                 </label>
@@ -317,7 +347,7 @@ export function BbqSettings() {
                     value={endDate}
                     min={startDate || undefined}
                     onChange={(event) => setEndDate(event.target.value)}
-                    className="h-11"
+                    className={settingsInputCls}
                     required
                   />
                 </label>
@@ -358,7 +388,7 @@ export function BbqSettings() {
                 type="button"
                 variant="ghost"
                 disabled={!isValidCleanupRange(startDate, endDate)}
-                className="min-h-11 w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className={`${settingsActionCls} text-destructive hover:bg-destructive/10 hover:text-destructive`}
                 onClick={() => void cleanup()}
               >
                 {task === "cleanup" ? (
@@ -374,7 +404,7 @@ export function BbqSettings() {
             </fieldset>
           </div>
         </details>
-        <section className="rounded-xl bg-card p-3 shrink-0">
+        <section className={`${settingsCardCls} p-3`}>
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <h2 className="flex items-center gap-2 text-sm font-medium">
@@ -388,9 +418,9 @@ export function BbqSettings() {
                 <Trans>添加到主屏幕，方便下次打开记账。</Trans>
               </p>
             </div>
-            <BbqCompanion mood="wave" className="block size-16 shrink-0" />
+            <BbqCompanion mood="wave" className="block size-10 shrink-0" />
           </div>
-          <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none">
+          <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none [&>button]:border-border/60 [&>button]:bg-muted/30 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button:hover]:shadow-none">
             <BbqInstallButton />
           </div>
         </section>

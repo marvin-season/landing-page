@@ -734,10 +734,10 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
-                    <BbqCompanion
+                    {/* <BbqCompanion
                       mood="photo-pose"
                       className="block size-14 shrink-0"
-                    />
+                    /> */}
                     <span className="text-xs tabular-nums text-muted-foreground">
                       {photos.length}/{MAX_ORDER_PHOTOS}
                     </span>
