@@ -52,6 +52,8 @@ Recent commits use Conventional Commit prefixes such as `feat:`, `fix:`, `chore:
 
 Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or stream behavior. See `docs/auth.md` before changing login, page gates, roles, or API auth. See `docs/i18n.md` before editing localized copy. Stream chat, admin, Mastra, and Python agent details are documented in `src/lib/stream/README.md`, `src/app/[lang]/admin/README.md`, `mastra-server/README.md`, and `agent-server/README.md`.
 
+除非特别说明，多语言相关改动默认只需处理中文（`zh`）、英文（`en`）和日文（`ja`）。
+
 When asked to record changes, follow `.changelog/README.md`: use `.changelog/YYYYMMDD/index.md` and append a timestamped entry.
 
 <!-- BEGIN:nextjs-agent-rules -->
