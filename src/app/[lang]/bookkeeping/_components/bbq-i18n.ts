@@ -3,12 +3,26 @@ import { msg } from "@lingui/core/macro";
 import type { CalorieSummary } from "@/lib/bbq/calories";
 
 // Translate presentation only; keep saved dates, units and calorie values intact.
-export function formatCalories(i18n: I18n, summary: CalorieSummary): string {
+export function formatCalories(
+  i18n: I18n,
+  summary: CalorieSummary,
+  options?: { compact?: boolean },
+): string {
   if (summary.recordedLineCount === 0) return `${i18n.number(0)} kcal`;
-  const value = i18n.number(Number(summary.totalKcal.toFixed(2)));
+  const value = options?.compact
+    ? formatCompactNumber(i18n, summary.totalKcal)
+    : i18n.number(Number(summary.totalKcal.toFixed(2)));
   return summary.missingLineCount > 0
-    ? i18n._(msg`${value} kcal（部分）`)
+    ? i18n._(msg`${value} kcal`)
     : `${value} kcal`;
+}
+
+// Use k consistently for thousands, including locales whose compact notation starts at 10,000.
+export function formatCompactNumber(i18n: I18n, value: number): string {
+  if (Math.abs(value) < 1_000) {
+    return i18n.number(Number(value.toFixed(2)));
+  }
+  return `${i18n.number(value / 1_000, { maximumFractionDigits: 1, useGrouping: false })}k`;
 }
 
 export function businessDayLabel(i18n: I18n, key: string): string {

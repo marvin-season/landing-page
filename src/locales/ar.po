@@ -1949,8 +1949,8 @@ msgid "所选范围内没有需要清理的数据"
 msgstr "لا توجد بيانات لتنظيفها في الفترة المحددة"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:297
-msgid "按记账日期筛选，包含起止日期；常用项目与标签保留。"
-msgstr "تصفية حسب تاريخ القيد مع تضمين تاريخَي البداية والنهاية. تُحفظ العناصر المتكررة والوسوم."
+msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
+msgstr "تصفية حسب تاريخ القيد مع تضمين تاريخَي البداية والنهاية. تُحذف السجلات أو صورها فقط، ولا تُحذف بيانات العناصر المتكررة والوسوم."
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
 msgid "清理中…"
@@ -2069,3 +2069,15 @@ msgstr "إضافة مجموعات في الإعدادات"
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
 msgid "选择分组和项目后保存订单"
 msgstr "اختر مجموعة وعناصر ثم احفظ الطلب"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "导入示例数据"
+msgstr "استيراد بيانات تجريبية"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "示例数据已导入，已有数据保留。"
+msgstr "تم استيراد البيانات التجريبية مع الاحتفاظ بالبيانات الحالية."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
+msgstr "3 عناصر متكررة و4 سجلات خلال آخر ثلاثة أيام. تُحفظ البيانات الحالية ولا تُضاف الأمثلة المستوردة سابقًا مرة أخرى."

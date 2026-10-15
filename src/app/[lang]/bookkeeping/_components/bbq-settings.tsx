@@ -12,6 +12,7 @@ import {
   DatabaseBackup,
   FileDown,
   FileUp,
+  FlaskConical,
   Languages,
   LoaderCircle,
   Palette,
@@ -119,6 +120,29 @@ export function BbqSettings() {
     }
   }
 
+  async function importSamples() {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setTask("import");
+    setMessage(null);
+    setNotice(null);
+    try {
+      const [{ bbqStore }, { createSampleBackup }] = await Promise.all([
+        import("@/lib/bbq/idb-store"),
+        import("@/lib/bbq/sample-backup"),
+      ]);
+      const existing = await bbqStore.exportBackup();
+      await bbqStore.importBackup(createSampleBackup(new Date(), existing));
+      notifyBbqMenuChanged();
+      setNotice(t`示例数据已导入，已有数据保留。`);
+    } catch (error) {
+      setMessage(bbqErrorMessage(i18n, error));
+    } finally {
+      busyRef.current = false;
+      setTask(null);
+    }
+  }
+
   async function cleanup() {
     if (busyRef.current) return;
     setMessage(null);
@@ -213,7 +237,7 @@ export function BbqSettings() {
               aria-hidden="true"
             />
             <h2 className="min-w-0 flex-1">
-              <Trans>备份账本</Trans>
+              <Trans>备份&还原</Trans>
             </h2>
             <ChevronDown className={detailsChevronCls} aria-hidden="true" />
           </summary>
@@ -273,11 +297,22 @@ export function BbqSettings() {
                   >
                     <FileUp className="size-4" aria-hidden="true" />
                     <Trans>导入完整备份</Trans>
-                    <BbqCompanion
-                      mood="care"
-                      className="inline-block size-6 shrink-0"
-                    />
                   </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className={settingsActionCls}
+                    onClick={() => void importSamples()}
+                  >
+                    <FlaskConical className="size-4" aria-hidden="true" />
+                    <Trans>导入示例数据</Trans>
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    <Trans>
+                      3 个常用项目，最近三天共 4
+                      条记录。保留已有数据，重复导入不重复添加。
+                    </Trans>
+                  </p>
                 </div>
               </fieldset>
               <input
@@ -327,7 +362,7 @@ export function BbqSettings() {
               </legend>
               <p className="text-xs text-muted-foreground">
                 <Trans>
-                  按记账日期筛选，包含起止日期；常用项目与标签保留。
+                  按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。
                 </Trans>
               </p>
               <div className="grid grid-cols-2 gap-2">

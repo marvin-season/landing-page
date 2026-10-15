@@ -1949,8 +1949,8 @@ msgid "所选范围内没有需要清理的数据"
 msgstr "В выбранном периоде нет данных для очистки"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:297
-msgid "按记账日期筛选，包含起止日期；常用项目与标签保留。"
-msgstr "Отбор по дате учёта, включая обе даты. Частые позиции и теги сохраняются."
+msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
+msgstr "Отбор по дате учёта, включая обе даты. Удаляются только записи или фотографии в них. Данные частых позиций и тегов не удаляются."
 
 #: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:372
 msgid "清理中…"
@@ -2069,3 +2069,15 @@ msgstr "Добавить группы в настройках"
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx
 msgid "选择分组和项目后保存订单"
 msgstr "Выберите группу и позиции, затем сохраните заказ"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "导入示例数据"
+msgstr "Импортировать примеры"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "示例数据已导入，已有数据保留。"
+msgstr "Примеры импортированы. Существующие данные сохранены."
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx
+msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
+msgstr "3 частые позиции и 4 записи за последние три дня. Существующие данные сохраняются, уже импортированные примеры не дублируются."

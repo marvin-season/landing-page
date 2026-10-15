@@ -13,7 +13,11 @@ import {
   getTrendRange,
 } from "@/lib/bbq/statistics";
 import { BbqCompanion } from "./bbq-companion";
-import { businessDayLabel, formatCalories } from "./bbq-i18n";
+import {
+  businessDayLabel,
+  formatCalories,
+  formatCompactNumber,
+} from "./bbq-i18n";
 import {
   cls,
   detailsChevronCls,
@@ -95,11 +99,13 @@ export function OrdersStatistics({
       <dl className="grid shrink-0 gap-3 overflow-hidden rounded-xl bg-card grid-cols-2 p-4">
         <StatisticMetric
           label={t`累计已完成金额`}
-          value={formatYuan(settledTotal)}
+          value={formatStatisticYuan(i18n, settledTotal)}
+          fullValue={formatYuan(settledTotal)}
         />
         <StatisticMetric
           label={t`累计已完成热量`}
-          value={formatCalories(i18n, settledCalories)}
+          value={formatCalories(i18n, settledCalories, { compact: true })}
+          fullValue={formatCalories(i18n, settledCalories)}
         />
       </dl>
       <p className="text-xs text-muted-foreground px-1">
@@ -117,8 +123,11 @@ export function OrdersStatistics({
                   <Trans>变化趋势</Trans>
                 </h2>
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {t`每时段平均已完成金额 ${formatYuan(averagePerPeriod)}`}
+              <p
+                className="mt-0.5 text-xs text-muted-foreground"
+                title={formatYuan(averagePerPeriod)}
+              >
+                {t`每时段平均已完成金额 ${formatStatisticYuan(i18n, averagePerPeriod)}`}
               </p>
             </div>
             <BbqCompanion
@@ -243,14 +252,23 @@ export function OrdersStatistics({
                         <dt className="text-muted-foreground">
                           <Trans>已完成金额</Trans>
                         </dt>
-                        <dd className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground">
-                          {formatYuan(item.settledTotalCents)}
+                        <dd
+                          className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground"
+                          title={formatYuan(item.settledTotalCents)}
+                        >
+                          {formatStatisticYuan(i18n, item.settledTotalCents)}
                         </dd>
                       </div>
                     </dl>
-                    <p className="mt-2 text-xs tabular-nums text-muted-foreground">
+                    <p
+                      className="mt-2 text-xs tabular-nums text-muted-foreground"
+                      title={formatCalories(i18n, item.settledCalories)}
+                    >
                       <Trans>
-                        已完成热量 {formatCalories(i18n, item.settledCalories)}
+                        已完成热量{" "}
+                        {formatCalories(i18n, item.settledCalories, {
+                          compact: true,
+                        })}
                       </Trans>
                     </p>
                   </li>
@@ -382,7 +400,7 @@ function TrendChart({
                   textAnchor="end"
                   className="fill-muted-foreground text-[11px]"
                 >
-                  {formatChartValue(value, mode)}
+                  {formatChartValue(i18n, value, mode)}
                 </text>
               </g>
             );
@@ -431,7 +449,7 @@ function TrendChart({
                   textAnchor="middle"
                   className="fill-foreground text-[11px] font-medium"
                 >
-                  {formatChartValue(value, mode)}
+                  {formatChartValue(i18n, value, mode)}
                 </text>
               </g>
             ))}
@@ -446,11 +464,23 @@ function TrendChart({
   );
 }
 
-function StatisticMetric({ label, value }: { label: string; value: string }) {
+function StatisticMetric({
+  label,
+  value,
+  fullValue,
+}: {
+  label: string;
+  value: string;
+  fullValue: string;
+}) {
   return (
     <div className="min-w-0">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-xl font-semibold tabular-nums text-foreground break-all tracking-tight">
+      <dd
+        className="mt-1 text-xl font-semibold tabular-nums text-foreground break-all tracking-tight"
+        title={fullValue}
+        aria-label={fullValue}
+      >
         {value}
       </dd>
     </div>
@@ -462,9 +492,15 @@ function compactDayLabel(i18n: I18n, key: string): string {
   return key.endsWith("#off") ? i18n._(msg`${date} 休息`) : date;
 }
 
-function formatChartValue(value: number, mode: ChartMode): string {
-  if (mode === "calories") return `${Number(value.toFixed(2))}`;
+function formatStatisticYuan(i18n: I18n, cents: number): string {
+  if (Math.abs(cents) < 100_000) return formatYuan(cents);
+  return `¥${formatCompactNumber(i18n, cents / 100)}`;
+}
+
+function formatChartValue(i18n: I18n, value: number, mode: ChartMode): string {
+  if (mode === "calories") return formatCompactNumber(i18n, value);
   if (mode === "orders") return `${Math.round(value)}`;
-  if (value >= 100_000) return `¥${(value / 100_000).toFixed(1)}k`;
+  if (Math.abs(value) >= 100_000)
+    return `¥${formatCompactNumber(i18n, value / 100)}`;
   return `¥${Math.round(value / 100)}`;
 }
