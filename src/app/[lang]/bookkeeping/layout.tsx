@@ -84,8 +84,8 @@ export default function BbqLayout({ children }: PropsWithChildren) {
   return (
     <CompanionAlbumProvider>
       <BbqInstallProvider>
-        <div className="min-w-0 flex flex-col mx-auto w-full max-w-xl flex-none pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
-          <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2">
+        <div className="min-w-0 flex flex-col lg:flex-row-reverse lg:py-0 mx-auto w-full max-w-xl lg:max-w-5xl flex-none pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
+          <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2 lg:px-4 pt-2 lg:pt-4">
             <Suspense fallback={null}>
               <BbqOfflineProvider>
                 <BbqApp>{children}</BbqApp>

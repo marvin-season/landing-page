@@ -93,7 +93,7 @@ const editorSectionCls = cls`${settingsCardCls} p-3`;
 
 const editorOrderBodyCls = cls`min-h-0 flex flex-col gap-3 shrink-0`;
 
-const editorTotalBarCls = cls`${settingsCardCls} px-3 py-2.5 w-full`;
+const _editorTotalBarCls = cls`${settingsCardCls} px-3 py-2.5 w-full`;
 
 const editorControlCls = cls`
   rounded-lg shadow-none transition-colors
@@ -936,7 +936,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             ) : null}
           </div>
         </div>
-        <div className={editorTotalBarCls}>
+        <div className={"p-2"}>
           <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_minmax(7rem,auto)] items-center gap-3">
             <p
               className="text-xl font-semibold tabular-nums tracking-tight truncate leading-tight min-w-0"
@@ -946,7 +946,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
             </p>
             <Button
               type="button"
-              className={`px-4 ${editorControlCls} focus-visible:ring-primary-foreground/70 min-h-11 w-full h-11 text-sm gap-1.5`}
+              size={"sm"}
+              className={`px-4 focus-visible:ring-primary-foreground/70 w-full text-sm gap-1.5`}
               disabled={!canSave}
               onClick={() => void save()}
             >

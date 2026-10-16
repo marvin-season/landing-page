@@ -38,14 +38,6 @@ const items = [
   },
 ];
 
-const mobileNavLinkCls = cls`
-  flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs
-  font-medium text-muted-foreground transition-colors hover:bg-muted/70
-  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset
-  focus-visible:ring-primary/50 aria-[current=page]:bg-primary/10
-  aria-[current=page]:text-primary aria-disabled:opacity-40 touch-manipulation
-`;
-
 export function BbqMobileNav() {
   const { t, i18n } = useLingui();
   const pathname = usePathname();
@@ -65,9 +57,9 @@ export function BbqMobileNav() {
 
   return (
     <nav
-      className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t`}
+      className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t lg:border-t-0 lg:border-r lg:mt-0`}
     >
-      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2">
+      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2 lg:flex lg:flex-col lg:gap-4 lg:h-full">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
           const disabled = itemSegment === "orders" && !canCreate && !active;
@@ -76,7 +68,9 @@ export function BbqMobileNav() {
             <Link
               key={href}
               href={href}
-              className={mobileNavLinkCls}
+              className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs 
+                font-medium text-muted-foreground transition-colors hover:bg-muted/70 lg:flex-row lg:items-center lg:justify-start lg:px-4
+                aria-disabled:opacity-40 touch-manipulation aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary`}
               aria-current={active ? "page" : undefined}
               aria-disabled={disabled || undefined}
               title={disabled ? t`当前为休息时段，06:00 后可记账` : undefined}
