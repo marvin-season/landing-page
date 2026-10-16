@@ -150,6 +150,7 @@ export function CompanionAlbumSettings() {
 
   return (
     <details
+      data-settings-section="companion-album"
       open={searchParams.get("section") === "companion-album"}
       className={`${settingsCardCls} ${detailsMotionCls}`}
     >

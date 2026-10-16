@@ -97,11 +97,7 @@ function AnnouncementFeed() {
         {feed.isError ? (
           <Alert className="mb-4">
             <AlertDescription>
-              <p>
-                {feed.data
-                  ? t`加载失败，已加载的公告仍可查看。`
-                  : t`暂时无法连接，当前仅展示内置公告。`}
-              </p>
+              <p>{feed.data ? t`加载失败` : t`网络无法连接，`}</p>
               <Button
                 type="button"
                 variant="ghost"

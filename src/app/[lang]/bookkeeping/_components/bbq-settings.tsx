@@ -19,7 +19,8 @@ import {
   Smartphone,
   Trash2,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemePicker } from "@/components/theme/theme-picker";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
@@ -60,6 +61,8 @@ const preferenceControlCls = cls`
 
 export function BbqSettings() {
   const { i18n, t } = useLingui();
+  const section = useSearchParams().get("section");
+  const settingsRef = useRef<HTMLDivElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
   const busyRef = useRef(false);
   const [task, setTask] = useState<"import" | "export" | "cleanup" | null>(
@@ -71,6 +74,27 @@ export function BbqSettings() {
   const [endDate, setEndDate] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (section !== "backup" && section !== "companion-album") return;
+    const target = settingsRef.current?.querySelector<HTMLElement>(
+      `[data-settings-section="${section}"]`,
+    );
+    if (!target) return;
+    target.scrollIntoView({ block: "start" });
+    // Let the initial border paint before briefly highlighting the destination.
+    const highlightTimer = window.setTimeout(() => {
+      target.dataset.highlighted = "true";
+    }, 100);
+    const restoreTimer = window.setTimeout(() => {
+      delete target.dataset.highlighted;
+    }, 900);
+    return () => {
+      window.clearTimeout(highlightTimer);
+      window.clearTimeout(restoreTimer);
+      delete target.dataset.highlighted;
+    };
+  }, [section]);
 
   async function exportBackup() {
     if (busyRef.current) return;
@@ -213,7 +237,10 @@ export function BbqSettings() {
           {notice}
         </p>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3">
+      <div
+        ref={settingsRef}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 [&_[data-settings-section]]:transition-[border-color] [&_[data-settings-section]]:duration-500 [&_[data-settings-section][data-highlighted]]:border-primary/60"
+      >
         <p className={groupLabelCls}>
           <Trans>基础设置</Trans>
         </p>
@@ -242,7 +269,11 @@ export function BbqSettings() {
           <Trans>数据管理</Trans>
         </p>
         <CompanionAlbumSettings />
-        <details className={`${settingsCardCls} ${detailsMotionCls}`}>
+        <details
+          data-settings-section="backup"
+          open={section === "backup"}
+          className={`${settingsCardCls} ${detailsMotionCls}`}
+        >
           <summary className={settingsSummaryCls}>
             <DatabaseBackup
               className="size-4 text-primary"

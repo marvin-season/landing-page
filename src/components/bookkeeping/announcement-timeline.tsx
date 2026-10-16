@@ -1,11 +1,16 @@
 "use client";
 
+import { Tag } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Pin } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Announcement } from "@/lib/bookkeeping-announcements/model";
+import { builtinAnnouncementBodies } from "./builtin-announcement-content";
 
-export function AnnouncementTimeline({ items }: { items: Announcement[] }) {
+export type AnnouncementView = Omit<Announcement, "body"> & {
+  body: ReactNode;
+};
+
+export function AnnouncementTimeline({ items }: { items: AnnouncementView[] }) {
   const { i18n } = useLingui();
   const dateFormat = new Intl.DateTimeFormat(
     i18n.locale === "pseudo" ? "en" : i18n.locale,
@@ -20,7 +25,7 @@ export function AnnouncementTimeline({ items }: { items: Announcement[] }) {
   );
   const pinnedItems = items.filter((item) => item.pinned);
   const timelineItems = items.filter((item) => !item.pinned);
-  const latest = timelineItems.reduce<Announcement | undefined>(
+  const latest = timelineItems.reduce<AnnouncementView | undefined>(
     (newest, item) =>
       !newest || item.publishedAt > newest.publishedAt ? item : newest,
     undefined,
@@ -28,34 +33,23 @@ export function AnnouncementTimeline({ items }: { items: Announcement[] }) {
   return (
     <div className="flex flex-col gap-5">
       {pinnedItems.length > 0 ? (
-        <section className="">
-          <h2 className="mb-3 flex items-center gap-1.5 text-xs font-medium text-primary">
-            <Pin className="size-3.5" />
-            置顶公告
-          </h2>
-          <ul className="flex flex-col gap-2.5">
-            {pinnedItems.map((item) => (
-              <li key={item.id}>
-                <AnnouncementCard item={item}>
-                  <time
-                    dateTime={item.publishedAt}
-                    className="mt-2 block text-xs text-muted-foreground"
-                  >
-                    {dateFormat.format(new Date(item.publishedAt))}
-                  </time>
-                </AnnouncementCard>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <ul className="flex flex-col gap-3">
+          {pinnedItems.map((item) => (
+            <li key={item.id}>
+              <AnnouncementCard item={item}>
+                <time
+                  dateTime={item.publishedAt}
+                  className="mt-2 block text-xs text-muted-foreground"
+                >
+                  {dateFormat.format(new Date(item.publishedAt))}
+                </time>
+              </AnnouncementCard>
+            </li>
+          ))}
+        </ul>
       ) : null}
       {timelineItems.length > 0 ? (
         <section>
-          {pinnedItems.length > 0 ? (
-            <h2 className="mb-3 text-xs font-medium text-muted-foreground">
-              公告动态
-            </h2>
-          ) : null}
           <ol className="ml-2 border-l border-border/70">
             {timelineItems.map((item) => (
               <li key={item.id} className="relative pl-5 pb-6 last:pb-1">
@@ -84,17 +78,31 @@ function AnnouncementCard({
   item,
   children,
 }: {
-  item: Announcement;
+  item: AnnouncementView;
   children?: ReactNode;
 }) {
+  const { t } = useLingui();
+  // Keep API/search text serializable; only authored built-ins get rich content.
+  const body =
+    item.source === "builtin" && typeof item.body === "string"
+      ? (builtinAnnouncementBodies[item.id] ?? item.body)
+      : item.body;
+
   return (
     <article className="rounded-xl border border-border/60 bg-card px-3.5 py-3">
-      <h3 className="text-sm font-semibold text-foreground break-words">
-        {item.title}
-      </h3>
-      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
-        {item.body}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-sm font-semibold text-foreground break-words min-w-0 flex-1">
+          {item.title}
+        </h3>
+        {item.pinned ? (
+          <Tag size="compact" className="shrink-0">
+            {t`置顶`}
+          </Tag>
+        ) : null}
+      </div>
+      <div className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
+        {body}
+      </div>
       {children}
     </article>
   );
