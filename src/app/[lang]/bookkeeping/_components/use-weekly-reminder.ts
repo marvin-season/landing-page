@@ -5,8 +5,15 @@ import { useEffect, useEffectEvent } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 
 const lastShownDays = new Map<string, string>();
+const weekMs = 7 * 24 * 60 * 60 * 1000;
 
-export function useDailyReminder(
+function shownThisWeek(lastShownDay: string | null | undefined, today: string) {
+  if (!lastShownDay) return false;
+  const elapsed = Date.parse(today) - Date.parse(lastShownDay);
+  return elapsed >= 0 && elapsed < weekMs;
+}
+
+export function useWeeklyReminder(
   storageKey: string,
   show: () => string | number,
   delay = 0,
@@ -16,14 +23,16 @@ export function useDailyReminder(
   // biome-ignore lint/correctness/useExhaustiveDependencies: Effect Events read the latest callback without restarting the reminder timer.
   useEffect(() => {
     let id: string | number | undefined;
-    // Delay until after Strict Mode replay; cancelled timers do not consume the day.
+    // Delay until after Strict Mode replay; cancelled timers do not consume the week.
     const timer = window.setTimeout(() => {
       const today = formatShanghaiDate(new Date());
-      if (lastShownDays.get(storageKey) === today) return;
+      // Keep the existing date keys so previous daily reminders start the cooldown.
+      if (shownThisWeek(lastShownDays.get(storageKey), today)) return;
       try {
-        if (window.localStorage.getItem(storageKey) === today) return;
+        if (shownThisWeek(window.localStorage.getItem(storageKey), today))
+          return;
       } catch {
-        // Keep the daily limit in memory when browser storage is unavailable.
+        // Keep the weekly limit in memory when browser storage is unavailable.
       }
 
       id = showReminder();

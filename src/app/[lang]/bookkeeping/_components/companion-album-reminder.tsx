@@ -5,12 +5,12 @@ import { useLingui } from "@lingui/react/macro";
 import { Images } from "lucide-react";
 import { BbqLink as Link } from "./bbq-link";
 import { bbqSettingsPath } from "./bbq-paths";
-import { useDailyReminder } from "./use-daily-reminder";
+import { useWeeklyReminder } from "./use-weekly-reminder";
 
 export function CompanionAlbumReminder() {
   const { t } = useLingui();
 
-  useDailyReminder(
+  useWeeklyReminder(
     "bookkeeping-companion-album-reminder:last-shown-day",
     () =>
       toast.info(t`给账本换上喜欢的配图`, {

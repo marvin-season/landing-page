@@ -28,7 +28,7 @@ export function AnnouncementTimeline({ items }: { items: Announcement[] }) {
   return (
     <div className="flex flex-col gap-5">
       {pinnedItems.length > 0 ? (
-        <section className="rounded-xl border border-primary/15 bg-primary/5 p-3">
+        <section className="">
           <h2 className="mb-3 flex items-center gap-1.5 text-xs font-medium text-primary">
             <Pin className="size-3.5" />
             置顶公告
