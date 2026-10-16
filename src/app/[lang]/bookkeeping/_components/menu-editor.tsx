@@ -63,7 +63,15 @@ const menuColorsCls = cls`
   [&_[data-slot=item-tag]]:border-border!
 `;
 
-export function MenuEditor() {
+export function MenuEditor({
+  variant = "page",
+  sharedTags,
+  onTagsChanged,
+}: {
+  variant?: "page" | "inline";
+  sharedTags?: ItemTag[];
+  onTagsChanged?: (tags: ItemTag[]) => void;
+}) {
   const { i18n, t } = useLingui();
   const [menu, setMenu] = useState<Category | null>(null);
   const [tags, setTags] = useState<ItemTag[]>([]);
@@ -101,10 +109,13 @@ export function MenuEditor() {
     setMenu(category);
     if (nextDishes !== null) setDishes(nextDishes);
     setTags(nextTags);
-  }, [listRequested]);
+    onTagsChanged?.(nextTags);
+  }, [listRequested, onTagsChanged]);
   const reloadTags = useCallback(async () => {
-    setTags(await bbqStore.listTags());
-  }, []);
+    const nextTags = await bbqStore.listTags();
+    setTags(nextTags);
+    onTagsChanged?.(nextTags);
+  }, [onTagsChanged]);
   const handleSaved = useCallback(async () => {
     setMessage(null);
     await reload();
@@ -135,20 +146,22 @@ export function MenuEditor() {
 
   return (
     <div
-      className={`mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden ${menuColorsCls}`}
+      className={cls`${variant === "inline" ? "flex flex-col gap-2 shrink-0" : "mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden"} ${menuColorsCls}`}
     >
-      <header className="flex gap-2 flex-row items-start justify-between shrink-0">
-        <div>
-          <div className="flex items-center gap-1.5">
-            <h1 className={pageTitleCls}>
-              <Trans>常用项目</Trans>
-            </h1>
+      {variant === "page" ? (
+        <header className="flex gap-2 flex-row items-start justify-between shrink-0">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h1 className={pageTitleCls}>
+                <Trans>常用项目</Trans>
+              </h1>
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              <Trans>常记的放这里 · {listedCount} 项可选</Trans>
+            </p>
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            <Trans>常记的放这里 · {listedCount} 项可选</Trans>
-          </p>
-        </div>
-      </header>
+        </header>
+      ) : null}
       {notice && !message ? (
         <p
           className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary"
@@ -164,11 +177,18 @@ export function MenuEditor() {
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-3">
+      <div
+        className={
+          variant === "inline"
+            ? undefined
+            : "min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-3"
+        }
+      >
         <DishList
+          showList={variant === "page"}
           categoryId={menu?.id ?? null}
           dishes={dishes}
-          tags={tags}
+          tags={sharedTags ?? tags}
           phase={phase}
           listRequested={listRequested}
           onRequest={() => setLoadRequest((request) => request || 1)}
@@ -187,6 +207,7 @@ export function MenuEditor() {
 }
 
 function DishList({
+  showList,
   categoryId,
   dishes,
   tags,
@@ -199,6 +220,7 @@ function DishList({
   onSaved,
   onError,
 }: {
+  showList: boolean;
   categoryId: string | null;
   dishes: Dish[] | null;
   tags: ItemTag[];
@@ -269,99 +291,101 @@ function DishList({
           ) : null}
         </div>
       </details>
-      <details
-        className={`${settingsCardCls} ${detailsMotionCls}`}
-        onToggle={(event) => {
-          if (event.currentTarget.open) onRequestList();
-        }}
-      >
-        <summary className={settingsSummaryCls}>
-          <Bookmark
-            className="size-4 shrink-0 text-primary"
-            aria-hidden="true"
-          />
-          <h2 className="text-sm font-medium text-foreground flex-1">
-            <Trans>我的常用</Trans>
-          </h2>
-          <span className="text-xs font-normal text-muted-foreground group-open/details:hidden">
-            <Trans>展开查看全部项目</Trans>
-          </span>
-          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-        </summary>
-        <div className="min-h-0 overflow-clip">
-          {listRequested ? (
-            dishes ? (
-              <>
-                <div className="sticky top-0 z-10 bg-background py-3 flex flex-col gap-2 px-3">
-                  <div className="flex min-w-0 items-center gap-2">
-                    {dishes.length > 0 ? (
-                      <div className="min-w-0 flex-1">
-                        <BbqSearch
-                          value={search}
-                          onChange={setSearch}
-                          label={t`搜索已有项目…`}
-                        />
-                      </div>
-                    ) : null}
-                    <ItemTagFilter
-                      tags={tags}
-                      value={activeTagFilter}
-                      onChange={setTagFilter}
-                    />
+      {showList ? (
+        <details
+          className={`${settingsCardCls} ${detailsMotionCls}`}
+          onToggle={(event) => {
+            if (event.currentTarget.open) onRequestList();
+          }}
+        >
+          <summary className={settingsSummaryCls}>
+            <Bookmark
+              className="size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+            <h2 className="text-sm font-medium text-foreground flex-1">
+              <Trans>我的常用</Trans>
+            </h2>
+            <span className="text-xs font-normal text-muted-foreground group-open/details:hidden">
+              <Trans>展开查看全部项目</Trans>
+            </span>
+            <ChevronDown className={detailsChevronCls} aria-hidden="true" />
+          </summary>
+          <div className="min-h-0 overflow-clip">
+            {listRequested ? (
+              dishes ? (
+                <>
+                  <div className="sticky top-0 z-10 bg-background py-3 flex flex-col gap-2 px-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      {dishes.length > 0 ? (
+                        <div className="min-w-0 flex-1">
+                          <BbqSearch
+                            value={search}
+                            onChange={setSearch}
+                            label={t`搜索已有项目…`}
+                          />
+                        </div>
+                      ) : null}
+                      <ItemTagFilter
+                        tags={tags}
+                        value={activeTagFilter}
+                        onChange={setTagFilter}
+                      />
+                    </div>
                   </div>
-                </div>
-                {dishes.length > 0 && matches?.length === 0 ? (
-                  <p
-                    className="py-6 text-center text-sm text-muted-foreground"
-                    role="status"
-                  >
-                    <Trans>没有匹配的项目，请换个关键词</Trans>
-                  </p>
-                ) : null}
-                {dishes.length === 0 ? (
-                  <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
-                    <BbqCompanion
-                      mood="dance"
-                      className="block size-32 shrink-0"
-                    />
-                    <p className="mt-2 text-sm font-medium text-foreground">
-                      <Trans>还没有项目</Trans>
+                  {dishes.length > 0 && matches?.length === 0 ? (
+                    <p
+                      className="py-6 text-center text-sm text-muted-foreground"
+                      role="status"
+                    >
+                      <Trans>没有匹配的项目，请换个关键词</Trans>
                     </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
-                    {dishes.map((dish) => (
-                      <div
-                        key={dish.id}
-                        className={
-                          dish.name.toLocaleLowerCase().includes(query) &&
-                          matchesTag(dish, activeTagFilter)
-                            ? "border-b border-border/60 last:border-b-0"
-                            : "hidden"
-                        }
-                      >
-                        <DishRow
-                          dish={dish}
-                          tags={tags}
-                          onTagsChanged={onTagsChanged}
-                          categoryId={dish.categoryId}
-                          onSaved={onSaved}
-                          onError={onError}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <MenuLoadStatus phase={phase} onRetry={onRetry} />
-            )
-          ) : null}
-        </div>
-      </details>
+                  ) : null}
+                  {dishes.length === 0 ? (
+                    <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
+                      <BbqCompanion
+                        mood="dance"
+                        className="block size-32 shrink-0"
+                      />
+                      <p className="mt-2 text-sm font-medium text-foreground">
+                        <Trans>还没有项目</Trans>
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
+                      {dishes.map((dish) => (
+                        <div
+                          key={dish.id}
+                          className={
+                            dish.name.toLocaleLowerCase().includes(query) &&
+                            matchesTag(dish, activeTagFilter)
+                              ? "border-b border-border/60 last:border-b-0"
+                              : "hidden"
+                          }
+                        >
+                          <DishRow
+                            dish={dish}
+                            tags={tags}
+                            onTagsChanged={onTagsChanged}
+                            categoryId={dish.categoryId}
+                            onSaved={onSaved}
+                            onError={onError}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <MenuLoadStatus phase={phase} onRetry={onRetry} />
+              )
+            ) : null}
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }
@@ -389,7 +413,7 @@ function MenuLoadStatus({
   );
 }
 
-function DishRow({
+export function DishRow({
   dish,
   tags,
   onTagsChanged,

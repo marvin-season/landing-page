@@ -48,7 +48,7 @@ const tagVariants = cva(
   {
     variants: {
       size: {
-        compact: "px-2 py-0.5 text-xs",
+        compact: "px-1 py-0.5 text-[10px]",
         normal: "px-3 py-1 text-sm",
       },
     },

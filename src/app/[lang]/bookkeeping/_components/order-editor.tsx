@@ -19,6 +19,7 @@ import {
   ImagePlus,
   LoaderCircle,
   Minus,
+  Pencil,
   Plus,
   ReceiptText,
   Save,
@@ -58,11 +59,15 @@ import {
   touchCls,
 } from "./bbq-layout";
 import { BbqLink as Link } from "./bbq-link";
-import { BBQ_MENU_CHANGED_EVENT } from "./bbq-menu-events";
-import { bbqHomePath, bbqMenuPath, bbqSettingsPath } from "./bbq-paths";
+import {
+  BBQ_MENU_CHANGED_EVENT,
+  notifyBbqMenuChanged,
+} from "./bbq-menu-events";
+import { bbqHomePath, bbqSettingsPath } from "./bbq-paths";
 import { BbqSearch } from "./bbq-search";
 import { settingsCardCls, settingsSummaryCls } from "./bbq-settings-styles";
 import { ItemTagBadge, ItemTagFilter } from "./item-tags";
+import { DishRow, MenuEditor } from "./menu-editor";
 import { useBbqNavigate } from "./use-bbq-nav";
 import { useGroupingSettings } from "./use-grouping-settings";
 
@@ -73,6 +78,15 @@ const editorWorkspaceCls = cls`
 
 const editorMenuPaneCls = cls`
   min-h-0 min-w-0 ${detailsMotionCls} ${settingsCardCls}
+`;
+
+const editorItemToolbarCls = cls`
+  flex min-w-0 items-center gap-1.5
+  [&_[data-slot=input]]:h-9 [&_[data-slot=input]]:pr-9
+  [&_[data-slot=input]]:bg-muted/30 [&_[data-slot=input]]:placeholder:text-xs
+  [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=select-trigger]]:w-24
+  [&_[data-slot=select-trigger]]:px-2 [&_[data-slot=select-trigger]]:text-xs
+  [&_[data-slot=select-trigger]]:bg-transparent
 `;
 
 const editorSectionCls = cls`${settingsCardCls} p-3`;
@@ -149,6 +163,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [saving, setSaving] = useState(false);
   const [processingPhotos, setProcessingPhotos] = useState(false);
   const [search, setSearch] = useState("");
+  const [managingItems, setManagingItems] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -198,7 +213,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     // 原生 details 收起不会延后读取；只在首次展开后加载并保留菜单状态。
     if (menuRequest === 0) return;
     let cancelled = false;
-    setMenuPhase("loading");
+    // 保存项目后后台刷新，避免卸载正在填写的项目表单。
+    setMenuPhase((current) => (current === "ready" ? current : "loading"));
     setMenuError(null);
     void readMenu()
       .then((menu) => {
@@ -226,10 +242,20 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     };
   }, [menuRequested]);
 
+  async function reloadTags() {
+    setTags(await bbqStore.listTags());
+  }
+
+  async function handleItemSaved() {
+    setMessage(null);
+    notifyBbqMenuChanged();
+  }
+
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const availableDishes = dishes.filter((dish) => dish.listed);
 
-  const filteredDishes = availableDishes.filter(
+  const visibleDishes = managingItems ? dishes : availableDishes;
+  const filteredDishes = visibleDishes.filter(
     (dish) =>
       dish.name
         .toLocaleLowerCase()
@@ -502,6 +528,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               ) : null}
             </section>
           ) : null}
+          <MenuEditor
+            variant="inline"
+            sharedTags={tags}
+            onTagsChanged={setTags}
+          />
           <details
             className={editorMenuPaneCls}
             onToggle={(event) => {
@@ -548,9 +579,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   </div>
                 ) : (
                   <div className="p-2.5">
-                    <div className="bg-muted/30 flex min-w-0 items-center gap-2 rounded-lg [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:bg-transparent [&_[data-slot=select-trigger]]:border-0 [&_[data-slot=select-trigger]]:bg-transparent border border-border/60">
-                      {availableDishes.length > 0 ? (
-                        <div className="min-w-0 flex-1">
+                    <div className={editorItemToolbarCls}>
+                      {dishes.length > 0 ? (
+                        <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
                           <BbqSearch
                             value={search}
                             onChange={setSearch}
@@ -563,8 +594,24 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         value={activeTagFilter}
                         onChange={setTagFilter}
                       />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant={managingItems ? "subtle" : "ghost"}
+                        className="shrink-0 size-9 rounded-lg [&_svg]:size-3.5"
+                        aria-pressed={managingItems}
+                        aria-label={managingItems ? t`取消编辑` : t`编辑`}
+                        title={managingItems ? t`取消编辑` : t`编辑`}
+                        onClick={() => setManagingItems((current) => !current)}
+                      >
+                        {managingItems ? (
+                          <X data-icon="inline-start" />
+                        ) : (
+                          <Pencil data-icon="inline-start" />
+                        )}
+                      </Button>
                     </div>
-                    {availableDishes.length === 0 ? (
+                    {visibleDishes.length === 0 ? (
                       <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
                         <UtensilsCrossed
                           className="size-7 text-muted-foreground/60"
@@ -576,16 +623,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         <p className="mt-1 text-sm text-muted-foreground">
                           <Trans>比如早餐、咖啡，或一次跑步。</Trans>
                         </p>
-                        <Button
-                          asChild
-                          size="sm"
-                          variant="outline"
-                          className="mt-3"
-                        >
-                          <Link href={bbqMenuPath()}>
-                            <Trans>添加常用项目</Trans>
-                          </Link>
-                        </Button>
                       </div>
                     ) : filteredDishes.length === 0 ? (
                       <p
@@ -594,59 +631,97 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       >
                         <Trans>没有匹配的项目，请换个关键词</Trans>
                       </p>
+                    ) : managingItems ? (
+                      <div className="mt-2 flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
+                        {dishes.map((dish) => (
+                          <div
+                            key={dish.id}
+                            className={
+                              filteredDishes.includes(dish)
+                                ? "border-b border-border/60 last:border-b-0"
+                                : "hidden"
+                            }
+                          >
+                            <DishRow
+                              dish={dish}
+                              categoryId={dish.categoryId}
+                              tags={tags}
+                              onTagsChanged={reloadTags}
+                              onSaved={handleItemSaved}
+                              onError={setMessage}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     ) : (
                       <div className="mt-2 grid min-h-0 grid-cols-2 gap-1.5 auto-rows-max content-start p-1 max-h-[min(16rem,40dvh)] overflow-y-auto overscroll-y-contain">
-                        {filteredDishes.map((dish) => (
-                          <Button
-                            key={dish.id}
-                            type="button"
-                            variant={
-                              selectedQuantities.has(dish.id)
-                                ? "subtle"
-                                : "outline"
-                            }
-                            className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 flex-wrap data-[selected=true]:bg-primary/5`}
-                            data-selected={selectedQuantities.has(dish.id)}
-                            aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
-                            onClick={() => addDish(dish)}
-                          >
-                            <span className="min-w-0 flex-1">
-                              <span
-                                className="block truncate"
-                                title={dish.name}
-                              >
-                                {dish.name}
-                              </span>
-                              <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
-                                {formatYuan(dish.priceCents)}/{dish.unit}
-                                <span className="mx-1" aria-hidden="true">
-                                  ·
+                        {filteredDishes.map((dish) => {
+                          const dishTags = tags.filter((tag) =>
+                            getDishTagIds(dish).includes(tag.id),
+                          );
+                          return (
+                            <Button
+                              key={dish.id}
+                              type="button"
+                              variant={
+                                selectedQuantities.has(dish.id)
+                                  ? "subtle"
+                                  : "outline"
+                              }
+                              className={`${touchCls} h-auto w-full justify-between rounded-lg px-2.5 py-2 text-left text-sm ${editorControlCls} hover:bg-muted/70 min-w-0 whitespace-nowrap items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5`}
+                              data-selected={selectedQuantities.has(dish.id)}
+                              aria-label={t`添加 ${dish.name}，已选 ${selectedQuantities.get(dish.id) ?? 0} 件`}
+                              onClick={() => addDish(dish)}
+                            >
+                              <span className="min-w-0 flex-1">
+                                <span className="flex min-w-0 items-center gap-1.5">
+                                  <span
+                                    className="block truncate flex-1"
+                                    title={dish.name}
+                                  >
+                                    {dish.name}
+                                  </span>
+                                  {dishTags.length > 0 ? (
+                                    <span className="flex min-w-0 max-w-[50%] shrink-0 items-center gap-1 [&_[data-slot=item-tag]]:px-1 [&_[data-slot=item-tag]]:py-0 [&_[data-slot=item-tag]]:text-[10px] [&_[data-slot=item-tag]]:leading-4">
+                                      <ItemTagBadge tag={dishTags[0]} />
+                                      {dishTags.length > 1 ? (
+                                        <span
+                                          className="shrink-0 text-[10px] font-normal text-muted-foreground"
+                                          title={dishTags
+                                            .slice(1)
+                                            .map((tag) => tag.name)
+                                            .join("、")}
+                                        >
+                                          +{dishTags.length - 1}
+                                        </span>
+                                      ) : null}
+                                    </span>
+                                  ) : null}
                                 </span>
-                                {formatCalories(
-                                  i18n,
-                                  summarizeCalories([{ ...dish, quantity: 1 }]),
-                                )}
-                              </span>
-                            </span>
-                            <span className="flex shrink-0 flex-col items-center gap-1 pt-0.5">
-                              <Plus className="size-4" aria-hidden="true" />
-                              {selectedQuantities.has(dish.id) ? (
-                                <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
-                                  {selectedQuantities.get(dish.id)}
+                                <span className="mt-0.5 block text-xs font-normal tabular-nums text-muted-foreground truncate">
+                                  {formatYuan(dish.priceCents)}/{dish.unit}
+                                  <span className="mx-1" aria-hidden="true">
+                                    ·
+                                  </span>
+                                  {formatCalories(
+                                    i18n,
+                                    summarizeCalories([
+                                      { ...dish, quantity: 1 },
+                                    ]),
+                                  )}
                                 </span>
-                              ) : null}
-                            </span>
-                            <span className="flex min-w-0 flex-wrap gap-1 empty:hidden w-full">
-                              {tags
-                                .filter((tag) =>
-                                  getDishTagIds(dish).includes(tag.id),
-                                )
-                                .map((tag) => (
-                                  <ItemTagBadge key={tag.id} tag={tag} />
-                                ))}
-                            </span>
-                          </Button>
-                        ))}
+                              </span>
+                              <span className="flex shrink-0 flex-col items-center gap-1 pt-0.5">
+                                <Plus className="size-4" aria-hidden="true" />
+                                {selectedQuantities.has(dish.id) ? (
+                                  <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs tabular-nums text-primary-foreground">
+                                    {selectedQuantities.get(dish.id)}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </Button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
