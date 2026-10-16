@@ -36,15 +36,13 @@ import { settingsCardCls, settingsSummaryCls } from "./bbq-settings-styles";
 import { useCompanionAlbum } from "./companion-album-provider";
 
 const moodLabels = {
-  hello: msg`备份提醒 / 未选项目 / 暂无进行中记录`,
-  dance: msg`常用 · 暂无项目 / 记录 · 进行中列表顶部`,
+  hello: msg`备份提醒 / 未选项目 / 记录 · 暂无记录`,
+  dance: msg`常用 · 暂无项目 / 记录 · 列表顶部`,
   chef: msg`常用 · 添加项目 / 记一笔 · 分组下未选项目`,
   exercise: msg`统计 · 热量图表旁`,
-  shy: msg`记录 · 暂无已完成记录`,
   wave: msg`设置 · 安装应用卡片`,
   busy: msg`统计 · 金额图表旁`,
   ponder: msg`统计 · 记录数图表旁 / 暂无数据`,
-  happy: msg`记录 · 已完成列表顶部`,
 };
 type SelectableMood = keyof typeof moodLabels;
 // Only offer images used by the UI; keep legacy moods compatible with saved packs.
@@ -127,7 +125,9 @@ export function CompanionAlbumSettings() {
         version: 1,
         images: {},
       };
-      for (const row of await companionImages.toArray()) {
+      // Export only selectable scenes; legacy images may still exist in storage.
+      for (const row of await companionImages.bulkGet(selectableMoods)) {
+        if (!row) continue;
         album.images[row.id] = {
           src: await blobDataUrl(row.image),
           still: await blobDataUrl(row.still),
@@ -174,11 +174,12 @@ export function CompanionAlbumSettings() {
           <legend className="sr-only">
             <Trans>自定义图集</Trans>
           </legend>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 mb-1">
             <Button
               type="button"
-              variant="outline"
+              variant="subtle"
               size="sm"
+              className="h-9 min-w-0 rounded-lg px-3"
               onClick={() => albumInput.current?.click()}
             >
               <FileUp data-icon="inline-start" />
@@ -188,22 +189,21 @@ export function CompanionAlbumSettings() {
               type="button"
               variant="outline"
               size="sm"
-              disabled={!count}
+              className="h-9 min-w-0 rounded-lg px-3"
+              disabled={!configuredCount}
               onClick={() => void exportAlbum()}
             >
               <FileDown data-icon="inline-start" />
               <Trans>导出图集</Trans>
             </Button>
-            <Button asChild variant="ghost" size="sm">
-              <a
-                href="https://github.com/marvin-season/landing-page/releases/download/luji-companions-v1/luji-companions.json"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FileDown data-icon="inline-start" />
-                <Trans>下载示例图集</Trans>
-              </a>
-            </Button>
+            <a
+              href="https://github.com/marvin-season/landing-page/releases/download/luji-companions-v1/luji-companions.json"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="col-span-2 w-fit justify-self-end text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              <Trans>下载示例图集</Trans>
+            </a>
           </div>
           <label className="flex flex-col gap-1.5 text-xs">
             <Trans>选择要更换图片的位置</Trans>
@@ -273,7 +273,7 @@ export function CompanionAlbumSettings() {
               <div className="flex flex-col gap-1.5 pb-1">
                 <p>
                   <Trans>
-                    约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。
+                    约 23 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。
                   </Trans>
                 </p>
                 <p>

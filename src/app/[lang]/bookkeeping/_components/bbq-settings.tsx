@@ -249,7 +249,9 @@ export function BbqSettings() {
           <div className="min-h-0 overflow-clip">
             <div className="flex flex-col gap-4 p-3 border-t border-border/60">
               <p className="text-xs text-muted-foreground">
-                <Trans>保存一份记录和常用项目，换设备也能带走。</Trans>
+                <Trans>
+                  保存一份记录和常用项目，换设备也能带走。备份不包含自定义图集，图集需单独导出；下方“图片”仅指记录中添加的图片。
+                </Trans>
               </p>
 
               <fieldset

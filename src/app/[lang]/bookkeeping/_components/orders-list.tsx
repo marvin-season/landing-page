@@ -102,10 +102,7 @@ export function OrdersList({
             </p>
           </div>
           {!loading && visibleOrders.length > 0 ? (
-            <BbqCompanion
-              mood={statusFilter === "open" ? "dance" : "happy"}
-              className="block size-12 shrink-0"
-            />
+            <BbqCompanion mood="dance" className="block size-12 shrink-0" />
           ) : null}
         </div>
         <div
@@ -152,10 +149,7 @@ export function OrdersList({
           </div>
         ) : visibleOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
-            <BbqCompanion
-              mood={statusFilter === "open" ? "hello" : "shy"}
-              className="block size-28 shrink-0"
-            />
+            <BbqCompanion mood="hello" className="block size-28 shrink-0" />
             <p className="mt-3 text-sm font-medium text-foreground">
               {statusFilter === "open"
                 ? t`还没有进行中的记录`

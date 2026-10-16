@@ -73,7 +73,7 @@ function AnnouncementFeed() {
           <Trans>公告</Trans>
         </h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          <Trans>更新与提醒，按时间由近到远</Trans>
+          <Trans>更新与提醒</Trans>
         </p>
       </header>
       <div className="shrink-0 [&_[data-slot=input]]:h-9 [&_[data-slot=button]]:size-9">
