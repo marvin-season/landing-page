@@ -50,6 +50,7 @@ import { LocalDataNotice } from "./local-data-notice";
 
 const radioOptionCls = cls`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-checked:border-primary/40 has-checked:bg-primary/5 has-disabled:cursor-not-allowed has-disabled:opacity-50 border-border/60 bg-muted/30 text-foreground transition-colors hover:bg-muted/50 has-focus-visible:ring-1 has-focus-visible:ring-primary/50`;
 const radioInputCls = cls`size-4 shrink-0 accent-primary`;
+const groupLabelCls = cls`shrink-0 px-1 pt-3 text-xs font-medium text-muted-foreground first:pt-0`;
 const preferenceControlCls = cls`
   shrink-0 [&>button]:min-h-8 [&>button]:min-w-16 [&>button]:rounded-md
   [&>button]:border [&>button]:border-border/60 [&>button]:bg-muted/30
@@ -213,6 +214,9 @@ export function BbqSettings() {
         </p>
       ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3">
+        <p className={groupLabelCls}>
+          <Trans>基础设置</Trans>
+        </p>
         <section className={`${settingsCardCls} divide-y divide-border/60`}>
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
             <h2 className="flex items-center gap-1.5 text-sm font-medium">
@@ -233,8 +237,11 @@ export function BbqSettings() {
             </div>
           </div>
         </section>
-        <CompanionAlbumSettings />
         <GroupingSettingsCard disabled={task !== null} />
+        <p className={groupLabelCls}>
+          <Trans>数据管理</Trans>
+        </p>
+        <CompanionAlbumSettings />
         <details className={`${settingsCardCls} ${detailsMotionCls}`}>
           <summary className={settingsSummaryCls}>
             <DatabaseBackup
@@ -448,6 +455,9 @@ export function BbqSettings() {
             </fieldset>
           </div>
         </details>
+        <p className={groupLabelCls}>
+          <Trans>其他</Trans>
+        </p>
         <section className={`${settingsCardCls} p-3`}>
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
