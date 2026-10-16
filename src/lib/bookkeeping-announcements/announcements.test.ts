@@ -77,6 +77,7 @@ test("drafts and scheduled announcements are private, including forged future cu
     ...listInput,
     cursor: {
       asOf: "2100-01-01T00:00:00.000Z",
+      pinned: false,
       publishedAt: "2100-01-01T00:00:00.000Z",
       id: "z",
     },
@@ -185,15 +186,18 @@ for (const role of [null, "guest", "admin", "super_admin"]) {
       (await routes.admin(request())).status,
       allowed ? 200 : expected,
     );
-    const created = await routes.admin(request("POST", input));
-    assert.equal(created.status, allowed ? 201 : expected);
-    const id = allowed
-      ? (await created.json()).id
-      : `db:${crypto.randomUUID()}`;
-    assert.equal(
-      (await routes.admin(request("PATCH", { ...input, id }))).status,
-      allowed ? 200 : expected,
+    const created = await routes.admin(
+      request("POST", { ...input, pinned: true }),
     );
+    assert.equal(created.status, allowed ? 201 : expected);
+    const createdBody = await created.json();
+    if (allowed) assert.equal(createdBody.pinned, true);
+    const id = allowed ? createdBody.id : `db:${crypto.randomUUID()}`;
+    const updated = await routes.admin(
+      request("PATCH", { ...input, id, pinned: false }),
+    );
+    assert.equal(updated.status, allowed ? 200 : expected);
+    if (allowed) assert.equal((await updated.json()).pinned, false);
     assert.equal(
       (await routes.admin(request("DELETE", { id }))).status,
       allowed ? 200 : expected,
@@ -265,4 +269,101 @@ test("public reads do not require auth and cannot mutate data", async () => {
   });
   assert.equal((await routes.publicList(request())).status, 200);
   assert.equal((await routes.publicList(request("POST", input))).status, 405);
+});
+
+test("migrates existing tables without changing records and can initialize repeatedly", async () => {
+  const { db, store } = setup();
+  await db.execute(`CREATE TABLE bookkeeping_announcements (
+    id TEXT PRIMARY KEY NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL,
+    published_at TEXT NOT NULL, published INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL, updated_at TEXT NOT NULL, updated_by TEXT NOT NULL
+  )`);
+  const id = `db:${crypto.randomUUID()}`;
+  await db.execute({
+    sql: "INSERT INTO bookkeeping_announcements VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    args: [
+      id,
+      "旧公告",
+      "保留内容",
+      input.publishedAt,
+      1,
+      input.publishedAt,
+      input.publishedAt,
+      "original-admin",
+    ],
+  });
+  for (const reader of [store, createAnnouncementStore(() => db)]) {
+    const page = await reader.list({ ...listInput, admin: true });
+    assert.equal(page.items[0].id, id);
+    assert.equal(page.items[0].pinned, false);
+    assert.equal(page.items[0].body, "保留内容");
+    assert.equal(page.items[0].publishedAt, input.publishedAt);
+  }
+  const row = (
+    await db.execute(
+      "SELECT updated_at, updated_by FROM bookkeeping_announcements",
+    )
+  ).rows[0];
+  assert.equal(row.updated_at, input.publishedAt);
+  assert.equal(row.updated_by, "original-admin");
+});
+
+test("pinned announcements span pages before newer regular and built-in announcements", async () => {
+  const { store } = setup();
+  const pinnedIds = new Set<string>();
+  for (let i = 0; i < 12; i++) {
+    const saved = await store.save(
+      {
+        ...input,
+        title: `Pinned ${i}`,
+        pinned: true,
+        publishedAt: "2025-01-01T00:00:00.000Z",
+      },
+      "admin",
+    );
+    pinnedIds.add(saved.id);
+  }
+  for (let i = 0; i < 15; i++)
+    await store.save({ ...input, title: `Regular ${i}` }, "admin");
+  let page = await store.list(listInput);
+  assert.equal(page.items.length, 10);
+  assert.ok(page.items.every((item) => item.pinned));
+  const all = [...page.items];
+  while (page.nextCursor) {
+    const cursor = listInputSchema.parse({ cursor: page.nextCursor }).cursor;
+    page = await store.list({ ...listInput, cursor });
+    all.push(...page.items);
+  }
+  assert.equal(all.length, 28);
+  assert.equal(new Set(all.map((item) => item.id)).size, 28);
+  assert.deepEqual(new Set(all.slice(0, 12).map((item) => item.id)), pinnedIds);
+  assert.ok(all.slice(12).every((item) => !item.pinned));
+  assert.equal(all[12].source, "builtin");
+});
+
+test("pinning and unpinning preserve publication times and never publish private announcements", async () => {
+  const { store } = setup();
+  const saved = await store.save({ ...input, pinned: true }, "admin");
+  assert.equal((await store.list(listInput)).items[0].id, saved.id);
+  await store.save({ ...input, pinned: false }, "admin", saved.id);
+  const unpinned = await store.list(listInput);
+  assert.equal(unpinned.items[0].source, "builtin");
+  assert.equal(
+    unpinned.items.find((item) => item.id === saved.id)?.publishedAt,
+    input.publishedAt,
+  );
+  const draft = await store.save(
+    { ...input, pinned: true, published: false },
+    "admin",
+  );
+  const scheduled = await store.save(
+    { ...input, pinned: true, publishedAt: "2099-01-01T00:00:00.000Z" },
+    "admin",
+  );
+  assert.ok(
+    !(await store.list(listInput)).items.some(
+      (item) => item.id === draft.id || item.id === scheduled.id,
+    ),
+  );
+  await assert.rejects(store.save({ ...input, pinned: "yes" }, "admin"));
 });

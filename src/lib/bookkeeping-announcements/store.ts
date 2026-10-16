@@ -18,28 +18,43 @@ export function createAnnouncementStore(getClient: () => Client = getAuthDb) {
     const client = getClient();
     let pending = ready.get(client);
     if (!pending) {
-      pending = client
-        .batch(
-          [
-            `CREATE TABLE IF NOT EXISTS bookkeeping_announcements (
-          id TEXT PRIMARY KEY NOT NULL,
-          title TEXT NOT NULL,
-          body TEXT NOT NULL,
-          published_at TEXT NOT NULL,
-          published INTEGER NOT NULL DEFAULT 0 CHECK (published IN (0, 1)),
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL,
-          updated_by TEXT NOT NULL
-        )`,
-            "CREATE INDEX IF NOT EXISTS bookkeeping_announcements_public ON bookkeeping_announcements (published, published_at DESC, id DESC)",
-            "CREATE INDEX IF NOT EXISTS bookkeeping_announcements_timeline ON bookkeeping_announcements (published_at DESC, id DESC)",
-          ],
-          "write",
-        )
-        .catch((error) => {
-          ready.delete(client);
-          throw error;
-        });
+      // Serialize schema inspection and migration so concurrent cold starts are safe.
+      pending = (async () => {
+        const transaction = await client.transaction("write");
+        try {
+          await transaction.execute(`CREATE TABLE IF NOT EXISTS bookkeeping_announcements (
+            id TEXT PRIMARY KEY NOT NULL,
+            title TEXT NOT NULL,
+            body TEXT NOT NULL,
+            published_at TEXT NOT NULL,
+            published INTEGER NOT NULL DEFAULT 0 CHECK (published IN (0, 1)),
+            pinned INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0, 1)),
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            updated_by TEXT NOT NULL
+          )`);
+          const columns = await transaction.execute(
+            "PRAGMA table_info(bookkeeping_announcements)",
+          );
+          if (!columns.rows.some((column) => column.name === "pinned")) {
+            await transaction.execute(
+              "ALTER TABLE bookkeeping_announcements ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0, 1))",
+            );
+          }
+          await transaction.execute(
+            "CREATE INDEX IF NOT EXISTS bookkeeping_announcements_public_pinned ON bookkeeping_announcements (published, pinned DESC, published_at DESC, id DESC)",
+          );
+          await transaction.execute(
+            "CREATE INDEX IF NOT EXISTS bookkeeping_announcements_timeline_pinned ON bookkeeping_announcements (pinned DESC, published_at DESC, id DESC)",
+          );
+          await transaction.commit();
+        } finally {
+          transaction.close();
+        }
+      })().catch((error) => {
+        ready.delete(client);
+        throw error;
+      });
       ready.set(client, pending);
     }
     await pending;
@@ -52,6 +67,7 @@ export function createAnnouncementStore(getClient: () => Client = getAuthDb) {
       body: String(row.body),
       publishedAt: String(row.published_at),
       published: Number(row.published) === 1,
+      pinned: Number(row.pinned) === 1,
       source: "database",
     };
   }
@@ -79,8 +95,16 @@ export function createAnnouncementStore(getClient: () => Client = getAuthDb) {
         args.push(asOf);
       }
       if (cursor) {
-        where.push("(published_at < ? OR (published_at = ? AND id < ?))");
-        args.push(cursor.publishedAt, cursor.publishedAt, cursor.id);
+        where.push(
+          "(pinned < ? OR (pinned = ? AND (published_at < ? OR (published_at = ? AND id < ?))))",
+        );
+        args.push(
+          Number(cursor.pinned),
+          Number(cursor.pinned),
+          cursor.publishedAt,
+          cursor.publishedAt,
+          cursor.id,
+        );
       }
       if (q) {
         where.push("(title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\')");
@@ -89,7 +113,7 @@ export function createAnnouncementStore(getClient: () => Client = getAuthDb) {
       }
       args.push(ANNOUNCEMENT_PAGE_SIZE + 1);
       const result = await client.execute({
-        sql: `SELECT id, title, body, published_at, published FROM bookkeeping_announcements WHERE ${where.join(" AND ")} ORDER BY published_at DESC, id DESC LIMIT ?`,
+        sql: `SELECT id, title, body, published_at, published, pinned FROM bookkeeping_announcements WHERE ${where.join(" AND ")} ORDER BY pinned DESC, published_at DESC, id DESC LIMIT ?`,
         args,
       });
       const builtin = admin
@@ -118,18 +142,19 @@ export function createAnnouncementStore(getClient: () => Client = getAuthDb) {
         value.body,
         value.publishedAt,
         Number(value.published),
+        Number(value.pinned),
         now,
         userId,
       ];
       if (id) {
         const result = await client.execute({
-          sql: "UPDATE bookkeeping_announcements SET title = ?, body = ?, published_at = ?, published = ?, updated_at = ?, updated_by = ? WHERE id = ?",
+          sql: "UPDATE bookkeeping_announcements SET title = ?, body = ?, published_at = ?, published = ?, pinned = ?, updated_at = ?, updated_by = ? WHERE id = ?",
           args: [...args, id],
         });
         if (!result.rowsAffected) throw new AnnouncementNotFound();
       } else {
         await client.execute({
-          sql: "INSERT INTO bookkeeping_announcements (title, body, published_at, published, updated_at, updated_by, id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          sql: "INSERT INTO bookkeeping_announcements (title, body, published_at, published, pinned, updated_at, updated_by, id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
           args: [...args, recordId, now],
         });
       }

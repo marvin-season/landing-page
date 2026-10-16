@@ -9,6 +9,7 @@ export const announcementInputSchema = z.object({
   body: z.string().trim().min(1).max(20000),
   publishedAt: timestamp,
   published: z.boolean(),
+  pinned: z.boolean().default(false),
 });
 export const databaseIdSchema = z.string().regex(/^db:[0-9a-f-]{36}$/);
 export const announcementSchema = announcementInputSchema.extend({
@@ -20,6 +21,7 @@ export type AnnouncementInput = z.infer<typeof announcementInputSchema>;
 
 const cursorSchema = z.object({
   asOf: timestamp,
+  pinned: z.boolean().default(false),
   publishedAt: timestamp,
   id: z.string().min(1).max(100),
 });
@@ -43,7 +45,13 @@ export const announcementPageSchema = z.object({
 });
 export type AnnouncementPage = z.infer<typeof announcementPageSchema>;
 
-export function compareAnnouncements(a: Announcement, b: Announcement) {
+type AnnouncementPosition = Pick<Announcement, "pinned" | "publishedAt" | "id">;
+
+export function compareAnnouncements(
+  a: AnnouncementPosition,
+  b: AnnouncementPosition,
+) {
+  if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
   if (a.publishedAt !== b.publishedAt)
     return a.publishedAt > b.publishedAt ? -1 : 1;
   return a.id === b.id ? 0 : a.id > b.id ? -1 : 1;
@@ -55,12 +63,7 @@ export function paginateAnnouncements(
   asOf: string,
 ): AnnouncementPage {
   const sorted = items
-    .filter(
-      (item) =>
-        !cursor ||
-        item.publishedAt < cursor.publishedAt ||
-        (item.publishedAt === cursor.publishedAt && item.id < cursor.id),
-    )
+    .filter((item) => !cursor || compareAnnouncements(item, cursor) > 0)
     .sort(compareAnnouncements);
   const page = sorted.slice(0, ANNOUNCEMENT_PAGE_SIZE);
   const last = page.at(-1);
@@ -68,7 +71,12 @@ export function paginateAnnouncements(
     items: page,
     nextCursor:
       sorted.length > ANNOUNCEMENT_PAGE_SIZE && last
-        ? JSON.stringify({ asOf, publishedAt: last.publishedAt, id: last.id })
+        ? JSON.stringify({
+            asOf,
+            pinned: last.pinned,
+            publishedAt: last.publishedAt,
+            id: last.id,
+          })
         : null,
   };
 }

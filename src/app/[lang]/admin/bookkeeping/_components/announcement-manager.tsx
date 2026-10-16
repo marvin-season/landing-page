@@ -201,6 +201,11 @@ export function AnnouncementManager() {
                     <h3 className="break-words text-sm font-medium">
                       {item.title}
                     </h3>
+                    {item.pinned ? (
+                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                        置顶
+                      </span>
+                    ) : null}
                     <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
                       {!item.published
                         ? t`草稿`
@@ -313,6 +318,7 @@ function AnnouncementForm({
   const [title, setTitle] = useState(item?.title ?? "");
   const [body, setBody] = useState(item?.body ?? "");
   const [published, setPublished] = useState(item?.published ?? false);
+  const [pinned, setPinned] = useState(item?.pinned ?? false);
   const [time, setTime] = useState(() =>
     item ? localDateTime(item.publishedAt) : "",
   );
@@ -335,6 +341,7 @@ function AnnouncementForm({
           title,
           body,
           published,
+          pinned,
           publishedAt:
             item && time === localDateTime(item.publishedAt)
               ? item.publishedAt
@@ -385,6 +392,14 @@ function AnnouncementForm({
               aria-label={t`发布公告`}
             />
             <Trans>发布公告</Trans>
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Switch
+              checked={pinned}
+              onCheckedChange={setPinned}
+              aria-label="置顶公告"
+            />
+            置顶公告
           </label>
           <div className="flex gap-2">
             {item ? (
