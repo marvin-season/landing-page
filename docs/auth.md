@@ -45,6 +45,8 @@ flowchart LR
 
 匹配是前缀匹配：`/admin/users`、`/zh/resume/`、`/agent/thread-1` 都会命中。`/agency` 这种前缀相似路径不会命中。
 
+`/admin/bookkeeping` 沿用 `/admin` 页面登录门闩。`/api/admin/bookkeeping/announcements` 的每次读取和写入都独立校验会话与数据库中的当前角色，仅允许 `admin` 和 `super_admin`；写请求还校验同源 Origin。公开的 `/api/bookkeeping/announcements` 只返回已到发布时间且已发布的公告。
+
 ## 3. 请求怎么走
 
 Next.js 16 用 `src/proxy.ts` 拦截页面请求（不再需要根目录 `middleware.ts`）。

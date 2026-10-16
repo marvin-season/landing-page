@@ -1,7 +1,16 @@
+import { Trans } from "@lingui/react/macro";
+import { setI18n } from "@lingui/react/server";
+import type { ReactNode } from "react";
 import { Link } from "@/components/link/link";
+import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { PrefetchUsersLink } from "./_components/prefetch-users-link";
 
 const tools = [
+  {
+    href: "/admin/bookkeeping",
+    title: <Trans>记账公告</Trans>,
+    description: <Trans>管理记账公告、草稿与发布时间</Trans>,
+  },
   {
     href: "/admin/users",
     title: "闲人止步",
@@ -16,8 +25,8 @@ function ToolText({
   title,
   description,
 }: {
-  title: string;
-  description: string;
+  title: ReactNode;
+  description: ReactNode;
 }) {
   return (
     <>
@@ -29,7 +38,11 @@ function ToolText({
   );
 }
 
-export default function AdminPage() {
+export default async function AdminPage({ params }: PageLangParam) {
+  const { lang } = await params;
+  // Pages can render independently of their layout during RSC navigation.
+  setI18n(getI18nInstance(lang));
+
   return (
     <>
       <header>

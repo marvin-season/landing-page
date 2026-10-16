@@ -23,6 +23,13 @@ describe("isProtectedPath", () => {
   it("matches admin with and without locale prefix", () => {
     assert.equal(isProtectedPath("/admin"), true);
     assert.equal(isProtectedPath("/admin/users"), true);
+    for (const prefix of ["", "/zh", "/en", "/ja"]) {
+      assert.equal(isProtectedPath(`${prefix}/admin/bookkeeping`), true);
+      assert.equal(
+        getSafeReturnTo(`${prefix}/admin/bookkeeping`),
+        `${prefix}/admin/bookkeeping`,
+      );
+    }
     assert.equal(isProtectedPath("/zh/admin"), true);
     assert.equal(isProtectedPath("/zh/admin/users"), true);
   });
@@ -42,6 +49,7 @@ describe("isProtectedPath", () => {
       for (const path of [
         "",
         "/menu",
+        "/announcements",
         "/settings",
         "/orders/new",
         "/orders/order-1",

@@ -4,6 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { usePathname } from "next/navigation";
 import { Fragment, type PropsWithChildren, useEffect, useState } from "react";
 import { readBookkeepingRoute } from "@/lib/bookkeeping-pwa/routes";
+import { Announcements } from "./announcements";
 import { BackupReminder } from "./backup-reminder";
 import { BbqSettings } from "./bbq-settings";
 import { CompanionAlbumReminder } from "./companion-album-reminder";
@@ -22,11 +23,13 @@ export function BbqApp({ children }: PropsWithChildren) {
       ? route.orderId
         ? t`编辑记录 · 记露`
         : t`新增记录 · 记露`
-      : route?.page === "menu"
-        ? t`菜单管理 · 记露`
-        : route?.page === "settings"
-          ? t`设置 · 记露`
-          : t`记露 · 支出与热量统计`;
+      : route?.page === "announcements"
+        ? t`公告 · 记露`
+        : route?.page === "menu"
+          ? t`菜单管理 · 记露`
+          : route?.page === "settings"
+            ? t`设置 · 记露`
+            : t`记露 · 支出与热量统计`;
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -41,6 +44,8 @@ export function BbqApp({ children }: PropsWithChildren) {
     <Fragment key={pathname}>
       {route.page === "editor" ? (
         <OrderEditor orderId={route.orderId} />
+      ) : route.page === "announcements" ? (
+        <Announcements />
       ) : route.page === "menu" ? (
         <MenuEditor />
       ) : route.page === "settings" ? (

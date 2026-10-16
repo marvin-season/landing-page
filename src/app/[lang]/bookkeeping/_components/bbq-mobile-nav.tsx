@@ -3,13 +3,18 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 
-import { BookOpen, NotebookPen, Settings } from "lucide-react";
+import { BookOpen, Megaphone, NotebookPen, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isBusinessHours } from "@/lib/bbq/business-day";
 import { cls } from "./bbq-layout";
 import { BbqLink as Link } from "./bbq-link";
-import { bbqHomePath, bbqNewOrderPath, bbqSettingsPath } from "./bbq-paths";
+import {
+  bbqAnnouncementsPath,
+  bbqHomePath,
+  bbqNewOrderPath,
+  bbqSettingsPath,
+} from "./bbq-paths";
 
 const items = [
   { label: msg`账本`, href: bbqHomePath(), segment: null, icon: BookOpen },
@@ -18,6 +23,12 @@ const items = [
     href: bbqNewOrderPath(),
     segment: "orders",
     icon: NotebookPen,
+  },
+  {
+    label: msg`公告`,
+    href: bbqAnnouncementsPath(),
+    segment: "announcements",
+    icon: Megaphone,
   },
   {
     label: msg`设置`,
@@ -56,7 +67,7 @@ export function BbqMobileNav() {
     <nav
       className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t`}
     >
-      <div className="mx-auto grid grid-cols-3 gap-1 py-1.5 px-2">
+      <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
           const active = segment === itemSegment;
           const disabled = itemSegment === "orders" && !canCreate && !active;

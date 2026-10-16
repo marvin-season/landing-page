@@ -198,6 +198,7 @@ test("offline cold navigations and unseen record IDs use the complete cached she
     "/zh/bookkeeping",
     "/zh/bookkeeping?day=2026-10-15",
     "/zh/bookkeeping/menu",
+    "/zh/bookkeeping/announcements",
     "/zh/bookkeeping/settings",
     "/zh/bookkeeping/orders/new",
     "/zh/bookkeeping/orders/created-offline",
@@ -218,6 +219,9 @@ test("auth, APIs, other languages, unknown routes and RSC never receive cached H
   worker.state.online = false;
   for (const path of [
     "/api/auth/session",
+    "/api/bookkeeping/announcements",
+    "/api/admin/bookkeeping/announcements",
+    "/zh/admin/bookkeeping",
     "/zh/admin",
     "/en/bookkeeping",
     "/zh/bookkeeping-other",

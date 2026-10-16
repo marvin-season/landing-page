@@ -35,7 +35,7 @@ msgid "{0} 个时段 · {totalOrders} 笔记录 · 已完成 {settledOrders} 笔
 msgstr "{0} 个时段 · {totalOrders} 笔记录 · 已完成 {settledOrders} 笔"
 
 #. placeholder {0}: order.seat
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:481
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:507
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:343
 msgid "{0} 号座"
 msgstr "{0} 号座"
@@ -59,13 +59,13 @@ msgstr "{0} 条记录"
 
 #. placeholder {0}: availableDishes.length
 #. placeholder {0}: order.lines.length
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:522
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:553
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:366
 msgid "{0} 项"
 msgstr "{0} 项"
 
 #. placeholder {0}: lines.length
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:668
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:743
 msgid "{0} 项 · {itemCount} 件"
 msgstr "{0} 项 · {itemCount} 件"
 
@@ -89,7 +89,7 @@ msgstr "{date} 记账时段"
 msgid "{value} kcal"
 msgstr ""
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:314
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:316
 msgid "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 msgstr "3 个常用项目，最近三天共 4 条记录。保留已有数据，重复导入不重复添加。"
 
@@ -704,8 +704,10 @@ msgstr "更换"
 msgid "Resume"
 msgstr "简历"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:383
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:546
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:189
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:116
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:407
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:577
 #: src/app/[lang]/knowledge/_components/document/chat.tsx:308
 msgid "Retry"
 msgstr "重试"
@@ -956,8 +958,8 @@ msgstr "放大"
 msgid "Zoom out"
 msgstr "缩小"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:181
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:273
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:185
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:316
 msgid "一键导入图集"
 msgstr "一键导入图集"
 
@@ -969,11 +971,11 @@ msgstr "一顿饭、一杯咖啡，都可以记在这里。"
 msgid "上个月"
 msgstr "上个月"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:236
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:244
 msgid "上传 / 替换"
 msgstr "上传 / 替换"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:285
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:328
 msgid "上传场景图片"
 msgstr "上传场景图片"
 
@@ -981,11 +983,15 @@ msgstr "上传场景图片"
 msgid "下个月"
 msgstr "下个月"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:473
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:204
+msgid "下载示例图集"
+msgstr "下载示例图集"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:499
 msgid "不分组"
 msgstr "不分组"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:271
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:273
 msgid "不含图片"
 msgstr "不含图片"
 
@@ -994,15 +1000,15 @@ msgstr "不含图片"
 msgid "个人记账"
 msgstr "个人记账"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:227
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:229
 msgid "主题"
 msgstr "主题"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:409
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:411
 msgid "仅移除图片，保留账目"
 msgstr "仅移除图片，保留账目"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:800
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:875
 msgid "从相册选择"
 msgstr "从相册选择"
 
@@ -1010,7 +1016,11 @@ msgstr "从相册选择"
 msgid "从第一笔开始"
 msgstr "从第一笔开始"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:712
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:286
+msgid "代码内置公告（只读）"
+msgstr "代码内置公告（只读）"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:736
 msgid "份"
 msgstr "份"
 
@@ -1019,28 +1029,34 @@ msgstr "份"
 msgid "休息时段"
 msgstr "休息时段"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:399
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:793
 msgid "保存"
 msgstr "保存"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:250
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:252
 msgid "保存一份记录和常用项目，换设备也能带走。"
 msgstr "保存一份记录和常用项目，换设备也能带走。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:889
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:399
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:793
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:964
 msgid "保存中…"
 msgstr "保存中…"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:891
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:141
+msgid "保存为草稿，或开启发布后按指定时间展示。"
+msgstr "保存为草稿，或开启发布后按指定时间展示。"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:966
 msgid "保存修改"
 msgstr "保存修改"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:893
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:968
 msgid "保存订单"
 msgstr "保存订单"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:894
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:969
 msgid "保存记录"
 msgstr "保存记录"
 
@@ -1050,7 +1066,7 @@ msgstr "保护本机存储"
 
 #. placeholder {0}: groupingEnabled ? t`订单` : t`记录`
 #. placeholder {1}: order.seq
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:434
 msgid "修改{0} #{1}"
 msgstr "修改{0} #{1}"
 
@@ -1058,7 +1074,7 @@ msgstr "修改{0} #{1}"
 msgid "修改记录"
 msgstr "修改记录"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:574
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:621
 msgid "先添几个常用项目"
 msgstr "先添几个常用项目"
 
@@ -1070,7 +1086,38 @@ msgstr "全部历史记录 · 仅保存在这台设备"
 msgid "全部标签"
 msgstr "全部标签"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:72
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:73
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:28
+msgid "公告"
+msgstr "公告"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
+#: src/app/[lang]/bookkeeping/announcements/page.tsx:15
+msgid "公告 · 记露"
+msgstr "公告 · 记露"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:352
+msgid "公告内容"
+msgstr "公告内容"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:166
+msgid "公告列表"
+msgstr "公告列表"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:64
+msgid "公告已保存"
+msgstr "公告已保存"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:82
+msgid "公告已删除"
+msgstr "公告已删除"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:341
+msgid "公告标题"
+msgstr "公告标题"
+
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:47
+#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx:31
 msgid "关闭"
 msgstr "关闭"
 
@@ -1086,12 +1133,16 @@ msgstr "关闭日历"
 msgid "关闭照片预览"
 msgstr "关闭照片预览"
 
+#: src/components/bookkeeping/announcement-timeline.tsx:30
+msgid "最新"
+msgstr "最新"
+
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:208
 msgid "最近时段在前"
 msgstr "最近时段在前"
 
 #. placeholder {0}: line.name
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:726
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:801
 msgid "减少 {0} 数量"
 msgstr "减少 {0} 数量"
 
@@ -1099,7 +1150,7 @@ msgstr "减少 {0} 数量"
 msgid "分类不存在"
 msgstr "分类不存在"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:444
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:470
 msgid "分组"
 msgstr "分组"
 
@@ -1119,19 +1170,24 @@ msgstr "分组已存在"
 msgid "分组设置不正确"
 msgstr "分组设置不正确"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:632
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656
 msgid "删除"
 msgstr "删除"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:620
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:644
 msgid "删除 {0}"
 msgstr "删除 {0}"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:529
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:553
 msgid "删除“{0}”？已有记录中的项目明细会保留。"
 msgstr "删除“{0}”？已有记录中的项目明细会保留。"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:245
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:246
+msgid "删除公告"
+msgstr "删除公告"
 
 #: src/app/[lang]/bookkeeping/_components/grouping-settings.tsx:131
 msgid "删除分组 {group}"
@@ -1147,52 +1203,86 @@ msgid "删除标签 {0}"
 msgstr "删除标签 {0}"
 
 #. placeholder {0}: index + 1
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:838
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:913
 msgid "删除第 {0} 张照片"
 msgstr "删除第 {0} 张照片"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:858
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:933
 msgid "删除这条记录"
 msgstr "删除这条记录"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:369
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:395
 msgid "删除这条记录？"
 msgstr "删除这条记录？"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:499
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:525
 msgid "到设置中添加分组"
 msgstr "到设置中添加分组"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:282
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:267
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:135
+msgid "加载公告中…"
+msgstr "加载公告中…"
+
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:102
+msgid "加载失败，已加载的公告仍可查看。"
+msgstr "加载失败，已加载的公告仍可查看。"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:178
+msgid "加载失败，请稍后重试。"
+msgstr "加载失败，请稍后重试。"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:280
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:144
+msgid "加载更早的公告"
+msgstr "加载更早的公告"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:284
 msgid "包含图片"
 msgstr "包含图片"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:698
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:722
 msgid "单价（选填，默认 0 元）"
 msgstr "单价（选填，默认 0 元）"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:690
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:714
 msgid "单价（选填）"
 msgstr "单价（选填）"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:711
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:735
 msgid "单位（选填，默认份）"
 msgstr "单位（选填，默认份）"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:704
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:728
 msgid "单位（选填）"
 msgstr "单位（选填）"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:21
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:19
 msgid "去备份"
 msgstr ""
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:24
+msgid "去换配图"
+msgstr "去换配图"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:378
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:380
+msgid "发布公告"
+msgstr "发布公告"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:364
+msgid "发布时间（本地时间）"
+msgstr "发布时间（本地时间）"
 
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:225
 msgid "取消"
 msgstr ""
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:748
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:749
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:390
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:772
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:773
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:603
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:604
 msgid "取消编辑"
 msgstr "取消编辑"
 
@@ -1212,12 +1302,12 @@ msgstr "各时段已完成金额趋势"
 msgid "各时段记录数趋势"
 msgstr "各时段记录数趋势"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:648
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:672
 msgid "名称"
 msgstr "名称"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:27
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:458
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:482
 msgid "名称不能为空"
 msgstr "名称不能为空"
 
@@ -1225,7 +1315,7 @@ msgstr "名称不能为空"
 msgid "名称最多 10 个字符，支持任意文字和符号。"
 msgstr "名称最多 10 个字符，支持任意文字和符号。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:731
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:755
 msgid "启用"
 msgstr "启用"
 
@@ -1237,28 +1327,36 @@ msgstr "启用分组"
 msgid "回到当前时段"
 msgstr "回到当前时段"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:109
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:112
 msgid "图集已导入，页面配图已更新。"
 msgstr "图集已导入，页面配图已更新。"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:145
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:148
 msgid "图集已导出，请在浏览器下载中查看。"
 msgstr "图集已导出，请在浏览器下载中查看。"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:262
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:304
 msgid "图集已清空。"
 msgstr "图集已清空。"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:117
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:271
+msgid "图集说明"
+msgstr "图集说明"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:18
+msgid "在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。"
+msgstr "在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:120
 msgid "场景图片已保存。"
 msgstr "场景图片已保存。"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:246
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:260
 msgid "场景图片已移除。"
 msgstr "场景图片已移除。"
 
 #. placeholder {0}: line.name
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:744
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:819
 msgid "增加 {0} 数量"
 msgstr "增加 {0} 数量"
 
@@ -1266,25 +1364,29 @@ msgstr "增加 {0} 数量"
 msgid "处理中…"
 msgstr "处理中…"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:781
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:800
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:856
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:875
 msgid "处理照片中…"
 msgstr "处理照片中…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:243
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:245
 msgid "备份&还原"
 msgstr ""
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:116
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:117
 msgid "备份已导入，记录和常用项目已更新"
 msgstr "备份已导入，记录和常用项目已更新"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:83
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:84
 msgid "备份已生成，请在浏览器下载中查看"
 msgstr "备份已生成，请在浏览器下载中查看"
 
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:39
+msgid "备份提醒 / 未选项目 / 暂无进行中记录"
+msgstr "备份提醒 / 未选项目 / 暂无进行中记录"
+
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:25
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:103
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:104
 msgid "备份文件不正确"
 msgstr "备份文件不正确"
 
@@ -1300,43 +1402,43 @@ msgstr "安装记露"
 msgid "完成记录"
 msgstr "完成记录"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:345
 msgid "导入中…"
 msgstr "导入中…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:302
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:304
 msgid "导入完整备份"
 msgstr "导入完整备份"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:311
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:313
 msgid "导入示例数据"
 msgstr "导入示例数据"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:194
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:280
 msgid "导入记露图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
 msgstr "导入记露图集 JSON（最大 100 MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大 12 MB）。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:343
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:345
 msgid "导出中…"
 msgstr "导出中…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:259
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:261
 msgid "导出图片"
 msgstr "导出图片"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:190
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:195
 msgid "导出图集"
 msgstr "导出图集"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:293
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:295
 msgid "导出备份"
 msgstr "导出备份"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:765
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:840
 msgid "小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张"
 msgstr "小票或随手拍，最多 {MAX_ORDER_PHOTOS} 张"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:287
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:310
 msgid "展开查看全部项目"
 msgstr "展开查看全部项目"
 
@@ -1344,15 +1446,19 @@ msgstr "展开查看全部项目"
 msgid "左右滑动查看全部时段"
 msgstr "左右滑动查看全部时段"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:174
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:175
 msgid "已删除 {orderCount} 条记录及 {photoCount} 张图片"
 msgstr "已删除 {orderCount} 条记录及 {photoCount} 张图片"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:209
+msgid "已发布"
+msgstr "已发布"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-offline-status.tsx:48
 msgid "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
 msgstr "已可离线使用：关闭后重新打开，也能记账和查看本机数据。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:582
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:606
 msgid "已启用"
 msgstr "已启用"
 
@@ -1384,27 +1490,35 @@ msgstr "已完成热量 {0}"
 msgid "已完成金额"
 msgstr "已完成金额"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:173
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:147
+msgid "已展示全部公告"
+msgstr "已展示全部公告"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:174
 msgid "已移除 {photoCount} 张图片，账目已保留"
 msgstr "已移除 {photoCount} 张图片，账目已保留"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:172
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:164
 msgid "已配置 {configuredCount} / {sceneCount} 个场景"
 msgstr "已配置 {configuredCount} / {sceneCount} 个场景"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:28
-msgid "常用"
-msgstr "常用"
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:40
+msgid "常用 · 暂无项目 / 记录 · 进行中列表顶部"
+msgstr "常用 · 暂无项目 / 记录 · 进行中列表顶部"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:144
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:41
+msgid "常用 · 添加项目 / 记一笔 · 分组下未选项目"
+msgstr "常用 · 添加项目 / 记一笔 · 分组下未选项目"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:156
 msgid "常用项目"
 msgstr "常用项目"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:112
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:123
 msgid "常用项目已保存"
 msgstr "常用项目已保存"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:148
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:160
 msgid "常记的放这里 · {listedCount} 项可选"
 msgstr "常记的放这里 · {listedCount} 项可选"
 
@@ -1412,7 +1526,7 @@ msgstr "常记的放这里 · {listedCount} 项可选"
 msgid "座号只能空着或选 1 到 8"
 msgstr "座号只能空着或选 1 到 8"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:415
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:441
 msgid "开单"
 msgstr "开单"
 
@@ -1420,11 +1534,11 @@ msgstr "开单"
 msgid "开发模式不启用离线缓存，请在正式部署后使用。"
 msgstr "开发模式不启用离线缓存，请在正式部署后使用。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:373
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:375
 msgid "开始日期"
 msgstr "开始日期"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:83
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:82
 msgid "当前为休息时段，06:00 后可记账"
 msgstr "当前为休息时段，06:00 后可记账"
 
@@ -1436,11 +1550,15 @@ msgstr "当前时段"
 msgid "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
 msgstr "当前浏览器、地址或语言暂不支持离线准备，请使用 HTTPS 下的中文、英文或日文页面。"
 
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:208
+msgid "待发布"
+msgstr "待发布"
+
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:128
 msgid "恢复进行中"
 msgstr "恢复进行中"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:284
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:307
 msgid "我的常用"
 msgstr "我的常用"
 
@@ -1448,11 +1566,11 @@ msgstr "我的常用"
 msgid "我的日常账本"
 msgstr "我的日常账本"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:171
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:172
 msgid "所选范围内没有需要清理的数据"
 msgstr "所选范围内没有需要清理的数据"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:480
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:506
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:342
 msgid "打包"
 msgstr "打包"
@@ -1461,7 +1579,7 @@ msgstr "打包"
 msgid "打开日历"
 msgstr "打开日历"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:108
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:109
 msgid "把备份按编号合并进当前记账数据？相同编号的数据会更新。"
 msgstr "把备份按编号合并进当前记账数据？相同编号的数据会更新。"
 
@@ -1469,7 +1587,7 @@ msgstr "把备份按编号合并进当前记账数据？相同编号的数据会
 msgid "把记录标为完成，就会计入上面的合计。"
 msgstr "把记录标为完成，就会计入上面的合计。"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:781
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:856
 msgid "拍照"
 msgstr "拍照"
 
@@ -1477,36 +1595,45 @@ msgstr "拍照"
 msgid "按标签筛选"
 msgstr "按标签筛选"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:367
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:369
 msgid "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
 msgstr "按记账日期筛选，包含起止日期。仅清理记录或记录中的图片，不会删除常用项目及标签数据。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:717
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:741
 msgid "排序"
 msgstr "排序"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:725
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:749
 msgid "排序（数字越大越靠前）"
 msgstr "排序（数字越大越靠前）"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:467
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:491
 msgid "排序要是整数"
 msgstr "排序要是整数"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:302
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:172
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:173
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:87
+msgid "搜索公告…"
+msgstr "搜索公告…"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:325
 msgid "搜索已有项目…"
 msgstr "搜索已有项目…"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:557
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:588
 msgid "搜索项目名称…"
 msgstr "搜索项目名称…"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:77
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:133
+msgid "操作失败，请检查输入、登录状态或网络后重试。"
+msgstr "操作失败，请检查输入、登录状态或网络后重试。"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:80
 msgid "操作失败。请检查文件格式、图片大小及本机存储空间，原图集不会因导入失败而被清空。"
 msgstr "操作失败。请检查文件格式、图片大小及本机存储空间，原图集不会因导入失败而被清空。"
 
 #: src/app/[lang]/(home)/data/home-data.tsx:123
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:46
 #: src/app/[lang]/bookkeeping/layout.tsx:31
 msgid "支出统计"
 msgstr "支出统计"
@@ -1519,24 +1646,32 @@ msgstr "支持开源"
 msgid "收起"
 msgstr "收起"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:455
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:457
 msgid "放到主屏幕"
 msgstr "放到主屏幕"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:726
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:750
 msgid "数字越大越靠前"
 msgstr "数字越大越靠前"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:20
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:18
 msgid "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
 msgstr "数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:23
+#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx:14
+msgid "数据存储与备份"
+msgstr "数据存储与备份"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
 #: src/app/[lang]/bookkeeping/orders/new/page.tsx:16
 msgid "新增记录 · 记露"
 msgstr "新增记录 · 记露"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:410
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:139
+msgid "新建公告"
+msgstr "新建公告"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:436
 msgid "新建订单"
 msgstr "新建订单"
 
@@ -1544,11 +1679,11 @@ msgstr "新建订单"
 msgid "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
 msgstr "新版本已就绪，关闭所有记账窗口后重新打开即可更新。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:657
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:681
 msgid "新项目"
 msgstr "新项目"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:301
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:344
 msgid "无法读取本机图集，请检查浏览器存储权限。"
 msgstr "无法读取本机图集，请检查浏览器存储权限。"
 
@@ -1560,7 +1695,7 @@ msgstr "日常消费"
 msgid "日常记账"
 msgstr "日常记账"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:331
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:354
 msgid "早餐、咖啡、跑步，从常记的开始。"
 msgstr "早餐、咖啡、跑步，从常记的开始。"
 
@@ -1573,19 +1708,32 @@ msgstr "时段明细"
 msgid "明细"
 msgstr "明细"
 
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:271
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:125
+msgid "暂无匹配的公告"
+msgstr "暂无匹配的公告"
+
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:313
 msgid "暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。"
 msgstr "暂无热量数据。在常用项目中填写热量，再完成一笔新记录即可查看。"
+
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:103
+msgid "暂时无法连接，当前仅展示内置公告。"
+msgstr "暂时无法连接，当前仅展示内置公告。"
+
+#: src/app/[lang]/bookkeeping/_components/announcements.tsx:76
+msgid "更新与提醒，按时间由近到远"
+msgstr "更新与提醒，按时间由近到远"
 
 #: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:186
 msgid "有记录的日期显示记录数"
 msgstr "有记录的日期显示记录数"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:167
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:287
 msgid "未上传的场景不显示配图。图片仅保存在当前浏览器，不会上传到服务器；换设备请单独导出图集，账本备份不包含图集。"
 msgstr "未上传的场景不显示配图。图片仅保存在当前浏览器，不会上传到服务器；换设备请单独导出图集，账本备份不包含图集。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:582
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:606
 msgid "未启用"
 msgstr "未启用"
 
@@ -1611,7 +1759,11 @@ msgstr "查看记录"
 msgid "查看记录 →"
 msgstr "查看记录 →"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:662
+#: src/app/[lang]/bookkeeping/announcements/page.tsx:16
+msgid "查看记露的最新公告、更新与使用提醒。"
+msgstr "查看记露的最新公告、更新与使用提醒。"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:686
 msgid "标签"
 msgstr "标签"
 
@@ -1636,15 +1788,15 @@ msgstr "标签已存在"
 msgid "正在准备离线资源，请保持联网…"
 msgstr "正在准备离线资源，请保持联网…"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:294
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:337
 msgid "正在处理图集…"
 msgstr "正在处理图集…"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:226
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:234
 msgid "此场景暂无图片"
 msgstr "此场景暂无图片"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:684
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:708
 msgid "每单位热量（kcal，选填）"
 msgstr "每单位热量（kcal，选填）"
 
@@ -1653,22 +1805,22 @@ msgstr "每单位热量（kcal，选填）"
 msgid "每时段平均已完成金额 {0}"
 msgstr "每时段平均已完成金额 {0}"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:301
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:319
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:327
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:345
 msgid "每条记录最多留存 {MAX_ORDER_PHOTOS} 张照片"
 msgstr "每条记录最多留存 {MAX_ORDER_PHOTOS} 张照片"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:577
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:624
 msgid "比如早餐、咖啡，或一次跑步。"
 msgstr "比如早餐、咖啡，或一次跑步。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:318
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:595
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:341
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:632
 msgid "没有匹配的项目，请换个关键词"
 msgstr "没有匹配的项目，请换个关键词"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:39
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:396
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:422
 msgid "没有找到这条记录"
 msgstr "没有找到这条记录"
 
@@ -1678,7 +1830,7 @@ msgstr "浏览器暂未授予持久存储，请继续定期导出备份。"
 
 #. placeholder {0}: dish.name
 #. placeholder {1}: selectedQuantities.get(dish.id) ?? 0
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:610
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:673
 msgid "添加 {0}，已选 {1} 件"
 msgstr "添加 {0}，已选 {1} 件"
 
@@ -1690,7 +1842,7 @@ msgstr "添加分组"
 msgid "添加分组后，即可在记账时选择。"
 msgstr "添加分组后，即可在记账时选择。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:458
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:460
 msgid "添加到主屏幕，方便下次打开记账。"
 msgstr "添加到主屏幕，方便下次打开记账。"
 
@@ -1698,8 +1850,7 @@ msgstr "添加到主屏幕，方便下次打开记账。"
 msgid "添加到主屏幕后，可通过专属图标直接打开记账页面。"
 msgstr "添加到主屏幕后，可通过专属图标直接打开记账页面。"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:243
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:586
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:265
 msgid "添加常用项目"
 msgstr "添加常用项目"
 
@@ -1708,32 +1859,32 @@ msgstr "添加常用项目"
 msgid "添加标签"
 msgstr "添加标签"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:769
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:793
 msgid "添加项目"
 msgstr "添加项目"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:442
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:444
 msgid "清理中…"
 msgstr "清理中…"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:397
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:399
 msgid "清理内容"
 msgstr "清理内容"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:425
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:427
 msgid "清理后无法撤销，建议先导出包含图片的备份。"
 msgstr "清理后无法撤销，建议先导出包含图片的备份。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:442
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:444
 msgid "清理所选范围"
 msgstr "清理所选范围"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:353
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:364
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:355
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:366
 msgid "清理瘦身"
 msgstr "清理瘦身"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:266
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:308
 msgid "清空图集"
 msgstr "清空图集"
 
@@ -1741,7 +1892,7 @@ msgstr "清空图集"
 msgid "清空搜索"
 msgstr "清空搜索"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:260
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:301
 msgid "清空本机图集？所有场景将留空，账目不受影响。"
 msgstr "清空本机图集？所有场景将留空，账目不受影响。"
 
@@ -1750,19 +1901,19 @@ msgstr "清空本机图集？所有场景将留空，账目不受影响。"
 #. placeholder {0}: formatCalories(i18n, summarizeCalories(order.lines))
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:39
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:61
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:672
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:712
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:747
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:787
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:99
 msgid "热量 {0}"
 msgstr "热量 {0}"
 
 #. placeholder {0}: formatCalories( i18n, summarizeCalories([{ ...dish, quantity: 1 }]), )
 #. placeholder {1}: dish.unit
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:591
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:615
 msgid "热量 {0}/{1}"
 msgstr "热量 {0}/{1}"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:675
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:699
 msgid "热量 kcal / 单位"
 msgstr "热量 kcal / 单位"
 
@@ -1774,11 +1925,11 @@ msgstr "热量（kcal）"
 msgid "热量应为有效数字（kcal），支持负数"
 msgstr "热量应为有效数字（kcal），支持负数"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:454
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:478
 msgid "热量应为有效数字（kcal），运动消耗可填负数"
 msgstr "热量应为有效数字（kcal），运动消耗可填负数"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:253
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:275
 msgid "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 msgstr "热量按每单位填写：摄入填正数，消耗填负数，可留空"
 
@@ -1787,7 +1938,7 @@ msgstr "热量按每单位填写：摄入填正数，消耗填负数，可留空
 msgid "热量记录"
 msgstr "热量记录"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:89
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:92
 msgid "用导入的图集替换当前图集？未包含的场景将留空。"
 msgstr "用导入的图集替换当前图集？未包含的场景将留空。"
 
@@ -1799,15 +1950,20 @@ msgstr "电脑：在 Chrome / Edge 地址栏或菜单中选择“安装应用”
 msgid "留存照片"
 msgstr "留存照片"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:158
+#. placeholder {0}: item.title
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:251
+msgid "确定删除公告“{0}”？此操作无法撤销。"
+msgstr "确定删除公告“{0}”？此操作无法撤销。"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:159
 msgid "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
 msgstr "确认删除 {startDate} 至 {endDate}（含起止日期）的所有记录及图片？无法撤销，请先备份。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:157
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:158
 msgid "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
 msgstr "确认移除 {startDate} 至 {endDate}（含起止日期）的记录图片？账目保留，图片无法撤销，请先备份。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:139
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:140
 msgid "示例数据已导入，已有数据保留。"
 msgstr "示例数据已导入，已有数据保留。"
 
@@ -1815,26 +1971,42 @@ msgstr "示例数据已导入，已有数据保留。"
 msgid "离线资源尚未准备完成，请联网后重试。"
 msgstr "离线资源尚未准备完成，请联网后重试。"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:250
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:264
 msgid "移除"
 msgstr "移除"
 
 #. placeholder {0}: line.name
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:725
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:800
 msgid "移除 {0}"
 msgstr "移除 {0}"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:420
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:422
 msgid "移除记录及图片"
 msgstr "移除记录及图片"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:254
+msgid "移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。"
+msgstr "移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。"
 
 #: src/app/[lang]/bookkeeping/menu/page.tsx:18
 msgid "管理常用消费项目与餐饮菜单，设置单价、单位、每单位热量和启用状态。"
 msgstr "管理常用消费项目与餐饮菜单，设置单价、单位、每单位热量和启用状态。"
 
+#: src/app/[lang]/admin/page.tsx:10
+msgid "管理记账公告、草稿与发布时间"
+msgstr "管理记账公告、草稿与发布时间"
+
 #: src/app/[lang]/bookkeeping/settings/page.tsx:17
 msgid "管理记账数据备份与应用安装。"
 msgstr "管理记账数据备份与应用安装。"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:108
+msgid "管理面向所有记账用户的公告"
+msgstr "管理面向所有记账用户的公告"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:275
+msgid "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
+msgstr "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
 
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:106
 msgid "累计已完成热量"
@@ -1844,24 +2016,48 @@ msgstr "累计已完成热量"
 msgid "累计已完成金额"
 msgstr "累计已完成金额"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:384
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:386
 msgid "结束日期"
 msgstr "结束日期"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:16
+msgid "给账本换上喜欢的配图"
+msgstr "给账本换上喜欢的配图"
 
 #: src/app/[lang]/bookkeeping/_components/orders-home-tabs.tsx:81
 msgid "统计"
 msgstr "统计"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:612
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:42
+msgid "统计 · 热量图表旁"
+msgstr "统计 · 热量图表旁"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:46
+msgid "统计 · 记录数图表旁 / 暂无数据"
+msgstr "统计 · 记录数图表旁 / 暂无数据"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:45
+msgid "统计 · 金额图表旁"
+msgstr "统计 · 金额图表旁"
+
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:636
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:603
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:604
 msgid "编辑"
 msgstr "编辑"
 
 #. placeholder {0}: dish.name
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:607
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:631
 msgid "编辑 {0}"
 msgstr "编辑 {0}"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:22
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:139
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:229
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:230
+msgid "编辑公告"
+msgstr "编辑公告"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:24
 #: src/app/[lang]/bookkeeping/orders/[id]/page.tsx:19
 msgid "编辑记录 · 记露"
 msgstr "编辑记录 · 记露"
@@ -1870,21 +2066,25 @@ msgstr "编辑记录 · 记露"
 msgid "自定义分组"
 msgstr "自定义分组"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:153
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:164
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:159
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:175
 msgid "自定义图集"
 msgstr "自定义图集"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:206
+msgid "草稿"
+msgstr "草稿"
 
 #: src/app/[lang]/bookkeeping/layout.tsx:34
 msgid "菜单管理"
 msgstr "菜单管理"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:25
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:29
 #: src/app/[lang]/bookkeeping/menu/page.tsx:16
 msgid "菜单管理 · 记露"
 msgstr "菜单管理 · 记露"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:434
 msgid "订单"
 msgstr "订单"
 
@@ -1893,7 +2093,7 @@ msgid "订单记录"
 msgstr "订单记录"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:22
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:411
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:437
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:173
 msgid "记一笔"
 msgstr "记一笔"
@@ -1902,10 +2102,18 @@ msgstr "记一笔"
 msgid "记下日常，就能在这里回看金额和热量的变化。"
 msgstr "记下日常，就能在这里回看金额和热量的变化。"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:408
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:434
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:237
 msgid "记录"
 msgstr "记录"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:47
+msgid "记录 · 已完成列表顶部"
+msgstr "记录 · 已完成列表顶部"
+
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:43
+msgid "记录 · 暂无已完成记录"
+msgstr "记录 · 暂无已完成记录"
 
 #. placeholder {0}: order.seq
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:300
@@ -1916,7 +2124,7 @@ msgstr "记录 #{0} 详情"
 msgid "记录列表"
 msgstr "记录列表"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:193
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:195
 msgid "记录存在这台设备，记得定期备份。"
 msgstr "记录存在这台设备，记得定期备份。"
 
@@ -1942,7 +2150,7 @@ msgstr "记录留存照片"
 
 #. placeholder {0}: index + 1
 #: src/app/[lang]/bookkeeping/_components/order-detail.tsx:99
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:827
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:902
 msgid "记录留存照片 {0}"
 msgstr "记录留存照片 {0}"
 
@@ -1954,17 +2162,29 @@ msgstr "记录留存照片大图"
 msgid "记录的照片大图，可按 Esc 或关闭按钮返回记录详情"
 msgstr "记录的照片大图，可按 Esc 或关闭按钮返回记录详情"
 
-#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:19
+#: src/app/[lang]/bookkeeping/_components/backup-reminder.tsx:17
 msgid "记得备份数据"
 msgstr "记得备份数据"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:415
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:441
 msgid "记账"
 msgstr "记账"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:92
+#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:91
 msgid "记账·休息中"
 msgstr "记账·休息中"
+
+#: src/app/[lang]/admin/page.tsx:9
+msgid "记账公告"
+msgstr "记账公告"
+
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:105
+msgid "记账公告管理"
+msgstr "记账公告管理"
+
+#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx:15
+msgid "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
+msgstr "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
 
 #: src/app/[lang]/bookkeeping/_components/business-day-calendar-content.tsx:148
 #: src/app/[lang]/bookkeeping/_components/orders-statistics.tsx:231
@@ -1975,17 +2195,41 @@ msgstr "记账时段"
 msgid "记账时段日历"
 msgstr "记账时段日历"
 
+#: src/app/[lang]/(home)/data/home-data.tsx:75
+#: src/app/[lang]/(home)/data/home-data.tsx:87
+#: src/app/[lang]/(home)/data/home-data.tsx:120
+#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:158
+#: src/app/[lang]/bookkeeping/layout.tsx:29
+#: src/app/[lang]/bookkeeping/layout.tsx:41
+#: src/app/[lang]/bookkeeping/layout.tsx:46
+#: src/app/[lang]/bookkeeping/layout.tsx:50
+msgid "记露"
+msgstr "记露"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:32
+#: src/app/[lang]/bookkeeping/layout.tsx:19
+msgid "记露 · 支出与热量统计"
+msgstr "记露 · 支出与热量统计"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
+msgid "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+msgstr "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
+
 #: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:34
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:189
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:191
 msgid "设置"
 msgstr "设置"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:27
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:44
+msgid "设置 · 安装应用卡片"
+msgstr "设置 · 安装应用卡片"
+
+#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:31
 #: src/app/[lang]/bookkeeping/settings/page.tsx:16
 msgid "设置 · 记露"
 msgstr "设置 · 记露"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:218
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:220
 msgid "语言"
 msgstr "语言"
 
@@ -1994,7 +2238,7 @@ msgid "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离
 msgstr "请使用 HTTPS 网站地址。首次联网完成离线准备后，可离线启动和记账；数据保存在本机，迁移设备或浏览器前请导出备份。"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:15
-#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:153
+#: src/app/[lang]/bookkeeping/_components/bbq-settings.tsx:154
 msgid "请选择有效的起止日期，开始日期不能晚于结束日期"
 msgstr "请选择有效的起止日期，开始日期不能晚于结束日期"
 
@@ -2004,16 +2248,16 @@ msgstr "请选择有效的起止日期，开始日期不能晚于结束日期"
 msgid "读取全部时段数据中…"
 msgstr "读取全部时段数据中…"
 
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:172
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:163
 msgid "读取图集中…"
 msgstr "读取图集中…"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:386
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:536
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:410
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:567
 msgid "读取常用项目中…"
 msgstr "读取常用项目中…"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:386
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:412
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:151
 msgid "读取记录中…"
 msgstr "读取记录中…"
@@ -2038,11 +2282,15 @@ msgstr "趋势指标"
 msgid "输入分组名称"
 msgstr "输入分组名称"
 
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:113
+msgid "返回管理入口"
+msgstr "返回管理入口"
+
 #: src/app/[lang]/bookkeeping/_components/orders-list.tsx:162
 msgid "还没有完成的记录"
 msgstr "还没有完成的记录"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:683
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:758
 msgid "还没有添加项目"
 msgstr "还没有添加项目"
 
@@ -2050,11 +2298,11 @@ msgstr "还没有添加项目"
 msgid "还没有进行中的记录"
 msgstr "还没有进行中的记录"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:328
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:351
 msgid "还没有项目"
 msgstr "还没有项目"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:665
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:740
 msgid "这一笔"
 msgstr "这一笔"
 
@@ -2062,7 +2310,11 @@ msgstr "这一笔"
 msgid "这个项目当前不可用"
 msgstr "这个项目当前不可用"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:418
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:289
+msgid "这些公告随应用更新，无法在管理页修改。"
+msgstr "这些公告随应用更新，无法在管理页修改。"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:444
 msgid "这次记点什么？"
 msgstr "这次记点什么？"
 
@@ -2071,7 +2323,7 @@ msgstr "这次记点什么？"
 msgid "进行中"
 msgstr "进行中"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:417
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:443
 msgid "选择分组和项目后保存订单"
 msgstr "选择分组和项目后保存订单"
 
@@ -2091,11 +2343,15 @@ msgstr "选择月份"
 msgid "选择标签"
 msgstr "选择标签"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:518
+#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:209
+msgid "选择要更换图片的位置"
+msgstr "选择要更换图片的位置"
+
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:549
 msgid "选择项目"
 msgstr ""
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:317
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:343
 msgid "部分照片读取失败，请选择浏览器可读取的图片"
 msgstr "部分照片读取失败，请选择浏览器可读取的图片"
 
@@ -2104,7 +2360,7 @@ msgid "重新准备离线资源"
 msgstr "重新准备离线资源"
 
 #: src/app/[lang]/bookkeeping/_components/bbq-errors.ts:33
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:463
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:487
 msgid "金额不正确"
 msgstr "金额不正确"
 
@@ -2116,39 +2372,19 @@ msgstr "金额与热量仅统计已完成记录；热量按每单位 × 数量�
 msgid "金额和热量怎么算？"
 msgstr "金额和热量怎么算？"
 
-#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:762
+#: src/app/[lang]/bookkeeping/_components/order-editor.tsx:837
 msgid "附张照片"
 msgstr "附张照片"
 
-#: src/app/[lang]/(home)/data/home-data.tsx:75
-#: src/app/[lang]/(home)/data/home-data.tsx:87
-#: src/app/[lang]/(home)/data/home-data.tsx:120
-#: src/app/[lang]/bookkeeping/_components/orders-home.tsx:158
-#: src/app/[lang]/bookkeeping/layout.tsx:29
-#: src/app/[lang]/bookkeeping/layout.tsx:41
-#: src/app/[lang]/bookkeeping/layout.tsx:46
-#: src/app/[lang]/bookkeeping/layout.tsx:50
-msgid "记露"
-msgstr "记露"
+#: src/app/[lang]/admin/bookkeeping/_components/announcement-manager.tsx:120
+msgid "需要管理员权限，请使用管理员账号登录。"
+msgstr "需要管理员权限，请使用管理员账号登录。"
 
-#: src/app/[lang]/bookkeeping/_components/bbq-app.tsx:28
-#: src/app/[lang]/bookkeeping/layout.tsx:19
-msgid "记露 · 支出与热量统计"
-msgstr "记露 · 支出与热量统计"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-search-copy.ts:3
-msgid "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
-msgstr "记露：个人记账、支出统计、日常消费、热量记录、菜单管理、订单记录。"
-
-#: src/app/[lang]/bookkeeping/_components/bbq-mobile-nav.tsx:68
-msgid "记露主导航"
-msgstr "记露主导航"
-
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:656
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:680
 msgid "项目名称"
 msgstr "项目名称"
 
-#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:736
+#: src/app/[lang]/bookkeeping/_components/menu-editor.tsx:760
 msgid "项目启用"
 msgstr "项目启用"
 
@@ -2161,79 +2397,3 @@ msgstr "项目标签"
 #: src/app/[lang]/bookkeeping/_components/item-tags.tsx:270
 msgid "默认"
 msgstr "默认"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:39
-msgid "备份提醒 / 未选项目 / 暂无进行中记录"
-msgstr "备份提醒 / 未选项目 / 暂无进行中记录"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:40
-msgid "常用 · 暂无项目 / 记录 · 进行中列表顶部"
-msgstr "常用 · 暂无项目 / 记录 · 进行中列表顶部"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:41
-msgid "常用 · 添加项目 / 记一笔 · 分组下未选项目"
-msgstr "常用 · 添加项目 / 记一笔 · 分组下未选项目"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:42
-msgid "统计 · 热量图表旁"
-msgstr "统计 · 热量图表旁"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:43
-msgid "记录 · 暂无已完成记录"
-msgstr "记录 · 暂无已完成记录"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:45
-msgid "设置 · 安装应用卡片"
-msgstr "设置 · 安装应用卡片"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:47
-msgid "统计 · 金额图表旁"
-msgstr "统计 · 金额图表旁"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:48
-msgid "统计 · 记录数图表旁 / 暂无数据"
-msgstr "统计 · 记录数图表旁 / 暂无数据"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:49
-msgid "记录 · 已完成列表顶部"
-msgstr "记录 · 已完成列表顶部"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:202
-msgid "选择要更换图片的位置"
-msgstr "选择要更换图片的位置"
-
-#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx
-msgid "数据存储与备份"
-msgstr "数据存储与备份"
-
-#: src/app/[lang]/bookkeeping/_components/local-data-notice.tsx
-msgid "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
-msgstr "记账数据仅保存在当前设备的浏览器中，不会自动上传或同步到云端。请定期导出备份，避免清除浏览器数据或更换设备后丢失记录。"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:213
-msgid "下载示例图集"
-msgstr "下载示例图集"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:217
-msgid "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
-msgstr "约 50 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:16
-msgid "给账本换上喜欢的配图"
-msgstr "给账本换上喜欢的配图"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:18
-msgid "在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。"
-msgstr "在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-reminder.tsx:24
-msgid "去换配图"
-msgstr "去换配图"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:265
-msgid "图集说明"
-msgstr "图集说明"
-
-#: src/app/[lang]/bookkeeping/_components/companion-album-settings.tsx:254
-msgid "移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。"
-msgstr "移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。"

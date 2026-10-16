@@ -2,7 +2,7 @@ export const bookkeepingLocales = ["zh", "en", "ja"] as const;
 
 export type BookkeepingRoute = {
   locale: string;
-  page: "home" | "menu" | "settings" | "editor";
+  page: "home" | "menu" | "settings" | "announcements" | "editor";
   orderId?: string;
 };
 
@@ -14,7 +14,8 @@ export function readBookkeepingRoute(
   if (!match) return null;
   const [, locale, tail = ""] = match;
   if (!tail || tail === "offline") return { locale, page: "home" };
-  if (tail === "menu" || tail === "settings") return { locale, page: tail };
+  if (tail === "menu" || tail === "settings" || tail === "announcements")
+    return { locale, page: tail };
   if (tail === "orders/new") return { locale, page: "editor" };
   const order = /^orders\/([^/]+)$/.exec(tail);
   if (!order) return null;

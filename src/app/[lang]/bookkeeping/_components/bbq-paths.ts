@@ -18,3 +18,7 @@ export function bbqMenuPath(): string {
 export function bbqSettingsPath(): string {
   return "/bookkeeping/settings";
 }
+
+export function bbqAnnouncementsPath(): string {
+  return "/bookkeeping/announcements";
+}
