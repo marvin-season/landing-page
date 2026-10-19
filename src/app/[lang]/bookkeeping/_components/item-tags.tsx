@@ -26,14 +26,24 @@ import type { ItemTag } from "@/lib/bbq/types";
 import { bbqErrorMessage } from "./bbq-errors";
 import { notifyBbqMenuChanged } from "./bbq-menu-events";
 
-export function ItemTagBadge({ tag }: { tag?: ItemTag | null }) {
+export function ItemTagBadge({
+  tag,
+  wrap = false,
+}: {
+  tag?: ItemTag | null;
+  wrap?: boolean;
+}) {
   const { t } = useLingui();
   if (!tag) return null;
   return (
     <Tag
       data-slot="item-tag"
       size="compact"
-      className="max-w-full truncate"
+      className={
+        wrap
+          ? "max-w-full min-w-0 whitespace-normal wrap-anywhere text-start"
+          : "max-w-full truncate"
+      }
       title={tag.name}
     >
       {tag.id === DEFAULT_TAG.id ? t`默认` : tag.name}
@@ -121,28 +131,31 @@ export function ItemTagSelect({
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <div className="flex min-w-0 items-center gap-1.5">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-          {options
-            .filter((tag) => selectedIds.includes(tag.id))
-            .map((tag) => (
-              <ItemTagBadge key={tag.id} tag={tag} />
-            ))}
-        </div>
+      <div className="flex min-w-0 items-start gap-1.5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               type="button"
               variant="outline"
               disabled={disabled || pending}
-              className="h-9 shrink-0 gap-1 px-2 text-xs"
+              className="min-h-9 min-w-0 gap-1 px-2 text-xs h-auto py-1.5 whitespace-normal text-start flex-1 justify-between rounded-lg"
               aria-label={t`项目标签`}
+              title={t`选择标签`}
             >
-              <Trans>选择标签</Trans>
-              <ChevronDown className="size-4" />
+              <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+                {options
+                  .filter((tag) => selectedIds.includes(tag.id))
+                  .map((tag) => (
+                    <ItemTagBadge key={tag.id} tag={tag} wrap />
+                  ))}
+              </span>
+              <ChevronDown className="size-3.5 shrink-0" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="max-h-64 w-64">
+          <DropdownMenuContent
+            align="end"
+            className="max-h-64 w-64 max-w-[calc(100vw-2rem)]"
+          >
             <DropdownMenuGroup>
               {options.map((tag) => (
                 <div key={tag.id} className="flex min-w-0 items-center gap-1">
@@ -153,7 +166,7 @@ export function ItemTagSelect({
                     onCheckedChange={(checked) => toggle(tag.id, checked)}
                     className="min-h-9 min-w-0 flex-1"
                   >
-                    <span className="truncate">
+                    <span className="min-w-0 whitespace-normal wrap-anywhere">
                       {tag.id === DEFAULT_TAG.id ? t`默认` : tag.name}
                     </span>
                   </DropdownMenuCheckboxItem>
@@ -163,7 +176,7 @@ export function ItemTagSelect({
                       disabled={disabled || pending}
                       aria-label={t`删除标签 ${tag.name}`}
                       onSelect={() => void remove(tag)}
-                      className="size-9 shrink-0 justify-center"
+                      className="size-9 shrink-0 justify-center [&_svg]:size-3.5"
                     >
                       <Trash2 />
                     </DropdownMenuItem>
@@ -177,7 +190,7 @@ export function ItemTagSelect({
           type="button"
           variant="outline"
           size="icon"
-          className="size-9 shrink-0"
+          className="size-9 shrink-0 rounded-lg"
           aria-label={t`添加标签`}
           aria-expanded={adding}
           disabled={disabled || pending}
@@ -186,7 +199,7 @@ export function ItemTagSelect({
             setError(null);
           }}
         >
-          <Plus className="size-4" />
+          <Plus className="size-3.5" />
         </Button>
       </div>
       {adding ? (
@@ -215,7 +228,7 @@ export function ItemTagSelect({
             onClick={() => void add()}
             className="size-9 shrink-0"
           >
-            <Save className="size-4" />
+            <Save className="size-3.5" />
           </Button>
           <Button
             type="button"
@@ -230,7 +243,7 @@ export function ItemTagSelect({
             }}
             className="size-9 shrink-0"
           >
-            <X className="size-4" />
+            <X className="size-3.5" />
           </Button>
         </div>
       ) : null}
