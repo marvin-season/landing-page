@@ -4,6 +4,9 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Input,
   Switch,
 } from "@landing-page/design-system";
@@ -16,9 +19,14 @@ import {
   Plus,
   Save,
   Trash2,
-  X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { centsToYuanInput, parseYuanToCents } from "@/lib/bbq/money";
 import {
@@ -49,7 +57,7 @@ import { ItemTagFilter, ItemTagSelect } from "./item-tags";
 
 const dishGridCls = cls`grid grid-cols-2 gap-2 min-w-0 items-end`;
 const dishFieldCls = cls`flex min-w-0 flex-col gap-1`;
-const dishRowCls = cls`rounded-lg border bg-muted/30 p-2.5 border-border/60`;
+const dishRowCls = cls`gap-x-3 gap-y-2.5 [&_[data-slot=input]]:border-border/70 [&_[data-slot=button]]:shadow-none`;
 const dishInputCls = cls`
   w-full min-w-0 rounded-lg border bg-card shadow-none h-9 px-2 text-base
   focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50
@@ -68,8 +76,12 @@ export function MenuEditor({
   variant = "page",
   sharedTags,
   onTagsChanged,
+  open,
+  onOpenChange,
 }: {
   variant?: "page" | "inline";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   sharedTags?: ItemTag[];
   onTagsChanged?: (tags: ItemTag[]) => void;
 }) {
@@ -82,7 +94,10 @@ export function MenuEditor({
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [localOpen, setLocalOpen] = useState(false);
+  const [inlineFormRequested, setInlineFormRequested] = useState(false);
   const categoryRequest = useRef<Promise<Category> | null>(null);
+  const listHeaderRef = useRef<HTMLDivElement>(null);
 
   const reload = useCallback(async () => {
     // 两个区域同时首次展开时，共用分类初始化，避免空库重复创建菜单。
@@ -143,11 +158,121 @@ export function MenuEditor({
     };
   }, [loadRequest, reload, i18n]);
 
+  const adding = open ?? localOpen;
+  function changeAdding(next: boolean) {
+    setLocalOpen(next);
+    onOpenChange?.(next);
+    if (next) {
+      setInlineFormRequested(true);
+      setLoadRequest((request) => request || 1);
+    }
+  }
+
+  if (variant === "inline") {
+    return (
+      <Collapsible
+        open={adding}
+        onOpenChange={changeAdding}
+        className={cls`shrink-0 ${menuColorsCls}`}
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && !event.defaultPrevented) {
+            event.stopPropagation();
+            changeAdding(false);
+          }
+        }}
+      >
+        <CollapsibleTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            className="relative z-30 h-14 w-full justify-start gap-2 rounded-xl border border-border/60 bg-card/85 px-3 py-2 text-sm shadow-none backdrop-blur-xl hover:bg-card/90 hover:shadow-none"
+          >
+            <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span className="min-w-0 flex-1 text-left">
+              <Trans>添加常用项目</Trans>
+            </span>
+            {adding ? (
+              <span className="text-xs font-normal text-muted-foreground">
+                <Trans>收起</Trans>
+              </span>
+            ) : (
+              <BbqCompanion mood="chef" className="block size-8 shrink-0" />
+            )}
+            <ChevronDown
+              className={cls`size-4 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${adding ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </Button>
+        </CollapsibleTrigger>
+        <button
+          type="button"
+          className={cls`absolute inset-0 z-20 bg-background/40 backdrop-blur-xs transition-[opacity,visibility] duration-200 ease-out motion-reduce:transition-none ${adding ? "visible opacity-100" : "invisible opacity-0 pointer-events-none"}`}
+          tabIndex={-1}
+          inert={!adding}
+          aria-hidden={!adding || undefined}
+          aria-label={t`收起`}
+          onClick={() => changeAdding(false)}
+        />
+        {/* 定位到记账内容区，始终只为入口占位；表单收起后保留输入。 */}
+        <CollapsibleContent
+          forceMount
+          inert={!adding}
+          aria-hidden={!adding || undefined}
+          className="absolute inset-x-0 top-16 bottom-2 z-30 pointer-events-none overflow-clip"
+        >
+          <div
+            className={cls`max-h-full overflow-y-auto overscroll-y-contain rounded-xl border border-border/60 bg-card/85 p-3 shadow-lg backdrop-blur-xl transition-[translate,visibility] duration-200 ease-out motion-reduce:transition-none ${adding ? "visible translate-y-0 pointer-events-auto" : "invisible -translate-y-full pointer-events-none"}`}
+          >
+            {notice && !message ? (
+              <p className="mb-3 text-sm text-primary" role="status">
+                {notice}
+              </p>
+            ) : null}
+            {message ? (
+              <Alert className="mb-3 border-destructive/30 bg-destructive/5 p-3">
+                <AlertDescription className="text-destructive">
+                  {message}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            {inlineFormRequested ? (
+              <div className="relative">
+                {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
+                <fieldset disabled={!menu} aria-busy={!menu}>
+                  <p className="text-muted-foreground text-[11px] mb-2">
+                    <Trans>
+                      热量按每单位填写：摄入填正数，消耗填负数，可留空
+                    </Trans>
+                  </p>
+                  <DishRow
+                    tags={sharedTags ?? tags}
+                    onTagsChanged={reloadTags}
+                    categoryId={menu?.id ?? ""}
+                    onSaved={handleSaved}
+                    onError={setMessage}
+                  />
+                </fieldset>
+                {!menu ? (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/80 backdrop-blur-sm">
+                    <MenuLoadStatus
+                      phase={phase}
+                      onRetry={() => setLoadRequest((request) => request + 1)}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
   const listedCount = dishes?.filter((dish) => dish.listed).length ?? "—";
 
   return (
     <div
-      className={cls`${variant === "inline" ? "flex flex-col gap-2 shrink-0" : "mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden"} ${menuColorsCls}`}
+      className={cls`mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden ${menuColorsCls}`}
     >
       {variant === "page" ? (
         <header className="flex gap-2 flex-row items-start justify-between shrink-0">
@@ -179,14 +304,12 @@ export function MenuEditor({
         </Alert>
       ) : null}
       <ItemEditViewport
-        className={variant === "inline" ? "" : "flex-1"}
-        scrollClassName={
-          variant === "inline"
-            ? ""
-            : "min-h-0 h-full overflow-y-auto overscroll-y-contain pb-3"
-        }
+        headerRef={listHeaderRef}
+        className="flex-1"
+        scrollClassName="min-h-0 h-full overflow-y-auto overscroll-y-contain pb-3"
       >
         <DishList
+          headerRef={listHeaderRef}
           showList={variant === "page"}
           categoryId={menu?.id ?? null}
           dishes={dishes}
@@ -209,6 +332,7 @@ export function MenuEditor({
 }
 
 function DishList({
+  headerRef,
   showList,
   categoryId,
   dishes,
@@ -222,6 +346,7 @@ function DishList({
   onSaved,
   onError,
 }: {
+  headerRef: RefObject<HTMLDivElement | null>;
   showList: boolean;
   categoryId: string | null;
   dishes: Dish[] | null;
@@ -317,7 +442,10 @@ function DishList({
             {listRequested ? (
               dishes ? (
                 <>
-                  <div className="sticky top-0 z-10 bg-background py-3 flex flex-col gap-2 px-3">
+                  <div
+                    ref={headerRef}
+                    className="sticky top-0 z-10 bg-background py-3 flex flex-col gap-2 px-3"
+                  >
                     <div className="flex min-w-0 items-center gap-2">
                       {dishes.length > 0 ? (
                         <div className="min-w-0 flex-1">
@@ -571,6 +699,7 @@ export function DishRow({
     setPending("delete");
     try {
       await bbqStore.deleteDish(dish.id);
+      setEditing(false);
       await onSaved();
     } catch (error) {
       onError(bbqErrorMessage(i18n, error));
@@ -581,7 +710,7 @@ export function DishRow({
   }
 
   function cancelEditing() {
-    if (!dish || pending) return;
+    if (!dish || pending || tagPending) return;
     setError(null);
     setTagIds(getDishTagIds(dish));
     setName(dish.name);
@@ -593,79 +722,139 @@ export function DishRow({
     setEditing(false);
   }
 
-  const summary = dish ? (
-    <DishItem
-      dish={dish}
-      tags={tags}
-      quantity={quantity}
-      disabled={pending !== null || tagPending}
-      actionLabel={
-        editing
-          ? t`收起`
-          : managing
-            ? t`编辑 ${dish.name}`
-            : t`添加 ${dish.name}，已选 ${quantity} 件`
-      }
-      onActivate={() => {
-        if (editing) cancelEditing();
-        else if (managing) setEditing(true);
-        else onAdd?.(dish);
-      }}
-      actions={
-        managing ? (
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              className="size-9 flex-none rounded-lg px-0 shadow-none hover:bg-muted/50 hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
-              disabled={pending !== null || tagPending}
-              aria-label={editing ? t`收起` : t`编辑 ${dish.name}`}
-              onClick={() => (editing ? cancelEditing() : setEditing(true))}
-            >
-              {editing ? (
-                <ChevronDown className="size-3.5" aria-hidden="true" />
-              ) : (
-                <Pencil
-                  strokeWidth={1.5}
-                  fill="none"
-                  className="size-3.5"
-                  aria-hidden="true"
-                />
-              )}
-              <span className="sr-only">
-                <Trans>编辑</Trans>
-              </span>
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="text-destructive size-9 flex-none rounded-lg px-0 hover:bg-destructive/10 hover:text-destructive focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-destructive/50 focus-visible:ring-offset-0"
-              disabled={pending !== null || tagPending}
-              aria-label={t`删除 ${dish.name}`}
-              onClick={() => void remove()}
-            >
-              {pending === "delete" ? (
-                <LoaderCircle
-                  className="size-3.5 animate-spin motion-reduce:animate-none"
-                  aria-hidden="true"
-                />
-              ) : (
-                <Trash2
-                  strokeWidth={1.5}
-                  fill="none"
-                  className="size-3.5"
-                  aria-hidden="true"
-                />
-              )}
-              <span className="sr-only">
-                <Trans>删除</Trans>
-              </span>
-            </Button>
-          </>
-        ) : undefined
-      }
-    />
-  ) : null;
+  const renderSummary = (isEditing: boolean) =>
+    dish ? (
+      <DishItem
+        className={
+          isEditing
+            ? "rounded-none border-0 bg-transparent px-3 py-3 data-[selected=true]:bg-transparent"
+            : undefined
+        }
+        dish={dish}
+        tags={tags}
+        quantity={quantity}
+        disabled={pending !== null || tagPending}
+        actionLabel={
+          isEditing
+            ? t`收起`
+            : managing
+              ? t`编辑 ${dish.name}`
+              : t`添加 ${dish.name}，已选 ${quantity} 件`
+        }
+        onActivate={() => {
+          if (isEditing) cancelEditing();
+          else if (managing) setEditing(true);
+          else if (dish.listed) onAdd?.(dish);
+        }}
+        actions={
+          isEditing ? (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-9 rounded-lg px-1.5 text-xs shadow-none [&_svg]:size-3.5"
+                disabled={pending !== null || tagPending}
+                onClick={cancelEditing}
+              >
+                <Trans>收起</Trans>
+                <ChevronDown data-icon="inline-end" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-destructive size-9 flex-none rounded-lg hover:bg-destructive/10 hover:text-destructive [&_svg]:size-3.5"
+                disabled={pending !== null || tagPending}
+                aria-label={t`删除 ${dish.name}`}
+                onClick={() => void remove()}
+              >
+                {pending === "delete" ? (
+                  <LoaderCircle className="animate-spin motion-reduce:animate-none" />
+                ) : (
+                  <Trash2 strokeWidth={1.5} fill="none" />
+                )}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-9 flex-none rounded-lg shadow-none hover:bg-muted/50 hover:shadow-none [@media(hover:hover)]:opacity-0 group-hover/dish:opacity-100 group-focus-within/dish:opacity-100 focus-visible:opacity-100 [&_svg]:size-3.5"
+                disabled={pending !== null || tagPending}
+                aria-label={t`编辑 ${dish.name}`}
+                title={t`编辑`}
+                onClick={() => setEditing(true)}
+              >
+                <Pencil strokeWidth={1.5} fill="none" />
+              </Button>
+              {!managing ? (
+                <Button
+                  type="button"
+                  variant="subtle"
+                  className="h-9 min-w-9 rounded-lg px-2 gap-1.5 shadow-none max-w-full [&_svg]:size-3.5"
+                  disabled={!dish.listed || pending !== null || tagPending}
+                  aria-label={t`添加 ${dish.name}，已选 ${quantity} 件`}
+                  onClick={() => onAdd?.(dish)}
+                >
+                  {quantity > 0 ? (
+                    <span
+                      className="text-xs tabular-nums min-w-0 truncate"
+                      title={String(quantity)}
+                    >
+                      {quantity}
+                    </span>
+                  ) : null}
+                  <Plus data-icon="inline-end" />
+                </Button>
+              ) : null}
+            </>
+          )
+        }
+      />
+    ) : null;
+
+  const summary = renderSummary(false);
+
+  const actions = (
+    <div
+      className={cls`col-span-2 flex min-w-0 items-center justify-between gap-2 flex-wrap ${isNew ? "pt-1" : ""}`}
+    >
+      <div className="flex min-h-9 justify-start items-center gap-2 min-w-0 max-w-full">
+        <span className={fieldLabelCls}>
+          <Trans>启用</Trans>
+        </span>
+        <div className="flex items-center justify-center min-h-9 min-w-0">
+          <Switch
+            checked={listed}
+            aria-label={t`项目启用`}
+            onCheckedChange={setListed}
+          />
+        </div>
+      </div>
+      <div className="flex min-h-9 items-center justify-end gap-1.5 min-w-0 max-w-full ms-auto">
+        <Button
+          type="button"
+          variant="default"
+          className="px-3 min-h-9 min-w-0 rounded-lg shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-offset-0 whitespace-normal h-auto py-1.5 text-xs max-w-full"
+          onClick={() => void commit()}
+        >
+          {pending === "save" ? (
+            <LoaderCircle
+              className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          ) : (
+            <Save className="size-3.5 shrink-0" aria-hidden="true" />
+          )}
+          <span className="min-w-0 wrap-anywhere">
+            {pending === "save" ? t`保存中…` : isNew ? t`添加项目` : t`完成`}
+          </span>
+        </Button>
+      </div>
+    </div>
+  );
 
   const form = (
     <fieldset
@@ -756,53 +945,7 @@ export function DishRow({
           title={t`数字越大越靠前`}
         />
       </label>
-      <div className="col-span-2 flex min-w-0 items-center justify-between gap-2 flex-wrap pt-1">
-        <div className="flex min-h-9 justify-start items-center gap-2 min-w-0 max-w-full">
-          <span className={fieldLabelCls}>
-            <Trans>启用</Trans>
-          </span>
-          <div className="flex items-center justify-center min-h-9 min-w-0">
-            <Switch
-              checked={listed}
-              aria-label={t`项目启用`}
-              onCheckedChange={setListed}
-            />
-          </div>
-        </div>
-        <div className="flex min-h-9 items-center justify-end gap-1.5 min-w-0 max-w-full ms-auto">
-          {dish ? (
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="shrink-0 size-9 text-muted-foreground hover:text-foreground rounded-lg"
-              aria-label={t`取消编辑`}
-              title={t`取消编辑`}
-              onClick={cancelEditing}
-            >
-              <X className="size-3.5 shrink-0" aria-hidden="true" />
-            </Button>
-          ) : null}
-          <Button
-            type="button"
-            variant="default"
-            className="px-3 min-h-9 min-w-0 rounded-lg shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-offset-0 whitespace-normal h-auto py-1.5 text-xs max-w-full"
-            onClick={() => void commit()}
-          >
-            {pending === "save" ? (
-              <LoaderCircle
-                className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-            ) : (
-              <Save className="size-3.5 shrink-0" aria-hidden="true" />
-            )}
-            <span className="min-w-0 wrap-anywhere">
-              {pending === "save" ? t`保存中…` : isNew ? t`添加项目` : t`保存`}
-            </span>
-          </Button>
-        </div>
-      </div>
+      {isNew ? actions : null}
       {error ? (
         <p
           className="col-span-2 rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive"
@@ -817,12 +960,29 @@ export function DishRow({
   if (!dish) return form;
   if (selection) {
     return (
-      <ExpandingItemEditor expanded={editing && managing} summary={summary}>
+      <ExpandingItemEditor
+        expanded={editing}
+        summary={summary}
+        expandedSummary={renderSummary(true)}
+        footer={
+          <fieldset disabled={pending !== null || tagPending}>
+            {actions}
+          </fieldset>
+        }
+      >
         {form}
       </ExpandingItemEditor>
     );
   }
-  return editing && managing ? form : summary;
+  return editing ? (
+    <>
+      {renderSummary(true)}
+      {form}
+      <fieldset disabled={pending !== null || tagPending}>{actions}</fieldset>
+    </>
+  ) : (
+    summary
+  );
 }
 
 function parseSort(value: string): number | null {

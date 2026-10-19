@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Plus } from "lucide-react";
 import type { ReactNode } from "react";
@@ -20,6 +21,7 @@ export function DishItem({
   actionLabel,
   actions,
   disabled,
+  className,
 }: {
   dish: Dish;
   tags: ItemTag[];
@@ -28,16 +30,17 @@ export function DishItem({
   actionLabel: string;
   actions?: ReactNode;
   disabled?: boolean;
+  className?: string;
 }) {
   const { i18n, t } = useLingui();
   const dishTagIds = getDishTagIds(dish);
   const dishTags = dishTagIds.length
     ? tags.filter((tag) => dishTagIds.includes(tag.id))
     : [DEFAULT_TAG];
-  const itemCls = cls`flex w-full rounded-lg px-2.5 py-2 text-left text-sm bg-card min-w-0 items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5`;
+  const itemCls = cls`flex w-full rounded-lg px-2.5 py-2 text-left text-sm bg-card min-w-0 items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5 group/dish`;
 
   return (
-    <article className={itemCls} data-selected={quantity > 0}>
+    <article className={cn(itemCls, className)} data-selected={quantity > 0}>
       <button
         type="button"
         className="min-w-0 flex-1 text-left min-h-11 cursor-pointer disabled:cursor-default"
@@ -71,7 +74,7 @@ export function DishItem({
           </span>
         ) : null}
       </button>
-      <div className="flex w-20 shrink-0 items-center justify-end gap-0.5">
+      <div className="flex min-w-20 shrink-0 items-center justify-end gap-0.5">
         {actions ?? (
           <Button
             type="button"

@@ -22,7 +22,6 @@ import {
   ImagePlus,
   LoaderCircle,
   Minus,
-  Pencil,
   Plus,
   ReceiptText,
   Save,
@@ -32,7 +31,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { bbqStore } from "@/lib/bbq/idb-store";
@@ -117,7 +116,7 @@ const photoActionCls = cls`
   px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
   has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1
   has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11 min-w-0 text-center
-  border border-border/60
+  border border-border/60 relative
 `;
 
 type DraftLine = {
@@ -173,8 +172,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const [saving, setSaving] = useState(false);
   const [processingPhotos, setProcessingPhotos] = useState(false);
   const [search, setSearch] = useState("");
-  const [managingItems, setManagingItems] = useState(false);
+  const itemHeaderRef = useRef<HTMLDivElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [addingItem, setAddingItem] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -263,7 +263,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
   const availableDishes = dishes.filter((dish) => dish.listed);
 
-  const visibleDishes = managingItems ? dishes : availableDishes;
+  const visibleDishes = dishes;
   const filteredDishes = visibleDishes.filter(
     (dish) =>
       dish.name
@@ -463,234 +463,229 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </AlertDescription>
         </Alert>
       ) : null}
-      <Collapsible open={cartOpen} onOpenChange={setCartOpen} asChild>
+      <Collapsible
+        open={cartOpen}
+        onOpenChange={(next) => {
+          if (next) setAddingItem(false);
+          setCartOpen(next);
+        }}
+        asChild
+      >
         <fieldset
           className={`${editorWorkspaceCls} min-w-0`}
           disabled={saving}
           aria-busy={saving}
         >
-          <div className="relative min-h-0 overflow-hidden">
-            <div className="h-full min-h-0" inert={cartOpen}>
-              <ItemEditViewport
-                className="h-full"
-                scrollClassName="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-3 pb-3 h-full"
-              >
-                {groupingEnabled ? (
-                  <section className={editorSectionCls}>
-                    <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="order-group"
-                        className="text-sm font-medium text-foreground shrink-0"
-                      >
-                        <Trans>分组</Trans>
-                      </label>
-                      <Select
-                        value={
-                          groupName === undefined
-                            ? "legacy"
-                            : groupName === null
-                              ? "none"
-                              : `group:${groupName}`
-                        }
-                        onValueChange={(value) =>
-                          setGroupName(
-                            value === "legacy"
-                              ? undefined
-                              : value === "none"
-                                ? null
-                                : value.slice(6),
-                          )
-                        }
-                      >
-                        <SelectTrigger
-                          id="order-group"
-                          className="min-w-0 h-11 bg-muted/30 flex-1 data-[size=default]:h-11 border-border/60 shadow-none rounded-lg"
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="none">
-                              <Trans>不分组</Trans>
-                            </SelectItem>
-                            {order &&
-                            order.groupingEnabled !== false &&
-                            order.groupName === undefined ? (
-                              <SelectItem value="legacy">
-                                {order.seat === null
-                                  ? t`打包`
-                                  : t`${order.seat} 号座`}
-                              </SelectItem>
-                            ) : null}
-                            {groupOptions.map((name) => (
-                              <SelectItem key={name} value={`group:${name}`}>
-                                {name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {groupingSettings?.names.length === 0 ? (
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        <Link
-                          href={bbqSettingsPath()}
-                          className="text-primary underline underline-offset-4"
-                        >
-                          <Trans>到设置中添加分组</Trans>
-                        </Link>
-                      </p>
-                    ) : null}
-                  </section>
-                ) : null}
-                <MenuEditor
-                  variant="inline"
-                  sharedTags={tags}
-                  onTagsChanged={setTags}
-                />
-                <details
-                  className={editorMenuPaneCls}
-                  open={menuOpen}
-                  onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+          {/* 外框只裁剪，不承接文件输入框聚焦时的隐式滚动。 */}
+          <div className="relative min-h-0 overflow-clip">
+            <div
+              className="h-full min-h-0 flex flex-col gap-3 isolate"
+              inert={cartOpen}
+            >
+              <MenuEditor
+                variant="inline"
+                sharedTags={tags}
+                onTagsChanged={setTags}
+                open={addingItem}
+                onOpenChange={setAddingItem}
+              />
+              <div className="min-h-0 flex-1 flex flex-col" inert={addingItem}>
+                <ItemEditViewport
+                  headerRef={itemHeaderRef}
+                  className="flex-1"
+                  scrollClassName="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-3 pb-3 h-full"
                 >
-                  <summary className={settingsSummaryCls}>
-                    <Plus
-                      className="size-4 shrink-0 text-primary"
-                      aria-hidden="true"
-                    />
-                    <span className="min-w-0 flex-1 truncate">
-                      <Trans>选择项目</Trans>
-                    </span>
-                    <span className="text-xs tabular-nums text-muted-foreground shrink-0 font-normal">
-                      {menuPhase === "ready" ? (
-                        <Trans>{availableDishes.length} 项</Trans>
-                      ) : (
-                        "—"
-                      )}
-                    </span>
-                    <ChevronDown
-                      className={detailsChevronCls}
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <div className="min-h-0 overflow-clip border-t border-border/60">
-                    {menuPhase === "loading" ? (
-                      <p
-                        className="py-8 text-center text-sm text-muted-foreground"
-                        role="status"
-                      >
-                        <Trans>读取常用项目中…</Trans>
-                      </p>
-                    ) : menuPhase === "error" ? (
-                      <div className="p-3 flex flex-col items-start gap-3">
-                        <p role="alert">{menuError}</p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() =>
-                            setMenuRevision((revision) => revision + 1)
+                  {groupingEnabled ? (
+                    <section className={editorSectionCls}>
+                      <div className="flex items-center gap-3">
+                        <label
+                          htmlFor="order-group"
+                          className="text-sm font-medium text-foreground shrink-0"
+                        >
+                          <Trans>分组</Trans>
+                        </label>
+                        <Select
+                          value={
+                            groupName === undefined
+                              ? "legacy"
+                              : groupName === null
+                                ? "none"
+                                : `group:${groupName}`
+                          }
+                          onValueChange={(value) =>
+                            setGroupName(
+                              value === "legacy"
+                                ? undefined
+                                : value === "none"
+                                  ? null
+                                  : value.slice(6),
+                            )
                           }
                         >
-                          <Trans>Retry</Trans>
-                        </Button>
+                          <SelectTrigger
+                            id="order-group"
+                            className="min-w-0 h-11 bg-muted/30 flex-1 data-[size=default]:h-11 border-border/60 shadow-none rounded-lg"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="none">
+                                <Trans>不分组</Trans>
+                              </SelectItem>
+                              {order &&
+                              order.groupingEnabled !== false &&
+                              order.groupName === undefined ? (
+                                <SelectItem value="legacy">
+                                  {order.seat === null
+                                    ? t`打包`
+                                    : t`${order.seat} 号座`}
+                                </SelectItem>
+                              ) : null}
+                              {groupOptions.map((name) => (
+                                <SelectItem key={name} value={`group:${name}`}>
+                                  {name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </div>
-                    ) : (
-                      <div className="p-2.5">
-                        <div className={editorItemToolbarCls}>
-                          {dishes.length > 0 ? (
-                            <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
-                              <BbqSearch
-                                value={search}
-                                onChange={setSearch}
-                                label={t`搜索项目名称…`}
-                              />
-                            </div>
-                          ) : null}
-                          <ItemTagFilter
-                            tags={tags}
-                            value={activeTagFilter}
-                            onChange={setTagFilter}
-                          />
+                      {groupingSettings?.names.length === 0 ? (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          <Link
+                            href={bbqSettingsPath()}
+                            className="text-primary underline underline-offset-4"
+                          >
+                            <Trans>到设置中添加分组</Trans>
+                          </Link>
+                        </p>
+                      ) : null}
+                    </section>
+                  ) : null}
+                  <details
+                    className={editorMenuPaneCls}
+                    open={menuOpen}
+                    onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+                  >
+                    <summary className={settingsSummaryCls}>
+                      <Plus
+                        className="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 flex-1 truncate">
+                        <Trans>选择项目</Trans>
+                      </span>
+                      <span className="text-xs tabular-nums text-muted-foreground shrink-0 font-normal">
+                        {menuPhase === "ready" ? (
+                          <Trans>{availableDishes.length} 项</Trans>
+                        ) : (
+                          "—"
+                        )}
+                      </span>
+                      <ChevronDown
+                        className={detailsChevronCls}
+                        aria-hidden="true"
+                      />
+                    </summary>
+                    <div className="min-h-0 overflow-clip border-t border-border/60">
+                      {menuPhase === "loading" ? (
+                        <p
+                          className="py-8 text-center text-sm text-muted-foreground"
+                          role="status"
+                        >
+                          <Trans>读取常用项目中…</Trans>
+                        </p>
+                      ) : menuPhase === "error" ? (
+                        <div className="p-3 flex flex-col items-start gap-3">
+                          <p role="alert">{menuError}</p>
                           <Button
                             type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="shrink-0 size-9 rounded-lg [&_svg]:size-3.5"
-                            aria-pressed={managingItems}
-                            aria-label={managingItems ? t`取消编辑` : t`编辑`}
-                            title={managingItems ? t`取消编辑` : t`编辑`}
+                            variant="outline"
                             onClick={() =>
-                              setManagingItems((current) => !current)
+                              setMenuRevision((revision) => revision + 1)
                             }
                           >
-                            {managingItems ? (
-                              <X
-                                data-icon="inline-start"
-                                strokeWidth={1.5}
-                                fill="none"
-                              />
-                            ) : (
-                              <Pencil
-                                data-icon="inline-start"
-                                strokeWidth={1.5}
-                                fill="none"
-                              />
-                            )}
+                            <Trans>Retry</Trans>
                           </Button>
                         </div>
-                        {visibleDishes.length === 0 ? (
-                          <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
-                            <UtensilsCrossed
-                              className="size-7 text-muted-foreground/60"
-                              aria-hidden="true"
-                            />
-                            <p className="mt-2 text-sm font-medium text-foreground">
-                              <Trans>先添几个常用项目</Trans>
-                            </p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              <Trans>比如早餐、咖啡，或一次跑步。</Trans>
-                            </p>
-                          </div>
-                        ) : filteredDishes.length === 0 ? (
-                          <p
-                            className="py-8 text-center text-sm text-muted-foreground"
-                            role="status"
+                      ) : (
+                        <div className="p-2.5">
+                          <div
+                            ref={itemHeaderRef}
+                            className={editorItemToolbarCls}
                           >
-                            <Trans>没有匹配的项目，请换个关键词</Trans>
-                          </p>
-                        ) : null}
-                        <div
-                          className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start p-1"
-                          hidden={filteredDishes.length === 0}
-                        >
-                          {dishes.map((dish) => (
-                            <div
-                              key={dish.id}
-                              className={
-                                filteredDishes.includes(dish)
-                                  ? "min-w-0"
-                                  : "hidden"
-                              }
-                            >
-                              <DishRow
-                                dish={dish}
-                                categoryId={dish.categoryId}
-                                tags={tags}
-                                managing={managingItems}
-                                quantity={selectedQuantities.get(dish.id) ?? 0}
-                                onAdd={addDish}
-                                onTagsChanged={reloadTags}
-                                onSaved={handleItemSaved}
-                                onError={setMessage}
+                            {dishes.length > 0 ? (
+                              <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
+                                <BbqSearch
+                                  value={search}
+                                  onChange={setSearch}
+                                  label={t`搜索项目名称…`}
+                                />
+                              </div>
+                            ) : null}
+                            <ItemTagFilter
+                              tags={tags}
+                              value={activeTagFilter}
+                              onChange={setTagFilter}
+                            />
+                          </div>
+                          {visibleDishes.length === 0 ? (
+                            <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
+                              <UtensilsCrossed
+                                className="size-7 text-muted-foreground/60"
+                                aria-hidden="true"
                               />
+                              <p className="mt-2 text-sm font-medium text-foreground">
+                                <Trans>先添几个常用项目</Trans>
+                              </p>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                <Trans>比如早餐、咖啡，或一次跑步。</Trans>
+                              </p>
                             </div>
-                          ))}
+                          ) : filteredDishes.length === 0 ? (
+                            <p
+                              className="py-8 text-center text-sm text-muted-foreground"
+                              role="status"
+                            >
+                              <Trans>没有匹配的项目，请换个关键词</Trans>
+                            </p>
+                          ) : null}
+                          <div
+                            className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start p-1"
+                            hidden={filteredDishes.length === 0}
+                          >
+                            {dishes.map((dish) => (
+                              <div
+                                key={dish.id}
+                                className={
+                                  filteredDishes.includes(dish)
+                                    ? "min-w-0"
+                                    : "hidden"
+                                }
+                              >
+                                <DishRow
+                                  dish={dish}
+                                  categoryId={dish.categoryId}
+                                  tags={tags}
+                                  managing={false}
+                                  quantity={
+                                    selectedQuantities.get(dish.id) ?? 0
+                                  }
+                                  onAdd={addDish}
+                                  onTagsChanged={reloadTags}
+                                  onSaved={handleItemSaved}
+                                  onError={setMessage}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </details>
-              </ItemEditViewport>
+                      )}
+                    </div>
+                  </details>
+                </ItemEditViewport>
+              </div>
             </div>
             {cartOpen ? (
               <button
@@ -855,7 +850,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         disabled={
                           processingPhotos || photos.length >= MAX_ORDER_PHOTOS
                         }
-                        className="sr-only"
+                        className="absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default"
                         onChange={(event) => {
                           const input = event.currentTarget;
                           void addPhotos(input.files).finally(() => {
@@ -874,7 +869,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                         disabled={
                           processingPhotos || photos.length >= MAX_ORDER_PHOTOS
                         }
-                        className="sr-only"
+                        className="absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default"
                         onChange={(event) => {
                           const input = event.currentTarget;
                           void addPhotos(input.files).finally(() => {
