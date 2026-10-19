@@ -58,6 +58,15 @@ const preferenceControlCls = cls`
   [&>button]:px-2 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button]:text-sm
   [&>button:focus-visible]:ring-1 [&>button:focus-visible]:ring-primary/50
 `;
+const settingsHighlightCls = cls`
+  [&_[data-settings-section]]:scroll-mt-2
+  [&_[data-settings-section]]:transition-[border-color]
+  [&_[data-settings-section]]:duration-500
+  [&_[data-settings-section]>summary]:transition-colors
+  [&_[data-settings-section]>summary]:duration-500
+  [&_[data-settings-section][data-highlighted]]:border-primary/40
+  [&_[data-settings-section][data-highlighted]>summary]:bg-primary/5
+`;
 
 export function BbqSettings() {
   const { i18n, t } = useLingui();
@@ -82,13 +91,13 @@ export function BbqSettings() {
     );
     if (!target) return;
     target.scrollIntoView({ block: "start" });
-    // Let the initial border paint before briefly highlighting the destination.
+    // 首屏绘制后再突出目标区域，留出足够时间辨认后平滑恢复。
     const highlightTimer = window.setTimeout(() => {
       target.dataset.highlighted = "true";
     }, 100);
     const restoreTimer = window.setTimeout(() => {
       delete target.dataset.highlighted;
-    }, 900);
+    }, 3600);
     return () => {
       window.clearTimeout(highlightTimer);
       window.clearTimeout(restoreTimer);
@@ -239,7 +248,7 @@ export function BbqSettings() {
       ) : null}
       <div
         ref={settingsRef}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 [&_[data-settings-section]]:transition-[border-color] [&_[data-settings-section]]:duration-500 [&_[data-settings-section][data-highlighted]]:border-primary/60"
+        className={cls`min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 ${settingsHighlightCls}`}
       >
         <p className={groupLabelCls}>
           <Trans>基础设置</Trans>

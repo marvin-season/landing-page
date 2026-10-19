@@ -55,13 +55,23 @@ import {
 } from "./item-edit-viewport";
 import { ItemTagFilter, ItemTagSelect } from "./item-tags";
 
-const dishGridCls = cls`grid grid-cols-2 gap-2 min-w-0 items-end`;
+const dishGridCls = cls`grid grid-cols-2 gap-x-3 gap-y-2.5 min-w-0 items-end`;
 const dishFieldCls = cls`flex min-w-0 flex-col gap-1`;
-const dishRowCls = cls`gap-x-3 gap-y-2.5 [&_[data-slot=input]]:border-border/70 [&_[data-slot=button]]:shadow-none`;
+const fieldLabelCls = cls`text-muted-foreground text-xs leading-4 wrap-anywhere`;
+const dishHintCls = cls`text-muted-foreground text-xs leading-relaxed mb-3`;
 const dishInputCls = cls`
   w-full min-w-0 rounded-lg border bg-card shadow-none h-9 px-2 text-base
   focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50
   focus-visible:ring-offset-0 placeholder:text-sm text-card-foreground
+  border-border/60 focus-visible:border-primary/50
+  placeholder:text-muted-foreground/70 placeholder:font-normal placeholder:opacity-100
+  dark:bg-card shinchan:bg-card apple:rounded-lg apple:bg-card apple:backdrop-blur-none
+`;
+const dishTagControlCls = cls`
+  rounded-lg border border-border/60 bg-card shadow-none hover:bg-muted/40 hover:shadow-none
+  focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-inset
+  focus-visible:ring-primary/50 focus-visible:ring-offset-0
+  shinchan:rounded-lg shinchan:bg-card apple:rounded-lg apple:bg-card apple:backdrop-blur-none
 `;
 
 // 仅统一常用项目页的控件底色和标签色，不改变共享组件在其他页面的配色。
@@ -239,7 +249,7 @@ export function MenuEditor({
               <div className="relative">
                 {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
                 <fieldset disabled={!menu} aria-busy={!menu}>
-                  <p className="text-muted-foreground text-[11px] mb-2">
+                  <p className={dishHintCls}>
                     <Trans>
                       热量按每单位填写：摄入填正数，消耗填负数，可留空
                     </Trans>
@@ -397,8 +407,8 @@ function DishList({
         <div className="min-h-0 overflow-clip">
           {addFormRequested ? (
             categoryId ? (
-              <div className="p-2.5 border-t bg-muted/30 border-border/60">
-                <p className="text-muted-foreground text-[11px] mb-2">
+              <div className="p-3 border-t bg-muted/30 border-border/60">
+                <p className={dishHintCls}>
                   <Trans>
                     热量按每单位填写：摄入填正数，消耗填负数，可留空
                   </Trans>
@@ -569,7 +579,6 @@ export function DishRow({
   const [tagIds, setTagIds] = useState<string[]>(
     dish ? getDishTagIds(dish) : [DEFAULT_TAG.id],
   );
-  const fieldLabelCls = cls`text-foreground/80 text-xs leading-4 wrap-anywhere`;
   const [name, setName] = useState(dish?.name ?? "");
   const [price, setPrice] = useState(
     dish ? centsToYuanInput(dish.priceCents) : "0",
@@ -827,6 +836,7 @@ export function DishRow({
         </span>
         <div className="flex items-center justify-center min-h-9 min-w-0">
           <Switch
+            className="shadow-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:ring-offset-0"
             checked={listed}
             aria-label={t`项目启用`}
             onCheckedChange={setListed}
@@ -837,7 +847,7 @@ export function DishRow({
         <Button
           type="button"
           variant="default"
-          className="px-3 min-h-9 min-w-0 rounded-lg shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-offset-0 whitespace-normal h-auto py-1.5 text-xs max-w-full"
+          className="px-3 min-h-9 min-w-0 rounded-lg shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-offset-0 whitespace-normal h-auto py-1.5 text-xs max-w-full focus-visible:ring-primary/50 shinchan:rounded-lg"
           onClick={() => void commit()}
         >
           {pending === "save" ? (
@@ -860,7 +870,7 @@ export function DishRow({
     <fieldset
       disabled={pending !== null || tagPending}
       aria-busy={pending !== null || tagPending}
-      className={`${dishGridCls} ${isNew ? "" : dishRowCls}`}
+      className={`${dishGridCls} ${menuColorsCls}`}
     >
       <label className={`col-span-2 ${dishFieldCls}`}>
         <span className={fieldLabelCls}>
@@ -873,7 +883,7 @@ export function DishRow({
           className={dishInputCls}
           autoComplete="off"
           aria-label={t`项目名称`}
-          placeholder={isNew ? t`新项目` : undefined}
+          placeholder={t`项目名称`}
         />
       </label>
       <div className={`col-span-2 ${dishFieldCls}`}>
@@ -881,6 +891,8 @@ export function DishRow({
           <Trans>标签</Trans>
         </span>
         <ItemTagSelect
+          inputClassName={dishInputCls}
+          controlClassName={dishTagControlCls}
           tags={tags}
           value={tagIds}
           onChange={setTagIds}
@@ -943,6 +955,7 @@ export function DishRow({
           autoComplete="off"
           aria-label={t`排序（数字越大越靠前）`}
           title={t`数字越大越靠前`}
+          placeholder="0"
         />
       </label>
       {isNew ? actions : null}
