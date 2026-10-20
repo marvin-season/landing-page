@@ -1,5 +1,6 @@
 import {
   Button,
+  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -20,10 +21,8 @@ import {
 } from "../../_styles/data-settings-styles";
 import {
   settingsActionCls,
-  settingsCardCls,
+  settingsDetailsCls,
 } from "../../_styles/settings-styles";
-
-import { SettingsDetails } from "./settings-details";
 
 export function BackupSettings({
   section,
@@ -51,10 +50,14 @@ export function BackupSettings({
     importSamples,
   } = data;
   return (
-    <SettingsDetails
+    <Details
+      mode="floating"
+      side="auto"
+      boundary="[data-settings-viewport]"
+      name="bookkeeping-settings"
       data-settings-section="backup"
       open={section === "backup"}
-      className={settingsCardCls}
+      className={settingsDetailsCls}
     >
       <DetailsSummary variant="flush">
         <DatabaseBackup className="size-4 text-primary" aria-hidden="true" />
@@ -166,6 +169,6 @@ export function BackupSettings({
           ) : null}
         </div>
       </DetailsContent>
-    </SettingsDetails>
+    </Details>
   );
 }

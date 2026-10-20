@@ -1,5 +1,6 @@
 import {
   Button,
+  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -15,11 +16,9 @@ import {
 } from "../../_styles/data-settings-styles";
 import {
   settingsActionCls,
-  settingsCardCls,
+  settingsDetailsCls,
   settingsInputCls,
 } from "../../_styles/settings-styles";
-
-import { SettingsDetails } from "./settings-details";
 
 export function CleanupSettings({
   data,
@@ -48,7 +47,13 @@ export function CleanupSettings({
     cleanup,
   } = data;
   return (
-    <SettingsDetails className={settingsCardCls}>
+    <Details
+      mode="floating"
+      side="auto"
+      boundary="[data-settings-viewport]"
+      name="bookkeeping-settings"
+      className={settingsDetailsCls}
+    >
       <DetailsSummary variant="flush">
         <Trash2 className="size-4 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">
@@ -145,6 +150,6 @@ export function CleanupSettings({
           </Button>
         </fieldset>
       </DetailsContent>
-    </SettingsDetails>
+    </Details>
   );
 }

@@ -8,6 +8,80 @@ import {
   DetailsContent,
   DetailsSummary,
 } from "./details";
+import { getDetailsPlacement } from "./details-placement";
+
+test("auto placement chooses visible space and respects an explicit direction", () => {
+  const bounds = { top: 100, bottom: 600 };
+  assert.deepEqual(
+    getDetailsPlacement({ top: 140, bottom: 190 }, bounds, "auto"),
+    {
+      side: "bottom",
+      maxHeight: 402,
+    },
+  );
+  assert.deepEqual(
+    getDetailsPlacement({ top: 500, bottom: 550 }, bounds, "auto"),
+    {
+      side: "top",
+      maxHeight: 392,
+    },
+  );
+  assert.deepEqual(
+    getDetailsPlacement({ top: 500, bottom: 550 }, bounds, "bottom"),
+    {
+      side: "bottom",
+      maxHeight: 42,
+    },
+  );
+});
+
+test("placement does not exceed the boundary when the trigger scrolls outside it", () => {
+  const bounds = { top: 100, bottom: 600 };
+  assert.deepEqual(
+    getDetailsPlacement({ top: 700, bottom: 750 }, bounds, "auto"),
+    {
+      side: "top",
+      maxHeight: 492,
+    },
+  );
+  assert.deepEqual(
+    getDetailsPlacement({ top: 0, bottom: 50 }, bounds, "auto"),
+    {
+      side: "bottom",
+      maxHeight: 492,
+    },
+  );
+  assert.equal(
+    getDetailsPlacement({ top: 100, bottom: 150 }, bounds, "top").maxHeight,
+    0,
+  );
+});
+
+test("auto placement preserves native markup without leaking boundary configuration", () => {
+  const html = renderToStaticMarkup(
+    createElement(
+      Details,
+      {
+        mode: "floating",
+        side: "auto",
+        boundary: "[data-viewport]",
+        name: "settings",
+        open: true,
+      },
+      createElement(DetailsSummary, null, "Settings"),
+      createElement(
+        DetailsContent,
+        null,
+        createElement("input", { defaultValue: "draft" }),
+      ),
+    ),
+  );
+  assert.match(html, /^<details[^>]*><summary\b/);
+  assert.match(html, /name="settings"/);
+  assert.match(html, /value="draft"/);
+  assert.match(html, /data-side="bottom"/);
+  assert.doesNotMatch(html, /boundary=|data-side="auto"/);
+});
 
 test("forwards native open, name, ref and toggle events without managing state", () => {
   const ref = createRef<HTMLDetailsElement>();

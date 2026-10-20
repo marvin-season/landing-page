@@ -6,6 +6,11 @@ export const settingsCardCls = cls`
   text-card-foreground shadow-none
 `;
 
+export const settingsDetailsCls = cls(
+  settingsCardCls,
+  cls`overflow-visible [&[open]]:z-40 [&>summary]:rounded-xl`,
+);
+
 export const settingsActionCls = cls`
   min-h-11 w-full justify-center rounded-lg px-3 text-sm shadow-none
   hover:bg-muted/70 hover:shadow-none focus-visible:ring-inset

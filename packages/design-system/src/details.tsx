@@ -4,17 +4,102 @@ import { cn as cls } from "@landing-page/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
+import { getDetailsPlacement } from "./details-placement";
 
 type DetailsProps = React.ComponentProps<"details"> & {
   /** Floating panels stay inside the current layout/stacking context (no portal). */
   mode?: "flow" | "floating";
-  side?: "top" | "bottom";
+  side?: "auto" | "top" | "bottom";
+  /** Closest ancestor matching this selector; defaults to the viewport in auto mode. */
+  boundary?: string;
   backdrop?: "blur" | "none";
   /** Defaults to the viewport; use `absolute` for a positioned parent scope. */
   backdropClassName?: string;
 };
 
 const DetailsContext = React.createContext<"top" | "bottom" | null>(null);
+
+const detailsBoundedCls = cls`
+  [&>[data-slot=details-content]]:max-h-(--details-available-height)
+`;
+
+function PositionedDetails({
+  side = "auto",
+  boundary,
+  ref,
+  className,
+  onToggle,
+  onClickCapture,
+  ...props
+}: DetailsProps) {
+  const localRef = React.useRef<HTMLDetailsElement>(null);
+  const [resolvedSide, setResolvedSide] = React.useState<"top" | "bottom">(
+    side === "top" ? "top" : "bottom",
+  );
+  React.useImperativeHandle(ref, () => localRef.current!, []);
+
+  const measure = React.useCallback(() => {
+    const details = localRef.current;
+    const summary = details?.querySelector("summary");
+    if (!details || !summary) return;
+    const bounds = boundary
+      ? details.closest(boundary)?.getBoundingClientRect()
+      : undefined;
+    const placement = getDetailsPlacement(
+      summary.getBoundingClientRect(),
+      {
+        top: Math.max(0, bounds?.top ?? 0),
+        bottom: Math.min(
+          window.innerHeight,
+          bounds?.bottom ?? window.innerHeight,
+        ),
+      },
+      side,
+    );
+    details.style.setProperty(
+      "--details-available-height",
+      `${placement.maxHeight}px`,
+    );
+    setResolvedSide(placement.side);
+  }, [boundary, side]);
+
+  React.useLayoutEffect(() => {
+    const details = localRef.current;
+    if (!details) return;
+    const update = () => {
+      if (details.open) measure();
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(details);
+    const container = boundary ? details.closest(boundary) : null;
+    if (container) observer.observe(container);
+    window.addEventListener("scroll", update, { capture: true, passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [boundary, measure]);
+
+  return (
+    <Details
+      {...props}
+      ref={localRef}
+      side={resolvedSide}
+      className={cls(className, detailsBoundedCls)}
+      onClickCapture={(event) => {
+        onClickCapture?.(event);
+        if (!event.defaultPrevented && !event.currentTarget.open) measure();
+      }}
+      onToggle={(event) => {
+        if (event.currentTarget.open) measure();
+        onToggle?.(event);
+      }}
+    />
+  );
+}
 
 const detailsFloatingCls = cls`
   group/details relative overflow-visible
@@ -92,6 +177,7 @@ function Details({
   className,
   mode = "flow",
   side = "bottom",
+  boundary,
   backdrop = "blur",
   backdropClassName,
   children,
@@ -99,8 +185,24 @@ function Details({
   ...props
 }: DetailsProps) {
   const floating = mode === "floating";
+  if (floating && (side === "auto" || boundary)) {
+    return (
+      <PositionedDetails
+        {...props}
+        mode={mode}
+        side={side}
+        boundary={boundary}
+        backdrop={backdrop}
+        backdropClassName={backdropClassName}
+        className={className}
+        onKeyDown={onKeyDown}
+      >
+        {children}
+      </PositionedDetails>
+    );
+  }
   return (
-    <DetailsContext value={floating ? side : null}>
+    <DetailsContext value={floating && side !== "auto" ? side : null}>
       <details
         data-slot="details"
         data-mode={mode}

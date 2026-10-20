@@ -3,6 +3,7 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -32,8 +33,7 @@ import {
   saveCompanion,
 } from "@/lib/bbq/companion-album-store";
 import { prepareCompanion } from "@/lib/bbq/companion-image";
-import { settingsCardCls } from "../../_styles/settings-styles";
-import { SettingsDetails } from "../settings/settings-details";
+import { settingsDetailsCls } from "../../_styles/settings-styles";
 import { Companion } from "./companion";
 import { useCompanionAlbum } from "./companion-album-provider";
 
@@ -151,10 +151,14 @@ export function CompanionAlbumSettings() {
   }
 
   return (
-    <SettingsDetails
+    <Details
+      mode="floating"
+      side="auto"
+      boundary="[data-settings-viewport]"
+      name="bookkeeping-settings"
       data-settings-section="companion-album"
       open={searchParams.get("section") === "companion-album"}
-      className={settingsCardCls}
+      className={settingsDetailsCls}
     >
       <DetailsSummary variant="flush">
         <Images className="size-4 text-primary" aria-hidden="true" />
@@ -353,6 +357,6 @@ export function CompanionAlbumSettings() {
           </p>
         ) : null}
       </DetailsContent>
-    </SettingsDetails>
+    </Details>
   );
 }
