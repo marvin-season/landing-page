@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getBookkeepingPageMetadata } from "@/lib/bookkeeping-seo";
 import { getI18nInstance } from "@/lib/i18n/appRouterI18n";
-import { OrderEditor } from "../../_components/order-editor";
+import { OrderEditor } from "../../_components/order/order-editor";
 
 export async function generateMetadata({
   params,

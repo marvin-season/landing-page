@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import type { Metadata } from "next";
 import { getBookkeepingPageMetadata } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
-import { OrderEditor } from "../../_components/order-editor";
+import { OrderEditor } from "../../_components/order/order-editor";
 
 export async function generateMetadata({
   params,

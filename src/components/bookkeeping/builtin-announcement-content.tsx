@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { cls } from "@/app/[lang]/bookkeeping/_components/bbq-layout";
-import { BbqLink as Link } from "@/app/[lang]/bookkeeping/_components/bbq-link";
-import { bbqSettingsPath } from "@/app/[lang]/bookkeeping/_components/bbq-paths";
+import { BbqLink as Link } from "@/app/[lang]/bookkeeping/_components/shared/bbq-link";
+import { bbqSettingsPath } from "@/app/[lang]/bookkeeping/_lib/bbq-paths";
+import { cls } from "@/app/[lang]/bookkeeping/_styles/bbq-layout";
 
 const linkCls = cls`text-primary underline underline-offset-4 hover:text-primary/80`;
 

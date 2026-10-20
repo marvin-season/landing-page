@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import type { Metadata } from "next";
 import { getBookkeepingPageMetadata } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
-import { MenuEditor } from "../_components/menu-editor";
+import { MenuEditor } from "../_components/menu/menu-editor";
 
 export async function generateMetadata({
   params,

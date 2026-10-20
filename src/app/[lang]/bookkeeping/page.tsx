@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { BackupReminder } from "./_components/backup-reminder";
-import { CompanionAlbumReminder } from "./_components/companion-album-reminder";
-import { OrdersHome } from "./_components/orders-home";
+import { OrdersHome } from "./_components/home/orders-home";
+import { BackupReminder } from "./_components/reminders/backup-reminder";
+import { CompanionAlbumReminder } from "./_components/reminders/companion-album-reminder";
 
 export default function BbqOrdersPage() {
   return (

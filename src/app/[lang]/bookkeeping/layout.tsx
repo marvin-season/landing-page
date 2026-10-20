@@ -4,12 +4,12 @@ import { type PropsWithChildren, Suspense } from "react";
 import { getBookkeepingAlternates } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getSiteOrigin } from "@/lib/site-origin";
-import { BbqApp } from "./_components/bbq-app";
-import { BbqInstallProvider } from "./_components/bbq-install-button";
-import { BbqMobileNav } from "./_components/bbq-mobile-nav";
-import { BbqOfflineProvider } from "./_components/bbq-offline-provider";
-import { bbqSearchDescription } from "./_components/bbq-search-copy";
-import { CompanionAlbumProvider } from "./_components/companion-album-provider";
+import { BbqApp } from "./_components/app/bbq-app";
+import { BbqMobileNav } from "./_components/app/bbq-mobile-nav";
+import { CompanionAlbumProvider } from "./_components/companion/companion-album-provider";
+import { BbqInstallProvider } from "./_components/pwa/bbq-install-button";
+import { BbqOfflineProvider } from "./_components/pwa/bbq-offline-provider";
+import { bbqSearchDescription } from "./_lib/bbq-search-copy";
 
 export async function generateMetadata({
   params,
