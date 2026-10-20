@@ -10,8 +10,8 @@ import { AnnouncementTimeline } from "@/components/bookkeeping/announcement-time
 import { getBuiltinAnnouncements } from "@/lib/bookkeeping-announcements/builtin";
 import { useAnnouncementFeed } from "@/lib/bookkeeping-announcements/client";
 import { compareAnnouncements } from "@/lib/bookkeeping-announcements/model";
-import { pageTitleCls } from "../../_styles/bbq-layout";
-import { BbqSearch } from "../shared/bbq-search";
+import { pageTitleCls } from "../../_styles/layout";
+import { SearchInput } from "../shared/search-input";
 
 export function Announcements() {
   const [client] = useState(() => new QueryClient());
@@ -77,7 +77,7 @@ function AnnouncementFeed() {
         </p>
       </header>
       <div className="shrink-0 [&_[data-slot=input]]:h-9 [&_[data-slot=button]]:size-9">
-        <BbqSearch
+        <SearchInput
           value={search}
           onChange={(value) => {
             setSearch(value);

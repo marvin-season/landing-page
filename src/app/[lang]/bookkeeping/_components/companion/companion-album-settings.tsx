@@ -30,12 +30,12 @@ import {
   saveCompanion,
 } from "@/lib/bbq/companion-album-store";
 import { prepareCompanion } from "@/lib/bbq/companion-image";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/bbq-layout";
+import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
 import {
   settingsCardCls,
   settingsSummaryCls,
-} from "../../_styles/bbq-settings-styles";
-import { BbqCompanion } from "./bbq-companion";
+} from "../../_styles/settings-styles";
+import { Companion } from "./companion";
 import { useCompanionAlbum } from "./companion-album-provider";
 
 const moodLabels = {
@@ -232,7 +232,7 @@ export function CompanionAlbumSettings() {
           </label>
           <div className="flex min-h-14 items-center gap-2">
             {images[mood] ? (
-              <BbqCompanion mood={mood} className="block size-14 shrink-0" />
+              <Companion mood={mood} className="block size-14 shrink-0" />
             ) : (
               <p className="text-xs text-muted-foreground">
                 <Trans>此场景暂无图片</Trans>

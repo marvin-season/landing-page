@@ -2,8 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import type { Category, Dish, ItemTag } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../_lib/bbq-errors";
-import { notifyBbqMenuChanged } from "../_lib/bbq-menu-events";
+import { errorMessage } from "../_lib/errors";
+import { notifyMenuChanged } from "../_lib/menu-events";
 
 export function useMenuData(onTagsChanged?: (tags: ItemTag[]) => void) {
   const { i18n, t } = useLingui();
@@ -53,7 +53,7 @@ export function useMenuData(onTagsChanged?: (tags: ItemTag[]) => void) {
   const handleSaved = useCallback(async () => {
     setMessage(null);
     await reload();
-    notifyBbqMenuChanged();
+    notifyMenuChanged();
     setNotice(t`常用项目已保存`);
   }, [reload, t]);
 
@@ -68,7 +68,7 @@ export function useMenuData(onTagsChanged?: (tags: ItemTag[]) => void) {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setMessage(bbqErrorMessage(i18n, error));
+        setMessage(errorMessage(i18n, error));
         setPhase("error");
       });
     return () => {

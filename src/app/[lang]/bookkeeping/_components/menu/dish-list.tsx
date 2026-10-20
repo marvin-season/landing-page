@@ -3,14 +3,14 @@ import { Bookmark, ChevronDown, Plus } from "lucide-react";
 import { type RefObject, useState } from "react";
 import { matchesTag, resolveTagFilter } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/bbq-layout";
+import { dishHintCls } from "../../_styles/dish-form-styles";
+import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
 import {
   settingsCardCls,
   settingsSummaryCls,
-} from "../../_styles/bbq-settings-styles";
-import { dishHintCls } from "../../_styles/dish-form-styles";
-import { BbqCompanion } from "../companion/bbq-companion";
-import { BbqSearch } from "../shared/bbq-search";
+} from "../../_styles/settings-styles";
+import { Companion } from "../companion/companion";
+import { SearchInput } from "../shared/search-input";
 import { DishRow } from "./dish-row";
 import { ItemTagFilter } from "./item-tags";
 import { MenuLoadStatus } from "./menu-load-status";
@@ -73,7 +73,7 @@ export function DishList({
           <span className="text-sm font-medium text-foreground flex-1">
             <Trans>添加常用项目</Trans>
           </span>
-          <BbqCompanion mood="chef" className="block size-8 shrink-0" />
+          <Companion mood="chef" className="block size-8 shrink-0" />
           <ChevronDown className={detailsChevronCls} aria-hidden="true" />
         </summary>
         <div className="min-h-0 overflow-clip">
@@ -130,7 +130,7 @@ export function DishList({
                   <div className="flex min-w-0 items-center gap-2">
                     {dishes.length > 0 ? (
                       <div className="min-w-0 flex-1">
-                        <BbqSearch
+                        <SearchInput
                           value={search}
                           onChange={setSearch}
                           label={t`搜索已有项目…`}
@@ -154,7 +154,7 @@ export function DishList({
                 ) : null}
                 {dishes.length === 0 ? (
                   <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
-                    <BbqCompanion
+                    <Companion
                       mood="dance"
                       className="block size-32 shrink-0"
                     />

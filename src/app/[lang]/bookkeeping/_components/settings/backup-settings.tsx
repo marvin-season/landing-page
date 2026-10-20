@@ -10,16 +10,16 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import type { SettingsData } from "../../_hooks/use-settings-data";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/bbq-layout";
-import {
-  settingsActionCls,
-  settingsCardCls,
-  settingsSummaryCls,
-} from "../../_styles/bbq-settings-styles";
 import {
   radioInputCls,
   radioOptionCls,
 } from "../../_styles/data-settings-styles";
+import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
+import {
+  settingsActionCls,
+  settingsCardCls,
+  settingsSummaryCls,
+} from "../../_styles/settings-styles";
 
 export function BackupSettings({
   section,

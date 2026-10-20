@@ -3,10 +3,10 @@
 import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
-import { useBbqOffline } from "./bbq-offline-provider";
+import { useOffline } from "./offline-provider";
 
-export function BbqOfflineStatus() {
-  const offline = useBbqOffline();
+export function OfflineStatus() {
+  const offline = useOffline();
   const { t } = useLingui();
   const [storage, setStorage] = useState<
     "available" | "saved" | "denied" | null

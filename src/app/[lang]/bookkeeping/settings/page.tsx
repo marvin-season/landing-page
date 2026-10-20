@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import type { Metadata } from "next";
 import { getBookkeepingPageMetadata } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
-import { BbqSettings } from "../_components/settings/bbq-settings";
+import { Settings } from "../_components/settings/settings";
 
 export async function generateMetadata({
   params,
@@ -21,6 +21,6 @@ export async function generateMetadata({
   };
 }
 
-export default function BbqSettingsPage() {
-  return <BbqSettings />;
+export default function SettingsPage() {
+  return <Settings />;
 }

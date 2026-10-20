@@ -1,4 +1,4 @@
-import { cls } from "./bbq-layout";
+import { cls } from "./layout";
 
 // 设置页的样式基准；常用项目复用卡片和标题样式，保持折叠入口一致。
 export const settingsCardCls = cls`

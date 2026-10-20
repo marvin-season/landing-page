@@ -4,7 +4,7 @@ import { Button, Input } from "@landing-page/design-system";
 import { useLingui } from "@lingui/react/macro";
 import { Search, X } from "lucide-react";
 
-export function BbqSearch({
+export function SearchInput({
   value,
   onChange,
   label,

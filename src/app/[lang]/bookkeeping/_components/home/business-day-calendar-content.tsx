@@ -10,11 +10,11 @@ import {
   formatShanghaiDate,
 } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
-import { businessDayLabel } from "../../_lib/bbq-i18n";
-import { bbqHomePath } from "../../_lib/bbq-paths";
-import { cls } from "../../_styles/bbq-layout";
-import { BbqLink as Link } from "../shared/bbq-link";
+import { errorMessage } from "../../_lib/errors";
+import { businessDayLabel } from "../../_lib/i18n";
+import { homePath } from "../../_lib/paths";
+import { cls } from "../../_styles/layout";
+import { LocalLink as Link } from "../shared/local-link";
 
 const calendarControlCls = cls`
   rounded-lg shadow-none transition-colors duration-150 hover:bg-muted/70
@@ -58,7 +58,7 @@ export function CalendarContent({ day }: { day: string }) {
         setCounts(next);
       },
       (reason: unknown) => {
-        if (!cancelled) setError(bbqErrorMessage(i18n, reason));
+        if (!cancelled) setError(errorMessage(i18n, reason));
       },
     );
     return () => {
@@ -165,7 +165,7 @@ export function CalendarContent({ day }: { day: string }) {
           return (
             <Dialog.Close key={dateKey} asChild>
               <Link
-                href={bbqHomePath(key)}
+                href={homePath(key)}
                 prefetch={false}
                 aria-label={`${businessDayLabel(i18n, key)}${counts ? t`，${count} 条记录` : ""}${selected ? t`，已选中` : ""}`}
                 aria-current={dateKey === today ? "date" : undefined}
@@ -192,7 +192,7 @@ export function CalendarContent({ day }: { day: string }) {
             size="sm"
             className={`${calendarControlCls} shrink-0 bg-muted/40`}
           >
-            <Link href={bbqHomePath(currentBusinessDayKey(new Date()))}>
+            <Link href={homePath(currentBusinessDayKey(new Date()))}>
               <Trans>回到当前时段</Trans>
             </Link>
           </Button>

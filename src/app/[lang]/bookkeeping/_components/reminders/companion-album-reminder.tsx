@@ -4,8 +4,8 @@ import { toast } from "@landing-page/design-system";
 import { useLingui } from "@lingui/react/macro";
 import { Images } from "lucide-react";
 import { useWeeklyReminder } from "../../_hooks/use-weekly-reminder";
-import { bbqSettingsPath } from "../../_lib/bbq-paths";
-import { BbqLink as Link } from "../shared/bbq-link";
+import { settingsPath } from "../../_lib/paths";
+import { LocalLink as Link } from "../shared/local-link";
 
 export function CompanionAlbumReminder() {
   const { t } = useLingui();
@@ -18,7 +18,7 @@ export function CompanionAlbumReminder() {
         description: t`在设置的“自定义图集”中上传自己的图片，也可以下载示例图集后导入。`,
         action: (
           <Link
-            href={`${bbqSettingsPath()}?section=companion-album`}
+            href={`${settingsPath()}?section=companion-album`}
             className="shrink-0 text-xs font-medium text-primary underline underline-offset-4"
           >
             {t`去换配图`}

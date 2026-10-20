@@ -1,24 +1,24 @@
-export function bbqHomePath(day?: string): string {
+export function homePath(day?: string): string {
   if (!day) return "/bookkeeping";
   return `/bookkeeping?${new URLSearchParams({ day }).toString()}`;
 }
 
-export function bbqNewOrderPath(): string {
+export function newOrderPath(): string {
   return "/bookkeeping/orders/new";
 }
 
-export function bbqOrderPath(id: string): string {
+export function orderPath(id: string): string {
   return `/bookkeeping/orders/${encodeURIComponent(id)}`;
 }
 
-export function bbqMenuPath(): string {
+export function menuPath(): string {
   return "/bookkeeping/menu";
 }
 
-export function bbqSettingsPath(): string {
+export function settingsPath(): string {
   return "/bookkeeping/settings";
 }
 
-export function bbqAnnouncementsPath(): string {
+export function announcementsPath(): string {
   return "/bookkeeping/announcements";
 }

@@ -24,7 +24,7 @@ const InstallContext = createContext<{
 } | null>(null);
 
 // 安装事件可能在首页触发，由常驻 layout 保存，切到设置后仍可使用原生安装。
-export function BbqInstallProvider({ children }: PropsWithChildren) {
+export function InstallProvider({ children }: PropsWithChildren) {
   const installPrompt = useRef<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [installing, setInstalling] = useState(false);
@@ -83,11 +83,11 @@ export function BbqInstallProvider({ children }: PropsWithChildren) {
   );
 }
 
-export function BbqInstallButton() {
+export function InstallButton() {
   const { t } = useLingui();
   const context = useContext(InstallContext);
   const [open, setOpen] = useState(false);
-  if (!context) throw new Error("BbqInstallButton requires BbqInstallProvider");
+  if (!context) throw new Error("InstallButton requires InstallProvider");
   const { installed, installing, requestInstall } = context;
 
   async function install() {

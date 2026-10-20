@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { BbqLink as Link } from "@/app/[lang]/bookkeeping/_components/shared/bbq-link";
-import { bbqSettingsPath } from "@/app/[lang]/bookkeeping/_lib/bbq-paths";
-import { cls } from "@/app/[lang]/bookkeeping/_styles/bbq-layout";
+import { LocalLink as Link } from "@/app/[lang]/bookkeeping/_components/shared/local-link";
+import { settingsPath } from "@/app/[lang]/bookkeeping/_lib/paths";
+import { cls } from "@/app/[lang]/bookkeeping/_styles/layout";
 
 const linkCls = cls`text-primary underline underline-offset-4 hover:text-primary/80`;
 
@@ -14,14 +14,14 @@ export const builtinAnnouncementBodies: Record<string, ReactNode> = {
       <p>数据仅存本机，不会云同步，可离线记账。</p>
       <p>
         换设备、卸载应用或清理浏览器前，请先到
-        <Link href={`${bbqSettingsPath()}?section=backup`} className={linkCls}>
+        <Link href={`${settingsPath()}?section=backup`} className={linkCls}>
           备份&amp;还原
         </Link>
         导出数据。
       </p>
       <p>
         <Link
-          href={`${bbqSettingsPath()}?section=companion-album`}
+          href={`${settingsPath()}?section=companion-album`}
           className={linkCls}
         >
           自定义图集

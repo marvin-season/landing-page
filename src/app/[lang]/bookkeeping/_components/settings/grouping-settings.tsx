@@ -13,11 +13,11 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { BbqStoreError } from "@/lib/bbq/store";
 import type { GroupingSettings } from "@/lib/bbq/types";
 import { useGroupingSettings } from "../../_hooks/use-grouping-settings";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
+import { errorMessage } from "../../_lib/errors";
 import {
   settingsCardCls,
   settingsInputCls,
-} from "../../_styles/bbq-settings-styles";
+} from "../../_styles/settings-styles";
 
 export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
   const { i18n, t } = useLingui();
@@ -37,7 +37,7 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
       await bbqStore.saveGroupingSettings(next);
       if (added) setName("");
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       busy.current = false;
       setPending(false);
@@ -52,7 +52,7 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
         throw new BbqStoreError("group_exists");
       void save({ ...settings, names: [...settings.names, group] }, true);
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     }
   }
 
@@ -156,7 +156,7 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
       ) : null}
       {message || loadError ? (
         <p className="px-3 pb-3 text-xs text-destructive" role="alert">
-          {message ?? bbqErrorMessage(i18n, loadError)}
+          {message ?? errorMessage(i18n, loadError)}
         </p>
       ) : null}
     </section>

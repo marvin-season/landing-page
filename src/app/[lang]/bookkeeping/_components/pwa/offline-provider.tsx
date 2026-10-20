@@ -36,7 +36,7 @@ function prepare(worker: ServiceWorker): Promise<boolean> {
   });
 }
 
-export function BbqOfflineProvider({ children }: PropsWithChildren) {
+export function OfflineProvider({ children }: PropsWithChildren) {
   const { currentLanguage } = useLanguage();
   const [status, setStatus] = useState<OfflineStatus>("preparing");
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -132,6 +132,6 @@ export function BbqOfflineProvider({ children }: PropsWithChildren) {
   );
 }
 
-export function useBbqOffline() {
+export function useOffline() {
   return useContext(OfflineContext);
 }

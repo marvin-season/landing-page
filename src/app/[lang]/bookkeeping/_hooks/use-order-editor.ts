@@ -16,14 +16,11 @@ import type {
   OrderPhoto,
   OrderStatus,
 } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../_lib/bbq-errors";
-import {
-  BBQ_MENU_CHANGED_EVENT,
-  notifyBbqMenuChanged,
-} from "../_lib/bbq-menu-events";
-import { bbqHomePath } from "../_lib/bbq-paths";
-import { useBbqNavigate } from "./use-bbq-nav";
+import { errorMessage } from "../_lib/errors";
+import { MENU_CHANGED_EVENT, notifyMenuChanged } from "../_lib/menu-events";
+import { homePath } from "../_lib/paths";
 import { useGroupingSettings } from "./use-grouping-settings";
+import { useNavigate } from "./use-navigate";
 
 export type DraftLine = {
   key: string;
@@ -47,7 +44,7 @@ async function readMenu() {
 
 export function useOrderEditor(orderId?: string) {
   const { i18n, t } = useLingui();
-  const navigate = useBbqNavigate();
+  const navigate = useNavigate();
   const [tags, setTags] = useState<ItemTag[]>([]);
   const [tagFilter, setTagFilter] = useState("all");
   const [dishes, setDishes] = useState<Dish[]>([]);
@@ -113,7 +110,7 @@ export function useOrderEditor(orderId?: string) {
         setPhase("ready");
       } catch (error) {
         if (cancelled) return;
-        setMessage(bbqErrorMessage(i18n, error));
+        setMessage(errorMessage(i18n, error));
         setPhase("error");
       }
     })();
@@ -137,7 +134,7 @@ export function useOrderEditor(orderId?: string) {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setMenuError(bbqErrorMessage(i18n, error));
+        setMenuError(errorMessage(i18n, error));
         setMenuPhase("error");
       });
     return () => {
@@ -147,9 +144,9 @@ export function useOrderEditor(orderId?: string) {
 
   useEffect(() => {
     const refreshMenu = () => setMenuRevision((revision) => revision + 1);
-    window.addEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
+    window.addEventListener(MENU_CHANGED_EVENT, refreshMenu);
     return () => {
-      window.removeEventListener(BBQ_MENU_CHANGED_EVENT, refreshMenu);
+      window.removeEventListener(MENU_CHANGED_EVENT, refreshMenu);
     };
   }, []);
 
@@ -159,7 +156,7 @@ export function useOrderEditor(orderId?: string) {
 
   async function handleItemSaved() {
     setMessage(null);
-    notifyBbqMenuChanged();
+    notifyMenuChanged();
   }
 
   const activeTagFilter = resolveTagFilter(tags, tagFilter);
@@ -293,9 +290,9 @@ export function useOrderEditor(orderId?: string) {
           quantity: line.quantity,
         })),
       });
-      navigate(bbqHomePath(saved.businessDayKey));
+      navigate(homePath(saved.businessDayKey));
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
       setSaving(false);
     }
   }
@@ -306,9 +303,9 @@ export function useOrderEditor(orderId?: string) {
     setSaving(true);
     try {
       await bbqStore.deleteOrder(order.id);
-      navigate(bbqHomePath(order.businessDayKey));
+      navigate(homePath(order.businessDayKey));
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
       setSaving(false);
     }
   }

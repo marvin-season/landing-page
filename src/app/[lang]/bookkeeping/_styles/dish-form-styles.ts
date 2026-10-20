@@ -1,4 +1,4 @@
-import { cls } from "./bbq-layout";
+import { cls } from "./layout";
 
 export const dishGridCls = cls`grid grid-cols-2 gap-x-3 gap-y-2.5 min-w-0 items-end`;
 export const dishFieldCls = cls`flex min-w-0 flex-col gap-1`;

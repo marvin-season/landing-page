@@ -10,10 +10,10 @@ import { MenuEditor } from "../menu/menu-editor";
 import { OrderEditor } from "../order/order-editor";
 import { BackupReminder } from "../reminders/backup-reminder";
 import { CompanionAlbumReminder } from "../reminders/companion-album-reminder";
-import { BbqSettings } from "../settings/bbq-settings";
+import { Settings } from "../settings/settings";
 
 /** A single client shell lets new local record URLs work without a server round trip. */
-export function BbqApp({ children }: PropsWithChildren) {
+export function App({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { t } = useLingui();
   const [mounted, setMounted] = useState(false);
@@ -49,7 +49,7 @@ export function BbqApp({ children }: PropsWithChildren) {
       ) : route.page === "menu" ? (
         <MenuEditor />
       ) : route.page === "settings" ? (
-        <BbqSettings />
+        <Settings />
       ) : (
         <>
           <BackupReminder />

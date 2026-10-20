@@ -30,14 +30,13 @@ import { useRef, useState } from "react";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { formatYuan } from "@/lib/bbq/money";
 import { useOrderEditor } from "../../_hooks/use-order-editor";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
-import { bbqSettingsPath } from "../../_lib/bbq-paths";
+import { errorMessage } from "../../_lib/errors";
+import { settingsPath } from "../../_lib/paths";
 import {
   detailsChevronCls,
   pageShellCls,
   pageTitleCls,
-} from "../../_styles/bbq-layout";
-import { settingsSummaryCls } from "../../_styles/bbq-settings-styles";
+} from "../../_styles/layout";
 import {
   editorCartPanelCls,
   editorItemToolbarCls,
@@ -46,12 +45,13 @@ import {
   editorSectionCls,
   editorWorkspaceCls,
 } from "../../_styles/order-editor-styles";
+import { settingsSummaryCls } from "../../_styles/settings-styles";
 import { DishRow } from "../menu/dish-row";
 import { ItemTagFilter } from "../menu/item-tags";
 import { MenuEditor } from "../menu/menu-editor";
-import { BbqLink as Link } from "../shared/bbq-link";
-import { BbqSearch } from "../shared/bbq-search";
 import { ItemEditViewport } from "../shared/item-edit-viewport";
+import { LocalLink as Link } from "../shared/local-link";
+import { SearchInput } from "../shared/search-input";
 import { OrderLines } from "./order-lines";
 import { OrderPhotos } from "./order-photos";
 
@@ -150,7 +150,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           role="alert"
         >
           <AlertDescription className="text-destructive">
-            {message ?? bbqErrorMessage(i18n, groupingError)}
+            {message ?? errorMessage(i18n, groupingError)}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -245,7 +245,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       {groupingSettings?.names.length === 0 ? (
                         <p className="mt-2 text-xs text-muted-foreground">
                           <Link
-                            href={bbqSettingsPath()}
+                            href={settingsPath()}
                             className="text-primary underline underline-offset-4"
                           >
                             <Trans>到设置中添加分组</Trans>
@@ -308,7 +308,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           >
                             {dishes.length > 0 ? (
                               <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
-                                <BbqSearch
+                                <SearchInput
                                   value={search}
                                   onChange={setSearch}
                                   label={t`搜索项目名称…`}

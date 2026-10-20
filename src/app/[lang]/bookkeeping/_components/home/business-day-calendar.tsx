@@ -6,7 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactElement, useState } from "react";
-import { cls } from "../../_styles/bbq-layout";
+import { cls } from "../../_styles/layout";
 
 const calendarControlCls = cls`
   rounded-lg shadow-none transition-colors duration-150 hover:bg-muted/70

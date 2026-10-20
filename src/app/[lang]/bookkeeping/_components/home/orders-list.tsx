@@ -16,12 +16,12 @@ import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order } from "@/lib/bbq/types";
-import { formatCalories } from "../../_lib/bbq-i18n";
-import { bbqNewOrderPath } from "../../_lib/bbq-paths";
-import { cls, touchCls } from "../../_styles/bbq-layout";
-import { BbqCompanion } from "../companion/bbq-companion";
+import { formatCalories } from "../../_lib/i18n";
+import { newOrderPath } from "../../_lib/paths";
+import { cls, touchCls } from "../../_styles/layout";
+import { Companion } from "../companion/companion";
 import { OrderDetail } from "../order/order-detail";
-import { BbqLink as Link } from "../shared/bbq-link";
+import { LocalLink as Link } from "../shared/local-link";
 
 function statusLabel(i18n: I18n, status: Order["status"]): string {
   return status === "open" ? i18n._(msg`进行中`) : i18n._(msg`已完成`);
@@ -102,7 +102,7 @@ export function OrdersList({
             </p>
           </div>
           {!loading && visibleOrders.length > 0 ? (
-            <BbqCompanion mood="dance" className="block size-12 shrink-0" />
+            <Companion mood="dance" className="block size-12 shrink-0" />
           ) : null}
         </div>
         <div
@@ -149,7 +149,7 @@ export function OrdersList({
           </div>
         ) : visibleOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
-            <BbqCompanion mood="hello" className="block size-28 shrink-0" />
+            <Companion mood="hello" className="block size-28 shrink-0" />
             <p className="mt-3 text-sm font-medium text-foreground">
               {statusFilter === "open"
                 ? t`还没有进行中的记录`
@@ -162,7 +162,7 @@ export function OrdersList({
             </p>
             {statusFilter === "open" && canCreateOrder ? (
               <Button asChild className="mt-4">
-                <Link href={bbqNewOrderPath()}>
+                <Link href={newOrderPath()}>
                   <Plus className="size-4" aria-hidden="true" />
                   <Trans>记一笔</Trans>
                 </Link>

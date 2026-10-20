@@ -6,9 +6,9 @@ import { ExternalLink, Github } from "lucide-react";
 import {
   settingsCardCls,
   settingsSummaryCls,
-} from "../../_styles/bbq-settings-styles";
+} from "../../_styles/settings-styles";
 
-export function BbqSupportCard() {
+export function SupportCard() {
   return (
     <Card className={settingsCardCls}>
       <a

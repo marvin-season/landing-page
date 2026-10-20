@@ -11,7 +11,7 @@ import {
   businessDayLabel,
   formatCalories,
   formatCompactNumber,
-} from "../../_lib/bbq-i18n";
+} from "../../_lib/i18n";
 
 export type ChartMode = "revenue" | "orders" | "calories";
 

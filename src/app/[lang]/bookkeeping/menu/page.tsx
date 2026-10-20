@@ -21,6 +21,6 @@ export async function generateMetadata({
   };
 }
 
-export default function BbqMenuPage() {
+export default function MenuPage() {
   return <MenuEditor />;
 }

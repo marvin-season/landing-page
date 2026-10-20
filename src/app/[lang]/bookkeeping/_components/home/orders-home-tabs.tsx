@@ -3,8 +3,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 
 import { ChevronDown } from "lucide-react";
-import { businessDayLabel } from "../../_lib/bbq-i18n";
-import { cls } from "../../_styles/bbq-layout";
+import { businessDayLabel } from "../../_lib/i18n";
+import { cls } from "../../_styles/layout";
 import { BusinessDayCalendar } from "./business-day-calendar";
 
 export type HomeView = "orders" | "statistics";

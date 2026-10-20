@@ -9,8 +9,8 @@ import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import { DEFAULT_TAG, getDishTagIds } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
-import { formatCalories } from "../../_lib/bbq-i18n";
-import { cls } from "../../_styles/bbq-layout";
+import { formatCalories } from "../../_lib/i18n";
+import { cls } from "../../_styles/layout";
 import { ItemTagBadge } from "./item-tags";
 
 export function DishItem({

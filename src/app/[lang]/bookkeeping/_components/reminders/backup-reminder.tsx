@@ -6,9 +6,9 @@ import { DatabaseBackup } from "lucide-react";
 import { useTheme } from "next-themes";
 import { getLocaleDir } from "@/lib/i18n/locales";
 import { useWeeklyReminder } from "../../_hooks/use-weekly-reminder";
-import { bbqSettingsPath } from "../../_lib/bbq-paths";
-import { BbqCompanion } from "../companion/bbq-companion";
-import { BbqLink as Link } from "../shared/bbq-link";
+import { settingsPath } from "../../_lib/paths";
+import { Companion } from "../companion/companion";
+import { LocalLink as Link } from "../shared/local-link";
 
 const reminderStorageKey = "bookkeeping-backup-reminder:last-shown-day";
 
@@ -25,7 +25,7 @@ export function BackupReminder() {
       description,
       action: (
         <Link
-          href={bbqSettingsPath()}
+          href={settingsPath()}
           className="shrink-0 text-xs font-medium text-primary underline underline-offset-4"
         >
           {actionLabel}
@@ -33,7 +33,7 @@ export function BackupReminder() {
       ),
       duration: 8_000,
       icon: (
-        <BbqCompanion
+        <Companion
           mood="hello"
           className="block size-14 object-contain"
           fallback={<DatabaseBackup className="size-5" />}

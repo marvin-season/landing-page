@@ -8,17 +8,17 @@ import { useEffect, useRef } from "react";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemePicker } from "@/components/theme/theme-picker";
 import { useSettingsData } from "../../_hooks/use-settings-data";
-import { cls, pageShellCls, pageTitleCls } from "../../_styles/bbq-layout";
-import { settingsCardCls } from "../../_styles/bbq-settings-styles";
-import { BbqCompanion } from "../companion/bbq-companion";
+import { cls, pageShellCls, pageTitleCls } from "../../_styles/layout";
+import { settingsCardCls } from "../../_styles/settings-styles";
+import { Companion } from "../companion/companion";
 import { CompanionAlbumSettings } from "../companion/companion-album-settings";
-import { BbqInstallButton } from "../pwa/bbq-install-button";
-import { BbqOfflineStatus } from "../pwa/bbq-offline-status";
+import { InstallButton } from "../pwa/install-button";
+import { OfflineStatus } from "../pwa/offline-status";
 import { LocalDataNotice } from "../reminders/local-data-notice";
 import { BackupSettings } from "./backup-settings";
-import { BbqSupportCard } from "./bbq-support-card";
 import { CleanupSettings } from "./cleanup-settings";
 import { GroupingSettingsCard } from "./grouping-settings";
+import { SupportCard } from "./support-card";
 
 const groupLabelCls = cls`shrink-0 px-1 pt-3 text-xs font-medium text-muted-foreground first:pt-0`;
 const preferenceControlCls = cls`
@@ -37,7 +37,7 @@ const settingsHighlightCls = cls`
   [&_[data-settings-section][data-highlighted]>summary]:bg-primary/5
 `;
 
-export function BbqSettings() {
+export function Settings() {
   const { i18n } = useLingui();
   const section = useSearchParams().get("section");
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -146,14 +146,14 @@ export function BbqSettings() {
                 <Trans>添加到主屏幕，方便下次打开记账。</Trans>
               </p>
             </div>
-            <BbqCompanion mood="wave" className="block size-10 shrink-0" />
+            <Companion mood="wave" className="block size-10 shrink-0" />
           </div>
           <div className="mt-3 [&>button]:min-h-11 [&>button]:w-full [&>button]:rounded-lg [&>button]:text-sm [&>button]:shadow-none [&>button]:border-border/60 [&>button]:bg-muted/30 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button:hover]:shadow-none">
-            <BbqInstallButton />
+            <InstallButton />
           </div>
-          <BbqOfflineStatus />
+          <OfflineStatus />
         </section>
-        <BbqSupportCard />
+        <SupportCard />
       </div>
     </div>
   );

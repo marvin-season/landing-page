@@ -3,8 +3,8 @@ import { useRef, useState } from "react";
 import { formatShanghaiDate } from "@/lib/bbq/business-day";
 import { isValidCleanupRange } from "@/lib/bbq/cleanup";
 import type { BbqBackup } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../_lib/bbq-errors";
-import { notifyBbqMenuChanged } from "../_lib/bbq-menu-events";
+import { errorMessage } from "../_lib/errors";
+import { notifyMenuChanged } from "../_lib/menu-events";
 
 export function useSettingsData() {
   const { i18n, t } = useLingui();
@@ -31,7 +31,7 @@ export function useSettingsData() {
       downloadBackup(backup, includePhotos);
       setNotice(t`备份已生成，请在浏览器下载中查看`);
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       busyRef.current = false;
       setTask(null);
@@ -60,11 +60,11 @@ export function useSettingsData() {
         return;
       const { bbqStore } = await import("@/lib/bbq/idb-store");
       await bbqStore.importBackup(parsed as BbqBackup);
-      notifyBbqMenuChanged();
+      notifyMenuChanged();
       setMessage(null);
       setNotice(t`备份已导入，记录和常用项目已更新`);
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       busyRef.current = false;
       setTask(null);
@@ -84,10 +84,10 @@ export function useSettingsData() {
       ]);
       const existing = await bbqStore.exportBackup();
       await bbqStore.importBackup(createSampleBackup(new Date(), existing));
-      notifyBbqMenuChanged();
+      notifyMenuChanged();
       setNotice(t`示例数据已导入，已有数据保留。`);
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       busyRef.current = false;
       setTask(null);
@@ -123,7 +123,7 @@ export function useSettingsData() {
             : t`已删除 ${orderCount} 条记录及 ${photoCount} 张图片`,
       );
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       busyRef.current = false;
       setTask(null);

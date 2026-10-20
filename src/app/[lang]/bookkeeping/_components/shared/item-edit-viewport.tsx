@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { cls } from "../../_styles/bbq-layout";
+import { cls } from "../../_styles/layout";
 
 const transitionMs = 260;
 const EditContext = createContext<{

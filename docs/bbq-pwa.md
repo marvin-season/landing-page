@@ -33,9 +33,9 @@
 ## 实现入口
 
 - `src/app/[lang]/bookkeeping/layout.tsx`：挂载离线状态 Provider 和客户端页面壳，保留既有服务端页面与 metadata。
-- `src/app/[lang]/bookkeeping/_components/app/bbq-app.tsx`：根据实际浏览器地址渲染账本、项目管理、设置和编辑器，复用原有组件与数据操作。首次 hydration 保留服务端内容，之后切换到本地页面壳。
-- `_components/shared/bbq-link.tsx`、`_hooks/use-bbq-nav.ts`：仅对同源、同语言的已知记账页面使用 History API；修改键点击保留链接行为，其他导航沿用原有路由。`src/lib/bookkeeping-pwa/routes.ts` 统一解析页面和本机记录 ID。
-- `_components/pwa/bbq-offline-provider.tsx`、`_components/pwa/bbq-offline-status.tsx`：注册 Worker、检查资源完整性、恢复联网后重试、提示等待中的更新，以及申请持久存储。以上相对路径均位于 `src/app/[lang]/bookkeeping/`。
+- `src/app/[lang]/bookkeeping/_components/app/app.tsx`：根据实际浏览器地址渲染账本、项目管理、设置和编辑器，复用原有组件与数据操作。首次 hydration 保留服务端内容，之后切换到本地页面壳。
+- `_components/shared/local-link.tsx`、`_hooks/use-navigate.ts`：仅对同源、同语言的已知记账页面使用 History API；修改键点击保留链接行为，其他导航沿用原有路由。`src/lib/bookkeeping-pwa/routes.ts` 统一解析页面和本机记录 ID。
+- `_components/pwa/offline-provider.tsx`、`_components/pwa/offline-status.tsx`：注册 Worker、检查资源完整性、恢复联网后重试、提示等待中的更新，以及申请持久存储。以上相对路径均位于 `src/app/[lang]/bookkeeping/`。
 - `src/app/[lang]/bookkeeping/offline/page.tsx`：通用离线文档入口，不嵌入具体账目，不参与搜索收录。
 - `src/lib/bookkeeping-pwa/worker.ts`：Serwist 缓存规则；使用 `bookkeeping-{locale}-precache` 隔离语言缓存，激活时清理旧版 `bookkeeping-{locale}-animations` 缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
 - `scripts/build-bookkeeping-pwa.mjs`：读取 `.next/BUILD_ID`、收集构建资源及应用图标、注入资源清单并生成 Worker。`nr bookkeeping:pwa:build` 可针对已有的当前生产构建单独重新生成 Worker；修改页面代码后仍须运行完整 `nr build`。

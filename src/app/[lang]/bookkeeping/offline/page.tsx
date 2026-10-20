@@ -5,7 +5,7 @@ export const metadata: Metadata = {
 };
 
 // Cached as a generic document, not as one particular record or business day.
-// BbqApp reads the actual browser URL after hydration and loads local data.
+// App reads the actual browser URL after hydration and loads local data.
 export default function BookkeepingOfflinePage() {
   return <span hidden data-bookkeeping-offline-shell="true" />;
 }

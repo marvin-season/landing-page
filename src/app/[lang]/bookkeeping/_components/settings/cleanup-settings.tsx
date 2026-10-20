@@ -3,17 +3,17 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, LoaderCircle, Trash2 } from "lucide-react";
 import { isValidCleanupRange } from "@/lib/bbq/cleanup";
 import type { SettingsData } from "../../_hooks/use-settings-data";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/bbq-layout";
+import {
+  radioInputCls,
+  radioOptionCls,
+} from "../../_styles/data-settings-styles";
+import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
 import {
   settingsActionCls,
   settingsCardCls,
   settingsInputCls,
   settingsSummaryCls,
-} from "../../_styles/bbq-settings-styles";
-import {
-  radioInputCls,
-  radioOptionCls,
-} from "../../_styles/data-settings-styles";
+} from "../../_styles/settings-styles";
 
 export function CleanupSettings({
   data,

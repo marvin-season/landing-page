@@ -4,12 +4,12 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan, lineCents } from "@/lib/bbq/money";
 import type { DraftLine } from "../../_hooks/use-order-editor";
-import { formatCalories } from "../../_lib/bbq-i18n";
+import { formatCalories } from "../../_lib/i18n";
 import {
   editorControlCls,
   editorSectionCls,
 } from "../../_styles/order-editor-styles";
-import { BbqCompanion } from "../companion/bbq-companion";
+import { Companion } from "../companion/companion";
 import { ItemTagBadge } from "../menu/item-tags";
 
 export function OrderLines({
@@ -29,7 +29,7 @@ export function OrderLines({
       </p>
       {lines.length === 0 ? (
         <div className="mt-3 flex min-h-28 flex-col items-center justify-center gap-2 text-center py-2">
-          <BbqCompanion
+          <Companion
             mood={groupingEnabled ? "chef" : "hello"}
             className="block size-16 shrink-0"
           />

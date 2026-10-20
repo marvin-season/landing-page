@@ -4,12 +4,12 @@ import { type PropsWithChildren, Suspense } from "react";
 import { getBookkeepingAlternates } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getSiteOrigin } from "@/lib/site-origin";
-import { BbqApp } from "./_components/app/bbq-app";
-import { BbqMobileNav } from "./_components/app/bbq-mobile-nav";
+import { App } from "./_components/app/app";
+import { MobileNav } from "./_components/app/mobile-nav";
 import { CompanionAlbumProvider } from "./_components/companion/companion-album-provider";
-import { BbqInstallProvider } from "./_components/pwa/bbq-install-button";
-import { BbqOfflineProvider } from "./_components/pwa/bbq-offline-provider";
-import { bbqSearchDescription } from "./_lib/bbq-search-copy";
+import { InstallProvider } from "./_components/pwa/install-button";
+import { OfflineProvider } from "./_components/pwa/offline-provider";
+import { searchDescription } from "./_lib/search-copy";
 
 export async function generateMetadata({
   params,
@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { lang } = await params;
   const i18n = getI18nInstance(lang);
   const title = i18n._(msg`记露 · 支出与热量统计`);
-  const description = i18n._(bbqSearchDescription);
+  const description = i18n._(searchDescription);
 
   return {
     metadataBase: new URL(await getSiteOrigin()),
@@ -80,22 +80,22 @@ export const viewport: Viewport = {
   themeColor: "#fff5f7",
 };
 
-export default function BbqLayout({ children }: PropsWithChildren) {
+export default function Layout({ children }: PropsWithChildren) {
   return (
     <CompanionAlbumProvider>
-      <BbqInstallProvider>
+      <InstallProvider>
         {/* 将记账外壳固定在视口内，避免外层页面滚动时带走底部导航。 */}
         <div className="min-w-0 flex flex-col lg:flex-row-reverse lg:py-0 mx-auto w-full max-w-xl lg:max-w-5xl flex-none pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden fixed inset-x-0 top-0 overscroll-none">
           <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2 lg:px-4 pt-2 lg:pt-4">
             <Suspense fallback={null}>
-              <BbqOfflineProvider>
-                <BbqApp>{children}</BbqApp>
-              </BbqOfflineProvider>
+              <OfflineProvider>
+                <App>{children}</App>
+              </OfflineProvider>
             </Suspense>
           </div>
-          <BbqMobileNav />
+          <MobileNav />
         </div>
-      </BbqInstallProvider>
+      </InstallProvider>
     </CompanionAlbumProvider>
   );
 }

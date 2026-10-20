@@ -2,7 +2,7 @@ import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { BbqStoreError } from "@/lib/bbq/store";
 
-export function bbqErrorMessage(i18n: I18n, error: unknown): string {
+export function errorMessage(i18n: I18n, error: unknown): string {
   if (!(error instanceof BbqStoreError)) return i18n._(msg`本机数据库打不开`);
   switch (error.code) {
     case "invalid_group_name":

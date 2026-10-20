@@ -13,9 +13,9 @@ import { ChevronDown, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ItemTag } from "@/lib/bbq/types";
 import { useMenuData } from "../../_hooks/use-menu-data";
-import { cls, pageTitleCls } from "../../_styles/bbq-layout";
 import { dishHintCls, menuColorsCls } from "../../_styles/dish-form-styles";
-import { BbqCompanion } from "../companion/bbq-companion";
+import { cls, pageTitleCls } from "../../_styles/layout";
+import { Companion } from "../companion/companion";
 import { ItemEditViewport } from "../shared/item-edit-viewport";
 import { DishList } from "./dish-list";
 import { DishRow } from "./dish-row";
@@ -91,7 +91,7 @@ export function MenuEditor({
                 <Trans>收起</Trans>
               </span>
             ) : (
-              <BbqCompanion mood="chef" className="block size-8 shrink-0" />
+              <Companion mood="chef" className="block size-8 shrink-0" />
             )}
             <ChevronDown
               className={cls`size-4 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${adding ? "rotate-180" : ""}`}

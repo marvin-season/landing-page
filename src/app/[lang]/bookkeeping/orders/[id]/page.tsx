@@ -26,7 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function BbqEditOrderPage({
+export default async function EditOrderPage({
   params,
 }: {
   params: Promise<{ id: string }>;

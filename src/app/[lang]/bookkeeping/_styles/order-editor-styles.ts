@@ -1,5 +1,5 @@
-import { cls, detailsMotionCls } from "./bbq-layout";
-import { settingsCardCls } from "./bbq-settings-styles";
+import { cls, detailsMotionCls } from "./layout";
+import { settingsCardCls } from "./settings-styles";
 
 export const editorWorkspaceCls = cls`
   grid min-h-0 flex-1 overflow-hidden

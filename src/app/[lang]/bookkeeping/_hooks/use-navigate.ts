@@ -5,7 +5,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { canNavigateBookkeepingLocally } from "@/lib/bookkeeping-pwa/routes";
 import { withLocalePrefix } from "@/lib/i18n/locales";
 
-export function useBbqNavigate() {
+export function useNavigate() {
   const router = useRouter();
   const { currentLanguage } = useLanguage();
   return (href: string) => {

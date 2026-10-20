@@ -7,16 +7,16 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
-import { formatCalories, formatCompactNumber } from "../../_lib/bbq-i18n";
-import { bbqHomePath } from "../../_lib/bbq-paths";
+import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
+import { homePath } from "../../_lib/paths";
 import {
   cls,
   detailsChevronCls,
   detailsMotionCls,
   detailsSummaryCls,
-} from "../../_styles/bbq-layout";
-import { BbqCompanion } from "../companion/bbq-companion";
-import { BbqLink as Link } from "../shared/bbq-link";
+} from "../../_styles/layout";
+import { Companion } from "../companion/companion";
+import { LocalLink as Link } from "../shared/local-link";
 import { type ChartMode, TrendChart } from "./trend-chart";
 
 // 配图跟随当前指标：小蜜蜂积累、思考回顾、运动热量。
@@ -46,7 +46,7 @@ export function OrdersStatistics({
   if (statistics.length === 0) {
     return (
       <div className="flex min-h-80 flex-col items-center justify-center rounded-xl bg-card px-6 text-center">
-        <BbqCompanion mood="ponder" className="block size-28 shrink-0" />
+        <Companion mood="ponder" className="block size-28 shrink-0" />
         <p className="mt-3 text-sm font-medium text-foreground">
           <Trans>从第一笔开始</Trans>
         </p>
@@ -117,7 +117,7 @@ export function OrdersStatistics({
                 {t`每时段平均已完成金额 ${formatStatisticYuan(i18n, averagePerPeriod)}`}
               </p>
             </div>
-            <BbqCompanion
+            <Companion
               mood={chartCompanionMoods[chartMode]}
               className="block size-10 shrink-0"
             />
@@ -203,7 +203,7 @@ export function OrdersStatistics({
                   <li key={item.businessDayKey} className="py-3">
                     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                       <Link
-                        href={bbqHomePath(item.businessDayKey)}
+                        href={homePath(item.businessDayKey)}
                         onNavigate={onSelectDay}
                         className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                       >

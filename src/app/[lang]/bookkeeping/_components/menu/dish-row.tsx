@@ -13,8 +13,7 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { centsToYuanInput, parseYuanToCents } from "@/lib/bbq/money";
 import { DEFAULT_TAG, getDishTagIds } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
-import { cls } from "../../_styles/bbq-layout";
+import { errorMessage } from "../../_lib/errors";
 import {
   dishFieldCls,
   dishGridCls,
@@ -23,6 +22,7 @@ import {
   fieldLabelCls,
   menuColorsCls,
 } from "../../_styles/dish-form-styles";
+import { cls } from "../../_styles/layout";
 import {
   ExpandingItemEditor,
   useItemEditSelection,
@@ -166,8 +166,8 @@ export function DishRow({
       await onSaved();
       saved = true;
     } catch (error) {
-      setError(bbqErrorMessage(i18n, error));
-      onError(bbqErrorMessage(i18n, error));
+      setError(errorMessage(i18n, error));
+      onError(errorMessage(i18n, error));
     } finally {
       savingRef.current = false;
       setPending(null);
@@ -188,7 +188,7 @@ export function DishRow({
       setEditing(false);
       await onSaved();
     } catch (error) {
-      onError(bbqErrorMessage(i18n, error));
+      onError(errorMessage(i18n, error));
     } finally {
       savingRef.current = false;
       setPending(null);

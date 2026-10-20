@@ -24,8 +24,8 @@ import { useRef, useState } from "react";
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { DEFAULT_TAG } from "@/lib/bbq/tags";
 import type { ItemTag } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
-import { notifyBbqMenuChanged } from "../../_lib/bbq-menu-events";
+import { errorMessage } from "../../_lib/errors";
+import { notifyMenuChanged } from "../../_lib/menu-events";
 
 export function ItemTagBadge({
   tag,
@@ -94,9 +94,9 @@ export function ItemTagSelect({
       onChange([...value.filter((id) => id !== DEFAULT_TAG.id), tag.id]);
       setName("");
       setAdding(false);
-      notifyBbqMenuChanged();
+      notifyMenuChanged();
     } catch (error) {
-      setError(bbqErrorMessage(i18n, error));
+      setError(errorMessage(i18n, error));
     } finally {
       busy.current = false;
       setPending(false);
@@ -114,9 +114,9 @@ export function ItemTagSelect({
       await bbqStore.deleteTag(tag.id);
       await onTagsChanged();
       onChange(value.filter((id) => id !== tag.id));
-      notifyBbqMenuChanged();
+      notifyMenuChanged();
     } catch (error) {
-      setError(bbqErrorMessage(i18n, error));
+      setError(errorMessage(i18n, error));
     } finally {
       busy.current = false;
       setPending(false);

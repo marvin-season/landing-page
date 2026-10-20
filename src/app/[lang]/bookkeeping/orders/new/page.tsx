@@ -21,6 +21,6 @@ export async function generateMetadata({
   };
 }
 
-export default function BbqNewOrderPage() {
+export default function NewOrderPage() {
   return <OrderEditor />;
 }

@@ -4,7 +4,7 @@ import { Camera, ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
 import type { OrderPhoto } from "@/lib/bbq/types";
-import { cls } from "../../_styles/bbq-layout";
+import { cls } from "../../_styles/layout";
 import { editorSectionCls } from "../../_styles/order-editor-styles";
 
 const photoActionCls = cls`

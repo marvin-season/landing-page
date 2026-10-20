@@ -13,8 +13,8 @@ import {
 import { bbqStore } from "@/lib/bbq/idb-store";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
-import { bbqErrorMessage } from "../../_lib/bbq-errors";
-import { pageShellCls, pageTitleCls } from "../../_styles/bbq-layout";
+import { errorMessage } from "../../_lib/errors";
+import { pageShellCls, pageTitleCls } from "../../_styles/layout";
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 
@@ -79,7 +79,7 @@ export function OrdersHome() {
       .catch((error: unknown) => {
         if (cancelled) return;
         setStorageFailed(true);
-        setMessage(bbqErrorMessage(i18n, error));
+        setMessage(errorMessage(i18n, error));
       });
     return () => {
       cancelled = true;
@@ -102,7 +102,7 @@ export function OrdersHome() {
       .catch((error: unknown) => {
         if (cancelled) return;
         setStorageFailed(true);
-        setMessage(bbqErrorMessage(i18n, error));
+        setMessage(errorMessage(i18n, error));
       })
       .finally(() => {
         if (!cancelled) setStatisticsLoading(false);
@@ -142,7 +142,7 @@ export function OrdersHome() {
       await reload();
       setSelectedId((current) => (current === order.id ? null : current));
     } catch (error) {
-      setMessage(bbqErrorMessage(i18n, error));
+      setMessage(errorMessage(i18n, error));
     } finally {
       setUpdatingStatusId(null);
     }

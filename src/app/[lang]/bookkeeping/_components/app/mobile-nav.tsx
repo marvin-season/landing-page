@@ -8,37 +8,37 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isBusinessHours } from "@/lib/bbq/business-day";
 import {
-  bbqAnnouncementsPath,
-  bbqHomePath,
-  bbqNewOrderPath,
-  bbqSettingsPath,
-} from "../../_lib/bbq-paths";
-import { cls } from "../../_styles/bbq-layout";
-import { BbqLink as Link } from "../shared/bbq-link";
+  announcementsPath,
+  homePath,
+  newOrderPath,
+  settingsPath,
+} from "../../_lib/paths";
+import { cls } from "../../_styles/layout";
+import { LocalLink as Link } from "../shared/local-link";
 
 const items = [
-  { label: msg`账本`, href: bbqHomePath(), segment: null, icon: BookOpen },
+  { label: msg`账本`, href: homePath(), segment: null, icon: BookOpen },
   {
     label: msg`记一笔`,
-    href: bbqNewOrderPath(),
+    href: newOrderPath(),
     segment: "orders",
     icon: NotebookPen,
   },
   {
     label: msg`公告`,
-    href: bbqAnnouncementsPath(),
+    href: announcementsPath(),
     segment: "announcements",
     icon: Megaphone,
   },
   {
     label: msg`设置`,
-    href: bbqSettingsPath(),
+    href: settingsPath(),
     segment: "settings",
     icon: Settings,
   },
 ];
 
-export function BbqMobileNav() {
+export function MobileNav() {
   const { t, i18n } = useLingui();
   const pathname = usePathname();
   const segment = pathname.split("/bookkeeping/")[1]?.split("/")[0] ?? null;
