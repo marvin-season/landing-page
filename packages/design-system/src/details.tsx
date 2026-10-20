@@ -3,7 +3,46 @@
 import { cn as cls } from "@landing-page/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
-import type * as React from "react";
+import * as React from "react";
+
+type DetailsProps = React.ComponentProps<"details"> & {
+  /** Floating panels stay inside the current layout/stacking context (no portal). */
+  mode?: "flow" | "floating";
+  side?: "top" | "bottom";
+  backdrop?: "blur" | "none";
+  /** Defaults to the viewport; use `absolute` for a positioned parent scope. */
+  backdropClassName?: string;
+};
+
+const DetailsContext = React.createContext<"top" | "bottom" | null>(null);
+
+const detailsFloatingCls = cls`
+  group/details relative overflow-visible
+  [&::details-content]:block
+  [&::details-content]:transition-[content-visibility]
+  [&::details-content]:duration-200 [&::details-content]:transition-discrete
+  [&>summary]:relative [&>summary]:z-30
+  [&[open]>[data-slot=details-content]>[data-slot=details-panel]]:translate-y-0
+  [&[open]>[data-slot=details-backdrop]]:opacity-100
+  [&:not([open])>[data-slot=details-content]>[data-slot=details-panel]]:pointer-events-none
+  [&:not([open])>[data-slot=details-backdrop]]:pointer-events-none
+  motion-reduce:[&::details-content]:transition-none
+`;
+
+const detailsBackdropCls = cls`
+  fixed inset-0 z-20 bg-background/40 backdrop-blur-xs opacity-0
+  transition-opacity duration-200 ease-out motion-reduce:transition-none
+`;
+
+const detailsFloatingContentCls = cls`
+  absolute inset-x-0 z-30 flex flex-col max-h-[min(32rem,70dvh)] overflow-clip pointer-events-none
+`;
+
+const detailsPanelCls = cls`
+  min-h-0 max-h-[inherit] overflow-y-auto overscroll-y-contain pointer-events-auto
+  rounded-xl border border-border/60 bg-card/85 shadow-lg backdrop-blur-xl
+  transition-transform duration-200 ease-out motion-reduce:transition-none
+`;
 
 const detailsMotionCls = cls`
   group/details
@@ -46,13 +85,66 @@ const detailsSummaryVariants = cva("", {
 });
 
 // Keep native open/onToggle behavior; the caller decides when to mount content.
-function Details({ className, ...props }: React.ComponentProps<"details">) {
+function Details({
+  className,
+  mode = "flow",
+  side = "bottom",
+  backdrop = "blur",
+  backdropClassName,
+  children,
+  onKeyDown,
+  ...props
+}: DetailsProps) {
+  const floating = mode === "floating";
   return (
-    <details
-      data-slot="details"
-      className={cls(className, detailsMotionCls)}
-      {...props}
-    />
+    <DetailsContext value={floating ? side : null}>
+      <details
+        data-slot="details"
+        data-mode={mode}
+        data-side={floating ? side : undefined}
+        className={
+          floating
+            ? cls(detailsFloatingCls, className)
+            : cls(className, detailsMotionCls)
+        }
+        onKeyDown={
+          floating
+            ? (event) => {
+                onKeyDown?.(event);
+                if (
+                  event.key === "Escape" &&
+                  !event.defaultPrevented &&
+                  event.currentTarget.open
+                ) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.currentTarget.open = false;
+                  event.currentTarget.querySelector("summary")?.focus();
+                }
+              }
+            : onKeyDown
+        }
+        {...props}
+      >
+        {children}
+        {floating && backdrop === "blur" ? (
+          <button
+            type="button"
+            data-slot="details-backdrop"
+            className={cls(detailsBackdropCls, backdropClassName)}
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={(event) => {
+              const details = event.currentTarget.closest("details");
+              if (details) {
+                details.open = false;
+                details.querySelector("summary")?.focus();
+              }
+            }}
+          />
+        ) : null}
+      </details>
+    </DetailsContext>
   );
 }
 
@@ -71,7 +163,37 @@ function DetailsSummary({
   );
 }
 
-function DetailsContent({ className, ...props }: React.ComponentProps<"div">) {
+function DetailsContent({
+  className,
+  floatingClassName,
+  ...props
+}: React.ComponentProps<"div"> & {
+  /** Floating positioning/clipping shell; className styles the scrollable panel. */
+  floatingClassName?: string;
+}) {
+  const side = React.use(DetailsContext);
+  if (side) {
+    return (
+      <div
+        data-slot="details-content"
+        className={cls(
+          detailsFloatingContentCls,
+          side === "top" ? "bottom-full" : "top-full",
+          floatingClassName,
+        )}
+      >
+        <div
+          data-slot="details-panel"
+          className={cls(
+            detailsPanelCls,
+            side === "top" ? "translate-y-full" : "-translate-y-full",
+            className,
+          )}
+          {...props}
+        />
+      </div>
+    );
+  }
   return (
     <div
       data-slot="details-content"
@@ -96,6 +218,7 @@ function DetailsChevron({
 }
 
 export {
+  type DetailsProps,
   Details,
   DetailsSummary,
   DetailsContent,

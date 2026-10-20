@@ -3,13 +3,13 @@
 import {
   Alert,
   AlertDescription,
-  Button,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
 } from "@landing-page/design-system";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDown, Plus } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
+import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ItemTag } from "@/lib/bbq/types";
 import { useMenuData } from "../../_hooks/use-menu-data";
@@ -34,7 +34,6 @@ export function MenuEditor({
   sharedTags?: ItemTag[];
   onTagsChanged?: (tags: ItemTag[]) => void;
 }) {
-  const { t } = useLingui();
   const {
     menu,
     tags,
@@ -65,101 +64,77 @@ export function MenuEditor({
 
   if (variant === "inline") {
     return (
-      <Collapsible
+      <Details
+        mode="floating"
+        side="bottom"
+        backdropClassName="absolute"
         open={adding}
-        onOpenChange={changeAdding}
-        className={cls`shrink-0 ${menuColorsCls}`}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && !event.defaultPrevented) {
-            event.stopPropagation();
-            changeAdding(false);
-          }
-        }}
+        onToggle={(event) => changeAdding(event.currentTarget.open)}
+        className={cls`static shrink-0 ${menuColorsCls}`}
       >
-        <CollapsibleTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            className="relative z-30 h-14 w-full justify-start gap-2 rounded-xl border border-border/60 bg-card/85 px-3 py-2 text-sm shadow-none backdrop-blur-xl hover:bg-card/90 hover:shadow-none"
-          >
-            <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />
-            <span className="min-w-0 flex-1 text-left">
-              <Trans>添加常用项目</Trans>
-            </span>
-            {adding ? (
-              <span className="text-xs font-normal text-muted-foreground">
-                <Trans>收起</Trans>
-              </span>
-            ) : (
-              <Companion mood="chef" className="block size-8 shrink-0" />
-            )}
-            <ChevronDown
-              className={cls`size-4 shrink-0 text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${adding ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
-          </Button>
-        </CollapsibleTrigger>
-        <button
-          type="button"
-          className={cls`absolute inset-0 z-20 bg-background/40 backdrop-blur-xs transition-[opacity,visibility] duration-200 ease-out motion-reduce:transition-none ${adding ? "visible opacity-100" : "invisible opacity-0 pointer-events-none"}`}
-          tabIndex={-1}
-          inert={!adding}
-          aria-hidden={!adding || undefined}
-          aria-label={t`收起`}
-          onClick={() => changeAdding(false)}
-        />
-        {/* 定位到记账内容区，始终只为入口占位；表单收起后保留输入。 */}
-        <CollapsibleContent
-          forceMount
-          inert={!adding}
-          aria-hidden={!adding || undefined}
-          className="absolute inset-x-0 top-16 bottom-2 z-30 pointer-events-none overflow-clip"
+        <DetailsSummary
+          variant="flush"
+          className="relative z-30 h-14 w-full justify-start gap-2 rounded-xl border border-border/60 bg-card/85 px-3 py-2 text-sm shadow-none backdrop-blur-xl hover:bg-card/90 hover:shadow-none"
         >
-          <div
-            className={cls`max-h-full overflow-y-auto overscroll-y-contain rounded-xl border border-border/60 bg-card/85 p-3 shadow-lg backdrop-blur-xl transition-[translate,visibility] duration-200 ease-out motion-reduce:transition-none ${adding ? "visible translate-y-0 pointer-events-auto" : "invisible -translate-y-full pointer-events-none"}`}
-          >
-            {notice && !message ? (
-              <p className="mb-3 text-sm text-primary" role="status">
-                {notice}
-              </p>
-            ) : null}
-            {message ? (
-              <Alert className="mb-3 border-destructive/30 bg-destructive/5 p-3">
-                <AlertDescription className="text-destructive">
-                  {message}
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            {inlineFormRequested ? (
-              <div className="relative">
-                {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
-                <fieldset disabled={!menu} aria-busy={!menu}>
-                  <p className={dishHintCls}>
-                    <Trans>
-                      热量按每单位填写：摄入填正数，消耗填负数，可留空
-                    </Trans>
-                  </p>
-                  <DishRow
-                    tags={sharedTags ?? tags}
-                    onTagsChanged={reloadTags}
-                    categoryId={menu?.id ?? ""}
-                    onSaved={handleSaved}
-                    onError={setMessage}
+          <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />
+          <span className="min-w-0 flex-1 text-left">
+            <Trans>添加常用项目</Trans>
+          </span>
+          {adding ? (
+            <span className="text-xs font-normal text-muted-foreground">
+              <Trans>收起</Trans>
+            </span>
+          ) : (
+            <Companion mood="chef" className="block size-8 shrink-0" />
+          )}
+          <DetailsChevron aria-hidden="true" />
+        </DetailsSummary>
+        {/* 定位到记账内容区，始终只为入口占位；表单收起后保留输入。 */}
+        <DetailsContent
+          floatingClassName="top-16 bottom-2 max-h-none"
+          className="p-3"
+        >
+          {notice && !message ? (
+            <p className="mb-3 text-sm text-primary" role="status">
+              {notice}
+            </p>
+          ) : null}
+          {message ? (
+            <Alert className="mb-3 border-destructive/30 bg-destructive/5 p-3">
+              <AlertDescription className="text-destructive">
+                {message}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {inlineFormRequested ? (
+            <div className="relative">
+              {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
+              <fieldset disabled={!menu} aria-busy={!menu}>
+                <p className={dishHintCls}>
+                  <Trans>
+                    热量按每单位填写：摄入填正数，消耗填负数，可留空
+                  </Trans>
+                </p>
+                <DishRow
+                  tags={sharedTags ?? tags}
+                  onTagsChanged={reloadTags}
+                  categoryId={menu?.id ?? ""}
+                  onSaved={handleSaved}
+                  onError={setMessage}
+                />
+              </fieldset>
+              {!menu ? (
+                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/80 backdrop-blur-sm">
+                  <MenuLoadStatus
+                    phase={phase}
+                    onRetry={() => setLoadRequest((request) => request + 1)}
                   />
-                </fieldset>
-                {!menu ? (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/80 backdrop-blur-sm">
-                    <MenuLoadStatus
-                      phase={phase}
-                      onRetry={() => setLoadRequest((request) => request + 1)}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </DetailsContent>
+      </Details>
     );
   }
 

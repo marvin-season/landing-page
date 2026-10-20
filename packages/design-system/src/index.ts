@@ -19,6 +19,7 @@ export {
   Details,
   DetailsChevron,
   DetailsContent,
+  type DetailsProps,
   DetailsSummary,
   detailsSummaryVariants,
 } from "./details";
