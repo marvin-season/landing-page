@@ -15,8 +15,8 @@ test("local routes preserve record IDs, new-record semantics, and trailing slash
       orderId: "record one",
     },
   );
-  assert.deepEqual(readBookkeepingRoute("/ja/bookkeeping/menu/"), {
-    locale: "ja",
+  assert.deepEqual(readBookkeepingRoute("/en/bookkeeping/menu/"), {
+    locale: "en",
     page: "menu",
   });
   assert.deepEqual(readBookkeepingRoute("/zh/bookkeeping/announcements"), {
@@ -24,6 +24,8 @@ test("local routes preserve record IDs, new-record semantics, and trailing slash
     page: "announcements",
   });
   for (const path of [
+    "/ja/bookkeeping/menu",
+    "/pseudo/bookkeeping",
     "/zh/admin",
     "/zh/bookkeeping-other",
     "/zh/bookkeeping/orders/a/b",
@@ -50,6 +52,8 @@ test("only same-origin, same-language bookkeeping navigation bypasses Next", () 
   for (const path of [
     "https://other.example/zh/bookkeeping",
     "/en/bookkeeping",
+    "/ja/bookkeeping/menu",
+    "/pseudo/bookkeeping",
     "/zh/admin",
     "/zh/bookkeeping/unknown",
   ]) {

@@ -1,4 +1,6 @@
-export const bookkeepingLocales = ["zh", "en", "ja"] as const;
+import { isLocale, locales } from "../i18n/locales";
+
+export const bookkeepingLocales = locales;
 
 export type BookkeepingRoute = {
   locale: string;
@@ -13,6 +15,7 @@ export function readBookkeepingRoute(
   const match = /^\/([a-z]+)\/bookkeeping(?:\/(.*?))?\/?$/.exec(pathname);
   if (!match) return null;
   const [, locale, tail = ""] = match;
+  if (!isLocale(locale)) return null;
   if (!tail || tail === "offline") return { locale, page: "home" };
   if (tail === "menu" || tail === "settings" || tail === "announcements")
     return { locale, page: tail };

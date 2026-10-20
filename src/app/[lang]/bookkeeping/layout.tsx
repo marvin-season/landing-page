@@ -23,7 +23,7 @@ export async function generateMetadata({
     metadataBase: new URL(await getSiteOrigin()),
     title: { absolute: title },
     description,
-    robots: { index: lang !== "pseudo", follow: true },
+    robots: { index: true, follow: true },
     alternates: getBookkeepingAlternates(lang),
     keywords: [
       i18n._(msg`记露`),

@@ -12,17 +12,14 @@ export type AnnouncementView = Omit<Announcement, "body"> & {
 
 export function AnnouncementTimeline({ items }: { items: AnnouncementView[] }) {
   const { i18n } = useLingui();
-  const dateFormat = new Intl.DateTimeFormat(
-    i18n.locale === "pseudo" ? "en" : i18n.locale,
-    {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Asia/Shanghai",
-    },
-  );
+  const dateFormat = new Intl.DateTimeFormat(i18n.locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Shanghai",
+  });
   const pinnedItems = items.filter((item) => item.pinned);
   const timelineItems = items.filter((item) => !item.pinned);
   const latest = timelineItems.reduce<AnnouncementView | undefined>(

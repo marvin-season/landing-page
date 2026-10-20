@@ -94,7 +94,7 @@ NextAuth `pages.signIn` 仍是 `/auth`（英文无前缀）。
 
 - `/zh/resume` → `/zh/auth?returnTo=%2Fzh%2Fresume`
 - `/agent` → `/auth?returnTo=%2Fagent`
-- `/agent` + 显式 `ja` → `/ja/auth?returnTo=%2Fagent`
+- `/agent` + 显式 `zh` → `/zh/auth?returnTo=%2Fagent`
 
 ### 4.2 `returnTo` 安全规则
 

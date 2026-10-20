@@ -218,9 +218,7 @@ export function AnnouncementManager() {
                     className="mt-1 block text-xs text-muted-foreground"
                     dateTime={item.publishedAt}
                   >
-                    {new Date(item.publishedAt).toLocaleString(
-                      i18n.locale === "pseudo" ? "en" : i18n.locale,
-                    )}
+                    {new Date(item.publishedAt).toLocaleString(i18n.locale)}
                   </time>
                   <p className="mt-2 line-clamp-3 whitespace-pre-wrap break-words text-sm text-muted-foreground">
                     {item.body}

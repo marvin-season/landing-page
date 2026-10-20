@@ -4,7 +4,6 @@ import { Toaster, toast } from "@landing-page/design-system";
 import { useLingui } from "@lingui/react/macro";
 import { DatabaseBackup } from "lucide-react";
 import { useTheme } from "next-themes";
-import { getLocaleDir } from "@/lib/i18n/locales";
 import { useWeeklyReminder } from "../../_hooks/use-weekly-reminder";
 import { settingsPath } from "../../_lib/paths";
 import { Companion } from "../companion/companion";
@@ -13,7 +12,7 @@ import { LocalLink as Link } from "../shared/local-link";
 const reminderStorageKey = "bookkeeping-backup-reminder:last-shown-day";
 
 export function BackupReminder() {
-  const { i18n, t } = useLingui();
+  const { t } = useLingui();
   const { resolvedTheme } = useTheme();
   const title = t`记得备份数据`;
   const description = t`数据仅保存在当前设备。移除应用前，请先备份数据，避免丢失。`;
@@ -47,7 +46,7 @@ export function BackupReminder() {
     <Toaster
       theme={resolvedTheme === "dark" ? "dark" : "light"}
       position="top-right"
-      dir={getLocaleDir(i18n.locale)}
+      dir="ltr"
       closeButton
       toastOptions={{ closeButtonAriaLabel: t`关闭` }}
     />

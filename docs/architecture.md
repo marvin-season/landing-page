@@ -85,7 +85,7 @@ flowchart TB
 
 记账业务数据由 `src/lib/bbq/idb-store.ts` 使用 Dexie 存入 IndexedDB。`bookkeeping/layout.tsx` 挂载 `BbqApp` 客户端页面壳，同源、同语言的记账区内导航通过 Next 支持的 History API 更新地址，原有页面组件按地址渲染；动态记录 ID 直接用于本机数据查询，不依赖服务器返回每条记录的 RSC 页面。
 
-生产构建后生成 `public/bbq-pwa/sw.js`。Serwist 预缓存构建资源和通用 `/{lang}/bookkeeping/offline` 文档，使未访问过的本机记录网址也能离线启动。Worker 分别控制中文、英文、日文记账路径，不缓存登录、管理、API 或 RSC 响应；新版本等待对应窗口关闭后激活，页面缓存更新不删除账本。安装清单仍使用中文启动地址。构建、资源策略、存储边界和验收步骤见 [记账 PWA](./bbq-pwa.md)。
+生产构建后生成 `public/bbq-pwa/sw.js`。Serwist 预缓存构建资源和通用 `/{lang}/bookkeeping/offline` 文档，使未访问过的本机记录网址也能离线启动。Worker 分别控制中文、英文记账路径，不缓存登录、管理、API 或 RSC 响应；新版本等待对应窗口关闭后激活，页面缓存更新不删除账本。安装清单仍使用中文启动地址。构建、资源策略、存储边界和验收步骤见 [记账 PWA](./bbq-pwa.md)。
 
 公告是记账区的联网模块：`/bookkeeping/announcements` 在客户端页面壳中展示，公开 API 合并 Turso 公告和代码内置公告，每页 10 条；断网时可读内置公告。`/admin/bookkeeping` 管理公告，页面需要登录，管理 API 额外校验管理员角色。公告请求不读取或上传 IndexedDB 账本。详见 [公告模块](./bookkeeping-announcements.md)。
 

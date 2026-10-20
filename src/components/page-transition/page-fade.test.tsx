@@ -27,7 +27,7 @@ test("BBQ pages keep navigation outside opacity and transform transitions", () =
     "/bookkeeping/orders/123",
     "/zh/bookkeeping/menu",
     "/en/bookkeeping",
-    "/ar/bookkeeping/orders/new",
+    "/en/bookkeeping/orders/new",
   ]) {
     assert.equal(renderPage(path), "<nav>首页 / 记账 / 菜单</nav>", path);
   }

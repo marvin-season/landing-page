@@ -1,6 +1,6 @@
 # 记账公告
 
-公开页面：`/{lang}/bookkeeping/announcements`，底部导航中的「公告」。管理页面：`/admin/bookkeeping`（中文为 `/zh/admin/bookkeeping`）。界面支持中文、英文和日文，数据库中的标题/正文按管理员输入原文展示。
+公开页面：`/{lang}/bookkeeping/announcements`，底部导航中的「公告」。管理页面：`/admin/bookkeeping`（中文为 `/zh/admin/bookkeeping`）。界面支持中文和英文，数据库中的标题/正文按管理员输入原文展示。
 
 ## 数据与发布
 

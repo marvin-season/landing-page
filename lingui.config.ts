@@ -1,8 +1,7 @@
-import { locales, pseudoLocale, sourceLocale } from "./src/lib/i18n/locales";
+import { locales, sourceLocale } from "./src/lib/i18n/locales";
 
 export default {
   locales,
-  pseudoLocale,
   sourceLocale,
   fallbackLocales: {
     default: sourceLocale,

@@ -328,10 +328,10 @@ function OrderSummary({
             {order.groupingEnabled !== false && order.groupName
               ? order.groupName
               : order.groupingEnabled === false || order.groupName === null
-                ? new Intl.ListFormat(
-                    i18n.locale === "pseudo" ? "en" : i18n.locale,
-                    { style: "short", type: "unit" },
-                  ).format(order.lines.map((line) => line.name)) || t`日常记账`
+                ? new Intl.ListFormat(i18n.locale, {
+                    style: "short",
+                    type: "unit",
+                  }).format(order.lines.map((line) => line.name)) || t`日常记账`
                 : order.seat === null
                   ? t`打包`
                   : t`${order.seat} 号座`}

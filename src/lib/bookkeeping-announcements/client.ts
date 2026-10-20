@@ -30,7 +30,7 @@ export function useAnnouncementFeed(locale: string, q = "", admin = false) {
     ],
     queryFn: async ({ pageParam, signal }) => {
       const params = new URLSearchParams({
-        locale: ["en", "ja"].includes(locale) ? locale : "zh",
+        locale: locale === "en" ? "en" : "zh",
         q,
       });
       if (pageParam) params.set("cursor", pageParam);

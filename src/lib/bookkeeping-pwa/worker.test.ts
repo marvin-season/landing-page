@@ -301,7 +301,7 @@ test(
     skip: !process.env.BOOKKEEPING_PWA_TEST_ORIGIN,
   },
   async () => {
-    for (const locale of ["zh", "en", "ja"]) {
+    for (const locale of ["zh", "en"]) {
       const worker = await harness(locale, new Map(), "unused", true);
       await worker.install();
       await worker.activate();

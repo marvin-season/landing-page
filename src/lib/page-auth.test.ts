@@ -23,7 +23,7 @@ describe("isProtectedPath", () => {
   it("matches admin with and without locale prefix", () => {
     assert.equal(isProtectedPath("/admin"), true);
     assert.equal(isProtectedPath("/admin/users"), true);
-    for (const prefix of ["", "/zh", "/en", "/ja"]) {
+    for (const prefix of ["", "/zh", "/en"]) {
       assert.equal(isProtectedPath(`${prefix}/admin/bookkeeping`), true);
       assert.equal(
         getSafeReturnTo(`${prefix}/admin/bookkeeping`),
@@ -35,17 +35,7 @@ describe("isProtectedPath", () => {
   });
 
   it("keeps BBQ pages public with and without locale prefix", () => {
-    for (const prefix of [
-      "",
-      "/zh",
-      "/en",
-      "/ja",
-      "/ko",
-      "/ru",
-      "/fr",
-      "/ar",
-      "/ug",
-    ]) {
+    for (const prefix of ["", "/zh", "/en"]) {
       for (const path of [
         "",
         "/menu",
@@ -129,8 +119,8 @@ describe("getAuthorizationUrl", () => {
       "/zh/auth?returnTo=%2Fzh%2Fadmin%2Fusers",
     );
     assert.equal(
-      getAuthorizationUrl("/agent", "ja"),
-      "/ja/auth?returnTo=%2Fagent",
+      getAuthorizationUrl("/agent", "zh"),
+      "/zh/auth?returnTo=%2Fagent",
     );
     assert.equal(
       getAuthorizationUrl("/resume", "en"),
