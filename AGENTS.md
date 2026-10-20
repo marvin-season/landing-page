@@ -52,7 +52,7 @@ Recent commits use Conventional Commit prefixes such as `feat:`, `fix:`, `chore:
 
 Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or stream behavior. See `docs/auth.md` before changing login, page gates, roles, or API auth. See `docs/i18n.md` before editing localized copy. Stream chat, admin, Mastra, and Python agent details are documented in `src/lib/stream/README.md`, `src/app/[lang]/admin/README.md`, `mastra-server/README.md`, and `agent-server/README.md`.
 
-除非特别说明，不需要处理多语言相关改动。如果要处理多语言这默认只需处理中文（`zh`）、英文（`en`）和日文（`ja`），除非特别说明需要处理其他语言。
+除非特别说明，否则不需要处理多语言相关改动。明确要求处理多语言时，仅处理中文（`zh`）和英文（`en`）。
 
 除非特别说明，否则不需要考虑无障碍兼容。
 
