@@ -17,6 +17,7 @@
     "bookkeeping:pwa:build": "node scripts/build-bookkeeping-pwa.mjs",
     "test:i18n": "node --import tsx --test src/lib/i18n/*.test.ts",
     "test:page-transition": "node --import tsx --test src/components/page-transition/page-fade.test.tsx",
+    "test:details": "node --import tsx --test packages/design-system/src/details.test.tsx",
     "bbq:pwa:assets": "node --import tsx scripts/generate-bbq-pwa.ts",
     "check:staged": "biome check --write --staged --no-errors-on-unmatched && git update-index --again",
     "lingui:extract": "lingui extract --clean",

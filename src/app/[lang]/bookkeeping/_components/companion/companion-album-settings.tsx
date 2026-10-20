@@ -1,9 +1,12 @@
 "use client";
-
 import {
   Alert,
   AlertDescription,
   Button,
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
   Select,
   SelectContent,
   SelectGroup,
@@ -13,7 +16,7 @@ import {
 } from "@landing-page/design-system";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDown, FileDown, FileUp, Images, Trash2 } from "lucide-react";
+import { FileDown, FileUp, Images, Trash2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import {
@@ -30,11 +33,7 @@ import {
   saveCompanion,
 } from "@/lib/bbq/companion-album-store";
 import { prepareCompanion } from "@/lib/bbq/companion-image";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
-import {
-  settingsCardCls,
-  settingsSummaryCls,
-} from "../../_styles/settings-styles";
+import { settingsCardCls } from "../../_styles/settings-styles";
 import { Companion } from "./companion";
 import { useCompanionAlbum } from "./companion-album-provider";
 
@@ -152,12 +151,12 @@ export function CompanionAlbumSettings() {
   }
 
   return (
-    <details
+    <Details
       data-settings-section="companion-album"
       open={searchParams.get("section") === "companion-album"}
-      className={`${settingsCardCls} ${detailsMotionCls}`}
+      className={settingsCardCls}
     >
-      <summary className={settingsSummaryCls}>
+      <DetailsSummary variant="flush">
         <Images className="size-4 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">
           <Trans>自定义图集</Trans>
@@ -167,9 +166,9 @@ export function CompanionAlbumSettings() {
             ? t`读取图集中…`
             : t`已配置 ${configuredCount} / ${sceneCount} 个场景`}
         </span>
-        <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-      </summary>
-      <div className="min-h-0 overflow-clip">
+        <DetailsChevron aria-hidden="true" />
+      </DetailsSummary>
+      <DetailsContent>
         <fieldset
           disabled={busy || loading || error}
           aria-busy={busy}
@@ -353,7 +352,7 @@ export function CompanionAlbumSettings() {
             {message}
           </p>
         ) : null}
-      </div>
-    </details>
+      </DetailsContent>
+    </Details>
   );
 }

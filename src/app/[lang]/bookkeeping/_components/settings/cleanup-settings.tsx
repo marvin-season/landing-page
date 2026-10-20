@@ -1,18 +1,23 @@
-import { Button, Input } from "@landing-page/design-system";
+import {
+  Button,
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
+  Input,
+} from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDown, LoaderCircle, Trash2 } from "lucide-react";
+import { LoaderCircle, Trash2 } from "lucide-react";
 import { isValidCleanupRange } from "@/lib/bbq/cleanup";
 import type { SettingsData } from "../../_hooks/use-settings-data";
 import {
   radioInputCls,
   radioOptionCls,
 } from "../../_styles/data-settings-styles";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
 import {
   settingsActionCls,
   settingsCardCls,
   settingsInputCls,
-  settingsSummaryCls,
 } from "../../_styles/settings-styles";
 
 export function CleanupSettings({
@@ -42,15 +47,15 @@ export function CleanupSettings({
     cleanup,
   } = data;
   return (
-    <details className={`${settingsCardCls} ${detailsMotionCls}`}>
-      <summary className={settingsSummaryCls}>
+    <Details className={settingsCardCls}>
+      <DetailsSummary variant="flush">
         <Trash2 className="size-4 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">
           <Trans>清理瘦身</Trans>
         </h2>
-        <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-      </summary>
-      <div className="min-h-0 overflow-clip">
+        <DetailsChevron aria-hidden="true" />
+      </DetailsSummary>
+      <DetailsContent>
         <fieldset
           disabled={task !== null}
           aria-busy={task === "cleanup"}
@@ -138,7 +143,7 @@ export function CleanupSettings({
             {task === "cleanup" ? t`清理中…` : t`清理所选范围`}
           </Button>
         </fieldset>
-      </div>
-    </details>
+      </DetailsContent>
+    </Details>
   );
 }

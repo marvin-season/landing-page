@@ -1,14 +1,16 @@
+import {
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
+} from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Bookmark, ChevronDown, Plus } from "lucide-react";
+import { Bookmark, Plus } from "lucide-react";
 import { type RefObject, useState } from "react";
 import { matchesTag, resolveTagFilter } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
 import { dishHintCls } from "../../_styles/dish-form-styles";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
-import {
-  settingsCardCls,
-  settingsSummaryCls,
-} from "../../_styles/settings-styles";
+import { settingsCardCls } from "../../_styles/settings-styles";
 import { Companion } from "../companion/companion";
 import { SearchInput } from "../shared/search-input";
 import { DishRow } from "./dish-row";
@@ -56,7 +58,7 @@ export function DishList({
   );
   return (
     <div className="flex flex-col gap-3">
-      <details
+      <Details
         open={adding}
         onToggle={(event) => {
           setAdding(event.currentTarget.open);
@@ -66,17 +68,17 @@ export function DishList({
             onRequest();
           }
         }}
-        className={`${settingsCardCls} ${detailsMotionCls}`}
+        className={settingsCardCls}
       >
-        <summary className={settingsSummaryCls}>
+        <DetailsSummary variant="flush">
           <Plus className="size-4 text-primary" aria-hidden="true" />
           <span className="text-sm font-medium text-foreground flex-1">
             <Trans>添加常用项目</Trans>
           </span>
           <Companion mood="chef" className="block size-8 shrink-0" />
-          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-        </summary>
-        <div className="min-h-0 overflow-clip">
+          <DetailsChevron aria-hidden="true" />
+        </DetailsSummary>
+        <DetailsContent>
           {addFormRequested ? (
             categoryId ? (
               <div className="p-3 border-t bg-muted/30 border-border/60">
@@ -98,15 +100,15 @@ export function DishList({
               <MenuLoadStatus phase={phase} onRetry={onRetry} />
             )
           ) : null}
-        </div>
-      </details>
-      <details
-        className={`${settingsCardCls} ${detailsMotionCls}`}
+        </DetailsContent>
+      </Details>
+      <Details
+        className={settingsCardCls}
         onToggle={(event) => {
           if (event.currentTarget.open) onRequestList();
         }}
       >
-        <summary className={settingsSummaryCls}>
+        <DetailsSummary variant="flush">
           <Bookmark
             className="size-4 shrink-0 text-primary"
             aria-hidden="true"
@@ -117,9 +119,9 @@ export function DishList({
           <span className="text-xs font-normal text-muted-foreground group-open/details:hidden">
             <Trans>展开查看全部项目</Trans>
           </span>
-          <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-        </summary>
-        <div className="min-h-0 overflow-clip">
+          <DetailsChevron aria-hidden="true" />
+        </DetailsSummary>
+        <DetailsContent>
           {listRequested ? (
             dishes ? (
               <>
@@ -194,8 +196,8 @@ export function DishList({
               <MenuLoadStatus phase={phase} onRetry={onRetry} />
             )
           ) : null}
-        </div>
-      </details>
+        </DetailsContent>
+      </Details>
     </div>
   );
 }

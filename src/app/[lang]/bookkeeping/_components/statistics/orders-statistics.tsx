@@ -1,20 +1,18 @@
 "use client";
-
+import {
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
+} from "@landing-page/design-system";
 import type { I18n } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
-
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
 import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
 import { homePath } from "../../_lib/paths";
-import {
-  cls,
-  detailsChevronCls,
-  detailsMotionCls,
-  detailsSummaryCls,
-} from "../../_styles/layout";
+import { cls } from "../../_styles/layout";
 import { Companion } from "../companion/companion";
 import { LocalLink as Link } from "../shared/local-link";
 import { type ChartMode, TrendChart } from "./trend-chart";
@@ -162,41 +160,39 @@ export function OrdersStatistics({
           </div>
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />
-        <details
-          className={`px-3 pb-3 text-xs text-muted-foreground ${detailsMotionCls}`}
-        >
-          <summary className={detailsSummaryCls}>
+        <Details className="px-3 pb-3 text-xs text-muted-foreground">
+          <DetailsSummary>
             <span className="min-w-0 flex-1">
               <Trans>金额和热量怎么算？</Trans>
             </span>
-            <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-          </summary>
-          <div className="min-h-0 overflow-clip">
+            <DetailsChevron aria-hidden="true" />
+          </DetailsSummary>
+          <DetailsContent>
             <p className="pt-2 leading-relaxed px-2.5">
               <Trans>
                 金额与热量仅统计已完成记录；热量按每单位 ×
                 数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
               </Trans>
             </p>
-          </div>
-        </details>
-        <details
-          className={`border-t ${detailsMotionCls}`}
+          </DetailsContent>
+        </Details>
+        <Details
+          className="border-t"
           aria-label={t`时段明细`}
           onToggle={(event) => {
             if (event.currentTarget.open) setPeriodsRequested(true);
           }}
         >
-          <summary className={detailsSummaryCls}>
+          <DetailsSummary>
             <h3 className="text-sm font-medium text-foreground flex-1">
               <Trans>时段明细</Trans>
             </h3>
             <span className="text-xs text-muted-foreground">
               <Trans>最近时段在前</Trans>
             </span>
-            <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-          </summary>
-          <div className="min-h-0 overflow-clip">
+            <DetailsChevron aria-hidden="true" />
+          </DetailsSummary>
+          <DetailsContent>
             {periodsRequested ? (
               <ul className="divide-y px-3">
                 {statistics.toReversed().map((item) => (
@@ -262,8 +258,8 @@ export function OrdersStatistics({
                 ))}
               </ul>
             ) : null}
-          </div>
-        </details>
+          </DetailsContent>
+        </Details>
       </section>
     </div>
   );

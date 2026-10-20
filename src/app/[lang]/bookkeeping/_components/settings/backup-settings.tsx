@@ -1,7 +1,12 @@
-import { Button } from "@landing-page/design-system";
+import {
+  Button,
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
+} from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  ChevronDown,
   DatabaseBackup,
   FileDown,
   FileUp,
@@ -14,11 +19,9 @@ import {
   radioInputCls,
   radioOptionCls,
 } from "../../_styles/data-settings-styles";
-import { detailsChevronCls, detailsMotionCls } from "../../_styles/layout";
 import {
   settingsActionCls,
   settingsCardCls,
-  settingsSummaryCls,
 } from "../../_styles/settings-styles";
 
 export function BackupSettings({
@@ -47,19 +50,19 @@ export function BackupSettings({
     importSamples,
   } = data;
   return (
-    <details
+    <Details
       data-settings-section="backup"
       open={section === "backup"}
-      className={`${settingsCardCls} ${detailsMotionCls}`}
+      className={settingsCardCls}
     >
-      <summary className={settingsSummaryCls}>
+      <DetailsSummary variant="flush">
         <DatabaseBackup className="size-4 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">
           <Trans>备份&还原</Trans>
         </h2>
-        <ChevronDown className={detailsChevronCls} aria-hidden="true" />
-      </summary>
-      <div className="min-h-0 overflow-clip">
+        <DetailsChevron aria-hidden="true" />
+      </DetailsSummary>
+      <DetailsContent>
         <div className="flex flex-col gap-4 p-3 border-t border-border/60">
           <p className="text-xs text-muted-foreground">
             <Trans>
@@ -161,7 +164,7 @@ export function BackupSettings({
             </p>
           ) : null}
         </div>
-      </div>
-    </details>
+      </DetailsContent>
+    </Details>
   );
 }

@@ -1,4 +1,4 @@
-import { cls, detailsMotionCls } from "./layout";
+import { cls } from "./layout";
 import { settingsCardCls } from "./settings-styles";
 
 export const editorWorkspaceCls = cls`
@@ -7,7 +7,7 @@ export const editorWorkspaceCls = cls`
 `;
 
 export const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 ${detailsMotionCls} ${settingsCardCls}
+  min-h-0 min-w-0 ${settingsCardCls}
 `;
 
 export const editorItemToolbarCls = cls`

@@ -6,14 +6,6 @@ export const settingsCardCls = cls`
   text-card-foreground shadow-none
 `;
 
-export const settingsSummaryCls = cls`
-  cursor-pointer text-sm font-medium text-foreground
-  flex min-h-14 items-center gap-2 rounded-none bg-transparent px-3 py-2
-  list-none [&::-webkit-details-marker]:hidden transition-colors hover:bg-muted/40
-  focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset
-  focus-visible:ring-primary/50
-`;
-
 export const settingsActionCls = cls`
   min-h-11 w-full justify-center rounded-lg px-3 text-sm shadow-none
   hover:bg-muted/70 hover:shadow-none focus-visible:ring-inset

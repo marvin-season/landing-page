@@ -16,6 +16,13 @@ export {
   CollapsibleTrigger,
 } from "./collapsible";
 export {
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
+  detailsSummaryVariants,
+} from "./details";
+export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,

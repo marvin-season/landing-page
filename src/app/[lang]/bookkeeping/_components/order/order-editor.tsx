@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Alert,
   AlertDescription,
@@ -7,6 +6,10 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  Details,
+  DetailsChevron,
+  DetailsContent,
+  DetailsSummary,
   Select,
   SelectContent,
   SelectGroup,
@@ -32,11 +35,7 @@ import { formatYuan } from "@/lib/bbq/money";
 import { useOrderEditor } from "../../_hooks/use-order-editor";
 import { errorMessage } from "../../_lib/errors";
 import { settingsPath } from "../../_lib/paths";
-import {
-  detailsChevronCls,
-  pageShellCls,
-  pageTitleCls,
-} from "../../_styles/layout";
+import { pageShellCls, pageTitleCls } from "../../_styles/layout";
 import {
   editorCartPanelCls,
   editorItemToolbarCls,
@@ -45,7 +44,6 @@ import {
   editorSectionCls,
   editorWorkspaceCls,
 } from "../../_styles/order-editor-styles";
-import { settingsSummaryCls } from "../../_styles/settings-styles";
 import { DishRow } from "../menu/dish-row";
 import { ItemTagFilter } from "../menu/item-tags";
 import { MenuEditor } from "../menu/menu-editor";
@@ -254,12 +252,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       ) : null}
                     </section>
                   ) : null}
-                  <details
+                  <Details
                     className={editorMenuPaneCls}
                     open={menuOpen}
                     onToggle={(event) => setMenuOpen(event.currentTarget.open)}
                   >
-                    <summary className={settingsSummaryCls}>
+                    <DetailsSummary variant="flush">
                       <Plus
                         className="size-4 shrink-0 text-primary"
                         aria-hidden="true"
@@ -274,12 +272,9 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           "—"
                         )}
                       </span>
-                      <ChevronDown
-                        className={detailsChevronCls}
-                        aria-hidden="true"
-                      />
-                    </summary>
-                    <div className="min-h-0 overflow-clip border-t border-border/60">
+                      <DetailsChevron aria-hidden="true" />
+                    </DetailsSummary>
+                    <DetailsContent className="border-t border-border/60">
                       {menuPhase === "loading" ? (
                         <p
                           className="py-8 text-center text-sm text-muted-foreground"
@@ -373,8 +368,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           </div>
                         </div>
                       )}
-                    </div>
-                  </details>
+                    </DetailsContent>
+                  </Details>
                 </ItemEditViewport>
               </div>
             </div>
