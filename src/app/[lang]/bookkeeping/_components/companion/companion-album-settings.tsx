@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   Button,
-  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -34,6 +33,7 @@ import {
 } from "@/lib/bbq/companion-album-store";
 import { prepareCompanion } from "@/lib/bbq/companion-image";
 import { settingsCardCls } from "../../_styles/settings-styles";
+import { SettingsDetails } from "../settings/settings-details";
 import { Companion } from "./companion";
 import { useCompanionAlbum } from "./companion-album-provider";
 
@@ -151,7 +151,7 @@ export function CompanionAlbumSettings() {
   }
 
   return (
-    <Details
+    <SettingsDetails
       data-settings-section="companion-album"
       open={searchParams.get("section") === "companion-album"}
       className={settingsCardCls}
@@ -353,6 +353,6 @@ export function CompanionAlbumSettings() {
           </p>
         ) : null}
       </DetailsContent>
-    </Details>
+    </SettingsDetails>
   );
 }

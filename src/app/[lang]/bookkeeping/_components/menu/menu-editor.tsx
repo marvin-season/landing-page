@@ -49,7 +49,6 @@ export function MenuEditor({
     handleSaved,
   } = useMenuData(onTagsChanged);
   const [localOpen, setLocalOpen] = useState(false);
-  const [inlineFormRequested, setInlineFormRequested] = useState(false);
   const listHeaderRef = useRef<HTMLDivElement>(null);
 
   const adding = open ?? localOpen;
@@ -57,7 +56,6 @@ export function MenuEditor({
     setLocalOpen(next);
     onOpenChange?.(next);
     if (next) {
-      setInlineFormRequested(true);
       setLoadRequest((request) => request || 1);
     }
   }
@@ -106,33 +104,29 @@ export function MenuEditor({
               </AlertDescription>
             </Alert>
           ) : null}
-          {inlineFormRequested ? (
-            <div className="relative">
-              {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
-              <fieldset disabled={!menu} aria-busy={!menu}>
-                <p className={dishHintCls}>
-                  <Trans>
-                    热量按每单位填写：摄入填正数，消耗填负数，可留空
-                  </Trans>
-                </p>
-                <DishRow
-                  tags={sharedTags ?? tags}
-                  onTagsChanged={reloadTags}
-                  categoryId={menu?.id ?? ""}
-                  onSaved={handleSaved}
-                  onError={setMessage}
+          <div className="relative">
+            {/* 首次加载也保留完整表单尺寸，避免短提示突然撑成整张表单。 */}
+            <fieldset disabled={!menu} aria-busy={!menu}>
+              <p className={dishHintCls}>
+                <Trans>热量按每单位填写：摄入填正数，消耗填负数，可留空</Trans>
+              </p>
+              <DishRow
+                tags={sharedTags ?? tags}
+                onTagsChanged={reloadTags}
+                categoryId={menu?.id ?? ""}
+                onSaved={handleSaved}
+                onError={setMessage}
+              />
+            </fieldset>
+            {!menu ? (
+              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/80 backdrop-blur-sm">
+                <MenuLoadStatus
+                  phase={phase}
+                  onRetry={() => setLoadRequest((request) => request + 1)}
                 />
-              </fieldset>
-              {!menu ? (
-                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/80 backdrop-blur-sm">
-                  <MenuLoadStatus
-                    phase={phase}
-                    onRetry={() => setLoadRequest((request) => request + 1)}
-                  />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+              </div>
+            ) : null}
+          </div>
         </DetailsContent>
       </Details>
     );

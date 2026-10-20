@@ -97,6 +97,7 @@ export function Settings() {
       ) : null}
       <div
         ref={settingsRef}
+        data-settings-viewport=""
         className={cls`min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 ${settingsHighlightCls}`}
       >
         <p className={groupLabelCls}>

@@ -1,6 +1,5 @@
 import {
   Button,
-  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -23,6 +22,8 @@ import {
   settingsActionCls,
   settingsCardCls,
 } from "../../_styles/settings-styles";
+
+import { SettingsDetails } from "./settings-details";
 
 export function BackupSettings({
   section,
@@ -50,7 +51,7 @@ export function BackupSettings({
     importSamples,
   } = data;
   return (
-    <Details
+    <SettingsDetails
       data-settings-section="backup"
       open={section === "backup"}
       className={settingsCardCls}
@@ -165,6 +166,6 @@ export function BackupSettings({
           ) : null}
         </div>
       </DetailsContent>
-    </Details>
+    </SettingsDetails>
   );
 }

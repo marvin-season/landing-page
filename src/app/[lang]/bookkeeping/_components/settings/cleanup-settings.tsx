@@ -1,6 +1,5 @@
 import {
   Button,
-  Details,
   DetailsChevron,
   DetailsContent,
   DetailsSummary,
@@ -19,6 +18,8 @@ import {
   settingsCardCls,
   settingsInputCls,
 } from "../../_styles/settings-styles";
+
+import { SettingsDetails } from "./settings-details";
 
 export function CleanupSettings({
   data,
@@ -47,7 +48,7 @@ export function CleanupSettings({
     cleanup,
   } = data;
   return (
-    <Details className={settingsCardCls}>
+    <SettingsDetails className={settingsCardCls}>
       <DetailsSummary variant="flush">
         <Trash2 className="size-4 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">
@@ -144,6 +145,6 @@ export function CleanupSettings({
           </Button>
         </fieldset>
       </DetailsContent>
-    </Details>
+    </SettingsDetails>
   );
 }

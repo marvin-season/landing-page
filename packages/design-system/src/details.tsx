@@ -24,6 +24,9 @@ const detailsFloatingCls = cls`
   [&>summary]:relative [&>summary]:z-30
   [&[open]>[data-slot=details-content]>[data-slot=details-panel]]:translate-y-0
   [&[open]>[data-slot=details-backdrop]]:opacity-100
+  starting:[&[open][data-side=bottom]>[data-slot=details-content]>[data-slot=details-panel]]:-translate-y-full
+  starting:[&[open][data-side=top]>[data-slot=details-content]>[data-slot=details-panel]]:translate-y-full
+  starting:[&[open][data-mode=floating]>[data-slot=details-backdrop]]:opacity-0
   [&:not([open])>[data-slot=details-content]>[data-slot=details-panel]]:pointer-events-none
   [&:not([open])>[data-slot=details-backdrop]]:pointer-events-none
   motion-reduce:[&::details-content]:transition-none
