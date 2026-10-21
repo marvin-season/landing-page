@@ -4,10 +4,10 @@ import { type PropsWithChildren, Suspense } from "react";
 import { getBookkeepingAlternates } from "@/lib/bookkeeping-seo";
 import { getI18nInstance, type PageLangParam } from "@/lib/i18n/appRouterI18n";
 import { getSiteOrigin } from "@/lib/site-origin";
-import { App } from "./_components/app/app";
 import { MobileNav } from "./_components/app/mobile-nav";
 import { CompanionAlbumProvider } from "./_components/companion/companion-album-provider";
 import { InstallProvider } from "./_components/pwa/install-button";
+import { OfflineNavigationProvider } from "./_components/pwa/offline-navigation";
 import { OfflineProvider } from "./_components/pwa/offline-provider";
 import { searchDescription } from "./_lib/search-copy";
 
@@ -84,17 +84,17 @@ export default function Layout({ children }: PropsWithChildren) {
   return (
     <CompanionAlbumProvider>
       <InstallProvider>
-        {/* 将记账外壳固定在视口内，避免外层页面滚动时带走底部导航。 */}
-        <div className="min-w-0 flex flex-col lg:flex-row-reverse lg:py-0 mx-auto w-full max-w-xl lg:max-w-5xl flex-none pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden fixed inset-x-0 top-0 overscroll-none">
-          <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2 lg:px-4 pt-2 lg:pt-4">
-            <Suspense fallback={null}>
-              <OfflineProvider>
-                <App>{children}</App>
-              </OfflineProvider>
-            </Suspense>
+        <OfflineNavigationProvider>
+          {/* 将记账外壳固定在视口内，避免外层页面滚动时带走底部导航。 */}
+          <div className="min-w-0 flex flex-col lg:flex-row-reverse lg:py-0 mx-auto w-full max-w-xl lg:max-w-5xl flex-none pb-[calc(1rem+env(safe-area-inset-bottom))] h-dvh overflow-hidden fixed inset-x-0 top-0 overscroll-none">
+            <div className="min-w-0 flex flex-1 flex-col min-h-0 overflow-hidden px-2 lg:px-4 pt-2 lg:pt-4">
+              <Suspense fallback={null}>
+                <OfflineProvider>{children}</OfflineProvider>
+              </Suspense>
+            </div>
+            <MobileNav />
           </div>
-          <MobileNav />
-        </div>
+        </OfflineNavigationProvider>
       </InstallProvider>
     </CompanionAlbumProvider>
   );

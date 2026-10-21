@@ -34,7 +34,7 @@ export default async function EditOrderPage({
   const { id } = await params;
   return (
     <Suspense fallback={null}>
-      <OrderEditor orderId={id} />
+      <OrderEditor key={id} orderId={id} />
     </Suspense>
   );
 }

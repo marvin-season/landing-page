@@ -2,6 +2,7 @@
 
 import {
   CacheFirst,
+  NetworkOnly,
   type PrecacheEntry,
   Serwist,
   type SerwistPlugin,
@@ -69,8 +70,17 @@ serwist.registerCapture(
   ({ request, url, sameOrigin }) =>
     sameOrigin &&
     request.mode === "navigate" &&
+    !request.headers.has("RSC") &&
     readBookkeepingRoute(url.pathname)?.locale === locale,
-  serwist.createHandlerBoundToUrl(new URL(shell, self.location.origin).href),
+  new NetworkOnly({
+    plugins: [
+      {
+        // Let Next serve its real route and metadata while online. The cached
+        // app is only a fallback when the navigation cannot reach the server.
+        handlerDidError: () => serwist.matchPrecache(shell),
+      },
+    ],
+  }),
 );
 
 // Imported artwork lives in IndexedDB. Remove only the retired built-in GIF cache.

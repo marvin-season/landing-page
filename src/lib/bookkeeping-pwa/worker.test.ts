@@ -82,6 +82,8 @@ async function harness(
   const state = {
     online: true,
     shell,
+    document: "<main>Next route</main>",
+    documentStatus: 200,
     requests: [] as string[],
     skipped: false,
   };
@@ -132,6 +134,12 @@ async function harness(
       if (!state.online) throw new TypeError("Network offline");
       if (live) return fetch(input);
       const path = new URL(url).pathname;
+      if (path.includes("/bookkeeping") && !path.endsWith("/offline")) {
+        return new Response(state.document, {
+          status: state.documentStatus,
+          headers: { "content-type": "text/html" },
+        });
+      }
       return new Response(
         path.endsWith("/offline") ? state.shell : `asset:${path}`,
         {
@@ -189,6 +197,43 @@ async function harness(
   };
 }
 
+test("online navigation uses fresh Next pages instead of the offline shell", async () => {
+  const worker = await harness();
+  await worker.install();
+  await worker.activate();
+  for (const path of [
+    "/zh/bookkeeping",
+    "/zh/bookkeeping/tools",
+    "/zh/bookkeeping/orders/local-id",
+  ]) {
+    worker.state.document = `<main>${path}</main>`;
+    assert.equal(
+      await (await worker.fetch(path, true))?.text(),
+      worker.state.document,
+    );
+    worker.state.document = "<main>Updated Next page</main>";
+    assert.equal(
+      await (await worker.fetch(path, true))?.text(),
+      worker.state.document,
+    );
+  }
+  worker.state.online = false;
+  assert.equal(
+    await (await worker.fetch("/zh/bookkeeping/tools", true))?.text(),
+    shell,
+  );
+});
+
+test("server error responses are not masked by the offline shell", async () => {
+  const worker = await harness();
+  await worker.install();
+  worker.state.documentStatus = 500;
+  worker.state.document = "<main>Server error</main>";
+  const response = await worker.fetch("/zh/bookkeeping", true);
+  assert.equal(response?.status, 500);
+  assert.equal(await response?.text(), worker.state.document);
+});
+
 test("offline cold navigations and unseen record IDs use the complete cached shell", async () => {
   const worker = await harness();
   await worker.install();
@@ -238,6 +283,10 @@ test("auth, APIs, other languages, unknown routes and RSC never receive cached H
     worker.fetch("/zh/bookkeeping/offline", false, { RSC: "1" }),
     /Network offline/,
   );
+  assert.equal(
+    await worker.fetch("/zh/bookkeeping/tools", true, { RSC: "1" }),
+    undefined,
+  );
 });
 
 test("retired built-in illustrations are not served or cached", async () => {
@@ -272,6 +321,8 @@ test("an update keeps the active shell until activation and leaves unrelated cac
   const second = await harness("zh", first.stores, "build-2");
   second.state.shell = shell.replace("</span>", "version two</span>");
   await second.install();
+  first.state.online = false;
+  second.state.online = false;
   assert.equal(
     await (await first.fetch("/zh/bookkeeping", true))?.text(),
     shell,
@@ -306,17 +357,26 @@ test(
       const worker = await harness(locale, new Map(), "unused", true);
       await worker.install();
       await worker.activate();
+      const online = await worker.fetch(`/${locale}/bookkeeping/tools`, true);
+      assert.equal(online?.status, 200);
+      assert.match(online?.headers.get("content-type") ?? "", /text\/html/);
+      assert.doesNotMatch(
+        (await online?.text()) ?? "",
+        /data-bookkeeping-offline-shell/,
+      );
       const assetsFetched = worker.state.requests.length;
       assert.ok(assetsFetched > 10);
       worker.state.online = false;
       assert.equal(await worker.prepare(), true);
-      for (const path of [
+      const paths = [
         "",
         "/menu",
         "/settings",
+        "/tools",
         "/orders/new",
         "/orders/offline-generated-id",
-      ]) {
+      ];
+      for (const path of paths) {
         const response = await worker.fetch(
           `/${locale}/bookkeeping${path}`,
           true,
@@ -327,7 +387,8 @@ test(
           ),
         );
       }
-      assert.equal(worker.state.requests.length, assetsFetched);
+      // Each document first attempts the network, then uses the cached shell.
+      assert.equal(worker.state.requests.length, assetsFetched + paths.length);
     }
   },
 );

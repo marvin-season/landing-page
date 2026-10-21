@@ -16,11 +16,11 @@
 
 - 生产环境首次联网访问中文或英文记账页面时，会注册仅控制该语言记账路径的 Service Worker。设置页“放到主屏幕”区域显示准备状态；出现“已可离线使用”后，支持断网启动、刷新、切页、记账、编辑任意本机记录、查看统计、照片和导入导出备份。不需要先访问每个页面或每条记录。
 - 每种语言分别准备；首次切换到尚未准备的语言需要联网。安装入口仍固定为中文。
-- 页面壳和构建静态资源使用 Serwist 预缓存，包括统计、日历、备份等延迟加载代码及字体。记账区内通过 Next 支持的 History API 本地导航，保留现有 URL、日期查询参数、返回/前进和数据库结构；记录 ID 从地址解析后交给原有编辑器读取 IndexedDB。
+- 离线文档和构建静态资源使用 Serwist 预缓存，包括统计、日历、备份等延迟加载代码及字体。正常访问使用 Next App Router 的页面、链接预取和 `router.push`，不再由布局中的客户端组件按 URL 分发页面。文档请求网络失败时才返回离线文档；进入该兜底页后，同源、同语言的已知记账地址通过 History API 本地切换，保留日期查询参数、返回/前进和本机记录 ID。
 - 不内置表情图集。设置页导入的动图和静帧保存在独立 IndexedDB `luji-companions` 中，导入后可离线显示，缺少的场景留空。旧版动图缓存会在新版 Worker 激活时移除；用户账目、照片不受影响。
 - 新版本下载完毕后显示提示，关闭所有对应语言的记账窗口，再打开即可生效。不会在编辑期间强制刷新。缓存版本更新不删除 IndexedDB，也不清理其他应用的缓存。
 - 可点击“保护本机存储”申请持久存储。浏览器可能拒绝，用户清除站点数据也仍会删除账本，因此仍需定期导出含照片的备份。请保持同一域名、协议和端口；更换来源无法直接读取旧 IndexedDB。
-- 不缓存登录、管理、API 或 Next.js RSC 响应。站外页面和首次访问的其他语言仍需要网络。开发模式不注册 Service Worker。
+- 不缓存登录、管理、API 或 Next.js RSC 响应，也不将离线 HTML 返回给 RSC 请求。正常页面断网切页时，如果 Next 没有可用的路由缓存，RSC 请求失败会退回文档导航，再由 Worker 提供离线文档。已进入离线文档的窗口恢复网络后继续本地切页，刷新后回到 Next 原生路由；不强制刷新编辑中的记录。站外页面和首次访问的其他语言仍需要网络。开发模式不注册 Service Worker。
 
 ## 构建与更新
 
@@ -32,12 +32,12 @@
 
 ## 实现入口
 
-- `src/app/[lang]/bookkeeping/layout.tsx`：挂载离线状态 Provider 和客户端页面壳，保留既有服务端页面与 metadata。
-- `src/app/[lang]/bookkeeping/_components/app/app.tsx`：根据实际浏览器地址渲染账本、项目管理、设置和编辑器，复用原有组件与数据操作。首次 hydration 保留服务端内容，之后切换到本地页面壳。
-- `_components/shared/local-link.tsx`、`_hooks/use-navigate.ts`：仅对同源、同语言的已知记账页面使用 History API；修改键点击保留链接行为，其他导航沿用原有路由。`src/lib/bookkeeping-pwa/routes.ts` 统一解析页面和本机记录 ID。
+- `src/app/[lang]/bookkeeping/layout.tsx`：直接渲染 Next 提供的 `children`，挂载离线状态与导航模式 Provider，保留共用导航。
+- `src/app/[lang]/bookkeeping/_components/pwa/offline-app.tsx`：仅由 `offline/page.tsx` 引入，缓存文档 hydration 后按实际地址展示本地页面；不接管正常 Next 页面。
+- `_components/shared/local-link.tsx`、`_hooks/use-navigate.ts`：正常模式使用已有的 Next Link 封装与 `router.push`；只有 `_components/pwa/offline-navigation.tsx` 判断当前 Next 路由段是 `offline` 时，才对同源、同语言的已知记账页面使用 History API。修改键点击保留链接行为，`replace` 语义保留。`src/lib/bookkeeping-pwa/routes.ts` 仅供离线兜底解析页面和本机记录 ID。
 - `_components/pwa/offline-provider.tsx`、`_components/pwa/offline-status.tsx`：注册 Worker、检查资源完整性、恢复联网后重试、提示等待中的更新，以及申请持久存储。以上相对路径均位于 `src/app/[lang]/bookkeeping/`。
 - `src/app/[lang]/bookkeeping/offline/page.tsx`：通用离线文档入口，不嵌入具体账目，不参与搜索收录。
-- `src/lib/bookkeeping-pwa/worker.ts`：Serwist 缓存规则；使用 `bookkeeping-{locale}-precache` 隔离语言缓存，激活时清理旧版 `bookkeeping-{locale}-animations` 缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
+- `src/lib/bookkeeping-pwa/worker.ts`：文档请求使用 Serwist `NetworkOnly`，网络异常才回退到缓存的离线文档，服务器返回的错误状态不会被隐藏；使用 `bookkeeping-{locale}-precache` 隔离语言缓存，激活时清理旧版 `bookkeeping-{locale}-animations` 缓存。显式修复缺失缓存后，确认写入完成才报告就绪；RSC 请求即使没有查询标记，也不会得到已缓存的 HTML。
 - `scripts/build-bookkeeping-pwa.mjs`：读取 `.next/BUILD_ID`、收集构建资源及应用图标、注入资源清单并生成 Worker。`nr bookkeeping:pwa:build` 可针对已有的当前生产构建单独重新生成 Worker；修改页面代码后仍须运行完整 `nr build`。
 - `next.config.ts`：为 Worker 返回 `Service-Worker-Allowed: /` 和禁止 HTTP 缓存的响应头；实际注册作用域仍限制为 `/{lang}/bookkeeping`。
 - `src/lib/bookkeeping-pwa/routes.test.ts`、`worker.test.ts`：路由边界、真实打包 Worker 的模拟离线测试，以及可选的生产资源集成测试。
@@ -52,7 +52,7 @@ nr test:bbq
 nr test:bookkeeping-pwa
 ```
 
-默认离线测试包含 8 项自动检查，另有 1 项需要运行中的生产服务，默认跳过。验证生产产物时，停止占用 3001 端口的开发服务，在一个终端运行：
+默认离线测试包含 10 项自动检查，另有 1 项需要运行中的生产服务，默认跳过。验证生产产物时，停止占用 3001 端口的开发服务，在一个终端运行：
 
 ```bash
 nr build
