@@ -22,3 +22,7 @@ export function settingsPath(): string {
 export function announcementsPath(): string {
   return "/bookkeeping/announcements";
 }
+
+export function toolsPath(): string {
+  return "/bookkeeping/tools";
+}

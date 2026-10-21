@@ -14,10 +14,8 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { errorMessage } from "../../_lib/errors";
-import {
-  BookkeepingPage,
-  BookkeepingTitle,
-} from "../shared/bookkeeping-layout";
+import { BookkeepingHeader } from "../shared/bookkeeping-header";
+import { BookkeepingPage } from "../shared/bookkeeping-layout";
 
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
@@ -159,15 +157,10 @@ export function OrdersHome() {
 
   return (
     <BookkeepingPage className="overflow-hidden flex-1">
-      <header className="flex shrink-0 flex-col gap-1.5">
-        <div>
-          <BookkeepingTitle>
-            <Trans>记露</Trans>
-          </BookkeepingTitle>
-          <p className="mt-1 text-xs text-muted-foreground">
-            <Trans>我的日常账本</Trans>
-          </p>
-        </div>
+      <BookkeepingHeader
+        title={<Trans>记露</Trans>}
+        description={<Trans>我的日常账本</Trans>}
+      >
         {storageFailed ? null : (
           <OrdersHomeTabs
             day={day}
@@ -182,7 +175,7 @@ export function OrdersHome() {
             </AlertDescription>
           </Alert>
         ) : null}
-      </header>
+      </BookkeepingHeader>
       {storageFailed ? null : (
         <motion.div
           key={homeView}

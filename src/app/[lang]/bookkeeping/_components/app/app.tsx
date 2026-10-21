@@ -9,6 +9,7 @@ import { OrdersHome } from "../home/orders-home";
 import { MenuEditor } from "../menu/menu-editor";
 import { OrderEditor } from "../order/order-editor";
 import { Settings } from "../settings/settings";
+import { Tools } from "../tools/tools";
 
 /** A single client shell lets new local record URLs work without a server round trip. */
 export function App({ children }: PropsWithChildren) {
@@ -27,7 +28,9 @@ export function App({ children }: PropsWithChildren) {
           ? t`菜单管理 · 记露`
           : route?.page === "settings"
             ? t`设置 · 记露`
-            : t`记露 · 支出与热量统计`;
+            : route?.page === "tools"
+              ? "工具 · 记露"
+              : t`记露 · 支出与热量统计`;
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -48,6 +51,8 @@ export function App({ children }: PropsWithChildren) {
         <MenuEditor />
       ) : route.page === "settings" ? (
         <Settings />
+      ) : route.page === "tools" ? (
+        <Tools />
       ) : (
         <OrdersHome />
       )}

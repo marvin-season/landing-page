@@ -17,7 +17,7 @@ import { useRef, useState } from "react";
 import type { ItemTag } from "@/lib/bbq/types";
 import { useMenuData } from "../../_hooks/use-menu-data";
 import { Companion } from "../companion/companion";
-import { BookkeepingTitle } from "../shared/bookkeeping-layout";
+import { BookkeepingHeader } from "../shared/bookkeeping-header";
 import { ItemEditViewport } from "../shared/item-edit-viewport";
 import { DishHint, MenuSurface } from "./dish-form";
 import { DishList } from "./dish-list";
@@ -149,18 +149,10 @@ export function MenuEditor({
 
   return (
     <MenuSurface className="mx-auto flex w-full flex-col gap-2 min-h-0 flex-1 overflow-hidden">
-      <header className="flex gap-2 flex-row items-start justify-between shrink-0">
-        <div>
-          <div className="flex items-center gap-1.5">
-            <BookkeepingTitle>
-              <Trans>常用项目</Trans>
-            </BookkeepingTitle>
-          </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            <Trans>常记的放这里 · {listedCount} 项可选</Trans>
-          </p>
-        </div>
-      </header>
+      <BookkeepingHeader
+        title={<Trans>常用项目</Trans>}
+        description={<Trans>常记的放这里 · {listedCount} 项可选</Trans>}
+      />
       {notice && !message ? (
         <p
           className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary"

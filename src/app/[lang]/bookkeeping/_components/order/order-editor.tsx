@@ -37,11 +37,8 @@ import { settingsPath } from "../../_lib/paths";
 import { DishRow } from "../menu/dish-row";
 import { ItemTagFilter } from "../menu/item-tags";
 import { MenuEditor } from "../menu/menu-editor";
-import {
-  BookkeepingCard,
-  BookkeepingPage,
-  BookkeepingTitle,
-} from "../shared/bookkeeping-layout";
+import { BookkeepingHeader } from "../shared/bookkeeping-header";
+import { BookkeepingCard, BookkeepingPage } from "../shared/bookkeeping-layout";
 import { ItemEditViewport } from "../shared/item-edit-viewport";
 import { LocalLink as Link } from "../shared/local-link";
 import { SearchInput } from "../shared/search-input";
@@ -122,22 +119,22 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
 
   return (
     <BookkeepingPage className="min-h-0 overflow-hidden flex-1">
-      <header className="flex shrink-0 flex-col gap-1">
-        <BookkeepingTitle>
-          {order
+      <BookkeepingHeader
+        title={
+          order
             ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
             : groupingEnabled
               ? t`新建订单`
-              : t`记一笔`}
-        </BookkeepingTitle>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          {order
+              : t`记一笔`
+        }
+        description={
+          order
             ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
             : groupingEnabled
               ? t`选择分组和项目后保存订单`
-              : t`这次记点什么？`}
-        </p>
-      </header>
+              : t`这次记点什么？`
+        }
+      />
       {message || groupingError ? (
         <Alert
           className="max-h-20 shrink-0 overflow-auto border-destructive/30 bg-destructive/5 p-2"

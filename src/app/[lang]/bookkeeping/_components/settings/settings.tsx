@@ -12,11 +12,8 @@ import { Companion } from "../companion/companion";
 import { CompanionAlbumSettings } from "../companion/companion-album-settings";
 import { InstallButton } from "../pwa/install-button";
 import { OfflineStatus } from "../pwa/offline-status";
-import {
-  BookkeepingCard,
-  BookkeepingPage,
-  BookkeepingTitle,
-} from "../shared/bookkeeping-layout";
+import { BookkeepingHeader } from "../shared/bookkeeping-header";
+import { BookkeepingCard, BookkeepingPage } from "../shared/bookkeeping-layout";
 import { BackupSettings } from "./backup-settings";
 import { CleanupSettings } from "./cleanup-settings";
 import { GroupingSettingsCard } from "./grouping-settings";
@@ -58,16 +55,10 @@ export function Settings() {
 
   return (
     <BookkeepingPage className="min-h-0 flex-1 overflow-hidden">
-      <header className="shrink-0">
-        <div className="flex items-center gap-1.5">
-          <BookkeepingTitle>
-            <Trans>设置</Trans>
-          </BookkeepingTitle>
-        </div>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          <Trans>记录存在这台设备，记得定期备份。</Trans>
-        </p>
-      </header>
+      <BookkeepingHeader
+        title={<Trans>设置</Trans>}
+        description={<Trans>记录存在这台设备，记得定期备份。</Trans>}
+      />
       {message ? (
         <Alert
           className="border-destructive/30 bg-destructive/5 p-3"

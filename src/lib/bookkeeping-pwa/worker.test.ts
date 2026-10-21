@@ -199,6 +199,7 @@ test("offline cold navigations and unseen record IDs use the complete cached she
     "/zh/bookkeeping?day=2026-10-15",
     "/zh/bookkeeping/menu",
     "/zh/bookkeeping/announcements",
+    "/zh/bookkeeping/tools",
     "/zh/bookkeeping/settings",
     "/zh/bookkeeping/orders/new",
     "/zh/bookkeeping/orders/created-offline",

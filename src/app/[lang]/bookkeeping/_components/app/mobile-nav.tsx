@@ -4,15 +4,15 @@ import { cn } from "@landing-page/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 
-import { BookOpen, Megaphone, NotebookPen, Settings } from "lucide-react";
+import { BookOpen, NotebookPen, Settings, Wrench } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isBusinessHours } from "@/lib/bbq/business-day";
 import {
-  announcementsPath,
   homePath,
   newOrderPath,
   settingsPath,
+  toolsPath,
 } from "../../_lib/paths";
 
 import { LocalLink as Link } from "../shared/local-link";
@@ -26,10 +26,10 @@ const items = [
     icon: NotebookPen,
   },
   {
-    label: msg`公告`,
-    href: announcementsPath(),
-    segment: "announcements",
-    icon: Megaphone,
+    label: msg`工具`,
+    href: toolsPath(),
+    segment: "tools",
+    icon: Wrench,
   },
   {
     label: msg`设置`,
