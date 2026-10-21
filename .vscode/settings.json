@@ -6,6 +6,7 @@
     "source.organizeImports.biome": "explicit",
     "source.fixAll.tailwindcss": "explicit"
   },
+  "json.schemaDownload.enable": true,
   "biome.enabled": true,
   "biome.requireConfiguration": true,
   "editor.defaultFormatter": "biomejs.biome",
