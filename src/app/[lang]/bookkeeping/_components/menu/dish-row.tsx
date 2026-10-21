@@ -201,12 +201,12 @@ export function DishRow({
     setEditing(false);
   }
 
-  const renderSummary = (isEditing: boolean) =>
+  const renderSummary = (isEditing: boolean, inPanel = isEditing) =>
     dish ? (
       <DishItem
         className={
-          isEditing
-            ? "rounded-none border-0 bg-transparent px-3 py-3 data-[selected=true]:bg-transparent"
+          inPanel
+            ? "rounded-none border-0 bg-transparent data-[selected=true]:bg-transparent"
             : undefined
         }
         dish={dish}
@@ -445,8 +445,9 @@ export function DishRow({
     return (
       <ExpandingItemEditor
         expanded={editing}
+        selected={quantity > 0}
         summary={summary}
-        expandedSummary={renderSummary(true)}
+        expandedSummary={renderSummary(editing, true)}
         footer={
           <fieldset disabled={pending !== null || tagPending}>
             {actions}

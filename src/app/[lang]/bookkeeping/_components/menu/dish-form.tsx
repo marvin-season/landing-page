@@ -82,7 +82,7 @@ export function DishInput({
     <Input
       {...props}
       className={cn(
-        "w-full min-w-0 rounded-lg border bg-card shadow-none h-9 px-2 text-base focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 placeholder:text-sm text-card-foreground border-border/60 focus-visible:border-primary/50 placeholder:text-muted-foreground/70 placeholder:font-normal placeholder:opacity-100 dark:bg-card shinchan:bg-card apple:rounded-lg apple:bg-card apple:backdrop-blur-none",
+        "w-full min-w-0 rounded-lg border bg-card shadow-none h-9 px-2 text-base focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 placeholder:text-sm text-card-foreground border-border/60 focus-visible:border-primary/50 placeholder:text-muted-foreground/70 placeholder:font-normal placeholder:opacity-100 dark:bg-card shinchan:bg-card apple:rounded-lg apple:bg-card apple:backdrop-blur-none max-md:text-sm max-md:placeholder:text-xs",
         className,
       )}
     />

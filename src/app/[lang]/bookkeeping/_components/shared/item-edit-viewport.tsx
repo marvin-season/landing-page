@@ -17,7 +17,8 @@ const EditContext = createContext<{
   selectedId: string | null;
   select: (id: string | null) => void;
   viewportRef: RefObject<HTMLDivElement | null>;
-  headerRef?: RefObject<HTMLDivElement | null>;
+  headerRef?: RefObject<HTMLElement | null>;
+  footerRef?: RefObject<HTMLElement | null>;
 } | null>(null);
 
 export function useItemEditSelection() {
@@ -30,11 +31,13 @@ export function ItemEditViewport({
   className,
   scrollClassName,
   headerRef,
+  footerRef,
 }: {
   children: ReactNode;
   className?: string;
   scrollClassName: string;
-  headerRef?: RefObject<HTMLDivElement | null>;
+  headerRef?: RefObject<HTMLElement | null>;
+  footerRef?: RefObject<HTMLElement | null>;
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [selectedId, select] = useState<string | null>(null);
@@ -50,7 +53,7 @@ export function ItemEditViewport({
 
   return (
     <EditContext.Provider
-      value={{ selectedId, select, viewportRef, headerRef }}
+      value={{ selectedId, select, viewportRef, headerRef, footerRef }}
     >
       <div
         ref={viewportRef}
@@ -73,13 +76,12 @@ export function ItemEditViewport({
 
 type Geometry = {
   viewportTop: number;
+  viewportBottom: number;
   top: number;
   left: number;
   width: number;
   height: number;
   expandedHeight: number;
-  expandedLeft: number;
-  expandedWidth: number;
 };
 
 /** Same placeholder + translate/height transition as OrdersList; portal avoids nested details clipping. */
@@ -87,12 +89,14 @@ export function ExpandingItemEditor({
   expanded,
   summary,
   expandedSummary,
+  selected = false,
   children,
   footer,
 }: {
   expanded: boolean;
   summary: ReactNode;
   expandedSummary?: ReactNode;
+  selected?: boolean;
   children: ReactNode;
   footer?: ReactNode;
 }) {
@@ -105,6 +109,7 @@ export function ExpandingItemEditor({
     const row = rowRef.current;
     const viewport = context?.viewportRef.current;
     const header = context?.headerRef?.current;
+    const footer = context?.footerRef?.current;
     if (!expanded || !row || !viewport) {
       setRaised(false);
       const timer = window.setTimeout(
@@ -117,28 +122,27 @@ export function ExpandingItemEditor({
       const origin = row.getBoundingClientRect();
       const bounds = viewport.getBoundingClientRect();
       const headerBounds = header?.getBoundingClientRect();
+      const footerBounds = footer?.getBoundingClientRect();
       // Only cover the visible list below its header, never the controls above it.
       const viewportTop = Math.min(
         viewport.clientHeight,
         Math.max(0, (headerBounds?.bottom ?? bounds.top) - bounds.top),
       );
-      const expandedLeft = Math.max(
-        4,
-        (headerBounds?.left ?? origin.left) - bounds.left,
-      );
-      const expandedRight = Math.min(
-        viewport.clientWidth - 4,
-        (headerBounds?.right ?? origin.right) - bounds.left,
+      const viewportBottom = Math.max(
+        viewportTop,
+        Math.min(
+          viewport.clientHeight,
+          (footerBounds?.top ?? bounds.bottom) - bounds.top,
+        ),
       );
       setGeometry({
         viewportTop,
+        viewportBottom: viewport.clientHeight - viewportBottom,
         top: origin.top - bounds.top - viewportTop,
         left: origin.left - bounds.left,
         width: origin.width,
         height: origin.height,
-        expandedHeight: Math.max(0, viewport.clientHeight - viewportTop - 16),
-        expandedLeft,
-        expandedWidth: Math.max(0, expandedRight - expandedLeft),
+        expandedHeight: Math.max(0, viewportBottom - viewportTop - 16),
       });
     };
     measure();
@@ -151,12 +155,13 @@ export function ExpandingItemEditor({
     observer.observe(viewport);
     observer.observe(row);
     if (header) observer.observe(header);
+    if (footer) observer.observe(footer);
     return () => {
       cancelAnimationFrame(frame);
       cancelAnimationFrame(secondFrame);
       observer.disconnect();
     };
-  }, [expanded, context?.viewportRef, context?.headerRef]);
+  }, [expanded, context?.viewportRef, context?.headerRef, context?.footerRef]);
 
   // If a filtered/deleted row unmounts, release the shared editing lock.
   const select = context?.select;
@@ -171,62 +176,69 @@ export function ExpandingItemEditor({
 
   return (
     <>
-      <div ref={rowRef}>{summary}</div>
+      <div ref={rowRef} className={geometry ? "opacity-0" : undefined}>
+        {summary}
+      </div>
       {geometry && context?.viewportRef.current
         ? createPortal(
             <div
               className="absolute inset-0 z-20 overflow-hidden"
-              style={{ top: geometry.viewportTop }}
+              style={{
+                top: geometry.viewportTop,
+                bottom: geometry.viewportBottom,
+              }}
               data-item-editor=""
             >
               <div
                 className={cn(
-                  "absolute inset-0 bg-background transition-opacity duration-200 motion-reduce:transition-none",
+                  "absolute inset-0 bg-card transition-opacity duration-200 motion-reduce:transition-none",
                   raised ? "opacity-100" : "opacity-0",
                 )}
               />
               <div
                 className={cn(
-                  "absolute min-h-0 flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card\n    transition-[transform,height,left,width] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)]\n    motion-reduce:transition-none",
+                  "absolute min-h-0 flex flex-col overflow-hidden rounded-lg border border-border/60 bg-card\n    transition-[transform,height] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)]\n    motion-reduce:transition-none data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5",
                 )}
+                data-selected={selected}
                 style={{
                   top: geometry.top,
-                  left: raised ? geometry.expandedLeft : geometry.left,
-                  width: raised ? geometry.expandedWidth : geometry.width,
+                  left: geometry.left,
+                  width: geometry.width,
                   height: raised ? geometry.expandedHeight : geometry.height,
                   transform: raised
                     ? `translateY(${8 - geometry.top}px)`
                     : "translateY(0)",
                 }}
               >
+                {/* Keep the form/footer layout stable while the outer card reveals it. */}
                 <div
-                  className={cn(
-                    "shrink-0 overflow-y-auto overscroll-y-contain",
-                    raised ? "max-h-[40%]" : "max-h-full",
-                  )}
+                  className="flex min-h-0 shrink-0 flex-col"
+                  style={{ height: Math.max(0, geometry.expandedHeight - 2) }}
                 >
-                  {expanded ? (expandedSummary ?? summary) : summary}
-                </div>
-                <div
-                  inert={!expanded}
-                  className={cn(
-                    "min-h-0 flex-1 overflow-y-auto overscroll-y-contain border-t border-border/40 p-3 transition-opacity duration-200 motion-reduce:transition-none",
-                    raised ? "opacity-100" : "opacity-0",
-                  )}
-                >
-                  {children}
-                </div>
-                {footer ? (
+                  <div className="shrink-0 overflow-y-auto overscroll-y-contain max-h-[40%]">
+                    {expandedSummary ?? summary}
+                  </div>
                   <div
                     inert={!expanded}
                     className={cn(
-                      "shrink-0 border-t border-border/40 bg-card p-3 transition-opacity duration-200 motion-reduce:transition-none",
+                      "min-h-0 flex-1 overflow-y-auto overscroll-y-contain border-t border-border/40 p-3 transition-opacity duration-200 motion-reduce:transition-none",
                       raised ? "opacity-100" : "opacity-0",
                     )}
                   >
-                    {footer}
+                    {children}
                   </div>
-                ) : null}
+                  {footer ? (
+                    <div
+                      inert={!expanded}
+                      className={cn(
+                        "shrink-0 border-t border-border/40 p-3 transition-opacity duration-200 motion-reduce:transition-none",
+                        raised ? "opacity-100" : "opacity-0",
+                      )}
+                    >
+                      {footer}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>,
             context.viewportRef.current,

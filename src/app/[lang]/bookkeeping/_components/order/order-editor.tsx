@@ -92,7 +92,8 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
     removeOrder,
   } = useOrderEditor(orderId);
   const [menuOpen, setMenuOpen] = useState(true);
-  const itemHeaderRef = useRef<HTMLDivElement>(null);
+  const itemHeaderRef = useRef<HTMLButtonElement>(null);
+  const orderFooterRef = useRef<HTMLDivElement>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
 
@@ -176,6 +177,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               <div className="min-h-0 flex-1 flex flex-col" inert={addingItem}>
                 <ItemEditViewport
                   headerRef={itemHeaderRef}
+                  footerRef={orderFooterRef}
                   className="flex-1"
                   scrollClassName="min-h-0 overflow-hidden flex flex-col gap-3 pb-3 h-full"
                 >
@@ -254,6 +256,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                     onOpenChange={(open) => setMenuOpen(open)}
                   >
                     <CollapsibleTrigger
+                      ref={itemHeaderRef}
                       variant="flush"
                       className="shrink-0 border-border/60 data-[state=open]:border-b data-[state=open]:rounded-b-none"
                     >
@@ -297,10 +300,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           </div>
                         ) : (
                           <div className="p-2.5">
-                            <div
-                              ref={itemHeaderRef}
-                              className="flex min-w-0 items-center gap-1.5 [&_[data-slot=input]]:h-9 [&_[data-slot=input]]:pr-9 [&_[data-slot=input]]:bg-muted/30 [&_[data-slot=input]]:placeholder:text-xs [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=select-trigger]]:w-24 [&_[data-slot=select-trigger]]:px-2 [&_[data-slot=select-trigger]]:text-xs [&_[data-slot=select-trigger]]:bg-transparent"
-                            >
+                            <div className="flex min-w-0 items-center gap-1.5 [&_[data-slot=input]]:h-9 [&_[data-slot=input]]:pr-9 [&_[data-slot=input]]:bg-muted/30 [&_[data-slot=input]]:placeholder:text-xs [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=select-trigger]]:w-24 [&_[data-slot=select-trigger]]:px-2 [&_[data-slot=select-trigger]]:text-xs [&_[data-slot=select-trigger]]:bg-transparent">
                               {dishes.length > 0 ? (
                                 <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
                                   <SearchInput
@@ -338,7 +338,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                               </p>
                             ) : null}
                             <div
-                              className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start p-1"
+                              className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start"
                               hidden={filteredDishes.length === 0}
                             >
                               {dishes.map((dish) => (
@@ -443,7 +443,10 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               </div>
             </CollapsibleContent>
           </div>
-          <div className="p-2 border-t border-border/60 bg-background">
+          <div
+            ref={orderFooterRef}
+            className="p-2 border-t border-border/60 bg-background"
+          >
             <div className="mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)_minmax(7rem,auto)] items-center gap-3">
               <CollapsibleTrigger asChild>
                 <Button
