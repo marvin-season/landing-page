@@ -48,8 +48,6 @@ export function CleanupSettings({
   } = data;
   return (
     <Details
-      mode="floating"
-      side="auto"
       boundary="[data-settings-viewport]"
       name="bookkeeping-settings"
       className={settingsDetailsCls}

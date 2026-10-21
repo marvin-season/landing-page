@@ -51,8 +51,6 @@ export function BackupSettings({
   } = data;
   return (
     <Details
-      mode="floating"
-      side="auto"
       boundary="[data-settings-viewport]"
       name="bookkeeping-settings"
       data-settings-section="backup"

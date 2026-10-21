@@ -152,8 +152,6 @@ export function CompanionAlbumSettings() {
 
   return (
     <Details
-      mode="floating"
-      side="auto"
       boundary="[data-settings-viewport]"
       name="bookkeeping-settings"
       data-settings-section="companion-album"
