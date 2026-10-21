@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Languages, Palette, Smartphone } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemePicker } from "@/components/theme/theme-picker";
 import { useSettingsData } from "../../_hooks/use-settings-data";
@@ -30,26 +30,30 @@ const settingsHighlightCls = cls`
   [&_[data-settings-section]]:scroll-mt-2
   [&_[data-settings-section]]:transition-[border-color]
   [&_[data-settings-section]]:duration-500
-  [&_[data-settings-section]>summary]:transition-colors
-  [&_[data-settings-section]>summary]:duration-500
+  [&_[data-settings-section]>[data-slot=collapsible-trigger]]:transition-colors
+  [&_[data-settings-section]>[data-slot=collapsible-trigger]]:duration-500
   [&_[data-settings-section][data-highlighted]]:border-primary/40
-  [&_[data-settings-section][data-highlighted]>summary]:bg-primary/5
+  [&_[data-settings-section][data-highlighted]>[data-slot=collapsible-trigger]]:bg-primary/5
 `;
 
 export function Settings() {
   const { i18n } = useLingui();
   const section = useSearchParams().get("section");
+  const [openSection, setOpenSection] = useState<string | null>(section);
   const settingsRef = useRef<HTMLDivElement>(null);
   const data = useSettingsData();
   const { task, message, notice } = data;
 
   useEffect(() => {
+    setOpenSection(section);
     if (section !== "backup" && section !== "companion-album") return;
     const target = settingsRef.current?.querySelector<HTMLElement>(
       `[data-settings-section="${section}"]`,
     );
     if (!target) return;
-    target.scrollIntoView({ block: "start" });
+    const scrollFrame = window.requestAnimationFrame(() => {
+      target.scrollIntoView({ block: "start" });
+    });
     // 首屏绘制后再突出目标区域，留出足够时间辨认后平滑恢复。
     const highlightTimer = window.setTimeout(() => {
       target.dataset.highlighted = "true";
@@ -58,6 +62,7 @@ export function Settings() {
       delete target.dataset.highlighted;
     }, 3600);
     return () => {
+      window.cancelAnimationFrame(scrollFrame);
       window.clearTimeout(highlightTimer);
       window.clearTimeout(restoreTimer);
       delete target.dataset.highlighted;
@@ -125,9 +130,22 @@ export function Settings() {
         <p className={groupLabelCls}>
           <Trans>数据管理</Trans>
         </p>
-        <CompanionAlbumSettings />
-        <BackupSettings section={section} data={data} />
-        <CleanupSettings data={data} />
+        <CompanionAlbumSettings
+          open={openSection === "companion-album"}
+          onOpenChange={(open) =>
+            setOpenSection(open ? "companion-album" : null)
+          }
+        />
+        <BackupSettings
+          open={openSection === "backup"}
+          onOpenChange={(open) => setOpenSection(open ? "backup" : null)}
+          data={data}
+        />
+        <CleanupSettings
+          open={openSection === "cleanup"}
+          onOpenChange={(open) => setOpenSection(open ? "cleanup" : null)}
+          data={data}
+        />
         <p className={groupLabelCls}>
           <Trans>其他</Trans>
         </p>

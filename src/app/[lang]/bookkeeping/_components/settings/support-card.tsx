@@ -1,8 +1,9 @@
 "use client";
 
-import { Card, detailsSummaryVariants } from "@landing-page/design-system";
+import { Card } from "@landing-page/design-system";
 import { Trans } from "@lingui/react/macro";
 import { ExternalLink, Github } from "lucide-react";
+import { collapsibleFlushTriggerCls } from "../../_styles/collapsible-styles";
 import { settingsCardCls } from "../../_styles/settings-styles";
 
 export function SupportCard() {
@@ -12,7 +13,7 @@ export function SupportCard() {
         href="https://github.com/marvin-season/landing-page"
         target="_blank"
         rel="noopener noreferrer"
-        className={detailsSummaryVariants({ variant: "flush" })}
+        className={collapsibleFlushTriggerCls}
       >
         <Github className="size-4 shrink-0 text-primary" aria-hidden="true" />
         <h2 className="min-w-0 flex-1">

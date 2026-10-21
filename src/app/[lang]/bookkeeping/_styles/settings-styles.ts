@@ -6,9 +6,9 @@ export const settingsCardCls = cls`
   text-card-foreground shadow-none
 `;
 
-export const settingsDetailsCls = cls(
+export const settingsCollapsibleCls = cls(
   settingsCardCls,
-  cls`overflow-visible [&[open]]:z-40 [&>summary]:rounded-xl`,
+  cls`overflow-visible data-[state=open]:z-40 [&>[data-slot=collapsible-trigger]]:rounded-xl`,
 );
 
 export const settingsActionCls = cls`

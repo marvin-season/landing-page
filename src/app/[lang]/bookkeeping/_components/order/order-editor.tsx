@@ -6,10 +6,6 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  Details,
-  DetailsChevron,
-  DetailsContent,
-  DetailsSummary,
   Select,
   SelectContent,
   SelectGroup,
@@ -35,6 +31,11 @@ import { formatYuan } from "@/lib/bbq/money";
 import { useOrderEditor } from "../../_hooks/use-order-editor";
 import { errorMessage } from "../../_lib/errors";
 import { settingsPath } from "../../_lib/paths";
+import {
+  collapsibleChevronCls,
+  collapsibleContentCls,
+  collapsibleFlushTriggerCls,
+} from "../../_styles/collapsible-styles";
 import { pageShellCls, pageTitleCls } from "../../_styles/layout";
 import {
   editorCartPanelCls,
@@ -252,12 +253,12 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       ) : null}
                     </section>
                   ) : null}
-                  <Details
+                  <Collapsible
                     className={editorMenuPaneCls}
                     open={menuOpen}
-                    onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+                    onOpenChange={(open) => setMenuOpen(open)}
                   >
-                    <DetailsSummary variant="flush">
+                    <CollapsibleTrigger className={collapsibleFlushTriggerCls}>
                       <Plus
                         className="size-4 shrink-0 text-primary"
                         aria-hidden="true"
@@ -272,104 +273,114 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           "—"
                         )}
                       </span>
-                      <DetailsChevron aria-hidden="true" />
-                    </DetailsSummary>
-                    <DetailsContent className="border-t border-border/60">
-                      {menuPhase === "loading" ? (
-                        <p
-                          className="py-8 text-center text-sm text-muted-foreground"
-                          role="status"
-                        >
-                          <Trans>读取常用项目中…</Trans>
-                        </p>
-                      ) : menuPhase === "error" ? (
-                        <div className="p-3 flex flex-col items-start gap-3">
-                          <p role="alert">{menuError}</p>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() =>
-                              setMenuRevision((revision) => revision + 1)
-                            }
-                          >
-                            <Trans>Retry</Trans>
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="p-2.5">
-                          <div
-                            ref={itemHeaderRef}
-                            className={editorItemToolbarCls}
-                          >
-                            {dishes.length > 0 ? (
-                              <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
-                                <SearchInput
-                                  value={search}
-                                  onChange={setSearch}
-                                  label={t`搜索项目名称…`}
-                                />
-                              </div>
-                            ) : null}
-                            <ItemTagFilter
-                              tags={tags}
-                              value={activeTagFilter}
-                              onChange={setTagFilter}
-                            />
-                          </div>
-                          {dishes.length === 0 ? (
-                            <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
-                              <UtensilsCrossed
-                                className="size-7 text-muted-foreground/60"
-                                aria-hidden="true"
-                              />
-                              <p className="mt-2 text-sm font-medium text-foreground">
-                                <Trans>先添几个常用项目</Trans>
-                              </p>
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                <Trans>比如早餐、咖啡，或一次跑步。</Trans>
-                              </p>
-                            </div>
-                          ) : filteredDishes.length === 0 ? (
+                      <ChevronDown
+                        className={collapsibleChevronCls}
+                        aria-hidden="true"
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent
+                      forceMount
+                      className={collapsibleContentCls}
+                    >
+                      <div className="min-h-0 overflow-clip">
+                        <div className="border-t border-border/60">
+                          {menuPhase === "loading" ? (
                             <p
                               className="py-8 text-center text-sm text-muted-foreground"
                               role="status"
                             >
-                              <Trans>没有匹配的项目，请换个关键词</Trans>
+                              <Trans>读取常用项目中…</Trans>
                             </p>
-                          ) : null}
-                          <div
-                            className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start p-1"
-                            hidden={filteredDishes.length === 0}
-                          >
-                            {dishes.map((dish) => (
-                              <div
-                                key={dish.id}
-                                className={
-                                  filteredDishes.includes(dish)
-                                    ? "min-w-0"
-                                    : "hidden"
+                          ) : menuPhase === "error" ? (
+                            <div className="p-3 flex flex-col items-start gap-3">
+                              <p role="alert">{menuError}</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() =>
+                                  setMenuRevision((revision) => revision + 1)
                                 }
                               >
-                                <DishRow
-                                  dish={dish}
-                                  categoryId={dish.categoryId}
+                                <Trans>Retry</Trans>
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="p-2.5">
+                              <div
+                                ref={itemHeaderRef}
+                                className={editorItemToolbarCls}
+                              >
+                                {dishes.length > 0 ? (
+                                  <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
+                                    <SearchInput
+                                      value={search}
+                                      onChange={setSearch}
+                                      label={t`搜索项目名称…`}
+                                    />
+                                  </div>
+                                ) : null}
+                                <ItemTagFilter
                                   tags={tags}
-                                  managing={false}
-                                  quantity={
-                                    selectedQuantities.get(dish.id) ?? 0
-                                  }
-                                  onAdd={addDish}
-                                  onTagsChanged={reloadTags}
-                                  onSaved={handleItemSaved}
-                                  onError={setMessage}
+                                  value={activeTagFilter}
+                                  onChange={setTagFilter}
                                 />
                               </div>
-                            ))}
-                          </div>
+                              {dishes.length === 0 ? (
+                                <div className="mt-3 flex min-h-36 flex-col items-center justify-center px-4 text-center pb-3">
+                                  <UtensilsCrossed
+                                    className="size-7 text-muted-foreground/60"
+                                    aria-hidden="true"
+                                  />
+                                  <p className="mt-2 text-sm font-medium text-foreground">
+                                    <Trans>先添几个常用项目</Trans>
+                                  </p>
+                                  <p className="mt-1 text-sm text-muted-foreground">
+                                    <Trans>比如早餐、咖啡，或一次跑步。</Trans>
+                                  </p>
+                                </div>
+                              ) : filteredDishes.length === 0 ? (
+                                <p
+                                  className="py-8 text-center text-sm text-muted-foreground"
+                                  role="status"
+                                >
+                                  <Trans>没有匹配的项目，请换个关键词</Trans>
+                                </p>
+                              ) : null}
+                              <div
+                                className="mt-2 grid min-h-0 grid-cols-1 gap-1.5 auto-rows-max content-start p-1"
+                                hidden={filteredDishes.length === 0}
+                              >
+                                {dishes.map((dish) => (
+                                  <div
+                                    key={dish.id}
+                                    className={
+                                      filteredDishes.includes(dish)
+                                        ? "min-w-0"
+                                        : "hidden"
+                                    }
+                                  >
+                                    <DishRow
+                                      dish={dish}
+                                      categoryId={dish.categoryId}
+                                      tags={tags}
+                                      managing={false}
+                                      quantity={
+                                        selectedQuantities.get(dish.id) ?? 0
+                                      }
+                                      onAdd={addDish}
+                                      onTagsChanged={reloadTags}
+                                      onSaved={handleItemSaved}
+                                      onError={setMessage}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </DetailsContent>
-                  </Details>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </ItemEditViewport>
               </div>
             </div>
