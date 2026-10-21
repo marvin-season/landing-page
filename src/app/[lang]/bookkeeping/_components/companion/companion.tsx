@@ -3,10 +3,8 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CompanionMood } from "@/lib/bbq/companion-album";
-import { cls } from "../../_styles/layout";
-import { useCompanionAlbum } from "./companion-album-provider";
 
-const companionCls = cls`block size-full object-contain select-none`;
+import { useCompanionAlbum } from "./companion-album-provider";
 
 export function Companion({
   mood = "hello",
@@ -29,7 +27,7 @@ export function Companion({
         alt=""
         width={image.width}
         height={image.height}
-        className={companionCls}
+        className="block size-full object-contain select-none"
         unoptimized
         loading="lazy"
         draggable={false}

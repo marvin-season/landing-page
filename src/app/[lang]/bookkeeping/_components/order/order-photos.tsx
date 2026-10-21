@@ -1,19 +1,12 @@
 import { Button } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Camera, ImagePlus, X } from "lucide-react";
 import Image from "next/image";
+import type { ComponentProps } from "react";
 import { MAX_ORDER_PHOTOS } from "@/lib/bbq/order-photo";
 import type { OrderPhoto } from "@/lib/bbq/types";
-import { cls } from "../../_styles/layout";
-import { editorSectionCls } from "../../_styles/order-editor-styles";
-
-const photoActionCls = cls`
-  inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-muted/30
-  px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/70
-  has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1
-  has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11 min-w-0 text-center
-  border border-border/60 relative
-`;
+import { BookkeepingCard } from "../shared/bookkeeping-layout";
 
 export function OrderPhotos({
   photos,
@@ -28,7 +21,7 @@ export function OrderPhotos({
 }) {
   const { t } = useLingui();
   return (
-    <section className={editorSectionCls}>
+    <BookkeepingCard variant="padded">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-medium text-foreground flex items-center gap-1.5">
@@ -49,7 +42,7 @@ export function OrderPhotos({
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <label className={photoActionCls}>
+        <PhotoAction>
           <Camera className="size-4" aria-hidden="true" />
           {processingPhotos ? t`处理照片中…` : t`拍照`}
           <input
@@ -65,8 +58,8 @@ export function OrderPhotos({
               });
             }}
           />
-        </label>
-        <label className={photoActionCls}>
+        </PhotoAction>
+        <PhotoAction>
           <ImagePlus className="size-4" aria-hidden="true" />
           {processingPhotos ? t`处理照片中…` : t`从相册选择`}
           <input
@@ -82,7 +75,7 @@ export function OrderPhotos({
               });
             }}
           />
-        </label>
+        </PhotoAction>
       </div>
       {photos.length > 0 ? (
         <ul className="mt-3 grid grid-cols-3 gap-2">
@@ -113,6 +106,18 @@ export function OrderPhotos({
           ))}
         </ul>
       ) : null}
-    </section>
+    </BookkeepingCard>
+  );
+}
+
+function PhotoAction({ className, ...props }: ComponentProps<"label">) {
+  return (
+    <label
+      {...props}
+      className={cn(
+        "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-muted/30 px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/70 has-disabled:pointer-events-none has-disabled:opacity-50 has-focus-visible:ring-1 has-focus-visible:ring-inset has-focus-visible:ring-primary/50 h-11 min-w-0 text-center border border-border/60 relative",
+        className,
+      )}
+    />
   );
 }

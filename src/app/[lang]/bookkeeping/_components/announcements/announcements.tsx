@@ -10,7 +10,8 @@ import { AnnouncementTimeline } from "@/components/bookkeeping/announcement-time
 import { getBuiltinAnnouncements } from "@/lib/bookkeeping-announcements/builtin";
 import { useAnnouncementFeed } from "@/lib/bookkeeping-announcements/client";
 import { compareAnnouncements } from "@/lib/bookkeeping-announcements/model";
-import { pageTitleCls } from "../../_styles/layout";
+import { BookkeepingTitle } from "../shared/bookkeeping-layout";
+
 import { SearchInput } from "../shared/search-input";
 
 export function Announcements() {
@@ -69,9 +70,9 @@ function AnnouncementFeed() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="shrink-0">
-        <h1 className={pageTitleCls}>
+        <BookkeepingTitle>
           <Trans>公告</Trans>
-        </h1>
+        </BookkeepingTitle>
         <p className="mt-1 text-xs text-muted-foreground">
           <Trans>更新与提醒</Trans>
         </p>

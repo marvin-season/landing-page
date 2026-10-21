@@ -1,5 +1,4 @@
 import {
-  Button,
   Collapsible,
   CollapsibleChevron,
   CollapsibleContent,
@@ -17,10 +16,10 @@ import {
 import { useRef } from "react";
 import type { SettingsData } from "../../_hooks/use-settings-data";
 import {
-  radioInputCls,
-  radioOptionCls,
-} from "../../_styles/data-settings-styles";
-import { settingsActionCls } from "../../_styles/settings-styles";
+  SettingsAction,
+  SettingsRadioInput,
+  SettingsRadioOption,
+} from "./settings-ui";
 
 export function BackupSettings({
   open,
@@ -80,57 +79,52 @@ export function BackupSettings({
               <Trans>导出图片</Trans>
             </legend>
             <div className="grid grid-cols-2 gap-2">
-              <label className={radioOptionCls}>
-                <input
+              <SettingsRadioOption>
+                <SettingsRadioInput
                   type="radio"
                   name="backup-photos"
                   value="exclude"
                   checked={!includePhotos}
                   onChange={() => setIncludePhotos(false)}
-                  className={radioInputCls}
                 />
                 <Trans>不含图片</Trans>
-              </label>
-              <label className={radioOptionCls}>
-                <input
+              </SettingsRadioOption>
+              <SettingsRadioOption>
+                <SettingsRadioInput
                   type="radio"
                   name="backup-photos"
                   value="include"
                   checked={includePhotos}
                   onChange={() => setIncludePhotos(true)}
-                  className={radioInputCls}
                 />
                 <Trans>包含图片</Trans>
-              </label>
+              </SettingsRadioOption>
             </div>
             <div className="mt-3 flex flex-col gap-2">
-              <Button
+              <SettingsAction
                 type="button"
                 variant="ghost"
-                className={settingsActionCls}
                 onClick={() => void exportBackup()}
               >
                 <FileDown className="size-4" aria-hidden="true" />
                 <Trans>导出备份</Trans>
-              </Button>
-              <Button
+              </SettingsAction>
+              <SettingsAction
                 type="button"
                 variant="ghost"
-                className={settingsActionCls}
                 onClick={() => importInputRef.current?.click()}
               >
                 <FileUp className="size-4" aria-hidden="true" />
                 <Trans>导入完整备份</Trans>
-              </Button>
-              <Button
+              </SettingsAction>
+              <SettingsAction
                 type="button"
                 variant="ghost"
-                className={settingsActionCls}
                 onClick={() => void importSamples()}
               >
                 <FlaskConical className="size-4" aria-hidden="true" />
                 <Trans>导入示例数据</Trans>
-              </Button>
+              </SettingsAction>
               <p className="text-xs text-muted-foreground">
                 <Trans>
                   3 个常用项目，最近三天共 4

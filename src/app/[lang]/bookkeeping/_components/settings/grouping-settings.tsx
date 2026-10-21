@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Switch } from "@landing-page/design-system";
+import { Button, Switch } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Folder, LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -14,10 +14,8 @@ import { BbqStoreError } from "@/lib/bbq/store";
 import type { GroupingSettings } from "@/lib/bbq/types";
 import { useGroupingSettings } from "../../_hooks/use-grouping-settings";
 import { errorMessage } from "../../_lib/errors";
-import {
-  settingsCardCls,
-  settingsInputCls,
-} from "../../_styles/settings-styles";
+import { BookkeepingCard } from "../shared/bookkeeping-layout";
+import { SettingsInput } from "./settings-ui";
 
 export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
   const { i18n, t } = useLingui();
@@ -57,7 +55,7 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
   }
 
   return (
-    <section className={settingsCardCls}>
+    <BookkeepingCard>
       <div className="flex items-center justify-between gap-3 px-3 py-3">
         <h2
           id="grouping-setting-label"
@@ -88,14 +86,14 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
             <Trans>名称最多 10 个字符，支持任意文字和符号。</Trans>
           </p>
           <div className="flex min-w-0 items-center gap-2">
-            <Input
+            <SettingsInput
               value={name}
               onChange={(event) => setName(event.target.value)}
               aria-label={t`分组名称`}
               placeholder={t`输入分组名称`}
               aria-invalid={count > MAX_GROUP_NAME_LENGTH}
               aria-describedby="group-name-count"
-              className={`${settingsInputCls} min-w-0 flex-1`}
+              className="min-w-0 flex-1"
             />
             <Button
               type="button"
@@ -159,6 +157,6 @@ export function GroupingSettingsCard({ disabled }: { disabled: boolean }) {
           {message ?? errorMessage(i18n, loadError)}
         </p>
       ) : null}
-    </section>
+    </BookkeepingCard>
   );
 }

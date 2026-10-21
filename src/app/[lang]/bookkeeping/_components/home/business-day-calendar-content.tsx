@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,21 +12,8 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { errorMessage } from "../../_lib/errors";
 import { businessDayLabel } from "../../_lib/i18n";
 import { homePath } from "../../_lib/paths";
-import { cls } from "../../_styles/layout";
 import { LocalLink as Link } from "../shared/local-link";
-
-const calendarControlCls = cls`
-  rounded-lg shadow-none transition-colors duration-150 hover:bg-muted/70
-  hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset
-  focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70
-  shinchan:rounded-lg min-h-11
-`;
-const dateCls = cls`
-  flex min-h-12 flex-col items-center justify-center rounded-lg text-sm
-  tabular-nums transition-colors focus-visible:outline-none
-  focus-visible:ring-1
-  border duration-150 focus-visible:ring-inset
-`;
+import { CalendarControl, CalendarDate } from "./calendar-controls";
 
 export function CalendarContent({ day }: { day: string }) {
   const { i18n, t } = useLingui();
@@ -93,16 +79,16 @@ export function CalendarContent({ day }: { day: string }) {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between gap-2">
-        <Button
+        <CalendarControl
           type="button"
           variant="ghost"
           size="icon"
-          className={`${calendarControlCls} size-11`}
+          className="size-11"
           aria-label={t`上个月`}
           onClick={() => shiftMonth(-1)}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
-        </Button>
+        </CalendarControl>
         <select
           aria-label={t`选择月份`}
           className="rounded-lg border border-transparent bg-muted/40 px-2 font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors duration-150 hover:bg-muted/70 focus-visible:ring-inset focus-visible:bg-muted/70 cursor-pointer text-foreground min-h-11 text-base"
@@ -119,16 +105,16 @@ export function CalendarContent({ day }: { day: string }) {
             </option>
           ))}
         </select>
-        <Button
+        <CalendarControl
           type="button"
           variant="ghost"
           size="icon"
-          className={`${calendarControlCls} size-11`}
+          className="size-11"
           aria-label={t`下个月`}
           onClick={() => shiftMonth(1)}
         >
           <ChevronRight className="size-4" aria-hidden="true" />
-        </Button>
+        </CalendarControl>
       </div>
       <div
         className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-muted/60 p-1"
@@ -136,17 +122,17 @@ export function CalendarContent({ day }: { day: string }) {
         aria-label={t`选择时段类型`}
       >
         {[false, true].map((off) => (
-          <Button
+          <CalendarControl
             key={String(off)}
             type="button"
             size="sm"
             variant="ghost"
-            className={`${calendarControlCls} ${offPeriod === off ? "bg-card text-foreground hover:bg-card focus-visible:bg-card" : "text-muted-foreground hover:text-foreground focus-visible:text-foreground"}`}
+            className={` ${offPeriod === off ? "bg-card text-foreground hover:bg-card focus-visible:bg-card" : "text-muted-foreground hover:text-foreground focus-visible:text-foreground"}`}
             aria-pressed={offPeriod === off}
             onClick={() => setOffPeriod(off)}
           >
             {off ? t`休息时段` : t`记账时段`}
-          </Button>
+          </CalendarControl>
         ))}
       </div>
       <div className="mt-3 grid grid-cols-7 gap-1 text-center">
@@ -164,18 +150,22 @@ export function CalendarContent({ day }: { day: string }) {
           const selected = key === day;
           return (
             <Dialog.Close key={dateKey} asChild>
-              <Link
-                href={homePath(key)}
-                prefetch={false}
-                aria-label={`${businessDayLabel(i18n, key)}${counts ? t`，${count} 条记录` : ""}${selected ? t`，已选中` : ""}`}
-                aria-current={dateKey === today ? "date" : undefined}
-                className={`${dateCls} ${selected ? "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:bg-primary/90 focus-visible:ring-primary-foreground/70" : count > 0 ? "bg-primary/5 text-foreground hover:bg-primary/10 focus-visible:bg-primary/10 focus-visible:ring-primary/50" : "text-muted-foreground hover:bg-muted/70 focus-visible:bg-muted/70 focus-visible:ring-primary/50"} ${dateKey === today && !selected ? "border-primary/30" : "border-transparent"}`}
+              <CalendarDate
+                state={selected ? "selected" : count > 0 ? "recorded" : "empty"}
+                today={dateKey === today}
               >
-                <span className="font-medium">{date}</span>
-                <span className="h-3 text-[10px] leading-3">
-                  {count > 0 ? t`${count} 条` : ""}
-                </span>
-              </Link>
+                <Link
+                  href={homePath(key)}
+                  prefetch={false}
+                  aria-label={`${businessDayLabel(i18n, key)}${counts ? t`，${count} 条记录` : ""}${selected ? t`，已选中` : ""}`}
+                  aria-current={dateKey === today ? "date" : undefined}
+                >
+                  <span className="font-medium">{date}</span>
+                  <span className="h-3 text-[10px] leading-3">
+                    {count > 0 ? t`${count} 条` : ""}
+                  </span>
+                </Link>
+              </CalendarDate>
             </Dialog.Close>
           );
         })}
@@ -186,16 +176,16 @@ export function CalendarContent({ day }: { day: string }) {
             (counts ? t`有记录的日期显示记录数` : t`读取记账时段记录中…`)}
         </p>
         <Dialog.Close asChild>
-          <Button
+          <CalendarControl
             asChild
             variant="ghost"
             size="sm"
-            className={`${calendarControlCls} shrink-0 bg-muted/40`}
+            className="shrink-0 bg-muted/40"
           >
             <Link href={homePath(currentBusinessDayKey(new Date()))}>
               <Trans>回到当前时段</Trans>
             </Link>
-          </Button>
+          </CalendarControl>
         </Dialog.Close>
       </div>
     </div>

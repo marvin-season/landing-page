@@ -1,19 +1,12 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
 import { Trans, useLingui } from "@lingui/react/macro";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactElement, useState } from "react";
-import { cls } from "../../_styles/layout";
+import { CalendarControl } from "./calendar-controls";
 
-const calendarControlCls = cls`
-  rounded-lg shadow-none transition-colors duration-150 hover:bg-muted/70
-  hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset
-  focus-visible:ring-primary/50 focus-visible:ring-offset-0 focus-visible:bg-muted/70
-  shinchan:rounded-lg min-h-11
-`;
 const CalendarContent = dynamic(
   () =>
     import("./business-day-calendar-content").then(
@@ -49,15 +42,15 @@ export function BusinessDayCalendar({
               <Trans>记账时段日历</Trans>
             </Dialog.Title>
             <Dialog.Close asChild>
-              <Button
+              <CalendarControl
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`${calendarControlCls} size-11`}
+                className="size-11"
                 aria-label={t`关闭日历`}
               >
                 <X className="size-4" aria-hidden="true" />
-              </Button>
+              </CalendarControl>
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-1 text-xs text-muted-foreground">

@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@landing-page/utils";
 
 import {
   createContext,
@@ -10,7 +11,6 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { cls } from "../../_styles/layout";
 
 const transitionMs = 260;
 const EditContext = createContext<{
@@ -47,15 +47,23 @@ export function ItemEditViewport({
     const timer = window.setTimeout(() => setPresent(false), transitionMs + 20);
     return () => window.clearTimeout(timer);
   }, [selectedId]);
-  const viewportCls = cls`relative min-h-0 overflow-hidden isolate ${className}`;
-  const scrollCls = cls`${scrollClassName} [scrollbar-gutter:stable] ${present ? "overflow-hidden!" : ""}`;
 
   return (
     <EditContext.Provider
       value={{ selectedId, select, viewportRef, headerRef }}
     >
-      <div ref={viewportRef} className={viewportCls}>
-        <div className={scrollCls} inert={present}>
+      <div
+        ref={viewportRef}
+        className={cn("relative min-h-0 overflow-hidden isolate", className)}
+      >
+        <div
+          className={cn(
+            scrollClassName,
+            "[scrollbar-gutter:stable]",
+            present ? "overflow-hidden!" : "",
+          )}
+          inert={present}
+        >
           {children}
         </div>
       </div>
@@ -161,12 +169,6 @@ export function ExpandingItemEditor({
     [select],
   );
 
-  const panelCls = cls`
-    absolute min-h-0 flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card
-    transition-[transform,height,left,width] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)]
-    motion-reduce:transition-none
-  `;
-
   return (
     <>
       <div ref={rowRef}>{summary}</div>
@@ -178,10 +180,15 @@ export function ExpandingItemEditor({
               data-item-editor=""
             >
               <div
-                className={cls`absolute inset-0 bg-background transition-opacity duration-200 motion-reduce:transition-none ${raised ? "opacity-100" : "opacity-0"}`}
+                className={cn(
+                  "absolute inset-0 bg-background transition-opacity duration-200 motion-reduce:transition-none",
+                  raised ? "opacity-100" : "opacity-0",
+                )}
               />
               <div
-                className={panelCls}
+                className={cn(
+                  "absolute min-h-0 flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card\n    transition-[transform,height,left,width] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)]\n    motion-reduce:transition-none",
+                )}
                 style={{
                   top: geometry.top,
                   left: raised ? geometry.expandedLeft : geometry.left,
@@ -193,20 +200,29 @@ export function ExpandingItemEditor({
                 }}
               >
                 <div
-                  className={cls`shrink-0 overflow-y-auto overscroll-y-contain ${raised ? "max-h-[40%]" : "max-h-full"}`}
+                  className={cn(
+                    "shrink-0 overflow-y-auto overscroll-y-contain",
+                    raised ? "max-h-[40%]" : "max-h-full",
+                  )}
                 >
                   {expanded ? (expandedSummary ?? summary) : summary}
                 </div>
                 <div
                   inert={!expanded}
-                  className={cls`min-h-0 flex-1 overflow-y-auto overscroll-y-contain border-t border-border/40 p-3 transition-opacity duration-200 motion-reduce:transition-none ${raised ? "opacity-100" : "opacity-0"}`}
+                  className={cn(
+                    "min-h-0 flex-1 overflow-y-auto overscroll-y-contain border-t border-border/40 p-3 transition-opacity duration-200 motion-reduce:transition-none",
+                    raised ? "opacity-100" : "opacity-0",
+                  )}
                 >
                   {children}
                 </div>
                 {footer ? (
                   <div
                     inert={!expanded}
-                    className={cls`shrink-0 border-t border-border/40 bg-card p-3 transition-opacity duration-200 motion-reduce:transition-none ${raised ? "opacity-100" : "opacity-0"}`}
+                    className={cn(
+                      "shrink-0 border-t border-border/40 bg-card p-3 transition-opacity duration-200 motion-reduce:transition-none",
+                      raised ? "opacity-100" : "opacity-0",
+                    )}
                   >
                     {footer}
                   </div>

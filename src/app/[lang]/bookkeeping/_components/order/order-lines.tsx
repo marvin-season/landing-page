@@ -1,16 +1,15 @@
 import { Button } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import type { ComponentProps } from "react";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan, lineCents } from "@/lib/bbq/money";
 import type { DraftLine } from "../../_hooks/use-order-editor";
 import { formatCalories } from "../../_lib/i18n";
-import {
-  editorControlCls,
-  editorSectionCls,
-} from "../../_styles/order-editor-styles";
 import { Companion } from "../companion/companion";
 import { ItemTagBadge } from "../menu/item-tags";
+import { BookkeepingCard } from "../shared/bookkeeping-layout";
 
 export function OrderLines({
   lines,
@@ -23,7 +22,7 @@ export function OrderLines({
 }) {
   const { i18n, t } = useLingui();
   return (
-    <section className={editorSectionCls}>
+    <BookkeepingCard variant="padded">
       <p className="text-xs tabular-nums text-muted-foreground break-words rounded-lg bg-muted/30 px-2.5 py-2">
         <Trans>热量 {formatCalories(i18n, summarizeCalories(lines))}</Trans>
       </p>
@@ -66,11 +65,10 @@ export function OrderLines({
                   </Trans>
                 </p>
               </div>
-              <Button
+              <QuantityControl
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
                 aria-label={
                   line.quantity === 1
                     ? t`移除 ${line.name}`
@@ -83,24 +81,41 @@ export function OrderLines({
                 ) : (
                   <Minus className="size-4" aria-hidden="true" />
                 )}
-              </Button>
+              </QuantityControl>
               <span className="min-w-6 text-center text-sm font-medium tabular-nums">
                 {line.quantity}
               </span>
-              <Button
+              <QuantityControl
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`shrink-0 ${editorControlCls} hover:bg-muted/70 size-11`}
                 aria-label={t`增加 ${line.name} 数量`}
                 onClick={() => changeQuantity(line.key, 1)}
               >
                 <Plus className="size-4" aria-hidden="true" />
-              </Button>
+              </QuantityControl>
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </BookkeepingCard>
+  );
+}
+
+function QuantityControl({
+  className,
+  ...props
+}: ComponentProps<typeof Button>) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      {...props}
+      className={cn(
+        "shrink-0 rounded-lg shadow-none transition-colors hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0 shinchan:rounded-lg hover:bg-muted/70 size-11",
+        className,
+      )}
+    />
   );
 }

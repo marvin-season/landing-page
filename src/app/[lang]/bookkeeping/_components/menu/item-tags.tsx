@@ -1,14 +1,12 @@
 "use client";
 
 import {
-  Button,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
   Select,
   SelectContent,
   SelectGroup,
@@ -17,7 +15,6 @@ import {
   SelectValue,
   Tag,
 } from "@landing-page/design-system";
-import { cn } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ChevronDown, Plus, Save, Trash2, X } from "lucide-react";
 import { useRef, useState } from "react";
@@ -26,6 +23,7 @@ import { DEFAULT_TAG } from "@/lib/bbq/tags";
 import type { ItemTag } from "@/lib/bbq/types";
 import { errorMessage } from "../../_lib/errors";
 import { notifyMenuChanged } from "../../_lib/menu-events";
+import { DishInput, DishTagButton } from "./dish-form";
 
 export function ItemTagBadge({
   tag,
@@ -59,8 +57,6 @@ export function ItemTagSelect({
   onTagsChanged,
   onPendingChange,
   disabled,
-  inputClassName,
-  controlClassName,
 }: {
   tags: ItemTag[];
   value: string[];
@@ -68,8 +64,6 @@ export function ItemTagSelect({
   onTagsChanged: () => Promise<void>;
   onPendingChange: (pending: boolean) => void;
   disabled?: boolean;
-  inputClassName?: string;
-  controlClassName?: string;
 }) {
   const { i18n, t } = useLingui();
   const [adding, setAdding] = useState(false);
@@ -139,14 +133,11 @@ export function ItemTagSelect({
       <div className="flex min-w-0 items-start gap-1.5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
+            <DishTagButton
               type="button"
               variant="outline"
               disabled={disabled || pending}
-              className={cn(
-                "min-h-9 min-w-0 gap-1 px-2 text-xs h-auto py-1.5 whitespace-normal text-start flex-1 justify-between rounded-lg",
-                controlClassName,
-              )}
+              className="min-h-9 min-w-0 gap-1 px-2 text-xs h-auto py-1.5 whitespace-normal text-start flex-1 justify-between rounded-lg"
               aria-label={t`项目标签`}
               title={t`选择标签`}
             >
@@ -158,7 +149,7 @@ export function ItemTagSelect({
                   ))}
               </span>
               <ChevronDown className="size-3.5 shrink-0" />
-            </Button>
+            </DishTagButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -194,11 +185,11 @@ export function ItemTagSelect({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button
+        <DishTagButton
           type="button"
           variant="outline"
           size="icon"
-          className={cn("size-9 shrink-0 rounded-lg", controlClassName)}
+          className="size-9 shrink-0 rounded-lg"
           aria-label={t`添加标签`}
           aria-expanded={adding}
           disabled={disabled || pending}
@@ -208,18 +199,18 @@ export function ItemTagSelect({
           }}
         >
           <Plus className="size-3.5" />
-        </Button>
+        </DishTagButton>
       </div>
       {adding ? (
         <div className="flex min-w-0 items-center gap-1.5">
-          <Input
+          <DishInput
             autoFocus
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder={t`标签名称`}
             aria-label={t`标签名称`}
             disabled={disabled || pending}
-            className={cn("h-9 min-w-0 flex-1", inputClassName)}
+            className="h-9 min-w-0 flex-1"
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                 event.preventDefault();
@@ -227,18 +218,18 @@ export function ItemTagSelect({
               }
             }}
           />
-          <Button
+          <DishTagButton
             type="button"
             variant="outline"
             size="icon"
             disabled={disabled || pending || !name.trim()}
             aria-label={t`添加标签`}
             onClick={() => void add()}
-            className={cn("size-9 shrink-0", controlClassName)}
+            className="size-9 shrink-0"
           >
             <Save className="size-3.5" />
-          </Button>
-          <Button
+          </DishTagButton>
+          <DishTagButton
             type="button"
             variant="ghost"
             size="icon"
@@ -249,10 +240,10 @@ export function ItemTagSelect({
               setName("");
               setError(null);
             }}
-            className={cn("size-9 shrink-0", controlClassName)}
+            className="size-9 shrink-0"
           >
             <X className="size-3.5" />
-          </Button>
+          </DishTagButton>
         </div>
       ) : null}
       {error ? (

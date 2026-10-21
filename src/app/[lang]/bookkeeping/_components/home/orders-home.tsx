@@ -14,7 +14,11 @@ import { bbqStore } from "@/lib/bbq/idb-store";
 import { summarizeOrdersByBusinessDay } from "@/lib/bbq/statistics";
 import type { Order } from "@/lib/bbq/types";
 import { errorMessage } from "../../_lib/errors";
-import { pageShellCls, pageTitleCls } from "../../_styles/layout";
+import {
+  BookkeepingPage,
+  BookkeepingTitle,
+} from "../shared/bookkeeping-layout";
+
 import { type HomeView, OrdersHomeTabs } from "./orders-home-tabs";
 import { OrdersList } from "./orders-list";
 
@@ -154,12 +158,12 @@ export function OrdersHome() {
       : [];
 
   return (
-    <div className={`${pageShellCls} overflow-hidden flex-1`}>
+    <BookkeepingPage className="overflow-hidden flex-1">
       <header className="flex shrink-0 flex-col gap-1.5">
         <div>
-          <h1 className={pageTitleCls}>
+          <BookkeepingTitle>
             <Trans>记露</Trans>
-          </h1>
+          </BookkeepingTitle>
           <p className="mt-1 text-xs text-muted-foreground">
             <Trans>我的日常账本</Trans>
           </p>
@@ -214,6 +218,6 @@ export function OrdersHome() {
           )}
         </motion.div>
       )}
-    </div>
+    </BookkeepingPage>
   );
 }

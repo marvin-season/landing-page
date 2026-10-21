@@ -34,17 +34,14 @@ import { formatYuan } from "@/lib/bbq/money";
 import { useOrderEditor } from "../../_hooks/use-order-editor";
 import { errorMessage } from "../../_lib/errors";
 import { settingsPath } from "../../_lib/paths";
-import { pageShellCls, pageTitleCls } from "../../_styles/layout";
-import {
-  editorCartPanelCls,
-  editorItemToolbarCls,
-  editorOrderBodyCls,
-  editorSectionCls,
-  editorWorkspaceCls,
-} from "../../_styles/order-editor-styles";
 import { DishRow } from "../menu/dish-row";
 import { ItemTagFilter } from "../menu/item-tags";
 import { MenuEditor } from "../menu/menu-editor";
+import {
+  BookkeepingCard,
+  BookkeepingPage,
+  BookkeepingTitle,
+} from "../shared/bookkeeping-layout";
 import { ItemEditViewport } from "../shared/item-edit-viewport";
 import { LocalLink as Link } from "../shared/local-link";
 import { SearchInput } from "../shared/search-input";
@@ -123,15 +120,15 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
   }
 
   return (
-    <div className={`${pageShellCls} min-h-0 overflow-hidden flex-1`}>
+    <BookkeepingPage className="min-h-0 overflow-hidden flex-1">
       <header className="flex shrink-0 flex-col gap-1">
-        <h1 className={pageTitleCls}>
+        <BookkeepingTitle>
           {order
             ? t`修改${groupingEnabled ? t`订单` : t`记录`} #${order.seq}`
             : groupingEnabled
               ? t`新建订单`
               : t`记一笔`}
-        </h1>
+        </BookkeepingTitle>
         <p className="text-xs text-muted-foreground leading-relaxed">
           {order
             ? `${formatShanghaiHm(new Date(order.openedAt))} ${groupingEnabled ? t`开单` : t`记账`}`
@@ -159,7 +156,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
         asChild
       >
         <fieldset
-          className={`${editorWorkspaceCls} min-w-0`}
+          className={`grid min-h-0 flex-1 overflow-hidden grid-rows-[minmax(0,1fr)_auto] min-w-0`}
           disabled={saving}
           aria-busy={saving}
         >
@@ -183,7 +180,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   scrollClassName="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-3 pb-3 h-full"
                 >
                   {groupingEnabled ? (
-                    <section className={editorSectionCls}>
+                    <BookkeepingCard variant="padded">
                       <div className="flex items-center gap-3">
                         <label
                           htmlFor="order-group"
@@ -248,7 +245,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           </Link>
                         </p>
                       ) : null}
-                    </section>
+                    </BookkeepingCard>
                   ) : null}
                   <Collapsible
                     variant="card"
@@ -296,7 +293,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                           <div className="p-2.5">
                             <div
                               ref={itemHeaderRef}
-                              className={editorItemToolbarCls}
+                              className="flex min-w-0 items-center gap-1.5 [&_[data-slot=input]]:h-9 [&_[data-slot=input]]:pr-9 [&_[data-slot=input]]:bg-muted/30 [&_[data-slot=input]]:placeholder:text-xs [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=select-trigger]]:w-24 [&_[data-slot=select-trigger]]:px-2 [&_[data-slot=select-trigger]]:text-xs [&_[data-slot=select-trigger]]:bg-transparent"
                             >
                               {dishes.length > 0 ? (
                                 <div className="min-w-0 flex-1 [&_[data-slot=button]]:size-9 [&_svg]:size-3.5">
@@ -381,7 +378,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
               />
             ) : null}
             <CollapsibleContent
-              className={editorCartPanelCls}
+              className="absolute inset-x-0 bottom-0 max-h-[92%] grid grid-rows-[auto_minmax(0,1fr)] rounded-t-2xl border border-b-0 border-border/60 bg-background shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom duration-200 motion-reduce:animate-none"
               onKeyDown={(event) => {
                 if (event.key === "Escape") setCartOpen(false);
               }}
@@ -411,7 +408,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   </span>
                 </Button>
               </CollapsibleTrigger>
-              <div className={editorOrderBodyCls}>
+              <div className="min-h-0 flex flex-col gap-3 overflow-y-auto overscroll-y-contain p-3">
                 <OrderLines
                   lines={lines}
                   groupingEnabled={groupingEnabled}
@@ -502,6 +499,6 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
           </div>
         </fieldset>
       </Collapsible>
-    </div>
+    </BookkeepingPage>
   );
 }

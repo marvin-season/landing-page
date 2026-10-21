@@ -14,8 +14,8 @@ import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
 import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
 import { homePath } from "../../_lib/paths";
-import { cls } from "../../_styles/layout";
 import { Companion } from "../companion/companion";
+import { BookkeepingTab } from "../shared/bookkeeping-tab";
 import { LocalLink as Link } from "../shared/local-link";
 import { type ChartMode, TrendChart } from "./trend-chart";
 
@@ -25,12 +25,6 @@ const chartCompanionMoods = {
   orders: "ponder",
   calories: "exercise",
 } as const;
-
-const chartModeCls = cls`
-  inline-flex items-center justify-center rounded-md px-3 text-xs font-medium
-  transition-colors flex-1 focus-visible:outline-none focus-visible:ring-1
-  focus-visible:ring-inset focus-visible:ring-primary/50 min-h-11
-`;
 
 export function OrdersStatistics({
   statistics,
@@ -127,38 +121,30 @@ export function OrdersStatistics({
             role="group"
             aria-label={t`趋势指标`}
           >
-            <button
+            <BookkeepingTab
+              variant="chart"
               type="button"
-              aria-pressed={chartMode === "revenue"}
-              className={`${chartModeCls} ${
-                chartMode === "revenue"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              selected={chartMode === "revenue"}
               onClick={() => setChartMode("revenue")}
             >
               <Trans>已完成金额</Trans>
-            </button>
-            <button
+            </BookkeepingTab>
+            <BookkeepingTab
+              variant="chart"
               type="button"
-              aria-pressed={chartMode === "orders"}
-              className={`${chartModeCls} ${
-                chartMode === "orders"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              selected={chartMode === "orders"}
               onClick={() => setChartMode("orders")}
             >
               <Trans>记录数</Trans>
-            </button>
-            <button
+            </BookkeepingTab>
+            <BookkeepingTab
+              variant="chart"
               type="button"
-              aria-pressed={chartMode === "calories"}
-              className={`${chartModeCls} ${chartMode === "calories" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+              selected={chartMode === "calories"}
               onClick={() => setChartMode("calories")}
             >
               <Trans>热量（kcal）</Trans>
-            </button>
+            </BookkeepingTab>
           </div>
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />

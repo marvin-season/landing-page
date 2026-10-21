@@ -11,9 +11,9 @@ import { Bookmark, Plus } from "lucide-react";
 import { type RefObject, useState } from "react";
 import { matchesTag, resolveTagFilter } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
-import { dishHintCls } from "../../_styles/dish-form-styles";
 import { Companion } from "../companion/companion";
 import { SearchInput } from "../shared/search-input";
+import { DishHint } from "./dish-form";
 import { DishRow } from "./dish-row";
 import { ItemTagFilter } from "./item-tags";
 import { MenuLoadStatus } from "./menu-load-status";
@@ -83,11 +83,11 @@ export function DishList({
           {addFormRequested ? (
             categoryId ? (
               <div className="p-3 border-t bg-muted/30 border-border/60">
-                <p className={dishHintCls}>
+                <DishHint>
                   <Trans>
                     热量按每单位填写：摄入填正数，消耗填负数，可留空
                   </Trans>
-                </p>
+                </DishHint>
                 <DishRow
                   key="new"
                   tags={tags}

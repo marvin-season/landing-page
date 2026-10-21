@@ -1,4 +1,5 @@
-import { Button, Input, Switch } from "@landing-page/design-system";
+import { Button, Switch } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ChevronDown,
@@ -15,18 +16,10 @@ import { DEFAULT_TAG, getDishTagIds } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
 import { errorMessage } from "../../_lib/errors";
 import {
-  dishFieldCls,
-  dishGridCls,
-  dishInputCls,
-  dishTagControlCls,
-  fieldLabelCls,
-  menuColorsCls,
-} from "../../_styles/dish-form-styles";
-import { cls } from "../../_styles/layout";
-import {
   ExpandingItemEditor,
   useItemEditSelection,
 } from "../shared/item-edit-viewport";
+import { DishField, DishFieldLabel, DishForm, DishInput } from "./dish-form";
 import { DishItem } from "./dish-item";
 import { ItemTagSelect } from "./item-tags";
 
@@ -305,12 +298,15 @@ export function DishRow({
 
   const actions = (
     <div
-      className={cls`col-span-2 flex min-w-0 items-center justify-between gap-2 flex-wrap ${isNew ? "pt-1" : ""}`}
+      className={cn(
+        "col-span-2 flex min-w-0 items-center justify-between gap-2 flex-wrap",
+        isNew ? "pt-1" : "",
+      )}
     >
       <div className="flex min-h-9 justify-start items-center gap-2 min-w-0 max-w-full">
-        <span className={fieldLabelCls}>
+        <DishFieldLabel>
           <Trans>启用</Trans>
-        </span>
+        </DishFieldLabel>
         <div className="flex items-center justify-center min-h-9 min-w-0">
           <Switch
             className="shadow-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:ring-offset-0"
@@ -344,97 +340,94 @@ export function DishRow({
   );
 
   const form = (
-    <fieldset
+    <DishForm
       disabled={pending !== null || tagPending}
       aria-busy={pending !== null || tagPending}
-      className={`${dishGridCls} ${menuColorsCls}`}
     >
-      <label className={`col-span-2 ${dishFieldCls}`}>
-        <span className={fieldLabelCls}>
+      <DishField className="col-span-2">
+        <DishFieldLabel>
           <Trans>名称</Trans>
-        </span>
-        <Input
+        </DishFieldLabel>
+        <DishInput
           ref={nameRef}
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className={dishInputCls}
           autoComplete="off"
           aria-label={t`项目名称`}
           placeholder={t`项目名称`}
         />
-      </label>
-      <div className={`col-span-2 ${dishFieldCls}`}>
-        <span className={fieldLabelCls}>
-          <Trans>标签</Trans>
-        </span>
-        <ItemTagSelect
-          inputClassName={dishInputCls}
-          controlClassName={dishTagControlCls}
-          tags={tags}
-          value={tagIds}
-          onChange={setTagIds}
-          onTagsChanged={onTagsChanged}
-          onPendingChange={setTagPending}
-          disabled={pending !== null}
-        />
-      </div>
-      <label className={dishFieldCls}>
-        <span className={fieldLabelCls}>
+      </DishField>
+      <DishField asChild className="col-span-2">
+        <div>
+          <DishFieldLabel>
+            <Trans>标签</Trans>
+          </DishFieldLabel>
+          <ItemTagSelect
+            tags={tags}
+            value={tagIds}
+            onChange={setTagIds}
+            onTagsChanged={onTagsChanged}
+            onPendingChange={setTagPending}
+            disabled={pending !== null}
+          />
+        </div>
+      </DishField>
+      <DishField>
+        <DishFieldLabel>
           <Trans>单价（选填）</Trans>
-        </span>
-        <Input
+        </DishFieldLabel>
+        <DishInput
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          className={`${dishInputCls} tabular-nums`}
+          className="tabular-nums"
           inputMode="decimal"
           autoComplete="off"
           aria-label={t`单价（选填，默认 0 元）`}
           placeholder="0"
         />
-      </label>
-      <label className={dishFieldCls}>
-        <span className={fieldLabelCls}>
+      </DishField>
+      <DishField>
+        <DishFieldLabel>
           <Trans>单位（选填）</Trans>
-        </span>
-        <Input
+        </DishFieldLabel>
+        <DishInput
           value={unit}
           onChange={(event) => setUnit(event.target.value)}
-          className={dishInputCls}
           autoComplete="off"
           aria-label={t`单位（选填，默认份）`}
           placeholder={t`份`}
         />
-      </label>
-      <label className={dishFieldCls}>
-        <span className={fieldLabelCls}>
+      </DishField>
+      <DishField>
+        <DishFieldLabel>
           <Trans>热量 kcal / 单位</Trans>
-        </span>
-        <Input
+        </DishFieldLabel>
+        <DishInput
           type="number"
           step="any"
           value={calories}
           onChange={(event) => setCalories(event.target.value)}
-          className={`${dishInputCls} tabular-nums`}
+          className="tabular-nums"
           autoComplete="off"
           aria-label={t`每单位热量（kcal，选填）`}
           placeholder="0"
         />
-      </label>
-      <label className={dishFieldCls}>
-        <span className={fieldLabelCls}>
+      </DishField>
+      <DishField>
+        <DishFieldLabel>
           <Trans>排序</Trans>
-        </span>
-        <Input
+        </DishFieldLabel>
+        <DishInput
           value={sort}
           onChange={(event) => setSort(event.target.value)}
-          className={`${dishInputCls} tabular-nums`}
+          className="tabular-nums"
           inputMode="numeric"
           autoComplete="off"
           aria-label={t`排序（数字越大越靠前）`}
           title={t`数字越大越靠前`}
           placeholder="0"
         />
-      </label>
+      </DishField>
       {isNew ? actions : null}
       {error ? (
         <p
@@ -444,7 +437,7 @@ export function DishRow({
           {error}
         </p>
       ) : null}
-    </fieldset>
+    </DishForm>
   );
 
   if (!dish) return form;

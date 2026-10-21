@@ -8,33 +8,20 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { ThemePicker } from "@/components/theme/theme-picker";
 import { useSettingsData } from "../../_hooks/use-settings-data";
-import { cls, pageShellCls, pageTitleCls } from "../../_styles/layout";
-import { settingsCardCls } from "../../_styles/settings-styles";
 import { Companion } from "../companion/companion";
 import { CompanionAlbumSettings } from "../companion/companion-album-settings";
 import { InstallButton } from "../pwa/install-button";
 import { OfflineStatus } from "../pwa/offline-status";
+import {
+  BookkeepingCard,
+  BookkeepingPage,
+  BookkeepingTitle,
+} from "../shared/bookkeeping-layout";
 import { BackupSettings } from "./backup-settings";
 import { CleanupSettings } from "./cleanup-settings";
 import { GroupingSettingsCard } from "./grouping-settings";
+import { SettingsGroupLabel, SettingsPreference } from "./settings-ui";
 import { SupportCard } from "./support-card";
-
-const groupLabelCls = cls`shrink-0 px-1 pt-3 text-xs font-medium text-muted-foreground first:pt-0`;
-const preferenceControlCls = cls`
-  shrink-0 [&>button]:min-h-8 [&>button]:min-w-16 [&>button]:rounded-md
-  [&>button]:border [&>button]:border-border/60 [&>button]:bg-muted/30
-  [&>button]:px-2 [&>button]:text-foreground [&>button:hover]:bg-muted/70 [&>button]:text-sm
-  [&>button:focus-visible]:ring-1 [&>button:focus-visible]:ring-primary/50
-`;
-const settingsHighlightCls = cls`
-  [&_[data-settings-section]]:scroll-mt-2
-  [&_[data-settings-section]]:transition-[border-color]
-  [&_[data-settings-section]]:duration-500
-  [&_[data-settings-section]>[data-slot=collapsible-trigger]]:transition-colors
-  [&_[data-settings-section]>[data-slot=collapsible-trigger]]:duration-500
-  [&_[data-settings-section][data-highlighted]]:border-primary/40
-  [&_[data-settings-section][data-highlighted]>[data-slot=collapsible-trigger]]:bg-primary/5
-`;
 
 export function Settings() {
   const { i18n } = useLingui();
@@ -70,12 +57,12 @@ export function Settings() {
   }, [section]);
 
   return (
-    <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
+    <BookkeepingPage className="min-h-0 flex-1 overflow-hidden">
       <header className="shrink-0">
         <div className="flex items-center gap-1.5">
-          <h1 className={pageTitleCls}>
+          <BookkeepingTitle>
             <Trans>设置</Trans>
-          </h1>
+          </BookkeepingTitle>
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
           <Trans>记录存在这台设备，记得定期备份。</Trans>
@@ -101,35 +88,35 @@ export function Settings() {
       <div
         ref={settingsRef}
         data-settings-viewport=""
-        className={cls`min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 ${settingsHighlightCls}`}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain flex flex-col gap-3 pb-3 [&_[data-settings-section]]:scroll-mt-2 [&_[data-settings-section]]:transition-[border-color] [&_[data-settings-section]]:duration-500 [&_[data-settings-section]>[data-slot=collapsible-trigger]]:transition-colors [&_[data-settings-section]>[data-slot=collapsible-trigger]]:duration-500 [&_[data-settings-section][data-highlighted]]:border-primary/40 [&_[data-settings-section][data-highlighted]>[data-slot=collapsible-trigger]]:bg-primary/5"
       >
-        <p className={groupLabelCls}>
+        <SettingsGroupLabel>
           <Trans>基础设置</Trans>
-        </p>
-        <section className={`${settingsCardCls} divide-y divide-border/60`}>
+        </SettingsGroupLabel>
+        <BookkeepingCard className="divide-y divide-border/60">
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
             <h2 className="flex items-center gap-1.5 text-sm font-medium">
               <Languages className="size-4 text-primary" aria-hidden="true" />
               <Trans>语言</Trans>
             </h2>
-            <div className={preferenceControlCls}>
+            <SettingsPreference>
               <LanguageSwitcher currentLang={i18n.locale} display="label" />
-            </div>
+            </SettingsPreference>
           </div>
           <div className="flex items-center justify-between gap-2 px-3 py-1.5">
             <h2 className="flex items-center gap-1.5 text-sm font-medium">
               <Palette className="size-4 text-primary" aria-hidden="true" />
               <Trans>主题</Trans>
             </h2>
-            <div className={preferenceControlCls}>
+            <SettingsPreference>
               <ThemePicker display="label" />
-            </div>
+            </SettingsPreference>
           </div>
-        </section>
+        </BookkeepingCard>
         <GroupingSettingsCard disabled={task !== null} />
-        <p className={groupLabelCls}>
+        <SettingsGroupLabel>
           <Trans>数据管理</Trans>
-        </p>
+        </SettingsGroupLabel>
         <CompanionAlbumSettings
           open={openSection === "companion-album"}
           onOpenChange={(open) =>
@@ -146,10 +133,10 @@ export function Settings() {
           onOpenChange={(open) => setOpenSection(open ? "cleanup" : null)}
           data={data}
         />
-        <p className={groupLabelCls}>
+        <SettingsGroupLabel>
           <Trans>其他</Trans>
-        </p>
-        <section className={`${settingsCardCls} p-3`}>
+        </SettingsGroupLabel>
+        <BookkeepingCard variant="padded">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <h2 className="flex items-center gap-2 text-sm font-medium">
@@ -169,9 +156,9 @@ export function Settings() {
             <InstallButton />
           </div>
           <OfflineStatus />
-        </section>
+        </BookkeepingCard>
         <SupportCard />
       </div>
-    </div>
+    </BookkeepingPage>
   );
 }

@@ -10,7 +10,7 @@ import { formatYuan } from "@/lib/bbq/money";
 import { DEFAULT_TAG, getDishTagIds } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
 import { formatCalories } from "../../_lib/i18n";
-import { cls } from "../../_styles/layout";
+
 import { ItemTagBadge } from "./item-tags";
 
 export function DishItem({
@@ -37,10 +37,15 @@ export function DishItem({
   const dishTags = dishTagIds.length
     ? tags.filter((tag) => dishTagIds.includes(tag.id))
     : [DEFAULT_TAG];
-  const itemCls = cls`flex w-full rounded-lg px-2.5 py-2 text-left text-sm bg-card min-w-0 items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5 group/dish`;
 
   return (
-    <article className={cn(itemCls, className)} data-selected={quantity > 0}>
+    <article
+      className={cn(
+        "flex w-full rounded-lg px-2.5 py-2 text-left text-sm bg-card min-w-0 items-start gap-2 border border-border/60 data-[selected=true]:border-primary/50 data-[selected=true]:bg-primary/5 group/dish",
+        className,
+      )}
+      data-selected={quantity > 0}
+    >
       <button
         type="button"
         className="min-w-0 flex-1 text-left min-h-11 cursor-pointer disabled:cursor-default"

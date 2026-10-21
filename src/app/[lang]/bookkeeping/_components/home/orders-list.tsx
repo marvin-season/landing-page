@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -18,26 +19,14 @@ import { formatYuan } from "@/lib/bbq/money";
 import type { Order } from "@/lib/bbq/types";
 import { formatCalories } from "../../_lib/i18n";
 import { newOrderPath } from "../../_lib/paths";
-import { cls, touchCls } from "../../_styles/layout";
 import { Companion } from "../companion/companion";
 import { OrderDetail } from "../order/order-detail";
+import { BookkeepingTab } from "../shared/bookkeeping-tab";
 import { LocalLink as Link } from "../shared/local-link";
 
 function statusLabel(i18n: I18n, status: Order["status"]): string {
   return status === "open" ? i18n._(msg`进行中`) : i18n._(msg`已完成`);
 }
-
-function orderTotalCls(status: Order["status"]): string {
-  const tone = status === "done" ? "text-muted-foreground" : "text-foreground";
-  return cls`text-base font-semibold tabular-nums ${tone} break-all sm:text-lg`;
-}
-
-const orderTabCls = cls`
-  inline-flex items-center justify-center gap-1.5 rounded-lg px-3 text-xs
-  font-medium transition-colors min-h-10 focus-visible:outline-none focus-visible:ring-2
-  focus-visible:ring-inset focus-visible:ring-primary/50
-  duration-150 active:bg-primary/10 touch-manipulation motion-reduce:transition-none
-`;
 
 export function OrdersList({
   orders,
@@ -110,30 +99,22 @@ export function OrdersList({
           role="group"
           aria-label={t`记录状态`}
         >
-          <button
+          <BookkeepingTab
+            variant="status"
             type="button"
-            aria-pressed={statusFilter === "open"}
-            className={`${orderTabCls} ${
-              statusFilter === "open"
-                ? "bg-background text-primary shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            selected={statusFilter === "open"}
             onClick={() => changeFilter("open")}
           >
             <Trans>进行中</Trans>
-          </button>
-          <button
+          </BookkeepingTab>
+          <BookkeepingTab
+            variant="status"
             type="button"
-            aria-pressed={statusFilter === "done"}
-            className={`${orderTabCls} ${
-              statusFilter === "done"
-                ? "bg-background text-primary shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            selected={statusFilter === "done"}
             onClick={() => changeFilter("done")}
           >
             <Trans>已完成</Trans>
-          </button>
+          </BookkeepingTab>
         </div>
       </div>
       <div
@@ -278,7 +259,7 @@ function OrderListItem({
         <button
           ref={summaryRef}
           type="button"
-          className={`${touchCls} w-full px-3 py-3 text-left transition-colors rounded-lg border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 duration-150 active:bg-primary/15 touch-manipulation motion-reduce:transition-none shrink-0 ${expanded ? "rounded-b-none border-transparent bg-primary/5 hover:bg-primary/5" : "border-transparent bg-card hover:bg-muted/70"}`}
+          className={`min-h-11 w-full px-3 py-3 text-left transition-colors rounded-lg border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 duration-150 active:bg-primary/15 touch-manipulation motion-reduce:transition-none shrink-0 ${expanded ? "rounded-b-none border-transparent bg-primary/5 hover:bg-primary/5" : "border-transparent bg-card hover:bg-muted/70"}`}
           aria-expanded={expanded}
           aria-controls={
             showDetail ? `bbq-order-detail-${order.id}` : undefined
@@ -371,7 +352,15 @@ function OrderSummary({
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2 max-w-[45%] text-right">
-        <p className={orderTotalCls(order.status)}>
+        <p
+          className={cn(
+            "text-base font-semibold tabular-nums",
+            order.status === "done"
+              ? "text-muted-foreground"
+              : "text-foreground",
+            "break-all sm:text-lg",
+          )}
+        >
           {formatYuan(order.totalCents)}
         </p>
         {showChevron ? (

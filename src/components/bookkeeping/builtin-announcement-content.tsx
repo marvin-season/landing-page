@@ -1,9 +1,9 @@
 "use client";
 
+import { cn as cls } from "@landing-page/utils";
 import type { ReactNode } from "react";
 import { LocalLink as Link } from "@/app/[lang]/bookkeeping/_components/shared/local-link";
 import { settingsPath } from "@/app/[lang]/bookkeeping/_lib/paths";
-import { cls } from "@/app/[lang]/bookkeeping/_styles/layout";
 
 const linkCls = cls`text-primary underline underline-offset-4 hover:text-primary/80`;
 

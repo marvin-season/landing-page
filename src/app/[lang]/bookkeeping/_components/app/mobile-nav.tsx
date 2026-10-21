@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@landing-page/utils";
 
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
@@ -13,7 +14,7 @@ import {
   newOrderPath,
   settingsPath,
 } from "../../_lib/paths";
-import { cls } from "../../_styles/layout";
+
 import { LocalLink as Link } from "../shared/local-link";
 
 const items = [
@@ -57,7 +58,11 @@ export function MobileNav() {
 
   return (
     <nav
-      className={cls`relative z-30 bg-background shrink-0 ${segment === "orders" ? "mt-0" : "mt-2"} border-t lg:border-t-0 lg:border-r lg:mt-0`}
+      className={cn(
+        "relative z-30 bg-background shrink-0",
+        segment === "orders" ? "mt-0" : "mt-2",
+        "border-t lg:border-t-0 lg:border-r lg:mt-0",
+      )}
     >
       <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2 lg:flex lg:flex-col lg:gap-4 lg:h-full">
         {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {

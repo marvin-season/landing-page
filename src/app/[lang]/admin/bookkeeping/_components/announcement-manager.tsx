@@ -12,12 +12,12 @@ import {
   Input,
   Switch,
 } from "@landing-page/design-system";
+import { cn as cls } from "@landing-page/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "ahooks";
 import { Pencil, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { cls } from "@/app/[lang]/bookkeeping/_styles/layout";
 import { AnnouncementTimeline } from "@/components/bookkeeping/announcement-timeline";
 import { Link } from "@/components/link/link";
 import { getBuiltinAnnouncements } from "@/lib/bookkeeping-announcements/builtin";
