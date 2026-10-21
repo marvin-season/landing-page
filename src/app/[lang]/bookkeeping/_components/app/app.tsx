@@ -8,8 +8,6 @@ import { Announcements } from "../announcements/announcements";
 import { OrdersHome } from "../home/orders-home";
 import { MenuEditor } from "../menu/menu-editor";
 import { OrderEditor } from "../order/order-editor";
-import { BackupReminder } from "../reminders/backup-reminder";
-import { CompanionAlbumReminder } from "../reminders/companion-album-reminder";
 import { Settings } from "../settings/settings";
 
 /** A single client shell lets new local record URLs work without a server round trip. */
@@ -51,11 +49,7 @@ export function App({ children }: PropsWithChildren) {
       ) : route.page === "settings" ? (
         <Settings />
       ) : (
-        <>
-          <BackupReminder />
-          <CompanionAlbumReminder />
-          <OrdersHome />
-        </>
+        <OrdersHome />
       )}
     </Fragment>
   );

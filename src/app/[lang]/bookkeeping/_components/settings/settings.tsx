@@ -14,7 +14,6 @@ import { Companion } from "../companion/companion";
 import { CompanionAlbumSettings } from "../companion/companion-album-settings";
 import { InstallButton } from "../pwa/install-button";
 import { OfflineStatus } from "../pwa/offline-status";
-import { LocalDataNotice } from "../reminders/local-data-notice";
 import { BackupSettings } from "./backup-settings";
 import { CleanupSettings } from "./cleanup-settings";
 import { GroupingSettingsCard } from "./grouping-settings";
@@ -67,7 +66,6 @@ export function Settings() {
 
   return (
     <div className={`${pageShellCls} min-h-0 flex-1 overflow-hidden`}>
-      <LocalDataNotice />
       <header className="shrink-0">
         <div className="flex items-center gap-1.5">
           <h1 className={pageTitleCls}>
