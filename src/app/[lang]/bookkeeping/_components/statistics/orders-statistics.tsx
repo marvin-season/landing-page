@@ -1,22 +1,19 @@
 "use client";
 import {
   Collapsible,
+  CollapsibleChevron,
   CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
   CollapsibleTrigger,
 } from "@landing-page/design-system";
 import type { I18n } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
 import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
 import { homePath } from "../../_lib/paths";
-import {
-  collapsibleChevronCls,
-  collapsibleContentCls,
-  collapsibleTriggerCls,
-} from "../../_styles/collapsible-styles";
 import { cls } from "../../_styles/layout";
 import { Companion } from "../companion/companion";
 import { LocalLink as Link } from "../shared/local-link";
@@ -166,21 +163,19 @@ export function OrdersStatistics({
         </div>
         <TrendChart statistics={statistics} mode={chartMode} />
         <Collapsible className="px-3 pb-3 text-xs text-muted-foreground">
-          <CollapsibleTrigger className={collapsibleTriggerCls}>
-            <span className="min-w-0 flex-1">
+          <CollapsibleTrigger variant="default">
+            <CollapsibleTitle>
               <Trans>金额和热量怎么算？</Trans>
-            </span>
-            <ChevronDown className={collapsibleChevronCls} aria-hidden="true" />
+            </CollapsibleTitle>
+            <CollapsibleChevron />
           </CollapsibleTrigger>
-          <CollapsibleContent forceMount className={collapsibleContentCls}>
-            <div className="min-h-0 overflow-clip">
-              <p className="pt-2 leading-relaxed px-2.5">
-                <Trans>
-                  金额与热量仅统计已完成记录；热量按每单位 ×
-                  数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
-                </Trans>
-              </p>
-            </div>
+          <CollapsibleContent variant="collapse">
+            <p className="pt-2 leading-relaxed px-2.5">
+              <Trans>
+                金额与热量仅统计已完成记录；热量按每单位 ×
+                数量汇总，正数为摄入、负数为消耗，合计为净热量；未填写的项目不计入，含缺失项时标记“部分”。
+              </Trans>
+            </p>
           </CollapsibleContent>
         </Collapsible>
         <Collapsible
@@ -190,83 +185,81 @@ export function OrdersStatistics({
             if (open) setPeriodsRequested(true);
           }}
         >
-          <CollapsibleTrigger className={collapsibleTriggerCls}>
-            <span className="text-sm font-medium text-foreground flex-1">
+          <CollapsibleTrigger variant="default">
+            <CollapsibleTitle>
               <Trans>时段明细</Trans>
-            </span>
-            <span className="text-xs text-muted-foreground">
+            </CollapsibleTitle>
+            <CollapsibleDescription>
               <Trans>最近时段在前</Trans>
-            </span>
-            <ChevronDown className={collapsibleChevronCls} aria-hidden="true" />
+            </CollapsibleDescription>
+            <CollapsibleChevron />
           </CollapsibleTrigger>
-          <CollapsibleContent forceMount className={collapsibleContentCls}>
-            <div className="min-h-0 overflow-clip">
-              {periodsRequested ? (
-                <ul className="divide-y px-3">
-                  {statistics.toReversed().map((item) => (
-                    <li key={item.businessDayKey} className="py-3">
-                      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                        <Link
-                          href={homePath(item.businessDayKey)}
-                          onNavigate={onSelectDay}
-                          className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                        >
-                          {item.businessDayKey.slice(0, 10)}
-                          <span className="text-xs">
-                            <Trans>查看记录 →</Trans>
-                          </span>
-                        </Link>
-                        <span className="text-xs text-muted-foreground">
-                          {item.businessDayKey.endsWith("#off")
-                            ? t`休息时段`
-                            : t`记账时段`}
-                        </span>
-                      </div>
-                      <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
-                        <div className="min-w-0">
-                          <dt className="text-muted-foreground">
-                            <Trans>记录</Trans>
-                          </dt>
-                          <dd className="mt-0.5 tabular-nums text-foreground">
-                            <Trans>{item.orderCount} 条</Trans>
-                          </dd>
-                        </div>
-                        <div className="min-w-0">
-                          <dt className="text-muted-foreground">
-                            <Trans>已完成</Trans>
-                          </dt>
-                          <dd className="mt-0.5 tabular-nums text-foreground">
-                            <Trans>{item.settledOrderCount} 条</Trans>
-                          </dd>
-                        </div>
-                        <div className="min-w-0 text-right">
-                          <dt className="text-muted-foreground">
-                            <Trans>已完成金额</Trans>
-                          </dt>
-                          <dd
-                            className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground"
-                            title={formatYuan(item.settledTotalCents)}
-                          >
-                            {formatStatisticYuan(i18n, item.settledTotalCents)}
-                          </dd>
-                        </div>
-                      </dl>
-                      <p
-                        className="mt-2 text-xs tabular-nums text-muted-foreground"
-                        title={formatCalories(i18n, item.settledCalories)}
+          <CollapsibleContent variant="collapse">
+            {periodsRequested ? (
+              <ul className="divide-y px-3">
+                {statistics.toReversed().map((item) => (
+                  <li key={item.businessDayKey} className="py-3">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                      <Link
+                        href={homePath(item.businessDayKey)}
+                        onNavigate={onSelectDay}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                       >
-                        <Trans>
-                          已完成热量{" "}
-                          {formatCalories(i18n, item.settledCalories, {
-                            compact: true,
-                          })}
-                        </Trans>
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
+                        {item.businessDayKey.slice(0, 10)}
+                        <span className="text-xs">
+                          <Trans>查看记录 →</Trans>
+                        </span>
+                      </Link>
+                      <span className="text-xs text-muted-foreground">
+                        {item.businessDayKey.endsWith("#off")
+                          ? t`休息时段`
+                          : t`记账时段`}
+                      </span>
+                    </div>
+                    <dl className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)] gap-2 text-xs">
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground">
+                          <Trans>记录</Trans>
+                        </dt>
+                        <dd className="mt-0.5 tabular-nums text-foreground">
+                          <Trans>{item.orderCount} 条</Trans>
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground">
+                          <Trans>已完成</Trans>
+                        </dt>
+                        <dd className="mt-0.5 tabular-nums text-foreground">
+                          <Trans>{item.settledOrderCount} 条</Trans>
+                        </dd>
+                      </div>
+                      <div className="min-w-0 text-right">
+                        <dt className="text-muted-foreground">
+                          <Trans>已完成金额</Trans>
+                        </dt>
+                        <dd
+                          className="mt-0.5 break-all text-sm font-semibold tabular-nums text-foreground"
+                          title={formatYuan(item.settledTotalCents)}
+                        >
+                          {formatStatisticYuan(i18n, item.settledTotalCents)}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p
+                      className="mt-2 text-xs tabular-nums text-muted-foreground"
+                      title={formatCalories(i18n, item.settledCalories)}
+                    >
+                      <Trans>
+                        已完成热量{" "}
+                        {formatCalories(i18n, item.settledCalories, {
+                          compact: true,
+                        })}
+                      </Trans>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </CollapsibleContent>
         </Collapsible>
       </section>

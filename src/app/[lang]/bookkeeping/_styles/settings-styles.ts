@@ -6,11 +6,6 @@ export const settingsCardCls = cls`
   text-card-foreground shadow-none
 `;
 
-export const settingsCollapsibleCls = cls(
-  settingsCardCls,
-  cls`overflow-visible data-[state=open]:z-40 [&>[data-slot=collapsible-trigger]]:rounded-xl`,
-);
-
 export const settingsActionCls = cls`
   min-h-11 w-full justify-center rounded-lg px-3 text-sm shadow-none
   hover:bg-muted/70 hover:shadow-none focus-visible:ring-inset

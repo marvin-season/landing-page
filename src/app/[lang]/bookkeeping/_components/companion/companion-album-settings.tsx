@@ -4,7 +4,10 @@ import {
   AlertDescription,
   Button,
   Collapsible,
+  CollapsibleChevron,
   CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
   CollapsibleTrigger,
   Select,
   SelectContent,
@@ -15,7 +18,7 @@ import {
 } from "@landing-page/design-system";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDown, FileDown, FileUp, Images, Trash2 } from "lucide-react";
+import { FileDown, FileUp, Images, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import {
   blobDataUrl,
@@ -31,12 +34,6 @@ import {
   saveCompanion,
 } from "@/lib/bbq/companion-album-store";
 import { prepareCompanion } from "@/lib/bbq/companion-image";
-import {
-  collapsibleChevronCls,
-  collapsibleContentCls,
-  collapsibleFlushTriggerCls,
-} from "../../_styles/collapsible-styles";
-import { settingsCollapsibleCls } from "../../_styles/settings-styles";
 import { Companion } from "./companion";
 import { useCompanionAlbum } from "./companion-album-provider";
 
@@ -163,209 +160,204 @@ export function CompanionAlbumSettings({
       data-settings-section="companion-album"
       open={open}
       onOpenChange={onOpenChange}
-      className={settingsCollapsibleCls}
+      variant="card"
     >
-      <CollapsibleTrigger className={collapsibleFlushTriggerCls}>
-        <Images className="size-4 text-primary" aria-hidden="true" />
-        <span className="min-w-0 flex-1">
+      <CollapsibleTrigger variant="flush">
+        <Images data-icon="inline-start" aria-hidden="true" />
+        <CollapsibleTitle>
           <Trans>自定义图集</Trans>
-        </span>
-        <span className="text-xs text-muted-foreground" role="status">
+        </CollapsibleTitle>
+        <CollapsibleDescription role="status">
           {loading
             ? t`读取图集中…`
             : t`已配置 ${configuredCount} / ${sceneCount} 个场景`}
-        </span>
-        <ChevronDown className={collapsibleChevronCls} aria-hidden="true" />
+        </CollapsibleDescription>
+        <CollapsibleChevron />
       </CollapsibleTrigger>
-      <CollapsibleContent forceMount className={collapsibleContentCls}>
-        <div className="min-h-0 overflow-clip">
-          <fieldset
-            disabled={busy || loading || error}
-            aria-busy={busy}
-            className="flex min-w-0 flex-col gap-2 p-3 border-t border-border/60 [&_[data-icon]]:size-3.5 [&_[data-icon]]:shrink-0"
-          >
-            <legend className="sr-only">
-              <Trans>自定义图集</Trans>
-            </legend>
-            <div className="grid grid-cols-2 gap-2 mb-1">
-              <Button
-                type="button"
-                variant="subtle"
-                size="sm"
-                className="h-9 min-w-0 rounded-lg px-3"
-                onClick={() => albumInput.current?.click()}
-              >
-                <FileUp data-icon="inline-start" />
-                <Trans>一键导入图集</Trans>
-              </Button>
+      <CollapsibleContent variant="collapse">
+        <fieldset
+          disabled={busy || loading || error}
+          aria-busy={busy}
+          className="flex min-w-0 flex-col gap-2 p-3 border-t border-border/60 [&_[data-icon]]:size-3.5 [&_[data-icon]]:shrink-0"
+        >
+          <legend className="sr-only">
+            <Trans>自定义图集</Trans>
+          </legend>
+          <div className="grid grid-cols-2 gap-2 mb-1">
+            <Button
+              type="button"
+              variant="subtle"
+              size="sm"
+              className="h-9 min-w-0 rounded-lg px-3"
+              onClick={() => albumInput.current?.click()}
+            >
+              <FileUp data-icon="inline-start" />
+              <Trans>一键导入图集</Trans>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-9 min-w-0 rounded-lg px-3"
+              disabled={!configuredCount}
+              onClick={() => void exportAlbum()}
+            >
+              <FileDown data-icon="inline-start" />
+              <Trans>导出图集</Trans>
+            </Button>
+            <a
+              href="https://github.com/marvin-season/landing-page/releases/download/luji-companions-v1/luji-companions.json"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="col-span-2 w-fit justify-self-end text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              <Trans>下载示例图集</Trans>
+            </a>
+          </div>
+          <label className="flex flex-col gap-1.5 text-xs">
+            <Trans>选择要更换图片的位置</Trans>
+            <Select
+              value={mood}
+              onValueChange={(value) => setMood(value as SelectableMood)}
+              disabled={busy || loading || error}
+            >
+              <SelectTrigger size="sm" className="w-full min-w-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {selectableMoods.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {i18n._(moodLabels[id])}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </label>
+          <div className="flex min-h-14 items-center gap-2">
+            {images[mood] ? (
+              <Companion mood={mood} className="block size-14 shrink-0" />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                <Trans>此场景暂无图片</Trans>
+              </p>
+            )}
+            <div className="ml-auto flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-9 min-w-0 rounded-lg px-3"
-                disabled={!configuredCount}
-                onClick={() => void exportAlbum()}
+                onClick={() => imageInput.current?.click()}
               >
-                <FileDown data-icon="inline-start" />
-                <Trans>导出图集</Trans>
+                <Trans>上传 / 替换</Trans>
               </Button>
-              <a
-                href="https://github.com/marvin-season/landing-page/releases/download/luji-companions-v1/luji-companions.json"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="col-span-2 w-fit justify-self-end text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
-              >
-                <Trans>下载示例图集</Trans>
-              </a>
-            </div>
-            <label className="flex flex-col gap-1.5 text-xs">
-              <Trans>选择要更换图片的位置</Trans>
-              <Select
-                value={mood}
-                onValueChange={(value) => setMood(value as SelectableMood)}
-                disabled={busy || loading || error}
-              >
-                <SelectTrigger size="sm" className="w-full min-w-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {selectableMoods.map((id) => (
-                      <SelectItem key={id} value={id}>
-                        {i18n._(moodLabels[id])}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </label>
-            <div className="flex min-h-14 items-center gap-2">
-              {images[mood] ? (
-                <Companion mood={mood} className="block size-14 shrink-0" />
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  <Trans>此场景暂无图片</Trans>
-                </p>
-              )}
-              <div className="ml-auto flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => imageInput.current?.click()}
-                >
-                  <Trans>上传 / 替换</Trans>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={!images[mood]}
-                  onClick={() => {
-                    if (
-                      !window.confirm(
-                        t`移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。`,
-                      )
-                    )
-                      return;
-                    void run(
-                      () => companionImages.delete(mood),
-                      t`场景图片已移除。`,
-                    );
-                  }}
-                >
-                  <Trans>移除</Trans>
-                </Button>
-              </div>
-            </div>
-            <div className="flex items-start justify-between gap-2">
-              <details className="min-w-0 flex-1 text-xs text-muted-foreground">
-                <summary className="w-fit cursor-pointer py-2">
-                  <Trans>图集说明</Trans>
-                </summary>
-                <div className="flex flex-col gap-1.5 pb-1">
-                  <p>
-                    <Trans>
-                      约 23 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。
-                    </Trans>
-                  </p>
-                  <p>
-                    <Trans>
-                      导入记露图集 JSON（最大 100
-                      MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大
-                      12 MB）。
-                    </Trans>
-                  </p>
-                  <p>
-                    <Trans>
-                      未上传的场景不显示配图。图片仅保存在当前浏览器，不会上传到服务器；换设备请单独导出图集，账本备份不包含图集。
-                    </Trans>
-                  </p>
-                </div>
-              </details>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                disabled={!count}
+                disabled={!images[mood]}
                 onClick={() => {
                   if (
-                    window.confirm(
-                      t`清空本机图集？所有场景将留空，账目不受影响。`,
+                    !window.confirm(
+                      t`移除这张配图？所有使用这张图片的位置将不再显示配图，账目不受影响。`,
                     )
                   )
-                    void run(() => companionImages.clear(), t`图集已清空。`);
+                    return;
+                  void run(
+                    () => companionImages.delete(mood),
+                    t`场景图片已移除。`,
+                  );
                 }}
               >
-                <Trash2 data-icon="inline-start" />
-                <Trans>清空图集</Trans>
+                <Trans>移除</Trans>
               </Button>
             </div>
-            <input
-              ref={albumInput}
-              type="file"
-              accept=".json,application/json"
-              className="sr-only"
-              aria-label={t`一键导入图集`}
-              onChange={(event) => {
-                const file = event.currentTarget.files?.[0];
-                event.currentTarget.value = "";
-                void importAlbum(file);
+          </div>
+          <div className="flex items-start justify-between gap-2">
+            <details className="min-w-0 flex-1 text-xs text-muted-foreground">
+              <summary className="w-fit cursor-pointer py-2">
+                <Trans>图集说明</Trans>
+              </summary>
+              <div className="flex flex-col gap-1.5 pb-1">
+                <p>
+                  <Trans>
+                    约 23 MB。下载后点击“一键导入图集”，选择下载的 JSON 文件。
+                  </Trans>
+                </p>
+                <p>
+                  <Trans>
+                    导入记露图集 JSON（最大 100
+                    MB），或选择场景上传自己的图片（GIF、PNG、JPEG、WebP，单张最大
+                    12 MB）。
+                  </Trans>
+                </p>
+                <p>
+                  <Trans>
+                    未上传的场景不显示配图。图片仅保存在当前浏览器，不会上传到服务器；换设备请单独导出图集，账本备份不包含图集。
+                  </Trans>
+                </p>
+              </div>
+            </details>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={!count}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    t`清空本机图集？所有场景将留空，账目不受影响。`,
+                  )
+                )
+                  void run(() => companionImages.clear(), t`图集已清空。`);
               }}
-            />
-            <input
-              ref={imageInput}
-              type="file"
-              accept="image/gif,image/png,image/jpeg,image/webp"
-              className="sr-only"
-              aria-label={t`上传场景图片`}
-              onChange={(event) => {
-                const file = event.currentTarget.files?.[0];
-                event.currentTarget.value = "";
-                void uploadImage(file);
-              }}
-            />
-            {busy ? (
-              <p className="text-xs text-muted-foreground" role="status">
-                <Trans>正在处理图集…</Trans>
-              </p>
-            ) : null}
-          </fieldset>
-          {error || failed ? (
-            <Alert className="border-destructive/30 bg-destructive/5">
-              <AlertDescription className="text-destructive">
-                {error ? t`无法读取本机图集，请检查浏览器存储权限。` : message}
-              </AlertDescription>
-            </Alert>
-          ) : message ? (
-            <p
-              className="px-3 pb-3 text-xs text-muted-foreground"
-              role="status"
             >
-              {message}
+              <Trash2 data-icon="inline-start" />
+              <Trans>清空图集</Trans>
+            </Button>
+          </div>
+          <input
+            ref={albumInput}
+            type="file"
+            accept=".json,application/json"
+            className="sr-only"
+            aria-label={t`一键导入图集`}
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              event.currentTarget.value = "";
+              void importAlbum(file);
+            }}
+          />
+          <input
+            ref={imageInput}
+            type="file"
+            accept="image/gif,image/png,image/jpeg,image/webp"
+            className="sr-only"
+            aria-label={t`上传场景图片`}
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              event.currentTarget.value = "";
+              void uploadImage(file);
+            }}
+          />
+          {busy ? (
+            <p className="text-xs text-muted-foreground" role="status">
+              <Trans>正在处理图集…</Trans>
             </p>
           ) : null}
-        </div>
+        </fieldset>
+        {error || failed ? (
+          <Alert className="border-destructive/30 bg-destructive/5">
+            <AlertDescription className="text-destructive">
+              {error ? t`无法读取本机图集，请检查浏览器存储权限。` : message}
+            </AlertDescription>
+          </Alert>
+        ) : message ? (
+          <p className="px-3 pb-3 text-xs text-muted-foreground" role="status">
+            {message}
+          </p>
+        ) : null}
       </CollapsibleContent>
     </Collapsible>
   );

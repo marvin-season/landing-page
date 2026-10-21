@@ -6,10 +6,6 @@ export const editorWorkspaceCls = cls`
   grid-rows-[minmax(0,1fr)_auto]
 `;
 
-export const editorMenuPaneCls = cls`
-  min-h-0 min-w-0 ${settingsCardCls}
-`;
-
 export const editorItemToolbarCls = cls`
   flex min-w-0 items-center gap-1.5
   [&_[data-slot=input]]:h-9 [&_[data-slot=input]]:pr-9

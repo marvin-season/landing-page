@@ -12,7 +12,11 @@ export {
 } from "./card";
 export {
   Collapsible,
+  CollapsibleBackdrop,
+  CollapsibleChevron,
   CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
   CollapsibleTrigger,
 } from "./collapsible";
 export {

@@ -4,18 +4,18 @@ import {
   Alert,
   AlertDescription,
   Collapsible,
+  CollapsibleBackdrop,
+  CollapsibleChevron,
   CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
   CollapsibleTrigger,
 } from "@landing-page/design-system";
 import { Trans } from "@lingui/react/macro";
-import { ChevronDown, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import type { ItemTag } from "@/lib/bbq/types";
 import { useMenuData } from "../../_hooks/use-menu-data";
-import {
-  collapsibleChevronCls,
-  collapsibleFlushTriggerCls,
-} from "../../_styles/collapsible-styles";
 import { dishHintCls, menuColorsCls } from "../../_styles/dish-form-styles";
 import { cls, pageTitleCls } from "../../_styles/layout";
 import { Companion } from "../companion/companion";
@@ -79,47 +79,27 @@ export function MenuEditor({
           }
         }}
       >
-        <CollapsibleTrigger
-          ref={triggerRef}
-          className={cls`${collapsibleFlushTriggerCls} relative z-30 h-14 w-full justify-start gap-2 rounded-xl border border-border/60 bg-card/85 px-3 py-2 text-sm shadow-none backdrop-blur-xl hover:bg-card/90 hover:shadow-none`}
-        >
-          <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />
-          <span className="min-w-0 flex-1 text-left">
+        <CollapsibleTrigger ref={triggerRef} variant="floating">
+          <Plus data-icon="inline-start" aria-hidden="true" />
+          <CollapsibleTitle>
             <Trans>添加常用项目</Trans>
-          </span>
+          </CollapsibleTitle>
           {adding ? (
-            <span className="text-xs font-normal text-muted-foreground">
+            <CollapsibleDescription>
               <Trans>收起</Trans>
-            </span>
+            </CollapsibleDescription>
           ) : (
             <Companion mood="chef" className="block size-8 shrink-0" />
           )}
-          <ChevronDown className={collapsibleChevronCls} aria-hidden="true" />
+          <CollapsibleChevron />
         </CollapsibleTrigger>
-        <button
-          type="button"
-          className={cls`absolute inset-0 z-20 bg-background/40 backdrop-blur-xs transition-opacity duration-200 ease-out motion-reduce:transition-none ${adding ? "opacity-100" : "pointer-events-none opacity-0"}`}
-          tabIndex={-1}
-          aria-hidden="true"
+        <CollapsibleBackdrop
           inert={!adding}
-          onClick={() => {
-            changeAdding(false);
-            triggerRef.current?.focus();
-          }}
+          onClick={() => triggerRef.current?.focus()}
         />
         {/* 定位到记账内容区，始终只为入口占位；表单收起后保留输入。 */}
         <div className="absolute inset-x-0 top-16 bottom-2 z-30 overflow-clip pointer-events-none">
-          <CollapsibleContent
-            forceMount
-            inert={!adding}
-            className={cls`
-            min-h-0 max-h-full overflow-y-auto overscroll-y-contain pointer-events-auto
-            rounded-xl border border-border/60 bg-card/85 shadow-lg backdrop-blur-xl
-            transition-[translate,opacity,visibility] duration-200! ease-out motion-reduce:transition-none
-            data-[state=closed]:-translate-y-full data-[state=closed]:invisible p-3
-            data-[state=closed]:opacity-0
-          `}
-          >
+          <CollapsibleContent variant="floating" inert={!adding}>
             {notice && !message ? (
               <p className="mb-3 text-sm text-primary" role="status">
                 {notice}
