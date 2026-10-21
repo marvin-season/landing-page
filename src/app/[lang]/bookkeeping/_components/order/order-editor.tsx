@@ -177,7 +177,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                 <ItemEditViewport
                   headerRef={itemHeaderRef}
                   className="flex-1"
-                  scrollClassName="min-h-0 overflow-y-auto overscroll-y-contain scroll-py-3 flex flex-col gap-3 pb-3 h-full"
+                  scrollClassName="min-h-0 overflow-hidden flex flex-col gap-3 pb-3 h-full"
                 >
                   {groupingEnabled ? (
                     <BookkeepingCard variant="padded">
@@ -249,11 +249,14 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                   ) : null}
                   <Collapsible
                     variant="card"
-                    className="min-h-0 min-w-0"
+                    className="min-h-0 min-w-0 flex flex-col shrink"
                     open={menuOpen}
                     onOpenChange={(open) => setMenuOpen(open)}
                   >
-                    <CollapsibleTrigger variant="flush">
+                    <CollapsibleTrigger
+                      variant="flush"
+                      className="shrink-0 border-border/60 data-[state=open]:border-b data-[state=open]:rounded-b-none"
+                    >
                       <Plus data-icon="inline-start" aria-hidden="true" />
                       <CollapsibleTitle className="truncate">
                         <Trans>选择项目</Trans>
@@ -267,8 +270,11 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       </CollapsibleDescription>
                       <CollapsibleChevron />
                     </CollapsibleTrigger>
-                    <CollapsibleContent variant="collapse">
-                      <div className="border-t border-border/60">
+                    <CollapsibleContent
+                      variant="collapse"
+                      className="min-h-0 [&>[data-slot=collapsible-body]]:overflow-y-auto [&>[data-slot=collapsible-body]]:overscroll-y-contain [&>[data-slot=collapsible-body]]:scroll-py-3 [&>[data-slot=collapsible-body]]:[scrollbar-gutter:stable]"
+                    >
+                      <div>
                         {menuPhase === "loading" ? (
                           <p
                             className="py-8 text-center text-sm text-muted-foreground"
