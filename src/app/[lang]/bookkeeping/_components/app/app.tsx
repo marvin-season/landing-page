@@ -2,7 +2,7 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { usePathname } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, type PropsWithChildren, useEffect, useState } from "react";
 import { readBookkeepingRoute } from "@/lib/bookkeeping-pwa/routes";
 import { Announcements } from "../announcements/announcements";
 import { OrdersHome } from "../home/orders-home";
@@ -11,8 +11,8 @@ import { OrderEditor } from "../order/order-editor";
 import { Settings } from "../settings/settings";
 import { Tools } from "../tools/tools";
 
-/** Only the cached offline document resolves local pages without a server. */
-export function OfflineApp() {
+/** A single client shell lets new local record URLs work without a server round trip. */
+export function App({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { t } = useLingui();
   const [mounted, setMounted] = useState(false);
@@ -37,9 +37,9 @@ export function OfflineApp() {
     document.title = title;
   }, [title]);
 
-  // The cached document has no record-specific content. Wait for hydration
-  // before resolving the actual URL at which the worker served this fallback.
-  if (!mounted || !route) return null;
+  // Preserve server HTML on initial hydration, including when SW serves the shell
+  // at a different URL. Existing server pages still provide metadata and SSR.
+  if (!mounted || !route) return children;
 
   return (
     <Fragment key={pathname}>
