@@ -12,8 +12,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { formatYuan } from "@/lib/bbq/money";
 import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
-import { homePath } from "../../_lib/paths";
 import { Companion } from "../companion/companion";
 import { BookkeepingTab } from "../shared/bookkeeping-tab";
 import { LocalLink as Link } from "../shared/local-link";
@@ -187,7 +187,7 @@ export function OrdersStatistics({
                   <li key={item.businessDayKey} className="py-3">
                     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                       <Link
-                        href={homePath(item.businessDayKey)}
+                        href={bookkeepingPath("", { day: item.businessDayKey })}
                         onNavigate={onSelectDay}
                         className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium tabular-nums text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                       >

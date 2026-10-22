@@ -17,8 +17,8 @@ import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import type { Order } from "@/lib/bbq/types";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { formatCalories } from "../../_lib/i18n";
-import { newOrderPath } from "../../_lib/paths";
 import { Companion } from "../companion/companion";
 import { OrderDetail } from "../order/order-detail";
 import { BookkeepingTab } from "../shared/bookkeeping-tab";
@@ -143,7 +143,7 @@ export function OrdersList({
             </p>
             {statusFilter === "open" && canCreateOrder ? (
               <Button asChild className="mt-4">
-                <Link href={newOrderPath()}>
+                <Link href={bookkeepingPath("orders/new")}>
                   <Plus className="size-4" aria-hidden="true" />
                   <Trans>记一笔</Trans>
                 </Link>

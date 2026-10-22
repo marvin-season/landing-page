@@ -1,43 +1,14 @@
 "use client";
 import { cn } from "@landing-page/utils";
 
-import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 
-import { BookOpen, NotebookPen, Settings, Wrench } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isBusinessHours } from "@/lib/bbq/business-day";
-import {
-  homePath,
-  newOrderPath,
-  settingsPath,
-  toolsPath,
-} from "../../_lib/paths";
 
 import { LocalLink as Link } from "../shared/local-link";
-
-const items = [
-  { label: msg`账本`, href: homePath(), segment: null, icon: BookOpen },
-  {
-    label: msg`记一笔`,
-    href: newOrderPath(),
-    segment: "orders",
-    icon: NotebookPen,
-  },
-  {
-    label: msg`工具`,
-    href: toolsPath(),
-    segment: "tools",
-    icon: Wrench,
-  },
-  {
-    label: msg`设置`,
-    href: settingsPath(),
-    segment: "settings",
-    icon: Settings,
-  },
-];
+import { bookkeepingNavigationItems } from "./navigation-config";
 
 export function MobileNav() {
   const { t, i18n } = useLingui();
@@ -65,34 +36,42 @@ export function MobileNav() {
       )}
     >
       <div className="mx-auto grid grid-cols-4 gap-1 py-1.5 px-2 lg:flex lg:flex-col lg:gap-4 lg:h-full">
-        {items.map(({ label, href, segment: itemSegment, icon: Icon }) => {
-          const active = segment === itemSegment;
-          const disabled = itemSegment === "orders" && !canCreate && !active;
+        {bookkeepingNavigationItems.map(
+          ({
+            label,
+            href,
+            segment: itemSegment,
+            icon: Icon,
+            requiresBusinessHours,
+          }) => {
+            const active = segment === itemSegment;
+            const disabled = requiresBusinessHours && !canCreate && !active;
 
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs 
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-xs
                 font-medium text-muted-foreground transition-colors hover:bg-muted/70 lg:flex-row lg:items-center lg:justify-start lg:px-4
                 aria-disabled:opacity-40 touch-manipulation aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary`}
-              aria-current={active ? "page" : undefined}
-              aria-disabled={disabled || undefined}
-              title={disabled ? t`当前为休息时段，06:00 后可记账` : undefined}
-              onClick={(event) => {
-                // 当前模块不重复跳转，避免点中记账导航时清空正在编辑的记录。
-                if (active || disabled) event.preventDefault();
-              }}
-            >
-              <Icon className="size-5" aria-hidden="true" />
-              <span>
-                {disabled && canCreate === false
-                  ? t`记账·休息中`
-                  : i18n._(label)}
-              </span>
-            </Link>
-          );
-        })}
+                aria-current={active ? "page" : undefined}
+                aria-disabled={disabled || undefined}
+                title={disabled ? t`当前为休息时段，06:00 后可记账` : undefined}
+                onClick={(event) => {
+                  // 当前模块不重复跳转，避免点中记账导航时清空正在编辑的记录。
+                  if (active || disabled) event.preventDefault();
+                }}
+              >
+                <Icon className="size-5" aria-hidden="true" />
+                <span>
+                  {disabled && canCreate === false
+                    ? t`记账·休息中`
+                    : i18n._(label)}
+                </span>
+              </Link>
+            );
+          },
+        )}
       </div>
     </nav>
   );

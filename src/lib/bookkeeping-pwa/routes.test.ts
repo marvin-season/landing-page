@@ -1,17 +1,60 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { canNavigateBookkeepingLocally, readBookkeepingRoute } from "./routes";
+import {
+  bookkeepingPath,
+  canNavigateBookkeepingLocally,
+  readBookkeepingRoute,
+} from "./routes";
+
+test("navigation paths round-trip for all pages and preserve encoded parameters", () => {
+  assert.equal(bookkeepingPath(), "/bookkeeping");
+  for (const page of [
+    "",
+    "menu",
+    "settings",
+    "announcements",
+    "tools",
+    "orders/new",
+  ]) {
+    assert.deepEqual(readBookkeepingRoute(`/zh${bookkeepingPath(page)}`), {
+      locale: "zh",
+      page,
+    });
+  }
+  assert.deepEqual(readBookkeepingRoute("/zh/bookkeeping/offline"), {
+    locale: "zh",
+    page: "",
+  });
+
+  const day = "2026-10-22#off";
+  const home = new URL(bookkeepingPath("", { day }), "https://example.com");
+  assert.equal(home.pathname, "/bookkeeping");
+  assert.equal(home.searchParams.get("day"), day);
+  assert.equal(home.hash, "");
+  assert.equal(
+    bookkeepingPath("settings", { section: "companion-album" }),
+    "/bookkeeping/settings?section=companion-album",
+  );
+
+  const id = "record /?#一";
+  const path = bookkeepingPath(`orders/${encodeURIComponent(id)}`);
+  assert.deepEqual(readBookkeepingRoute(`/en${path}`), {
+    locale: "en",
+    page: "orders/[id]",
+    orderId: id,
+  });
+});
 
 test("local routes preserve record IDs, new-record semantics, and trailing slashes", () => {
   assert.deepEqual(readBookkeepingRoute("/zh/bookkeeping/orders/new"), {
     locale: "zh",
-    page: "editor",
+    page: "orders/new",
   });
   assert.deepEqual(
     readBookkeepingRoute("/en/bookkeeping/orders/record%20one"),
     {
       locale: "en",
-      page: "editor",
+      page: "orders/[id]",
       orderId: "record one",
     },
   );

@@ -2,9 +2,25 @@ import { isLocale, locales } from "../i18n/locales";
 
 export const bookkeepingLocales = locales;
 
+export function bookkeepingPath(
+  path = "",
+  query?: Record<string, string>,
+): string {
+  const pathname = path ? `/bookkeeping/${path}` : "/bookkeeping";
+  const search = new URLSearchParams(query).toString();
+  return search ? `${pathname}?${search}` : pathname;
+}
+
 export type BookkeepingRoute = {
   locale: string;
-  page: "home" | "menu" | "settings" | "announcements" | "tools" | "editor";
+  page:
+    | ""
+    | "menu"
+    | "settings"
+    | "announcements"
+    | "tools"
+    | "orders/new"
+    | "orders/[id]";
   orderId?: string;
 };
 
@@ -16,19 +32,23 @@ export function readBookkeepingRoute(
   if (!match) return null;
   const [, locale, tail = ""] = match;
   if (!isLocale(locale)) return null;
-  if (!tail || tail === "offline") return { locale, page: "home" };
+  if (!tail || tail === "offline") return { locale, page: "" };
   if (
     tail === "menu" ||
     tail === "settings" ||
     tail === "announcements" ||
-    tail === "tools"
+    tail === "tools" ||
+    tail === "orders/new"
   )
     return { locale, page: tail };
-  if (tail === "orders/new") return { locale, page: "editor" };
   const order = /^orders\/([^/]+)$/.exec(tail);
   if (!order) return null;
   try {
-    return { locale, page: "editor", orderId: decodeURIComponent(order[1]) };
+    return {
+      locale,
+      page: "orders/[id]",
+      orderId: decodeURIComponent(order[1]),
+    };
   } catch {
     return null;
   }

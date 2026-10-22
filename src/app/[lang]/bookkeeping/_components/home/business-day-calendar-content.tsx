@@ -9,9 +9,9 @@ import {
   formatShanghaiDate,
 } from "@/lib/bbq/business-day";
 import { bbqStore } from "@/lib/bbq/idb-store";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { errorMessage } from "../../_lib/errors";
 import { businessDayLabel } from "../../_lib/i18n";
-import { homePath } from "../../_lib/paths";
 import { LocalLink as Link } from "../shared/local-link";
 import { CalendarControl, CalendarDate } from "./calendar-controls";
 
@@ -155,7 +155,7 @@ export function CalendarContent({ day }: { day: string }) {
                 today={dateKey === today}
               >
                 <Link
-                  href={homePath(key)}
+                  href={bookkeepingPath("", { day: key })}
                   prefetch={false}
                   aria-label={`${businessDayLabel(i18n, key)}${counts ? t`，${count} 条记录` : ""}${selected ? t`，已选中` : ""}`}
                   aria-current={dateKey === today ? "date" : undefined}
@@ -182,7 +182,11 @@ export function CalendarContent({ day }: { day: string }) {
             size="sm"
             className="shrink-0 bg-muted/40"
           >
-            <Link href={homePath(currentBusinessDayKey(new Date()))}>
+            <Link
+              href={bookkeepingPath("", {
+                day: currentBusinessDayKey(new Date()),
+              })}
+            >
               <Trans>回到当前时段</Trans>
             </Link>
           </CalendarControl>

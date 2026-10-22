@@ -31,9 +31,9 @@ import {
 import { useRef, useState } from "react";
 import { formatShanghaiHm } from "@/lib/bbq/business-day";
 import { formatYuan } from "@/lib/bbq/money";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { useOrderEditor } from "../../_hooks/use-order-editor";
 import { errorMessage } from "../../_lib/errors";
-import { settingsPath } from "../../_lib/paths";
 import { DishRow } from "../menu/dish-row";
 import { ItemTagFilter } from "../menu/item-tags";
 import { MenuEditor } from "../menu/menu-editor";
@@ -237,7 +237,7 @@ export function OrderEditor({ orderId }: { orderId?: string }) {
                       {groupingSettings?.names.length === 0 ? (
                         <p className="mt-2 text-xs text-muted-foreground">
                           <Link
-                            href={settingsPath()}
+                            href={bookkeepingPath("settings")}
                             className="text-primary underline underline-offset-4"
                           >
                             <Trans>到设置中添加分组</Trans>

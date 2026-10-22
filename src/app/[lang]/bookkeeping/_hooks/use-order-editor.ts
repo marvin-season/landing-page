@@ -16,9 +16,9 @@ import type {
   OrderPhoto,
   OrderStatus,
 } from "@/lib/bbq/types";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { errorMessage } from "../_lib/errors";
 import { MENU_CHANGED_EVENT, notifyMenuChanged } from "../_lib/menu-events";
-import { homePath } from "../_lib/paths";
 import { useGroupingSettings } from "./use-grouping-settings";
 import { useNavigate } from "./use-navigate";
 
@@ -290,7 +290,7 @@ export function useOrderEditor(orderId?: string) {
           quantity: line.quantity,
         })),
       });
-      navigate(homePath(saved.businessDayKey));
+      navigate(bookkeepingPath("", { day: saved.businessDayKey }));
     } catch (error) {
       setMessage(errorMessage(i18n, error));
       setSaving(false);
@@ -303,7 +303,7 @@ export function useOrderEditor(orderId?: string) {
     setSaving(true);
     try {
       await bbqStore.deleteOrder(order.id);
-      navigate(homePath(order.businessDayKey));
+      navigate(bookkeepingPath("", { day: order.businessDayKey }));
     } catch (error) {
       setMessage(errorMessage(i18n, error));
       setSaving(false);

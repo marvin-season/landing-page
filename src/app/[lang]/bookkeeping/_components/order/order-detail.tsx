@@ -10,8 +10,8 @@ import { summarizeCalories } from "@/lib/bbq/calories";
 import { formatYuan } from "@/lib/bbq/money";
 import { getLineTags } from "@/lib/bbq/tags";
 import type { Order, OrderPhoto } from "@/lib/bbq/types";
+import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { formatCalories } from "../../_lib/i18n";
-import { orderPath } from "../../_lib/paths";
 import { ItemTagBadge } from "../menu/item-tags";
 import { LocalLink as Link } from "../shared/local-link";
 
@@ -132,7 +132,9 @@ export function OrderDetail({
             variant="outline"
             className="rounded-lg px-3 shadow-none hover:shadow-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/50 focus-visible:ring-offset-0"
           >
-            <Link href={orderPath(order.id)}>
+            <Link
+              href={bookkeepingPath(`orders/${encodeURIComponent(order.id)}`)}
+            >
               <Pencil className="size-4" aria-hidden="true" />
               <Trans>修改记录</Trans>
             </Link>
