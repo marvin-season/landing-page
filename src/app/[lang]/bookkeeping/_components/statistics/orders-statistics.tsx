@@ -15,6 +15,7 @@ import type { BusinessDayStatistics } from "@/lib/bbq/statistics";
 import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { formatCalories, formatCompactNumber } from "../../_lib/i18n";
 import { Companion } from "../companion/companion";
+import { BookkeepingEmptyState } from "../shared/bookkeeping-empty-state";
 import { BookkeepingTab } from "../shared/bookkeeping-tab";
 import { LocalLink as Link } from "../shared/local-link";
 import { type ChartMode, TrendChart } from "./trend-chart";
@@ -39,15 +40,12 @@ export function OrdersStatistics({
 
   if (statistics.length === 0) {
     return (
-      <div className="flex min-h-80 flex-col items-center justify-center rounded-xl bg-card px-6 text-center">
-        <Companion mood="ponder" className="block size-28 shrink-0" />
-        <p className="mt-3 text-sm font-medium text-foreground">
-          <Trans>从第一笔开始</Trans>
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          <Trans>记下日常，就能在这里回看金额和热量的变化。</Trans>
-        </p>
-      </div>
+      <BookkeepingEmptyState
+        mood="ponder"
+        className="min-h-80 rounded-xl bg-card"
+        title={<Trans>从第一笔开始</Trans>}
+        description={<Trans>记下日常，就能在这里回看金额和热量的变化。</Trans>}
+      />
     );
   }
 

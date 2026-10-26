@@ -12,6 +12,7 @@ import { type RefObject, useState } from "react";
 import { matchesTag, resolveTagFilter } from "@/lib/bbq/tags";
 import type { Dish, ItemTag } from "@/lib/bbq/types";
 import { Companion } from "../companion/companion";
+import { BookkeepingEmptyState } from "../shared/bookkeeping-empty-state";
 import { SearchInput } from "../shared/search-input";
 import { DishHint } from "./dish-form";
 import { DishRow } from "./dish-row";
@@ -153,18 +154,15 @@ export function DishList({
                   </p>
                 ) : null}
                 {dishes.length === 0 ? (
-                  <div className="flex min-h-36 flex-col items-center justify-center rounded-xl bg-card px-5 text-center">
-                    <Companion
-                      mood="dance"
-                      className="block size-32 shrink-0"
-                    />
-                    <p className="mt-2 text-sm font-medium text-foreground">
-                      <Trans>还没有项目</Trans>
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                  <BookkeepingEmptyState
+                    mood="dance"
+                    className="min-h-36 rounded-xl bg-card px-5"
+                    companionClassName="size-32"
+                    title={<Trans>还没有项目</Trans>}
+                    description={
                       <Trans>早餐、咖啡、跑步，从常记的开始。</Trans>
-                    </p>
-                  </div>
+                    }
+                  />
                 ) : (
                   <div className="flex flex-col rounded-xl bg-card overflow-hidden ring-1 ring-inset ring-border/60">
                     {dishes.map((dish) => (

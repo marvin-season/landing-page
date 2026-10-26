@@ -44,7 +44,7 @@ const moodLabels = {
   exercise: msg`统计 · 热量图表旁`,
   wave: msg`设置 · 安装应用卡片`,
   busy: msg`统计 · 金额图表旁`,
-  ponder: msg`统计 · 记录数图表旁 / 暂无数据`,
+  ponder: msg`统计 · 记录数图表旁 / 暂无数据 / 工具 · 空状态`,
 };
 type SelectableMood = keyof typeof moodLabels;
 // Only offer images used by the UI; keep legacy moods compatible with saved packs.

@@ -21,6 +21,7 @@ import { bookkeepingPath } from "@/lib/bookkeeping-pwa/routes";
 import { formatCalories } from "../../_lib/i18n";
 import { Companion } from "../companion/companion";
 import { OrderDetail } from "../order/order-detail";
+import { BookkeepingEmptyState } from "../shared/bookkeeping-empty-state";
 import { BookkeepingTab } from "../shared/bookkeeping-tab";
 import { LocalLink as Link } from "../shared/local-link";
 
@@ -129,27 +130,30 @@ export function OrdersList({
             <Trans>读取记录中…</Trans>
           </div>
         ) : visibleOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 text-center flex-1 py-6">
-            <Companion mood="hello" className="block size-28 shrink-0" />
-            <p className="mt-3 text-sm font-medium text-foreground">
-              {statusFilter === "open"
+          <BookkeepingEmptyState
+            mood="hello"
+            className="flex-1"
+            title={
+              statusFilter === "open"
                 ? t`还没有进行中的记录`
-                : t`还没有完成的记录`}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {statusFilter === "open"
+                : t`还没有完成的记录`
+            }
+            description={
+              statusFilter === "open"
                 ? t`一顿饭、一杯咖啡，都可以记在这里。`
-                : t`把记录标为完成，就会计入上面的合计。`}
-            </p>
-            {statusFilter === "open" && canCreateOrder ? (
-              <Button asChild className="mt-4">
-                <Link href={bookkeepingPath("orders/new")}>
-                  <Plus className="size-4" aria-hidden="true" />
-                  <Trans>记一笔</Trans>
-                </Link>
-              </Button>
-            ) : null}
-          </div>
+                : t`把记录标为完成，就会计入上面的合计。`
+            }
+            action={
+              statusFilter === "open" && canCreateOrder ? (
+                <Button asChild>
+                  <Link href={bookkeepingPath("orders/new")}>
+                    <Plus className="size-4" aria-hidden="true" />
+                    <Trans>记一笔</Trans>
+                  </Link>
+                </Button>
+              ) : null
+            }
+          />
         ) : (
           <ul className="p-2 flex-1 flex flex-col gap-2">
             {visibleOrders.map((order) => (
