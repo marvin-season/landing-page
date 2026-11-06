@@ -2,10 +2,10 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
+import type { TInputParams } from "@/lib/stream/chat-request";
 import {
   type ChatStreamState,
   chatStreamText,
-  type TInputParams,
 } from "@/lib/stream/chat-stream-state";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import type {

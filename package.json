@@ -12,6 +12,7 @@
     "format": "biome format --write",
     "check": "biome check .",
     "test:bookkeeping-pwa": "node --import tsx --test src/lib/bookkeeping-pwa/*.test.ts",
+    "test:chat-stream": "node --import tsx --test src/lib/stream/*.test.ts",
     "bookkeeping:pwa:build": "node scripts/build-bookkeeping-pwa.mjs",
     "bbq:pwa:assets": "node --import tsx scripts/generate-bbq-pwa.ts",
     "check:staged": "biome check --write --staged --no-errors-on-unmatched && git update-index --again",

@@ -1,15 +1,4 @@
 import type { UIMessageChunk } from "ai";
-import type { Observable } from "rxjs";
-import { scan } from "rxjs";
-import { buildSubmitMessageBody, type ChatSubmitMessage } from "./chat-request";
-import { createObservableStream } from "./chat-stream";
-
-export type TInputParams = {
-  url: string;
-  text: string;
-  threadId: string;
-  messages?: ChatSubmitMessage[];
-};
 
 // ---------------------------------------------------------------------------
 // 内容块类型（用于 state.blocks）
@@ -232,17 +221,4 @@ export function chatStreamText(state: ChatStreamState) {
     .map((block) => block.content)
     .join("");
   return `${fromBlocks}${state.streamingText}`;
-}
-
-/** 创建状态流 Observable */
-export function createObservableState({
-  url,
-  text,
-  threadId,
-  messages,
-}: TInputParams): Observable<ChatStreamState> {
-  const body = buildSubmitMessageBody({ threadId, text, messages });
-  return createObservableStream(url, body).pipe(
-    scan(reduceChatStreamEvent, initialChatStreamState),
-  );
 }

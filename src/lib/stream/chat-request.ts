@@ -6,6 +6,13 @@ export type ChatSubmitMessage = {
   text: string;
 };
 
+export type TInputParams = {
+  url: string;
+  text: string;
+  threadId: string;
+  messages?: ChatSubmitMessage[];
+};
+
 type BuildSubmitMessageBodyOptions = {
   threadId: string;
   text: string;

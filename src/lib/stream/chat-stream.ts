@@ -4,7 +4,8 @@ import { Observable } from "rxjs";
 /** 将 SSE 流转换为 Observable（事件类型与 ai 包 UIMessageChunk 一致） */
 export function createObservableStream(
   url: string,
-  body: any,
+  body: unknown,
+  signal?: AbortSignal,
 ): Observable<UIMessageChunk> {
   return new Observable((subscriber) => {
     let cancelled = false;
@@ -16,8 +17,13 @@ export function createObservableStream(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal,
     })
       .then(async (response) => {
+        if (cancelled) {
+          await response.body?.cancel();
+          return;
+        }
         if (!response.ok || !response.body) {
           subscriber.error(new Error(`HTTP ${response.status}`));
           return;
@@ -48,7 +54,7 @@ export function createObservableStream(
 
     return () => {
       cancelled = true;
-      reader?.cancel();
+      void reader?.cancel().catch(() => {});
     };
   });
 }

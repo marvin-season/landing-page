@@ -1,27 +1,54 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Subscription } from "rxjs";
+import type { TInputParams } from "./chat-request";
+import {
+  type ChatStreamAdapter,
+  createObservableState,
+  defaultChatStreamAdapter,
+} from "./chat-stream-adapter";
 import {
   type ChatStreamState,
-  createObservableState,
   flushChatStreamState,
   initialChatStreamState,
-  type TInputParams,
 } from "./chat-stream-state";
 
-export function useChatStreamState(options: {
+type ChatStreamCallbacks = {
   onComplete?: (state: ChatStreamState) => void;
   onError?: (error: string) => void;
-}) {
+};
+
+type ChatStreamHandle<TInput> = {
+  state: ChatStreamState;
+  send: (input: TInput) => void;
+  loading: boolean;
+  error: string | null;
+  stop: () => void;
+};
+
+export function useChatStreamState<TInput>(
+  options: ChatStreamCallbacks & { adapter: ChatStreamAdapter<TInput> },
+): ChatStreamHandle<TInput>;
+export function useChatStreamState(
+  options?: ChatStreamCallbacks,
+): ChatStreamHandle<TInputParams>;
+export function useChatStreamState<TInput>(
+  options: ChatStreamCallbacks & { adapter?: ChatStreamAdapter<TInput> } = {},
+) {
   const { onComplete, onError } = options;
+  // 公共重载保证：省略 adapter 时，send 仅接受默认接口的 TInputParams。
+  const adapter =
+    options.adapter ??
+    (defaultChatStreamAdapter as unknown as ChatStreamAdapter<TInput>);
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const subscriptionRef = useRef<Subscription | null>(null);
   const latestRef = useRef(initialChatStreamState);
 
   const send = useCallback(
-    (input: TInputParams) => {
+    (input: TInput) => {
       subscriptionRef.current?.unsubscribe();
       subscriptionRef.current = null;
 
@@ -29,30 +56,34 @@ export function useChatStreamState(options: {
       latestRef.current = initialChatStreamState;
       setState(initialChatStreamState);
       setLoading(true);
-      const sub = createObservableState(input).subscribe({
-        next: (nextState) => {
-          latestRef.current = nextState;
-          setState(nextState);
-        },
-        error: (err) => {
-          const message = err instanceof Error ? err.message : String(err);
-          setError(message);
-          setLoading(false);
-          subscriptionRef.current = null;
-          onError?.(message);
-        },
-        complete: () => {
-          const flushed = flushChatStreamState(latestRef.current);
-          latestRef.current = flushed;
-          setState(flushed);
-          setLoading(false);
-          subscriptionRef.current = null;
-          onComplete?.(flushed);
-        },
-      });
-      subscriptionRef.current = sub;
+      // 先保存容器，兼容同步完成/抛错，以及完成回调中再次 send。
+      const subscription = new Subscription();
+      subscriptionRef.current = subscription;
+      subscription.add(
+        createObservableState(input, adapter).subscribe({
+          next: (nextState) => {
+            latestRef.current = nextState;
+            setState(nextState);
+          },
+          error: (err) => {
+            const message = err instanceof Error ? err.message : String(err);
+            setError(message);
+            setLoading(false);
+            subscriptionRef.current = null;
+            onError?.(message);
+          },
+          complete: () => {
+            const flushed = flushChatStreamState(latestRef.current);
+            latestRef.current = flushed;
+            setState(flushed);
+            setLoading(false);
+            subscriptionRef.current = null;
+            onComplete?.(flushed);
+          },
+        }),
+      );
     },
-    [onComplete, onError],
+    [adapter, onComplete, onError],
   );
 
   const stop = useCallback(() => {
