@@ -6,9 +6,10 @@
 
 | 文件 | 职责 |
 |------|------|
-| `use-chat-stream-state.ts` | React Hook，封装订阅与 `state / send / loading / error` |
-| `chat-stream-state.ts` | 状态类型、归约函数、`fromChatStreamState`、`flushChatStreamState` |
+| `use-chat-stream-state.ts` | React Hook，封装订阅、卸载清理与 `state / send / loading / error / stop` |
+| `chat-stream-state.ts` | 状态类型、归约函数、`createObservableState`、`flushChatStreamState` |
 | `chat-stream.ts` | 底层 SSE → `Observable<UIMessageChunk>`（ai 包类型） |
+| `chat-request.ts` | `ChatSubmitMessage` 类型与 `buildSubmitMessageBody` 请求体构造 |
 
 ---
 
@@ -17,35 +18,44 @@
 ### 签名
 
 ```ts
-function useChatStreamState(url: string): {
+function useChatStreamState(options: {
+  onComplete?: (state: ChatStreamState) => void;
+  onError?: (error: string) => void;
+}): {
   state: ChatStreamState;
-  send: (body: Record<string, unknown>) => void;
+  send: (input: TInputParams) => void;
   loading: boolean;
   error: string | null;
+  stop: () => void;
 }
 ```
 
 ### 参数
 
-- **url**：流式接口地址（POST），例如 `"/api/chat"`。
+- **onComplete**：流正常结束并刷新剩余文本后，接收最终状态。
+- **onError**：流发生错误时，接收与返回值 `error` 一致的错误信息。
 
 ### 返回值
 
 - **state**：当前流式对话状态（见下文 `ChatStreamState`）。
-- **send(body)**：发起一次请求。会先取消上一次未完成的订阅、清空错误、将状态重置为 `initialChatStreamState`，再订阅 `fromChatStreamState(url, body)`；每次 `next` 更新 `state`，`complete` 时调用 `flushChatStreamState` 并置 `loading = false`，`error` 时写入错误信息并置 `loading = false`。
+- **send(input)**：传入 `{ url, text, threadId, messages? }` 发起一次请求。会先取消上一次未完成的订阅、清空错误、将状态重置为 `initialChatStreamState`，再订阅 `createObservableState(input)`；每次 `next` 更新 `state`，`complete` 时调用 `flushChatStreamState` 并置 `loading = false`，`error` 时写入错误信息并置 `loading = false`。
 - **loading**：是否有进行中的请求。
 - **error**：最近一次请求的错误信息，无错误时为 `null`。
+- **stop()**：取消当前订阅并置 `loading = false`，保留当前状态，不触发完成或错误回调。
 
 ### 使用示例
 
 ```tsx
-function ChatPage() {
-  const { state, send, loading, error } = useChatStreamState("/api/chat");
+function ChatPage({ threadId }: { threadId: string }) {
+  const { state, send, loading, error } = useChatStreamState({});
   const { messageId, blocks, streamingText, streamingTool } = state;
 
   return (
     <>
-      <button onClick={() => send({ messages: [...] })} disabled={loading}>
+      <button
+        onClick={() => send({ url: "/api/chat", text: "你好", threadId })}
+        disabled={loading}
+      >
         发送
       </button>
       {error && <p>{error}</p>}
@@ -57,9 +67,10 @@ function ChatPage() {
 
 ### 行为说明
 
-- 每次调用 `send(body)` 会先执行 `subscriptionRef.current?.unsubscribe()`，再创建新订阅，因此同一时刻只会有一个请求在跑。
+- 每次调用 `send(input)` 会先取消上一次订阅，再创建新订阅，每个 Hook 实例只保留一个活动订阅。
 - 请求开始时状态会被重置为 `initialChatStreamState`，便于新对话展示。
 - 流 **complete** 时会对当前 state 执行一次 `flushChatStreamState`，把尚未写入 `blocks` 的 `streamingText` 追加为文本块。
+- Hook 通过 `useEffect(() => stop, [stop])` 在卸载时自动清理，调用方无需重复注册清理。
 
 ---
 

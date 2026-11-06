@@ -1,7 +1,7 @@
 "use client";
 
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   type ChatStreamState,
   chatStreamText,
@@ -70,8 +70,6 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
   });
   const loadingRef = useRef(loading);
   loadingRef.current = loading;
-
-  useEffect(() => () => stop(), [stop]);
 
   const ask = useCallback(
     (instruction: string, selectedQuote: DocumentQuote | null) => {

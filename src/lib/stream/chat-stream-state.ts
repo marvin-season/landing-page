@@ -1,7 +1,7 @@
 import type { UIMessageChunk } from "ai";
 import type { Observable } from "rxjs";
 import { scan } from "rxjs";
-import { buildSubmitMessageBody, type ChatSubmitMessage } from "@/lib/chat/api";
+import { buildSubmitMessageBody, type ChatSubmitMessage } from "./chat-request";
 import { createObservableStream } from "./chat-stream";
 
 export type TInputParams = {

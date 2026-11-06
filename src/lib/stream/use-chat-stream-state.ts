@@ -1,19 +1,19 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import type { TInputParams } from "@/lib/stream/chat-stream-state";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type ChatStreamState,
   createObservableState,
   flushChatStreamState,
   initialChatStreamState,
+  type TInputParams,
 } from "./chat-stream-state";
 
 export function useChatStreamState(options: {
   onComplete?: (state: ChatStreamState) => void;
   onError?: (error: string) => void;
 }) {
-  const { onComplete } = options;
+  const { onComplete, onError } = options;
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +35,11 @@ export function useChatStreamState(options: {
           setState(nextState);
         },
         error: (err) => {
-          setError(err instanceof Error ? err.message : String(err));
+          const message = err instanceof Error ? err.message : String(err);
+          setError(message);
           setLoading(false);
+          subscriptionRef.current = null;
+          onError?.(message);
         },
         complete: () => {
           const flushed = flushChatStreamState(latestRef.current);
@@ -49,7 +52,7 @@ export function useChatStreamState(options: {
       });
       subscriptionRef.current = sub;
     },
-    [onComplete],
+    [onComplete, onError],
   );
 
   const stop = useCallback(() => {
@@ -57,6 +60,8 @@ export function useChatStreamState(options: {
     subscriptionRef.current = null;
     setLoading(false);
   }, []);
+
+  useEffect(() => stop, [stop]);
 
   return { state, send, loading, error, stop };
 }
