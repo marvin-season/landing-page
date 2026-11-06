@@ -2,12 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Subscription } from "rxjs";
-import type { TInputParams } from "./chat-request";
 import {
   type ChatStreamAdapter,
   createObservableState,
-  defaultChatStreamAdapter,
-} from "./chat-stream-adapter";
+} from "./chat-stream-observable";
 import {
   type ChatStreamState,
   flushChatStreamState,
@@ -29,18 +27,8 @@ type ChatStreamHandle<TInput> = {
 
 export function useChatStreamState<TInput>(
   options: ChatStreamCallbacks & { adapter: ChatStreamAdapter<TInput> },
-): ChatStreamHandle<TInput>;
-export function useChatStreamState(
-  options?: ChatStreamCallbacks,
-): ChatStreamHandle<TInputParams>;
-export function useChatStreamState<TInput>(
-  options: ChatStreamCallbacks & { adapter?: ChatStreamAdapter<TInput> } = {},
-) {
-  const { onComplete, onError } = options;
-  // 公共重载保证：省略 adapter 时，send 仅接受默认接口的 TInputParams。
-  const adapter =
-    options.adapter ??
-    (defaultChatStreamAdapter as unknown as ChatStreamAdapter<TInput>);
+): ChatStreamHandle<TInput> {
+  const { adapter, onComplete, onError } = options;
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

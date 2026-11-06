@@ -2,6 +2,7 @@
 
 import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
+import { useChatStreamState } from "@landing-page/utils/stream";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bot,
@@ -19,7 +20,7 @@ import {
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
 import { MessageItem } from "@/components/message/message-item";
-import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
+import { submitMessageStreamAdapter } from "@/lib/stream/chat-stream-adapter";
 import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../../_components/ActionCard";
 import { ResponseSection } from "../../_components/ResponseSection";
@@ -74,6 +75,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
   );
 
   const { state, send, loading, error } = useChatStreamState({
+    adapter: submitMessageStreamAdapter,
     onComplete: () => {
       void refetchHistory();
     },

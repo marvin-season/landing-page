@@ -1,21 +1,19 @@
 "use client";
 
+import {
+  type ChatStreamAdapter,
+  type ChatStreamState,
+  chatStreamText,
+  useChatStreamState,
+} from "@landing-page/utils/stream";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
 import type { TInputParams } from "@/lib/stream/chat-request";
-import {
-  type ChatStreamAdapter,
-  defaultChatStreamAdapter,
-} from "@/lib/stream/chat-stream-adapter";
-import {
-  type ChatStreamState,
-  chatStreamText,
-} from "@/lib/stream/chat-stream-state";
+import { submitMessageStreamAdapter } from "@/lib/stream/chat-stream-adapter";
 import {
   type MockChatInput,
   mockChatStreamAdapter,
 } from "@/lib/stream/mock-chat-stream-adapter";
-import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import type {
   DocumentQuote,
   KnowledgeDocument,
@@ -38,7 +36,7 @@ const knowledgeChatAdapter: ChatStreamAdapter<KnowledgeChatInput> = (
   context,
 ) =>
   request.mode === "ai"
-    ? defaultChatStreamAdapter(request.input, context)
+    ? submitMessageStreamAdapter(request.input, context)
     : mockChatStreamAdapter(request.input, context);
 
 function seedMessages(

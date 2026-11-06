@@ -1,15 +1,16 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { UIMessageChunk } from "ai";
-import { lastValueFrom, Observable, of } from "rxjs";
 import {
   type ChatStreamAdapter,
+  chatStreamText,
   createObservableState,
-  defaultChatStreamAdapter,
-} from "./chat-stream-adapter";
-import { chatStreamText, flushChatStreamState } from "./chat-stream-state";
+  flushChatStreamState,
+} from "@landing-page/utils/stream";
+import type { UIMessageChunk } from "ai";
+import { lastValueFrom, Observable, of } from "rxjs";
+import { submitMessageStreamAdapter } from "./chat-stream-adapter";
 
-test("默认适配器保留请求格式，并处理跨网络块的 SSE 数据", async (t) => {
+test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", async (t) => {
   let request: RequestInit | undefined;
   const encoder = new TextEncoder();
   const events: UIMessageChunk[] = [
@@ -43,7 +44,7 @@ test("默认适配器保留请求格式，并处理跨网络块的 SSE 数据", 
   const state = await lastValueFrom(
     createObservableState(
       { url: "/api/chat", threadId: "thread-1", text: "hello" },
-      defaultChatStreamAdapter,
+      submitMessageStreamAdapter,
     ),
   );
 
@@ -120,7 +121,7 @@ test("取消订阅会中断适配器、执行清理且不触发完成或错误",
   assert.equal(errorCount, 0);
 });
 
-test("默认适配器在 fetch 尚未响应时也能取消请求", async (t) => {
+test("项目适配器在 fetch 尚未响应时也能取消请求", async (t) => {
   let signal: AbortSignal | undefined;
   t.mock.method(
     globalThis,
@@ -138,7 +139,7 @@ test("默认适配器在 fetch 尚未响应时也能取消请求", async (t) => 
   let errorCount = 0;
   const subscription = createObservableState(
     { url: "/api/chat", threadId: "thread-1", text: "hello" },
-    defaultChatStreamAdapter,
+    submitMessageStreamAdapter,
   ).subscribe({ error: () => errorCount++ });
 
   subscription.unsubscribe();

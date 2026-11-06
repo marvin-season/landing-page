@@ -1,7 +1,9 @@
+import {
+  type ChatStreamAdapter,
+  createObservableStream,
+} from "@landing-page/utils/stream";
 import type { UIMessageChunk } from "ai";
 import { concat, map, of } from "rxjs";
-import { createObservableStream } from "./chat-stream";
-import type { ChatStreamAdapter } from "./chat-stream-adapter";
 
 export type MockChatInput = { text: string };
 

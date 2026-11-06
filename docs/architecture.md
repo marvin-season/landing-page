@@ -150,7 +150,7 @@ flowchart TB
 
 ## 6. 前端状态与流式 UI
 
-- **流式聊天**：`src/lib/stream/`、`use-chat-stream-state` 等与 AI SDK / Mastra 流对接。
+- **流式聊天**：`packages/utils/src/stream/` 通过 `@landing-page/utils/stream` 提供通用 Hook、状态归约和 SSE 工具，适配器必须显式传入；`src/lib/stream/` 保留项目请求构造与实际适配器，对接 AI SDK / Mastra 或 mock 接口。
 - **UI 栈**：Tailwind CSS 4、Radix、Framer Motion / Motion、GSAP、统一 Markdown（unified 管线）等。
 
 ## 7. 国际化（Lingui）

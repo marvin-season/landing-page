@@ -1,11 +1,11 @@
 "use client";
 
-import { ChatMessageShell } from "@/components/chat/chat-message-shell";
-import Markdown from "@/components/markdown";
 import type {
   ContentBlock,
   StreamingToolCall,
-} from "@/lib/stream/chat-stream-state";
+} from "@landing-page/utils/stream";
+import { ChatMessageShell } from "@/components/chat/chat-message-shell";
+import Markdown from "@/components/markdown";
 import type { ToolStreamingPhase } from "./ToolBlock";
 import { ToolBlock } from "./ToolBlock";
 

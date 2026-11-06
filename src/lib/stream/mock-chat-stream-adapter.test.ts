@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import {
+  chatStreamText,
+  createObservableState,
+  flushChatStreamState,
+} from "@landing-page/utils/stream";
 import { lastValueFrom, toArray } from "rxjs";
 import { POST } from "../../app/api/knowledge/chatv2/route";
-import { createObservableState } from "./chat-stream-adapter";
-import { chatStreamText, flushChatStreamState } from "./chat-stream-state";
 import { mockChatStreamAdapter } from "./mock-chat-stream-adapter";
 
 test("mock 接口通过适配器逐段输出完整回复，并保留中文、换行和 emoji", async (t) => {
