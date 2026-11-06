@@ -9,6 +9,7 @@
 - `chat-stream-state.ts`：状态类型、纯事件归约函数、文本合并与完成收尾。
 - `chat-request.ts`：当前项目的请求入参、`ChatSubmitMessage` 与 `buildSubmitMessageBody`。
 - `chat-stream.ts`：默认接口的 SSE 读取，将 JSON 事件输出为 Observable。
+- `mock-chat-stream-adapter.ts`：将 `/api/knowledge/chatv2` 的 `{ delta }` SSE 转为统一文本事件。
 - `chat-stream-adapter.test.ts`：协议兼容、适配器、错误和取消行为测试。
 
 ## 默认用法
@@ -110,7 +111,13 @@ const { send, state, stop } = useChatStreamState({
 send({ url: "/api/custom-text", prompt: "你好", model: "example-model" });
 ```
 
-第三方鉴权、跨域和具体供应商协议由接入方处理；本模块目前内置的是项目默认适配器。
+第三方鉴权、跨域和具体供应商协议由接入方处理。
+
+### Mock SSE 接口
+
+`POST /api/knowledge/chatv2` 接收 `{ text: string }`，分段返回 `hello,i am your assiastant,` 拼接输入文本。每段是 `data: {"delta":"..."}` 加两个换行，最后发送 `data: [DONE]` 并关闭流。
+
+`mockChatStreamAdapter` 复用 SSE 读取逻辑，并补齐 `text-start / text-delta / text-end` 事件。知识库聊天关闭「AI 回复」时使用此适配器，开启时继续使用原来的知识库接口；重试沿用上次请求的模式。
 
 ## 统一状态与事件
 

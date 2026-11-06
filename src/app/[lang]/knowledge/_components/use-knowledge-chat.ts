@@ -4,9 +4,17 @@ import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
 import type { TInputParams } from "@/lib/stream/chat-request";
 import {
+  type ChatStreamAdapter,
+  defaultChatStreamAdapter,
+} from "@/lib/stream/chat-stream-adapter";
+import {
   type ChatStreamState,
   chatStreamText,
 } from "@/lib/stream/chat-stream-state";
+import {
+  type MockChatInput,
+  mockChatStreamAdapter,
+} from "@/lib/stream/mock-chat-stream-adapter";
 import { useChatStreamState } from "@/lib/stream/use-chat-stream-state";
 import type {
   DocumentQuote,
@@ -20,6 +28,18 @@ import {
 } from "./knowledge-prompt";
 
 const THROTTLE = true;
+
+type KnowledgeChatInput =
+  | { mode: "ai"; input: TInputParams }
+  | { mode: "mock"; input: MockChatInput };
+
+const knowledgeChatAdapter: ChatStreamAdapter<KnowledgeChatInput> = (
+  request,
+  context,
+) =>
+  request.mode === "ai"
+    ? defaultChatStreamAdapter(request.input, context)
+    : mockChatStreamAdapter(request.input, context);
 
 function seedMessages(
   source: KnowledgeDocument,
@@ -52,7 +72,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
   const [quote, setQuote] = useState<DocumentQuote | null>(null);
   const [aiReply, setAiReply] = useState(false);
   const threadIdRef = useRef(crypto.randomUUID());
-  const lastSendRef = useRef<TInputParams | null>(null);
+  const lastSendRef = useRef<KnowledgeChatInput | null>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
 
@@ -66,6 +86,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
   }, []);
 
   const { state, send, loading, error, stop } = useChatStreamState({
+    adapter: knowledgeChatAdapter,
     onComplete: onStreamComplete,
   });
   const loadingRef = useRef(loading);
@@ -84,13 +105,19 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
       const nextMessages = [...messagesRef.current, userMessage];
       setQuote(null);
       setMessages(nextMessages);
-      if (!aiReply) return;
-      const input = {
-        url: "/api/knowledge/chat",
-        threadId: threadIdRef.current,
-        text,
-        messages: THROTTLE ? undefined : toKnowledgeChatMessages(nextMessages),
-      };
+      const input: KnowledgeChatInput = aiReply
+        ? {
+            mode: "ai",
+            input: {
+              url: "/api/knowledge/chat",
+              threadId: threadIdRef.current,
+              text,
+              messages: THROTTLE
+                ? undefined
+                : toKnowledgeChatMessages(nextMessages),
+            },
+          }
+        : { mode: "mock", input: { text: instruction.trim() || text } };
       lastSendRef.current = input;
       send(input);
     },

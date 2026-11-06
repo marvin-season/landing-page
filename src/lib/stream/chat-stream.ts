@@ -1,12 +1,12 @@
 import type { UIMessageChunk } from "ai";
 import { Observable } from "rxjs";
 
-/** 将 SSE 流转换为 Observable（事件类型与 ai 包 UIMessageChunk 一致） */
-export function createObservableStream(
+/** 读取单行 JSON data 的 SSE 流，默认事件类型为 AI SDK UIMessageChunk。 */
+export function createObservableStream<TEvent = UIMessageChunk>(
   url: string,
   body: unknown,
   signal?: AbortSignal,
-): Observable<UIMessageChunk> {
+): Observable<TEvent> {
   return new Observable((subscriber) => {
     let cancelled = false;
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
@@ -41,7 +41,7 @@ export function createObservableStream(
             const raw = match[1].trim();
             if (!raw) continue;
             try {
-              const event = JSON.parse(raw) as UIMessageChunk;
+              const event = JSON.parse(raw) as TEvent;
               subscriber.next(event);
             } catch {
               // 忽略非 JSON 行（如 data: [DONE]）
