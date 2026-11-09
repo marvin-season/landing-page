@@ -16,6 +16,7 @@ import { useState } from "react";
 import {
   Conversation,
   ConversationContent,
+  ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
@@ -98,19 +99,19 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
     pendingUserMessage == null;
 
   return (
-    <div className="relative flex min-h-dvh flex-col">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <span className="agent-doodle-corner right-8 top-6 hidden rotate-[7deg] md:block">
         stream notes
       </span>
       <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-4 sm:px-6">
-        <div className="min-h-0 flex-1 overflow-y-auto py-6 sm:py-8">
+        <div className="min-h-0 flex-1 flex flex-col py-6 sm:py-8">
           {error != null ? (
             <Alert className="agent-hand-border-soft mb-4 bg-white/80 text-destructive">
               <AlertDescription>Error: {error}</AlertDescription>
             </Alert>
           ) : null}
 
-          <Conversation className="h-full">
+          <Conversation className="min-h-0">
             <ConversationContent>
               {historyLoading ? (
                 <ThreadHistoryLoading />
@@ -199,6 +200,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
                 />
               )}
             </ConversationContent>
+            <ConversationScrollButton aria-label="回到底部" title="回到底部" />
           </Conversation>
         </div>
 
