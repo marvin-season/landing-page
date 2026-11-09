@@ -104,7 +104,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
         stream notes
       </span>
       <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-4 sm:px-6">
-        <div className="min-h-0 flex-1 flex flex-col py-6 sm:py-8">
+        <div className="min-h-0 flex-1 flex flex-col pt-6 sm:pt-8">
           {error != null ? (
             <Alert className="agent-hand-border-soft mb-4 bg-white/80 text-destructive">
               <AlertDescription>Error: {error}</AlertDescription>
@@ -112,7 +112,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
           ) : null}
 
           <Conversation className="min-h-0">
-            <ConversationContent>
+            <ConversationContent className="pb-0 [&>*:last-child]:mb-0">
               {historyLoading ? (
                 <ThreadHistoryLoading />
               ) : showEmptyState ? (
@@ -204,7 +204,7 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
           </Conversation>
         </div>
 
-        <div className="sticky bottom-0 shrink-0 bg-[linear-gradient(to_top,var(--agent-paper)_70%,transparent)] pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-[rgba(255,253,244,0.82)] sm:py-6">
+        <div className="sticky bottom-0 shrink-0 bg-[linear-gradient(to_top,var(--agent-paper)_70%,transparent)] pt-2 pb-4 backdrop-blur supports-backdrop-filter:bg-[rgba(255,253,244,0.82)] sm:pb-6">
           <ActionCard
             messageId={messageId}
             loading={loading || historyLoading}
