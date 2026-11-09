@@ -10,13 +10,18 @@ import { POST } from "../../app/api/knowledge/chatv2/route";
 import { mockChatStreamAdapter } from "./mock-chat-stream-adapter";
 
 test("mock 接口通过适配器逐段输出完整回复，并保留中文、换行和 emoji", async (t) => {
+  const input = {
+    url: "/api/knowledge/chatv2?source=test",
+    text: "你好\n介绍一下自己🙂",
+  };
   let wireResponse: Response | undefined;
   t.mock.method(
     globalThis,
     "fetch",
     async (url: RequestInfo | URL, init?: RequestInit) => {
-      assert.equal(url, "/api/knowledge/chatv2");
+      assert.equal(url, input.url);
       assert.equal(init?.method, "POST");
+      assert.deepEqual(JSON.parse(String(init?.body)), { text: input.text });
       const response = await POST(new Request(`http://localhost${url}`, init));
       assert.equal(response.status, 200);
       assert.equal(
@@ -28,10 +33,9 @@ test("mock 接口通过适配器逐段输出完整回复，并保留中文、换
     },
   );
 
-  const text = "你好\n介绍一下自己🙂";
-  const expected = `hello,i am your assiastant,${text}`;
+  const expected = `hello,i am your assiastant,${input.text}`;
   const states = await lastValueFrom(
-    createObservableState({ text }, mockChatStreamAdapter).pipe(toArray()),
+    createObservableState(input, mockChatStreamAdapter).pipe(toArray()),
   );
   const replies = states.map(chatStreamText);
   assert.ok(new Set(replies).size > 3);
@@ -80,7 +84,12 @@ test("mock 接口拒绝无效请求，适配器将 HTTP 错误传递给调用方
       POST(new Request(`http://localhost${url}`, init)),
   );
   await assert.rejects(
-    lastValueFrom(createObservableState({ text: "" }, mockChatStreamAdapter)),
+    lastValueFrom(
+      createObservableState(
+        { url: "/api/knowledge/chatv2", text: "" },
+        mockChatStreamAdapter,
+      ),
+    ),
     /HTTP 400/,
   );
 });

@@ -115,7 +115,13 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
                 : toKnowledgeChatMessages(nextMessages),
             },
           }
-        : { mode: "mock", input: { text: instruction.trim() || text } };
+        : {
+            mode: "mock",
+            input: {
+              url: "/api/knowledge/chatv2",
+              text: instruction.trim() || text,
+            },
+          };
       lastSendRef.current = input;
       send(input);
     },

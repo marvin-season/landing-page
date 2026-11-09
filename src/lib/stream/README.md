@@ -32,7 +32,7 @@ Agent 会话页显式使用 `submitMessageStreamAdapter`。知识库聊天通过
 
 `POST /api/knowledge/chatv2` 接收 `{ text: string }`，分段返回 `hello,i am your assiastant,` 拼接输入文本。每段是 `data: {"delta":"..."}` 加两个换行，最后发送 `data: [DONE]` 并关闭流。
 
-`mockChatStreamAdapter` 补齐 `text-start / text-delta / text-end` 事件，输入类型为 `MockChatInput`。
+`mockChatStreamAdapter` 补齐 `text-start / text-delta / text-end` 事件，输入类型为 `MockChatInput`（`{ url: string; text: string }`）。URL 由调用方传入，请求体只发送 `{ text }`；知识库聊天传入 `/api/knowledge/chatv2`。
 
 ## 验证
 
