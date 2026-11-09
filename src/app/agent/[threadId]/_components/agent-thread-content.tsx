@@ -81,6 +81,10 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
     },
   });
   const { messageId, blocks, streamingText, streamingTool } = state;
+  // 流结束后继续显示当前轮，直到历史记录包含这条回复，再一起切换。
+  const showPendingTurn =
+    pendingUserMessage != null &&
+    (loading || !historyMessages.some((message) => message.id === messageId));
 
   const handleSendText = (text: string) => {
     setPendingUserMessage(text);
@@ -180,14 +184,14 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
                   <MessageItem key={message.id} m={message} />
                 ))
               )}
-              {loading && pendingUserMessage != null && (
+              {showPendingTurn && pendingUserMessage != null && (
                 <ChatMessageShell role="user">
                   <div className="wrap-break-word [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                     <Markdown>{pendingUserMessage}</Markdown>
                   </div>
                 </ChatMessageShell>
               )}
-              {loading && (
+              {showPendingTurn && (
                 <ResponseSection
                   blocks={blocks}
                   streamingTool={streamingTool}
