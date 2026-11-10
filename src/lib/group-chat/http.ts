@@ -184,9 +184,17 @@ export function createWorldHandlers({
       }
       if (request.method === "POST" && action === "stop") {
         const input = z
-          .object({ runId: idSchema.optional() })
+          .object({
+            runId: idSchema.optional(),
+            clientRequestId: z.string().uuid().optional(),
+          })
           .parse(await body(request));
-        const room = await store.stop(ownerId, id, input.runId);
+        const room = await store.stop(
+          ownerId,
+          id,
+          input.runId,
+          input.clientRequestId,
+        );
         if (!input.runId || room.run?.id === input.runId)
           abortRun(room.run?.id);
         return json({ room: view(room) });

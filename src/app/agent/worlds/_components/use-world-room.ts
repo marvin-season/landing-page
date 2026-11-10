@@ -2,7 +2,7 @@
 
 import { useChatStreamCore } from "@landing-page/utils/stream";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { worldRequest, worldStream } from "@/lib/group-chat/client";
+import { worldRequest, worldStoryStream } from "@/lib/group-chat/client";
 import type { RunInput, WorldMessage, WorldRoom } from "@/lib/group-chat/model";
 
 function mergeRoom(previous: WorldRoom | null, next: WorldRoom) {
@@ -29,19 +29,27 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState(false);
+  const [stopping, setStopping] = useState(false);
   const [phase, setPhase] = useState("");
   const busyRef = useRef(false);
   const pendingRef = useRef(false);
+  const stoppingRef = useRef(false);
   const epoch = useRef(0);
   const mounted = useRef(true);
   const sequence = useRef(0);
   const accepted = useRef(false);
   const lastCommand = useRef<RunInput | null>(null);
+  const requestId = useRef<string | undefined>(undefined);
   const refresh = useCallback(async () => {
     const requestEpoch = epoch.current;
     try {
       const data = await worldRequest<{ room: WorldRoom }>(`rooms/${roomId}`);
-      if (mounted.current && !busyRef.current && requestEpoch === epoch.current)
+      if (
+        mounted.current &&
+        !busyRef.current &&
+        !pendingRef.current &&
+        requestEpoch === epoch.current
+      )
         setRoom((old) => mergeRoom(old, data.room));
     } catch (e) {
       if (mounted.current)
@@ -66,7 +74,7 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
     };
   }, [refresh]);
   const stream = useChatStreamCore({
-    adapter: worldStream,
+    adapter: worldStoryStream,
     onStart: () => {
       epoch.current += 1;
       pendingRef.current = true;
@@ -81,12 +89,17 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
     onEvent: (event) => {
       if (event.eventSeq <= sequence.current) return;
       sequence.current = event.eventSeq;
-      if (event.type === "room") {
+      if (event.type === "request") {
+        requestId.current = event.clientRequestId;
+        pendingRef.current = true;
+        setPending(true);
+        setPhase("正在安排下一位角色…");
+      } else if (event.type === "room") {
         setRoom((old) => mergeRoom(old, event.room));
+        pendingRef.current = false;
+        setPending(false);
         if (!accepted.current) {
           accepted.current = true;
-          pendingRef.current = false;
-          setPending(false);
           onAccepted();
         }
       } else if (event.type === "phase") setPhase(event.phase);
@@ -143,10 +156,15 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
       clientRequestId: crypto.randomUUID(),
       expectedVersion: room.version,
     };
+    requestId.current = lastCommand.current.clientRequestId;
     stream.send({ roomId, command: lastCommand.current });
   }
   async function stop() {
+    if (stoppingRef.current) return;
     const runId = pendingRef.current ? undefined : room?.run?.id;
+    stoppingRef.current = true;
+    setStopping(true);
+    lastCommand.current = null;
     epoch.current += 1;
     pendingRef.current = true;
     stream.stop();
@@ -158,14 +176,20 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
       const data = await worldRequest<{ room: WorldRoom }>(
         `rooms/${roomId}/stop`,
         "POST",
-        { runId },
+        { runId, clientRequestId: requestId.current },
       );
-      setRoom((old) => mergeRoom(old, data.room));
+      if (mounted.current) setRoom((old) => mergeRoom(old, data.room));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "暂停失败");
+      if (mounted.current)
+        setError(e instanceof Error ? e.message : "暂停失败");
     } finally {
       pendingRef.current = false;
-      setPending(false);
+      stoppingRef.current = false;
+      if (mounted.current) {
+        setPending(false);
+        setStopping(false);
+        void refresh();
+      }
     }
   }
   async function loadEarlier() {
@@ -199,13 +223,14 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
     setError,
     busy,
     pending,
+    stopping,
     phase,
     refresh,
     start,
     stop,
     loadEarlier,
     retrySubmission:
-      !accepted.current && lastCommand.current
+      !stopping && !accepted.current && lastCommand.current
         ? () => stream.send({ roomId, command: lastCommand.current! })
         : undefined,
   };

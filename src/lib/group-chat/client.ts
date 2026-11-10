@@ -2,6 +2,68 @@ import { parseJsonEventStream } from "ai";
 import { z } from "zod";
 import type { RunInput, WorldEvent, WorldRoom } from "./model";
 
+export type WorldClientEvent =
+  | WorldEvent
+  | {
+      type: "request";
+      clientRequestId: string;
+      eventSeq: number;
+      runId: string;
+    };
+
+/** Keep bounded server runs going only while this page's subscription is active. */
+export async function* worldStoryStream(
+  input: { roomId: string; command: RunInput },
+  context: { signal: AbortSignal },
+): AsyncGenerator<WorldClientEvent> {
+  let command = input.command;
+  let sequence = 0;
+  while (!context.signal.aborted) {
+    yield {
+      type: "request",
+      clientRequestId: command.clientRequestId,
+      eventSeq: ++sequence,
+      runId: "",
+    };
+    context.signal.throwIfAborted();
+    let room: WorldRoom | undefined;
+    let failed = false;
+    let runId: string | undefined;
+    let serverSequence = 0;
+    for await (const event of worldStream({ ...input, command }, context)) {
+      context.signal.throwIfAborted();
+      if (event.eventSeq <= serverSequence) continue;
+      serverSequence = event.eventSeq;
+      runId ??= event.runId;
+      if (event.type === "room") room = event.room;
+      if (event.type === "error") failed = true;
+      yield { ...event, eventSeq: ++sequence };
+    }
+    if (
+      context.signal.aborted ||
+      failed ||
+      command.mode !== "auto" ||
+      !room ||
+      room.status !== "active" ||
+      room.paused ||
+      room.run?.id !== runId ||
+      room.run?.status !== "completed" ||
+      room.run.mode !== "auto" ||
+      room.run.turns !== room.run.limit
+    )
+      return;
+    command = {
+      clientRequestId: crypto.randomUUID(),
+      expectedVersion: room.version,
+      mode: "auto",
+      text: "",
+      mentions: [],
+      resume: false,
+      continueRunId: room.run.id,
+    };
+  }
+}
+
 export async function worldRequest<T>(
   path: string,
   method = "GET",

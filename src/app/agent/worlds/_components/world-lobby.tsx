@@ -36,7 +36,25 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
+import { neonNightWorld } from "./neon-night-world";
 import { WorldEditor } from "./world-editor";
+
+const builtInWorlds = [
+  {
+    id: "fog-harbor",
+    config: exampleWorld,
+    description:
+      "暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，而下一步由你们共同决定。",
+    details: "3 位角色 · 自由探索 · 信息不对称",
+  },
+  {
+    id: "neon-night",
+    config: neonNightWorld,
+    description:
+      "你是想把旧铺面做起来的有志青年，三位精神小妹带着各自的心事加入。夜市、创业、嘴硬与偏心，玩笑里藏着一点心动。",
+    details: "三女一男 · 全员成年 · 你扮演男主 · 街头日常与轻暧昧",
+  },
+];
 
 export function WorldLobby() {
   const router = useRouter();
@@ -128,28 +146,31 @@ export function WorldLobby() {
             </AlertDescription>
           </Alert>
         ) : null}
-        <section className="grid gap-6 rounded-3xl border border-border bg-muted/30 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <BookOpen className="size-4" />
-              一个可以直接开始的世界
-            </div>
-            <h2 className="text-2xl font-semibold">雾港停电之夜</h2>
-            <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-              暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，而下一步由你们共同决定。
-            </p>
-            <p className="text-xs text-muted-foreground">
-              3 位角色 · 自由探索 · 信息不对称
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setEditing(structuredClone(exampleWorld))}
+        {builtInWorlds.map((world) => (
+          <section
+            key={world.id}
+            className="grid gap-6 rounded-3xl border border-border bg-muted/30 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8"
           >
-            设定并开始
-            <ArrowRight data-icon="inline-end" />
-          </Button>
-        </section>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <BookOpen className="size-4" />
+                一个可以直接开始的世界
+              </div>
+              <h2 className="text-2xl font-semibold">{world.config.title}</h2>
+              <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
+                {world.description}
+              </p>
+              <p className="text-xs text-muted-foreground">{world.details}</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setEditing(structuredClone(world.config))}
+            >
+              设定并开始
+              <ArrowRight data-icon="inline-end" />
+            </Button>
+          </section>
+        ))}
         <section className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">我的世界</h2>

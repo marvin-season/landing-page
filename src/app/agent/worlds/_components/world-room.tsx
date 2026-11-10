@@ -71,6 +71,12 @@ function WorldNotes({
             </p>
           </div>
         </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
+          <p className="font-medium">系统 · 故事主持人</p>
+          <p className="text-xs leading-6 text-muted-foreground">
+            叙述场景、推进事件，并根据你的发言安排角色回应，无需点名。
+          </p>
+        </div>
         {room.config.characters.map((c) => (
           <div
             key={c.id}
@@ -178,7 +184,9 @@ function MessageBubble({
           )}
         >
           <span className="font-medium text-foreground">{message.name}</span>
-          <span>{user ? "你" : "角色"}</span>
+          <span>
+            {user ? "你" : message.kind === "narrator" ? "故事主持人" : "角色"}
+          </span>
           <time>
             {new Date(message.createdAt).toLocaleTimeString("zh-CN", {
               hour: "2-digit",
@@ -264,7 +272,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         </Button>
       </div>
     );
-  const running = chat.busy || room.run?.status === "running";
+  const running = chat.stopping || chat.busy || room.run?.status === "running";
+  const waitingForDecision = room.paused && room.run?.reason === "等待你的决定";
   const ended = room.status === "ended";
   const mentionItems = room.config.characters
     .filter((c) => c.enabled)
@@ -285,7 +294,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       mode: "auto",
       text: draft,
       mentions: mentions.map((m) => m.id),
-      resume: resume || !room!.paused,
+      resume: resume || !room!.paused || waitingForDecision,
     });
   }
   async function edit(copy = false) {
@@ -321,7 +330,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 : running
                   ? chat.phase || room.run?.phase
                   : room.paused
-                    ? "已暂停"
+                    ? room.run?.reason || "已暂停"
                     : room.run?.reason || "故事尚未开始"}
             </p>
           </div>
@@ -376,7 +385,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   </p>
                   <p className="text-xs leading-6 text-muted-foreground">
                     以「{room.config.userName}
-                    」的身份说第一句话，或者让角色们先开口。你可以随时暂停、点名或加入讨论。
+                    」的身份说第一句话，或者让系统开启故事。系统会安排角色依次回应，你可以随时暂停或加入讨论，无需
+                    @ 点名。
                   </p>
                 </div>
               ) : null}
@@ -388,7 +398,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     !running &&
                     !ended &&
                     message.id === latestMessage?.id &&
-                    message.kind === "agent" &&
+                    ["agent", "narrator"].includes(message.kind) &&
                     ["interrupted", "failed", "truncated"].includes(
                       message.status,
                     ) &&
@@ -433,10 +443,11 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                       <Button
                         size="sm"
                         variant="outline"
+                        disabled={chat.stopping}
                         onClick={() => void chat.stop()}
                       >
                         <Pause data-icon="inline-start" />
-                        暂停
+                        {chat.stopping ? "正在暂停…" : "暂停"}
                       </Button>
                     ) : (
                       <Button
@@ -452,7 +463,9 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                         }
                       >
                         <Play data-icon="inline-start" />
-                        {room.status === "draft" ? "让角色先开口" : "继续对话"}
+                        {room.status === "draft"
+                          ? "让系统开启故事"
+                          : "继续故事"}
                       </Button>
                     )}
                     <Button
@@ -472,7 +485,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                       仅下一条
                     </Button>
                     <span className="text-xs text-muted-foreground">
-                      每次最多 {room.config.maxTurns} 条 · 随时可插话
+                      系统主持剧情，角色依次回应 · 随时可暂停或插话
                     </span>
                   </div>
                   <AiInput
@@ -485,17 +498,19 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     maxLength={8000}
                     rows={2}
                     onSubmit={() => send()}
-                    placeholder={`以 ${room.config.userName} 的身份发言，输入 @ 点名角色…`}
+                    placeholder={`以 ${room.config.userName} 的身份说话或行动，系统会安排回应…`}
                     sendLabel="发送消息"
                     emptyMentionLabel="没有匹配的角色"
                     removeMentionLabel="取消点名"
                     hint={
-                      room.paused
-                        ? "当前已暂停，普通发送只保存消息。"
-                        : "Enter 发送 · Shift + Enter 换行 · 点名消息对所有角色公开"
+                      waitingForDecision
+                        ? "说出你的决定，角色会继续推进故事。"
+                        : room.paused
+                          ? "当前已暂停，普通发送只保存消息。"
+                          : "无需点名，系统自动安排回应 · @ 可指定角色优先发言"
                     }
                     footer={
-                      room.paused ? (
+                      room.paused && !waitingForDecision ? (
                         <Button
                           type="button"
                           size="sm"

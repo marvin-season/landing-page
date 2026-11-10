@@ -6,6 +6,7 @@ import {
   directorContext,
   eligibleCharacters,
   fallbackSpeaker,
+  narratorContext,
   parseSelection,
   summaryContext,
 } from "./context";
@@ -48,7 +49,9 @@ const fakeComplete: Complete = async ({ messages, onText }) => {
       }),
     };
   }
-  const text = "我先检查一下控制台，请大家留意对讲机。";
+  const text = messages[0].content.includes("可见的系统主持人")
+    ? "控制室的备用灯闪烁了一下，对讲机传出短促的呼叫声。"
+    : "我先检查一下控制台，请大家留意对讲机。";
   onText?.(text);
   return { text, usage: { input: 20, output: 10 } };
 };
@@ -88,6 +91,7 @@ test("private goals and knowledge never enter other actors, director or summary 
     actorContext(room, room.config.characters[1]),
     directorContext(room, eligibleCharacters(room)),
     summaryContext(room, []),
+    narratorContext(room, "继续剧情"),
   ]) {
     assert.doesNotMatch(
       JSON.stringify(context),
@@ -119,10 +123,12 @@ test("automatic run commits three ordered messages, uses previous speakers, and 
   );
   const saved = await store.get("alice", room.id);
   const actors = saved.messages.filter((m) => m.kind === "agent");
-  assert.equal(actors.length, 3);
+  assert.equal(actors.length, 2);
+  assert.equal(saved.messages[1].kind, "narrator");
   assert.ok(actors.every((m) => m.status === "complete"));
   assert.notEqual(actors[0].speakerId, actors[1].speakerId);
-  assert.match(seen[1], /我先检查一下控制台/);
+  assert.match(seen[1], /备用灯闪烁/);
+  assert.match(seen[2], /我先检查一下控制台/);
   assert.equal(saved.run?.status, "completed");
   assert.equal(saved.run?.turns, 3);
   assert.equal(events.at(-1)?.type, "done");
@@ -132,7 +138,7 @@ test("automatic run commits three ordered messages, uses previous speakers, and 
   );
 });
 
-test("mentions are deduplicated and only requested actors reply in order", async () => {
+test("mentions get ordered priority, then autonomous actors continue", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);
   const started = await store.begin(
@@ -147,11 +153,143 @@ test("mentions are deduplicated and only requested actors reply in order", async
     () => {},
   );
   const saved = await store.get("alice", room.id);
-  assert.deepEqual(
-    saved.messages.filter((m) => m.kind === "agent").map((m) => m.speakerId),
-    ["reporter", "engineer"],
+  const speakers = saved.messages
+    .filter((m) => m.kind === "agent")
+    .map((m) => m.speakerId);
+  assert.deepEqual(speakers.slice(0, 2), ["reporter", "engineer"]);
+  assert.equal(speakers.length, 2);
+  assert.equal(saved.messages.at(-1)?.kind, "narrator");
+});
+
+test("a genuine user decision pauses instead of automatically scheduling again", async () => {
+  const store = setup();
+  const room = await store.create("alice", { ...exampleWorld, maxTurns: 4 });
+  const started = await store.begin("alice", room.id, command());
+  await createWorldEngine(store, async (input) =>
+    input.messages[0].content.includes("调度器")
+      ? {
+          text: '{"action":"wait","question":"你是否愿意亲自进入断电的机房？"}',
+        }
+      : fakeComplete(input),
+  )("alice", started.room, new AbortController().signal, () => {});
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.run?.status, "paused");
+  assert.equal(saved.run?.reason, "等待你的决定");
+  assert.equal(saved.paused, true);
+  assert.equal(saved.messages.length, 4);
+  assert.equal(saved.messages.at(-1)?.kind, "narrator");
+  assert.match(saved.messages.at(-1)!.text, /是否愿意/);
+});
+
+test("pausing during the reading interval preserves the reply and cancels the next actor", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({ mentions: ["engineer", "reporter"] }),
   );
-  assert.equal(saved.run?.calls, 2);
+  let stop: Promise<unknown> | undefined;
+  const done = createWorldEngine(store, fakeComplete)(
+    "alice",
+    started.room,
+    new AbortController().signal,
+    (event) => {
+      if (event.type === "phase" && event.phase.includes("阅读")) {
+        stop = store.stop("alice", room.id, event.runId).then(() => {
+          abortRun(event.runId);
+        });
+      }
+    },
+  );
+  await done;
+  await stop;
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.run?.status, "paused");
+  assert.equal(saved.run?.turns, 1);
+  assert.equal(saved.messages.filter((m) => m.kind === "agent").length, 1);
+  assert.equal(saved.messages.at(-1)?.status, "complete");
+});
+
+test("a two-character world still consults the director before the next actor", async () => {
+  const store = setup();
+  const room = await store.create("alice", {
+    ...exampleWorld,
+    characters: exampleWorld.characters.slice(0, 2),
+  });
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "你们进入控制室。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({ mentions: ["engineer"] }),
+  );
+  await createWorldEngine(store, async (input) =>
+    input.messages[0].content.includes("调度器")
+      ? { text: '{"action":"wait","question":"你是否愿意亲自进入机房？"}' }
+      : fakeComplete(input),
+  )("alice", started.room, new AbortController().signal, () => {});
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.run?.turns, 3);
+  assert.equal(saved.messages.filter((m) => m.kind === "agent").length, 2);
+  assert.equal(saved.run?.reason, "等待你的决定");
+  assert.equal(saved.paused, true);
+});
+
+test("stop fences a pending request even when it reaches the server before begin", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const input = command({ text: "开始吧", resume: true });
+  await store.stop("alice", room.id, undefined, input.clientRequestId);
+  await assert.rejects(store.begin("alice", room.id, input), /暂停/);
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.run, null);
+  assert.equal(saved.messages.length, 0);
+  assert.equal(saved.paused, true);
+});
+
+test("continuations need the completed run and cannot undo a pause or replace another run", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const started = await store.begin("alice", room.id, command());
+  // Simulate a committed batch without spending time generating its replies.
+  await store.change("alice", room.id, (r) => {
+    r.run!.status = "completed";
+    r.run!.turns = r.run!.limit;
+  });
+  const continuation = command({ continueRunId: started.room.run!.id });
+  const next = await store.begin("alice", room.id, continuation);
+  assert.equal(next.value.started, true);
+  assert.equal(next.room.messages.length, 0);
+  await assert.rejects(
+    store.begin(
+      "alice",
+      room.id,
+      command({ continueRunId: started.room.run!.id }),
+    ),
+    /暂停或更新/,
+  );
+  await store.change("alice", room.id, (r) => {
+    r.run!.status = "completed";
+  });
+  await store.stop("alice", room.id, next.room.run!.id);
+  await assert.rejects(
+    store.begin(
+      "alice",
+      room.id,
+      command({ continueRunId: next.room.run!.id }),
+    ),
+    /暂停或更新/,
+  );
 });
 
 test("idempotency prevents duplicate user messages and stale versions are rejected", async () => {
@@ -289,6 +427,17 @@ test("director invalid output falls back and unknown/private candidates cannot b
     ),
   );
   assert.ok(fallbackSpeaker(room));
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "控制室传来杂音。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
   const started = await store.begin(
     "alice",
     room.id,
@@ -328,6 +477,145 @@ test("backup import allocates fresh identities and rejects inconsistent referenc
     }),
     /引用/,
   );
+});
+
+test("ordinary unmentioned messages receive a selected actor response even when the director asks to wait", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "你们来到控制室。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
+  for (const decision of [
+    { action: "wait", question: "你要怎么做？" },
+    {
+      action: "speak",
+      speakerId: "reporter",
+      direction: "回应用户对停电原因的追问，提出一条可验证的线索。",
+    },
+  ]) {
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step", text: "停电前发生过什么？", resume: true }),
+    );
+    let actorInput = "";
+    await createWorldEngine(store, async (input) => {
+      if (input.messages[0].content.includes("调度器"))
+        return { text: JSON.stringify(decision) };
+      actorInput = input.messages[1].content;
+      return fakeComplete(input);
+    })("alice", started.room, new AbortController().signal, () => {});
+    const saved = await store.get("alice", room.id);
+    assert.equal(saved.messages.at(-1)?.kind, "agent");
+    assert.equal(saved.run?.turns, 1);
+    if (decision.action === "speak") {
+      assert.equal(saved.messages.at(-1)?.speakerId, "reporter");
+      assert.match(actorInput, /可验证的线索/);
+    }
+  }
+});
+
+test("system narration can be interrupted, retried and exported without becoming an NPC", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({ mode: "step" }),
+  );
+  const controller = new AbortController();
+  await createWorldEngine(store, async ({ onText }) => {
+    onText?.("灯光开始闪烁");
+    controller.abort();
+    return { text: "不应提交" };
+  })("alice", started.room, controller.signal, () => {});
+  const interrupted = await store.get("alice", room.id);
+  assert.equal(interrupted.messages.at(-1)?.kind, "narrator");
+  assert.equal(interrupted.messages.at(-1)?.status, "interrupted");
+  const retry = await store.begin(
+    "alice",
+    room.id,
+    command({
+      mode: "retry",
+      retryMessageId: interrupted.messages.at(-1)!.id,
+      resume: true,
+    }),
+  );
+  await createWorldEngine(store, fakeComplete)(
+    "alice",
+    retry.room,
+    new AbortController().signal,
+    () => {},
+  );
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.messages.at(-1)?.speakerId, "system");
+  assert.equal(saved.messages.at(-1)?.status, "complete");
+  const imported = await store.import("alice", exportBackup(saved));
+  assert.equal(imported.messages.at(-1)?.kind, "narrator");
+  assert.match(
+    JSON.stringify(actorContext(imported, imported.config.characters[0])),
+    /备用灯闪烁/,
+  );
+  assert.doesNotMatch(
+    JSON.stringify(actorContext(imported, imported.config.characters[0])),
+    /灯光开始闪烁/,
+  );
+});
+
+test("the host can advance a scene, but repeated narration gives an actor the next turn", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "你们进入控制室。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+    appendMessage(r, {
+      speakerId: "engineer",
+      name: "许岚",
+      kind: "agent",
+      text: "我检查一下。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
+  const complete: Complete = (input) =>
+    input.messages[0].content.includes("调度器")
+      ? Promise.resolve({
+          text: '{"action":"narrate","direction":"对讲机出现新的公开信号"}',
+        })
+      : fakeComplete(input);
+  for (const expected of ["narrator", "agent"]) {
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step" }),
+    );
+    await createWorldEngine(store, complete)(
+      "alice",
+      started.room,
+      new AbortController().signal,
+      () => {},
+    );
+    assert.equal(
+      (await store.get("alice", room.id)).messages.at(-1)?.kind,
+      expected,
+    );
+  }
 });
 
 test("HTTP handlers enforce authentication, origin and ownership and stream a real room lifecycle", async () => {
@@ -456,7 +744,7 @@ test("long conversations summarize public history and keep original messages", a
 test("a room owner cannot cancel another owner's run by supplying its run ID", async () => {
   const store = setup();
   const alice = await store.create("alice", exampleWorld);
-  const bob = await store.create("bob", exampleWorld);
+  const bob = await store.create("bob", { ...exampleWorld, maxTurns: 1 });
   const started = await store.begin(
     "bob",
     bob.id,

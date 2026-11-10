@@ -1,8 +1,11 @@
+import { setTimeout as delay } from "node:timers/promises";
 import {
   actorContext,
+  canWaitForUser,
   directorContext,
   eligibleCharacters,
   fallbackSpeaker,
+  narratorContext,
   parseSelection,
   summaryBatch,
   summaryContext,
@@ -131,15 +134,23 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           }
           const mentioned = room.run!.mentions[turn];
           const eligible = eligibleCharacters(room);
-          let speaker = mentioned
-            ? room.config.characters.find(
-                (c) => c.id === mentioned && c.enabled,
-              )
-            : fallbackSpeaker(room, eligible);
+          let speaker =
+            mentioned && mentioned !== "system"
+              ? room.config.characters.find(
+                  (c) => c.id === mentioned && c.enabled,
+                )
+              : fallbackSpeaker(room, eligible);
           if (!speaker)
             throw new WorldError("no_characters", "没有可发言的角色");
-          if (!mentioned && eligible.length > 1) {
-            await phase("正在选择发言者");
+          let narrating =
+            mentioned === "system" ||
+            (!mentioned &&
+              !room.messages.some(
+                (m) => m.kind === "narrator" && m.status === "complete",
+              ));
+          let direction = "承接当前事件，给出一个可供角色回应的具体场景变化。";
+          if (!mentioned && !narrating) {
+            await phase("系统正在安排剧情");
             const recent = room.messages
               .filter((m) => m.kind === "agent" && m.status === "complete")
               .slice(
@@ -149,45 +160,77 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               recent.length >=
                 room.config.characters.filter((c) => c.enabled).length * 2 &&
               !recent.some((m) => m.speakerId === speaker!.id);
-            if (!overdue) {
-              try {
-                const text = await call(
-                  process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model,
-                  directorContext(room, eligible),
-                  1500,
-                );
-                const selected = parseSelection(text, eligible);
-                if (!selected) {
-                  await change((r) =>
-                    finishRun(r, "completed", "等待你的决定"),
-                  );
-                  break;
-                }
-                speaker = selected;
-              } catch (error) {
-                if (
-                  signal.aborted ||
-                  storageError ||
-                  (error instanceof WorldError &&
-                    [
-                      "stopped",
-                      "budget",
-                      "tools_disabled",
-                      "proxy_auth",
-                    ].includes(error.code))
-                )
-                  throw error;
-                // One failed director attempt uses the deterministic speaker, never a repair loop.
+            try {
+              const text = await call(
+                process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model,
+                directorContext(room, eligible),
+                1500,
+              );
+              const selected = parseSelection(text, eligible);
+              if (selected.action === "wait" && canWaitForUser(room)) {
+                await change((r) => {
+                  message = appendMessage(r, {
+                    speakerId: "system",
+                    name: "系统",
+                    kind: "narrator",
+                    text: selected.question,
+                    status: "complete",
+                    runId,
+                    mentions: [],
+                  });
+                  r.run!.turns += 1;
+                  r.updatedAt = new Date().toISOString();
+                  finishRun(r, "paused", "等待你的决定");
+                });
+                send({ type: "message", message: message! });
+                message = undefined;
+                break;
               }
+              if (selected.action === "speak") {
+                if (!overdue) speaker = selected.character;
+                direction =
+                  speaker.id === selected.character.id
+                    ? selected.direction
+                    : "";
+              } else if (
+                selected.action === "narrate" &&
+                room.messages
+                  .filter((m) => m.status === "complete" && m.kind !== "system")
+                  .at(-1)?.kind !== "narrator"
+              ) {
+                narrating = true;
+                direction = selected.direction;
+              } else {
+                direction =
+                  "直接回应最近的用户消息或系统事件，并自主推进一个小行动，不要再次把话题退回给用户。";
+              }
+            } catch (error) {
+              if (
+                signal.aborted ||
+                storageError ||
+                (error instanceof WorldError &&
+                  [
+                    "stopped",
+                    "budget",
+                    "tools_disabled",
+                    "proxy_auth",
+                  ].includes(error.code))
+              )
+                throw error;
+              // One failed director attempt uses the deterministic speaker, never a repair loop.
             }
           }
-          const messages = actorContext(room, speaker);
-          await phase(`${speaker.name} 正在回应`);
+          const messages = narrating
+            ? narratorContext(room, direction)
+            : actorContext(room, speaker, direction);
+          await phase(
+            narrating ? "系统正在推进剧情" : `${speaker.name} 正在回应`,
+          );
           await change((r) => {
             message = appendMessage(r, {
-              speakerId: speaker!.id,
-              name: speaker!.name,
-              kind: "agent",
+              speakerId: narrating ? "system" : speaker!.id,
+              name: narrating ? "系统" : speaker!.name,
+              kind: narrating ? "narrator" : "agent",
               text: "",
               status: "streaming",
               runId,
@@ -197,7 +240,10 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           send({ type: "message", message: message! });
           partial = "";
           let lastCheckpoint = Date.now();
-          const text = await call(speaker.model, messages, 2000, (delta) => {
+          const model = narrating
+            ? process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model
+            : speaker.model;
+          const text = await call(model, messages, 2000, (delta) => {
             if (signal.aborted) return;
             partial += delta;
             send({ type: "delta", messageId: message!.id, text: delta });
@@ -232,6 +278,16 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           send({ type: "message", message: message! });
           message = undefined;
           partial = "";
+          if (room.run!.mode === "auto") {
+            await phase("留一点时间阅读，随后继续剧情…");
+            await delay(
+              Math.min(5000, Math.max(1500, text.length * 25)),
+              undefined,
+              {
+                signal,
+              },
+            );
+          }
         }
         if (room.run?.status === "running") {
           await change((r) =>

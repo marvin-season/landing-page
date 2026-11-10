@@ -57,7 +57,7 @@ export const messageSchema = z.object({
   seq: z.number().int().positive(),
   speakerId: idSchema,
   name: text(60),
-  kind: z.enum(["user", "agent", "system"]),
+  kind: z.enum(["user", "agent", "narrator", "system"]),
   text: z.string().max(12000),
   status: z.enum([
     "streaming",
@@ -124,6 +124,7 @@ export const runInputSchema = z.object({
   text: text(8000).default(""),
   mentions: z.array(idSchema).max(6).default([]),
   retryMessageId: idSchema.optional(),
+  continueRunId: idSchema.optional(),
   resume: z.boolean().default(false),
 });
 export type RunInput = z.infer<typeof runInputSchema>;

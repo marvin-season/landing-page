@@ -236,11 +236,27 @@ export function createWorldStore(getClient: () => Client) {
         })
       ).room;
     },
-    async stop(ownerId: string, id: string, runId?: string) {
+    async stop(
+      ownerId: string,
+      id: string,
+      runId?: string,
+      clientRequestId?: string,
+    ) {
       return (
-        await change(ownerId, id, (room) => {
+        await change(ownerId, id, async (room, tx) => {
+          // Fence a request that is still in flight, even if stop reaches us first.
+          if (clientRequestId)
+            await tx.execute({
+              sql: "INSERT OR IGNORE INTO world_requests VALUES (?, ?, ?)",
+              args: [id, clientRequestId, "cancelled"],
+            });
           if (runId && room.run?.id !== runId) return;
           finishRun(room, "paused", "已暂停");
+          if (room.run) {
+            room.run.reason = "已暂停";
+            room.run.phase = "已暂停";
+          }
+          room.updatedAt = new Date().toISOString();
         })
       ).room;
     },
@@ -275,6 +291,8 @@ export function createWorldStore(getClient: () => Client) {
           args: [id, input.clientRequestId],
         });
         if (previous.rows[0]) {
+          if (previous.rows[0].hash === "cancelled")
+            throw new WorldError("stopped", "对话已暂停", 409);
           if (previous.rows[0].hash !== hash)
             throw new WorldError(
               "idempotency_conflict",
@@ -287,6 +305,17 @@ export function createWorldStore(getClient: () => Client) {
           throw new WorldError("conflict", "设定已更新，请刷新后发送", 409);
         if (room.status === "ended")
           throw new WorldError("ended", "故事已结束");
+        if (
+          input.continueRunId &&
+          (input.mode !== "auto" ||
+            input.text ||
+            input.mentions.length ||
+            room.paused ||
+            room.run?.id !== input.continueRunId ||
+            room.run.status !== "completed" ||
+            room.run.mode !== "auto")
+        )
+          throw new WorldError("stopped", "剧情已暂停或更新，请手动继续", 409);
         const mentions = [...new Set(input.mentions)];
         for (const participantId of mentions) {
           if (
@@ -306,7 +335,7 @@ export function createWorldStore(getClient: () => Client) {
           if (
             !target ||
             target !== latest ||
-            target.kind !== "agent" ||
+            !["agent", "narrator"].includes(target.kind) ||
             !["failed", "interrupted", "truncated"].includes(target.status) ||
             target.configVersion !== room.version
           )
@@ -315,6 +344,7 @@ export function createWorldStore(getClient: () => Client) {
               "上下文已变化，请重新点名该角色",
             );
           if (
+            target.kind === "agent" &&
             !room.config.characters.some(
               (c) => c.id === target.speakerId && c.enabled,
             )
@@ -362,7 +392,7 @@ export function createWorldStore(getClient: () => Client) {
             limit:
               input.mode === "step" || input.mode === "retry"
                 ? 1
-                : mentions.length || room.config.maxTurns,
+                : Math.max(mentions.length, room.config.maxTurns),
             mentions,
             configVersion: room.version,
             mode: input.mode,
@@ -418,7 +448,8 @@ export function createWorldStore(getClient: () => Client) {
           (message.kind === "agent" &&
             !config.characters.some((c) => c.id === message.speakerId)) ||
           (message.kind === "user" && message.speakerId !== "user") ||
-          (message.kind === "system" && message.speakerId !== "system") ||
+          (["system", "narrator"].includes(message.kind) &&
+            message.speakerId !== "system") ||
           message.mentions.some(
             (id) => !config.characters.some((c) => c.id === id),
           )

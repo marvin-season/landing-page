@@ -393,19 +393,8 @@ export function WorldEditor({
         </section>
         <section className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold">对话节奏</h3>
-          <label className="flex flex-col gap-2 text-sm">
-            每次自动发言上限（1～10 条）
-            <Input
-              type="number"
-              min={1}
-              max={10}
-              value={config.maxTurns}
-              onChange={(e) => update("maxTurns", Number(e.target.value))}
-              required
-            />
-          </label>
           <p className="text-xs leading-5 text-muted-foreground">
-            角色依次发言，达到上限后等待你继续。点名时仅由被点名的角色回应。
+            角色会依据各自设定主动推进故事，每次只由一位角色发言，留出阅读时间后再继续。点名角色优先回应，之后恢复自动调度；你可以随时暂停，或使用“仅下一条”。需要你做决定时，故事会停下来等待。
           </p>
           <div className="flex flex-wrap gap-2">
             <Button
