@@ -2,6 +2,7 @@
 export { createObservableStream } from "./chat-stream";
 export {
   type ChatStreamAdapter,
+  createObservableEvents,
   createObservableState,
 } from "./chat-stream-observable";
 export {
@@ -15,4 +16,8 @@ export {
   type TextBlock,
   type ToolCallBlock,
 } from "./chat-stream-state";
+export {
+  type ChatStreamCoreOptions,
+  useChatStreamCore,
+} from "./use-chat-stream-core";
 export { useChatStreamState } from "./use-chat-stream-state";

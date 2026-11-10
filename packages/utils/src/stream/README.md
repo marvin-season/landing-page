@@ -6,8 +6,9 @@
 
 ## 目录结构
 
-- `use-chat-stream-state.ts`：React Hook，提供 `state / send / loading / error / stop`。
-- `chat-stream-observable.ts`：`ChatStreamAdapter<TInput>` 契约、取消信号与 `createObservableState`。
+- `use-chat-stream-core.ts`：管理订阅与取消，通过回调逐条输出事件，不维护 React 状态。
+- `use-chat-stream-state.ts`：消费 core 事件并归约状态，提供 `state / send / loading / error / stop`。
+- `chat-stream-observable.ts`：`ChatStreamAdapter<TInput, TEvent>` 契约、取消信号、原始事件流 `createObservableEvents` 与状态流 `createObservableState`。
 - `chat-stream-state.ts`：状态类型、纯事件归约函数、文本合并与完成收尾。
 - `chat-stream.ts`：读取单行 JSON data 的 SSE，输出指定事件类型的 Observable。
 - `index.ts`：独立子路径的公开导出。
@@ -18,7 +19,59 @@
 
 项目适配器应放在应用层；包只依赖 React、RxJS 和 AI SDK 的事件类型，不引用应用代码。
 
-## 自定义适配器
+## 只消费事件，不维护 React 状态
+
+已有自己的 store，或只想逐条处理事件时，可以直接使用 `useChatStreamCore`。输入和事件类型均从适配器推导，不依赖 AI SDK：
+
+```tsx
+import { useChatStreamCore } from "@landing-page/utils/stream";
+
+// 接口响应的解码、解压和协议转换全部由 adapter 负责。
+async function* adapter(
+  input: { prompt: string },
+  { signal }: { signal: AbortSignal },
+) {
+  const response = await fetch("/api/custom-text", {
+    method: "POST",
+    body: input.prompt,
+    signal,
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.body) throw new Error("缺少响应流");
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      yield { delta: value };
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+const { send, stop } = useChatStreamCore({
+  adapter,
+  onStart: () => console.log("开始请求"),
+  onEvent: (event) => console.log(event.delta), // 自动推导为 { delta: string }
+  onComplete: () => console.log("流已结束"),
+  onError: (message) => console.error(message),
+});
+```
+
+`adapter` 和 `onEvent` 必填，其余回调可选。core 只返回 `send / stop`，不累积文本或保存 `state / loading / error`，不会因收到事件而主动触发渲染。
+
+- `onStart` 在每次 `send` 时、适配器启动前调用。
+- `onEvent` 按顺序收到适配器输出的 `TEvent`，不会对 `type` 等字段作特殊处理。
+- 适配器抛错、Observable error 或 `onEvent` 抛错都会终止流并进入 `onError`。自定义协议错误由适配器或消费层解释。
+- `onComplete` 不携带累积状态；`useChatStreamState` 负责归约、收尾，再向自己的 `onComplete(state)` 提供最终状态。
+- `stop`、下一次 `send` 和卸载只取消请求，不触发 `onComplete / onError`。
+
+非 React 场景可订阅 `createObservableEvents(input, adapter)`；已有的 `createObservableState(input, adapter)` 继续在事件流上累积状态。
+
+## 状态层适配器
+
+`useChatStreamState` 是基于 AI SDK 事件的消费层，使用 `UIMessageChunk` 归约文本与工具调用；这不是 core 的限制。`ChatStreamAdapter<TInput, TEvent>` 支持任意事件，省略第二个泛型时默认使用 `UIMessageChunk`，兼容现有适配器。
 
 ```ts
 import type { UIMessageChunk } from "ai";
@@ -104,7 +157,7 @@ type ChatStreamState = {
 - `start`：设置 `messageId`。
 - `text-start / text-delta / text-end`：开始、追加和完成文本块；同一文本块使用一致的 `id`。
 - `tool-input-start / tool-input-delta / tool-input-available / tool-output-available`：更新工具输入和结果。
-- `error`：终止状态流，交给 Hook 更新 `error` 并调用 `onError`。
+- `error`：状态归约时抛错，终止状态流，交给 Hook 更新 `error` 并调用 `onError`；core 自身不识别这种协议事件。
 - 其他事件当前不改变状态；新增 reasoning、文件等展示能力还需要扩展状态归约与 UI。
 
 `blocks` 包含已完成的文本块与工具调用；`streamingTool` 当前只记录一个进行中的工具调用，适配器应按顺序输出工具事件。
@@ -113,12 +166,12 @@ type ChatStreamState = {
 
 ## 生命周期
 
-- 每个 Hook 实例只管理一条活动订阅。再次 `send` 会取消上一条，并重置状态、错误和 loading。
+- 每个 Hook 实例只管理一条活动订阅。再次 `send` 会取消上一条；state hook 同时重置状态、错误和 loading。
 - `stop()` 取消订阅并触发适配器的 AbortSignal，保留当前状态，设置 `loading = false`，不调用完成或错误回调。
-- 卸载通过 `useEffect(() => stop, [stop])` 自动清理，调用方无需重复注册。
-- 同步抛错、异步错误和标准错误事件都进入同一错误通道。
+- 卸载由 core 自动取消订阅，不调用业务回调或更新 React 状态，调用方无需重复注册。
+- 同步抛错与异步错误进入同一错误通道；state hook 也会把 AI SDK 错误事件转换为错误。
 - 同步完成的适配器，以及完成回调中再次 `send`，不会覆盖新请求的订阅引用。
-- 适配器在每次 send 时选定；仅更换 options.adapter 不会重启正在进行的请求。
+- 适配器和回调在每次 send 时选定；仅更换 options 不会重启正在进行的请求。
 
 ## 验证
 

@@ -3,12 +3,78 @@ import { test } from "node:test";
 import {
   type ChatStreamAdapter,
   chatStreamText,
+  createObservableEvents,
   createObservableState,
   flushChatStreamState,
 } from "@landing-page/utils/stream";
 import type { UIMessageChunk } from "ai";
-import { lastValueFrom, Observable, of } from "rxjs";
+import { lastValueFrom, Observable, of, take, toArray } from "rxjs";
 import { submitMessageStreamAdapter } from "./chat-stream-adapter";
+
+test("通用事件流原样输出自定义事件，不解释 type 或归约状态", async () => {
+  type CustomEvent = { type: string; value: number };
+  const events: CustomEvent[] = [
+    { type: "progress", value: 1 },
+    { type: "error", value: 2 },
+    { type: "progress", value: 3 },
+  ];
+  const adapter: ChatStreamAdapter<{ id: number }, CustomEvent> = (input) => {
+    assert.equal(input.id, 7);
+    return events;
+  };
+  const received = await lastValueFrom(
+    createObservableEvents({ id: 7 }, adapter).pipe(toArray()),
+  );
+
+  assert.deepEqual(received, events);
+  assert.ok(received.every((event, index) => event === events[index]));
+});
+
+test("通用事件流支持异步字符串，并为每次订阅创建独立取消信号", async () => {
+  const signals: AbortSignal[] = [];
+  const events = createObservableEvents(
+    "hello",
+    async function* (input, context) {
+      signals.push(context.signal);
+      yield input;
+      yield " world";
+    },
+  );
+
+  assert.deepEqual(await lastValueFrom(events.pipe(toArray())), [
+    "hello",
+    " world",
+  ]);
+  assert.deepEqual(await lastValueFrom(events.pipe(toArray())), [
+    "hello",
+    " world",
+  ]);
+  assert.notEqual(signals[0], signals[1]);
+  assert.ok(signals.every((signal) => signal.aborted));
+});
+
+test("同步事件消费结束时立即取消源并释放资源", async () => {
+  let produced = 0;
+  let cleanupCount = 0;
+  let signal: AbortSignal | undefined;
+  const received = await lastValueFrom(
+    createObservableEvents(undefined, (_, context) => {
+      signal = context.signal;
+      return new Observable<number>((subscriber) => {
+        for (let value = 0; value < 3 && !subscriber.closed; value++) {
+          produced++;
+          subscriber.next(value);
+        }
+        return () => cleanupCount++;
+      });
+    }).pipe(take(1), toArray()),
+  );
+
+  assert.deepEqual(received, [0]);
+  assert.equal(produced, 1);
+  assert.equal(signal?.aborted, true);
+  assert.equal(cleanupCount, 1);
+});
 
 test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", async (t) => {
   let request: RequestInit | undefined;

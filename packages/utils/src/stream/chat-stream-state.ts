@@ -75,6 +75,9 @@ export function reduceChatStreamEvent(
 ): ChatStreamState {
   const t = event.type;
 
+  // AI SDK 的协议错误属于状态层语义，通用 core 不识别任何事件字段。
+  if (t === "error") throw new Error(event.errorText);
+
   if (t === "start") {
     const raw = "messageId" in event ? event.messageId : undefined;
     return {
