@@ -91,3 +91,30 @@ test("SDK adapter bounds visible text and never treats a truncated reply as comp
   );
   assert.equal(streamed, "12345");
 });
+
+test("a short selection deadline aborts the provider without cancelling the room", async () => {
+  let aborted = false;
+  const complete = createTextCompletion(
+    () =>
+      new OpenAI({
+        apiKey: "test",
+        maxRetries: 0,
+        fetch: async (_url, init) =>
+          new Promise<Response>((_resolve, reject) => {
+            const abort = () => {
+              aborted = true;
+              reject(init?.signal?.reason);
+            };
+            if (init?.signal?.aborted) abort();
+            else init?.signal?.addEventListener("abort", abort, { once: true });
+          }),
+      }),
+  );
+  const request = { ...input(), timeoutMs: 25 };
+  await assert.rejects(
+    complete(request),
+    (error: unknown) => error instanceof WorldError && error.code === "timeout",
+  );
+  assert.equal(aborted, true);
+  assert.equal(request.signal.aborted, false);
+});

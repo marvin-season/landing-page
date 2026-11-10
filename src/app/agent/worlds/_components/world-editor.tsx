@@ -394,7 +394,7 @@ export function WorldEditor({
         <section className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold">对话节奏</h3>
           <p className="text-xs leading-5 text-muted-foreground">
-            角色会依据各自设定主动推进故事，每次只由一位角色发言，留出阅读时间后再继续。点名角色优先回应，之后恢复自动调度；你可以随时暂停，或使用“仅下一条”。需要你做决定时，故事会停下来等待。
+            角色会依据各自设定主动推进故事，每次只由一位角色发言，回复完成后立即安排下一条。点名角色优先回应，之后恢复自动调度；你可以随时暂停，或使用“仅下一条”。需要你做决定时，故事会停下来等待。
           </p>
           <div className="flex flex-wrap gap-2">
             <Button

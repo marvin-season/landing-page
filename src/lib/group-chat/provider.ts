@@ -14,6 +14,7 @@ export type Complete = (input: {
   messages: ModelMessage[];
   signal: AbortSignal;
   maxCharacters: number;
+  timeoutMs?: number;
   onText?: (text: string) => void;
 }) => Promise<ModelResult>;
 
@@ -58,11 +59,22 @@ export function providerError(error: unknown): WorldError {
 export function createTextCompletion(
   getClient: () => OpenAI = client,
 ): Complete {
-  return async ({ model, messages, signal, maxCharacters, onText }) => {
+  return async ({
+    model,
+    messages,
+    signal,
+    maxCharacters,
+    onText,
+    timeoutMs = 60000,
+  }) => {
     const timeout = new AbortController();
     const combined = AbortSignal.any([signal, timeout.signal]);
-    const totalTimer = setTimeout(() => timeout.abort(), 60000);
-    let idleTimer = setTimeout(() => timeout.abort(), 30000);
+    const budgetMs = Math.min(60000, Math.max(1, timeoutMs));
+    const totalTimer = setTimeout(() => timeout.abort(), budgetMs);
+    let idleTimer = setTimeout(
+      () => timeout.abort(),
+      Math.min(30000, budgetMs),
+    );
     let text = "";
     let finish: string | null = null;
     let usage: ModelResult["usage"];
@@ -78,7 +90,10 @@ export function createTextCompletion(
       );
       for await (const chunk of stream) {
         clearTimeout(idleTimer);
-        idleTimer = setTimeout(() => timeout.abort(), 30000);
+        idleTimer = setTimeout(
+          () => timeout.abort(),
+          Math.min(30000, budgetMs),
+        );
         const choice = chunk.choices[0];
         if (choice?.delta.tool_calls?.length || choice?.delta.function_call)
           throw new WorldError(

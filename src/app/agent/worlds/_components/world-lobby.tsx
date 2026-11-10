@@ -43,6 +43,7 @@ const builtInWorlds = [
   {
     id: "fog-harbor",
     config: exampleWorld,
+    adultsOnly: false,
     description:
       "暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，而下一步由你们共同决定。",
     details: "3 位角色 · 自由探索 · 信息不对称",
@@ -50,9 +51,10 @@ const builtInWorlds = [
   {
     id: "neon-night",
     config: neonNightWorld,
+    adultsOnly: true,
     description:
-      "你是想把旧铺面做起来的有志青年，三位精神小妹带着各自的心事加入。夜市、创业、嘴硬与偏心，玩笑里藏着一点心动。",
-    details: "三女一男 · 全员成年 · 你扮演男主 · 街头日常与轻暧昧",
+      "你扮演想在旧街立足的有志青年，与三位精神小妹卷入夜生活、债务与感情纠葛。含粗口、烟酒、成人关系及冲突情节，每次选择都要付出代价。",
+    details: "18+ 成人向 · R 级风格 · 三女一男 · 未成年人禁止使用",
   },
 ];
 
@@ -164,9 +166,18 @@ export function WorldLobby() {
             </div>
             <Button
               variant="outline"
-              onClick={() => setEditing(structuredClone(world.config))}
+              onClick={() => {
+                if (
+                  world.adultsOnly &&
+                  !window.confirm(
+                    "《霓虹夜巷》为 18+ 成人向、R 级风格剧本，含粗口、烟酒、成人关系及冲突情节，未成年人禁止使用。\n\n点击“确定”表示你确认已年满 18 岁并愿意继续；否则请取消。",
+                  )
+                )
+                  return;
+                setEditing(structuredClone(world.config));
+              }}
             >
-              设定并开始
+              {world.adultsOnly ? "确认成年并开始" : "设定并开始"}
               <ArrowRight data-icon="inline-end" />
             </Button>
           </section>

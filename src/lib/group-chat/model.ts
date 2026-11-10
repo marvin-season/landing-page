@@ -69,6 +69,7 @@ export const messageSchema = z.object({
   configVersion: z.number().int().positive(),
   runId: idSchema.nullable(),
   mentions: z.array(idSchema).max(6),
+  followUpTo: idSchema.optional(),
   createdAt: z.string().datetime(),
 });
 export type WorldMessage = z.infer<typeof messageSchema>;

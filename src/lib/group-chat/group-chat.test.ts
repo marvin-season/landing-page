@@ -8,6 +8,7 @@ import {
   fallbackSpeaker,
   narratorContext,
   parseSelection,
+  pendingUserQuestions,
   summaryContext,
 } from "./context";
 import { abortRun, createWorldEngine } from "./engine";
@@ -45,7 +46,12 @@ const fakeComplete: Complete = async ({ messages, onText }) => {
     return {
       text: JSON.stringify({
         action: "speak",
-        speakerId: data.candidates[0].id,
+        speakerId: (
+          data.candidates.find(
+            (c: { id: string }) =>
+              c.id !== data.publicConversation.at(-1)?.speakerId,
+          ) || data.candidates[0]
+        ).id,
       }),
     };
   }
@@ -55,6 +61,145 @@ const fakeComplete: Complete = async ({ messages, onText }) => {
   onText?.(text);
   return { text, usage: { input: 20, output: 10 } };
 };
+
+async function conversationWithQuestion() {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "大家正在检查设备。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+    appendMessage(r, {
+      speakerId: "engineer",
+      name: "许岚",
+      kind: "agent",
+      text: "林舟，你能把手电筒给我吗？",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
+  return { store, room };
+}
+
+test("an ordinary named request and an answer to an NPC skip a separate selection call", async () => {
+  for (const [text, expected] of [
+    ["周渡，帮我联络船员。", "dispatcher"],
+    ["好，我拿给你。", "engineer"],
+  ]) {
+    const { store, room } = await conversationWithQuestion();
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step", text, resume: true }),
+    );
+    await createWorldEngine(store, async (input) => {
+      assert.doesNotMatch(input.messages[0].content, /调度器/);
+      assert.equal(
+        JSON.parse(input.messages[1].content).yourCharacter.id,
+        expected,
+      );
+      return fakeComplete(input);
+    })("alice", started.room, new AbortController().signal, () => {});
+    const saved = await store.get("alice", room.id);
+    assert.equal(saved.run?.calls, 1);
+    assert.equal(saved.messages.at(-1)?.speakerId, expected);
+  }
+});
+
+test("waiting for an answer does not add a duplicate system question", async () => {
+  const { store, room } = await conversationWithQuestion();
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({ mode: "step" }),
+  );
+  await createWorldEngine(store, async () => ({ text: '{"action":"wait"}' }))(
+    "alice",
+    started.room,
+    new AbortController().signal,
+    () => {},
+  );
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.run?.status, "paused");
+  assert.equal(saved.messages.length, 2);
+  assert.equal(saved.messages.at(-1)?.speakerId, "engineer");
+});
+
+test("waiting NPCs may follow up once while other interested speakers can participate", async () => {
+  const { store, room } = await conversationWithQuestion();
+  for (const followUp of [false, true, true]) {
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step" }),
+    );
+    await createWorldEngine(store, async (input) => {
+      if (input.messages[0].content.includes("调度器"))
+        return {
+          text: JSON.stringify({
+            action: "speak",
+            speakerId: "engineer",
+            followUp,
+          }),
+        };
+      return {
+        text:
+          JSON.parse(input.messages[1].content).yourCharacter.id === "engineer"
+            ? "你找得到手电筒吗？"
+            : "我先确认其他设备的情况。",
+      };
+    })("alice", started.room, new AbortController().signal, () => {});
+  }
+  const saved = await store.get("alice", room.id);
+  const messages = saved.messages.slice(2);
+  assert.notEqual(messages[0].speakerId, "engineer");
+  assert.equal(messages[1].speakerId, "engineer");
+  assert.equal(messages[1].followUpTo, saved.messages[1].id);
+  assert.notEqual(messages[2].speakerId, "engineer");
+  assert.equal(pendingUserQuestions(saved)[0].followedUp, true);
+  const imported = await store.import("alice", exportBackup(saved));
+  assert.equal(imported.messages[3].followUpTo, imported.messages[1].id);
+  assert.equal(pendingUserQuestions(imported)[0].followedUp, true);
+});
+
+test("ready narration uses one model call and a slow director yields to a nonwaiting NPC", async () => {
+  for (const slow of [false, true]) {
+    const { store, room } = await conversationWithQuestion();
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step" }),
+    );
+    await createWorldEngine(store, async (input) => {
+      if (input.messages[0].content.includes("调度器")) {
+        assert.equal(input.timeoutMs, 8000);
+        if (slow) throw new WorldError("timeout", "选人超时");
+        return { text: '{"action":"narrate","text":"对讲机传出新的呼叫声。"}' };
+      }
+      assert.equal(
+        slow,
+        true,
+        "ready narration must not trigger another generation call",
+      );
+      assert.notEqual(
+        JSON.parse(input.messages[1].content).yourCharacter.id,
+        "engineer",
+      );
+      return fakeComplete(input);
+    })("alice", started.room, new AbortController().signal, () => {});
+    const saved = await store.get("alice", room.id);
+    assert.equal(saved.run?.calls, slow ? 2 : 1);
+    assert.equal(saved.messages.at(-1)?.status, "complete");
+    assert.equal(saved.messages.at(-1)?.kind, slow ? "agent" : "narrator");
+  }
+});
 
 test("room ownership, configuration snapshots and template independence", async () => {
   const store = setup();
@@ -176,12 +321,12 @@ test("a genuine user decision pauses instead of automatically scheduling again",
   assert.equal(saved.run?.status, "paused");
   assert.equal(saved.run?.reason, "等待你的决定");
   assert.equal(saved.paused, true);
-  assert.equal(saved.messages.length, 4);
+  assert.equal(saved.messages.length, 3);
   assert.equal(saved.messages.at(-1)?.kind, "narrator");
   assert.match(saved.messages.at(-1)!.text, /是否愿意/);
 });
 
-test("pausing during the reading interval preserves the reply and cancels the next actor", async () => {
+test("pausing between replies preserves the completed reply and cancels the next actor", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);
   const started = await store.begin(
@@ -195,7 +340,7 @@ test("pausing during the reading interval preserves the reply and cancels the ne
     started.room,
     new AbortController().signal,
     (event) => {
-      if (event.type === "phase" && event.phase.includes("阅读")) {
+      if (event.type === "message" && event.message.status === "complete") {
         stop = store.stop("alice", room.id, event.runId).then(() => {
           abortRun(event.runId);
         });
@@ -239,8 +384,8 @@ test("a two-character world still consults the director before the next actor", 
       : fakeComplete(input),
   )("alice", started.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
-  assert.equal(saved.run?.turns, 3);
-  assert.equal(saved.messages.filter((m) => m.kind === "agent").length, 2);
+  assert.equal(saved.run?.turns, 2);
+  assert.equal(saved.messages.filter((m) => m.kind === "agent").length, 1);
   assert.equal(saved.run?.reason, "等待你的决定");
   assert.equal(saved.paused, true);
 });

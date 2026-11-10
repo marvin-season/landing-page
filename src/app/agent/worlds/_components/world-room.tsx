@@ -330,7 +330,9 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 : running
                   ? chat.phase || room.run?.phase
                   : room.paused
-                    ? room.run?.reason || "已暂停"
+                    ? waitingForDecision
+                      ? "等待你的回复"
+                      : room.run?.reason || "已暂停"
                     : room.run?.reason || "故事尚未开始"}
             </p>
           </div>
@@ -504,7 +506,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     removeMentionLabel="取消点名"
                     hint={
                       waitingForDecision
-                        ? "说出你的决定，角色会继续推进故事。"
+                        ? "回复角色的问题，大家会继续聊下去。"
                         : room.paused
                           ? "当前已暂停，普通发送只保存消息。"
                           : "无需点名，系统自动安排回应 · @ 可指定角色优先发言"

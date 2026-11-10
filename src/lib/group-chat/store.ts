@@ -437,7 +437,7 @@ export function createWorldStore(getClient: () => Client) {
       const room = fresh(ownerId, backup.config);
       room.version = backup.version;
       room.snapshots = backup.snapshots;
-      const ids = new Set<string>();
+      const ids = new Map<string, string>();
       let seq = 0;
       for (const message of backup.messages) {
         const config = versions.get(message.configVersion);
@@ -445,6 +445,8 @@ export function createWorldStore(getClient: () => Client) {
           !config ||
           message.seq <= seq ||
           ids.has(message.id) ||
+          (message.followUpTo &&
+            (message.kind !== "agent" || !ids.has(message.followUpTo))) ||
           (message.kind === "agent" &&
             !config.characters.some((c) => c.id === message.speakerId)) ||
           (message.kind === "user" && message.speakerId !== "user") ||
@@ -455,11 +457,14 @@ export function createWorldStore(getClient: () => Client) {
           )
         )
           throw new WorldError("invalid_backup", "备份消息引用或顺序不完整");
-        ids.add(message.id);
+        ids.set(message.id, randomUUID());
         seq = message.seq;
         room.messages.push({
           ...message,
-          id: randomUUID(),
+          id: ids.get(message.id)!,
+          followUpTo: message.followUpTo
+            ? ids.get(message.followUpTo)
+            : undefined,
           runId: null,
           status:
             message.status === "streaming" ? "interrupted" : message.status,
