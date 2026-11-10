@@ -1,6 +1,8 @@
 import type { UIMessageChunk } from "ai";
 import { type Observable, scan } from "rxjs";
 import {
+  type AiSdkChatRequest,
+  aiSdkChatStreamAdapter,
   type ChatStreamAdapter,
   createChatEventStream,
 } from "./chat-event-stream";
@@ -233,14 +235,26 @@ export function getChatStreamText(state: ChatStreamState): string {
 }
 
 /**
- * 非 React 入口：订阅适配器事件，每条事件输出一份累积的聊天状态。
+ * 非 React 入口：默认读取 AI SDK 事件，第三方协议可传入 adapter。
+ * 每条事件输出一份累积的聊天状态。
  * 完成时不自动收尾文本，需要时由调用方使用 flushChatStreamText。
  */
+export function createChatStateStream(
+  input: AiSdkChatRequest,
+  adapter?: undefined,
+): Observable<ChatStreamState>;
 export function createChatStateStream<TInput>(
   input: TInput,
   adapter: ChatStreamAdapter<TInput>,
+): Observable<ChatStreamState>;
+export function createChatStateStream<TInput>(
+  input: TInput,
+  adapter?: ChatStreamAdapter<TInput>,
 ): Observable<ChatStreamState> {
-  return createChatEventStream(input, adapter).pipe(
+  // 公开重载保证：省略 adapter 时 input 必须是 AiSdkChatRequest。
+  const resolvedAdapter =
+    adapter ?? (aiSdkChatStreamAdapter as ChatStreamAdapter<TInput>);
+  return createChatEventStream(input, resolvedAdapter).pipe(
     scan(reduceChatStreamState, initialChatStreamState),
   );
 }

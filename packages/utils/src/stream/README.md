@@ -7,7 +7,7 @@
 ## 目录结构
 
 - `sse-json-stream.ts`：**传输层**。`createJsonSseStream` 发送 POST JSON 请求，逐行解析 SSE 的 JSON data；不依赖聊天事件类型。
-- `chat-event-stream.ts`：**事件层**。定义 `ChatStreamAdapter`；`createChatEventStream` 调用适配器并管理取消，原样输出事件。
+- `chat-event-stream.ts`：**事件层**。定义 `ChatStreamAdapter` 和默认的 `aiSdkChatStreamAdapter`；`createChatEventStream` 调用适配器并管理取消，原样输出事件。
 - `chat-stream-state.ts`：**状态层**。定义聊天状态，提供纯状态函数与 `createChatStateStream`，将 AI SDK 事件累积为文本和工具调用。
 - `use-chat-stream-core.ts`：事件层的 React 生命周期封装，管理 send / stop / 卸载，通过回调逐条输出事件。
 - `use-chat-stream-state.ts`：组合 core 与状态函数，提供 `state / send / loading / error / stop`。
@@ -17,22 +17,35 @@
 
 三层分别回答“如何读取响应”“如何订阅与取消事件”“如何把事件变成聊天内容”。Observable 是共同的返回形式，不能用来区分职责。
 
-SSE 工具由应用适配器按需使用；适配器也可以使用 SDK、异步迭代器或其他传输方式。事件层不依赖状态层，自定义事件无需加载聊天归约逻辑。状态层依赖事件层，专门处理 AI SDK 聊天事件。React Hook 再组合这些能力。
+SSE 工具由内置 AI SDK 适配器和应用自定义适配器按需使用；适配器也可以使用 SDK、异步迭代器或其他传输方式。事件层不依赖状态层，自定义事件无需加载聊天归约逻辑。状态层依赖事件层，专门处理 AI SDK 聊天事件。React Hook 再组合这些能力。
 
 ### 按用途选方法
 
 - 请求 SSE 接口：`createJsonSseStream<TEvent>(url, body, signal)` → `Observable<TEvent>`。只创建流，订阅时才发请求；事件类型由调用方指定，默认 `unknown`。
 - 订阅适配器事件：`createChatEventStream(input, adapter)` → `Observable<TEvent>`。每次订阅创建独立的取消信号，结束或退订时释放。
-- 订阅累积聊天状态：`createChatStateStream(input, adapter)` → `Observable<ChatStreamState>`。每条事件输出一次状态，不自动收尾文本。
+- 订阅累积聊天状态：`createChatStateStream(input, adapter?)` → `Observable<ChatStreamState>`。每条事件输出一次状态，不自动收尾文本。
 - 处理单个聊天事件：`reduceChatStreamState(state, event)` → 下一份状态；可用于自己的 store，不创建订阅。
 - 将剩余文本归入内容块：`flushChatStreamText(state)` → 收尾后的状态；不结束订阅或工具调用。
 - 读取完整文本：`getChatStreamText(state)` → `string`；包含已完成文本与正在生成的文本，不修改状态。
 
-## 必须传入适配器
+## 默认使用 AI SDK，第三方协议才需要 adapter
 
-`useChatStreamState({ adapter, onComplete?, onError? })` 的 options 和 adapter 都是必填。没有内置默认适配器或回退行为，`send` 的入参由 adapter 自动推导。
+聊天状态层统一消费 AI SDK 的 `UIMessageChunk`。`reduceChatStreamState` 固定处理这一标准，不需要让每个接口各自定义 reducer。
 
-项目适配器应放在应用层；包只依赖 React、RxJS 和 AI SDK 的事件类型，不引用应用代码。
+`useChatStreamState()` 或 `useChatStreamState({ onComplete?, onError? })` 默认使用内置 `aiSdkChatStreamAdapter`。`send` 接收 `AiSdkChatRequest`（`{ url, body }`），通过 POST JSON 请求读取 AI SDK SSE；项目 URL、threadId、messages 等请求内容由应用层构造。
+
+```tsx
+import { useChatStreamState } from "@landing-page/utils/stream";
+
+const { state, send, loading, error, stop } = useChatStreamState();
+send({ url: "/api/chat", body: { messages, trigger: "submit-message" } });
+```
+
+`createChatStateStream({ url, body })` 提供相同的非 React 默认入口。
+
+只有接口输出其他数据格式时，才传 `useChatStreamState({ adapter })` 或 `createChatStateStream(input, adapter)`。自定义 adapter 负责把第三方事件转换为 `UIMessageChunk`，入参由 adapter 自动推导；自定义入参必须配套 adapter，不能省略后落入默认请求逻辑。
+
+项目请求构造和第三方适配器放在应用层；共享包不引用应用代码。
 
 ## 只消费事件，不维护 React 状态
 
@@ -84,9 +97,9 @@ const { send, stop } = useChatStreamCore({
 
 非 React 场景可订阅 `createChatEventStream(input, adapter)` 获取原始事件，或订阅 `createChatStateStream(input, adapter)` 获取累积聊天状态。
 
-## 状态层适配器
+## Adapter 的职责
 
-`useChatStreamState` 是基于 AI SDK 事件的消费层，使用 `UIMessageChunk` 归约文本与工具调用；这不是 core 的限制。`ChatStreamAdapter<TInput, TEvent>` 支持任意事件，省略第二个泛型时默认使用 `UIMessageChunk`，兼容现有适配器。
+`useChatStreamState` 与 `createChatStateStream` 始终使用 `UIMessageChunk` 归约文本与工具调用，自定义 adapter 也必须输出这个统一标准。底层 `useChatStreamCore` 与 `createChatEventStream` 仍可独立处理任意事件，使用时需要显式提供 adapter；它们不负责聊天状态。`ChatStreamAdapter<TInput, TEvent>` 的第二个泛型默认是 `UIMessageChunk`。
 
 ```ts
 import type { UIMessageChunk } from "ai";
@@ -103,9 +116,11 @@ type ChatStreamAdapter<TInput> = (
 适配器负责：
 
 1. 定义自己的入参，组装 URL、请求头和请求体，或调用供应商 SDK。
-2. 将供应商响应转换为统一事件。SSE 只是传输格式，不同供应商的 JSON 事件仍需转换。
+2. 将供应商响应转换为 `UIMessageChunk`。SSE 只定义传输格式，例如 mock 的 `{ delta }` 仍需转为 `text-delta` 并补齐开始、结束事件。
 3. 将 `signal` 传给请求或 SDK，并在清理阶段释放读取器等资源。取消订阅本身无法中断不响应 signal 的外部操作。
 4. 通过抛错、Observable error 或 `{ type: "error", errorText }` 报告失败。
+
+Adapter 输出事件，reducer 累积状态，Hook 管理 `state / loading / error`。
 
 下面以返回**原始 UTF-8 文本流**的接口为例；如果接口返回 SSE，需要在适配器中解析 SSE 后再转换事件：
 

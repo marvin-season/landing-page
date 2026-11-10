@@ -21,7 +21,7 @@ import {
 import { ChatMessageShell } from "@/components/chat/chat-message-shell";
 import Markdown from "@/components/markdown";
 import { MessageItem } from "@/components/message/message-item";
-import { submitMessageStreamAdapter } from "@/lib/stream/chat-stream-adapter";
+import { buildSubmitMessageBody } from "@/lib/stream/chat-request";
 import { useTRPC } from "@/lib/trpc";
 import { ActionCard } from "../../_components/ActionCard";
 import { ResponseSection } from "../../_components/ResponseSection";
@@ -76,7 +76,6 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
   );
 
   const { state, send, loading, error } = useChatStreamState({
-    adapter: submitMessageStreamAdapter,
     onComplete: () => {
       void refetchHistory();
     },
@@ -89,7 +88,10 @@ export function AgentThreadContent({ threadId }: AgentThreadContentProps) {
 
   const handleSendText = (text: string) => {
     setPendingUserMessage(text);
-    send({ text, threadId, url: "/api/chat" });
+    send({
+      url: "/api/chat",
+      body: buildSubmitMessageBody({ text, threadId }),
+    });
   };
 
   const showEmptyState =

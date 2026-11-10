@@ -1,5 +1,7 @@
 // biome-ignore-all lint/performance/noBarrelFile: package stream public API entrypoint.
 export {
+  type AiSdkChatRequest,
+  aiSdkChatStreamAdapter,
   type ChatStreamAdapter,
   createChatEventStream,
 } from "./chat-event-stream";

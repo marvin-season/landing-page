@@ -2,7 +2,11 @@
 
 import type { UIMessageChunk } from "ai";
 import { useCallback, useRef, useState } from "react";
-import type { ChatStreamAdapter } from "./chat-event-stream";
+import {
+  type AiSdkChatRequest,
+  aiSdkChatStreamAdapter,
+  type ChatStreamAdapter,
+} from "./chat-event-stream";
 import {
   type ChatStreamState,
   flushChatStreamText,
@@ -24,11 +28,21 @@ type ChatStreamHandle<TInput> = {
   stop: () => void;
 };
 
-/** 将 core 的事件归约为 React 状态，保持面向页面的现有调用方式。 */
+/** 默认读取 AI SDK SSE 并累积聊天状态，send 接收 { url, body }。 */
+export function useChatStreamState(
+  options?: ChatStreamCallbacks & { adapter?: undefined },
+): ChatStreamHandle<AiSdkChatRequest>;
+/** 第三方格式通过 adapter 转为 UIMessageChunk，send 入参由 adapter 推导。 */
 export function useChatStreamState<TInput>(
   options: ChatStreamCallbacks & { adapter: ChatStreamAdapter<TInput> },
+): ChatStreamHandle<TInput>;
+export function useChatStreamState<TInput = AiSdkChatRequest>(
+  options: ChatStreamCallbacks & { adapter?: ChatStreamAdapter<TInput> } = {},
 ): ChatStreamHandle<TInput> {
-  const { adapter, onComplete, onError } = options;
+  const { onComplete, onError } = options;
+  // 公开重载保证：省略 adapter 时 send 只接受 AiSdkChatRequest。
+  const adapter =
+    options.adapter ?? (aiSdkChatStreamAdapter as ChatStreamAdapter<TInput>);
   const [state, setState] = useState<ChatStreamState>(initialChatStreamState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

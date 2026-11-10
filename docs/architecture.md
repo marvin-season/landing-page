@@ -150,7 +150,7 @@ flowchart TB
 
 ## 6. 前端状态与流式 UI
 
-- **流式聊天**：`packages/utils/src/stream/` 通过 `@landing-page/utils/stream` 提供通用 Hook、状态归约和 SSE 工具，适配器必须显式传入；`src/lib/stream/` 保留项目请求构造与实际适配器，对接 AI SDK / Mastra 或 mock 接口。
+- **流式聊天**：`packages/utils/src/stream/` 通过 `@landing-page/utils/stream` 提供 Hook、状态归约和 SSE 工具，聊天状态统一使用 AI SDK `UIMessageChunk`；状态 Hook 默认读取 AI SDK SSE，第三方协议才需自定义 adapter。`src/lib/stream/` 保留项目请求构造与 mock 格式转换，默认发送参数为 `{ url, body }`。
 - **UI 栈**：Tailwind CSS 4、Radix、Framer Motion / Motion、GSAP、统一 Markdown（unified 管线）等。
 
 ## 7. 国际化（Lingui）

@@ -7,7 +7,7 @@ import { concat, map, of } from "rxjs";
 
 export type MockChatInput = { url: string; text: string };
 
-/** 将指定接口的 { delta } SSE 转换为统一文本事件。 */
+/** 将第三方 { delta } 转为 AI SDK 文本事件，并补齐 text-start / text-end。 */
 export const mockChatStreamAdapter: ChatStreamAdapter<MockChatInput> = (
   { url, text },
   { signal },

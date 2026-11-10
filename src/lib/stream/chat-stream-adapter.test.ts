@@ -9,7 +9,7 @@ import {
 } from "@landing-page/utils/stream";
 import type { UIMessageChunk } from "ai";
 import { lastValueFrom, Observable, of, take, toArray } from "rxjs";
-import { submitMessageStreamAdapter } from "./chat-stream-adapter";
+import { buildSubmitMessageBody } from "./chat-request";
 
 test("通用事件流原样输出自定义事件，不解释 type 或归约状态", async () => {
   type CustomEvent = { type: string; value: number };
@@ -76,7 +76,7 @@ test("同步事件消费结束时立即取消源并释放资源", async () => {
   assert.equal(cleanupCount, 1);
 });
 
-test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", async (t) => {
+test("省略 adapter 时读取 AI SDK SSE，保留请求格式并处理跨网络块的数据", async (t) => {
   let request: RequestInit | undefined;
   const encoder = new TextEncoder();
   const events: UIMessageChunk[] = [
@@ -108,10 +108,10 @@ test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", 
   );
 
   const state = await lastValueFrom(
-    createChatStateStream(
-      { url: "/api/chat", threadId: "thread-1", text: "hello" },
-      submitMessageStreamAdapter,
-    ),
+    createChatStateStream({
+      url: "/api/chat",
+      body: buildSubmitMessageBody({ threadId: "thread-1", text: "hello" }),
+    }),
   );
 
   assert.equal(request?.method, "POST");
@@ -187,7 +187,7 @@ test("取消订阅会中断适配器、执行清理且不触发完成或错误",
   assert.equal(errorCount, 0);
 });
 
-test("项目适配器在 fetch 尚未响应时也能取消请求", async (t) => {
+test("默认 AI SDK 请求在 fetch 尚未响应时也能取消", async (t) => {
   let signal: AbortSignal | undefined;
   t.mock.method(
     globalThis,
@@ -203,10 +203,10 @@ test("项目适配器在 fetch 尚未响应时也能取消请求", async (t) => 
     },
   );
   let errorCount = 0;
-  const subscription = createChatStateStream(
-    { url: "/api/chat", threadId: "thread-1", text: "hello" },
-    submitMessageStreamAdapter,
-  ).subscribe({ error: () => errorCount++ });
+  const subscription = createChatStateStream({
+    url: "/api/chat",
+    body: buildSubmitMessageBody({ threadId: "thread-1", text: "hello" }),
+  }).subscribe({ error: () => errorCount++ });
 
   subscription.unsubscribe();
   assert.equal(signal?.aborted, true);
@@ -224,4 +224,48 @@ test("同步事件流可以正常完成并释放适配器资源", async () => {
   );
   assert.equal(state.messageId, "reply-sync");
   assert.equal(signal?.aborted, true);
+});
+
+test("默认 AI SDK 请求将 HTTP 错误和协议错误传递给状态消费者", async (t) => {
+  const responses = [
+    new Response(null, { status: 503 }),
+    new Response('data: {"type":"error","errorText":"provider failed"}\n\n'),
+  ];
+  t.mock.method(globalThis, "fetch", async () => responses.shift());
+
+  for (const error of [/HTTP 503/, /provider failed/]) {
+    await assert.rejects(
+      lastValueFrom(createChatStateStream({ url: "/api/chat", body: {} })),
+      error,
+    );
+  }
+});
+
+test("默认 AI SDK 流按订阅发起请求，分别维护状态和取消信号", async (t) => {
+  const signals: AbortSignal[] = [];
+  t.mock.method(
+    globalThis,
+    "fetch",
+    async (_url: RequestInfo | URL, init?: RequestInit) => {
+      assert.ok(init?.signal);
+      signals.push(init.signal);
+      return new Response(
+        'data: {"type":"text-start","id":"text-1"}\n\n' +
+          'data: {"type":"text-delta","id":"text-1","delta":"hello"}\n\n' +
+          'data: {"type":"text-end","id":"text-1"}\n\n',
+      );
+    },
+  );
+  const stream = createChatStateStream({ url: "/api/chat", body: {} });
+  assert.equal(signals.length, 0);
+  const [first, second] = await Promise.all([
+    lastValueFrom(stream),
+    lastValueFrom(stream),
+  ]);
+
+  assert.equal(getChatStreamText(first), "hello");
+  assert.equal(getChatStreamText(second), "hello");
+  assert.notEqual(first, second);
+  assert.notEqual(signals[0], signals[1]);
+  assert.ok(signals.every((signal) => signal.aborted));
 });

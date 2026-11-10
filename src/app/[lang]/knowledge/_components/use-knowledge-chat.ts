@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  type AiSdkChatRequest,
+  aiSdkChatStreamAdapter,
   type ChatStreamAdapter,
   type ChatStreamState,
   getChatStreamText,
@@ -8,8 +10,7 @@ import {
 } from "@landing-page/utils/stream";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
-import type { TInputParams } from "@/lib/stream/chat-request";
-import { submitMessageStreamAdapter } from "@/lib/stream/chat-stream-adapter";
+import { buildSubmitMessageBody } from "@/lib/stream/chat-request";
 import {
   type MockChatInput,
   mockChatStreamAdapter,
@@ -28,7 +29,7 @@ import {
 const THROTTLE = true;
 
 type KnowledgeChatInput =
-  | { mode: "ai"; input: TInputParams }
+  | { mode: "ai"; input: AiSdkChatRequest }
   | { mode: "mock"; input: MockChatInput };
 
 const knowledgeChatAdapter: ChatStreamAdapter<KnowledgeChatInput> = (
@@ -36,7 +37,7 @@ const knowledgeChatAdapter: ChatStreamAdapter<KnowledgeChatInput> = (
   context,
 ) =>
   request.mode === "ai"
-    ? submitMessageStreamAdapter(request.input, context)
+    ? aiSdkChatStreamAdapter(request.input, context)
     : mockChatStreamAdapter(request.input, context);
 
 function seedMessages(
@@ -108,11 +109,13 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
             mode: "ai",
             input: {
               url: "/api/knowledge/chat",
-              threadId: threadIdRef.current,
-              text,
-              messages: THROTTLE
-                ? undefined
-                : toKnowledgeChatMessages(nextMessages),
+              body: buildSubmitMessageBody({
+                threadId: threadIdRef.current,
+                text,
+                messages: THROTTLE
+                  ? undefined
+                  : toKnowledgeChatMessages(nextMessages),
+              }),
             },
           }
         : {
