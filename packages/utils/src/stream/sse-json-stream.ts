@@ -1,8 +1,10 @@
-import type { UIMessageChunk } from "ai";
 import { Observable } from "rxjs";
 
-/** 读取单行 JSON data 的 SSE 流，默认事件类型为 AI SDK UIMessageChunk。 */
-export function createObservableStream<TEvent = UIMessageChunk>(
+/**
+ * 订阅时 POST JSON 请求体，将 SSE 中每行 data 的 JSON 解析为 TEvent。
+ * 不转换聊天协议；忽略非 JSON 行（包括 [DONE]），响应流关闭时完成。
+ */
+export function createJsonSseStream<TEvent = unknown>(
   url: string,
   body: unknown,
   signal?: AbortSignal,

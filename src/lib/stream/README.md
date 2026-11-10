@@ -14,12 +14,12 @@
 适配器必须显式传入；Hook 没有默认适配器。
 
 ```tsx
-import { chatStreamText, useChatStreamState } from "@landing-page/utils/stream";
+import { getChatStreamText, useChatStreamState } from "@landing-page/utils/stream";
 import { submitMessageStreamAdapter } from "@/lib/stream/chat-stream-adapter";
 
 const { state, send, loading, error, stop } = useChatStreamState({
   adapter: submitMessageStreamAdapter,
-  onComplete: (state) => console.log(chatStreamText(state)),
+  onComplete: (state) => console.log(getChatStreamText(state)),
   onError: (message) => console.error(message),
 });
 

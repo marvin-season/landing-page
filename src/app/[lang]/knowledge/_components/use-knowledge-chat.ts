@@ -3,7 +3,7 @@
 import {
   type ChatStreamAdapter,
   type ChatStreamState,
-  chatStreamText,
+  getChatStreamText,
   useChatStreamState,
 } from "@landing-page/utils/stream";
 import { useLingui } from "@lingui/react/macro";
@@ -75,7 +75,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
   messagesRef.current = messages;
 
   const onStreamComplete = useCallback((flushed: ChatStreamState) => {
-    const text = chatStreamText(flushed).trim();
+    const text = getChatStreamText(flushed).trim();
     if (!text) return;
     setMessages((previous) => [
       ...previous,
@@ -143,7 +143,7 @@ export function useKnowledgeChat(source: KnowledgeDocument) {
     stop,
     loading,
     error,
-    streamingText: loading ? chatStreamText(state) : undefined,
+    streamingText: loading ? getChatStreamText(state) : undefined,
     throttle: THROTTLE,
   };
 }

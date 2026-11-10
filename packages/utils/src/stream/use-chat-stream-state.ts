@@ -2,12 +2,12 @@
 
 import type { UIMessageChunk } from "ai";
 import { useCallback, useRef, useState } from "react";
-import type { ChatStreamAdapter } from "./chat-stream-observable";
+import type { ChatStreamAdapter } from "./chat-event-stream";
 import {
   type ChatStreamState,
-  flushChatStreamState,
+  flushChatStreamText,
   initialChatStreamState,
-  reduceChatStreamEvent,
+  reduceChatStreamState,
 } from "./chat-stream-state";
 import { useChatStreamCore } from "./use-chat-stream-core";
 
@@ -43,7 +43,7 @@ export function useChatStreamState<TInput>(
   }, []);
 
   const handleEvent = useCallback((event: UIMessageChunk) => {
-    const nextState = reduceChatStreamEvent(latestRef.current, event);
+    const nextState = reduceChatStreamState(latestRef.current, event);
     latestRef.current = nextState;
     setState(nextState);
   }, []);
@@ -58,7 +58,7 @@ export function useChatStreamState<TInput>(
   );
 
   const handleComplete = useCallback(() => {
-    const flushed = flushChatStreamState(latestRef.current);
+    const flushed = flushChatStreamText(latestRef.current);
     latestRef.current = flushed;
     setState(flushed);
     setLoading(false);

@@ -6,12 +6,27 @@
 
 ## 目录结构
 
-- `use-chat-stream-core.ts`：管理订阅与取消，通过回调逐条输出事件，不维护 React 状态。
-- `use-chat-stream-state.ts`：消费 core 事件并归约状态，提供 `state / send / loading / error / stop`。
-- `chat-stream-observable.ts`：`ChatStreamAdapter<TInput, TEvent>` 契约、取消信号、原始事件流 `createObservableEvents` 与状态流 `createObservableState`。
-- `chat-stream-state.ts`：状态类型、纯事件归约函数、文本合并与完成收尾。
-- `chat-stream.ts`：读取单行 JSON data 的 SSE，输出指定事件类型的 Observable。
+- `sse-json-stream.ts`：**传输层**。`createJsonSseStream` 发送 POST JSON 请求，逐行解析 SSE 的 JSON data；不依赖聊天事件类型。
+- `chat-event-stream.ts`：**事件层**。定义 `ChatStreamAdapter`；`createChatEventStream` 调用适配器并管理取消，原样输出事件。
+- `chat-stream-state.ts`：**状态层**。定义聊天状态，提供纯状态函数与 `createChatStateStream`，将 AI SDK 事件累积为文本和工具调用。
+- `use-chat-stream-core.ts`：事件层的 React 生命周期封装，管理 send / stop / 卸载，通过回调逐条输出事件。
+- `use-chat-stream-state.ts`：组合 core 与状态函数，提供 `state / send / loading / error / stop`。
 - `index.ts`：独立子路径的公开导出。
+
+### 为什么分三层
+
+三层分别回答“如何读取响应”“如何订阅与取消事件”“如何把事件变成聊天内容”。Observable 是共同的返回形式，不能用来区分职责。
+
+SSE 工具由应用适配器按需使用；适配器也可以使用 SDK、异步迭代器或其他传输方式。事件层不依赖状态层，自定义事件无需加载聊天归约逻辑。状态层依赖事件层，专门处理 AI SDK 聊天事件。React Hook 再组合这些能力。
+
+### 按用途选方法
+
+- 请求 SSE 接口：`createJsonSseStream<TEvent>(url, body, signal)` → `Observable<TEvent>`。只创建流，订阅时才发请求；事件类型由调用方指定，默认 `unknown`。
+- 订阅适配器事件：`createChatEventStream(input, adapter)` → `Observable<TEvent>`。每次订阅创建独立的取消信号，结束或退订时释放。
+- 订阅累积聊天状态：`createChatStateStream(input, adapter)` → `Observable<ChatStreamState>`。每条事件输出一次状态，不自动收尾文本。
+- 处理单个聊天事件：`reduceChatStreamState(state, event)` → 下一份状态；可用于自己的 store，不创建订阅。
+- 将剩余文本归入内容块：`flushChatStreamText(state)` → 收尾后的状态；不结束订阅或工具调用。
+- 读取完整文本：`getChatStreamText(state)` → `string`；包含已完成文本与正在生成的文本，不修改状态。
 
 ## 必须传入适配器
 
@@ -67,7 +82,7 @@ const { send, stop } = useChatStreamCore({
 - `onComplete` 不携带累积状态；`useChatStreamState` 负责归约、收尾，再向自己的 `onComplete(state)` 提供最终状态。
 - `stop`、下一次 `send` 和卸载只取消请求，不触发 `onComplete / onError`。
 
-非 React 场景可订阅 `createObservableEvents(input, adapter)`；已有的 `createObservableState(input, adapter)` 继续在事件流上累积状态。
+非 React 场景可订阅 `createChatEventStream(input, adapter)` 获取原始事件，或订阅 `createChatStateStream(input, adapter)` 获取累积聊天状态。
 
 ## 状态层适配器
 
@@ -134,7 +149,7 @@ export const textAdapter: ChatStreamAdapter<TextInput> = async function* (
 ```tsx
 const { send, state, stop } = useChatStreamState({
   adapter: textAdapter,
-  onComplete: (state) => console.log(chatStreamText(state)),
+  onComplete: (state) => console.log(getChatStreamText(state)),
 });
 
 send({ url: "/api/custom-text", prompt: "你好", model: "example-model" });
@@ -162,7 +177,7 @@ type ChatStreamState = {
 
 `blocks` 包含已完成的文本块与工具调用；`streamingTool` 当前只记录一个进行中的工具调用，适配器应按顺序输出工具事件。
 
-`chatStreamText(state)` 合并已完成文本与实时文本。流正常完成时，Hook 使用 `flushChatStreamState` 将剩余文本写入 `blocks`，然后调用 `onComplete`。
+`getChatStreamText(state)` 合并已完成文本与实时文本。流正常完成时，Hook 使用 `flushChatStreamText` 将剩余文本写入 `blocks`，然后调用 `onComplete`。
 
 ## 生命周期
 

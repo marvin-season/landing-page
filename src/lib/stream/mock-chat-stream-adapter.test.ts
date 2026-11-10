@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  chatStreamText,
-  createObservableState,
-  flushChatStreamState,
+  createChatStateStream,
+  flushChatStreamText,
+  getChatStreamText,
 } from "@landing-page/utils/stream";
 import { lastValueFrom, toArray } from "rxjs";
 import { POST } from "../../app/api/knowledge/chatv2/route";
@@ -35,16 +35,16 @@ test("mock 接口通过适配器逐段输出完整回复，并保留中文、换
 
   const expected = `hello,i am your assiastant,${input.text}`;
   const states = await lastValueFrom(
-    createObservableState(input, mockChatStreamAdapter).pipe(toArray()),
+    createChatStateStream(input, mockChatStreamAdapter).pipe(toArray()),
   );
-  const replies = states.map(chatStreamText);
+  const replies = states.map(getChatStreamText);
   assert.ok(new Set(replies).size > 3);
   assert.ok(
     replies.some((reply) => reply.length > 0 && reply.length < expected.length),
   );
   assert.ok(replies.every((reply) => expected.startsWith(reply)));
-  const final = flushChatStreamState(states[states.length - 1]);
-  assert.equal(chatStreamText(final), expected);
+  const final = flushChatStreamText(states[states.length - 1]);
+  assert.equal(getChatStreamText(final), expected);
   assert.equal(final.streamingText, "");
   assert.equal(final.blocks.length, 1);
 
@@ -85,7 +85,7 @@ test("mock 接口拒绝无效请求，适配器将 HTTP 错误传递给调用方
   );
   await assert.rejects(
     lastValueFrom(
-      createObservableState(
+      createChatStateStream(
         { url: "/api/knowledge/chatv2", text: "" },
         mockChatStreamAdapter,
       ),

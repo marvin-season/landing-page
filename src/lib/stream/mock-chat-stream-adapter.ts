@@ -1,6 +1,6 @@
 import {
   type ChatStreamAdapter,
-  createObservableStream,
+  createJsonSseStream,
 } from "@landing-page/utils/stream";
 import type { UIMessageChunk } from "ai";
 import { concat, map, of } from "rxjs";
@@ -15,7 +15,7 @@ export const mockChatStreamAdapter: ChatStreamAdapter<MockChatInput> = (
   const id = crypto.randomUUID();
   return concat(
     of<UIMessageChunk>({ type: "text-start", id }),
-    createObservableStream<{ delta: string }>(url, { text }, signal).pipe(
+    createJsonSseStream<{ delta: string }>(url, { text }, signal).pipe(
       map(({ delta }): UIMessageChunk => ({ type: "text-delta", id, delta })),
     ),
     of<UIMessageChunk>({ type: "text-end", id }),

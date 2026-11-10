@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   type ChatStreamAdapter,
-  chatStreamText,
-  createObservableEvents,
-  createObservableState,
-  flushChatStreamState,
+  createChatEventStream,
+  createChatStateStream,
+  flushChatStreamText,
+  getChatStreamText,
 } from "@landing-page/utils/stream";
 import type { UIMessageChunk } from "ai";
 import { lastValueFrom, Observable, of, take, toArray } from "rxjs";
@@ -23,7 +23,7 @@ test("通用事件流原样输出自定义事件，不解释 type 或归约状�
     return events;
   };
   const received = await lastValueFrom(
-    createObservableEvents({ id: 7 }, adapter).pipe(toArray()),
+    createChatEventStream({ id: 7 }, adapter).pipe(toArray()),
   );
 
   assert.deepEqual(received, events);
@@ -32,7 +32,7 @@ test("通用事件流原样输出自定义事件，不解释 type 或归约状�
 
 test("通用事件流支持异步字符串，并为每次订阅创建独立取消信号", async () => {
   const signals: AbortSignal[] = [];
-  const events = createObservableEvents(
+  const events = createChatEventStream(
     "hello",
     async function* (input, context) {
       signals.push(context.signal);
@@ -58,7 +58,7 @@ test("同步事件消费结束时立即取消源并释放资源", async () => {
   let cleanupCount = 0;
   let signal: AbortSignal | undefined;
   const received = await lastValueFrom(
-    createObservableEvents(undefined, (_, context) => {
+    createChatEventStream(undefined, (_, context) => {
       signal = context.signal;
       return new Observable<number>((subscriber) => {
         for (let value = 0; value < 3 && !subscriber.closed; value++) {
@@ -108,7 +108,7 @@ test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", 
   );
 
   const state = await lastValueFrom(
-    createObservableState(
+    createChatStateStream(
       { url: "/api/chat", threadId: "thread-1", text: "hello" },
       submitMessageStreamAdapter,
     ),
@@ -120,7 +120,7 @@ test("项目适配器保留请求格式，并处理跨网络块的 SSE 数据", 
   assert.equal(body.trigger, "submit-message");
   assert.deepEqual(body.messages[0].parts, [{ type: "text", text: "hello" }]);
   assert.equal(state.messageId, "reply-1");
-  assert.equal(chatStreamText(state), "你好");
+  assert.equal(getChatStreamText(state), "你好");
   assert.equal(state.streamingText, "");
 });
 
@@ -134,12 +134,12 @@ test("自定义入参和异步事件流复用同一状态归约与完成收尾",
     };
 
   const state = await lastValueFrom(
-    createObservableState(
+    createChatStateStream(
       { prompt: "custom reply", model: "example-model" },
       adapter,
     ),
   );
-  const flushed = flushChatStreamState(state);
+  const flushed = flushChatStreamText(state);
   assert.deepEqual(flushed.blocks, [
     { kind: "text", id: "custom-text", content: "custom reply" },
   ]);
@@ -149,7 +149,7 @@ test("自定义入参和异步事件流复用同一状态归约与完成收尾",
 test("同步抛错和流内错误事件进入 Observable 错误通道", async () => {
   await assert.rejects(
     lastValueFrom(
-      createObservableState({}, () => {
+      createChatStateStream({}, () => {
         throw new Error("adapter failed");
       }),
     ),
@@ -157,7 +157,7 @@ test("同步抛错和流内错误事件进入 Observable 错误通道", async ()
   );
   await assert.rejects(
     lastValueFrom(
-      createObservableState({}, () =>
+      createChatStateStream({}, () =>
         of<UIMessageChunk>({ type: "error", errorText: "provider failed" }),
       ),
     ),
@@ -174,7 +174,7 @@ test("取消订阅会中断适配器、执行清理且不触发完成或错误",
     signal = context.signal;
     return new Observable(() => () => cleanupCount++);
   };
-  const subscription = createObservableState("prompt", adapter).subscribe({
+  const subscription = createChatStateStream("prompt", adapter).subscribe({
     complete: () => completeCount++,
     error: () => errorCount++,
   });
@@ -203,7 +203,7 @@ test("项目适配器在 fetch 尚未响应时也能取消请求", async (t) => 
     },
   );
   let errorCount = 0;
-  const subscription = createObservableState(
+  const subscription = createChatStateStream(
     { url: "/api/chat", threadId: "thread-1", text: "hello" },
     submitMessageStreamAdapter,
   ).subscribe({ error: () => errorCount++ });
@@ -217,7 +217,7 @@ test("项目适配器在 fetch 尚未响应时也能取消请求", async (t) => 
 test("同步事件流可以正常完成并释放适配器资源", async () => {
   let signal: AbortSignal | undefined;
   const state = await lastValueFrom(
-    createObservableState("reply-sync", (messageId, context) => {
+    createChatStateStream("reply-sync", (messageId, context) => {
       signal = context.signal;
       return of<UIMessageChunk>({ type: "start", messageId });
     }),

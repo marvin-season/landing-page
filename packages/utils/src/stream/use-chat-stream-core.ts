@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef } from "react";
 import { Observable, Subscription, tap } from "rxjs";
 import {
   type ChatStreamAdapter,
-  createObservableEvents,
-} from "./chat-stream-observable";
+  createChatEventStream,
+} from "./chat-event-stream";
 
 export type ChatStreamCoreOptions<TInput, TEvent> = {
   adapter: ChatStreamAdapter<TInput, TEvent>;
@@ -51,7 +51,7 @@ export function useChatStreamCore<TInput, TEvent>({
         // subscriber 由 RxJS 创建。启动适配器前就交给容器管理，保证 onEvent
         // 中 stop / send 能立即取消同步事件源，不必等 subscribe() 返回。
         subscription.add(subscriber);
-        return createObservableEvents(input, adapter).subscribe(subscriber);
+        return createChatEventStream(input, adapter).subscribe(subscriber);
       });
       subscription.add(
         events.pipe(tap(onEvent)).subscribe({

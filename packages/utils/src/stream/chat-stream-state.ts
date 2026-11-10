@@ -1,4 +1,9 @@
 import type { UIMessageChunk } from "ai";
+import { type Observable, scan } from "rxjs";
+import {
+  type ChatStreamAdapter,
+  createChatEventStream,
+} from "./chat-event-stream";
 
 // ---------------------------------------------------------------------------
 // 内容块类型（用于 state.blocks）
@@ -67,9 +72,10 @@ function pushTextBlock(
 }
 
 /**
- * 状态归约函数：根据事件更新状态， 初始值 initialChatStreamState
+ * 将单个 AI SDK 事件归约为下一份状态；纯函数，不发请求、不创建订阅。
+ * 初始值为 initialChatStreamState，协议 error 事件会抛错。
  */
-export function reduceChatStreamEvent(
+export function reduceChatStreamState(
   state: ChatStreamState,
   event: UIMessageChunk,
 ): ChatStreamState {
@@ -201,8 +207,8 @@ export function reduceChatStreamEvent(
   return state;
 }
 
-/** 结束时刷新剩余文本到 blocks */
-export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
+/** 将尚未结束的文本写入 blocks，返回收尾后的状态；不结束订阅或工具调用。 */
+export function flushChatStreamText(state: ChatStreamState): ChatStreamState {
   if (!state.currentTextId || !state.streamingText.trim())
     return { ...state, streamingText: "" };
   return {
@@ -217,11 +223,24 @@ export function flushChatStreamState(state: ChatStreamState): ChatStreamState {
   };
 }
 
-/** Concatenate completed text blocks with the in-flight delta. */
-export function chatStreamText(state: ChatStreamState) {
+/** 提取已完成文本与正在生成的文本，忽略工具调用；不修改状态。 */
+export function getChatStreamText(state: ChatStreamState): string {
   const fromBlocks = state.blocks
     .filter((block): block is TextBlock => block.kind === "text")
     .map((block) => block.content)
     .join("");
   return `${fromBlocks}${state.streamingText}`;
+}
+
+/**
+ * 非 React 入口：订阅适配器事件，每条事件输出一份累积的聊天状态。
+ * 完成时不自动收尾文本，需要时由调用方使用 flushChatStreamText。
+ */
+export function createChatStateStream<TInput>(
+  input: TInput,
+  adapter: ChatStreamAdapter<TInput>,
+): Observable<ChatStreamState> {
+  return createChatEventStream(input, adapter).pipe(
+    scan(reduceChatStreamState, initialChatStreamState),
+  );
 }
