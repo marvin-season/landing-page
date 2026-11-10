@@ -386,8 +386,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     {room.config.scene}
                   </p>
                   <p className="text-xs leading-6 text-muted-foreground">
-                    以「{room.config.userName}
-                    」的身份说第一句话，或者让系统开启故事。系统会安排角色依次回应，你可以随时暂停或加入讨论，无需
+                    你就是{room.config.userName}
+                    ，直接用“我”说话就好，比如“我来帮忙”或“我想先看看”。也可以让系统开启故事，随时暂停或接话，无需
                     @ 点名。
                   </p>
                 </div>
@@ -500,7 +500,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     maxLength={8000}
                     rows={2}
                     onSubmit={() => send()}
-                    placeholder={`以 ${room.config.userName} 的身份说话或行动，系统会安排回应…`}
+                    placeholder="直接说你想说的话，比如：我来帮忙。"
                     sendLabel="发送消息"
                     emptyMentionLabel="没有匹配的角色"
                     removeMentionLabel="取消点名"
