@@ -16,6 +16,7 @@ import {
   type WorldConfig,
   type WorldPreset,
 } from "@/lib/group-chat/model";
+import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
 
 export function WorldEditor({
@@ -230,9 +231,17 @@ export function WorldEditor({
               className="rounded-2xl border border-border bg-card p-4"
             >
               <summary className="cursor-pointer text-sm font-semibold">
-                {character.name || `角色 ${index + 1}`} ·{" "}
-                {character.identity || "待设定身份"}
-                {character.enabled ? "" : "（已禁用）"}
+                <span className="inline-flex items-center gap-3 align-middle">
+                  <CharacterAvatar
+                    id={character.id}
+                    name={character.name || `角色 ${index + 1}`}
+                  />
+                  <span>
+                    {character.name || `角色 ${index + 1}`} ·{" "}
+                    {character.identity || "待设定身份"}
+                    {character.enabled ? "" : "（已禁用）"}
+                  </span>
+                </span>
               </summary>
               <div className="mt-5 flex flex-col gap-5">
                 {presets.some((p) => p.kind === "character") ? (

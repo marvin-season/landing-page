@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   Button,
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -36,6 +35,7 @@ import type {
   WorldRoom,
 } from "@/lib/group-chat/model";
 import type { WorldTemplate } from "@/lib/group-chat/world-templates";
+import { WorldCard } from "./world-card";
 import { WorldEditor } from "./world-editor";
 
 export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
@@ -144,7 +144,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {templates.map((world) => (
-                <Card key={world.id}>
+                <WorldCard key={world.id} seed={world.id}>
                   <CardHeader className="px-4 py-3">
                     <CardTitle className="text-base">
                       {world.config.title}
@@ -166,7 +166,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                       <ArrowRight data-icon="inline-end" />
                     </Button>
                   </CardFooter>
-                </Card>
+                </WorldCard>
               ))}
             </div>
           </section>
@@ -188,7 +188,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           ) : null}
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {rooms.data?.rooms.map((room) => (
-              <Card key={room.id}>
+              <WorldCard key={room.id} seed={room.id}>
                 <CardHeader className="flex-row items-start justify-between gap-2 px-4 py-3">
                   <CardTitle className="text-base">{room.title}</CardTitle>
                   <CardDescription>
@@ -228,7 +228,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                     <Trash2 />
                   </Button>
                 </CardFooter>
-              </Card>
+              </WorldCard>
             ))}
           </div>
         </section>

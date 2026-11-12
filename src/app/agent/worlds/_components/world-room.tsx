@@ -43,6 +43,7 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
+import { CharacterAvatar } from "./character-avatar";
 import { useWorldRoom } from "./use-world-room";
 import { WorldEditor } from "./world-editor";
 
@@ -83,12 +84,15 @@ function WorldNotes({
             className="flex flex-col gap-2 rounded-xl border border-border p-3"
           >
             <div className="flex items-center justify-between gap-2">
-              <div>
-                <p className="font-medium">
-                  {c.name}
-                  {c.enabled ? "" : " · 已禁用"}
-                </p>
-                <p className="text-xs text-muted-foreground">{c.identity}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                <CharacterAvatar id={c.id} name={c.name} />
+                <div className="min-w-0">
+                  <p className="font-medium">
+                    {c.name}
+                    {c.enabled ? "" : " · 已禁用"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{c.identity}</p>
+                </div>
               </div>
               <Button
                 variant="ghost"
@@ -168,14 +172,21 @@ function MessageBubble({
     message.status !== "complete" && message.status !== "streaming";
   return (
     <article className={cn("flex gap-3", user && "flex-row-reverse")}>
-      <div
-        className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold",
-          user && "bg-primary/10 text-primary",
-        )}
-      >
-        {message.name.slice(0, 1)}
-      </div>
+      {message.kind === "agent" || message.kind === "user" ? (
+        <CharacterAvatar
+          id={message.kind === "user" ? "former-player" : message.speakerId}
+          name={message.name}
+        />
+      ) : (
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold",
+            user && "bg-primary/10 text-primary",
+          )}
+        >
+          {message.name.slice(0, 1)}
+        </div>
+      )}
       <div className="flex min-w-0 max-w-[88%] flex-col gap-2 sm:max-w-[85%]">
         <div
           className={cn(
@@ -280,7 +291,12 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const ended = room.status === "ended";
   const mentionItems = room.config.characters
     .filter((c) => c.enabled)
-    .map((c) => ({ id: c.id, label: c.name, description: c.identity }));
+    .map((c) => ({
+      id: c.id,
+      label: c.name,
+      description: c.identity,
+      icon: <CharacterAvatar id={c.id} name={c.name} size="sm" />,
+    }));
   const latestMessage = room.messages.filter((m) => m.kind !== "system").at(-1);
   function addMention(id: string) {
     const item = mentionItems.find((c) => c.id === id);
