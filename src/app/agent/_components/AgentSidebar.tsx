@@ -39,6 +39,7 @@ import { Link } from "@/components/link/link";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { useTRPC } from "@/lib/trpc";
 import { isWorldsPath } from "./agent-paths";
+import { SidebarListLink } from "./sidebar-list-link";
 import { WorkspaceNav } from "./workspace-nav";
 import { WorldsListContent } from "./worlds-list-content";
 
@@ -242,25 +243,30 @@ function ThreadListContent({
                     </Button>
                   </div>
                 ) : (
-                  <Link
+                  <SidebarListLink
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
-                    className={cn(
-                      "group flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors",
-                      threadId === t.id ? "bg-muted" : "hover:bg-muted/60",
-                    )}
+                    active={threadId === t.id}
+                    className="group flex items-center gap-2"
                   >
                     <span className="min-w-0 flex-1 truncate">
                       <span className="block truncate leading-5">
                         {t.title ?? "新对话"}
                       </span>
-                      <span className="block text-[11px] leading-4 text-muted-foreground">
+                      <span className="block text-[11px] font-normal leading-4 text-muted-foreground">
                         <HistoryLinkStatus>
                           {dayjs(t.updatedAt).fromNow()}
                         </HistoryLinkStatus>
                       </span>
                     </span>
-                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div
+                      className={cn(
+                        "flex shrink-0 items-center gap-0.5 transition-opacity",
+                        threadId === t.id
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100",
+                      )}
+                    >
                       <Button
                         size="icon"
                         variant="ghost"
@@ -293,7 +299,7 @@ function ThreadListContent({
                         )}
                       </Button>
                     </div>
-                  </Link>
+                  </SidebarListLink>
                 )}
               </li>
             ))}
@@ -360,8 +366,8 @@ function DesktopRailLink({
           aria-label={label}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "flex size-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground",
-            active && "bg-muted text-foreground",
+            "flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground",
+            active && "bg-primary/10 text-primary",
           )}
         >
           {children}
@@ -577,21 +583,18 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
         />
       ) : (
         <div className="flex h-full w-60 animate-in fade-in-0 duration-200 flex-col">
-          <div className="flex h-12 shrink-0 items-center justify-between border-b px-2">
-            <span className="px-1 text-sm font-semibold">
-              {worlds ? "开放世界" : "对话"}
-            </span>
+          <div className="flex h-12 shrink-0 items-center gap-1 border-b px-2">
+            <WorkspaceNav className="min-w-0 flex-1" />
             <Button
               variant="ghost"
               size="icon"
-              className="size-8"
+              className="size-8 shrink-0"
               onClick={() => setCollapsed(true)}
               aria-label="收起侧边栏"
             >
               <ChevronsLeft className="size-4" />
             </Button>
           </div>
-          <WorkspaceNav />
           <div className="flex min-h-0 flex-1 flex-col">{listContent()}</div>
           <div className="shrink-0 border-t p-2">
             <div className="mb-2">
@@ -632,7 +635,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           side="left"
           className="flex w-72 flex-col bg-sidebar p-0 text-sidebar-foreground"
         >
-          <WorkspaceNav onNavigate={closeSheet} />
+          <div className="shrink-0 border-b p-2">
+            <WorkspaceNav onNavigate={closeSheet} />
+          </div>
           <div className="min-h-0 flex-1 overflow-hidden">
             {listContent(closeSheet)}
           </div>

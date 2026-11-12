@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { Link } from "@/components/link/link";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { RoomListItem } from "@/lib/group-chat/model";
+import { SidebarListLink } from "./sidebar-list-link";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
@@ -67,19 +68,17 @@ export function WorldsListContent({
           <ul className="space-y-0.5">
             {rooms.data?.rooms.map((room) => (
               <li key={room.id}>
-                <Link
+                <SidebarListLink
                   href={`/agent/worlds/${room.id}`}
                   onClick={onItemClick}
-                  className={cn(
-                    "block rounded-lg px-2 py-1.5 text-sm transition-colors",
-                    roomId === room.id ? "bg-muted" : "hover:bg-muted/60",
-                  )}
+                  active={roomId === room.id}
+                  className="block"
                 >
                   <span className="block truncate leading-5">{room.title}</span>
-                  <span className="block text-[11px] leading-4 text-muted-foreground">
+                  <span className="block text-[11px] font-normal leading-4 text-muted-foreground">
                     {roomStatus(room)} · {dayjs(room.updatedAt).fromNow()}
                   </span>
-                </Link>
+                </SidebarListLink>
               </li>
             ))}
           </ul>
