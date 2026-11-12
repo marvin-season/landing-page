@@ -38,6 +38,7 @@ import {
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText, worldRequest } from "@/lib/group-chat/client";
 import type {
+  Character,
   WorldConfig,
   WorldMessage,
   WorldPreset,
@@ -156,9 +157,11 @@ function WorldNotes({
 
 function MessageBubble({
   message,
+  characters,
   onRetry,
 }: {
   message: WorldMessage;
+  characters: Character[];
   onRetry?: () => void;
 }) {
   if (message.kind === "system")
@@ -168,6 +171,13 @@ function MessageBubble({
       </p>
     );
   const user = message.kind === "intervention";
+  const missingMentions = message.mentions
+    .map(
+      (id) =>
+        `@${characters.find((character) => character.id === id)?.name ?? id}`,
+    )
+    .filter((name) => !message.text.includes(name));
+  const text = [...missingMentions, message.text].filter(Boolean).join(" ");
   const unfinished =
     message.status !== "complete" && message.status !== "streaming";
   return (
@@ -216,9 +226,9 @@ function MessageBubble({
             unfinished && "opacity-60",
           )}
         >
-          {message.text ? (
+          {text ? (
             <UnifiedMarkdown
-              content={message.text}
+              content={text}
               hasNextChunk={message.status === "streaming"}
             />
           ) : (
@@ -300,10 +310,15 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const latestMessage = room.messages.filter((m) => m.kind !== "system").at(-1);
   function addMention(id: string) {
     const item = mentionItems.find((c) => c.id === id);
-    if (item)
+    if (item && !mentions.some((mention) => mention.id === id)) {
+      setDraft(
+        (current) =>
+          `${current}${current && !/\s$/.test(current) ? " " : ""}@${item.label} `,
+      );
       setMentions((current) =>
         current.some((m) => m.id === id) ? current : [...current, item],
       );
+    }
     setNotes(false);
   }
   function send(resume = false) {
@@ -412,6 +427,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 <MessageBubble
                   key={message.id}
                   message={message}
+                  characters={room.config.characters}
                   onRetry={
                     !running &&
                     !ended &&
@@ -510,6 +526,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     mentions={mentions}
                     onMentionsChange={setMentions}
                     mentionItems={mentionItems}
+                    mentionDisplay="inline"
                     disabled={chat.pending || actionPending}
                     maxLength={8000}
                     rows={2}

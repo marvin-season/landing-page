@@ -66,6 +66,7 @@ export type AiInputProps<T = unknown> = {
   onMentionsChange?: (mentions: AiMentionItem<T>[]) => void;
   mentionItems?: readonly AiMentionItem<T>[];
   mentionTrigger?: string;
+  mentionDisplay?: "tags" | "inline";
   placeholder?: string;
   label?: string;
   disabled?: boolean;
@@ -144,7 +145,7 @@ export function AiInput<T = unknown>({
         />
       ) : null}
       {header}
-      {mentions.length > 0 ? (
+      {props.mentionDisplay !== "inline" && mentions.length > 0 ? (
         <div className="mb-3 flex flex-wrap gap-2">
           {mentions.map((mention) => (
             <span

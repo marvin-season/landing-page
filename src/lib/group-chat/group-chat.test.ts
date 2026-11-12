@@ -348,6 +348,145 @@ test("private goals and knowledge never enter other actors, director or summary 
   }
 });
 
+test("all generators see every unsummarized event after the current summary", async () => {
+  const room = await setup().create("alice", exampleWorld);
+  for (let i = 0; i < 16; i++) {
+    appendMessage(room, {
+      speakerId: "engineer",
+      name: "许岚",
+      kind: "agent",
+      text: i === 1 ? "备用电源已经恢复，大家已离开控制室。" : `后续事件${i}`,
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  }
+  room.summary = {
+    text: "已完成：确认断电原因；当前：开始维修。",
+    throughSeq: 1,
+    configVersion: 1,
+  };
+  appendMessage(room, {
+    speakerId: "engineer",
+    name: "许岚",
+    kind: "agent",
+    text: "未完成的推测，不应成为剧情事实",
+    status: "interrupted",
+    runId: null,
+    mentions: [],
+  });
+  for (const context of [
+    actorContext(room, room.config.characters[0]),
+    narratorContext(room, "继续维修后的事件"),
+    directorContext(room, eligibleCharacters(room)),
+  ]) {
+    const data = JSON.parse(context[1].content);
+    assert.equal(data.world.initialScene, room.config.scene);
+    assert.equal(data.world.initialFacts, room.config.facts);
+    assert.equal(data.world.scene, undefined);
+    assert.equal(data.world.summary, room.summary.text);
+    assert.deepEqual(
+      data.publicConversation.map((message: { seq: number }) => message.seq),
+      Array.from({ length: 15 }, (_, index) => index + 2),
+    );
+    assert.equal(data.publicConversation[0].text, room.messages[1].text);
+  }
+});
+
+test("name-addressing across run batches eventually returns control to the director", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (r) => {
+    appendMessage(r, {
+      speakerId: "system",
+      name: "系统",
+      kind: "narrator",
+      text: "大家正在维修设备。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+  });
+  let actors = 0;
+  let directors = 0;
+  const complete: Complete = async (input) => {
+    if (input.purpose === "director") {
+      directors++;
+      const data = JSON.parse(input.messages[1].content);
+      if (actors >= 4) {
+        assert.equal(data.consecutiveActorTurns, 4);
+        assert.equal(data.awaitingReply, "engineer");
+        return {
+          text: JSON.stringify({
+            action: "narrate",
+            text: "电源恢复，走廊的灯依次亮起，对讲机传来了船员清晰的回音。",
+          }),
+        };
+      }
+      return { text: '{"action":"speak","speakerId":"engineer"}' };
+    }
+    actors++;
+    const id = JSON.parse(input.messages[1].content).yourCharacter.id;
+    return {
+      text: id === "engineer" ? "林舟，再确认一下。" : "许岚，再确认一下。",
+    };
+  };
+  for (const mode of ["auto", "step", "step"] as const) {
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode, resume: true }),
+    );
+    await createWorldEngine(store, complete)(
+      "alice",
+      started.room,
+      new AbortController().signal,
+      () => {},
+    );
+  }
+  const saved = await store.get("alice", room.id);
+  assert.equal(actors, 4);
+  assert.equal(directors, 2);
+  assert.equal(saved.messages.at(-1)?.kind, "narrator");
+  assert.match(saved.messages.at(-1)!.text, /电源恢复/);
+});
+
+test("operator mentions retain priority after a long actor exchange", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (r) => {
+    for (let i = 0; i < 4; i++) {
+      appendMessage(r, {
+        speakerId: "engineer",
+        name: "许岚",
+        kind: "agent",
+        text: "林舟，再确认一下。",
+        status: "complete",
+        runId: null,
+        mentions: [],
+      });
+    }
+  });
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({
+      mode: "step",
+      mentions: ["reporter"],
+      resume: true,
+    }),
+  );
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    assert.equal(
+      JSON.parse(input.messages[1].content).yourCharacter.id,
+      "reporter",
+    );
+    return fakeComplete(input);
+  })("alice", started.room, new AbortController().signal, () => {});
+  assert.equal((await store.get("alice", room.id)).run?.calls, 1);
+});
+
 test("automatic run commits three ordered messages, uses previous speakers, and stops", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);

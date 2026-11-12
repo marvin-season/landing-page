@@ -160,7 +160,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               ));
           let direction = narrating
             ? "承接当前事件，给出一个可供角色回应的具体场景变化。"
-            : "直接回应最近的发言，并推进符合自己身份与目标的小行动。";
+            : "承接最近已发生的事，直接回应尚未解决的问题，并落实行动、给出新的进展或结果。";
           let preparedNarration: string | undefined;
           if (!mentioned && !narrating && !directSpeaker) {
             await phase("系统正在安排剧情");
@@ -189,7 +189,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               } else {
                 speaker = fallback!;
                 direction =
-                  "落实最新系统干预，承接最近事件并自主推进一个小行动，不等待操作者输入。";
+                  "落实仍未完成的系统干预，承接最近事件的结果并自主完成一个具体行动，不重演已完成的事，不等待操作者输入。";
               }
             } catch (error) {
               if (

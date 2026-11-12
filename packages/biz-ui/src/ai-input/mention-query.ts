@@ -2,6 +2,36 @@ import type { AiMentionItem, MentionRange } from "./types";
 
 const DEFAULT_TRIGGER = "@";
 
+export function inlineMentions<T>(
+  value: string,
+  items: readonly AiMentionItem<T>[],
+  trigger = DEFAULT_TRIGGER,
+): AiMentionItem<T>[] {
+  if (!trigger) return [];
+  const candidates = [...items].sort((a, b) => b.label.length - a.label.length);
+  const result: AiMentionItem<T>[] = [];
+  const seen = new Set<string>();
+  let start = value.indexOf(trigger);
+  while (start !== -1) {
+    const before = value.charAt(start - 1);
+    if (start === 0 || /[\s\p{P}]/u.test(before)) {
+      const nameStart = start + trigger.length;
+      const item = candidates.find((candidate) => {
+        if (!candidate.label || !value.startsWith(candidate.label, nameStart))
+          return false;
+        const after = value.charAt(nameStart + candidate.label.length);
+        return !after || /[\s\p{P}]/u.test(after);
+      });
+      if (item && !seen.has(item.id)) {
+        result.push(item);
+        seen.add(item.id);
+      }
+    }
+    start = value.indexOf(trigger, start + Math.max(trigger.length, 1));
+  }
+  return result;
+}
+
 export function getActiveMention(
   value: string,
   caret: number,

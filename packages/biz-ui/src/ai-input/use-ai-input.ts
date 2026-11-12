@@ -18,7 +18,7 @@ import {
   useState,
 } from "react";
 import { mentionMenuKey, nextMentionIndex } from "./mention-menu";
-import { filterMentionItems } from "./mention-query";
+import { filterMentionItems, inlineMentions } from "./mention-query";
 import { MentionSuggestion } from "./mention-suggestion";
 import { editorToPlainText, plainTextToContent } from "./plain-text";
 import type { AiInputHandle, AiInputSubmitValue, AiMentionItem } from "./types";
@@ -64,6 +64,7 @@ export type UseAiInputProps<T = unknown> = {
   onMentionsChange?: (mentions: AiMentionItem<T>[]) => void;
   mentionItems?: readonly AiMentionItem<T>[];
   mentionTrigger?: string;
+  mentionDisplay?: "tags" | "inline";
   placeholder?: string;
   label?: string;
   disabled?: boolean;
@@ -88,6 +89,7 @@ export function useAiInput<T = unknown>({
   onMentionsChange,
   mentionItems,
   mentionTrigger = "@",
+  mentionDisplay = "tags",
   placeholder,
   label,
   disabled = false,
@@ -136,6 +138,7 @@ export function useAiInput<T = unknown>({
   const submitEnabledRef = useRef(submitEnabled);
   const disabledRef = useRef(disabled);
   const loadingRef = useRef(loading);
+  const mentionDisplayRef = useRef(mentionDisplay);
 
   valueRef.current = value;
   mentionsRef.current = mentions;
@@ -153,13 +156,16 @@ export function useAiInput<T = unknown>({
   submitEnabledRef.current = submitEnabled;
   disabledRef.current = disabled;
   loadingRef.current = loading;
+  mentionDisplayRef.current = mentionDisplay;
 
   const setValue = useCallback((next: string) => {
+    valueRef.current = next;
     if (valuePropRef.current === undefined) setUncontrolledValue(next);
     onValueChangeRef.current?.(next);
   }, []);
 
   const setMentions = useCallback((next: AiMentionItem<T>[]) => {
+    mentionsRef.current = next;
     if (mentionsPropRef.current === undefined) setUncontrolledMentions(next);
     onMentionsChangeRef.current?.(next);
   }, []);
@@ -246,8 +252,20 @@ export function useAiInput<T = unknown>({
             allow: () => Boolean(mentionItemsRef.current),
             items: ({ query }) => suggestionApi.current.items(query),
             command: ({ editor: mentionEditor, range, props }) => {
-              mentionEditor.chain().focus().deleteRange(range).run();
-              suggestionApi.current.addMention(props as AiMentionItem<T>);
+              const item = props as AiMentionItem<T>;
+              if (mentionDisplayRef.current === "inline") {
+                mentionEditor
+                  .chain()
+                  .focus()
+                  .insertContentAt(range, {
+                    type: "text",
+                    text: `${mentionTrigger}${item.label} `,
+                  })
+                  .run();
+              } else {
+                mentionEditor.chain().focus().deleteRange(range).run();
+                suggestionApi.current.addMention(item);
+              }
             },
             render: () => ({
               onStart: (props) =>
@@ -280,7 +298,13 @@ export function useAiInput<T = unknown>({
         },
       },
       onUpdate: ({ editor: nextEditor }) => {
-        setValue(editorToPlainText(nextEditor));
+        const next = editorToPlainText(nextEditor);
+        setValue(next);
+        if (mentionDisplayRef.current === "inline") {
+          setMentions(
+            inlineMentions(next, mentionItemsRef.current ?? [], mentionTrigger),
+          );
+        }
       },
     },
     [],
@@ -328,6 +352,24 @@ export function useAiInput<T = unknown>({
       emitUpdate: false,
     });
   }, [editor, value]);
+
+  useEffect(() => {
+    if (mentionDisplay !== "inline") return;
+    const next = inlineMentions(value, mentionItems ?? [], mentionTrigger);
+    if (
+      next.length !== mentions.length ||
+      next.some((item, index) => item.id !== mentions[index]?.id)
+    ) {
+      setMentions(next);
+    }
+  }, [
+    mentionDisplay,
+    mentionItems,
+    mentionTrigger,
+    mentions,
+    setMentions,
+    value,
+  ]);
 
   useEffect(() => {
     editor?.setEditable(!disabled);
