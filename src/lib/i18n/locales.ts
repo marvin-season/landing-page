@@ -21,7 +21,13 @@ export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
 
-const unlocalizedRoots = new Set(["agent", "agui", "api", "pdfjs"]);
+const unlocalizedRoots = new Set([
+  "agent",
+  "agui",
+  "api",
+  "pdfjs",
+  "saltline-fable-5.2",
+]);
 
 export function isBookkeepingPath(pathname: string): boolean {
   return pathname === "/bookkeeping" || pathname.startsWith("/bookkeeping/");

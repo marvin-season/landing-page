@@ -51,6 +51,7 @@ export function NavigationCarousel({ items }: { items: HomeNavLink[] }) {
 
 export function NavCard({
   href,
+  target,
   analyticsId,
   title,
   description,
@@ -70,8 +71,9 @@ export function NavCard({
         location: "home_navigation",
         external,
       }}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
+      target={target ?? (external ? "_blank" : undefined)}
+      rel={external || target === "_blank" ? "noreferrer" : undefined}
+      prefetch={target === "_blank" ? false : undefined}
       data-featured={featured || undefined}
       className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-64 shrink-0 hover:z-10 hover:scale-[1.02] focus-visible:border-primary/45 focus-visible:bg-primary/5 motion-reduce:transform-none flex flex-col bg-linear-to-br from-card/90 to-muted/30 hover:to-primary/10 shinchan:matte-surface shinchan:hover:shadow-sm apple:glass-surface apple:hover:shadow-sm data-[featured=true]:isolate data-[featured=true]:border-0 data-[featured=true]:p-4.25 data-[featured=true]:shadow-primary/15"
     >

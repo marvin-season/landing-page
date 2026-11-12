@@ -74,6 +74,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/saltline-fable-5.2",
+        destination: "/saltline-fable-5.2/index.html",
+      },
+      {
         // 匹配所有以 /api-remote 开头的请求
         source: "/api-remote/:path*",
         // 转发到目标 HTTP 地址

@@ -94,6 +94,7 @@ export const homeProfiles = {
 
 export type HomeNavLink = {
   href: string;
+  target?: "_blank";
   analyticsId: string;
   title: ReactNode;
   description: ReactNode;
@@ -143,6 +144,15 @@ export const navLinks: HomeNavLink[] = [
     description: <Trans>设定一个世界，与多个角色一起展开故事</Trans>,
     badge: "NEW",
     icon: Globe,
+  },
+  {
+    href: "/saltline-fable-5.2",
+    target: "_blank",
+    analyticsId: "saltline_fable",
+    title: "Saltline Fable 5.2",
+    description: "打开 Saltline Fable 5.2",
+    badge: "NEW",
+    icon: BookOpen,
   },
   {
     href: "/resume",

@@ -88,12 +88,13 @@ export const config = {
      * - pdfjs (PDF.js worker, character maps, fonts, and Wasm)
      * - knowledge/examples (sample documents)
      * - bbq-pwa (BBQ installation manifests and icons)
+     * - saltline-fable-5.2 (standalone HTML page)
      * - favicon.ico (favicon file)
      * - manifest.json, robots.txt, sitemap.xml (SEO files)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Agent is included so the session gate can run. Auth lives under [lang]
      * and is not a protected page, so the gate does not redirect it.
      */
-    "/((?!bbq-pwa(?:/|$)|knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
+    "/((?!saltline-fable-5\\.2(?:/|$)|bbq-pwa(?:/|$)|knowledge/examples(?:/|$)|pdfjs(?:/|$)|_next/static|api|agui|_next/image|favicon.ico|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|md)$).*)",
   ],
 };
