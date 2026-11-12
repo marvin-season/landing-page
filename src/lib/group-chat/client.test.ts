@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { type WorldClientEvent, worldStoryStream } from "./client";
-import { exampleWorld } from "./example";
 import { runInputSchema, type WorldEvent, type WorldRoom } from "./model";
+import { exampleWorld } from "./world-templates";
 
 function snapshot(id: string, paused = false): WorldRoom {
   return {

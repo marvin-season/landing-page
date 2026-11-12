@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
 import { WorldLobby } from "./_components/world-lobby";
 
 export const metadata: Metadata = {
@@ -7,5 +8,5 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 export default function WorldsPage() {
-  return <WorldLobby />;
+  return <WorldLobby templates={loadWorldTemplates()} />;
 }

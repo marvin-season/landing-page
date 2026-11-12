@@ -29,42 +29,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
-import { exampleWorld } from "@/lib/group-chat/example";
 import type {
   RoomListItem,
   WorldConfig,
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
-import { neonNightWorld } from "./neon-night-world";
-import { qingyunPeakWorld } from "./qingyun-peak-world";
+import type { WorldTemplate } from "@/lib/group-chat/world-templates";
 import { WorldEditor } from "./world-editor";
 
-const builtInWorlds = [
-  {
-    id: "fog-harbor",
-    config: exampleWorld,
-    description:
-      "暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，角色会自主决定下一步，你可以随时干预。",
-    details: "4 位 NPC · 自由探索 · 信息不对称",
-  },
-  {
-    id: "neon-night",
-    config: neonNightWorld,
-    description:
-      "大学毕业旅行的最后一晚，暴雨把顾深、女友苏晚和闺蜜林知夏关在海景别墅。湿衣、酒气与越界试探，每靠近一步都更难回头。",
-    details: "情侣带闺蜜 · 毕业旅行 · 信息不对称",
-  },
-  {
-    id: "qingyun-peak",
-    config: qingyunPeakWorld,
-    description:
-      "南宫婉入落云宗，搬进青云峰，与韩立、慕沛灵住在一起。原著到此为止，往后由你们自己过。",
-    details: "韩立 · 慕沛灵 · 南宫婉 · 自由发展",
-  },
-];
-
-export function WorldLobby() {
+export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
+  const defaultConfig =
+    templates.find((template) => template.id === "fog-harbor")?.config ??
+    templates[0]?.config;
   const router = useRouter();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<WorldConfig | null>(null);
@@ -115,7 +92,11 @@ export function WorldLobby() {
               <Upload data-icon="inline-start" />
               导入存档
             </Button>
-            <Button onClick={() => setEditing(structuredClone(exampleWorld))}>
+            <Button
+              onClick={() => {
+                if (defaultConfig) setEditing(structuredClone(defaultConfig));
+              }}
+            >
               <Plus data-icon="inline-start" />
               创建世界
             </Button>
@@ -155,7 +136,7 @@ export function WorldLobby() {
             </AlertDescription>
           </Alert>
         ) : null}
-        {builtInWorlds.map((world) => (
+        {templates.map((world) => (
           <section
             key={world.id}
             className="grid gap-6 rounded-3xl border border-border bg-muted/30 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8"

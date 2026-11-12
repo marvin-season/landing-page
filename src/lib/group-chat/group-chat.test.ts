@@ -11,7 +11,6 @@ import {
   summaryContext,
 } from "./context";
 import { abortRun, createWorldEngine } from "./engine";
-import { exampleWorld } from "./example";
 import { createWorldHandlers } from "./http";
 import { upgradeWorldRoom } from "./migration";
 import {
@@ -23,6 +22,7 @@ import {
 } from "./model";
 import type { Complete } from "./provider";
 import { appendMessage, createWorldStore } from "./store";
+import { exampleWorld } from "./world-templates";
 
 const clients: Client[] = [];
 afterEach(() => {

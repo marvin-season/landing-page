@@ -53,6 +53,7 @@
 ## 代码与验证
 
 - 页面与表单：`src/app/agent/worlds/`。
+- 内置世界模板：`public/worlds/*.json`，文件名即模板 id，由 `world-templates.ts` 扫描读取。
 - API：`src/app/api/group-chat/[[...path]]/route.ts`，包含鉴权、来源和房间所有权校验。
 - 领域、上下文、存储和调度：`src/lib/group-chat/`。
 - 传输：复用共享 `useChatStreamCore`，使用 AI SDK 的 SSE 解析器读取房间事件；Mastra Agent 与 OpenAI-compatible provider 负责生成协议。
