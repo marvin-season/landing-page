@@ -18,7 +18,7 @@ function snapshot(id: string, paused = false): WorldRoom {
       id,
       status: paused ? "paused" : "completed",
       phase: "",
-      reason: paused ? "等待你的决定" : "本轮对话已完成",
+      reason: paused ? "已暂停" : "本轮对话已完成",
       startedAt: 0,
       leaseUntil: 0,
       deadline: 0,

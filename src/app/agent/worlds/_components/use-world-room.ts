@@ -40,6 +40,7 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
   const accepted = useRef(false);
   const lastCommand = useRef<RunInput | null>(null);
   const requestId = useRef<string | undefined>(undefined);
+  const autoStarted = useRef<string | null>(null);
   const refresh = useCallback(async () => {
     const requestEpoch = epoch.current;
     try {
@@ -147,6 +148,30 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
       void refresh();
     },
   });
+  useEffect(() => {
+    if (
+      !room ||
+      room.status !== "draft" ||
+      room.paused ||
+      room.run ||
+      autoStarted.current === room.id ||
+      pendingRef.current ||
+      stoppingRef.current
+    )
+      return;
+    autoStarted.current = room.id;
+    const command: RunInput = {
+      clientRequestId: crypto.randomUUID(),
+      expectedVersion: room.version,
+      mode: "auto",
+      text: "",
+      mentions: [],
+      resume: false,
+    };
+    lastCommand.current = command;
+    requestId.current = command.clientRequestId;
+    stream.send({ roomId: room.id, command });
+  }, [room, stream.send]);
   function start(
     command: Omit<RunInput, "clientRequestId" | "expectedVersion">,
   ) {

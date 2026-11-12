@@ -1,13 +1,12 @@
+import type { WorldAgentPurpose } from "~/mastra-server/agents/world-agents";
 import {
   actorContext,
-  canWaitForUser,
   directorContext,
   directReplySpeaker,
   eligibleCharacters,
   fallbackSpeaker,
   narratorContext,
   parseSelection,
-  pendingUserQuestions,
   summaryBatch,
   summaryContext,
 } from "./context";
@@ -86,6 +85,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
         send({ type: "phase", phase: label });
       }
       async function call(
+        purpose: WorldAgentPurpose,
         model: string,
         messages: ModelMessage[],
         maxCharacters: number,
@@ -98,6 +98,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           r.run!.calls += 1;
         });
         const result = await complete({
+          purpose,
           model,
           messages,
           signal,
@@ -122,6 +123,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           while (batch.length) {
             await phase("正在整理公共剧情");
             const text = await call(
+              "summary",
               room.config.characters.find((c) => c.enabled)!.model,
               summaryContext(room, batch),
               5000,
@@ -160,14 +162,11 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
             ? "承接当前事件，给出一个可供角色回应的具体场景变化。"
             : "直接回应最近的发言，并推进符合自己身份与目标的小行动。";
           let preparedNarration: string | undefined;
-          let followUpTo =
-            room.run!.mode === "retry"
-              ? room.messages.findLast((m) => m.kind !== "system")?.followUpTo
-              : undefined;
           if (!mentioned && !narrating && !directSpeaker) {
             await phase("系统正在安排剧情");
             try {
               const text = await call(
+                "director",
                 process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model,
                 directorContext(room, eligible),
                 1500,
@@ -175,52 +174,9 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
                 8000,
               );
               const selected = parseSelection(text, eligible);
-              if (
-                selected.action === "wait" &&
-                canWaitForUser(room) &&
-                (selected.question ||
-                  pendingUserQuestions(room).length ||
-                  /[?？]/.test(
-                    room.messages.findLast(
-                      (m) => m.status === "complete" && m.kind === "agent",
-                    )?.text ?? "",
-                  ))
-              ) {
-                await change((r) => {
-                  if (selected.question) {
-                    message = appendMessage(r, {
-                      speakerId: "system",
-                      name: "系统",
-                      kind: "narrator",
-                      text: selected.question,
-                      status: "complete",
-                      runId,
-                      mentions: [],
-                    });
-                    r.run!.turns += 1;
-                  }
-                  r.updatedAt = new Date().toISOString();
-                  finishRun(r, "paused", "等待你的决定");
-                });
-                if (message) send({ type: "message", message });
-                message = undefined;
-                break;
-              }
               if (selected.action === "speak") {
-                const waiting = pendingUserQuestions(room).find(
-                  (q) => q.speakerId === selected.character.id,
-                );
-                if (waiting && (!selected.followUp || waiting.followedUp)) {
-                  if (!fallback) {
-                    await change((r) => finishRun(r, "paused", "等待你的决定"));
-                    break;
-                  }
-                  speaker = fallback;
-                } else {
-                  speaker = selected.character;
-                  direction = selected.direction;
-                  followUpTo = waiting?.messageId;
-                }
+                speaker = selected.character;
+                direction = selected.direction;
               } else if (
                 selected.action === "narrate" &&
                 room.messages
@@ -231,13 +187,9 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
                 direction = selected.direction;
                 preparedNarration = selected.text;
               } else {
-                if (!fallback) {
-                  await change((r) => finishRun(r, "paused", "等待你的决定"));
-                  break;
-                }
-                speaker = fallback;
+                speaker = fallback!;
                 direction =
-                  "直接回应最近的用户消息或系统事件，并自主推进一个小行动，不要再次把话题退回给用户。";
+                  "落实最新系统干预，承接最近事件并自主推进一个小行动，不等待操作者输入。";
               }
             } catch (error) {
               if (
@@ -253,10 +205,6 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               )
                 throw error;
               // One failed director attempt uses the deterministic speaker, never a repair loop.
-              if (!fallback) {
-                await change((r) => finishRun(r, "paused", "等待你的决定"));
-                break;
-              }
             }
           }
           const messages = narrating
@@ -274,7 +222,6 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               status: "streaming",
               runId,
               mentions: [],
-              followUpTo,
             });
           });
           send({ type: "message", message: message! });
@@ -285,30 +232,36 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
             : speaker.model;
           const text =
             preparedNarration ??
-            (await call(model, messages, 2000, (delta) => {
-              if (signal.aborted) return;
-              partial += delta;
-              send({ type: "delta", messageId: message!.id, text: delta });
-              if (Date.now() - lastCheckpoint > 500) {
-                const snapshot = partial;
-                const messageId = message!.id;
-                lastCheckpoint = Date.now();
-                checkpoint = checkpoint
-                  .then(() =>
-                    store.during(ownerId, roomId, runId, (r) => {
-                      const current = r.messages.find(
-                        (m) => m.id === messageId,
-                      );
-                      if (current?.status === "streaming")
-                        current.text = snapshot;
-                    }),
-                  )
-                  .catch((error: unknown) => {
-                    storageError = error;
-                    controller.abort();
-                  });
-              }
-            }));
+            (await call(
+              narrating ? "narrator" : "actor",
+              model,
+              messages,
+              2000,
+              (delta) => {
+                if (signal.aborted) return;
+                partial += delta;
+                send({ type: "delta", messageId: message!.id, text: delta });
+                if (Date.now() - lastCheckpoint > 500) {
+                  const snapshot = partial;
+                  const messageId = message!.id;
+                  lastCheckpoint = Date.now();
+                  checkpoint = checkpoint
+                    .then(() =>
+                      store.during(ownerId, roomId, runId, (r) => {
+                        const current = r.messages.find(
+                          (m) => m.id === messageId,
+                        );
+                        if (current?.status === "streaming")
+                          current.text = snapshot;
+                      }),
+                    )
+                    .catch((error: unknown) => {
+                      storageError = error;
+                      controller.abort();
+                    });
+                }
+              },
+            ));
           await checkpoint;
           if (storageError) throw storageError;
           await change((r) => {

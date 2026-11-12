@@ -1,6 +1,6 @@
-import type { WorldConfig } from "@/lib/group-chat/model";
+import { configSchema } from "@/lib/group-chat/model";
 
-export const neonNightWorld: WorldConfig = {
+export const neonNightWorld = configSchema.parse({
   title: "毕业季·暴雨别墅",
   background: `大学毕业旅行的最后一晚 · 暴雨 · 海景别墅
 
@@ -58,4 +58,4 @@ export const neonNightWorld: WorldConfig = {
       enabled: true,
     },
   ],
-};
+});

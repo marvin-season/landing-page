@@ -18,20 +18,19 @@ export const characterSchema = z.object({
   model: text(160).min(1),
   enabled: z.boolean(),
 });
-export const configSchema = z
+const currentConfigSchema = z
   .object({
     title: text(60).min(1, "请填写世界名称"),
     background: text(8000).min(1, "请填写世界背景"),
     scene: text(2000).min(1, "请填写初始场景"),
     rules: text(4000),
     facts: text(4000),
-    userName: text(30).min(1, "请填写你的角色名称"),
-    userRole: text(1000),
-    characters: z.array(characterSchema).min(2).max(6),
+    storyGoal: text(4000).default(""),
+    characters: z.array(characterSchema).min(2).max(7),
     maxTurns: z.number().int().min(1).max(10),
   })
   .superRefine((value, ctx) => {
-    const names = [value.userName, ...value.characters.map((c) => c.name)];
+    const names = value.characters.map((c) => c.name);
     if (new Set(names).size !== names.length)
       ctx.addIssue({
         code: "custom",
@@ -50,6 +49,36 @@ export const configSchema = z
         path: ["characters"],
       });
   });
+// Old presets had one human protagonist in addition to up to six NPCs.
+// Preserve that character as an NPC instead of silently removing them.
+export const configSchema = z.preprocess((input) => {
+  if (!input || typeof input !== "object") return input;
+  const legacy = input as Record<string, unknown>;
+  if ("storyGoal" in legacy || typeof legacy.userName !== "string")
+    return input;
+  const characters = z.array(characterSchema).safeParse(legacy.characters);
+  if (!characters.success) return input;
+  const cast = characters.data;
+  if (!cast.some((character) => character.name === legacy.userName)) {
+    let id = "former-player";
+    while (cast.some((character) => character.id === id)) id += "-npc";
+    const role = typeof legacy.userRole === "string" ? legacy.userRole : "";
+    cast.push({
+      id,
+      name: legacy.userName,
+      identity: role.slice(0, 300) || "故事中的一位参与者",
+      personality: "依据已有身份与经历自主判断，与其他角色自然交流。",
+      goal: "结合当前处境和个人身份，自主作出决定并推进故事。",
+      publicInfo: role,
+      privateInfo: "",
+      style: "用第一人称简短回应，以具体行动推进剧情。",
+      model:
+        cast.find((character) => character.enabled)?.model || "cursor/auto",
+      enabled: true,
+    });
+  }
+  return { ...legacy, storyGoal: "", characters: cast };
+}, currentConfigSchema);
 export type Character = z.infer<typeof characterSchema>;
 export type WorldConfig = z.infer<typeof configSchema>;
 export const messageSchema = z.object({
@@ -57,7 +86,7 @@ export const messageSchema = z.object({
   seq: z.number().int().positive(),
   speakerId: idSchema,
   name: text(60),
-  kind: z.enum(["user", "agent", "narrator", "system"]),
+  kind: z.enum(["user", "intervention", "agent", "narrator", "system"]),
   text: z.string().max(12000),
   status: z.enum([
     "streaming",
@@ -68,7 +97,7 @@ export const messageSchema = z.object({
   ]),
   configVersion: z.number().int().positive(),
   runId: idSchema.nullable(),
-  mentions: z.array(idSchema).max(6),
+  mentions: z.array(idSchema).max(7),
   followUpTo: idSchema.optional(),
   createdAt: z.string().datetime(),
 });
@@ -123,7 +152,7 @@ export const runInputSchema = z.object({
   expectedVersion: z.number().int().positive(),
   mode: z.enum(["auto", "step", "save", "retry"]),
   text: text(8000).default(""),
-  mentions: z.array(idSchema).max(6).default([]),
+  mentions: z.array(idSchema).max(7).default([]),
   retryMessageId: idSchema.optional(),
   continueRunId: idSchema.optional(),
   resume: z.boolean().default(false),

@@ -17,6 +17,7 @@
 ## 使用方式
 
 - **Chat API**：`src/app/api/chat/route.ts` 使用 `handleChatStream` 与 `mastra` 处理流式对话
+- **开放世界**：`src/lib/group-chat/provider.ts` 通过四类世界 Agent 处理调度、NPC 发言、旁白和摘要。用户为系统操作者；世界状态和消息仍由 group-chat 存档管理，Agent 不启用自动 Memory 或工具，避免角色私有上下文混用。
 - **Thread**：`server/thread/index.ts` 通过 `mastra` 获取 agent memory，用于会话/线程
 
 ## 别名

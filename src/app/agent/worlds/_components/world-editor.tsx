@@ -165,7 +165,7 @@ export function WorldEditor({
               value={config.rules}
               onChange={(v) => update("rules", v)}
               multiline
-              hint="例如：没有超自然力量、不替用户决定行动、使用简短对话。"
+              hint="例如：没有超自然力量、NPC 自主作出选择、使用简短对话。"
             />
             <TextField
               label="已确认的公共事实"
@@ -177,35 +177,29 @@ export function WorldEditor({
           </FieldGroup>
         </section>
         <section className="flex flex-col gap-5">
-          <h3 className="text-lg font-semibold">你的角色</h3>
+          <h3 className="text-lg font-semibold">故事推进要求</h3>
           <FieldGroup>
             <TextField
-              label="名字"
-              value={config.userName}
-              onChange={(v) => update("userName", v)}
-              maxLength={30}
-              required
-            />
-            <TextField
-              label="身份与背景"
-              value={config.userRole}
-              onChange={(v) => update("userRole", v)}
+              label="当前目标与节奏"
+              value={config.storyGoal}
+              onChange={(v) => update("storyGoal", v)}
               multiline
-              maxLength={1000}
+              maxLength={4000}
+              hint="例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
             />
           </FieldGroup>
         </section>
         <section className="flex flex-col gap-5">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-lg font-semibold">
-              登场角色 · {config.characters.length}/6
+              NPC · {config.characters.length}/7
             </h3>
             {!lockedMembers ? (
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={config.characters.length >= 6}
+                disabled={config.characters.length >= 7}
                 onClick={() =>
                   update("characters", [
                     ...config.characters,
@@ -394,7 +388,8 @@ export function WorldEditor({
         <section className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold">对话节奏</h3>
           <p className="text-xs leading-5 text-muted-foreground">
-            角色会依据各自设定主动推进故事，每次只由一位角色发言，回复完成后立即安排下一条。点名角色优先回应，之后恢复自动调度；你可以随时暂停，或使用“仅下一条”。需要你做决定时，故事会停下来等待。
+            进入新世界后，NPC
+            会依据设定和推进要求自动行动，逐条接话，不等待你回答。你可以随时发送系统干预来改变事件、角色行动或故事走向，也可以暂停、点名或使用“仅下一条”。
           </p>
           <div className="flex flex-wrap gap-2">
             <Button

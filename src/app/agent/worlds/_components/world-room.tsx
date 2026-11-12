@@ -62,19 +62,19 @@ function WorldNotes({
         </h3>
         <div className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-            {room.config.userName.slice(0, 1)}
+            系
           </div>
           <div>
-            <p className="font-medium">{room.config.userName} · 你</p>
+            <p className="font-medium">系统操作者 · 你</p>
             <p className="text-xs leading-5 text-muted-foreground">
-              {room.config.userRole}
+              {room.config.storyGoal || "观察 NPC 自主行动，随时干预故事走向。"}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
-          <p className="font-medium">系统 · 故事主持人</p>
+          <p className="font-medium">自动叙事 · 故事主持人</p>
           <p className="text-xs leading-6 text-muted-foreground">
-            叙述场景、推进事件，并根据你的发言安排角色回应，无需点名。
+            根据世界设定与系统干预叙述场景、推进事件，并安排 NPC 自主接话。
           </p>
         </div>
         {room.config.characters.map((c) => (
@@ -133,7 +133,7 @@ function WorldNotes({
       <section className="flex flex-col gap-2">
         <h3 className="font-semibold">世界规则</h3>
         <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
-          {room.config.rules || "自由对话，不替用户行动。"}
+          {room.config.rules || "NPC 自主行动，按当前需求持续推进。"}
         </p>
       </section>
       {room.run ? (
@@ -163,7 +163,7 @@ function MessageBubble({
         {message.text}
       </p>
     );
-  const user = message.kind === "user";
+  const user = message.kind === "intervention";
   const unfinished =
     message.status !== "complete" && message.status !== "streaming";
   return (
@@ -185,7 +185,11 @@ function MessageBubble({
         >
           <span className="font-medium text-foreground">{message.name}</span>
           <span>
-            {user ? "你" : message.kind === "narrator" ? "故事主持人" : "角色"}
+            {user
+              ? "你 · 系统指令"
+              : message.kind === "narrator"
+                ? "故事主持人"
+                : "NPC"}
           </span>
           <time>
             {new Date(message.createdAt).toLocaleTimeString("zh-CN", {
@@ -273,7 +277,6 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       </div>
     );
   const running = chat.stopping || chat.busy || room.run?.status === "running";
-  const waitingForDecision = room.paused && room.run?.reason === "等待你的决定";
   const ended = room.status === "ended";
   const mentionItems = room.config.characters
     .filter((c) => c.enabled)
@@ -294,7 +297,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       mode: "auto",
       text: draft,
       mentions: mentions.map((m) => m.id),
-      resume: resume || !room!.paused || waitingForDecision,
+      resume: resume || mentions.length > 0 || !room!.paused,
     });
   }
   async function edit(copy = false) {
@@ -330,9 +333,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 : running
                   ? chat.phase || room.run?.phase
                   : room.paused
-                    ? waitingForDecision
-                      ? "等待你的回复"
-                      : room.run?.reason || "已暂停"
+                    ? room.run?.reason || "已暂停"
                     : room.run?.reason || "故事尚未开始"}
             </p>
           </div>
@@ -386,9 +387,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     {room.config.scene}
                   </p>
                   <p className="text-xs leading-6 text-muted-foreground">
-                    你就是{room.config.userName}
-                    ，直接用“我”说话就好，比如“我来帮忙”或“我想先看看”。也可以让系统开启故事，随时暂停或接话，无需
-                    @ 点名。
+                    你是系统操作者，所有登场人物都是
+                    NPC。故事会自动开始并持续推进，你可以观察，也可以随时输入指令改变事件、角色行动或故事走向。
                   </p>
                 </div>
               ) : null}
@@ -465,9 +465,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                         }
                       >
                         <Play data-icon="inline-start" />
-                        {room.status === "draft"
-                          ? "让系统开启故事"
-                          : "继续故事"}
+                        {room.status === "draft" ? "开始自动推进" : "继续故事"}
                       </Button>
                     )}
                     <Button
@@ -487,7 +485,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                       仅下一条
                     </Button>
                     <span className="text-xs text-muted-foreground">
-                      系统主持剧情，角色依次回应 · 随时可暂停或插话
+                      NPC 自主推进故事 · 你可随时暂停或发送系统干预
                     </span>
                   </div>
                   <AiInput
@@ -500,19 +498,19 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     maxLength={8000}
                     rows={2}
                     onSubmit={() => send()}
-                    placeholder="直接说你想说的话，比如：我来帮忙。"
-                    sendLabel="发送消息"
+                    placeholder="输入系统干预，例如：让暴雨停下来，大家开始调查停电原因。"
+                    sendLabel="应用干预"
                     emptyMentionLabel="没有匹配的角色"
                     removeMentionLabel="取消点名"
                     hint={
-                      waitingForDecision
-                        ? "回复角色的问题，大家会继续聊下去。"
-                        : room.paused
-                          ? "当前已暂停，普通发送只保存消息。"
-                          : "无需点名，系统自动安排回应 · @ 可指定角色优先发言"
+                      room.paused
+                        ? mentions.length
+                          ? "提交点名后立即继续，指定 NPC 优先行动，随后自动推进。"
+                          : "当前已暂停，提交只保存指令；继续后生效。"
+                        : "指令会中止当前生成并调整后续剧情 · @ 可指定 NPC 优先行动"
                     }
                     footer={
-                      room.paused && !waitingForDecision ? (
+                      room.paused ? (
                         <Button
                           type="button"
                           size="sm"
@@ -522,7 +520,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                           }
                           onClick={() => send(true)}
                         >
-                          发送并继续
+                          干预并继续
                         </Button>
                       ) : undefined
                     }

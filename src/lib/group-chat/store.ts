@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { type Client, createClient, type Transaction } from "@libsql/client";
+import { upgradeWorldRoom } from "./migration";
 import {
   backupSchema,
   configSchema,
@@ -95,7 +96,7 @@ export function createWorldStore(getClient: () => Client) {
     });
     if (!result.rows[0])
       throw new WorldError("not_found", "房间不存在或无权访问", 404);
-    const room = JSON.parse(String(result.rows[0].data)) as WorldRoom;
+    const room = upgradeWorldRoom(JSON.parse(String(result.rows[0].data)));
     if (
       room.run?.status === "running" &&
       (room.run.leaseUntil < Date.now() || room.run.deadline < Date.now())
@@ -365,13 +366,13 @@ export function createWorldStore(getClient: () => Client) {
         const replacedRunId =
           room.run?.status === "running" ? room.run.id : null;
         if (replacedRunId)
-          finishRun(room, "interrupted", "用户插话，中止上一轮");
+          finishRun(room, "interrupted", "系统干预，中止上一轮");
         if (hasMessage)
           appendMessage(room, {
             speakerId: "user",
-            name: room.config.userName,
-            kind: "user",
-            text: input.text || "请回应。",
+            name: "系统干预",
+            kind: "intervention",
+            text: input.text || "让指定 NPC 优先行动，随后继续自动推进。",
             mentions: input.mentions,
             status: "complete",
             runId: null,
@@ -449,7 +450,8 @@ export function createWorldStore(getClient: () => Client) {
             (message.kind !== "agent" || !ids.has(message.followUpTo))) ||
           (message.kind === "agent" &&
             !config.characters.some((c) => c.id === message.speakerId)) ||
-          (message.kind === "user" && message.speakerId !== "user") ||
+          (["user", "intervention"].includes(message.kind) &&
+            message.speakerId !== "user") ||
           (["system", "narrator"].includes(message.kind) &&
             message.speakerId !== "system") ||
           message.mentions.some(
@@ -474,7 +476,7 @@ export function createWorldStore(getClient: () => Client) {
       room.summary = null;
       room.status = room.messages.length ? "active" : "draft";
       room.paused = true;
-      return insert(room);
+      return insert(upgradeWorldRoom(room));
     },
     async presets(ownerId: string) {
       const rows = await (await database()).execute({
@@ -484,7 +486,7 @@ export function createWorldStore(getClient: () => Client) {
       return rows.rows.map(
         (row) =>
           ({
-            ...JSON.parse(String(row.data)),
+            ...presetInputSchema.parse(JSON.parse(String(row.data))),
             id: String(row.id),
           }) as WorldPreset,
       );
