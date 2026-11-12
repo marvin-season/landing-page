@@ -18,6 +18,8 @@ node_modules
 /out/
 /public/pdfjs/
 /public/bbq-pwa/sw.js
+/public/worlds/local/*
+!/public/worlds/local/.gitkeep
 
 # production
 /build
