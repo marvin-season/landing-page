@@ -3,6 +3,7 @@ import {
   BookOpen,
   Bot,
   FileUser,
+  Globe,
   History,
   type LucideIcon,
   Shapes,
@@ -134,6 +135,14 @@ export const navLinks: HomeNavLink[] = [
     description: <Trans>Main chat flow powered by Mastra</Trans>,
     badge: "Chat",
     icon: Bot,
+  },
+  {
+    href: "/agent/worlds",
+    analyticsId: "worlds",
+    title: <Trans>开放世界</Trans>,
+    description: <Trans>设定一个世界，与多个角色一起展开故事</Trans>,
+    badge: "NEW",
+    icon: Globe,
   },
   {
     href: "/resume",

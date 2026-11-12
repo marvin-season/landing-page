@@ -21,14 +21,16 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ChevronsLeft,
   ChevronsRight,
+  Globe,
   Loader2,
   LogOut,
   Menu,
+  MessageSquare,
   MessageSquarePlus,
   Pencil,
+  Plus,
   Trash2,
 } from "lucide-react";
-import Image from "next/image";
 import { useLinkStatus } from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -36,6 +38,9 @@ import { useCallback, useState } from "react";
 import { Link } from "@/components/link/link";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { useTRPC } from "@/lib/trpc";
+import { isWorldsPath } from "./agent-paths";
+import { WorkspaceNav } from "./workspace-nav";
+import { WorldsListContent } from "./worlds-list-content";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
@@ -155,7 +160,7 @@ function ThreadListContent({
     <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <div className="shrink-0 p-2">
         <Button
-          className="agent-sketched-button w-full justify-center gap-2 font-medium h-9"
+          className="w-full justify-center gap-2"
           onClick={handleNewChat}
           disabled={createMutation.isPending}
         >
@@ -169,19 +174,19 @@ function ThreadListContent({
       </div>
 
       {error && (
-        <div className="agent-hand-border-soft mx-3 mb-2 bg-white/70 px-3 py-2 text-xs text-destructive">
+        <div className="mx-3 mb-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2">
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-8 text-sm text-[var(--agent-muted-ink)]">
+          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
             加载中…
           </div>
         ) : threads.length === 0 ? (
-          <div className="py-6 text-center text-xs text-[var(--agent-muted-ink)]">
+          <div className="py-6 text-center text-xs text-muted-foreground">
             暂无会话
           </div>
         ) : (
@@ -190,14 +195,14 @@ function ThreadListContent({
               <li key={t.id}>
                 {editing === t.id ? (
                   <div
-                    className="agent-hand-border-soft agent-yellow-fill flex items-center gap-1 px-1.5 py-1"
+                    className="flex items-center gap-1 rounded-lg bg-muted px-1.5 py-1"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       placeholder="会话标题"
-                      className="agent-sketched-input h-8 flex-1 text-sm"
+                      className="h-8 flex-1 text-sm"
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleRename(t.id);
@@ -209,7 +214,7 @@ function ThreadListContent({
                     />
                     <Button
                       size="sm"
-                      className="agent-sketched-button h-8 px-2"
+                      className="h-8 px-2"
                       onClick={() => handleRename(t.id)}
                       disabled={
                         (updateMutation.isPending &&
@@ -227,7 +232,7 @@ function ThreadListContent({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 rounded-full px-2 hover:bg-black/5"
+                      className="h-8 px-2"
                       onClick={() => {
                         setEditing(null);
                         setEditTitle("");
@@ -241,17 +246,15 @@ function ThreadListContent({
                     href={`/agent/${t.id}`}
                     onClick={onItemClick}
                     className={cn(
-                      "group flex items-center gap-2 rounded-[15px_18px_14px_16px] border border-transparent px-2 py-1.5 text-sm transition-all shinchan:rounded-lg apple:rounded-xl",
-                      threadId === t.id
-                        ? "agent-blue-fill border-[rgba(34,32,26,0.22)] shadow-[0_4px_14px_rgba(34,32,26,0.07)] apple:border-primary/25 apple:shadow-[var(--glass-shadow)]"
-                        : "hover:border-[rgba(34,32,26,0.24)] hover:bg-white/45 apple:hover:border-white/50 apple:hover:bg-card/50",
+                      "group flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors",
+                      threadId === t.id ? "bg-muted" : "hover:bg-muted/60",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">
                       <span className="block truncate leading-5">
                         {t.title ?? "新对话"}
                       </span>
-                      <span className="block text-[11px] leading-4 text-[var(--agent-muted-ink)]">
+                      <span className="block text-[11px] leading-4 text-muted-foreground">
                         <HistoryLinkStatus>
                           {dayjs(t.updatedAt).fromNow()}
                         </HistoryLinkStatus>
@@ -261,7 +264,7 @@ function ThreadListContent({
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="size-7 rounded-full hover:bg-white/70"
+                        className="size-7"
                         onClick={(e) => {
                           e.preventDefault();
                           setEditing(t.id);
@@ -323,10 +326,7 @@ function DesktopRailButton({
           type="button"
           variant="ghost"
           size="icon"
-          className={cn(
-            "agent-hand-border-soft size-10 bg-white/55 hover:bg-white/80",
-            className,
-          )}
+          className={cn("size-10", className)}
           onClick={onClick}
           disabled={disabled}
           aria-label={label}
@@ -341,29 +341,66 @@ function DesktopRailButton({
   );
 }
 
+function DesktopRailLink({
+  href,
+  label,
+  active,
+  children,
+}: {
+  href: string;
+  label: string;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          href={href}
+          aria-label={label}
+          aria-current={active ? "page" : undefined}
+          className={cn(
+            "flex size-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground",
+            active && "bg-muted text-foreground",
+          )}
+        >
+          {children}
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={8}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 type AgentUser = {
   id: string;
   name?: string | null;
   email?: string | null;
 };
 
-function UserAvatar({ className }: { className?: string }) {
+function getInitials(user: AgentUser) {
+  const source = user.name?.trim() || user.email?.trim() || user.id || "?";
+  return source.slice(0, 1).toUpperCase();
+}
+
+function UserAvatar({
+  user,
+  className,
+}: {
+  user: AgentUser;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
-        "relative block shrink-0 overflow-hidden bg-white",
+        "flex shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground",
         className,
       )}
+      aria-hidden
     >
-      <Image
-        unoptimized
-        src="/shinchan.png"
-        alt=""
-        fill
-        sizes="40px"
-        className="object-cover object-[center_22%]"
-        aria-hidden
-      />
+      {getInitials(user)}
     </span>
   );
 }
@@ -386,7 +423,7 @@ function UserFooter({
         <button
           type="button"
           className={cn(
-            "agent-hand-border-soft flex items-center overflow-hidden transition-colors",
+            "flex items-center overflow-hidden rounded-lg transition-colors hover:bg-muted/60",
             compact
               ? "size-10 justify-center p-0"
               : "w-full gap-2 px-2 py-1.5 text-left",
@@ -395,15 +432,16 @@ function UserFooter({
           aria-label={compact ? "账户" : undefined}
         >
           <UserAvatar
-            className={compact ? "size-full" : "agent-hand-border-soft size-8"}
+            user={user}
+            className={compact ? "size-10 text-sm" : "size-8"}
           />
           {compact ? null : (
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-(--agent-ink)">
+              <span className="block truncate text-sm font-medium">
                 {displayName}
               </span>
               {showEmail ? (
-                <span className="block truncate text-[11px] leading-4 text-(--agent-muted-ink)">
+                <span className="block truncate text-[11px] leading-4 text-muted-foreground">
                   {user.email}
                 </span>
               ) : null}
@@ -418,7 +456,7 @@ function UserFooter({
         className="w-56"
       >
         <div className="flex items-center gap-2.5">
-          <UserAvatar className="agent-hand-border-soft size-10" />
+          <UserAvatar user={user} className="size-10 text-sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium leading-none">
               {displayName}
@@ -451,25 +489,43 @@ function DesktopCollapsedContent({
   user?: AgentUser;
   onExpand: () => void;
 }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const worlds = isWorldsPath(pathname);
   const createMutation = useCreateThread();
 
   return (
-    <div className="agent-doodle-grid flex h-full w-full animate-in fade-in-0 flex-col items-center py-3 duration-200">
+    <div className="flex h-full w-full animate-in fade-in-0 flex-col items-center py-3 duration-200">
       <div className="flex w-full flex-col items-center gap-2">
         <DesktopRailButton label="展开侧边栏" onClick={onExpand}>
           <ChevronsRight className="size-4" />
         </DesktopRailButton>
-        <DesktopRailButton
-          label="新建对话"
-          onClick={() => createMutation.mutate(undefined)}
-          disabled={createMutation.isPending}
-        >
-          {createMutation.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <MessageSquarePlus className="size-4" />
-          )}
-        </DesktopRailButton>
+        <DesktopRailLink href="/agent" label="对话" active={!worlds}>
+          <MessageSquare className="size-4" />
+        </DesktopRailLink>
+        <DesktopRailLink href="/agent/worlds" label="开放世界" active={worlds}>
+          <Globe className="size-4" />
+        </DesktopRailLink>
+        {worlds ? (
+          <DesktopRailButton
+            label="创建世界"
+            onClick={() => router.push("/agent/worlds")}
+          >
+            <Plus className="size-4" />
+          </DesktopRailButton>
+        ) : (
+          <DesktopRailButton
+            label="新建对话"
+            onClick={() => createMutation.mutate(undefined)}
+            disabled={createMutation.isPending}
+          >
+            {createMutation.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <MessageSquarePlus className="size-4" />
+            )}
+          </DesktopRailButton>
+        )}
       </div>
 
       <div className="mt-auto flex w-full flex-col items-center">
@@ -495,13 +551,21 @@ type AgentSidebarProps = {
 export function AgentSidebar({ user }: AgentSidebarProps) {
   const pathname = usePathname();
   const isAgentRoute = pathname.startsWith("/agent");
+  const worlds = isWorldsPath(pathname);
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const closeSheet = () => setOpen(false);
+  const listContent = (onItemClick?: () => void) =>
+    worlds ? (
+      <WorldsListContent onItemClick={onItemClick} className="flex-1" />
+    ) : (
+      <ThreadListContent onItemClick={onItemClick} className="flex-1" />
+    );
 
   const desktopSidebar = (
     <aside
       className={cn(
-        "agent-doodle-grid hidden h-full shrink-0 overflow-hidden border-r border-[rgba(34,32,26,0.18)] bg-[rgba(248,241,223,0.72)] text-[var(--agent-ink)] transition-[width] duration-200 ease-out md:flex",
+        "hidden h-full shrink-0 overflow-hidden border-r bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out md:flex",
         collapsed ? "w-14" : "w-60",
       )}
       data-collapsed={collapsed}
@@ -513,24 +577,23 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
         />
       ) : (
         <div className="flex h-full w-60 animate-in fade-in-0 duration-200 flex-col">
-          <div className="flex h-12 shrink-0 items-center justify-between border-b border-[rgba(34,32,26,0.16)] px-2">
-            <span className="agent-scribble-title text-sm font-black">
-              Agent
+          <div className="flex h-12 shrink-0 items-center justify-between border-b px-2">
+            <span className="px-1 text-sm font-semibold">
+              {worlds ? "开放世界" : "对话"}
             </span>
             <Button
               variant="ghost"
               size="icon"
-              className="agent-hand-border-soft size-8 bg-white/45 hover:bg-white/75"
+              className="size-8"
               onClick={() => setCollapsed(true)}
               aria-label="收起侧边栏"
             >
               <ChevronsLeft className="size-4" />
             </Button>
           </div>
-          <div className="flex min-h-0 flex-1 flex-col">
-            <ThreadListContent className="flex-1" />
-          </div>
-          <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+          <WorkspaceNav />
+          <div className="flex min-h-0 flex-1 flex-col">{listContent()}</div>
+          <div className="shrink-0 border-t p-2">
             <div className="mb-2">
               <ThemeSwitcher className="w-full" />
             </div>
@@ -539,7 +602,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
+                className="w-full justify-start gap-2 text-muted-foreground"
                 onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
@@ -553,26 +616,27 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   );
 
   const mobileHeader = (
-    <header className="agent-doodle-grid flex h-12 shrink-0 items-center border-b border-[rgba(34,32,26,0.18)] bg-[rgba(255,253,244,0.92)] px-3 backdrop-blur md:hidden">
+    <header className="flex h-12 shrink-0 items-center border-b bg-background px-3 md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            className="agent-hand-border-soft size-9 bg-white/60"
-            aria-label="打开会话列表"
+            className="size-9"
+            aria-label="打开菜单"
           >
             <Menu className="size-5" />
           </Button>
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="agent-sketch agent-doodle-grid flex w-72 flex-col border-[var(--agent-border)] bg-[var(--agent-paper)] p-0"
+          className="flex w-72 flex-col bg-sidebar p-0 text-sidebar-foreground"
         >
+          <WorkspaceNav onNavigate={closeSheet} />
           <div className="min-h-0 flex-1 overflow-hidden">
-            <ThreadListContent onItemClick={() => setOpen(false)} />
+            {listContent(closeSheet)}
           </div>
-          <div className="shrink-0 border-t border-[rgba(34,32,26,0.16)] p-2">
+          <div className="shrink-0 border-t p-2">
             <div className="mb-2">
               <ThemeSwitcher />
             </div>
@@ -581,7 +645,7 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
             ) : (
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 rounded-full text-[var(--agent-muted-ink)] hover:bg-white/60 hover:text-[var(--agent-ink)]"
+                className="w-full justify-start gap-2 text-muted-foreground"
                 onClick={() => signOut({ callbackUrl: "/auth" })}
               >
                 <LogOut className="size-4" />
@@ -591,8 +655,8 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
           </div>
         </SheetContent>
       </Sheet>
-      <span className="agent-scribble-title ml-2 text-sm font-black">
-        Agent
+      <span className="ml-2 text-sm font-semibold">
+        {worlds ? "开放世界" : "对话"}
       </span>
     </header>
   );

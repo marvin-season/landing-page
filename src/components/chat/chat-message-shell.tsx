@@ -16,17 +16,16 @@ const ROLE_STYLES: Record<
   user: {
     row: "justify-end",
     bubble:
-      "agent-hand-border-soft agent-blue-fill max-w-[85%] px-4 py-3 text-sm leading-relaxed text-[var(--agent-ink)]",
+      "max-w-[85%] rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed",
     avatar:
-      "agent-hand-border-soft agent-yellow-fill flex size-8 shrink-0 items-center justify-center text-[var(--agent-ink)]",
+      "flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground",
     icon: <User className="size-4" />,
   },
   assistant: {
     row: "",
-    bubble:
-      "agent-hand-border-soft min-w-0 max-w-[85%] bg-[rgba(255,253,244,0.82)] px-4 py-3 text-sm leading-relaxed text-[var(--agent-ink)]",
+    bubble: "min-w-0 max-w-[85%] text-sm leading-relaxed",
     avatar:
-      "agent-hand-border-soft agent-green-fill flex size-8 shrink-0 items-center justify-center text-[var(--agent-ink)]",
+      "flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground",
     icon: <Bot className="size-4" />,
   },
 };

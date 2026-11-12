@@ -21,7 +21,7 @@ export default async function AgentLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="agent-sketch h-dvh overflow-hidden shinchan:font-sans apple:font-sans">
+      <body className="h-dvh overflow-hidden bg-background font-sans text-foreground antialiased [background-image:none]">
         <ThemeProvider>
           <TankQueryClientProvider>
             <div className="flex h-full flex-col md:flex-row">
