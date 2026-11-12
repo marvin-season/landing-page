@@ -37,6 +37,7 @@ import type {
   WorldRoom,
 } from "@/lib/group-chat/model";
 import { neonNightWorld } from "./neon-night-world";
+import { qingyunPeakWorld } from "./qingyun-peak-world";
 import { WorldEditor } from "./world-editor";
 
 const builtInWorlds = [
@@ -44,15 +45,22 @@ const builtInWorlds = [
     id: "fog-harbor",
     config: exampleWorld,
     description:
-      "暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，而下一步由你们共同决定。",
-    details: "3 位角色 · 自由探索 · 信息不对称",
+      "暴雨、灯塔与一艘失联的船。工程师、调度员、记者各有线索，角色会自主决定下一步，你可以随时干预。",
+    details: "4 位 NPC · 自由探索 · 信息不对称",
   },
   {
     id: "neon-night",
     config: neonNightWorld,
     description:
-      "大学毕业旅行的最后一晚，暴雨把你、女友苏晚和闺蜜林知夏关在海景别墅。湿衣、酒气与越界试探，每靠近一步都更难回头。",
+      "大学毕业旅行的最后一晚，暴雨把顾深、女友苏晚和闺蜜林知夏关在海景别墅。湿衣、酒气与越界试探，每靠近一步都更难回头。",
     details: "情侣带闺蜜 · 毕业旅行 · 信息不对称",
+  },
+  {
+    id: "qingyun-peak",
+    config: qingyunPeakWorld,
+    description:
+      "南宫婉入落云宗，搬进青云峰，与韩立、慕沛灵住在一起。原著到此为止，往后由你们自己过。",
+    details: "韩立 · 慕沛灵 · 南宫婉 · 自由发展",
   },
 ];
 
@@ -94,7 +102,8 @@ export function WorldLobby() {
             </p>
             <h1 className="text-3xl font-semibold tracking-tight">世界群聊</h1>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              写下世界的起点，赋予角色身份与秘密。故事会在你们的对话中展开。
+              设定世界与推进目标，NPC
+              会自主展开故事。你作为系统操作者，随时介入改变走向。
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -297,7 +306,8 @@ export function WorldLobby() {
           <SheetHeader>
             <SheetTitle>创建你的世界</SheetTitle>
             <SheetDescription>
-              开始前设定背景、角色和规则。保存不会调用模型。
+              设定背景、NPC
+              和推进要求。创建并进入世界后自动开始，保存预设不会调用模型。
             </SheetDescription>
           </SheetHeader>
           <div className="px-5 pb-5">
