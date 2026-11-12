@@ -70,15 +70,15 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
     }
   }
   return (
-    <div className="min-h-full bg-background px-5 py-8 text-foreground sm:px-8 lg:px-12">
-      <div className="mx-auto flex max-w-6xl flex-col gap-9">
-        <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex flex-col gap-3">
+    <div className="min-h-full bg-background px-5 py-6 text-foreground sm:px-8 lg:px-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6">
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-1.5">
             <p className="text-xs font-medium tracking-widest text-muted-foreground">
               WORLD CHAT
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight">世界群聊</h1>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+            <h1 className="text-2xl font-semibold tracking-tight">世界群聊</h1>
+            <p className="max-w-xl text-sm leading-5 text-muted-foreground">
               设定世界与推进目标，NPC
               会自主展开故事。你作为系统操作者，随时介入改变走向。
             </p>
@@ -136,32 +136,42 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             </AlertDescription>
           </Alert>
         ) : null}
-        {templates.map((world) => (
-          <section
-            key={world.id}
-            className="grid gap-6 rounded-3xl border border-border bg-muted/30 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8"
-          >
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <BookOpen className="size-4" />
-                一个可以直接开始的世界
-              </div>
-              <h2 className="text-2xl font-semibold">{world.config.title}</h2>
-              <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-                {world.description}
-              </p>
-              <p className="text-xs text-muted-foreground">{world.details}</p>
+        {templates.length ? (
+          <section className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-4 text-muted-foreground" />
+              <h2 className="text-lg font-semibold">模板</h2>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setEditing(structuredClone(world.config))}
-            >
-              设定并开始
-              <ArrowRight data-icon="inline-end" />
-            </Button>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {templates.map((world) => (
+                <Card key={world.id}>
+                  <CardHeader className="px-4 py-3">
+                    <CardTitle className="text-base">
+                      {world.config.title}
+                    </CardTitle>
+                    <CardDescription>{world.details}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 pt-0 pb-3">
+                    <p className="line-clamp-2 text-sm leading-5 text-muted-foreground">
+                      {world.description}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="px-4 pt-0 pb-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setEditing(structuredClone(world.config))}
+                    >
+                      设定并开始
+                      <ArrowRight data-icon="inline-end" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
           </section>
-        ))}
-        <section className="flex flex-col gap-5">
+        ) : null}
+        <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">我的世界</h2>
             <span className="text-sm text-muted-foreground">
@@ -169,17 +179,18 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             </span>
           </div>
           {rooms.isPending ? (
-            <p className="py-8 text-sm text-muted-foreground">正在读取存档…</p>
+            <p className="py-4 text-sm text-muted-foreground">正在读取存档…</p>
           ) : null}
           {rooms.data?.rooms.length === 0 ? (
-            <p className="py-8 text-sm leading-6 text-muted-foreground">
+            <p className="py-4 text-sm leading-5 text-muted-foreground">
               还没有故事存档。从示例开始，或创建你自己的世界。
             </p>
           ) : null}
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {rooms.data?.rooms.map((room) => (
               <Card key={room.id}>
-                <CardHeader>
+                <CardHeader className="flex-row items-start justify-between gap-2 px-4 py-3">
+                  <CardTitle className="text-base">{room.title}</CardTitle>
                   <CardDescription>
                     {room.status === "ended"
                       ? "已结束"
@@ -189,11 +200,10 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                           ? "已暂停"
                           : "进行中"}
                   </CardDescription>
-                  <CardTitle>{room.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="size-4" />
+                <CardContent className="px-4 pt-0 pb-3">
+                  <p className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Users className="size-3.5" />
                     {room.characters.join("、")}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -201,7 +211,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                     {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
                   </p>
                 </CardContent>
-                <CardFooter className="justify-between">
+                <CardFooter className="justify-between px-4 pt-0 pb-3">
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/agent/worlds/${room.id}`}>
                       {room.status === "ended" ? "查看故事" : "进入世界"}
@@ -223,7 +233,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           </div>
         </section>
         {presets.data?.presets.length ? (
-          <section className="flex flex-col gap-4">
+          <section className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold">我的预设</h2>
             {presets.data.presets.map((preset) => (
               <div
