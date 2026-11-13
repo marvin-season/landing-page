@@ -68,6 +68,8 @@ Locale 规则（与授权无关，但和回跳地址叠在一起）：
 
 `/api`、`/agui`、静态资源不进 matcher，**页面门闩管不到 API**。API 各自再调 `auth()`。
 
+本地开发（`NODE_ENV === "development"`）不走这套门闩。`auth()` 直接返回用户 `dev`，`getUserRole("dev")` 返回 `super_admin`，不读 cookie、不访问账号库。生产构建不会走这条路径。
+
 `/resume` 与 `/admin` 的响应会额外带 `Cache-Control: private, no-store` 和 `X-Robots-Tag: noindex, nofollow, noarchive`。`/agent` 不带这组头。
 
 ## 4. 登录与回跳
