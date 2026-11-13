@@ -56,7 +56,9 @@ const nextAuth = NextAuth({
 
 export const { handlers, signIn, signOut } = nextAuth;
 
-export const auth: typeof nextAuth.auth = ((...args) => {
+type Auth = typeof nextAuth.auth;
+
+export const auth = ((...args: unknown[]) => {
   if (args.length === 0 && isLocalDevelopment()) return devSession();
-  return nextAuth.auth(...args);
-}) as typeof nextAuth.auth;
+  return (nextAuth.auth as (...inner: unknown[]) => ReturnType<Auth>)(...args);
+}) as Auth;
