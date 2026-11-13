@@ -2,32 +2,37 @@ import { cn } from "@landing-page/utils";
 import Image from "next/image";
 
 const portraits = [
-  "male-01",
-  "male-02",
-  "male-03",
-  "female-01",
-  "female-02",
-  "female-03",
-  "female-04",
-  "female-05",
-  "female-06",
-  "female-07",
+  "01-287511",
+  "02-389045",
+  "03-304074",
+  "04-258617",
+  "05-548467",
+  "06-446343",
+  "07-415259",
+  "08-788827",
+  "09-954464",
+  "10-876607",
+  "11-858550",
+  "12-648136",
+  "13-924762",
+  "14-200673",
+  "15-860932",
 ] as const;
 
 const characterPortraits = new Map<string, (typeof portraits)[number]>([
-  ["engineer", "female-02"],
-  ["dispatcher", "male-02"],
-  ["reporter", "female-01"],
-  ["former-player", "male-03"],
-  ["hanli", "male-01"],
-  ["mupeiling", "female-04"],
-  ["nangongwan", "female-05"],
-  ["jiangwan", "female-01"],
-  ["suli", "female-03"],
-  ["suwan", "female-06"],
-  ["linzhixia", "female-07"],
-  ["liangzhi", "female-02"],
-  ["songcheng", "female-04"],
+  ["engineer", "01-287511"],
+  ["dispatcher", "02-389045"],
+  ["reporter", "03-304074"],
+  ["former-player", "04-258617"],
+  ["hanli", "05-548467"],
+  ["mupeiling", "06-446343"],
+  ["nangongwan", "07-415259"],
+  ["jiangwan", "08-788827"],
+  ["suli", "09-954464"],
+  ["suwan", "10-876607"],
+  ["linzhixia", "11-858550"],
+  ["liangzhi", "12-648136"],
+  ["songcheng", "13-924762"],
 ]);
 
 function portraitFor(id: string) {
@@ -54,12 +59,12 @@ export function CharacterAvatar({
   const pixels = size === "sm" ? 16 : 36;
   return (
     <Image
-      src={`/worlds/avatars/${portraitFor(id)}.webp`}
+      src={`/images/18/girls-rating/${portraitFor(id)}.webp`}
       alt={name}
       width={pixels}
       height={pixels}
       className={cn(
-        "shrink-0 rounded-full bg-muted object-cover",
+        "shrink-0 rounded-full bg-muted object-cover object-top",
         size === "sm" ? "size-4" : "size-9",
       )}
     />
