@@ -19,7 +19,8 @@
     "lingui:compile": "lingui compile",
     "postinstall": "pnpm lingui:extract && pnpm lingui:compile && node scripts/copy-pdf-assets.mjs",
     "prepare": "simple-git-hooks",
-    "girls-rating:download": "python3 ./scripts/download.py --page 3 --count 10"
+    "girls-rating:download": "python3 ./scripts/download.py --page 3 --count 10",
+    "pikpak:download": "uv run --with pikpakapi python3 ./scripts/pikpak-download.py"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.56",
