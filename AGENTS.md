@@ -58,8 +58,6 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 除非特别说明，否则不需要考虑无障碍兼容。
 
-When asked to record changes, follow `.changelog/README.md`: use `.changelog/YYYYMMDD/index.md` and append a timestamped entry.
-
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

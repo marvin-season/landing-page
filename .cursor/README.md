@@ -8,9 +8,8 @@
 - 典型 frontmatter：`description`、`alwaysApply`、`globs`。
 - `alwaysApply: true` 会把全文注入每一轮，只留给每轮都要遵守的短约束。
 - 只在特定文件生效时设 `alwaysApply: false` 并写 `globs`。只在相关任务生效时设 `alwaysApply: false`，靠 `description` 让模型按需读取。
-- **代码变更记录**未放在 Rules 中，约定写在 [`.changelog/README.md`](../.changelog/README.md)；需要时代码助手依赖对话说明或该文档即可。
 
-新增规则时：保持单条规则职责单一；大段流程说明可放在 `docs/` 或 `.changelog/README.md` 以免占用固定上下文。
+新增规则时：保持单条规则职责单一；大段流程说明可放在 `docs/` 以免占用固定上下文。
 
 ## `skills/`（Agent Skills）
 
@@ -19,7 +18,9 @@
 - 技能目录里不要放 `AGENTS.md`。Cursor 会把工作区内每份 `AGENTS.md` 每轮注入。全文放在 `reference.md`，需要时再读。
 - 当前技能：
   - [`skills/pretext/`](skills/pretext/)：Pretext 文本测量与排版
-  - [`skills/vercel-react-best-practices/`](skills/vercel-react-best-practices/)：Vercel React/Next 性能实践（大量分类规则文件）
+  - [`skills/pdf-citation-highlight/`](skills/pdf-citation-highlight/)：PDF 引用高亮
+- Cursor 和 Codex 都会加载仓库里的 `.agents/skills/`。两边都要用的技能只放那里，不要在 `.cursor/skills/` 再放同名副本。
+  - [`../.agents/skills/content-driven-split-pane/`](../.agents/skills/content-driven-split-pane/)：内容驱动的双栏高度
 
 不要将整块 Skill 合并进单条 `.mdc`，以免上下文膨胀；优先保持 Skill 目录结构。
 

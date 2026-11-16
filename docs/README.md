@@ -13,7 +13,6 @@
 | [docs/tech-stack.md](./tech-stack.md) | 人 | 技术栈表（版本以 package.json 为准） |
 | [docs/i18n.md](./i18n.md) | 人 / Agent | Lingui 与国际化流程 |
 | [docs/bbq-pwa.md](./bbq-pwa.md) | 人 / Agent | 记账 PWA 安装、离线架构、构建部署、数据保护与验收 |
-| [.changelog/README.md](../.changelog/README.md) | 人 | 变更历史目录约定（摘要） |
 | [.cursor/README.md](../.cursor/README.md) | 人 / Agent | Cursor `rules/` 与 `skills/` 说明 |
 | [mastra-server/README.md](../mastra-server/README.md) | 人 / Agent | Mastra 目录结构与 Chat 集成 |
 | [agent-server/README.md](../agent-server/README.md) | 人 / Agent | Agent 服务说明 |
@@ -24,8 +23,5 @@
 | [src/app/[lang]/admin/README.md](../src/app/[lang]/admin/README.md) | 人 | Admin 区域说明 |
 | [.cursor/skills/pretext/SKILL.md](../.cursor/skills/pretext/SKILL.md) | Agent | Pretext 技能入口 |
 | [.cursor/skills/pretext/reference.md](../.cursor/skills/pretext/reference.md) | Agent | Pretext 参考 |
-| [.cursor/skills/vercel-react-best-practices/SKILL.md](../.cursor/skills/vercel-react-best-practices/SKILL.md) | Agent | React/Next 性能技能入口 |
-| [.cursor/skills/vercel-react-best-practices/reference.md](../.cursor/skills/vercel-react-best-practices/reference.md) | Agent | 性能规则全文，按需读取 |
-| [.cursor/skills/vercel-react-best-practices/rules/](../.cursor/skills/vercel-react-best-practices/rules/) | Agent | 分类性能规则（多文件） |
-
-`.changelog/YYYYMMDD/index.md` 为按日追加的变更记录，不在此逐条列出。
+| [.cursor/skills/pdf-citation-highlight/SKILL.md](../.cursor/skills/pdf-citation-highlight/SKILL.md) | Agent | PDF 引用高亮 |
+| [.agents/skills/content-driven-split-pane/SKILL.md](../.agents/skills/content-driven-split-pane/SKILL.md) | Agent | 内容驱动的双栏高度。Cursor 与 Codex 都读 `.agents/skills/` |
