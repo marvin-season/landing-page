@@ -1,14 +1,12 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Link } from "@/components/link/link";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { RoomListItem } from "@/lib/group-chat/model";
 import { SidebarListLink } from "./sidebar-list-link";
@@ -38,16 +36,7 @@ export function WorldsListContent({
   });
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
-      <div className="shrink-0 p-2">
-        <Button asChild className="w-full justify-center gap-2">
-          <Link href="/agent/worlds" onClick={onItemClick}>
-            <Plus className="size-4" />
-            创建世界
-          </Link>
-        </Button>
-      </div>
-
+    <div className={cn("flex min-h-0 flex-1 flex-col pt-2", className)}>
       {rooms.error ? (
         <div className="mx-3 mb-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
           {rooms.error.message}
