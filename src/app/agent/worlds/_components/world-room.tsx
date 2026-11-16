@@ -52,7 +52,6 @@ import type {
 import { CharacterAvatar } from "./character-avatar";
 import { useWorldRoom } from "./use-world-room";
 import { WorldEditor } from "./world-editor";
-import "./world-surface.css";
 
 function NoteCard({
   title,
@@ -80,7 +79,7 @@ function WorldNotes({
 }) {
   return (
     <div className="flex flex-col text-sm">
-      <h3 className="world-label mb-1">登场</h3>
+      <h3 className="mb-1">登场</h3>
       <NoteCard>
         <div className="flex items-center gap-2">
           <span className="flex size-7 shrink-0 items-center justify-center text-xs text-muted-foreground">
@@ -184,8 +183,7 @@ function MessageBubble({
   characters: Character[];
   onRetry?: () => void;
 }) {
-  if (message.kind === "system")
-    return <p className="world-system">{message.text}</p>;
+  if (message.kind === "system") return <p>{message.text}</p>;
   const user = message.kind === "intervention";
   const narrator = message.kind === "narrator";
   const displayName = narrator ? "旁白" : message.name;
@@ -237,13 +235,7 @@ function MessageBubble({
             })}
           </time>
         </div>
-        <div
-          className={cn(
-            "mt-1.5 text-sm leading-7",
-            narrator ? "world-narration" : "world-bubble",
-            user && "world-bubble-user",
-          )}
-        >
+        <div className="mt-1.5 text-sm leading-7">
           {text ? (
             <UnifiedMarkdown
               content={text}
@@ -374,7 +366,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   }
   if (!room)
     return (
-      <div className="world-sheet flex min-h-full flex-col items-center justify-center gap-5 p-8 text-foreground">
+      <div className="flex min-h-full flex-col items-center justify-center gap-5 p-8 text-foreground">
         <BookOpen className="size-8 text-muted-foreground" />
         <p>{chat.error || "正在打开世界…"}</p>
         <Button asChild variant="outline">
@@ -531,7 +523,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     );
   };
   return (
-    <div className="world-sheet flex h-full min-h-0 flex-col text-foreground">
+    <div className="flex h-full min-h-0 flex-col text-foreground">
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-2">
           <Button asChild variant="ghost" size="icon">
@@ -593,14 +585,14 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               ) : null}
               {!room.messages.length ? (
                 <div className="flex flex-col gap-4 border-b border-border py-6">
-                  <p className="world-label">开场</p>
+                  <p>开场</p>
                   <h2 className="font-serif text-2xl font-normal">
                     {room.config.title}
                   </h2>
                   <p className="whitespace-pre-wrap text-sm leading-7">
                     {room.config.background}
                   </p>
-                  <p className="world-narration whitespace-pre-wrap text-sm leading-7">
+                  <p className="whitespace-pre-wrap text-sm leading-7">
                     {room.config.scene}
                   </p>
                   <p className="text-xs leading-6 text-muted-foreground">
@@ -711,7 +703,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     </span>
                   </div>
                   <AiInput
-                    className="rounded-2xl border-(--line) bg-(--card) shadow-none"
+                    className="rounded-2xl shadow-none"
                     value={draft}
                     onValueChange={setDraft}
                     mentions={mentions}
@@ -793,7 +785,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         </aside>
       </div>
       <Sheet open={notes} onOpenChange={setNotes}>
-        <SheetContent className="world-sheet overflow-y-auto">
+        <SheetContent className="overflow-y-auto">
           <SheetHeader>
             <SheetTitle>世界与角色</SheetTitle>
             <SheetDescription>公开设定与当前剧情</SheetDescription>
@@ -809,7 +801,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="world-sheet w-full gap-0 overflow-hidden sm:max-w-2xl">
+        <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
           <SheetHeader className="shrink-0 border-b border-border pr-12">
             <SheetTitle>
               {copying ? "复制为新世界" : "世界设定与存档"}

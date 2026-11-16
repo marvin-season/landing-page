@@ -61,6 +61,8 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 除非特别说明，否则不需要考虑无障碍兼容。
 
+除非特别说明，否则样式默认使用tailwind实现
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

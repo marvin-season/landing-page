@@ -33,6 +33,9 @@ import { FieldGroup, TextField } from "./fields";
 
 type SectionKey = "world" | "story" | "cast" | "pace";
 
+const selectClassName =
+  "h-9 w-full appearance-none rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
 function preview(value: string, fallback: string) {
   const line = value.trim().split("\n")[0] ?? "";
   return line || fallback;
@@ -63,7 +66,9 @@ function EditorSection({
         <CollapsibleTrigger variant="flush" className="min-w-0 flex-1">
           <Icon data-icon="inline-start" aria-hidden="true" />
           <CollapsibleTitle>
-            <span className="block truncate">{title}</span>
+            <span className="block truncate font-serif text-base font-normal">
+              {title}
+            </span>
             <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground group-data-[state=open]/collapsible-trigger:hidden">
               {summary}
             </span>
@@ -71,11 +76,11 @@ function EditorSection({
           <CollapsibleChevron />
         </CollapsibleTrigger>
         {actions ? (
-          <div className="flex shrink-0 items-center pr-2">{actions}</div>
+          <div className="flex shrink-0 items-center pr-3">{actions}</div>
         ) : null}
       </div>
       <CollapsibleContent variant="collapse">
-        <div className="flex flex-col gap-4 border-t border-border/60 px-4 py-3">
+        <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
           {children}
         </div>
       </CollapsibleContent>
@@ -186,13 +191,13 @@ export function WorldEditor({
         });
       }}
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain px-5 py-4">
         <fieldset
           disabled={pending}
           className="flex min-w-0 flex-col gap-3 disabled:opacity-60"
         >
           {!lockedMembers && presets.some((p) => p.kind === "world") ? (
-            <label className="flex flex-col gap-2 text-sm font-medium">
+            <label className="flex flex-col gap-2 px-1 text-sm font-medium">
               使用世界预设
               <select
                 value={presetId}
@@ -202,7 +207,7 @@ export function WorldEditor({
                   if (preset?.kind === "world")
                     setConfig(structuredClone(preset.content));
                 }}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className={selectClassName}
               >
                 <option value="">自定义世界</option>
                 {presets
@@ -358,7 +363,10 @@ export function WorldEditor({
                     })
                   }
                 >
-                  <CollapsibleTrigger variant="flush">
+                  <CollapsibleTrigger
+                    variant="flush"
+                    className={character.enabled ? undefined : "opacity-60"}
+                  >
                     <CharacterAvatar
                       id={character.id}
                       name={character.name || `角色 ${index + 1}`}
@@ -380,7 +388,7 @@ export function WorldEditor({
                     <CollapsibleChevron />
                   </CollapsibleTrigger>
                   <CollapsibleContent variant="collapse">
-                    <div className="flex flex-col gap-4 border-t border-border/60 px-4 py-3">
+                    <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
                       {presets.some((p) => p.kind === "character") ? (
                         <label className="flex flex-col gap-2 text-sm">
                           使用角色预设
@@ -400,7 +408,7 @@ export function WorldEditor({
                                   id: character.id,
                                 });
                             }}
-                            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                            className={selectClassName}
                           >
                             <option value="">选择预设</option>
                             {presets
@@ -493,7 +501,7 @@ export function WorldEditor({
                           />
                         </label>
                       </FieldGroup>
-                      <div className="flex flex-wrap items-center gap-3 border-t border-border/60 pt-4">
+                      <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
                         <label className="flex items-center gap-2 text-sm">
                           <Switch
                             checked={character.enabled}
@@ -503,35 +511,38 @@ export function WorldEditor({
                           />
                           允许发言
                         </label>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => void savePreset(character)}
-                        >
-                          {characterPresetIds[character.id]
-                            ? "更新角色预设"
-                            : "保存角色预设"}
-                        </Button>
-                        {!lockedMembers ? (
+                        <div className="flex items-center gap-1">
                           <Button
                             type="button"
                             size="sm"
                             variant="ghost"
-                            disabled={config.characters.length <= 2}
-                            onClick={() =>
-                              update(
-                                "characters",
-                                config.characters.filter(
-                                  (c) => c.id !== character.id,
-                                ),
-                              )
-                            }
+                            onClick={() => void savePreset(character)}
                           >
-                            <Trash2 data-icon="inline-start" />
-                            移除
+                            {characterPresetIds[character.id]
+                              ? "更新角色预设"
+                              : "保存角色预设"}
                           </Button>
-                        ) : null}
+                          {!lockedMembers ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive"
+                              disabled={config.characters.length <= 2}
+                              onClick={() =>
+                                update(
+                                  "characters",
+                                  config.characters.filter(
+                                    (c) => c.id !== character.id,
+                                  ),
+                                )
+                              }
+                            >
+                              <Trash2 data-icon="inline-start" />
+                              移除
+                            </Button>
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   </CollapsibleContent>
@@ -547,7 +558,7 @@ export function WorldEditor({
             summary="自动推进，可改成旁白或角色"
             icon={SlidersHorizontal}
           >
-            <p className="text-xs leading-5 text-muted-foreground">
+            <p className="text-sm leading-6 text-muted-foreground">
               进入新世界后，NPC
               会依据设定和推进要求自动行动，逐条接话，不等待你回答。输入默认是系统干预，也可以改成旁白或某个角色；你还可以暂停、点名或使用“仅下一条”。
             </p>
@@ -594,29 +605,18 @@ export function WorldEditor({
           </EditorSection>
         </fieldset>
       </div>
-      <div className="flex shrink-0 flex-col gap-3 border-t border-border bg-background px-5 py-4">
+      <div className="flex shrink-0 flex-col gap-2 border-t border-border bg-card px-5 py-3">
         {error ? (
           <Alert className="text-destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
         {connection ? (
-          <p className="text-sm text-muted-foreground">{connection}</p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {connection}
+          </p>
         ) : null}
-        <div className="flex flex-wrap gap-3">
-          <Button type="submit" disabled={pending}>
-            {pending
-              ? "正在保存…"
-              : submitLabel || (lockedMembers ? "保存设定" : "创建世界")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={pending}
-            onClick={() => void savePreset()}
-          >
-            {presetId ? "更新世界预设" : "保存为世界预设"}
-          </Button>
+        <div className="flex items-center justify-between gap-3">
           <Button
             type="button"
             variant="ghost"
@@ -625,6 +625,21 @@ export function WorldEditor({
           >
             取消
           </Button>
+          <div className="flex min-w-0 flex-wrap justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={pending}
+              onClick={() => void savePreset()}
+            >
+              {presetId ? "更新世界预设" : "保存为世界预设"}
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending
+                ? "正在保存…"
+                : submitLabel || (lockedMembers ? "保存设定" : "创建世界")}
+            </Button>
+          </div>
         </div>
       </div>
     </form>

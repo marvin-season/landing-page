@@ -22,19 +22,14 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
-import { worldGradientFromSeed } from "@/lib/group-chat/world-gradient";
 import type { WorldTemplate } from "@/lib/group-chat/world-templates";
 import { WorldCard } from "./world-card";
 import { WorldEditor } from "./world-editor";
-import "./world-surface.css";
 
 export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
   const defaultConfig =
     templates.find((template) => template.id === "fog-harbor")?.config ??
     templates[0]?.config;
-  const gradientByTitle = new Map(
-    templates.map((template) => [template.config.title, template.gradient]),
-  );
   const router = useRouter();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<WorldConfig | null>(null);
@@ -63,7 +58,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
     }
   }
   return (
-    <div className="world-sheet min-h-full px-5 py-8 text-foreground sm:px-8 lg:px-12">
+    <div className="min-h-full px-5 py-8 text-foreground sm:px-8 lg:px-12">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
         <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -133,9 +128,8 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             </h2>
             <div>
               {templates.map((world) => (
-                <WorldCard key={world.id} tone={world.gradient}>
+                <WorldCard key={world.id}>
                   <div className="flex items-center gap-4 py-3">
-                    <span className="size-1.5 shrink-0 rounded-full bg-(--edge)" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {world.config.title} ·{" "}
@@ -180,15 +174,8 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           ) : null}
           <div>
             {rooms.data?.rooms.map((room) => (
-              <WorldCard
-                key={room.id}
-                tone={
-                  gradientByTitle.get(room.title) ??
-                  worldGradientFromSeed(room.id)
-                }
-              >
+              <WorldCard key={room.id}>
                 <div className="flex items-center gap-4 py-3">
-                  <span className="size-1.5 shrink-0 rounded-full bg-(--edge)" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{room.title}</p>
                     <p className="truncate text-xs text-muted-foreground">
@@ -233,7 +220,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             {presets.data.presets.map((preset) => (
               <div
                 key={preset.id}
-                className="world-card flex items-center justify-between gap-4 px-5 py-4"
+                className="flex items-center justify-between gap-4 px-5 py-4"
               >
                 <div>
                   <p className="text-sm font-medium">{preset.name}</p>
@@ -288,7 +275,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="world-sheet w-full gap-0 overflow-hidden sm:max-w-2xl">
+        <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
           <SheetHeader className="shrink-0 border-b border-border pr-12">
             <SheetTitle>创建你的世界</SheetTitle>
             <SheetDescription>
