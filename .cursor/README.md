@@ -5,7 +5,9 @@
 ## `rules/`（Project Rules）
 
 - 文件为 **`.mdc`**（Markdown + Cursor 元数据）。
-- 典型 frontmatter：`description`（供 Cursor 判断是否相关）、`alwaysApply: true`（每次对话自动注入）。
+- 典型 frontmatter：`description`、`alwaysApply`、`globs`。
+- `alwaysApply: true` 会把全文注入每一轮，只留给每轮都要遵守的短约束。
+- 只在特定文件生效时设 `alwaysApply: false` 并写 `globs`。只在相关任务生效时设 `alwaysApply: false`，靠 `description` 让模型按需读取。
 - **代码变更记录**未放在 Rules 中，约定写在 [`.changelog/README.md`](../.changelog/README.md)；需要时代码助手依赖对话说明或该文档即可。
 
 新增规则时：保持单条规则职责单一；大段流程说明可放在 `docs/` 或 `.changelog/README.md` 以免占用固定上下文。
