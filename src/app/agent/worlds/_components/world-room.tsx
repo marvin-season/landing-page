@@ -95,7 +95,7 @@ function WorldNotes({
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-3">
-                <CharacterAvatar id={c.id} name={c.name} />
+                <CharacterAvatar id={c.id} name={c.name} avatar={c.avatar} />
                 <div className="min-w-0">
                   <p className="font-medium">
                     {c.name}
@@ -378,7 +378,9 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       id: c.id,
       label: c.name,
       description: c.identity,
-      icon: <CharacterAvatar id={c.id} name={c.name} size="sm" />,
+      icon: (
+        <CharacterAvatar id={c.id} name={c.name} avatar={c.avatar} size="sm" />
+      ),
     }));
   const speaker =
     speakerId === "narrator" ||

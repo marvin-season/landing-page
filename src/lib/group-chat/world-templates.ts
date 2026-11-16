@@ -63,6 +63,11 @@ export function loadWorldTemplates(): WorldTemplate[] {
         `世界模板渐变色重复：${name} 与 ${previous} 同为 ${meta.data.gradient}`,
       );
     gradients.set(meta.data.gradient, name);
+    const missingAvatar = config.data.characters.find(
+      (character) => !character.avatar,
+    );
+    if (missingAvatar)
+      throw new Error(`世界模板缺少角色头像：${name} / ${missingAvatar.id}`);
     return {
       id,
       description: meta.data.description,

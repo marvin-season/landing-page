@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { worldAvatars } from "./world-avatar";
 
 const text = (max: number) => z.string().trim().max(max);
 export const idSchema = z
@@ -17,6 +18,7 @@ export const characterSchema = z.object({
   style: text(300),
   model: text(160).min(1),
   enabled: z.boolean(),
+  avatar: z.enum(worldAvatars).optional(),
 });
 const currentConfigSchema = z
   .object({

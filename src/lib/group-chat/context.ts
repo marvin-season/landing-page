@@ -72,9 +72,11 @@ export function actorContext(
   character: Character,
   direction = "只用对白接话。不要写旁白、场景、动作或心理。已经问过或确认过的不要再问。",
 ): ModelMessage[] {
+  const { avatar, ...persona } = character;
+  void avatar;
   const data = {
     world: publicWorld(room),
-    yourCharacter: character,
+    yourCharacter: persona,
     publicConversation: transcript(recentMessages(room)),
     direction,
   };

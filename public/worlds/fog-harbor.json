@@ -12,6 +12,7 @@
   "characters": [
     {
       "id": "engineer",
+      "avatar": "female-02",
       "name": "许岚",
       "identity": "维修工程师",
       "personality": "谨慎、直接，习惯先检查再行动。",
@@ -24,6 +25,7 @@
     },
     {
       "id": "dispatcher",
+      "avatar": "male-02",
       "name": "周渡",
       "identity": "港口调度员",
       "personality": "讲求效率，在压力下容易急躁。",
@@ -36,6 +38,7 @@
     },
     {
       "id": "reporter",
+      "avatar": "female-01",
       "name": "沈禾",
       "identity": "调查记者",
       "personality": "敏锐、好奇，对互相矛盾的说法保持怀疑。",
@@ -48,6 +51,7 @@
     },
     {
       "id": "former-player",
+      "avatar": "male-03",
       "name": "林舟",
       "identity": "临时协调员",
       "personality": "冷静务实，善于协调不同意见。",

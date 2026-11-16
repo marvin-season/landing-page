@@ -362,6 +362,7 @@ export function WorldEditor({
                     <CharacterAvatar
                       id={character.id}
                       name={character.name || `角色 ${index + 1}`}
+                      avatar={character.avatar}
                     />
                     <CollapsibleTitle>
                       <span className="block truncate">

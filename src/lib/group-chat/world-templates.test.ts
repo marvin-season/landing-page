@@ -16,5 +16,7 @@ test("scans json world templates", () => {
   for (const template of templates) {
     assert.ok(template.config.title);
     assert.ok(template.config.characters.length >= 2);
+    for (const character of template.config.characters)
+      assert.ok(character.avatar);
   }
 });
