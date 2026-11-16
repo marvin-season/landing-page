@@ -173,6 +173,8 @@ function MessageBubble({
       </p>
     );
   const user = message.kind === "intervention";
+  const narrator = message.kind === "narrator";
+  const displayName = narrator ? "旁白" : message.name;
   const missingMentions = message.mentions
     .map(
       (id) =>
@@ -196,7 +198,7 @@ function MessageBubble({
             user && "bg-primary/10 text-primary",
           )}
         >
-          {message.name.slice(0, 1)}
+          {displayName.slice(0, 1)}
         </div>
       )}
       <div className="flex min-w-0 max-w-[88%] flex-col gap-2 sm:max-w-[85%]">
@@ -206,14 +208,8 @@ function MessageBubble({
             user && "justify-end",
           )}
         >
-          <span className="font-medium text-foreground">{message.name}</span>
-          <span>
-            {user
-              ? "你 · 系统指令"
-              : message.kind === "narrator"
-                ? "旁白"
-                : "NPC"}
-          </span>
+          <span className="font-medium text-foreground">{displayName}</span>
+          {narrator ? null : <span>{user ? "你 · 系统指令" : "NPC"}</span>}
           <time>
             {new Date(message.createdAt).toLocaleTimeString("zh-CN", {
               hour: "2-digit",
