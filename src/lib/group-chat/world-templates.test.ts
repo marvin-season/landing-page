@@ -9,6 +9,10 @@ test("scans json world templates", () => {
     new Set(templates.map((template) => template.id)).size,
     templates.length,
   );
+  assert.equal(
+    new Set(templates.map((template) => template.gradient)).size,
+    templates.length,
+  );
   for (const template of templates) {
     assert.ok(template.config.title);
     assert.ok(template.config.characters.length >= 2);

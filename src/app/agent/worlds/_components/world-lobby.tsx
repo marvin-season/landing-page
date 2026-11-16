@@ -34,6 +34,7 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
+import { worldGradientFromSeed } from "@/lib/group-chat/world-gradient";
 import type { WorldTemplate } from "@/lib/group-chat/world-templates";
 import { WorldCard } from "./world-card";
 import { WorldEditor } from "./world-editor";
@@ -42,6 +43,9 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
   const defaultConfig =
     templates.find((template) => template.id === "fog-harbor")?.config ??
     templates[0]?.config;
+  const gradientByTitle = new Map(
+    templates.map((template) => [template.config.title, template.gradient]),
+  );
   const router = useRouter();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<WorldConfig | null>(null);
@@ -144,7 +148,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {templates.map((world) => (
-                <WorldCard key={world.id} seed={world.id}>
+                <WorldCard key={world.id} tone={world.gradient}>
                   <CardHeader className="px-4 py-3">
                     <CardTitle className="text-base">
                       {world.config.title}
@@ -188,7 +192,13 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           ) : null}
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {rooms.data?.rooms.map((room) => (
-              <WorldCard key={room.id} seed={room.id}>
+              <WorldCard
+                key={room.id}
+                tone={
+                  gradientByTitle.get(room.title) ??
+                  worldGradientFromSeed(room.id)
+                }
+              >
                 <CardHeader className="flex-row items-start justify-between gap-2 px-4 py-3">
                   <CardTitle className="text-base">{room.title}</CardTitle>
                   <CardDescription>

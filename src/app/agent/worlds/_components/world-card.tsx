@@ -1,6 +1,7 @@
 import { Card } from "@landing-page/design-system";
 import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
+import type { WorldGradient } from "@/lib/group-chat/world-gradient";
 
 const gradientVariants = cva(
   "pointer-events-none absolute inset-0 -z-10 bg-linear-to-br",
@@ -17,31 +18,21 @@ const gradientVariants = cva(
         rose: "from-rose-200/75 via-pink-100/55 to-purple-100/65 dark:from-rose-500/20 dark:via-pink-500/10 dark:to-purple-500/15",
         indigo:
           "from-indigo-200/75 via-violet-100/55 to-cyan-100/65 dark:from-indigo-500/20 dark:via-violet-500/10 dark:to-cyan-500/15",
-      },
+      } satisfies Record<WorldGradient, string>,
     },
   },
 );
 
-const tones = ["violet", "sky", "emerald", "amber", "rose", "indigo"] as const;
-
 export function WorldCard({
-  seed,
+  tone,
   children,
 }: {
-  seed: string;
+  tone: WorldGradient;
   children: ReactNode;
 }) {
-  // Stable pseudo-random colors keep SSR and client renders in sync.
-  let hash = 0;
-  for (const char of seed)
-    hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
-
   return (
     <Card className="relative isolate overflow-hidden">
-      <div
-        aria-hidden="true"
-        className={gradientVariants({ tone: tones[hash % tones.length] })}
-      />
+      <div aria-hidden="true" className={gradientVariants({ tone })} />
       {children}
     </Card>
   );

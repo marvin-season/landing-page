@@ -2,16 +2,19 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { z } from "zod";
 import { configSchema, idSchema, type WorldConfig } from "./model";
+import { type WorldGradient, worldGradients } from "./world-gradient";
 
 const templateMetaSchema = z.object({
   description: z.string().trim().min(1).max(800),
   details: z.string().trim().min(1).max(120),
+  gradient: z.enum(worldGradients),
 });
 
 export type WorldTemplate = {
   id: string;
   description: string;
   details: string;
+  gradient: WorldGradient;
   config: WorldConfig;
 };
 
@@ -31,6 +34,7 @@ export function loadWorldTemplates(): WorldTemplate[] {
   ].sort((a, b) => a.localeCompare(b));
   if (files.length === 0) throw new Error(`未找到世界模板：${templatesDir}`);
   const seen = new Set<string>();
+  const gradients = new Map<WorldGradient, string>();
   return files.map((file) => {
     const name = basename(file);
     const id = idSchema.parse(name.slice(0, -".json".length));
@@ -53,10 +57,17 @@ export function loadWorldTemplates(): WorldTemplate[] {
         `世界模板无效：${name}：${issues.map((issue) => issue.message).join("；")}`,
       );
     }
+    const previous = gradients.get(meta.data.gradient);
+    if (previous)
+      throw new Error(
+        `世界模板渐变色重复：${name} 与 ${previous} 同为 ${meta.data.gradient}`,
+      );
+    gradients.set(meta.data.gradient, name);
     return {
       id,
       description: meta.data.description,
       details: meta.data.details,
+      gradient: meta.data.gradient,
       config: config.data,
     };
   });
