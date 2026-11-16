@@ -45,9 +45,10 @@
       "style": {
         "noNonNullAssertion": "off",
         "noExcessiveLinesPerFile": {
-          "level": "error",
+          "level": "warn",
           "options": {
-            "maxLines": 2000
+            "maxLines": 800,
+            "skipBlankLines": true
           }
         }
       }
@@ -57,6 +58,18 @@
       "react": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/*.test.{ts,tsx,js,jsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noExcessiveLinesPerFile": "off"
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "actions": {
       "source": {
