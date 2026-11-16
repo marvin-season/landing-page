@@ -39,3 +39,40 @@ flowchart TD
   next -->|否| summary
   next -->|是| done[status=completed 客户端再开一批]
 ```
+
+进程启动时 `route.ts` 调用一次 `createWorldHandlers`。里面的 `createWorldEngine(worldStore, completeText)` 只执行这一次，得到 `execute`。之后每一批发言都调用这个 `execute`。测试要换假的 `complete`，所以每个用例会再调用一次 `createWorldEngine`。
+
+```mermaid
+flowchart TD
+  route[route.ts] --> handlers[createWorldHandlers]
+  handlers --> engine["createWorldEngine(worldStore, completeText)"]
+  engine --> execute[execute]
+  ui[useWorldRoom] --> story[worldStoryStream]
+  ui --> request[worldRequest]
+  story --> stream[worldStream]
+  stream --> runs["POST rooms/:id/runs"]
+  request --> other["其余 /api/group-chat"]
+  runs --> handle[handle]
+  other --> handle
+  handle -->|列表、配置、导入导出| store[worldStore]
+  handle -->|连接测试| complete[completeText]
+  handle -->|开跑| begin[store.begin]
+  begin --> execute
+  handle -->|暂停、结束、删除| abort[abortRun]
+  execute --> batch{summaryBatch 过长?}
+  batch -->|是| summary["summaryContext → call(summary)"]
+  summary --> complete
+  summary --> batch
+  batch -->|否| plan[nextTurn]
+  plan --> draft[appendMessage]
+  draft -->|旁白| narrator["narratorContext → call(narrator)"]
+  draft -->|对白| actor["actorContext → call(actor)"]
+  narrator --> complete
+  actor --> complete
+  complete --> agent["mastra.getAgent(purpose).stream"]
+  narrator --> saved[store.during 写入正文]
+  actor --> saved
+  saved --> more{turn < run.limit?}
+  more -->|是| batch
+  more -->|否| finish[finishRun]
+```
