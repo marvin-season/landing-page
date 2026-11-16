@@ -1,12 +1,14 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Agent } from "@mastra/core/agent";
 
-export type WorldAgentPurpose = "actor" | "director" | "narrator" | "summary";
+export type WorldAgentPurpose = "actor" | "narrator" | "summary";
 
 function worldAgent(purpose: WorldAgentPurpose, name: string): Agent {
   return new Agent({
     id: `world-${purpose}`,
     name,
+    // context.ts builds the per-call role instructions; provider.ts passes them
+    // to stream(). Turn selection belongs to schedule.ts, not an agent.
     instructions: "按照本次提供的世界上下文完成纯文本生成，不调用工具。",
     model: ({ requestContext }) =>
       createOpenAICompatible({
@@ -25,13 +27,12 @@ function worldAgent(purpose: WorldAgentPurpose, name: string): Agent {
           }),
       }).chatModel(requestContext.get("model") as string),
     maxRetries: 0,
-    // Context is assembled per NPC. Automatic memory must not mix private roles.
+    // group-chat owns history and summaries. Automatic memory must not mix roles.
   });
 }
 
 export const worldAgents = {
   actor: worldAgent("actor", "World NPC"),
-  director: worldAgent("director", "World Director"),
   narrator: worldAgent("narrator", "World Narrator"),
   summary: worldAgent("summary", "World Summary"),
 };

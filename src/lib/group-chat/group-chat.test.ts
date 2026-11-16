@@ -148,14 +148,13 @@ test("NPC questions go to the addressed NPC and system naming retains priority",
   }
 });
 
-test("NPC questions and obsolete wait selections never require operator input", async () => {
+test("NPC questions continue through actor calls without requiring operator input", async () => {
   const { store, room } = await conversationWithQuestion();
   const started = await store.begin("alice", room.id, command());
-  await createWorldEngine(store, async (input) =>
-    input.purpose === "director"
-      ? { text: '{"action":"wait","question":"你要怎么做？"}' }
-      : fakeComplete(input),
-  )("alice", started.room, new AbortController().signal, () => {});
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    return fakeComplete(input);
+  })("alice", started.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
   assert.equal(saved.run?.status, "completed");
   assert.equal(saved.run?.turns, exampleWorld.maxTurns);
