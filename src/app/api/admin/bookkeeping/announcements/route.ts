@@ -12,4 +12,5 @@ const handler = createAnnouncementHandlers({
     return { id: session.user.id, role: await getUserRole(session.user.id) };
   },
 }).admin;
+
 export { handler as GET, handler as POST, handler as PATCH, handler as DELETE };

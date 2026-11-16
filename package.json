@@ -101,7 +101,7 @@
     "zod": "^4.6.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.7",
+    "@biomejs/biome": "2.6.8",
     "@chenglou/pretext": "^0.0.3",
     "@lingui/cli": "^5.9.5",
     "@lingui/loader": "^5.9.5",

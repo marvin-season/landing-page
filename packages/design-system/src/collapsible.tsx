@@ -182,10 +182,10 @@ function CollapsibleBackdrop({
 
 export {
   Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-  CollapsibleTitle,
-  CollapsibleDescription,
-  CollapsibleChevron,
   CollapsibleBackdrop,
+  CollapsibleChevron,
+  CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
+  CollapsibleTrigger,
 };

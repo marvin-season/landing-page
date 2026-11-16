@@ -296,38 +296,34 @@ test("error documents and mismatched deployments fail offline installation", asy
   }
 });
 
-test(
-  "production worker installs the served shell and serves unseen routes offline",
-  {
-    skip: !process.env.BOOKKEEPING_PWA_TEST_ORIGIN,
-  },
-  async () => {
-    for (const locale of ["zh", "en"]) {
-      const worker = await harness(locale, new Map(), "unused", true);
-      await worker.install();
-      await worker.activate();
-      const assetsFetched = worker.state.requests.length;
-      assert.ok(assetsFetched > 10);
-      worker.state.online = false;
-      assert.equal(await worker.prepare(), true);
-      for (const path of [
-        "",
-        "/menu",
-        "/settings",
-        "/orders/new",
-        "/orders/offline-generated-id",
-      ]) {
-        const response = await worker.fetch(
-          `/${locale}/bookkeeping${path}`,
-          true,
-        );
-        assert.ok(
-          (await response?.text())?.includes(
-            'data-bookkeeping-offline-shell="true"',
-          ),
-        );
-      }
-      assert.equal(worker.state.requests.length, assetsFetched);
+test("production worker installs the served shell and serves unseen routes offline", {
+  skip: !process.env.BOOKKEEPING_PWA_TEST_ORIGIN,
+}, async () => {
+  for (const locale of ["zh", "en"]) {
+    const worker = await harness(locale, new Map(), "unused", true);
+    await worker.install();
+    await worker.activate();
+    const assetsFetched = worker.state.requests.length;
+    assert.ok(assetsFetched > 10);
+    worker.state.online = false;
+    assert.equal(await worker.prepare(), true);
+    for (const path of [
+      "",
+      "/menu",
+      "/settings",
+      "/orders/new",
+      "/orders/offline-generated-id",
+    ]) {
+      const response = await worker.fetch(
+        `/${locale}/bookkeeping${path}`,
+        true,
+      );
+      assert.ok(
+        (await response?.text())?.includes(
+          'data-bookkeeping-offline-shell="true"',
+        ),
+      );
     }
-  },
-);
+    assert.equal(worker.state.requests.length, assetsFetched);
+  }
+});

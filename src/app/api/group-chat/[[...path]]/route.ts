@@ -16,4 +16,5 @@ async function route(
 ) {
   return handle(request, (await context.params).path ?? []);
 }
+
 export { route as GET, route as POST, route as PATCH, route as DELETE };

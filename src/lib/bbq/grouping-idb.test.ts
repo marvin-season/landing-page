@@ -65,31 +65,29 @@ describe("grouping preferences persistence", () => {
     assert.equal(changed.groupingEnabled, true);
   });
 
-  it(
-    "notifies mounted views when settings change",
-    { timeout: 3000 },
-    async () => {
-      await new Promise<void>((resolve, reject) => {
-        let changed = false;
-        const subscription = liveQuery(() =>
-          bbqStore.getGroupingSettings(),
-        ).subscribe({
-          next(settings) {
-            if (settings.enabled && settings.names.includes("实时")) {
-              subscription.unsubscribe();
-              resolve();
-            } else if (!changed) {
-              changed = true;
-              void bbqStore
-                .saveGroupingSettings({ enabled: true, names: ["实时"] })
-                .catch(reject);
-            }
-          },
-          error: reject,
-        });
+  it("notifies mounted views when settings change", {
+    timeout: 3000,
+  }, async () => {
+    await new Promise<void>((resolve, reject) => {
+      let changed = false;
+      const subscription = liveQuery(() =>
+        bbqStore.getGroupingSettings(),
+      ).subscribe({
+        next(settings) {
+          if (settings.enabled && settings.names.includes("实时")) {
+            subscription.unsubscribe();
+            resolve();
+          } else if (!changed) {
+            changed = true;
+            void bbqStore
+              .saveGroupingSettings({ enabled: true, names: ["实时"] })
+              .catch(reject);
+          }
+        },
+        error: reject,
       });
-    },
-  );
+    });
+  });
 
   it("exports and imports settings atomically and accepts old backups", async () => {
     const backup = await bbqStore.exportBackup({ includePhotos: true });
