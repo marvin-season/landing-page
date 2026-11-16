@@ -15,9 +15,9 @@ export function CharacterAvatar({
   id: string;
   name: string;
   avatar?: WorldAvatar;
-  size?: "sm" | "default";
+  size?: "sm" | "md" | "default";
 }) {
-  const pixels = size === "sm" ? 16 : 36;
+  const pixels = size === "sm" ? 16 : size === "md" ? 28 : 36;
   return (
     <Image
       src={worldAvatarSrc(avatar ?? worldAvatarFromSeed(id))}
@@ -26,7 +26,7 @@ export function CharacterAvatar({
       height={pixels}
       className={cn(
         "shrink-0 rounded-full bg-muted object-cover",
-        size === "sm" ? "size-4" : "size-9",
+        size === "sm" ? "size-4" : size === "md" ? "size-7" : "size-9",
       )}
     />
   );

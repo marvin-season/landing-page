@@ -75,7 +75,7 @@ function EditorSection({
         ) : null}
       </div>
       <CollapsibleContent variant="collapse">
-        <div className="flex flex-col gap-5 border-t border-border/60 px-4 py-4">
+        <div className="flex flex-col gap-4 border-t border-border/60 px-4 py-3">
           {children}
         </div>
       </CollapsibleContent>
@@ -202,7 +202,7 @@ export function WorldEditor({
                   if (preset?.kind === "world")
                     setConfig(structuredClone(preset.content));
                 }}
-                className="h-10 rounded-xl border border-input bg-background px-3"
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="">自定义世界</option>
                 {presets
@@ -283,7 +283,7 @@ export function WorldEditor({
                 maxLength={4000}
                 hint="例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
               />
-              <label className="flex items-center justify-between gap-4 rounded-xl bg-muted/40 px-4 py-3 text-sm">
+              <label className="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5 text-sm">
                 <span>
                   <span className="font-medium">旁白</span>
                   <span className="mt-1 block text-xs leading-5 text-muted-foreground">
@@ -380,7 +380,7 @@ export function WorldEditor({
                     <CollapsibleChevron />
                   </CollapsibleTrigger>
                   <CollapsibleContent variant="collapse">
-                    <div className="flex flex-col gap-5 border-t border-border/60 px-4 py-4">
+                    <div className="flex flex-col gap-4 border-t border-border/60 px-4 py-3">
                       {presets.some((p) => p.kind === "character") ? (
                         <label className="flex flex-col gap-2 text-sm">
                           使用角色预设
@@ -400,7 +400,7 @@ export function WorldEditor({
                                   id: character.id,
                                 });
                             }}
-                            className="h-10 rounded-xl border border-input bg-background px-3"
+                            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                           >
                             <option value="">选择预设</option>
                             {presets

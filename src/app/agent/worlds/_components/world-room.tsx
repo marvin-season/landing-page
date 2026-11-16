@@ -21,7 +21,6 @@ import { cn } from "@landing-page/utils";
 import {
   ArrowLeft,
   BookOpen,
-  Check,
   Copy,
   Download,
   Flag,
@@ -35,7 +34,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -53,6 +52,24 @@ import type {
 import { CharacterAvatar } from "./character-avatar";
 import { useWorldRoom } from "./use-world-room";
 import { WorldEditor } from "./world-editor";
+import "./world-surface.css";
+
+function NoteCard({
+  title,
+  children,
+}: {
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-2 border-b border-border py-3">
+      {title ? (
+        <h3 className="text-xs tracking-wide text-muted-foreground">{title}</h3>
+      ) : null}
+      {children}
+    </section>
+  );
+}
 
 function WorldNotes({
   room,
@@ -62,96 +79,85 @@ function WorldNotes({
   onMention: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-7 text-sm">
-      <section className="flex flex-col gap-3">
-        <h3 className="flex items-center gap-2 font-semibold">
-          <Users className="size-4" />
-          登场角色
-        </h3>
-        <div className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
+    <div className="flex flex-col text-sm">
+      <h3 className="world-label mb-1">登场</h3>
+      <NoteCard>
+        <div className="flex items-center gap-2">
+          <span className="flex size-7 shrink-0 items-center justify-center text-xs text-muted-foreground">
             系
-          </div>
-          <div>
-            <p className="font-medium">系统操作者 · 你</p>
-            <p className="text-xs leading-5 text-muted-foreground">
-              {room.config.storyGoal ||
-                "默认以系统身份干预。输入框上方可以改成旁白或任意角色。"}
-            </p>
-          </div>
+          </span>
+          <p className="min-w-0 flex-1 truncate font-medium">系统 · 你</p>
         </div>
-        {room.config.narration ? (
-          <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
-            <p className="font-medium">旁白</p>
-            <p className="text-xs leading-6 text-muted-foreground">
-              只负责场景和事件。对话角色不在自己的发言里写旁白。
+        <p className="text-xs leading-5 text-muted-foreground">
+          {room.config.storyGoal ||
+            "默认以系统身份干预。输入框上方可以改成旁白或任意角色。"}
+        </p>
+      </NoteCard>
+      {room.config.narration ? (
+        <NoteCard>
+          <p className="font-medium">旁白</p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            只负责场景和事件。对话角色不在自己的发言里写旁白。
+          </p>
+        </NoteCard>
+      ) : null}
+      {room.config.characters.map((c) => (
+        <NoteCard key={c.id}>
+          <div className="flex items-center gap-2">
+            <CharacterAvatar
+              id={c.id}
+              name={c.name}
+              avatar={c.avatar}
+              size="md"
+            />
+            <p className="min-w-0 flex-1 truncate font-medium">
+              {c.name}
+              {c.enabled ? "" : " · 已禁用"}
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 shrink-0 px-2"
+              disabled={!c.enabled || room.status === "ended"}
+              onClick={() => onMention(c.id)}
+            >
+              点名
+            </Button>
           </div>
-        ) : null}
-        {room.config.characters.map((c) => (
-          <div
-            key={c.id}
-            className="flex flex-col gap-2 rounded-xl border border-border p-3"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex min-w-0 items-center gap-3">
-                <CharacterAvatar id={c.id} name={c.name} avatar={c.avatar} />
-                <div className="min-w-0">
-                  <p className="font-medium">
-                    {c.name}
-                    {c.enabled ? "" : " · 已禁用"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{c.identity}</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={!c.enabled || room.status === "ended"}
-                onClick={() => onMention(c.id)}
-              >
-                点名
-              </Button>
-            </div>
-            <p className="text-xs leading-6 text-muted-foreground">
-              {c.publicInfo || c.personality}
-            </p>
-          </div>
-        ))}
-      </section>
-      <section className="flex flex-col gap-2">
-        <h3 className="font-semibold">当前场景</h3>
-        <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
+          <p className="text-xs leading-5 text-muted-foreground">
+            {c.identity}
+          </p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {c.publicInfo || c.personality}
+          </p>
+        </NoteCard>
+      ))}
+      <NoteCard title="当前场景">
+        <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
           {room.config.scene}
         </p>
-      </section>
+      </NoteCard>
       {room.config.facts ? (
-        <section className="flex flex-col gap-2">
-          <h3 className="flex items-center gap-2 font-semibold">
-            <Check className="size-4" />
-            已确认事实
-          </h3>
-          <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
+        <NoteCard title="已确认事实">
+          <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
             {room.config.facts}
           </p>
-        </section>
+        </NoteCard>
       ) : null}
       {room.summary ? (
-        <section className="flex flex-col gap-2">
-          <h3 className="font-semibold">剧情摘要</h3>
-          <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
+        <NoteCard title="剧情摘要">
+          <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
             {room.summary.text}
           </p>
-        </section>
+        </NoteCard>
       ) : null}
-      <section className="flex flex-col gap-2">
-        <h3 className="font-semibold">世界规则</h3>
-        <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
+      <NoteCard title="世界规则">
+        <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
           {room.config.rules || "NPC 自主行动，按当前需求持续推进。"}
         </p>
-      </section>
+      </NoteCard>
       {room.run ? (
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p className="px-1 text-xs leading-5 text-muted-foreground">
           本轮 {room.run.turns}/{room.run.limit} 条发言 · {room.run.calls}{" "}
           次调用
           <br />
@@ -174,11 +180,7 @@ function MessageBubble({
   onRetry?: () => void;
 }) {
   if (message.kind === "system")
-    return (
-      <p className="text-center text-xs text-muted-foreground">
-        {message.text}
-      </p>
-    );
+    return <p className="world-system">{message.text}</p>;
   const user = message.kind === "intervention";
   const narrator = message.kind === "narrator";
   const displayName = narrator ? "旁白" : message.name;
@@ -191,34 +193,39 @@ function MessageBubble({
   const text = [...missingMentions, message.text].filter(Boolean).join(" ");
   const unfinished =
     message.status !== "complete" && message.status !== "streaming";
+  const character = characters.find((item) => item.id === message.speakerId);
+  const role = narrator
+    ? message.operator
+      ? "你"
+      : "场景"
+    : user
+      ? "系统指令"
+      : message.operator
+        ? "你"
+        : (character?.identity ?? "NPC");
   return (
-    <article className={cn("flex gap-3", user && "flex-row-reverse")}>
-      <div
-        className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold",
-          user && "bg-primary/10 text-primary",
-        )}
-      >
-        {displayName.slice(0, 1)}
-      </div>
-      <div className="flex min-w-0 max-w-[88%] flex-col gap-2 sm:max-w-[85%]">
-        <div
-          className={cn(
-            "flex items-center gap-2 text-xs text-muted-foreground",
-            user && "justify-end",
-          )}
-        >
+    <article
+      className={cn(
+        "flex items-start gap-3 border-b border-border py-4",
+        unfinished && "opacity-60",
+      )}
+    >
+      {narrator ? null : character ? (
+        <CharacterAvatar
+          id={character.id}
+          name={character.name}
+          avatar={character.avatar}
+        />
+      ) : (
+        <span className="flex size-9 shrink-0 items-center justify-center text-xs text-muted-foreground">
+          {displayName.slice(0, 1)}
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-2 text-xs text-muted-foreground">
           <span className="font-medium text-foreground">{displayName}</span>
-          {narrator ? (
-            message.operator ? (
-              <span>你</span>
-            ) : null
-          ) : (
-            <span>
-              {user ? "你 · 系统指令" : message.operator ? "你" : "NPC"}
-            </span>
-          )}
-          <time>
+          <span className="min-w-0 max-w-48 truncate">{role}</span>
+          <time className="ml-auto shrink-0 tabular-nums">
             {new Date(message.createdAt).toLocaleTimeString("zh-CN", {
               hour: "2-digit",
               minute: "2-digit",
@@ -227,9 +234,9 @@ function MessageBubble({
         </div>
         <div
           className={cn(
-            "rounded-2xl border border-border bg-card px-4 py-3 text-sm leading-7",
-            user && "border-transparent bg-primary/10",
-            unfinished && "opacity-60",
+            "mt-1.5 text-sm leading-7",
+            narrator ? "world-narration" : "world-bubble",
+            user && "world-bubble-user",
           )}
         >
           {text ? (
@@ -362,7 +369,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   }
   if (!room)
     return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-5 bg-background p-8 text-foreground">
+      <div className="world-sheet flex min-h-full flex-col items-center justify-center gap-5 p-8 text-foreground">
         <BookOpen className="size-8 text-muted-foreground" />
         <p>{chat.error || "正在打开世界…"}</p>
         <Button asChild variant="outline">
@@ -519,16 +526,16 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     );
   };
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
+    <div className="world-sheet flex h-full min-h-0 flex-col text-foreground">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
+        <div className="flex min-w-0 items-center gap-2">
           <Button asChild variant="ghost" size="icon">
             <Link href="/agent/worlds" aria-label="返回世界列表">
               <ArrowLeft />
             </Link>
           </Button>
           <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold">
+            <h1 className="truncate font-serif text-lg font-normal">
               {room.config.title}
             </h1>
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -569,7 +576,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <Conversation className="min-h-0">
-            <ConversationContent className="mx-auto w-full max-w-4xl gap-6 px-4 py-6 sm:px-8">
+            <ConversationContent className="mx-auto w-full max-w-3xl gap-0 px-4 py-6 sm:px-8">
               {(room.messages[0]?.seq ?? 1) > 1 ? (
                 <Button
                   variant="ghost"
@@ -580,17 +587,15 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 </Button>
               ) : null}
               {!room.messages.length ? (
-                <div className="mx-auto flex max-w-lg flex-col gap-5 py-10">
-                  <p className="text-xs font-medium tracking-widest text-muted-foreground">
-                    故事的起点
-                  </p>
-                  <h2 className="text-2xl font-semibold">
+                <div className="flex flex-col gap-4 border-b border-border py-6">
+                  <p className="world-label">开场</p>
+                  <h2 className="font-serif text-2xl font-normal">
                     {room.config.title}
                   </h2>
-                  <p className="whitespace-pre-wrap text-sm leading-8 text-muted-foreground">
+                  <p className="whitespace-pre-wrap text-sm leading-7">
                     {room.config.background}
                   </p>
-                  <p className="whitespace-pre-wrap border-l-2 border-primary/30 pl-4 text-sm leading-7">
+                  <p className="world-narration whitespace-pre-wrap text-sm leading-7">
                     {room.config.scene}
                   </p>
                   <p className="text-xs leading-6 text-muted-foreground">
@@ -630,7 +635,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             <ConversationScrollButton />
           </Conversation>
           <footer className="shrink-0 border-t border-border px-4 py-3 sm:px-6">
-            <div className="mx-auto flex max-w-4xl flex-col gap-3">
+            <div className="mx-auto flex max-w-3xl flex-col gap-3">
               {chat.error ? (
                 <Alert className="text-destructive">
                   <AlertDescription>
@@ -700,6 +705,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     </span>
                   </div>
                   <AiInput
+                    className="rounded-2xl border-(--line) bg-(--card) shadow-none"
                     value={draft}
                     onValueChange={setDraft}
                     mentions={mentions}
@@ -776,12 +782,12 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             </div>
           </footer>
         </div>
-        <aside className="hidden w-72 shrink-0 overflow-y-auto border-l border-border p-5 xl:block">
+        <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
           <WorldNotes room={room} onMention={addMention} />
         </aside>
       </div>
       <Sheet open={notes} onOpenChange={setNotes}>
-        <SheetContent className="overflow-y-auto">
+        <SheetContent className="world-sheet overflow-y-auto">
           <SheetHeader>
             <SheetTitle>世界与角色</SheetTitle>
             <SheetDescription>公开设定与当前剧情</SheetDescription>
@@ -797,7 +803,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
+        <SheetContent className="world-sheet w-full gap-0 overflow-hidden sm:max-w-2xl">
           <SheetHeader className="shrink-0 border-b border-border pr-12">
             <SheetTitle>
               {copying ? "复制为新世界" : "世界设定与存档"}

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useId } from "react";
 
 export function FieldGroup({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-5">{children}</div>;
+  return <div className="flex flex-col gap-4">{children}</div>;
 }
 export function TextField({
   label,
@@ -39,7 +39,7 @@ export function TextField({
           maxLength={maxLength}
           required={required}
           rows={4}
-          className="min-h-24 w-full resize-y rounded-xl border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-24 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       ) : (
         <Input
