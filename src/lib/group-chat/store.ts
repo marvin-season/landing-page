@@ -28,6 +28,43 @@ export function roomListing(room: WorldRoom): RoomListItem {
     paused: room.paused,
   };
 }
+function inputLine(room: WorldRoom, input: RunInput) {
+  const speaker = input.speaker;
+  const text = input.text;
+  const character =
+    speaker === "system" || speaker === "narrator"
+      ? undefined
+      : room.config.characters.find(
+          (item) => item.id === speaker && item.enabled,
+        );
+  if (speaker !== "system" && speaker !== "narrator" && !character)
+    throw new WorldError("invalid_speaker", "当前输入角色不存在或已禁用");
+  if (speaker !== "system" && !text)
+    throw new WorldError(
+      "empty_message",
+      speaker === "narrator" ? "请输入旁白" : "请输入角色对白",
+    );
+  if (speaker === "narrator")
+    return {
+      speakerId: "system",
+      name: "旁白",
+      kind: "narrator" as const,
+      text,
+    };
+  if (character)
+    return {
+      speakerId: character.id,
+      name: character.name,
+      kind: "agent" as const,
+      text,
+    };
+  return {
+    speakerId: "user",
+    name: "系统干预",
+    kind: "intervention" as const,
+    text: text || "让指定 NPC 优先行动，随后继续自动推进。",
+  };
+}
 export function appendMessage(
   room: WorldRoom,
   input: Omit<WorldMessage, "id" | "seq" | "createdAt" | "configVersion">,
@@ -366,17 +403,25 @@ export function createWorldStore(getClient: () => Client) {
         const replacedRunId =
           room.run?.status === "running" ? room.run.id : null;
         if (replacedRunId)
-          finishRun(room, "interrupted", "系统干预，中止上一轮");
-        if (hasMessage)
+          finishRun(
+            room,
+            "interrupted",
+            input.speaker === "narrator"
+              ? "旁白插入，中止上一轮"
+              : input.speaker === "system"
+                ? "系统干预，中止上一轮"
+                : "角色对白插入，中止上一轮",
+          );
+        if (hasMessage) {
+          const line = inputLine(room, input);
           appendMessage(room, {
-            speakerId: "user",
-            name: "系统干预",
-            kind: "intervention",
-            text: input.text || "让指定 NPC 优先行动，随后继续自动推进。",
+            ...line,
             mentions: input.mentions,
             status: "complete",
             runId: null,
+            operator: true,
           });
+        }
         if (started) {
           if (room.run) room.runs.push(structuredClone(room.run));
           const now = Date.now();

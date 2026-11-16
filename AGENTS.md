@@ -34,8 +34,11 @@ When dependencies are missing or need to be refreshed, use `ni` commands so the 
 
 Biome is the source of truth for formatting and linting. It uses 2-space indentation, recommended React/Next rules, and automatic import organization. Prefer TypeScript for app code, `tsx` for React components, and kebab-case file names when matching existing patterns, for example `chat-mode-switcher.tsx`. Keep atomic UI in `packages/design-system`, reusable composed business UI in `packages/biz-ui`, and page-only components near their route in `_components`. See `.cursor/rules/component-layers.mdc`.
 
+格式化组件时执行已有脚本即可，例如 `nr lint` 或 `nr format`。
+
 ## Implementation & Reuse
 
+- 尽可能使用已有组件，不要重复定义组件。先在 `packages/design-system`、`packages/biz-ui` 和当前路由的 `_components` 中查找，已有组件能覆盖需求时直接复用。
 - 复用样式不要通过定义或导出 Tailwind 类名变量（如 `xxxCls`）实现，而应采用无头组件、组合组件及明确的 `variant` 统一封装样式。调用处通过组件和插槽组合 UI，不再拼接共享类名；仅使用一次的样式直接写在对应元素上。
 - `cn()` / `cls()` 仅用于组件内部合并局部样式和条件类名，按普通函数传参，不使用带插值的模板标签写法，避免类名合并顺序覆盖圆角、背景等样式。
 - Do not reinvent the wheel. First reuse existing project components, utilities, and dependencies; prefer mature, actively maintained libraries over hand-written implementations of common functionality.

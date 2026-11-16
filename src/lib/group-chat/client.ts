@@ -58,6 +58,7 @@ export async function* worldStoryStream(
       mode: "auto",
       text: "",
       mentions: [],
+      speaker: "system",
       resume: false,
       continueRunId: room.run.id,
     };

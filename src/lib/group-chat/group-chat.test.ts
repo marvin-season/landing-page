@@ -1187,3 +1187,100 @@ test("a room owner cannot cancel another owner's run by supplying its run ID", a
   await done;
   assert.equal((await store.get("bob", bob.id)).run?.status, "completed");
 });
+
+test("user input defaults to system and can be posted as narrator or a character", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const asSystem = await store.begin(
+    "alice",
+    room.id,
+    command({ text: "让雨停", mode: "save" }),
+  );
+  assert.equal(asSystem.room.messages.at(-1)?.kind, "intervention");
+  assert.equal(asSystem.room.messages.at(-1)?.name, "系统干预");
+  await store.change("alice", room.id, (current) => {
+    current.config.narration = true;
+    current.config.characters[0].enabled = false;
+  });
+  await assert.rejects(
+    () =>
+      store.begin(
+        "alice",
+        room.id,
+        command({ text: "我先看电路。", speaker: "engineer", mode: "save" }),
+      ),
+    (error: unknown) =>
+      error instanceof WorldError && error.code === "invalid_speaker",
+  );
+  await store.change("alice", room.id, (current) => {
+    current.config.characters[0].enabled = true;
+  });
+  const asNarrator = await store.begin(
+    "alice",
+    room.id,
+    command({
+      text: "雨停了，控制室里只剩对讲机的电流声。",
+      speaker: "narrator",
+      mode: "step",
+      resume: true,
+    }),
+  );
+  assert.equal(asNarrator.room.messages.at(-1)?.kind, "narrator");
+  assert.equal(asNarrator.room.messages.at(-1)?.operator, true);
+  assert.equal(asNarrator.room.messages.at(-1)?.name, "旁白");
+  assert.equal(
+    asNarrator.room.messages.at(-1)?.text,
+    "雨停了，控制室里只剩对讲机的电流声。",
+  );
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    const data = JSON.parse(input.messages[1].content);
+    assert.equal(data.world.latestIntervention, "让雨停");
+    assert.equal(data.publicConversation.at(-1).kind, "narrator");
+    assert.match(input.messages[0].content, /已经发生的旁白/);
+    return fakeComplete(input);
+  })("alice", asNarrator.room, new AbortController().signal, () => {});
+  const narrated = await store.get("alice", room.id);
+  assert.equal(narrated.messages.at(-2)?.kind, "narrator");
+  assert.equal(narrated.messages.at(-1)?.kind, "agent");
+  assert.equal(narrated.messages.at(-1)?.operator, undefined);
+  const asCharacter = await store.begin(
+    "alice",
+    room.id,
+    command({
+      text: "周渡，你去联络船员。",
+      speaker: "engineer",
+      mode: "step",
+      resume: true,
+    }),
+  );
+  assert.equal(asCharacter.room.messages.at(-1)?.kind, "agent");
+  assert.equal(asCharacter.room.messages.at(-1)?.operator, true);
+  assert.equal(asCharacter.room.messages.at(-1)?.speakerId, "engineer");
+  assert.equal(asCharacter.room.messages.at(-1)?.name, "许岚");
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    assert.equal(
+      JSON.parse(input.messages[1].content).yourCharacter.id,
+      "dispatcher",
+    );
+    return fakeComplete(input);
+  })("alice", asCharacter.room, new AbortController().signal, () => {});
+  assert.equal(
+    (await store.get("alice", room.id)).messages.at(-1)?.speakerId,
+    "dispatcher",
+  );
+  await assert.rejects(
+    () =>
+      store.begin(
+        "alice",
+        room.id,
+        command({ speaker: "narrator", mentions: ["engineer"], mode: "save" }),
+      ),
+    (error: unknown) =>
+      error instanceof WorldError && error.code === "empty_message",
+  );
+  const reserved = structuredClone(exampleWorld);
+  reserved.characters[0].id = "narrator";
+  assert.equal(configSchema.safeParse(reserved).success, false);
+});

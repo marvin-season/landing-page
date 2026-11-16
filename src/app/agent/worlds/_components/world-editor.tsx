@@ -410,7 +410,7 @@ export function WorldEditor({
           <h3 className="text-lg font-semibold">对话节奏</h3>
           <p className="text-xs leading-5 text-muted-foreground">
             进入新世界后，NPC
-            会依据设定和推进要求自动行动，逐条接话，不等待你回答。你可以随时发送系统干预来改变事件、角色行动或故事走向，也可以暂停、点名或使用“仅下一条”。
+            会依据设定和推进要求自动行动，逐条接话，不等待你回答。输入默认是系统干预，也可以改成旁白或某个角色；你还可以暂停、点名或使用“仅下一条”。
           </p>
           <div className="flex flex-wrap gap-2">
             <Button

@@ -5,6 +5,12 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -69,7 +75,8 @@ function WorldNotes({
           <div>
             <p className="font-medium">系统操作者 · 你</p>
             <p className="text-xs leading-5 text-muted-foreground">
-              {room.config.storyGoal || "观察 NPC 自主行动，随时干预故事走向。"}
+              {room.config.storyGoal ||
+                "默认以系统身份干预。输入框上方可以改成旁白或任意角色。"}
             </p>
           </div>
         </div>
@@ -209,7 +216,15 @@ function MessageBubble({
           )}
         >
           <span className="font-medium text-foreground">{displayName}</span>
-          {narrator ? null : <span>{user ? "你 · 系统指令" : "NPC"}</span>}
+          {narrator ? (
+            message.operator ? (
+              <span>你</span>
+            ) : null
+          ) : (
+            <span>
+              {user ? "你 · 系统指令" : message.operator ? "你" : "NPC"}
+            </span>
+          )}
           <time>
             {new Date(message.createdAt).toLocaleTimeString("zh-CN", {
               hour: "2-digit",
@@ -253,10 +268,69 @@ function MessageBubble({
   );
 }
 
+function inputPlaceholder(speaker: string, label: string) {
+  if (speaker === "narrator")
+    return "写下旁白，例如：雨停了，控制室里只剩对讲机的电流声。";
+  if (speaker === "system")
+    return "输入系统干预，例如：让暴雨停下来，大家开始调查停电原因。";
+  return `以${label}的身份说一句话。`;
+}
+
+function inputHint(
+  speaker: string,
+  label: string,
+  paused: boolean,
+  mentionCount: number,
+) {
+  if (paused && mentionCount)
+    return "提交点名后立即继续，指定 NPC 优先行动，随后自动推进。";
+  if (paused)
+    return speaker === "system"
+      ? "当前已暂停，提交只保存指令；继续后生效。"
+      : "当前已暂停，提交只保存这一条；继续后生效。";
+  if (speaker === "narrator")
+    return "这段会直接写成旁白，随后由角色接话。@ 仍可指定接下来谁先说。";
+  if (speaker !== "system")
+    return `这段会作为${label}已经说出的对白，其他角色接着回应。`;
+  return "指令会中止当前生成并调整后续剧情 · @ 可指定 NPC 优先行动";
+}
+
+function InputSpeakerSelect({
+  value,
+  characters,
+  onChange,
+}: {
+  value: string;
+  characters: { id: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="mb-2 flex items-center gap-2">
+      <span className="text-xs text-muted-foreground">输入身份</span>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger size="sm" aria-label="输入身份">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="system">系统</SelectItem>
+          <SelectItem value="narrator">旁白</SelectItem>
+          <SelectSeparator />
+          {characters.map((item) => (
+            <SelectItem key={item.id} value={item.id}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 export function WorldRoomView({ roomId }: { roomId: string }) {
   const router = useRouter();
   const [draft, setDraft] = useState("");
   const [mentions, setMentions] = useState<AiMentionItem[]>([]);
+  const [speakerId, setSpeakerId] = useState("system");
   const [notes, setNotes] = useState(false);
   const [editing, setEditing] = useState<WorldConfig | null>(null);
   const [copying, setCopying] = useState(false);
@@ -305,6 +379,18 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       description: c.identity,
       icon: <CharacterAvatar id={c.id} name={c.name} size="sm" />,
     }));
+  const speaker =
+    speakerId === "narrator" ||
+    mentionItems.some((item) => item.id === speakerId)
+      ? speakerId
+      : "system";
+  const speakingCharacter = mentionItems.find((item) => item.id === speaker);
+  const speakerLabel =
+    speaker === "system"
+      ? "系统"
+      : speaker === "narrator"
+        ? "旁白"
+        : (speakingCharacter?.label ?? "系统");
   const latestMessage = room.messages.filter((m) => m.kind !== "system").at(-1);
   function addMention(id: string) {
     const item = mentionItems.find((c) => c.id === id);
@@ -320,12 +406,14 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     setNotes(false);
   }
   function send(resume = false) {
-    if (!draft.trim() && !mentions.length) return;
+    const text = draft.trim();
+    if (speaker === "system" ? !text && !mentions.length : !text) return;
     submitted.current = { text: draft, mentions };
     chat.start({
       mode: "auto",
       text: draft,
       mentions: mentions.map((m) => m.id),
+      speaker,
       resume: resume || mentions.length > 0 || !room!.paused,
     });
   }
@@ -440,6 +528,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                             mode: "retry",
                             text: "",
                             mentions: [],
+                            speaker: "system",
                             resume: true,
                             retryMessageId: message.id,
                           })
@@ -490,6 +579,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                             mode: "auto",
                             text: "",
                             mentions: [],
+                            speaker: "system",
                             resume: true,
                           })
                         }
@@ -507,6 +597,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                           mode: "step",
                           text: "",
                           mentions: [],
+                          speaker: "system",
                           resume: true,
                         })
                       }
@@ -515,7 +606,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                       仅下一条
                     </Button>
                     <span className="text-xs text-muted-foreground">
-                      NPC 自主推进故事 · 你可随时暂停或发送系统干预
+                      NPC 自主推进故事 · 当前输入身份是{speakerLabel}
                     </span>
                   </div>
                   <AiInput
@@ -526,20 +617,37 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     mentionItems={mentionItems}
                     mentionDisplay="inline"
                     disabled={chat.pending || actionPending}
+                    canSubmit={
+                      speaker === "system"
+                        ? Boolean(draft.trim() || mentions.length)
+                        : Boolean(draft.trim())
+                    }
                     maxLength={8000}
                     rows={2}
                     onSubmit={() => send()}
-                    placeholder="输入系统干预，例如：让暴雨停下来，大家开始调查停电原因。"
-                    sendLabel="应用干预"
+                    placeholder={inputPlaceholder(speaker, speakerLabel)}
+                    sendLabel={
+                      speaker === "system"
+                        ? "应用干预"
+                        : speaker === "narrator"
+                          ? "发送旁白"
+                          : "发送"
+                    }
                     emptyMentionLabel="没有匹配的角色"
                     removeMentionLabel="取消点名"
-                    hint={
-                      room.paused
-                        ? mentions.length
-                          ? "提交点名后立即继续，指定 NPC 优先行动，随后自动推进。"
-                          : "当前已暂停，提交只保存指令；继续后生效。"
-                        : "指令会中止当前生成并调整后续剧情 · @ 可指定 NPC 优先行动"
+                    header={
+                      <InputSpeakerSelect
+                        value={speaker}
+                        characters={mentionItems}
+                        onChange={setSpeakerId}
+                      />
                     }
+                    hint={inputHint(
+                      speaker,
+                      speakerLabel,
+                      room.paused,
+                      mentions.length,
+                    )}
                     footer={
                       room.paused ? (
                         <Button
@@ -547,11 +655,14 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                           size="sm"
                           variant="ghost"
                           disabled={
-                            chat.pending || (!draft.trim() && !mentions.length)
+                            chat.pending ||
+                            (speaker === "system"
+                              ? !draft.trim() && !mentions.length
+                              : !draft.trim())
                           }
                           onClick={() => send(true)}
                         >
-                          干预并继续
+                          {speaker === "system" ? "干预并继续" : "发送并继续"}
                         </Button>
                       ) : undefined
                     }

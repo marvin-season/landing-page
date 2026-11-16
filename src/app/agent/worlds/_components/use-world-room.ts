@@ -166,6 +166,7 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
       mode: "auto",
       text: "",
       mentions: [],
+      speaker: "system",
       resume: false,
     };
     lastCommand.current = command;

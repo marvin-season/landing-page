@@ -42,7 +42,8 @@ const currentConfigSchema = z
     if (
       new Set(ids).size !== ids.length ||
       ids.includes("user") ||
-      ids.includes("system")
+      ids.includes("system") ||
+      ids.includes("narrator")
     )
       ctx.addIssue({
         code: "custom",
@@ -100,6 +101,7 @@ export const messageSchema = z.object({
   runId: idSchema.nullable(),
   mentions: z.array(idSchema).max(7),
   followUpTo: idSchema.optional(),
+  operator: z.literal(true).optional(),
   createdAt: z.string().datetime(),
 });
 export type WorldMessage = z.infer<typeof messageSchema>;
@@ -154,6 +156,7 @@ export const runInputSchema = z.object({
   mode: z.enum(["auto", "step", "save", "retry"]),
   text: text(8000).default(""),
   mentions: z.array(idSchema).max(7).default([]),
+  speaker: z.string().trim().min(1).max(100).default("system"),
   retryMessageId: idSchema.optional(),
   continueRunId: idSchema.optional(),
   resume: z.boolean().default(false),
