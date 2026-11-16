@@ -14,6 +14,7 @@
 
 - 每个子目录一个技能，入口为 **`SKILL.md`**（可含 YAML frontmatter：`name`、`description`）。
 - 模型通常按任务匹配 `description` 再读取完整 `SKILL.md`；细则可放在同目录下的 `rules/*.md`、`reference.md` 等。
+- 技能目录里不要放 `AGENTS.md`。Cursor 会把工作区内每份 `AGENTS.md` 每轮注入。全文放在 `reference.md`，需要时再读。
 - 当前技能：
   - [`skills/pretext/`](skills/pretext/)：Pretext 文本测量与排版
   - [`skills/vercel-react-best-practices/`](skills/vercel-react-best-practices/)：Vercel React/Next 性能实践（大量分类规则文件）

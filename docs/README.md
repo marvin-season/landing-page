@@ -25,7 +25,7 @@
 | [.cursor/skills/pretext/SKILL.md](../.cursor/skills/pretext/SKILL.md) | Agent | Pretext 技能入口 |
 | [.cursor/skills/pretext/reference.md](../.cursor/skills/pretext/reference.md) | Agent | Pretext 参考 |
 | [.cursor/skills/vercel-react-best-practices/SKILL.md](../.cursor/skills/vercel-react-best-practices/SKILL.md) | Agent | React/Next 性能技能入口 |
-| [.cursor/skills/vercel-react-best-practices/AGENTS.md](../.cursor/skills/vercel-react-best-practices/AGENTS.md) | Agent | 该技能的 Agent 说明 |
+| [.cursor/skills/vercel-react-best-practices/reference.md](../.cursor/skills/vercel-react-best-practices/reference.md) | Agent | 性能规则全文，按需读取 |
 | [.cursor/skills/vercel-react-best-practices/rules/](../.cursor/skills/vercel-react-best-practices/rules/) | Agent | 分类性能规则（多文件） |
 
 `.changelog/YYYYMMDD/index.md` 为按日追加的变更记录，不在此逐条列出。
