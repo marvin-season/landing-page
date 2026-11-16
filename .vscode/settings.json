@@ -9,6 +9,7 @@
   "json.schemaDownload.enable": true,
   "biome.enabled": true,
   "biome.requireConfiguration": true,
+  "biome.lsp.bin": "./node_modules/@biomejs/biome/bin/biome",
   "editor.defaultFormatter": "biomejs.biome",
   "cSpell.words": [
     "deepseek",

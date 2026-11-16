@@ -79,73 +79,51 @@
   box-shadow: none;
 }
 
-.world-card-sky,
-.world-card-emerald,
-.world-card-violet,
-.world-card-amber,
-.world-card-rose,
-.world-card-indigo {
-  border-bottom: 0;
-  box-shadow: inset 1px 0 0 var(--edge, var(--line));
-}
-
 .world-card-sky {
-  --wash: #e4eef5;
   --edge: #c9dce8;
 }
 
 .world-card-emerald {
-  --wash: #e3f0e4;
   --edge: #c9e0cb;
 }
 
 .world-card-violet {
-  --wash: #efe6f4;
   --edge: #ddd0ea;
 }
 
 .world-card-amber {
-  --wash: #f8efd8;
   --edge: #ead9b4;
 }
 
 .world-card-rose {
-  --wash: #f8e6e1;
   --edge: #efd0c8;
 }
 
 .world-card-indigo {
-  --wash: #e6e9f6;
   --edge: #d0d5ee;
 }
 
 .dark .world-card-sky {
-  --wash: #31424d;
   --edge: #466070;
 }
 
 .dark .world-card-emerald {
-  --wash: #314238;
   --edge: #466050;
 }
 
 .dark .world-card-violet {
-  --wash: #3a3348;
   --edge: #564868;
 }
 
 .dark .world-card-amber {
-  --wash: #433828;
   --edge: #66543a;
 }
 
 .dark .world-card-rose {
-  --wash: #43332f;
   --edge: #664840;
 }
 
 .dark .world-card-indigo {
-  --wash: #323848;
   --edge: #46506c;
 }
 
@@ -177,6 +155,18 @@
   color: var(--quiet);
   font-size: 0.75rem;
   text-align: center;
+}
+
+.world-sheet button,
+.world-sheet a.rounded-full {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.world-sheet button:hover,
+.world-sheet a.rounded-full:hover {
+  background-color: color-mix(in srgb, var(--ink) 7%, transparent);
 }
 
 .world-sheet [data-slot="input"],

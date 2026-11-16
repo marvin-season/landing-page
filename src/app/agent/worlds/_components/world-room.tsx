@@ -132,6 +132,11 @@ function WorldNotes({
           </p>
         </NoteCard>
       ))}
+      <NoteCard title="背景故事">
+        <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
+          {room.config.background}
+        </p>
+      </NoteCard>
       <NoteCard title="当前场景">
         <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
           {room.config.scene}
@@ -576,7 +581,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <Conversation className="min-h-0">
-            <ConversationContent className="mx-auto w-full max-w-3xl gap-0 px-4 py-6 sm:px-8">
+            <ConversationContent className="mx-auto w-full max-w-6xl gap-0 px-4 py-6 sm:px-6">
               {(room.messages[0]?.seq ?? 1) > 1 ? (
                 <Button
                   variant="ghost"
@@ -635,7 +640,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             <ConversationScrollButton />
           </Conversation>
           <footer className="shrink-0 border-t border-border px-4 py-3 sm:px-6">
-            <div className="mx-auto flex max-w-3xl flex-col gap-3">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
               {chat.error ? (
                 <Alert className="text-destructive">
                   <AlertDescription>
@@ -662,12 +667,13 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                         disabled={chat.stopping}
                         onClick={() => void chat.stop()}
                       >
-                        <Pause data-icon="inline-start" />
+                        <Pause size={16} data-icon="inline-start" />
                         {chat.stopping ? "正在暂停…" : "暂停"}
                       </Button>
                     ) : (
                       <Button
                         size="sm"
+                        variant="outline"
                         disabled={chat.pending || actionPending}
                         onClick={() =>
                           chat.start({
@@ -679,7 +685,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                           })
                         }
                       >
-                        <Play data-icon="inline-start" />
+                        <Play size={16} data-icon="inline-start" />
                         {room.status === "draft" ? "开始自动推进" : "继续故事"}
                       </Button>
                     )}
@@ -697,7 +703,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                         })
                       }
                     >
-                      <SkipForward data-icon="inline-start" />
+                      <SkipForward size={16} data-icon="inline-start" />
                       仅下一条
                     </Button>
                     <span className="text-xs text-muted-foreground">

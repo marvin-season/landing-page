@@ -11,7 +11,7 @@ export function WorldCard({
   children: ReactNode;
 }) {
   return (
-    <article className={cn("world-card", `world-card-${tone}`)}>
+    <article className={cn("world-card group", `world-card-${tone}`)}>
       {children}
     </article>
   );

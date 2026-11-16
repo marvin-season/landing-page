@@ -4,11 +4,6 @@ import {
   Alert,
   AlertDescription,
   Button,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -16,7 +11,7 @@ import {
   SheetTitle,
 } from "@landing-page/design-system";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Plus, Trash2, Upload, Users } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -69,18 +64,15 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
   }
   return (
     <div className="world-sheet min-h-full px-5 py-8 text-foreground sm:px-8 lg:px-12">
-      <div className="mx-auto flex max-w-5xl flex-col gap-10">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <h1 className="font-serif text-3xl font-normal tracking-tight">
-              世界群聊
-            </h1>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground">
-              设定世界与推进目标，NPC
-              会自主展开故事。你作为系统操作者，随时介入改变走向。
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+        <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="font-serif text-2xl font-normal">世界群聊</h1>
+            <p className="mt-1 truncate text-sm text-muted-foreground">
+              设定世界与推进目标，NPC 会自主展开故事。你可以随时介入。
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex shrink-0 gap-1">
             <Button
               variant="outline"
               disabled={pending}
@@ -135,43 +127,46 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           </Alert>
         ) : null}
         {templates.length ? (
-          <section className="flex flex-col gap-4">
-            <h2 className="world-label">模板</h2>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <section>
+            <h2 className="mb-1 text-xs tracking-wide text-muted-foreground">
+              模板
+            </h2>
+            <div>
               {templates.map((world) => (
                 <WorldCard key={world.id} tone={world.gradient}>
-                  <CardHeader className="gap-1.5 px-5 pt-5 pb-2">
-                    <CardTitle className="font-serif text-lg font-normal">
-                      {world.config.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs leading-5">
-                      {world.details}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="px-5 pb-3">
-                    <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">
-                      {world.description}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="px-5 pb-5">
+                  <div className="flex items-center gap-4 py-3">
+                    <span className="size-1.5 shrink-0 rounded-full bg-(--edge)" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">
+                        {world.config.title} ·{" "}
+                        <span className="text-xs font-light text-muted-foreground">
+                          {world.details}
+                        </span>
+                      </p>
+                      <p className="mt-1 line-clamp-3 text-xs leading-5 whitespace-pre-wrap text-muted-foreground">
+                        {world.config.background} · {world.config.background}
+                      </p>
+                    </div>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="ghost"
+                      className="pointer-events-none opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100"
                       onClick={() => setEditing(structuredClone(world.config))}
                     >
                       设定并开始
-                      <ArrowRight data-icon="inline-end" />
                     </Button>
-                  </CardFooter>
+                  </div>
                 </WorldCard>
               ))}
             </div>
           </section>
         ) : null}
-        <section className="flex flex-col gap-4">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="world-label min-w-0 flex-1">我的世界</h2>
-            <span className="shrink-0 text-xs text-muted-foreground">
+        <section>
+          <div className="mb-1 flex items-baseline justify-between gap-3">
+            <h2 className="text-xs tracking-wide text-muted-foreground">
+              我的世界
+            </h2>
+            <span className="text-xs text-muted-foreground">
               {rooms.data?.rooms.length ?? 0} 个存档
             </span>
           </div>
@@ -183,7 +178,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
               还没有故事存档。从示例开始，或创建你自己的世界。
             </p>
           ) : null}
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div>
             {rooms.data?.rooms.map((room) => (
               <WorldCard
                 key={room.id}
@@ -192,37 +187,28 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                   worldGradientFromSeed(room.id)
                 }
               >
-                <CardHeader className="flex-row items-baseline justify-between gap-3 px-5 pt-5 pb-2">
-                  <CardTitle className="font-serif text-lg font-normal">
-                    {room.title}
-                  </CardTitle>
-                  <CardDescription className="shrink-0 text-xs">
-                    {room.status === "ended"
-                      ? "已结束"
-                      : room.status === "draft"
-                        ? "未开始"
-                        : room.paused
-                          ? "已暂停"
-                          : "进行中"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-5 pb-3">
-                  <p className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Users className="size-3" />
-                    <span className="truncate">
+                <div className="flex items-center gap-4 py-3">
+                  <span className="size-1.5 shrink-0 rounded-full bg-(--edge)" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{room.title}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {room.status === "ended"
+                        ? "已结束"
+                        : room.status === "draft"
+                          ? "未开始"
+                          : room.paused
+                            ? "已暂停"
+                            : "进行中"}
+                      {" · "}
                       {room.characters.join("、")}
-                    </span>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {room.messageCount} 条对话 ·{" "}
-                    {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
-                  </p>
-                </CardContent>
-                <CardFooter className="justify-between px-5 pb-5">
-                  <Button asChild variant="outline" size="sm">
+                      {" · "}
+                      {room.messageCount} 条 ·{" "}
+                      {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
+                    </p>
+                  </div>
+                  <Button asChild variant="ghost" size="sm">
                     <Link href={`/agent/worlds/${room.id}`}>
-                      {room.status === "ended" ? "查看故事" : "进入世界"}
-                      <ArrowRight data-icon="inline-end" />
+                      {room.status === "ended" ? "查看" : "进入"}
                     </Link>
                   </Button>
                   <Button
@@ -232,16 +218,18 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                     onClick={() => void remove(room.id)}
                     aria-label={`删除${room.title}`}
                   >
-                    <Trash2 />
+                    <Trash2 size={16} />
                   </Button>
-                </CardFooter>
+                </div>
               </WorldCard>
             ))}
           </div>
         </section>
         {presets.data?.presets.length ? (
-          <section className="flex flex-col gap-3">
-            <h2 className="world-label">我的预设</h2>
+          <section>
+            <h2 className="mb-1 text-xs tracking-wide text-muted-foreground">
+              我的预设
+            </h2>
             {presets.data.presets.map((preset) => (
               <div
                 key={preset.id}
