@@ -30,12 +30,6 @@ flowchart TB
   API --> TRPC
   API --> MASTRA
   TRPC --> MASTRA
-  subgraph external [外部 / 可配置]
-    REMOTE[NEXT_PUBLIC_API_BASE_URL]
-    AGENT_SVC[localhost:7777 via /api-agent]
-  end
-  next -.->|rewrites /api-remote| REMOTE
-  next -.->|rewrites /api-agent| AGENT_SVC
 ```
 
 ## 2. 目录与职责
@@ -136,17 +130,12 @@ flowchart TB
 
 - `src/app/api/knowledge/chat/route.ts`、`src/app/api/email/test/route.ts` 等，按功能拆分。
 
-### 4.5 Next.js `rewrites`（`next.config.ts`）
-
-- `/api-remote/:path*` → `NEXT_PUBLIC_API_BASE_URL`，用于前端以同源路径代理后端。
-- `/api-agent/:path*` → `http://localhost:7777`，用于独立 Agent 服务（若运行）。
-
 ## 5. Mastra 子系统
 
 详见 [mastra-server/README.md](../mastra-server/README.md)。要点：
 
 - `mastra-server/index.ts` 注册 agents（如 general、knowledge）、workflow、LibSQL storage、日志与 observability。
-- 与 Next 进程**同一 Node 运行时**内 import，无单独 HTTP 端口要求（与可选的 `localhost:7777` 外部服务不同）。
+- 与 Next 进程**同一 Node 运行时**内 import，无单独 HTTP 端口要求。独立的 `agent-server` 仍监听 `localhost:7777`，由调用方直接访问。
 
 ## 6. 前端状态与流式 UI
 

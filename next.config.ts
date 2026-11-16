@@ -77,16 +77,6 @@ const nextConfig: NextConfig = {
         source: "/saltline-fable-5.2",
         destination: "/saltline-fable-5.2/index.html",
       },
-      {
-        // 匹配所有以 /api-remote 开头的请求
-        source: "/api-remote/:path*",
-        // 转发到目标 HTTP 地址
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
-      },
-      {
-        source: "/api-agent/:path*",
-        destination: "http://localhost:7777/:path*",
-      },
     ];
   },
 };

@@ -44,7 +44,7 @@ formData.append("message", "hello");
 formData.append("stream", "true");
 formData.append("session_id", "your-session-id");
 
-fetch("/api-agent/agents/prosemirror-agent/runs", {
+fetch("http://localhost:7777/agents/prosemirror-agent/runs", {
   method: "POST",
   body: formData,
 });
