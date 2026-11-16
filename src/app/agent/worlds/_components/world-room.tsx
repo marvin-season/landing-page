@@ -73,12 +73,14 @@ function WorldNotes({
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
-          <p className="font-medium">自动叙事 · 故事主持人</p>
-          <p className="text-xs leading-6 text-muted-foreground">
-            根据世界设定与系统干预叙述场景、推进事件，并安排 NPC 自主接话。
-          </p>
-        </div>
+        {room.config.narration ? (
+          <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
+            <p className="font-medium">旁白</p>
+            <p className="text-xs leading-6 text-muted-foreground">
+              只负责场景和事件。对话角色不在自己的发言里写旁白。
+            </p>
+          </div>
+        ) : null}
         {room.config.characters.map((c) => (
           <div
             key={c.id}
@@ -209,7 +211,7 @@ function MessageBubble({
             {user
               ? "你 · 系统指令"
               : message.kind === "narrator"
-                ? "故事主持人"
+                ? "旁白"
                 : "NPC"}
           </span>
           <time>

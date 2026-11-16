@@ -188,6 +188,18 @@ export function WorldEditor({
               maxLength={4000}
               hint="例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
             />
+            <label className="flex items-center justify-between gap-4 rounded-xl border border-border px-4 py-3 text-sm">
+              <span>
+                <span className="font-medium">旁白</span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                  打开后由旁白叙述场景和事件。对话角色只说自己的话。
+                </span>
+              </span>
+              <Switch
+                checked={config.narration}
+                onCheckedChange={(narration) => update("narration", narration)}
+              />
+            </label>
           </FieldGroup>
         </section>
         <section className="flex flex-col gap-5">

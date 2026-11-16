@@ -89,6 +89,39 @@ async function conversationWithQuestion() {
   return { store, room };
 }
 
+test("narration stays with the dialogue characters until the switch is on", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  const started = await store.begin(
+    "alice",
+    room.id,
+    command({ mode: "step" }),
+  );
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    assert.match(input.messages[0].content, /旁白已关闭/);
+    assert.doesNotMatch(input.messages[0].content, /场景转移/);
+    return fakeComplete(input);
+  })("alice", started.room, new AbortController().signal, () => {});
+  const scene = await store.begin(
+    "alice",
+    room.id,
+    command({ mode: "step", text: "安排一个新的环境变化", resume: true }),
+  );
+  await createWorldEngine(store, async (input) => {
+    assert.equal(input.purpose, "actor");
+    assert.match(input.messages[1].content, /不要写成旁白/);
+    return fakeComplete(input);
+  })("alice", scene.room, new AbortController().signal, () => {});
+  const saved = await store.get("alice", room.id);
+  assert.equal(saved.messages.at(-1)?.kind, "agent");
+  assert.equal(
+    saved.messages.filter((message) => message.kind === "narrator").length,
+    0,
+  );
+  assert.equal(saved.config.narration, false);
+});
+
 test("NPC questions go to the addressed NPC and system naming retains priority", async () => {
   for (const [text, expected] of [
     ["周渡，联络船员。", "dispatcher"],
@@ -275,6 +308,9 @@ test("a running story applies a new intervention after aborting the old generati
 
 test("a scene intervention is narrated in one model call", async () => {
   const { store, room } = await conversationWithQuestion();
+  await store.change("alice", room.id, (current) => {
+    current.config.narration = true;
+  });
   const started = await store.begin(
     "alice",
     room.id,
@@ -384,6 +420,7 @@ test("repeated confirmations advance the scene in one narration", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);
   await store.change("alice", room.id, (r) => {
+    r.config.narration = true;
     appendMessage(r, {
       speakerId: "system",
       name: "系统",
@@ -878,7 +915,10 @@ test("ordinary unmentioned messages receive a selected actor response even when 
 
 test("system narration can be interrupted, retried and exported without becoming an NPC", async () => {
   const store = setup();
-  const room = await store.create("alice", exampleWorld);
+  const room = await store.create("alice", {
+    ...exampleWorld,
+    narration: true,
+  });
   const started = await store.begin(
     "alice",
     room.id,
@@ -927,6 +967,7 @@ test("a stalled exchange is narrated once, then an actor continues", async () =>
   const store = setup();
   const room = await store.create("alice", exampleWorld);
   await store.change("alice", room.id, (r) => {
+    r.config.narration = true;
     appendMessage(r, {
       speakerId: "system",
       name: "系统",

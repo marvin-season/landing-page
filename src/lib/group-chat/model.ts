@@ -26,6 +26,7 @@ const currentConfigSchema = z
     rules: text(4000),
     facts: text(4000),
     storyGoal: text(4000).default(""),
+    narration: z.boolean().default(false),
     characters: z.array(characterSchema).min(2).max(7),
     maxTurns: z.number().int().min(1).max(10),
   })

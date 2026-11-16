@@ -141,6 +141,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           const eligible = eligibleCharacters(room);
           const cue = mentioned ? undefined : interventionCue(room);
           const stalled = !mentioned && !cue && dialogueStalled(room);
+          const narrationOn = room.config.narration;
           const directSpeaker =
             !mentioned && !cue && !stalled
               ? directReplySpeaker(room)
@@ -155,36 +156,39 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           if (!speaker)
             throw new WorldError("no_characters", "没有可发言的角色");
           const narrating =
-            mentioned === "system" ||
-            cue?.ask === false ||
-            stalled ||
-            (!mentioned &&
-              !cue &&
-              !directSpeaker &&
-              !room.messages.some(
-                (m) =>
-                  m.status === "complete" &&
-                  (m.kind === "narrator" || m.kind === "agent"),
-              ));
-          const direction = cue
-            ? cue.ask
-              ? `用你自己的第一人称直接回应：${cue.text}`
-              : `把这条系统干预写成眼前可见的变化：${cue.text}`
+            narrationOn &&
+            (mentioned === "system" ||
+              cue?.ask === false ||
+              stalled ||
+              (!mentioned &&
+                !cue &&
+                !directSpeaker &&
+                !room.messages.some(
+                  (m) =>
+                    m.status === "complete" &&
+                    (m.kind === "narrator" || m.kind === "agent"),
+                )));
+          const spoken =
+            "只用对白接话。不要写旁白、场景、动作或心理。已经问过或确认过的不要再问。";
+          const direction = narrating
+            ? cue && !cue.ask
+              ? `把这条系统干预写成眼前可见的变化：${cue.text}`
+              : stalled
+                ? "刚才的交流已在重复或停在两人来回确认上。落实一个可见结果，让时间向前，并给出一个新的具体状况。不要复述角色刚才的原话。"
+                : "承接当前事件，给出一个可供角色回应的具体场景变化。"
             : stalled
-              ? "刚才的交流已在重复或停在两人来回确认上。落实一个可见结果，让时间向前，并给出一个新的具体状况。不要复述角色刚才的原话。"
-              : narrating
-                ? "承接当前事件，给出一个可供角色回应的具体场景变化。"
-                : "用第一人称直接说出你要说的话，不要写旁白或括号动作。承接最近的事，说出一个新的决定或你刚做完的事。已经问过或确认过的不要再问。";
+              ? "刚才的话在重复。用对白转到下一件事。不要写旁白。"
+              : cue
+                ? `用对白回应，不要写成旁白：${cue.text}`
+                : spoken;
           const messages = narrating
             ? narratorContext(room, direction)
             : actorContext(room, speaker, direction);
-          await phase(
-            narrating ? "系统正在推进剧情" : `${speaker.name} 正在回应`,
-          );
+          await phase(narrating ? "旁白正在叙述" : `${speaker.name} 正在回应`);
           await change((r) => {
             message = appendMessage(r, {
               speakerId: narrating ? "system" : speaker!.id,
-              name: narrating ? "系统" : speaker!.name,
+              name: narrating ? "旁白" : speaker!.name,
               kind: narrating ? "narrator" : "agent",
               text: "",
               status: "streaming",
