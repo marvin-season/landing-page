@@ -6,9 +6,9 @@ import {
   type WorldRoom,
 } from "./model";
 import type { ModelMessage } from "./provider";
+import { addressedCharacter, consecutiveActorTurns } from "./schedule";
 
 export const CONTEXT_CHARACTERS = 26000;
-const MAX_DIRECT_EXCHANGES = 4;
 const storyContinuity =
   "world.initialScene 是开场场景，world.initialFacts 是设定中的事实基线，人物资料中的当时动作、位置和心情也是起点，不是每轮重置的当前状态。以剧情摘要和按 seq 排序的公开历史判断此刻的时间、地点、物品、关系及已完成的行动；后续明确发生的变化覆盖起点中的临时状态，持续遵守世界规则。若旧规则要求每条只推进一小步，理解为不跳过其他角色的重要选择，而不是重复准备、试探或确认。已经回答的问题、做出的决定和完成的行动不要换一种说法再演一遍；从其结果继续。连续几条若只在重复确认、追问或同一种小动作，就停止重复，把当前这件事做完并转入下一件具体的事。每条回复带来与当前事件有关的新信息、明确表态、实际行动或可见结果，避免只有倒茶、视线、袖口等装饰性动作。可以完成自己能独立做完的日常行动，不必反复说打算做；需要他人同意的重要选择仍留给本人回应。一件事已有结果就自然进入下一件事，必要时允许合理的时间流逝和场景转移，但不越过世界规则、未决的重要选择或秘密边界。系统干预中的安排和角色的计划，只有在公开历史实际落实后才算已发生。";
 export function publicCharacter({
@@ -113,123 +113,6 @@ export function narratorContext(
   ]);
 }
 
-export function eligibleCharacters(room: WorldRoom) {
-  return room.config.characters.filter((c) => c.enabled);
-}
-
-function directlyAddresses(text: string, name: string) {
-  const value = text.trim();
-  if (
-    value === name ||
-    value.startsWith(`@${name}`) ||
-    ["，", ",", "：", ":"].some((punctuation) =>
-      value.startsWith(name + punctuation),
-    )
-  )
-    return true;
-  const tail = value.replace(/[？?！!。.\s]+$/u, "");
-  if (tail === name) return true;
-  if (!tail.endsWith(name)) return false;
-  return /[，,：:@、\s]$/u.test(tail.slice(0, -name.length));
-}
-
-function addressedCharacter(room: WorldRoom) {
-  const history = room.messages.filter(
-    (m) => m.status === "complete" && m.kind !== "system",
-  );
-  const latest = history.at(-1);
-  if (!latest || latest.kind === "narrator") return undefined;
-  const active = eligibleCharacters(room);
-  const addressed = active.find(
-    (c) => c.id !== latest.speakerId && directlyAddresses(latest.text, c.name),
-  );
-  if (addressed) return addressed;
-  return undefined;
-}
-function consecutiveActorTurns(room: WorldRoom) {
-  const history = room.messages.filter(
-    (message) => message.status === "complete" && message.kind !== "system",
-  );
-  return (
-    history.length -
-    1 -
-    history.findLastIndex((message) => message.kind !== "agent")
-  );
-}
-
-function publicHistory(room: WorldRoom) {
-  return room.messages.filter(
-    (message) => message.status === "complete" && message.kind !== "system",
-  );
-}
-function beatText(text: string, names: string[]) {
-  let value = text;
-  for (const name of [...names].sort((a, b) => b.length - a.length))
-    value = value.split(name).join("");
-  return value.replace(/[\s，。！？、,.!?:：；;（）()「」《》""“”@]/gu, "");
-}
-function similarBeat(left: string, right: string) {
-  if (!left || !right) return false;
-  if (left === right) return true;
-  const shorter = left.length < right.length ? left : right;
-  const longer = left.length < right.length ? right : left;
-  if (shorter.length >= 6 && longer.includes(shorter)) return true;
-  if (shorter.length < 4) return false;
-  const grams = (value: string) => {
-    const set = new Set<string>();
-    for (let index = 0; index < value.length - 1; index += 1)
-      set.add(value.slice(index, index + 2));
-    return set;
-  };
-  const leftGrams = grams(left);
-  const rightGrams = grams(right);
-  let shared = 0;
-  for (const gram of leftGrams) if (rightGrams.has(gram)) shared += 1;
-  const smaller = Math.min(leftGrams.size, rightGrams.size);
-  return smaller > 0 && shared / smaller >= 0.6;
-}
-export function dialogueStalled(room: WorldRoom) {
-  const history = publicHistory(room);
-  const start = history.findLastIndex((message) => message.kind !== "agent");
-  const tail = history.slice(start + 1);
-  if (tail.length < 3) return false;
-  const names = eligibleCharacters(room).map((character) => character.name);
-  const recent = tail.slice(-3).map((message) => beatText(message.text, names));
-  if (recent.every((beat) => similarBeat(beat, recent[2]))) return true;
-  if (tail.length < 4) return false;
-  const speakers = new Set(tail.slice(-4).map((message) => message.speakerId));
-  return speakers.size <= 2;
-}
-export function interventionCue(room: WorldRoom) {
-  const latest = publicHistory(room).at(-1);
-  if (latest?.kind !== "intervention") return undefined;
-  if (addressedCharacter(room)) return undefined;
-  return { ask: /[?？]\s*$/u.test(latest.text), text: latest.text };
-}
-export function directReplySpeaker(room: WorldRoom) {
-  // Stop name-to-name replies after four actor lines so a later turn can advance the scene.
-  if (consecutiveActorTurns(room) >= MAX_DIRECT_EXCHANGES) return undefined;
-  return addressedCharacter(room);
-}
-
-export function fallbackSpeaker(
-  room: WorldRoom,
-  eligible = eligibleCharacters(room),
-) {
-  const recent = room.messages
-    .filter((m) => m.kind === "agent" && m.status === "complete")
-    .slice(-room.config.characters.length * 2);
-  return [...eligible].sort((a, b) => {
-    const countA = recent.filter((m) => m.speakerId === a.id).length;
-    const countB = recent.filter((m) => m.speakerId === b.id).length;
-    return (
-      countA - countB ||
-      recent.findLastIndex((m) => m.speakerId === a.id) -
-        recent.findLastIndex((m) => m.speakerId === b.id) ||
-      a.id.localeCompare(b.id)
-    );
-  })[0];
-}
 export function directorContext(
   room: WorldRoom,
   eligible: Character[],

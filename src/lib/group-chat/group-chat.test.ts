@@ -4,8 +4,6 @@ import { type Client, createClient } from "@libsql/client";
 import {
   actorContext,
   directorContext,
-  eligibleCharacters,
-  fallbackSpeaker,
   narratorContext,
   parseSelection,
   summaryContext,
@@ -21,6 +19,7 @@ import {
   type WorldEvent,
 } from "./model";
 import type { Complete } from "./provider";
+import { eligibleCharacters, fallbackSpeaker } from "./schedule";
 import { appendMessage, createWorldStore } from "./store";
 import { exampleWorld } from "./world-templates";
 
