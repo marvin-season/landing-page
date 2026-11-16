@@ -293,39 +293,37 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
-          <SheetHeader>
+        <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
+          <SheetHeader className="shrink-0 border-b border-border pr-12">
             <SheetTitle>创建你的世界</SheetTitle>
             <SheetDescription>
               设定背景、NPC
               和推进要求。创建并进入世界后自动开始，保存预设不会调用模型。
             </SheetDescription>
           </SheetHeader>
-          <div className="px-5 pb-5">
-            {editing ? (
-              <WorldEditor
-                initial={editing}
-                presets={presets.data?.presets}
-                onPresetSaved={() => {
-                  void queryClient.invalidateQueries({
-                    queryKey: ["world-presets"],
-                  });
-                }}
-                onCancel={() => setEditing(null)}
-                onSave={async (config) => {
-                  const result = await worldRequest<{ room: WorldRoom }>(
-                    "rooms",
-                    "POST",
-                    config,
-                  );
-                  void queryClient.invalidateQueries({
-                    queryKey: ["world-rooms"],
-                  });
-                  router.push(`/agent/worlds/${result.room.id}`);
-                }}
-              />
-            ) : null}
-          </div>
+          {editing ? (
+            <WorldEditor
+              initial={editing}
+              presets={presets.data?.presets}
+              onPresetSaved={() => {
+                void queryClient.invalidateQueries({
+                  queryKey: ["world-presets"],
+                });
+              }}
+              onCancel={() => setEditing(null)}
+              onSave={async (config) => {
+                const result = await worldRequest<{ room: WorldRoom }>(
+                  "rooms",
+                  "POST",
+                  config,
+                );
+                void queryClient.invalidateQueries({
+                  queryKey: ["world-rooms"],
+                });
+                router.push(`/agent/worlds/${result.room.id}`);
+              }}
+            />
+          ) : null}
         </SheetContent>
       </Sheet>
     </div>

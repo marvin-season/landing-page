@@ -428,6 +428,93 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       /* Configuration can still be edited without preset discovery. */
     }
   }
+  const archiveActions = () => {
+    return (
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={actionPending}
+          onClick={() =>
+            void action(async () => {
+              const response = await fetch(
+                `/api/group-chat/rooms/${room.id}/export?format=markdown`,
+              );
+              if (!response.ok) throw new Error("导出失败");
+              downloadText(
+                `${room.config.title}.md`,
+                await response.text(),
+                "text/markdown",
+              );
+            })
+          }
+        >
+          <Download data-icon="inline-start" />
+          导出对话
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={actionPending}
+          onClick={() =>
+            void action(async () => {
+              if (
+                !window.confirm(
+                  "完整备份包含所有角色的秘密和私有设定，请妥善保管。是否导出？",
+                )
+              )
+                return;
+              const data = await worldRequest(`rooms/${room.id}/export`);
+              downloadText(
+                `${room.config.title}.json`,
+                JSON.stringify(data, null, 2),
+              );
+            })
+          }
+        >
+          完整备份
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setCopying(true);
+            setEditing(structuredClone(room.config));
+          }}
+        >
+          <Copy data-icon="inline-start" />
+          复制世界
+        </Button>
+        {!ended ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={actionPending}
+            onClick={() =>
+              void action(async () => {
+                if (
+                  !window.confirm(
+                    "结束这个故事？结束后只能查看与导出，也可以复制配置创建新世界。",
+                  )
+                )
+                  return;
+                const data = await worldRequest<{ room: WorldRoom }>(
+                  `rooms/${room.id}`,
+                  "PATCH",
+                  { action: "end" },
+                );
+                chat.setRoom(data.room);
+                setEditing(null);
+              })
+            }
+          >
+            <Flag data-icon="inline-start" />
+            结束故事
+          </Button>
+        ) : null}
+      </div>
+    );
+  };
   return (
     <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-4 sm:px-6">
@@ -707,8 +794,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
-          <SheetHeader>
+        <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
+          <SheetHeader className="shrink-0 border-b border-border pr-12">
             <SheetTitle>
               {copying ? "复制为新世界" : "世界设定与存档"}
             </SheetTitle>
@@ -716,95 +803,13 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               修改设定只影响后续对话。秘密仅提供给对应角色。
             </SheetDescription>
           </SheetHeader>
-          <div className="flex flex-col gap-6 px-5 pb-5">
-            {!copying ? (
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={actionPending}
-                  onClick={() =>
-                    void action(async () => {
-                      const response = await fetch(
-                        `/api/group-chat/rooms/${room.id}/export?format=markdown`,
-                      );
-                      if (!response.ok) throw new Error("导出失败");
-                      downloadText(
-                        `${room.config.title}.md`,
-                        await response.text(),
-                        "text/markdown",
-                      );
-                    })
-                  }
-                >
-                  <Download data-icon="inline-start" />
-                  导出对话
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={actionPending}
-                  onClick={() =>
-                    void action(async () => {
-                      if (
-                        !window.confirm(
-                          "完整备份包含所有角色的秘密和私有设定，请妥善保管。是否导出？",
-                        )
-                      )
-                        return;
-                      const data = await worldRequest(
-                        `rooms/${room.id}/export`,
-                      );
-                      downloadText(
-                        `${room.config.title}.json`,
-                        JSON.stringify(data, null, 2),
-                      );
-                    })
-                  }
-                >
-                  完整备份
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setCopying(true);
-                    setEditing(structuredClone(room.config));
-                  }}
-                >
-                  <Copy data-icon="inline-start" />
-                  复制世界
-                </Button>
-                {!ended ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={actionPending}
-                    onClick={() =>
-                      void action(async () => {
-                        if (
-                          !window.confirm(
-                            "结束这个故事？结束后只能查看与导出，也可以复制配置创建新世界。",
-                          )
-                        )
-                          return;
-                        const data = await worldRequest<{ room: WorldRoom }>(
-                          `rooms/${room.id}`,
-                          "PATCH",
-                          { action: "end" },
-                        );
-                        chat.setRoom(data.room);
-                        setEditing(null);
-                      })
-                    }
-                  >
-                    <Flag data-icon="inline-start" />
-                    结束故事
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
-            {editing && (!ended || copying) ? (
+          {editing && (!ended || copying) ? (
+            <>
+              {!copying ? (
+                <div className="shrink-0 border-b border-border px-5 py-3">
+                  {archiveActions()}
+                </div>
+              ) : null}
               <WorldEditor
                 key={`${copying}-${room.version}`}
                 initial={editing}
@@ -835,8 +840,12 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   setEditing(null);
                 }}
               />
-            ) : null}
-          </div>
+            </>
+          ) : (
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+              {archiveActions()}
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>
