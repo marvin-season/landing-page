@@ -287,7 +287,7 @@ export function useAiInput<T = unknown>({
           role: "combobox",
           "aria-autocomplete": "list",
           "aria-label": label ?? placeholder ?? "Message",
-          class: "max-h-40 min-h-20 overflow-y-auto outline-none",
+          class: "max-h-40 overflow-y-auto outline-none",
         },
         handleKeyDown: (_view, event) => {
           if (mentionOpenRef.current) return false;

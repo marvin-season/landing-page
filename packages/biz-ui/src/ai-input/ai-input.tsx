@@ -3,7 +3,7 @@
 import { Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { Tiptap } from "@tiptap/react";
-import type { ReactNode, Ref } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { MentionMenu } from "./mention-menu";
 import type { AiInputHandle, AiInputSubmitValue, AiMentionItem } from "./types";
 import { useAiInput } from "./use-ai-input";
@@ -88,8 +88,8 @@ export type AiInputProps<T = unknown> = {
 };
 
 const editorCls = cn(
-  "max-h-40 min-h-20 w-full bg-transparent",
-  "[&_.tiptap]:min-h-20 [&_.tiptap]:max-h-40 [&_.tiptap]:overflow-y-auto [&_.tiptap]:bg-transparent [&_.tiptap]:text-sm [&_.tiptap]:leading-6 [&_.tiptap]:outline-none",
+  "max-h-40 w-full bg-transparent",
+  "[&_.tiptap]:max-h-40 [&_.tiptap]:min-h-[var(--ai-input-min-height)] [&_.tiptap]:overflow-y-auto [&_.tiptap]:bg-transparent [&_.tiptap]:text-sm [&_.tiptap]:leading-6 [&_.tiptap]:outline-none",
   "[&_.tiptap_p]:m-0",
   "[&_.tiptap_.is-editor-empty:first-child::before]:pointer-events-none [&_.tiptap_.is-editor-empty:first-child::before]:float-left [&_.tiptap_.is-editor-empty:first-child::before]:h-0 [&_.tiptap_.is-editor-empty:first-child::before]:text-muted-foreground [&_.tiptap_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]",
 );
@@ -122,6 +122,11 @@ export function AiInput<T = unknown>({
     removeMention,
     onStop,
   } = useAiInput(props);
+  const minHeight = `${Math.max(rows, 1) * 1.5}rem`;
+  const editorStyle = {
+    minHeight,
+    "--ai-input-min-height": minHeight,
+  } as CSSProperties;
 
   return (
     <form
@@ -180,15 +185,11 @@ export function AiInput<T = unknown>({
               editorCls,
               disabled && "cursor-not-allowed opacity-50",
             )}
-            style={{ minHeight: `${Math.max(rows, 1) * 1.5}rem` }}
+            style={editorStyle}
           />
         </Tiptap>
       ) : (
-        <div
-          aria-hidden
-          className={editorCls}
-          style={{ minHeight: `${Math.max(rows, 1) * 1.5}rem` }}
-        />
+        <div aria-hidden className={editorCls} style={editorStyle} />
       )}
       <div className="mt-2 flex items-center justify-between gap-3">
         <div className="min-w-0 text-[11px] text-muted-foreground">

@@ -5,6 +5,10 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Collapsible,
+  CollapsibleChevron,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Select,
   SelectContent,
   SelectItem,
@@ -174,6 +178,43 @@ function WorldNotes({
   );
 }
 
+function isUnfinishedReply(message: WorldMessage) {
+  return (
+    message.kind !== "system" &&
+    message.status !== "complete" &&
+    message.status !== "streaming"
+  );
+}
+
+function transcriptRows(messages: WorldMessage[]) {
+  const unfinished = messages.filter(isUnfinishedReply);
+  const visible = new Set(unfinished.slice(-2).map((message) => message.id));
+  type Row =
+    | { type: "message"; message: WorldMessage }
+    | { type: "folded"; id: string; messages: WorldMessage[] };
+  const rows: Row[] = [];
+  let folded: WorldMessage[] = [];
+  const flush = () => {
+    if (!folded.length) return;
+    rows.push({ type: "folded", id: folded[0]!.id, messages: folded });
+    folded = [];
+  };
+  for (const message of messages) {
+    if (
+      unfinished.length > 2 &&
+      isUnfinishedReply(message) &&
+      !visible.has(message.id)
+    ) {
+      folded.push(message);
+      continue;
+    }
+    flush();
+    rows.push({ type: "message", message });
+  }
+  flush();
+  return rows;
+}
+
 function MessageBubble({
   message,
   characters,
@@ -194,8 +235,7 @@ function MessageBubble({
     )
     .filter((name) => !message.text.includes(name));
   const text = [...missingMentions, message.text].filter(Boolean).join(" ");
-  const unfinished =
-    message.status !== "complete" && message.status !== "streaming";
+  const unfinished = isUnfinishedReply(message);
   const character = characters.find((item) => item.id === message.speakerId);
   const role = narrator
     ? message.operator
@@ -265,6 +305,39 @@ function MessageBubble({
   );
 }
 
+function UnfinishedReplyStack({
+  messages,
+  characters,
+  onRetry,
+}: {
+  messages: WorldMessage[];
+  characters: Character[];
+  onRetry: (message: WorldMessage) => (() => void) | undefined;
+}) {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger className="group/collapsible-trigger flex w-full cursor-pointer items-center gap-2 border-b border-border py-3 text-left text-xs text-muted-foreground">
+        <CollapsibleChevron />
+        <span>
+          {messages.length > 1
+            ? `${messages.length} 条未完成回复 · 不计入后续剧情`
+            : "未完成 · 不计入后续剧情"}
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        {messages.map((message) => (
+          <MessageBubble
+            key={message.id}
+            message={message}
+            characters={characters}
+            onRetry={onRetry(message)}
+          />
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 function inputPlaceholder(speaker: string, label: string) {
   if (speaker === "narrator")
     return "写下旁白，例如：雨停了，控制室里只剩对讲机的电流声。";
@@ -302,7 +375,7 @@ function InputSpeakerSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="mb-1.5 flex items-center gap-1.5">
+    <div className="mb-1 flex items-center gap-1.5">
       <span className="text-xs text-muted-foreground">输入身份</span>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
@@ -399,6 +472,26 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         ? "旁白"
         : (speakingCharacter?.label ?? "系统");
   const latestMessage = room.messages.filter((m) => m.kind !== "system").at(-1);
+  function retryFor(message: WorldMessage) {
+    if (
+      running ||
+      ended ||
+      message.id !== latestMessage?.id ||
+      !["agent", "narrator"].includes(message.kind) ||
+      !["interrupted", "failed", "truncated"].includes(message.status) ||
+      message.configVersion !== room.version
+    )
+      return undefined;
+    return () =>
+      chat.start({
+        mode: "retry",
+        text: "",
+        mentions: [],
+        speaker: "system",
+        resume: true,
+        retryMessageId: message.id,
+      });
+  }
   function addMention(id: string) {
     const item = mentionItems.find((c) => c.id === id);
     if (item && !mentions.some((mention) => mention.id === id)) {
@@ -601,38 +694,28 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   </p>
                 </div>
               ) : null}
-              {room.messages.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                  characters={room.config.characters}
-                  onRetry={
-                    !running &&
-                    !ended &&
-                    message.id === latestMessage?.id &&
-                    ["agent", "narrator"].includes(message.kind) &&
-                    ["interrupted", "failed", "truncated"].includes(
-                      message.status,
-                    ) &&
-                    message.configVersion === room.version
-                      ? () =>
-                          chat.start({
-                            mode: "retry",
-                            text: "",
-                            mentions: [],
-                            speaker: "system",
-                            resume: true,
-                            retryMessageId: message.id,
-                          })
-                      : undefined
-                  }
-                />
-              ))}
+              {transcriptRows(room.messages).map((row) =>
+                row.type === "folded" ? (
+                  <UnfinishedReplyStack
+                    key={row.id}
+                    messages={row.messages}
+                    characters={room.config.characters}
+                    onRetry={retryFor}
+                  />
+                ) : (
+                  <MessageBubble
+                    key={row.message.id}
+                    message={row.message}
+                    characters={room.config.characters}
+                    onRetry={retryFor(row.message)}
+                  />
+                ),
+              )}
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
-          <footer className="shrink-0 border-t border-border px-4 py-3 sm:px-6">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
+          <footer className="shrink-0 border-t border-border px-4 py-2 sm:px-6">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-2">
               {chat.error ? (
                 <Alert className="text-destructive">
                   <AlertDescription>
@@ -703,7 +786,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     </span>
                   </div>
                   <AiInput
-                    className="rounded-2xl shadow-none"
+                    className="rounded-2xl p-2 shadow-none"
                     value={draft}
                     onValueChange={setDraft}
                     mentions={mentions}
@@ -717,7 +800,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                         : Boolean(draft.trim())
                     }
                     maxLength={8000}
-                    rows={2}
+                    rows={1}
                     onSubmit={() => send()}
                     placeholder={inputPlaceholder(speaker, speakerLabel)}
                     sendLabel={
