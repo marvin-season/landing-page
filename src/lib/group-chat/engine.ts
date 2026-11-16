@@ -1,12 +1,12 @@
 import type { WorldAgentPurpose } from "~/mastra-server/agents/world-agents";
 import {
   actorContext,
-  directorContext,
+  dialogueStalled,
   directReplySpeaker,
   eligibleCharacters,
   fallbackSpeaker,
+  interventionCue,
   narratorContext,
-  parseSelection,
   summaryBatch,
   summaryContext,
 } from "./context";
@@ -139,11 +139,14 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           }
           const mentioned = room.run!.mentions[turn];
           const eligible = eligibleCharacters(room);
-          const directSpeaker = !mentioned
-            ? directReplySpeaker(room)
-            : undefined;
+          const cue = mentioned ? undefined : interventionCue(room);
+          const stalled = !mentioned && !cue && dialogueStalled(room);
+          const directSpeaker =
+            !mentioned && !cue && !stalled
+              ? directReplySpeaker(room)
+              : undefined;
           const fallback = fallbackSpeaker(room, eligible);
-          let speaker =
+          const speaker =
             mentioned && mentioned !== "system"
               ? room.config.characters.find(
                   (c) => c.id === mentioned && c.enabled,
@@ -151,62 +154,27 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
               : (directSpeaker ?? fallback ?? eligible[0]);
           if (!speaker)
             throw new WorldError("no_characters", "没有可发言的角色");
-          let narrating =
+          const narrating =
             mentioned === "system" ||
+            cue?.ask === false ||
+            stalled ||
             (!mentioned &&
+              !cue &&
               !directSpeaker &&
               !room.messages.some(
-                (m) => m.kind === "narrator" && m.status === "complete",
+                (m) =>
+                  m.status === "complete" &&
+                  (m.kind === "narrator" || m.kind === "agent"),
               ));
-          let direction = narrating
-            ? "承接当前事件，给出一个可供角色回应的具体场景变化。"
-            : "承接最近已发生的事，直接回应尚未解决的问题，并落实行动、给出新的进展或结果。";
-          let preparedNarration: string | undefined;
-          if (!mentioned && !narrating && !directSpeaker) {
-            await phase("系统正在安排剧情");
-            try {
-              const text = await call(
-                "director",
-                process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model,
-                directorContext(room, eligible),
-                1500,
-                undefined,
-                8000,
-              );
-              const selected = parseSelection(text, eligible);
-              if (selected.action === "speak") {
-                speaker = selected.character;
-                direction = selected.direction;
-              } else if (
-                selected.action === "narrate" &&
-                room.messages
-                  .filter((m) => m.status === "complete" && m.kind !== "system")
-                  .at(-1)?.kind !== "narrator"
-              ) {
-                narrating = true;
-                direction = selected.direction;
-                preparedNarration = selected.text;
-              } else {
-                speaker = fallback!;
-                direction =
-                  "落实仍未完成的系统干预，承接最近事件的结果并自主完成一个具体行动，不重演已完成的事，不等待操作者输入。";
-              }
-            } catch (error) {
-              if (
-                signal.aborted ||
-                storageError ||
-                (error instanceof WorldError &&
-                  [
-                    "stopped",
-                    "budget",
-                    "tools_disabled",
-                    "proxy_auth",
-                  ].includes(error.code))
-              )
-                throw error;
-              // One failed director attempt uses the deterministic speaker, never a repair loop.
-            }
-          }
+          const direction = cue
+            ? cue.ask
+              ? `用你自己的第一人称直接回应：${cue.text}`
+              : `把这条系统干预写成眼前可见的变化：${cue.text}`
+            : stalled
+              ? "刚才的交流已在重复或停在两人来回确认上。落实一个可见结果，让时间向前，并给出一个新的具体状况。不要复述角色刚才的原话。"
+              : narrating
+                ? "承接当前事件，给出一个可供角色回应的具体场景变化。"
+                : "用第一人称直接说出你要说的话，不要写旁白或括号动作。承接最近的事，说出一个新的决定或你刚做完的事。已经问过或确认过的不要再问。";
           const messages = narrating
             ? narratorContext(room, direction)
             : actorContext(room, speaker, direction);
@@ -230,38 +198,36 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
           const model = narrating
             ? process.env.GROUP_CHAT_DIRECTOR_MODEL || speaker.model
             : speaker.model;
-          const text =
-            preparedNarration ??
-            (await call(
-              narrating ? "narrator" : "actor",
-              model,
-              messages,
-              2000,
-              (delta) => {
-                if (signal.aborted) return;
-                partial += delta;
-                send({ type: "delta", messageId: message!.id, text: delta });
-                if (Date.now() - lastCheckpoint > 500) {
-                  const snapshot = partial;
-                  const messageId = message!.id;
-                  lastCheckpoint = Date.now();
-                  checkpoint = checkpoint
-                    .then(() =>
-                      store.during(ownerId, roomId, runId, (r) => {
-                        const current = r.messages.find(
-                          (m) => m.id === messageId,
-                        );
-                        if (current?.status === "streaming")
-                          current.text = snapshot;
-                      }),
-                    )
-                    .catch((error: unknown) => {
-                      storageError = error;
-                      controller.abort();
-                    });
-                }
-              },
-            ));
+          const text = await call(
+            narrating ? "narrator" : "actor",
+            model,
+            messages,
+            2000,
+            (delta) => {
+              if (signal.aborted) return;
+              partial += delta;
+              send({ type: "delta", messageId: message!.id, text: delta });
+              if (Date.now() - lastCheckpoint > 500) {
+                const snapshot = partial;
+                const messageId = message!.id;
+                lastCheckpoint = Date.now();
+                checkpoint = checkpoint
+                  .then(() =>
+                    store.during(ownerId, roomId, runId, (r) => {
+                      const current = r.messages.find(
+                        (m) => m.id === messageId,
+                      );
+                      if (current?.status === "streaming")
+                        current.text = snapshot;
+                    }),
+                  )
+                  .catch((error: unknown) => {
+                    storageError = error;
+                    controller.abort();
+                  });
+              }
+            },
+          );
           await checkpoint;
           if (storageError) throw storageError;
           await change((r) => {

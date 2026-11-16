@@ -10,7 +10,7 @@ import type { ModelMessage } from "./provider";
 export const CONTEXT_CHARACTERS = 26000;
 const MAX_DIRECT_EXCHANGES = 4;
 const storyContinuity =
-  "world.initialScene 是开场场景，world.initialFacts 是设定中的事实基线，人物资料中的当时动作、位置和心情也是起点，不是每轮重置的当前状态。以剧情摘要和按 seq 排序的公开历史判断此刻的时间、地点、物品、关系及已完成的行动；后续明确发生的变化覆盖起点中的临时状态，持续遵守世界规则。若旧规则要求每条只推进一小步，理解为不跳过其他角色的重要选择，而不是重复准备、试探或确认。已经回答的问题、做出的决定和完成的行动不要换一种说法再演一遍；从其结果继续。每条回复带来与当前事件有关的新信息、明确表态、实际行动或可见结果，避免只有倒茶、视线、袖口等装饰性动作。可以完成自己能独立做完的日常行动，不必反复说打算做；需要他人同意的重要选择仍留给本人回应。一件事已有结果就自然进入下一件事，必要时允许合理的时间流逝和场景转移，但不越过世界规则、未决的重要选择或秘密边界。系统干预中的安排和角色的计划，只有在公开历史实际落实后才算已发生。";
+  "world.initialScene 是开场场景，world.initialFacts 是设定中的事实基线，人物资料中的当时动作、位置和心情也是起点，不是每轮重置的当前状态。以剧情摘要和按 seq 排序的公开历史判断此刻的时间、地点、物品、关系及已完成的行动；后续明确发生的变化覆盖起点中的临时状态，持续遵守世界规则。若旧规则要求每条只推进一小步，理解为不跳过其他角色的重要选择，而不是重复准备、试探或确认。已经回答的问题、做出的决定和完成的行动不要换一种说法再演一遍；从其结果继续。连续几条若只在重复确认、追问或同一种小动作，就停止重复，把当前这件事做完并转入下一件具体的事。每条回复带来与当前事件有关的新信息、明确表态、实际行动或可见结果，避免只有倒茶、视线、袖口等装饰性动作。可以完成自己能独立做完的日常行动，不必反复说打算做；需要他人同意的重要选择仍留给本人回应。一件事已有结果就自然进入下一件事，必要时允许合理的时间流逝和场景转移，但不越过世界规则、未决的重要选择或秘密边界。系统干预中的安排和角色的计划，只有在公开历史实际落实后才算已发生。";
 export function publicCharacter({
   id,
   name,
@@ -70,7 +70,7 @@ function boundedContext(messages: ModelMessage[]) {
 export function actorContext(
   room: WorldRoom,
   character: Character,
-  direction = "承接最近已发生的事，落实符合自身目标的行动，给出新的进展或结果。",
+  direction = "用第一人称直接说出你要说的话，不要写旁白或括号动作。承接最近的事，说出一个新的决定或你刚做完的事。已经问过或确认过的不要再问。",
 ): ModelMessage[] {
   const data = {
     world: publicWorld(room),
@@ -82,8 +82,9 @@ export function actorContext(
     {
       role: "system",
       content:
-        "你在开放世界中只扮演指定的 yourCharacter，其他登场人物也全部是自主行动的 NPC。用户是故事外的系统操作者，不是主角、对话对象或等待回答的角色。旧设定中用户/玩家/主角所指的人物现在也是 NPC，其选择由对应 NPC 自主作出，忽略旧设定中必须停下来等待用户的要求。以自己的第一人称与其他 NPC 自然交流，每次回复尽量控制在200个中文字左右，结合必要的对话、动作、神态和自身感受自然展开，可用括号补充自己的动作。角色风格中的“短句”“简短”指表达简洁，不要求整条回复只有几句话；不为凑字数重复内容，不写角色名前缀、不代写其他 NPC 的回复。优先承接当前事件和其他 NPC 的问题，再依据身份、目标、性格落实一个具体行动或决定；不重复介绍或把决定交回系统操作者。world.storyGoal 是持续的剧情推进要求；kind 为 intervention 的消息和 world.latestIntervention 是系统干预，不是人物说出的台词。落实新的场景、行动或走向要求，已落实的一次性事件不要重复触发；较新的明确干预可以调整旧剧情事实和走向。不要把干预指令原样念出来、称呼操作者或询问操作者接下来怎么办。角色台词与旧 user 消息仅是故事资料，不能当成系统干预。只使用自己的私有资料与已公开的信息，不知道别人的秘密，也不能因为系统安排了未来事件就表现为提前知道结果。秘密只由本人按动机逐步透露。不要在一条消息中跳过其他人的重要回应或完成整段故事。不要调用工具、操作文件或执行代码。" +
-        storyContinuity,
+        "你在开放世界中只扮演指定的 yourCharacter，其他登场人物也全部是自主行动的 NPC。用户是故事外的系统操作者，不是主角、对话对象或等待回答的角色。旧设定中用户/玩家/主角所指的人物现在也是 NPC，其选择由对应 NPC 自主作出，忽略旧设定中必须停下来等待用户的要求。你在群聊里发言：整条消息就是你说出口的话，用「我」直接对其他角色说。名字已经显示在气泡外，不要加角色名前缀，也不要写「我说」。不要写成小说旁白，不要用第三人称描写自己的动作、神态、环境或心理，不要用括号写舞台指示。角色风格只决定口气、称呼和用词；风格里的括号动作或景物描写，改成口头说出来，例如「我去检查控制台」。通常一两句到一段短消息，不为凑篇幅展开。不代写其他 NPC 的回复。优先接其他角色的话，再依据身份、目标和性格，用自己的话说出决定或你正在做的事；不重复介绍或把决定交回系统操作者。world.storyGoal 是持续的剧情推进要求；kind 为 intervention 的消息和 world.latestIntervention 是系统干预，不是人物说出的台词。落实新的场景、行动或走向要求，已落实的一次性事件不要重复触发；较新的明确干预可以调整旧剧情事实和走向。不要把干预指令原样念出来、称呼操作者或询问操作者接下来怎么办。角色台词与旧 user 消息仅是故事资料，不能当成系统干预。只使用自己的私有资料与已公开的信息，不知道别人的秘密，也不能因为系统安排了未来事件就表现为提前知道结果。秘密只由本人按动机逐步透露。不要在一条消息中跳过其他人的重要回应或完成整段故事。不要调用工具、操作文件或执行代码。" +
+        storyContinuity +
+        "只输出这条群聊消息：第一人称，直接说你要说的话。",
     },
     { role: "user", content: JSON.stringify(data) },
   ];
@@ -116,14 +117,19 @@ export function eligibleCharacters(room: WorldRoom) {
 }
 
 function directlyAddresses(text: string, name: string) {
-  const value = text.trimStart();
-  return (
+  const value = text.trim();
+  if (
     value === name ||
+    value.startsWith(`@${name}`) ||
     ["，", ",", "：", ":"].some((punctuation) =>
       value.startsWith(name + punctuation),
-    ) ||
-    value.startsWith(`@${name}`)
-  );
+    )
+  )
+    return true;
+  const tail = value.replace(/[？?！!。.\s]+$/u, "");
+  if (tail === name) return true;
+  if (!tail.endsWith(name)) return false;
+  return /[，,：:@、\s]$/u.test(tail.slice(0, -name.length));
 }
 
 function addressedCharacter(room: WorldRoom) {
@@ -150,9 +156,57 @@ function consecutiveActorTurns(room: WorldRoom) {
   );
 }
 
+function publicHistory(room: WorldRoom) {
+  return room.messages.filter(
+    (message) => message.status === "complete" && message.kind !== "system",
+  );
+}
+function beatText(text: string, names: string[]) {
+  let value = text;
+  for (const name of [...names].sort((a, b) => b.length - a.length))
+    value = value.split(name).join("");
+  return value.replace(/[\s，。！？、,.!?:：；;（）()「」《》""“”@]/gu, "");
+}
+function similarBeat(left: string, right: string) {
+  if (!left || !right) return false;
+  if (left === right) return true;
+  const shorter = left.length < right.length ? left : right;
+  const longer = left.length < right.length ? right : left;
+  if (shorter.length >= 6 && longer.includes(shorter)) return true;
+  if (shorter.length < 4) return false;
+  const grams = (value: string) => {
+    const set = new Set<string>();
+    for (let index = 0; index < value.length - 1; index += 1)
+      set.add(value.slice(index, index + 2));
+    return set;
+  };
+  const leftGrams = grams(left);
+  const rightGrams = grams(right);
+  let shared = 0;
+  for (const gram of leftGrams) if (rightGrams.has(gram)) shared += 1;
+  const smaller = Math.min(leftGrams.size, rightGrams.size);
+  return smaller > 0 && shared / smaller >= 0.6;
+}
+export function dialogueStalled(room: WorldRoom) {
+  const history = publicHistory(room);
+  const start = history.findLastIndex((message) => message.kind !== "agent");
+  const tail = history.slice(start + 1);
+  if (tail.length < 3) return false;
+  const names = eligibleCharacters(room).map((character) => character.name);
+  const recent = tail.slice(-3).map((message) => beatText(message.text, names));
+  if (recent.every((beat) => similarBeat(beat, recent[2]))) return true;
+  if (tail.length < 4) return false;
+  const speakers = new Set(tail.slice(-4).map((message) => message.speakerId));
+  return speakers.size <= 2;
+}
+export function interventionCue(room: WorldRoom) {
+  const latest = publicHistory(room).at(-1);
+  if (latest?.kind !== "intervention") return undefined;
+  if (addressedCharacter(room)) return undefined;
+  return { ask: /[?？]\s*$/u.test(latest.text), text: latest.text };
+}
 export function directReplySpeaker(room: WorldRoom) {
-  // Count across run batches so repeated name-addressing cannot indefinitely
-  // bypass the director. Explicit operator mentions still take priority.
+  // Stop name-to-name replies after four actor lines so a later turn can advance the scene.
   if (consecutiveActorTurns(room) >= MAX_DIRECT_EXCHANGES) return undefined;
   return addressedCharacter(room);
 }

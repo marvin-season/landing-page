@@ -71,7 +71,7 @@ export const configSchema = z.preprocess((input) => {
       goal: "结合当前处境和个人身份，自主作出决定并推进故事。",
       publicInfo: role,
       privateInfo: "",
-      style: "用第一人称简短回应，以具体行动推进剧情。",
+      style: "用第一人称直接说话，像在群聊里发言。",
       model:
         cast.find((character) => character.enabled)?.model || "cursor/auto",
       enabled: true,

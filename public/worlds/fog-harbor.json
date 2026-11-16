@@ -53,7 +53,7 @@
       "goal": "根据新线索安排团队分工，帮助大家脱困。",
       "publicInfo": "负责协调团队优先处理的目标。",
       "privateInfo": "",
-      "style": "用第一人称简短回应，以具体行动推进剧情。",
+      "style": "用第一人称直接说话，像在群聊里发言。",
       "model": "cursor/auto",
       "enabled": true
     }
