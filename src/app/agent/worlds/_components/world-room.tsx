@@ -193,21 +193,14 @@ function MessageBubble({
     message.status !== "complete" && message.status !== "streaming";
   return (
     <article className={cn("flex gap-3", user && "flex-row-reverse")}>
-      {message.kind === "agent" || message.kind === "user" ? (
-        <CharacterAvatar
-          id={message.kind === "user" ? "former-player" : message.speakerId}
-          name={message.name}
-        />
-      ) : (
-        <div
-          className={cn(
-            "flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold",
-            user && "bg-primary/10 text-primary",
-          )}
-        >
-          {displayName.slice(0, 1)}
-        </div>
-      )}
+      <div
+        className={cn(
+          "flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold",
+          user && "bg-primary/10 text-primary",
+        )}
+      >
+        {displayName.slice(0, 1)}
+      </div>
       <div className="flex min-w-0 max-w-[88%] flex-col gap-2 sm:max-w-[85%]">
         <div
           className={cn(
@@ -305,18 +298,26 @@ function InputSpeakerSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="mb-2 flex items-center gap-2">
+    <div className="mb-1.5 flex items-center gap-1.5">
       <span className="text-xs text-muted-foreground">输入身份</span>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger size="sm" aria-label="输入身份">
+        <SelectTrigger
+          size="sm"
+          aria-label="输入身份"
+          className="h-6 gap-1 px-2 py-0 text-xs data-[size=sm]:h-6 [&_svg]:size-3"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="system">系统</SelectItem>
-          <SelectItem value="narrator">旁白</SelectItem>
+          <SelectItem value="system" className="py-1 text-xs">
+            系统
+          </SelectItem>
+          <SelectItem value="narrator" className="py-1 text-xs">
+            旁白
+          </SelectItem>
           <SelectSeparator />
           {characters.map((item) => (
-            <SelectItem key={item.id} value={item.id}>
+            <SelectItem key={item.id} value={item.id} className="py-1 text-xs">
               {item.label}
             </SelectItem>
           ))}
