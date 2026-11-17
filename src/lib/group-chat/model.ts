@@ -216,6 +216,17 @@ export function exportMarkdown(room: WorldRoom) {
     )
     .join("\n\n")}\n`;
 }
+export function exportNarrationMarkdown(room: WorldRoom) {
+  const messages = room.messages.filter(
+    (message) => message.kind === "narrator",
+  );
+  return `# ${room.config.title} · 旁白叙事\n\n${messages
+    .map(
+      (message) =>
+        `## 旁白${message.status === "complete" ? "" : "（未完成）"}\n\n${message.text}`,
+    )
+    .join("\n\n")}\n`;
+}
 export class WorldError extends Error {
   constructor(
     public code: string,

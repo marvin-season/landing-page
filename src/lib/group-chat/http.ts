@@ -3,6 +3,7 @@ import { abortRun, createWorldEngine } from "./engine";
 import {
   exportBackup,
   exportMarkdown,
+  exportNarrationMarkdown,
   idSchema,
   runInputSchema,
   WorldError,
@@ -118,14 +119,20 @@ export function createWorldHandlers({
       if (request.method === "GET") {
         const room = await store.get(ownerId, id);
         if (action === "export") {
-          if (new URL(request.url).searchParams.get("format") === "markdown")
-            return new Response(exportMarkdown(room), {
-              headers: {
-                "Content-Type": "text/markdown; charset=utf-8",
-                "Cache-Control": "private, no-store",
-                "Content-Disposition": 'attachment; filename="world-chat.md"',
+          const format = new URL(request.url).searchParams.get("format");
+          if (format === "markdown" || format === "narration")
+            return new Response(
+              format === "narration"
+                ? exportNarrationMarkdown(room)
+                : exportMarkdown(room),
+              {
+                headers: {
+                  "Content-Type": "text/markdown; charset=utf-8",
+                  "Cache-Control": "private, no-store",
+                  "Content-Disposition": 'attachment; filename="world-chat.md"',
+                },
               },
-            });
+            );
           return json(exportBackup(room));
         }
         if (action === "messages") {

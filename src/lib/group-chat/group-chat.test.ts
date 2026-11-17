@@ -14,6 +14,7 @@ import { upgradeWorldRoom } from "./migration";
 import {
   configSchema,
   exportBackup,
+  exportNarrationMarkdown,
   runInputSchema,
   WorldError,
   type WorldEvent,
@@ -994,6 +995,46 @@ test("backup import allocates fresh identities and rejects inconsistent referenc
     }),
     /引用/,
   );
+});
+
+test("narration export keeps every narrator message and excludes dialogue", async () => {
+  const store = setup();
+  const room = await store.create("alice", exampleWorld);
+  await store.change("alice", room.id, (saved) => {
+    appendMessage(saved, {
+      speakerId: "system",
+      name: "旁白",
+      kind: "narrator",
+      text: "第一段场景。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+    appendMessage(saved, {
+      speakerId: "dispatcher",
+      name: "调度员",
+      kind: "agent",
+      text: "我们先检查设备。",
+      status: "complete",
+      runId: null,
+      mentions: [],
+    });
+    appendMessage(saved, {
+      speakerId: "system",
+      name: "旁白",
+      kind: "narrator",
+      text: "第二段场景。",
+      status: "interrupted",
+      runId: null,
+      mentions: [],
+    });
+  });
+  const markdown = exportNarrationMarkdown(await store.get("alice", room.id));
+  assert.match(markdown, /旁白叙事/);
+  assert.match(markdown, /第一段场景。/);
+  assert.match(markdown, /第二段场景。/);
+  assert.doesNotMatch(markdown, /我们先检查设备。/);
+  assert.match(markdown, /（未完成）/);
 });
 
 test("ordinary unmentioned messages receive a selected actor response even when the director asks to wait", async () => {

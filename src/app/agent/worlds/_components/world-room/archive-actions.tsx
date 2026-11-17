@@ -49,6 +49,27 @@ export function ArchiveActions({
         disabled={pending}
         onClick={() =>
           void onPending(async () => {
+            const response = await fetch(
+              `/api/group-chat/rooms/${room.id}/export?format=narration`,
+            );
+            if (!response.ok) throw new Error("导出失败");
+            downloadText(
+              `${room.config.title}-旁白叙事.md`,
+              await response.text(),
+              "text/markdown",
+            );
+          })
+        }
+      >
+        <Download data-icon="inline-start" />
+        导出旁白
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={pending}
+        onClick={() =>
+          void onPending(async () => {
             if (
               !window.confirm(
                 "完整备份包含所有角色的秘密和私有设定，请妥善保管。是否导出？",
