@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
 
+export function WorldGrid({ children }: { children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-4 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
+      {children}
+    </div>
+  );
+}
+
 export function WorldCard({
   children,
   onClick,
@@ -9,10 +17,19 @@ export function WorldCard({
 }) {
   return (
     <article
-      className="group border-b last:border-b-0 flex items-start gap-4 py-3 cursor-pointer"
+      className="group flex items-start gap-2 min-w-0 border rounded-lg p-4 transition-all duration-300 hover:shadow-xl cursor-pointer flex-col data-[interactive=true]:cursor-pointer"
+      data-interactive={Boolean(onClick)}
       onClick={onClick}
     >
       {children}
     </article>
+  );
+}
+
+export function WorldCardFooter({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-auto flex w-full items-center justify-between gap-3 pt-1">
+      {children}
+    </div>
   );
 }
