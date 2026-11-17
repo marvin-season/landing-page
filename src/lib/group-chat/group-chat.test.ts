@@ -30,6 +30,25 @@ function contextData(messages: ModelMessage[]) {
     .map((message) => JSON.parse(message.content));
   return Object.assign({}, ...parts, {
     world: Object.assign({}, ...parts.map((part) => part.world ?? {})),
+    publicConversation: messages.flatMap((message) => {
+      if (message.role === "system") return [];
+      if (message.role === "assistant") {
+        const character = parts.find(
+          (part) => part.yourCharacter,
+        )?.yourCharacter;
+        return [
+          {
+            kind: character ? "agent" : "narrator",
+            speakerId: character?.id ?? "system",
+            text: message.content,
+          },
+        ];
+      }
+      const part = JSON.parse(message.content);
+      return part.publicEvent
+        ? [part.publicEvent]
+        : (part.publicConversation ?? []);
+    }),
   });
 }
 
@@ -421,8 +440,8 @@ test("all generators see every unsummarized event after the current summary", as
     assert.equal(data.world.scene, undefined);
     assert.equal(data.world.summary, room.summary.text);
     assert.deepEqual(
-      data.publicConversation.map((message: { seq: number }) => message.seq),
-      Array.from({ length: 15 }, (_, index) => index + 2),
+      data.publicConversation.map((message: { text: string }) => message.text),
+      room.messages.slice(1, 16).map((message) => message.text),
     );
     assert.equal(data.publicConversation[0].text, room.messages[1].text);
   }

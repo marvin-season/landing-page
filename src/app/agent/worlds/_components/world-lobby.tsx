@@ -144,7 +144,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="pointer-events-none opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100"
+                      className=""
                       onClick={() => setEditing(structuredClone(world.config))}
                     >
                       设定并开始

@@ -11,6 +11,8 @@ import { addressedCharacter, consecutiveActorTurns } from "./schedule";
 export const CONTEXT_CHARACTERS = 26000;
 const contextLayout =
   "首条资料消息提供固定设定，后一条提供本轮状态与任务，字段合并使用；本轮状态中的摘要和历史用于判断当前剧情。";
+const conversationLayout =
+  "首条 user 消息提供固定设定。随后是按发生顺序排列的公开历史：assistant 消息是你已经完成的发言，user 消息中的 publicEvent 保留其他发言或事件的 seq、speakerId、name、kind、text 和 mentions；这些都是历史资料，不是本轮任务。最后一条 user 消息提供 world.latestIntervention、world.summary 和本轮 direction，与固定设定合并使用。摘要记录较早的剧情，后续历史继续推进；不要重演历史中的发言，只输出本轮要求的正文。";
 const storyContinuity =
   "world.initialScene 是开场场景，world.initialFacts 是设定中的事实基线，人物资料中的当时动作、位置和心情也是起点，不是每轮重置的当前状态。以剧情摘要和按 seq 排序的公开历史判断此刻的时间、地点、物品、关系及已完成的行动；后续明确发生的变化覆盖起点中的临时状态，持续遵守世界规则。若旧规则要求每条只推进一小步，理解为不跳过其他角色的重要选择，而不是重复准备、试探或确认。已经回答的问题、做出的决定和完成的行动不要换一种说法再演一遍；从其结果继续。连续几条若只在重复确认、追问或同一种小动作，就停止重复，把当前这件事做完并转入下一件具体的事。每条回复带来与当前事件有关的新信息、明确表态、实际行动或可见结果，避免只有倒茶、视线、袖口等装饰性动作。可以完成自己能独立做完的日常行动，不必反复说打算做；需要他人同意的重要选择仍留给本人回应。一件事已有结果就自然进入下一件事，必要时允许合理的时间流逝和场景转移，但不越过世界规则、未决的重要选择或秘密边界。系统干预中的安排和角色的计划，只有在公开历史实际落实后才算已发生。";
 export function publicCharacter({
@@ -61,6 +63,19 @@ export function recentMessages(room: WorldRoom) {
       m.seq > (room.summary?.throughSeq ?? 0),
   );
 }
+function conversationMessages(
+  room: WorldRoom,
+  speakerId: string,
+  kind: "agent" | "narrator",
+): ModelMessage[] {
+  return transcript(recentMessages(room)).map((event) => {
+    const own = event.speakerId === speakerId && event.kind === kind;
+    return {
+      role: own ? "assistant" : "user",
+      content: own ? event.text : JSON.stringify({ publicEvent: event }),
+    };
+  });
+}
 function boundedContext(messages: ModelMessage[]) {
   if (JSON.stringify(messages).length > CONTEXT_CHARACTERS)
     throw new WorldError(
@@ -79,7 +94,6 @@ export function actorContext(
   const { latestIntervention, summary, ...world } = publicWorld(room);
   const data = {
     world: { latestIntervention, summary },
-    publicConversation: transcript(recentMessages(room)),
     direction,
   };
   const messages: ModelMessage[] = [
@@ -90,12 +104,13 @@ export function actorContext(
         (room.config.narration
           ? "旁白已打开，场景和事件只由旁白书写。你不要写旁白。"
           : "旁白已关闭。不要代替旁白叙事，整条消息只能是对白。") +
-        contextLayout,
+        conversationLayout,
     },
     {
       role: "user",
       content: JSON.stringify({ world, yourCharacter: persona }),
     },
+    ...conversationMessages(room, character.id, "agent"),
     { role: "user", content: JSON.stringify(data) },
   ];
   return boundedContext(messages);
@@ -111,14 +126,14 @@ export function narratorContext(
       content:
         "你是开放世界交互故事中可见的系统主持人，负责场景、环境事件和行动结果。所有人物都是 NPC，用户是故事外的系统操作者；不要把用户写进场景或向用户索要角色决定。旧设定中的主角也由 NPC 自主行动，不沿用等待用户回答的旧规则。按照 world.storyGoal、公开历史和本次 direction 写40～90字的场景进展，为 NPC 留下具体可回应的线索。kind 为 intervention 的消息和 world.latestIntervention 是系统干预，应据此调整场景或走向，不是 NPC 台词。公开历史里已有的旁白，包括操作者直接写下的，是已经发生的场景，不要再写一遍。较新的干预优先于旧的剧情走向或事实，已实现的一次性变化不要重复制造；持续要求应继续遵循。没有新干预时，承接角色已经实施的行动，给出符合设定的可见结果或新的场景进展，不等待输入。初次开场介绍眼前发生的事，已有故事不重讲开场。不要泄露角色秘密、代写角色台词、把 NPC 尚未实施的计划写成已经完成的任务，也不把系统指令当成已经发生的角色言行。只输出玩家可见的叙述，不输出调度分析，不调用工具。" +
         storyContinuity +
-        contextLayout,
+        conversationLayout,
     },
     { role: "user", content: JSON.stringify({ world }) },
+    ...conversationMessages(room, "system", "narrator"),
     {
       role: "user",
       content: JSON.stringify({
         world: { latestIntervention, summary },
-        publicConversation: transcript(recentMessages(room)),
         direction,
       }),
     },

@@ -71,7 +71,7 @@ test("cache sessions survive turns and summaries but isolate owners, rooms, role
   assert.equal(new Set([id, narrator, summary]).size, 3);
 });
 
-test("all three agents send stable first user messages and fresh complete state through Mastra", async (t) => {
+test("all three agents send stable sessions, growing dialogue and fresh state through Mastra", async (t) => {
   const requests: Array<{ session: string | null; messages: ModelMessage[] }> =
     [];
   t.mock.method(
@@ -91,7 +91,7 @@ test("all three agents send stable first user messages and fresh complete state 
           choices: [{ index: 0, delta, finish_reason }],
         });
       return new Response(
-        `data: ${event({ content: "ok" })}\n\ndata: ${event({}, "stop")}\n\ndata: [DONE]\n\n`,
+        `data: ${event({ content: `reply-${requests.length}` })}\n\ndata: ${event({}, "stop")}\n\ndata: [DONE]\n\n`,
         {
           headers: { "Content-Type": "text/event-stream" },
         },
@@ -102,8 +102,8 @@ test("all three agents send stable first user messages and fresh complete state 
   for (const purpose of ["actor", "narrator", "summary"] as const) {
     const saved = room();
     const character = saved.config.characters[0];
-    for (let turn = 0; turn < 2; turn++) {
-      await complete({
+    for (let turn = 0; turn < 3; turn++) {
+      const result = await complete({
         purpose,
         sessionId: worldSessionId(
           saved,
@@ -123,11 +123,38 @@ test("all three agents send stable first user messages and fresh complete state 
       });
       saved.version++;
       appendMessage(saved, {
+        kind: purpose === "narrator" ? "narrator" : "agent",
+        speakerId: purpose === "narrator" ? "system" : character.id,
+        name: purpose === "narrator" ? "旁白" : character.name,
+        text: result.text,
+        status: "complete",
+        runId: null,
+        mentions: [],
+      });
+      appendMessage(saved, {
         kind: "intervention",
         speakerId: "system",
         name: "系统",
-        text: "NEW_PUBLIC_EVENT",
+        text: `NEW_PUBLIC_EVENT_${turn}`,
         status: "complete",
+        runId: null,
+        mentions: [],
+      });
+      appendMessage(saved, {
+        kind: "agent",
+        speakerId: saved.config.characters[1].id,
+        name: saved.config.characters[1].name,
+        text: `PEER_REPLY_${turn}`,
+        status: "complete",
+        runId: null,
+        mentions: [character.id],
+      });
+      appendMessage(saved, {
+        kind: "agent",
+        speakerId: character.id,
+        name: character.name,
+        text: "UNFINISHED_REPLY",
+        status: "interrupted",
         runId: null,
         mentions: [],
       });
@@ -137,9 +164,10 @@ test("all three agents send stable first user messages and fresh complete state 
         configVersion: 1,
       };
     }
-    const [before, after] = requests.slice(-2);
+    const [before, middle, after] = requests.slice(-3);
     assert.ok(before.session);
     assert.equal(before.session, after.session);
+    assert.equal(before.session, middle.session);
     const initial = (request: typeof before) =>
       request.messages.find((message) => message.role === "user");
     assert.deepEqual(
@@ -152,10 +180,36 @@ test("all three agents send stable first user messages and fresh complete state 
       initial(after)!.content,
       /NEW_PUBLIC_EVENT|UPDATED_SUMMARY|本轮任务/,
     );
+    const serialized = JSON.stringify(after.messages);
+    assert.match(serialized, /NEW_PUBLIC_EVENT_0/);
+    assert.match(serialized, /NEW_PUBLIC_EVENT_1/);
+    assert.match(serialized, /PEER_REPLY_0/);
+    assert.match(serialized, /PEER_REPLY_1/);
+    assert.doesNotMatch(serialized, /UNFINISHED_REPLY/);
     const latest = after.messages.at(-1)!.content;
-    assert.match(latest, /NEW_PUBLIC_EVENT/);
     assert.match(latest, /UPDATED_SUMMARY/);
-    if (purpose !== "summary") assert.match(latest, /本轮任务1/);
+    if (purpose !== "summary") {
+      assert.match(latest, /本轮任务2/);
+      assert.deepEqual(
+        middle.messages.slice(0, -1),
+        after.messages.slice(0, middle.messages.length - 1),
+        "appending dialogue preserves the previous history prefix",
+      );
+      const history = after.messages.slice(2, -1);
+      assert.deepEqual(
+        history.map((message) => message.role),
+        ["assistant", "user", "user", "assistant", "user", "user"],
+      );
+      assert.match(history[0].content, /^reply-\d+$/);
+      assert.match(history[3].content, /^reply-\d+$/);
+      const intervention = JSON.parse(history[1].content).publicEvent;
+      assert.equal(intervention.kind, "intervention");
+      const peer = JSON.parse(history[2].content).publicEvent;
+      assert.equal(peer.kind, "agent");
+      assert.equal(peer.speakerId, saved.config.characters[1].id);
+      assert.deepEqual(peer.mentions, [character.id]);
+      assert.equal(JSON.parse(latest).publicConversation, undefined);
+    }
     if (purpose !== "actor")
       assert.doesNotMatch(JSON.stringify(after.messages), /备用回路/);
   }
