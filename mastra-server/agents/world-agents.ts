@@ -15,6 +15,9 @@ function worldAgent(purpose: WorldAgentPurpose, name: string): Agent {
         name: "world-proxy",
         baseURL: process.env.GROUP_CHAT_BASE_URL || "http://127.0.0.1:3425/v1",
         apiKey: process.env.GROUP_CHAT_API_KEY || "magpie",
+        headers: requestContext.get("sessionId")
+          ? { "X-Magpie-Session": requestContext.get("sessionId") as string }
+          : undefined,
         // The provider omits tool_choice when no tools are registered. The
         // local agent proxy still needs an explicit opt-out of upstream tools.
         fetch: (url, init) =>

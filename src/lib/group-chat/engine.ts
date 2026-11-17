@@ -14,6 +14,7 @@ import {
 } from "./model";
 import { type Complete, type ModelMessage, providerError } from "./provider";
 import { nextTurn } from "./schedule";
+import { worldSessionId } from "./session";
 import { appendMessage, finishRun, type WorldStore } from "./store";
 
 type ActiveRun = { controller: AbortController; done: Promise<void> };
@@ -85,6 +86,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
         model: string,
         messages: ModelMessage[],
         maxCharacters: number,
+        characterId?: string,
         onText?: (text: string) => void,
         timeoutMs?: number,
       ) {
@@ -95,6 +97,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
         });
         const result = await complete({
           purpose,
+          sessionId: worldSessionId(room, purpose, model, characterId),
           model,
           messages,
           signal,
@@ -163,6 +166,7 @@ export function createWorldEngine(store: WorldStore, complete: Complete) {
             model,
             messages,
             2000,
+            narrating ? undefined : plan.speaker.id,
             (delta) => {
               if (signal.aborted) return;
               partial += delta;

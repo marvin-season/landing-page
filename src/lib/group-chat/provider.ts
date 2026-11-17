@@ -14,6 +14,7 @@ export type ModelResult = {
 };
 export type Complete = (input: {
   purpose?: WorldAgentPurpose;
+  sessionId?: string;
   model: string;
   messages: ModelMessage[];
   signal: AbortSignal;
@@ -73,6 +74,7 @@ export function createTextCompletion(
 ): Complete {
   return async ({
     purpose = "actor",
+    sessionId,
     model,
     messages,
     signal,
@@ -93,8 +95,12 @@ export function createTextCompletion(
       combined.throwIfAborted();
       const agent = await getAgent(purpose);
       combined.throwIfAborted();
-      const requestContext = new RequestContext<{ model: string }>();
+      const requestContext = new RequestContext<{
+        model: string;
+        sessionId?: string;
+      }>();
       requestContext.set("model", model);
+      if (sessionId) requestContext.set("sessionId", sessionId);
       const stream = await agent.stream(
         messages.filter((message) => message.role !== "system"),
         {

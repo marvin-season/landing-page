@@ -18,10 +18,20 @@ import {
   WorldError,
   type WorldEvent,
 } from "./model";
-import type { Complete } from "./provider";
+import type { Complete, ModelMessage } from "./provider";
 import { eligibleCharacters, fallbackSpeaker } from "./schedule";
+import { worldSessionId } from "./session";
 import { appendMessage, createWorldStore } from "./store";
 import { exampleWorld } from "./world-templates";
+
+function contextData(messages: ModelMessage[]) {
+  const parts = messages
+    .filter((message) => message.role === "user")
+    .map((message) => JSON.parse(message.content));
+  return Object.assign({}, ...parts, {
+    world: Object.assign({}, ...parts.map((part) => part.world ?? {})),
+  });
+}
 
 const clients: Client[] = [];
 afterEach(() => {
@@ -109,7 +119,7 @@ test("narration stays with the dialogue characters until the switch is on", asyn
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    assert.match(input.messages[1].content, /不要写成旁白/);
+    assert.match(JSON.stringify(contextData(input.messages)), /不要写成旁白/);
     return fakeComplete(input);
   })("alice", scene.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
@@ -137,9 +147,10 @@ test("NPC questions go to the addressed NPC and system naming retains priority",
       assert.equal(input.purpose, "actor");
       assert.doesNotMatch(input.messages[0].content, /调度器/);
       assert.equal(
-        JSON.parse(input.messages[1].content).yourCharacter.id,
-        expected,
+        input.sessionId,
+        worldSessionId(started.room, "actor", input.model, expected),
       );
+      assert.equal(contextData(input.messages).yourCharacter.id, expected);
       return fakeComplete(input);
     })("alice", started.room, new AbortController().signal, () => {});
     const saved = await store.get("alice", room.id);
@@ -194,7 +205,7 @@ test("interventions remain system directions after summarization, never NPC dial
     narratorContext(saved, "继续"),
     directorContext(saved, saved.config.characters),
   ]) {
-    const data = JSON.parse(context[1].content);
+    const data = contextData(context);
     assert.equal(data.world.storyGoal, "查明停电原因");
     assert.equal(data.world.latestIntervention, "暴雨停下，优先调查备用电路");
     assert.equal(data.world.user, undefined);
@@ -236,8 +247,8 @@ test("legacy saves and backups retain the human protagonist as an NPC without pr
   assert.equal(imported.config.characters.length, 4);
   assert.equal(imported.paused, true);
   assert.equal(
-    JSON.parse(actorContext(imported, imported.config.characters[0])[1].content)
-      .world.latestIntervention,
+    contextData(actorContext(imported, imported.config.characters[0])).world
+      .latestIntervention,
     "",
   );
   assert.equal(configSchema.parse(imported.config).characters.length, 4);
@@ -256,7 +267,7 @@ test("a running story applies a new intervention after aborting the old generati
     ready = resolve;
   });
   const engine = createWorldEngine(store, async (input) => {
-    const data = JSON.parse(input.messages[1].content);
+    const data = contextData(input.messages);
     if (data.world.latestIntervention === "暴雨停下，改为调查备用电路") {
       assert.equal(data.world.latestIntervention, "暴雨停下，改为调查备用电路");
       return fakeComplete(input);
@@ -316,7 +327,10 @@ test("a scene intervention is narrated in one model call", async () => {
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "narrator");
-    assert.match(input.messages[1].content, /安排一个新的环境变化/);
+    assert.match(
+      JSON.stringify(contextData(input.messages)),
+      /安排一个新的环境变化/,
+    );
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
@@ -401,7 +415,7 @@ test("all generators see every unsummarized event after the current summary", as
     narratorContext(room, "继续维修后的事件"),
     directorContext(room, eligibleCharacters(room)),
   ]) {
-    const data = JSON.parse(context[1].content);
+    const data = contextData(context);
     assert.equal(data.world.initialScene, room.config.scene);
     assert.equal(data.world.initialFacts, room.config.facts);
     assert.equal(data.world.scene, undefined);
@@ -451,7 +465,7 @@ test("repeated confirmations advance the scene in one narration", async () => {
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "narrator");
-    assert.match(input.messages[1].content, /重复|时间向前/);
+    assert.match(JSON.stringify(contextData(input.messages)), /重复|时间向前/);
     return {
       text: "电源恢复，走廊的灯依次亮起，对讲机传来了船员清晰的回音。",
     };
@@ -489,10 +503,7 @@ test("operator mentions retain priority after a long actor exchange", async () =
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    assert.equal(
-      JSON.parse(input.messages[1].content).yourCharacter.id,
-      "reporter",
-    );
+    assert.equal(contextData(input.messages).yourCharacter.id, "reporter");
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   assert.equal((await store.get("alice", room.id)).run?.calls, 1);
@@ -509,7 +520,7 @@ test("automatic run commits three ordered messages, uses previous speakers, and 
   const seen: string[] = [];
   const complete: Complete = async (input) => {
     if (!input.messages[0].content.includes("调度器"))
-      seen.push(input.messages[1].content);
+      seen.push(JSON.stringify(contextData(input.messages)));
     return fakeComplete(input);
   };
   const events: WorldEvent[] = [];
@@ -900,7 +911,7 @@ test("ordinary unmentioned messages receive a selected actor response even when 
   let actorInput = "";
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    actorInput = input.messages[1].content;
+    actorInput = JSON.stringify(contextData(input.messages));
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
@@ -1118,12 +1129,15 @@ test("long conversations summarize public history and keep original messages", a
     if (input.messages[0].content.includes("压缩")) {
       summaries++;
       assert.doesNotMatch(
-        input.messages[1].content,
+        JSON.stringify(contextData(input.messages)),
         /UNFINISHED_PRIVATE_TOKEN|备用回路/,
       );
       return { text: "大家讨论了多个公开事件，尚未确认任何行动结果。" };
     }
-    assert.doesNotMatch(input.messages[1].content, /UNFINISHED_PRIVATE_TOKEN/);
+    assert.doesNotMatch(
+      JSON.stringify(contextData(input.messages)),
+      /UNFINISHED_PRIVATE_TOKEN/,
+    );
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
@@ -1232,7 +1246,7 @@ test("user input defaults to system and can be posted as narrator or a character
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    const data = JSON.parse(input.messages[1].content);
+    const data = contextData(input.messages);
     assert.equal(data.world.latestIntervention, "让雨停");
     assert.equal(data.publicConversation.at(-1).kind, "narrator");
     assert.match(input.messages[0].content, /已经发生的旁白/);
@@ -1258,10 +1272,7 @@ test("user input defaults to system and can be posted as narrator or a character
   assert.equal(asCharacter.room.messages.at(-1)?.name, "许岚");
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    assert.equal(
-      JSON.parse(input.messages[1].content).yourCharacter.id,
-      "dispatcher",
-    );
+    assert.equal(contextData(input.messages).yourCharacter.id, "dispatcher");
     return fakeComplete(input);
   })("alice", asCharacter.room, new AbortController().signal, () => {});
   assert.equal(

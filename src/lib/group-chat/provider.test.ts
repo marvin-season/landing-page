@@ -18,6 +18,7 @@ function completion(t: TestContext, events: unknown[]) {
       assert.equal(body.model, "cursor/auto");
       assert.equal(body.tool_choice, "none");
       assert.equal(body.tools, undefined);
+      assert.equal(new Headers(init?.headers).get("X-Magpie-Session"), null);
       return new Response(
         new ReadableStream({
           start(controller) {
@@ -144,6 +145,7 @@ test("a short selection deadline aborts the provider without cancelling the room
 test("simultaneous NPC calls keep their model and instructions isolated", async (t) => {
   const requests: Array<{
     model: string;
+    session: string | null;
     messages: Array<{ content: string }>;
   }> = [];
   t.mock.method(
@@ -151,7 +153,10 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
     "fetch",
     async (_url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
-      requests.push(body);
+      requests.push({
+        ...body,
+        session: new Headers(init?.headers).get("X-Magpie-Session"),
+      });
       await new Promise((resolve) =>
         setTimeout(resolve, body.model === "npc/a" ? 10 : 1),
       );
@@ -167,6 +172,7 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
       complete({
         ...input(),
         model: `npc/${name}`,
+        sessionId: `world-${name}`,
         messages: [
           { role: "system", content: `private-${name}` },
           { role: "user", content: `context-${name}` },
@@ -180,6 +186,7 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
   );
   for (const request of requests) {
     const name = request.model.slice(-1);
+    assert.equal(request.session, `world-${name}`);
     assert.deepEqual(
       request.messages.map((message) => message.content),
       [`private-${name}`, `context-${name}`],
