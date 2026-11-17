@@ -1,8 +1,7 @@
 import { type Character, WorldError, type WorldRoom } from "./model";
 
 const MAX_DIRECT_EXCHANGES = 4;
-const spokenDirection =
-  "只用对白接话。不要写旁白、场景、动作或心理。已经问过或确认过的不要再问。";
+const NARRATION_INTERVAL = 3;
 
 export type TurnPlan = {
   kind: "speak" | "narrate";
@@ -132,6 +131,11 @@ export function nextTurn(room: WorldRoom, turn: number): TurnPlan {
   const narrationOn = room.config.narration;
   const directSpeaker =
     !mentioned && !cue && !stalled ? directReplySpeaker(room) : undefined;
+  const narrationDue =
+    !mentioned &&
+    !cue &&
+    !directSpeaker &&
+    consecutiveActorTurns(room) >= NARRATION_INTERVAL;
   const fallback = fallbackSpeaker(room, eligible);
   const speaker =
     mentioned && mentioned !== "system"
@@ -143,6 +147,7 @@ export function nextTurn(room: WorldRoom, turn: number): TurnPlan {
     (mentioned === "system" ||
       cue?.ask === false ||
       stalled ||
+      narrationDue ||
       (!mentioned &&
         !cue &&
         !directSpeaker &&
@@ -153,14 +158,10 @@ export function nextTurn(room: WorldRoom, turn: number): TurnPlan {
         )));
   const direction = narrating
     ? cue && !cue.ask
-      ? `把这条系统干预写成眼前可见的变化：${cue.text}`
-      : stalled
-        ? "刚才的交流已在重复或停在两人来回确认上。落实一个可见结果，让时间向前，并给出一个新的具体状况。不要复述角色刚才的原话。"
-        : "承接当前事件，给出一个可供角色回应的具体场景变化。"
-    : stalled
-      ? "刚才的话在重复。用对白转到下一件事。不要写旁白。"
-      : cue
-        ? `用对白回应，不要写成旁白：${cue.text}`
-        : spokenDirection;
+      ? "依据最新系统干预叙述当前场景。"
+      : "承接当前场景和角色言行，写一段旁白。"
+    : cue
+      ? "以角色身份回应最新系统干预。"
+      : "轮到你发言。";
   return { kind: narrating ? "narrate" : "speak", speaker, direction };
 }

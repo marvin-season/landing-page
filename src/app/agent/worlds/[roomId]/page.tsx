@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { WorldRoomView } from "../_components/world-room";
 
 export const metadata: Metadata = {
-  title: "世界群聊",
+  title: "World Chat",
   robots: { index: false, follow: false },
 };
 export default async function RoomPage({

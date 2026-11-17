@@ -69,7 +69,7 @@ function command(extra = {}) {
     ...extra,
   });
 }
-const fakeComplete: Complete = async ({ messages, onText }) => {
+const fakeComplete: Complete = async ({ messages, onText, purpose }) => {
   if (messages[0].content.includes("调度器")) {
     const data = JSON.parse(messages[1].content);
     return {
@@ -84,9 +84,10 @@ const fakeComplete: Complete = async ({ messages, onText }) => {
       }),
     };
   }
-  const text = messages[0].content.includes("可见的系统主持人")
-    ? "控制室的备用灯闪烁了一下，对讲机传出短促的呼叫声。"
-    : "我先检查一下控制台，请大家留意对讲机。";
+  const text =
+    purpose === "narrator"
+      ? "控制室的备用灯闪烁了一下，对讲机传出短促的呼叫声。"
+      : "我先检查一下控制台，请大家留意对讲机。";
   onText?.(text);
   return { text, usage: { input: 20, output: 10 } };
 };
@@ -127,8 +128,6 @@ test("narration stays with the dialogue characters until the switch is on", asyn
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    assert.match(input.messages[0].content, /旁白已关闭/);
-    assert.doesNotMatch(input.messages[0].content, /场景转移/);
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   const scene = await store.begin(
@@ -138,7 +137,10 @@ test("narration stays with the dialogue characters until the switch is on", asyn
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "actor");
-    assert.match(JSON.stringify(contextData(input.messages)), /不要写成旁白/);
+    assert.equal(
+      contextData(input.messages).world.latestIntervention,
+      "安排一个新的环境变化",
+    );
     return fakeComplete(input);
   })("alice", scene.room, new AbortController().signal, () => {});
   const saved = await store.get("alice", room.id);
@@ -484,7 +486,6 @@ test("repeated confirmations advance the scene in one narration", async () => {
   );
   await createWorldEngine(store, async (input) => {
     assert.equal(input.purpose, "narrator");
-    assert.match(JSON.stringify(contextData(input.messages)), /重复|时间向前/);
     return {
       text: "电源恢复，走廊的灯依次亮起，对讲机传来了船员清晰的回音。",
     };
@@ -499,6 +500,7 @@ test("operator mentions retain priority after a long actor exchange", async () =
   const store = setup();
   const room = await store.create("alice", exampleWorld);
   await store.change("alice", room.id, (r) => {
+    r.config.narration = true;
     for (let i = 0; i < 4; i++) {
       appendMessage(r, {
         speakerId: "engineer",
@@ -526,6 +528,92 @@ test("operator mentions retain priority after a long actor exchange", async () =
     return fakeComplete(input);
   })("alice", started.room, new AbortController().signal, () => {});
   assert.equal((await store.get("alice", room.id)).run?.calls, 1);
+});
+
+test("narration advances varied dialogue while respecting direct replies and the room switch", async () => {
+  for (const scenario of [
+    { narration: true, count: 3, addressed: false, purpose: "narrator" },
+    { narration: false, count: 3, addressed: false, purpose: "actor" },
+    { narration: true, count: 3, addressed: true, purpose: "actor" },
+    { narration: true, count: 4, addressed: true, purpose: "narrator" },
+  ]) {
+    const store = setup();
+    const room = await store.create("alice", exampleWorld);
+    await store.change("alice", room.id, (r) => {
+      r.config.narration = scenario.narration;
+      const dialogue = [
+        ["engineer", "配电箱的保险丝已经更换。"],
+        ["reporter", "值班记录里有昨夜的检修备注。"],
+        ["dispatcher", "对讲机频道已调好。"],
+        ["reporter", "仓库里还有一组备用灯。"],
+      ];
+      for (const [index, [speakerId, text]] of dialogue
+        .slice(0, scenario.count)
+        .entries()) {
+        const character = r.config.characters.find((c) => c.id === speakerId)!;
+        appendMessage(r, {
+          speakerId,
+          name: character.name,
+          kind: "agent",
+          text:
+            scenario.addressed && index === scenario.count - 1
+              ? "林舟，能把手电筒带来吗？"
+              : text,
+          status: "complete",
+          runId: null,
+          mentions: [],
+        });
+      }
+    });
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step" }),
+    );
+    await createWorldEngine(store, async (input) => {
+      assert.equal(input.purpose, scenario.purpose, JSON.stringify(scenario));
+      if (scenario.addressed && scenario.purpose === "actor")
+        assert.equal(
+          contextData(input.messages).yourCharacter.id,
+          "former-player",
+        );
+      return fakeComplete(input);
+    })("alice", started.room, new AbortController().signal, () => {});
+  }
+});
+
+test("narration cadence survives batch boundaries and always allows dialogue after narration", async () => {
+  const store = setup();
+  const room = await store.create("alice", {
+    ...exampleWorld,
+    narration: true,
+  });
+  const replies = [
+    "配电箱的保险丝已经更换。",
+    "值班记录里有昨夜的检修备注。",
+    "对讲机频道已调好。",
+    "仓库里还有一组备用灯。",
+  ];
+  for (const expected of [
+    "narrator",
+    "actor",
+    "actor",
+    "actor",
+    "narrator",
+    "actor",
+  ]) {
+    const started = await store.begin(
+      "alice",
+      room.id,
+      command({ mode: "step" }),
+    );
+    await createWorldEngine(store, async (input) => {
+      assert.equal(input.purpose, expected);
+      return expected === "actor"
+        ? { text: replies.shift()! }
+        : { text: "维修完成后，走廊里的照明恢复了，船员的呼叫声也变得清晰。" };
+    })("alice", started.room, new AbortController().signal, () => {});
+  }
 });
 
 test("automatic run commits three ordered messages, uses previous speakers, and stops", async () => {
