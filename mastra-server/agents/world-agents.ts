@@ -1,7 +1,7 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Agent } from "@mastra/core/agent";
 
-export type WorldAgentPurpose = "actor" | "narrator" | "summary";
+export type WorldAgentPurpose = "actor" | "narrator" | "summary" | "writer";
 
 function worldAgent(purpose: WorldAgentPurpose, name: string): Agent {
   return new Agent({
@@ -38,4 +38,5 @@ export const worldAgents = {
   actor: worldAgent("actor", "World NPC"),
   narrator: worldAgent("narrator", "World Narrator"),
   summary: worldAgent("summary", "World Summary"),
+  writer: worldAgent("writer", "World Novel Writer"),
 };

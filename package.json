@@ -12,6 +12,7 @@
     "format": "biome format --write",
     "check": "biome check .",
     "test:group-chat": "node --import tsx --test src/lib/group-chat/*.test.ts",
+    "test:novel": "node --import tsx --test src/app/agent/worlds/_components/novel/*.test.ts",
     "bookkeeping:pwa:build": "node scripts/build-bookkeeping-pwa.mjs",
     "bbq:pwa:assets": "node --import tsx scripts/generate-bbq-pwa.ts",
     "check:staged": "biome check --write --staged --no-errors-on-unmatched && git update-index --again",

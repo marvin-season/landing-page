@@ -9,6 +9,7 @@
 | [docs/architecture.md](./architecture.md) | 人 / Agent | 架构总览、目录、tRPC、Mastra、路由 |
 | [多 Agent 开放世界群聊需求](./requirements/agent-group-chat-prd.md) | 人 / Agent | 需求评估、角色与世界预设、调度、记忆、接入方案与验收 |
 | [世界群聊使用与实现](./group-chat.md) | 人 / Agent | 新页面入口、本地代理配置、运行边界和测试命令 |
+| [开放世界小说模式架构](./novel-mode.md) | 人 / Agent | 单 Writer 职责、章节流、存储与导出边界、可靠性和长篇演进设计 |
 | [docs/auth.md](./auth.md) | 人 / Agent | 登录、页面门闩、角色与 API 鉴权 |
 | [docs/tech-stack.md](./tech-stack.md) | 人 | 技术栈表（版本以 package.json 为准） |
 | [docs/i18n.md](./i18n.md) | 人 / Agent | Lingui 与国际化流程 |

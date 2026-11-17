@@ -9,8 +9,16 @@ import {
 } from "@landing-page/utils/stream";
 import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
-import type { WorldRoom } from "@/lib/group-chat/model";
-import { chapterPrompt, createNovel, type Novel, novelRequest } from "./model";
+import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
+import {
+  chapterPrompt,
+  createBackground,
+  createNovel,
+  type Novel,
+  type NovelBackground,
+  novelRequest,
+  summaryPrompt,
+} from "./model";
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
@@ -19,6 +27,7 @@ const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 export function useNovel(
   room: WorldRoom,
   onBusyChange: (busy: boolean) => void,
+  onBackgroundReady: (background: NovelBackground) => void,
 ) {
   const key = `${room.ownerId}:${room.id}`;
   const [novel, setNovel] = useState(() => createNovel(room.config));
@@ -27,6 +36,14 @@ export function useNovel(
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
+  const [task, setTask] = useState<"chapter" | "summary">("chapter");
+  const [backgroundExport, setBackgroundExport] =
+    useState<NovelBackground | null>(null);
+  const input = useRef<{
+    task: "chapter" | "summary";
+    config: WorldConfig;
+    novel: Novel;
+  } | null>(null);
   const state = useRef(initialChatStreamState);
   const finished = useRef(false);
   const generating = useRef(false);
@@ -55,6 +72,7 @@ export function useNovel(
   }, [key]);
 
   function update(next: Novel) {
+    setBackgroundExport(null);
     latest.current = next;
     setNovel(next);
     setSaving(true);
@@ -78,7 +96,9 @@ export function useNovel(
     onEvent(event) {
       if (event.type === "finish") {
         if (event.finishReason && event.finishReason !== "stop")
-          throw new Error("本章未完整生成，请调整篇幅后重试。草稿未计入正文。");
+          throw new Error(
+            "本次输出未完整生成，请缩减内容后重试。草稿未计入正文或导出文件。",
+          );
         finished.current = true;
       }
       state.current = reduceChatStreamState(state.current, event);
@@ -88,7 +108,28 @@ export function useNovel(
       end();
       const text = getChatStreamText(state.current).trim();
       if (!finished.current || !text) {
-        setError("连接提前结束或没有生成正文，请重试。草稿未计入正文。");
+        setError(
+          "连接提前结束或没有生成内容，请重试。草稿未计入正文或导出文件。",
+        );
+        return;
+      }
+      const captured = input.current;
+      if (!captured) return;
+      if (captured.task === "summary") {
+        try {
+          const background = createBackground(
+            captured.config,
+            captured.novel,
+            text,
+          );
+          setBackgroundExport(background);
+          setPreview("");
+          onBackgroundReady(background);
+        } catch {
+          setError(
+            "总结导出失败；若总结过长请缩减后重试，若下载失败可点击再次导出。",
+          );
+        }
         return;
       }
       update({
@@ -110,10 +151,17 @@ export function useNovel(
     },
   });
 
-  function generate() {
+  function generate(task: "chapter" | "summary" = "chapter") {
     if (!ready || generating.current) return;
     setError("");
-    const prompt = chapterPrompt(room.config, latest.current);
+    if (task === "summary" && !latest.current.chapters.length) {
+      setError("请先完成至少一章，再总结导出背景。");
+      return;
+    }
+    const prompt =
+      task === "summary"
+        ? summaryPrompt(room.config, latest.current)
+        : chapterPrompt(room.config, latest.current);
     // Keep all previous chapters intact rather than silently dropping continuity.
     if (prompt.length > 150000) {
       setError(
@@ -122,6 +170,13 @@ export function useNovel(
       return;
     }
     chapterTitle.current = `第${latest.current.chapters.length + 1}章`;
+    input.current = {
+      task,
+      config: structuredClone(room.config),
+      novel: structuredClone(latest.current),
+    };
+    setTask(task);
+    setBackgroundExport(null);
     finished.current = false;
     state.current = initialChatStreamState;
     setPreview("");
@@ -129,8 +184,8 @@ export function useNovel(
     setBusy(true);
     onBusyChange(true);
     stream.send({
-      url: "/api/chat",
-      body: novelRequest(room.id, prompt),
+      url: "/api/novel",
+      body: novelRequest(room.id, prompt, task),
     });
   }
 
@@ -142,11 +197,19 @@ export function useNovel(
     saving,
     busy,
     preview,
+    task,
+    backgroundExport,
+    importBackground(background: NovelBackground | undefined) {
+      if (!ready || generating.current)
+        throw new Error("正在生成或读取小说，请稍后再导入背景。");
+      setError("");
+      update({ ...latest.current, background });
+    },
     generate,
     stop() {
       stream.stop();
       end();
-      setError("已停止，本次草稿未计入正文，可重新生成本章。");
+      setError("已停止，本次草稿未计入正文或导出文件，可以重新生成。");
     },
   };
 }

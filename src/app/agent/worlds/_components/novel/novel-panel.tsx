@@ -7,6 +7,7 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
+import { BackgroundControls, downloadBackground } from "./background-controls";
 import { exportNovel } from "./model";
 import { useNovel } from "./use-novel";
 
@@ -17,7 +18,7 @@ export function NovelPanel({
   room: WorldRoom;
   onBusyChange: (busy: boolean) => void;
 }) {
-  const writer = useNovel(room, onBusyChange);
+  const writer = useNovel(room, onBusyChange, downloadBackground);
   const { novel } = writer;
   const [selected, setSelected] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -113,6 +114,19 @@ export function NovelPanel({
             />
           </FieldGroup>
         </fieldset>
+        <BackgroundControls
+          background={novel.background}
+          exported={writer.backgroundExport}
+          disabled={disabled}
+          canSummarize={
+            novel.chapters.length > 0 && Boolean(novel.title.trim())
+          }
+          onImport={writer.importBackground}
+          onSummarize={() => {
+            setEditing(false);
+            writer.generate("summary");
+          }}
+        />
         {writer.error ? (
           <Alert>
             <AlertDescription>{writer.error}</AlertDescription>
@@ -147,15 +161,19 @@ export function NovelPanel({
           {writer.busy ? (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" />
-              正在创作第{novel.chapters.length + 1}章…
+              {writer.task === "summary"
+                ? "正在总结剧情背景…"
+                : `正在创作第${novel.chapters.length + 1}章…`}
             </span>
           ) : null}
         </div>
         {writer.preview ? (
           <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
             <h3 className="font-serif text-lg">
-              第{novel.chapters.length + 1}章 ·{" "}
-              {writer.busy ? "生成中" : "未完成草稿"}
+              {writer.task === "summary"
+                ? "背景总结"
+                : `第${novel.chapters.length + 1}章`}{" "}
+              · {writer.busy ? "生成中" : "未完成草稿"}
             </h3>
             <UnifiedMarkdown
               content={writer.preview}
