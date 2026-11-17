@@ -19,6 +19,7 @@ const buttonVariants = cva(
         soft: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         subtle:
           "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary",
+        text: "bg-transparent text-foreground/80 hover:text-foreground",
       },
       size: {
         sm: "h-8 px-4 text-xs",

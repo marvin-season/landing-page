@@ -12,7 +12,6 @@ import {
 } from "@landing-page/design-system";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Upload } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
@@ -129,27 +128,25 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             <div>
               {templates.map((world) => (
                 <WorldCard key={world.id}>
-                  <div className="flex items-center gap-4 py-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {world.config.title} ·{" "}
-                        <span className="text-xs font-light text-muted-foreground">
-                          {world.details}
-                        </span>
-                      </p>
-                      <p className="mt-1 line-clamp-3 text-xs leading-5 whitespace-pre-wrap text-muted-foreground">
-                        {world.config.background} · {world.config.background}
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className=""
-                      onClick={() => setEditing(structuredClone(world.config))}
-                    >
-                      设定并开始
-                    </Button>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {world.config.title} ·{" "}
+                      <span className="text-xs font-light text-muted-foreground">
+                        {world.details}
+                      </span>
+                    </p>
+                    <p className="mt-1 line-clamp-3 text-xs leading-5 whitespace-pre-wrap text-muted-foreground">
+                      {world.config.background} · {world.config.background}
+                    </p>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="text"
+                    className=""
+                    onClick={() => setEditing(structuredClone(world.config))}
+                  >
+                    设定并开始
+                  </Button>
                 </WorldCard>
               ))}
             </div>
@@ -174,40 +171,40 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           ) : null}
           <div>
             {rooms.data?.rooms.map((room) => (
-              <WorldCard key={room.id}>
-                <div className="flex items-center gap-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{room.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {room.status === "ended"
-                        ? "已结束"
-                        : room.status === "draft"
-                          ? "未开始"
-                          : room.paused
-                            ? "已暂停"
-                            : "进行中"}
-                      {" · "}
-                      {room.characters.join("、")}
-                      {" · "}
-                      {room.messageCount} 条 ·{" "}
-                      {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
-                    </p>
-                  </div>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/agent/worlds/${room.id}`}>
-                      {room.status === "ended" ? "查看" : "进入"}
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={pending}
-                    onClick={() => void remove(room.id)}
-                    aria-label={`删除${room.title}`}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+              <WorldCard
+                key={room.id}
+                onClick={() => router.push(`/agent/worlds/${room.id}`)}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{room.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {room.status === "ended"
+                      ? "已结束"
+                      : room.status === "draft"
+                        ? "未开始"
+                        : room.paused
+                          ? "已暂停"
+                          : "进行中"}
+                    {" · "}
+                    {room.characters.join("、")}
+                    {" · "}
+                    {room.messageCount} 条 ·{" "}
+                    {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
+                  </p>
                 </div>
+                {/* <Button asChild variant="text" size="sm">
+                  <Link href={`/agent/worlds/${room.id}`}>
+                    {room.status === "ended" ? "查看" : "进入"}
+                  </Link>
+                </Button> */}
+                <Button
+                  variant="text"
+                  disabled={pending}
+                  onClick={() => void remove(room.id)}
+                  aria-label={`删除${room.title}`}
+                >
+                  <Trash2 />
+                </Button>
               </WorldCard>
             ))}
           </div>
