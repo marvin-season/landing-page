@@ -1,11 +1,11 @@
 "use client";
 
 import type { AiMentionItem } from "@landing-page/biz-ui";
-import { Button } from "@landing-page/design-system";
+import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
   WorldConfig,
@@ -14,6 +14,7 @@ import type {
   WorldRoom,
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "../character-avatar";
+import { NovelPanel } from "../novel/novel-panel";
 import { useWorldRoom } from "../use-world-room";
 import { ArchiveActions } from "./archive-actions";
 import { RoomComposer } from "./room-composer";
@@ -32,17 +33,34 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [copying, setCopying] = useState(false);
   const [presets, setPresets] = useState<WorldPreset[]>([]);
   const [actionPending, setActionPending] = useState(false);
+  const [novelMode, setNovelMode] = useState(false);
+  const [modeReady, setModeReady] = useState(false);
+  const [novelBusy, setNovelBusy] = useState(false);
+  useEffect(() => {
+    try {
+      setNovelMode(
+        localStorage.getItem(`world-novel-mode:${roomId}`) === "true",
+      );
+    } catch {
+      /* Mode remains available when browser storage is restricted. */
+    }
+    setModeReady(true);
+  }, [roomId]);
   const submitted = useRef<{ text: string; mentions: AiMentionItem[] } | null>(
     null,
   );
-  const chat = useWorldRoom(roomId, () => {
-    if (submitted.current) {
-      const saved = submitted.current;
-      setDraft((value) => (value === saved.text ? "" : value));
-      setMentions((value) => (value === saved.mentions ? [] : value));
-      submitted.current = null;
-    }
-  });
+  const chat = useWorldRoom(
+    roomId,
+    () => {
+      if (submitted.current) {
+        const saved = submitted.current;
+        setDraft((value) => (value === saved.text ? "" : value));
+        setMentions((value) => (value === saved.mentions ? [] : value));
+        submitted.current = null;
+      }
+    },
+    modeReady && !novelMode,
+  );
   const { room } = chat;
   async function action(work: () => Promise<void>) {
     setActionPending(true);
@@ -158,62 +176,98 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     <div className="flex h-full min-h-0 flex-col text-foreground">
       <RoomHeader
         title={loaded.config.title}
-        running={running}
+        running={running || novelBusy}
         ended={ended}
-        phase={chat.phase || loaded.run?.phase || ""}
+        phase={
+          novelBusy ? "正在创作章节…" : chat.phase || loaded.run?.phase || ""
+        }
         paused={loaded.paused}
-        reason={loaded.run?.reason}
+        reason={novelMode ? "小说模式 · 单智能体创作" : loaded.run?.reason}
         actionPending={actionPending}
         onOpenNotes={() => setNotes(true)}
         onEdit={() => void edit()}
+        novelMode={novelMode}
+        modeDisabled={!modeReady || novelBusy || actionPending || chat.stopping}
+        onNovelModeChange={(enabled) => {
+          void action(async () => {
+            if (running) {
+              await chat.stop();
+              const result = await worldRequest<{ room: WorldRoom }>(
+                `rooms/${roomId}`,
+              );
+              if (result.room.run?.status === "running")
+                throw new Error("群聊尚未暂停，请稍后再切换模式。");
+            }
+            setNovelMode(enabled);
+            try {
+              localStorage.setItem(
+                `world-novel-mode:${roomId}`,
+                String(enabled),
+              );
+            } catch {
+              chat.setError("模式已切换，但浏览器未能保存模式偏好。");
+            }
+          });
+        }}
       />
+      {novelMode && chat.error ? (
+        <Alert>
+          <AlertDescription>{chat.error}</AlertDescription>
+        </Alert>
+      ) : null}
       <div className="flex min-h-0 flex-1">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <RoomTranscript
-            room={room}
-            onLoadEarlier={() => void chat.loadEarlier()}
-            onRetry={retryFor}
-          />
-          <RoomComposer
-            draft={draft}
-            mentions={mentions}
-            mentionItems={mentionItems}
-            speaker={speaker}
-            speakerLabel={speakerLabel}
-            paused={loaded.paused}
-            running={running}
-            stopping={chat.stopping}
-            pending={chat.pending}
-            actionPending={actionPending}
-            ended={ended}
-            draftStatus={loaded.status === "draft"}
-            error={chat.error}
-            onRetrySubmission={chat.retrySubmission}
-            onDraftChange={setDraft}
-            onMentionsChange={setMentions}
-            onSpeakerChange={setSpeakerId}
-            onSend={send}
-            onStop={() => void chat.stop()}
-            onContinue={() =>
-              chat.start({
-                mode: "auto",
-                text: "",
-                mentions: [],
-                speaker: "system",
-                resume: true,
-              })
-            }
-            onStep={() =>
-              chat.start({
-                mode: "step",
-                text: "",
-                mentions: [],
-                speaker: "system",
-                resume: true,
-              })
-            }
-            onCopy={() => void edit(true)}
-          />
+          {novelMode ? (
+            <NovelPanel key={room.id} room={room} onBusyChange={setNovelBusy} />
+          ) : (
+            <>
+              <RoomTranscript
+                room={room}
+                onLoadEarlier={() => void chat.loadEarlier()}
+                onRetry={retryFor}
+              />
+              <RoomComposer
+                draft={draft}
+                mentions={mentions}
+                mentionItems={mentionItems}
+                speaker={speaker}
+                speakerLabel={speakerLabel}
+                paused={loaded.paused}
+                running={running}
+                stopping={chat.stopping}
+                pending={chat.pending}
+                actionPending={actionPending}
+                ended={ended}
+                draftStatus={loaded.status === "draft"}
+                error={chat.error}
+                onRetrySubmission={chat.retrySubmission}
+                onDraftChange={setDraft}
+                onMentionsChange={setMentions}
+                onSpeakerChange={setSpeakerId}
+                onSend={send}
+                onStop={() => void chat.stop()}
+                onContinue={() =>
+                  chat.start({
+                    mode: "auto",
+                    text: "",
+                    mentions: [],
+                    speaker: "system",
+                    resume: true,
+                  })
+                }
+                onStep={() =>
+                  chat.start({
+                    mode: "step",
+                    text: "",
+                    mentions: [],
+                    speaker: "system",
+                    resume: true,
+                  })
+                }
+                onCopy={() => void edit(true)}
+              />
+            </>
+          )}
         </div>
         <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
           <WorldNotes room={room} onMention={addMention} />

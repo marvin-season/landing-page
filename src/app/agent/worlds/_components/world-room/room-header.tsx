@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import { Button, Switch } from "@landing-page/design-system";
 import { ArrowLeft, LoaderCircle, Settings2, Users } from "lucide-react";
 import Link from "next/link";
 
@@ -14,6 +14,9 @@ export function RoomHeader({
   actionPending,
   onOpenNotes,
   onEdit,
+  novelMode,
+  modeDisabled,
+  onNovelModeChange,
 }: {
   title: string;
   running: boolean;
@@ -24,6 +27,9 @@ export function RoomHeader({
   actionPending: boolean;
   onOpenNotes: () => void;
   onEdit: () => void;
+  novelMode: boolean;
+  modeDisabled: boolean;
+  onNovelModeChange: (enabled: boolean) => void;
 }) {
   return (
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
@@ -48,6 +54,14 @@ export function RoomHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <label className="flex items-center gap-2 text-sm">
+          <Switch
+            checked={novelMode}
+            disabled={modeDisabled}
+            onCheckedChange={onNovelModeChange}
+          />
+          小说模式
+        </label>
         <Button
           variant="outline"
           size="sm"
