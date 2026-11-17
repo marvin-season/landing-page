@@ -10,7 +10,6 @@ import {
   novelRequest,
   parseBackgroundFile,
   serializeBackground,
-  summaryInstructions,
   summaryPrompt,
 } from "./model";
 
@@ -86,9 +85,9 @@ test("summary requests merge inherited background with completed chapters, witho
   assert.equal(JSON.stringify(prompt).includes(novel.chapterGoal), false);
   assert.equal(JSON.stringify(prompt).includes(novel.outline), false);
   const request = novelRequest("room-one", JSON.stringify(prompt), "summary");
-  assert.equal(request.instructions, summaryInstructions);
-  assert.deepEqual(request.activeTools, []);
-  assert.equal(request.maxSteps, 1);
+  assert.equal(request.task, "summary");
+  assert.equal(request.roomId, "room-one");
+  assert.equal(request.prompt, JSON.stringify(prompt));
 });
 
 test("background import rejects malformed, oversized and incompatible files", () => {
@@ -175,13 +174,10 @@ test("whole novel exports preserve chapter order and exclude author settings and
   );
 });
 
-test("chapter requests use one isolated writer session with tools and historical recall disabled", () => {
-  const request = novelRequest("room-one", "设定与完整正文");
-  const other = novelRequest("room-two", "另一部小说");
-  assert.notEqual(request.threadId, other.threadId);
-  assert.equal(request.threadId, novelRequest("room-one", "重试").threadId);
-  assert.deepEqual(request.activeTools, []);
-  assert.equal(request.toolChoice, "none");
-  assert.equal(request.maxSteps, 1);
-  assert.equal(request.memory.options.lastMessages, 0);
+test("chapter requests identify the room and task without sending model credentials or runtime overrides", () => {
+  assert.deepEqual(novelRequest("room-one", "设定与完整正文"), {
+    roomId: "room-one",
+    prompt: "设定与完整正文",
+    task: "chapter",
+  });
 });

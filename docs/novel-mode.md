@@ -18,7 +18,7 @@
 | 用户输入 | 系统干预、角色对白或旁白 | 创作要求、大纲、视角、下一章要求与正文修改 |
 | 推进方式 | 页面订阅可自动接续多批对白 | 用户每次触发一章，不自动连写 |
 | 正文存档 | 服务端世界房间存档 | 当前浏览器 IndexedDB |
-| 生成接口 | `/api/group-chat/rooms/:id/runs` | 现有 `/api/chat` |
+| 生成接口 | `/api/group-chat/rooms/:id/runs` | `/api/novel` |
 | 运行对象 | `WorldRun` | 当前仅为前端生成状态，没有小说运行实体 |
 
 ## 2. 模块与依赖
@@ -31,10 +31,9 @@ flowchart TD
   Hook --> Model[model.ts：小说结构、上下文、请求与导出文本]
   Hook --> Store[Dexie / IndexedDB：world-novels]
   Hook --> Core[共享 useChatStreamCore 与 AI SDK 状态归约]
-  Core --> API[POST /api/chat：会话认证]
-  API --> Writer[现有 General Agent：本次覆写为 Writer 职责]
-  Writer --> LLM[Agent 当前配置的模型]
-  Writer --> Memory[既有 Mastra Memory 路径]
+  Core --> API[POST /api/novel：会话认证与房间所有权校验]
+  API --> Writer[World Novel Writer：单 Writer 职责]
+  Writer --> LLM[开放世界代理与首个启用角色的模型]
 ```
 
 代码入口：
@@ -44,7 +43,7 @@ flowchart TD
 - [`novel/novel-panel.tsx`](../src/app/agent/worlds/_components/novel/novel-panel.tsx)：输入创作要求，选择与编辑章节，展示流式草稿，触发 TXT / Markdown 下载。
 - [`novel/use-novel.ts`](../src/app/agent/worlds/_components/novel/use-novel.ts)：协调本机存档、生成请求、流事件、完成判定和写入队列。
 - [`novel/model.ts`](../src/app/agent/worlds/_components/novel/model.ts)：`Novel` / `Chapter`、默认值、Writer 指令、上下文构造、请求参数和导出文本。
-- [`/api/chat`](../src/app/api/chat/route.ts) 与 [`general-agent.ts`](../mastra-server/agents/general-agent.ts)：现有服务端传输和 Agent。小说模式没有注册独立的 `novelWriter` Agent。
+- [`/api/novel`](../src/app/api/novel/route.ts)、[`novel.ts`](../src/lib/group-chat/novel.ts) 与 [`world-agents.ts`](../mastra-server/agents/world-agents.ts)：校验会话、来源和房间所有权，由同一世界 Agent 工厂创建的 Writer 负责生成。
 
 页面层依赖现有原子组件、字段组件与 `UnifiedMarkdown`；流生命周期、取消和文本归约复用 `@landing-page/utils/stream`。不为小说重复实现 SSE 解析器，也不接入群聊的选人、旁白轮次和连续批次逻辑。
 
@@ -81,7 +80,7 @@ type Novel = {
 | 模式偏好 | localStorage `world-novel-mode:${roomId}` | 本机 UI 偏好，不是服务端房间模式，也不是权限控制 |
 | 生成中的正文与失败片段 | `useNovel` 内存状态 `preview` | 不加入已完成章节；刷新或卸载后不恢复 |
 | 导入的小说背景 | `Novel.background`，随小说存入 IndexedDB | 原世界设定、剧情总结、来源书名和覆盖章节；不覆盖本书设定与成稿 |
-| 模型请求与响应 | 现有 `/api/chat` / Mastra Memory 链路 | 不是小说业务存档，也不用于恢复本机章节 |
+| 模型请求与响应 | `/api/novel` / 世界代理链路 | 不是小说业务存档，也不用于恢复本机章节 |
 
 本机存储按用户和房间区分记录，不等于设备上的加密隔离。清除浏览器数据、换浏览器或换设备后不能依靠世界房间恢复小说。当前删除房间、复制世界和导入世界备份都没有处理小说 IndexedDB 数据：旧记录不会自动清理，复制出来的新房间也不会携带章节。
 
@@ -97,7 +96,7 @@ type Novel = {
 4. `task`：下一章节序号、目标字数、本章要求；未填写本章要求时按大纲继续。
 5. `importedBackground`：用户从本地导入的另一部小说背景，包含原世界设定与剧情总结；没有导入时省略。它不计入本书章节数量。
 
-Writer 指令要求仅输出本章正文，不输出分析、额外章标题、群聊格式或下一章。角色 `enabled` 原本表示群聊发言资格，当前上下文不会据此过滤人物。角色的 `model`、世界 `narration` 和 `maxTurns` 也随完整设定发送，但不驱动小说的模型路由或调度。
+Writer 指令要求仅输出本章正文，不输出分析、额外章标题、群聊格式或下一章。角色 `enabled` 原本表示群聊发言资格，当前上下文不会据此过滤人物。模型由服务端读取房间配置，采用第一个启用角色的 `model`；全部禁用时取第一个角色。世界 `narration` 和 `maxTurns` 不驱动小说调度。
 
 群聊消息、公共历史摘要和未完成小说片段不进入小说上下文。小说从世界设定的初始场景和自身正文发展；当前没有“从群聊剧情接续写小说”的显式导入流程。
 
@@ -105,25 +104,17 @@ Writer 指令要求仅输出本章正文，不输出分析、额外章标题、�
 
 ```ts
 {
-  threadId: `world-novel-${roomId}`,
-  messages: [/* 一个包含完整创作上下文的 user UIMessage */],
-  trigger: "submit-message",
-  instructions: writerInstructions,
-  activeTools: [],
-  toolChoice: "none",
-  maxSteps: 1,
-  memory: { options: { lastMessages: 0 } },
-  modelSettings: { maxOutputTokens: 8192 }
+  roomId,
+  prompt: "完整创作上下文 JSON 文本",
+  task: "chapter" // 或 "summary"
 }
 ```
 
-同一房间沿用线程 ID，不同房间分开。服务端从登录会话设置 Memory 的 `resource`，用该线程 ID 设置 `thread`；不接受浏览器自行指定所有者。线程名本身不是房间访问权限证明，现有 `/api/chat` 也没有小说专用的房间所有权、章节版本或幂等校验。
+`POST /api/novel` 从登录会话取得所有者，校验同源请求与房间所有权，限制上下文不超过 150,000 字符。服务端固定 Writer / Summary 指令、禁用工具、限制单步和 8192 输出 token，不接受客户端覆盖模型、指令或工具配置。
 
-`lastMessages: 0` 用于关闭历史消息召回，让前端提交的完整小说上下文决定本次写作；**不代表关闭服务端存储**。通用 Agent 仍配置了 `Memory`，其线程可能进入普通会话列表，请求与响应也可能被既有存储和日志链路处理。不能将当前方案描述为“正文只存在本机”。
+Writer 由世界 Agent 工厂创建，使用相同的 `GROUP_CHAT_BASE_URL` / `GROUP_CHAT_API_KEY`，默认代理为 `http://127.0.0.1:3425/v1`。模型取房间中第一个启用角色的配置，全部禁用时取第一个角色。写章和背景总结共用此模型，暂未提供小说独立模型选择。
 
-当前实际模型由 General Agent 决定，代码中为 `deepseek/deepseek-chat`，不使用世界 NPC 的 `cursor/auto` 或 `GROUP_CHAT_*` 代理配置。群聊里的获取模型与测试连接只验证群聊链路，不能证明小说生成可用。小说暂未提供独立模型选择。
-
-工具禁用通过本次请求参数实现；复用的 General Agent 本身仍注册了工具。这个配置是当前正常客户端的调用约定，不是小说专用服务端强制策略。单智能体指一次写作任务只有一个 Writer 执行，不代表每本书创建独立的服务端 Agent 实例。
+代理会话使用 `worldSessionId(room, "writer", model)`，隔离所有者、房间、配置、模型和群聊角色。Writer 不配置自动 Memory，不混入普通聊天线程；请求与响应仍经过服务端、代理和既有观测链路，不能描述为纯本机处理。单智能体指一次任务由一个 Writer 执行，不代表每本书创建独立的 Agent 实例。
 
 ## 5. 生成与模式切换生命周期
 
@@ -140,7 +131,7 @@ sequenceDiagram
   actor User as 用户
   participant UI as NovelPanel
   participant Hook as useNovel
-  participant API as /api/chat + Writer
+  participant API as /api/novel + Writer
   participant DB as IndexedDB
   User->>UI: 生成下一章
   UI->>Hook: generate()
@@ -161,7 +152,7 @@ sequenceDiagram
 
 当前 `finish` 事件有 `finishReason` 时要求为 `stop`；缺失原因的 `finish` 也会被接受。还必须等流正常结束并检查正文非空，才追加章节。没有 `finish` 的连接结束，以及 `length` 等非正常完成原因，都不能成为已完成章节。
 
-`generating` ref 防止同一 Hook 重复提交，`useChatStreamCore` 管理取消与卸载清理。停止会取消浏览器订阅，不自动重试，不续写草稿；再次生成仍写同一个章节序号。当前接口未把请求断开显式绑定为小说服务端任务取消，不能保证上游模型立即停止计算或计费。
+`generating` ref 防止同一 Hook 重复提交，`useChatStreamCore` 管理取消与卸载清理。停止会取消浏览器订阅，不自动重试，不续写草稿；再次生成仍写同一个章节序号。服务端将 `request.signal` 传给 Writer，浏览器取消可沿流式链路传播；上游是否立即停止计算或计费取决于代理与模型服务。
 
 完成后先更新前端章节数组，再异步保存。保存失败时本章仍可在当前页面查看、导出，也可能被下次生成用作上下文；它尚不是持久化成功的章节。当前没有“仅重试保存”操作，后续一次完整对象写入可以重新保存当前内容。
 
@@ -187,13 +178,13 @@ TXT 导出保留用户和模型的正文原文，不额外移除 Markdown 语法
 
 “导入背景”通过本地文件选择器读取导出的 `.md` 文件，限制文件不超过 2 MB、总结不超过 20,000 字符，使用 Zod 校验格式、版本、来源和世界配置。不支持缺少来源信息的普通文本、世界群聊备份或未知版本，失败时保留当前小说。成功后将背景单独保存为 `Novel.background`，可编辑总结、替换或移除；本书名称、大纲、世界设定和章节数组保持原值。
 
-后续写章节和再次总结都会携带该背景，因此可以从 A 小说导出，导入 B 小说继续创作，再总结供 C 小说使用。整理继承历史的准确性仍需作者审核。此处没有增加第二个摘要 Agent，没有自动滚动压缩，也没有改变实际模型通道；仍使用 `/api/chat`。总结与写章暂时共用完整上下文的字符上限，超限会阻止提交，不静默省略章节。
+后续写章节和再次总结都会携带该背景，因此可以从 A 小说导出，导入 B 小说继续创作，再总结供 C 小说使用。整理继承历史的准确性仍需作者审核。此处没有增加第二个摘要 Agent，没有自动滚动压缩，写章与总结均使用 `/api/novel` 和开放世界代理。总结与写章暂时共用完整上下文的字符上限，超限会阻止提交，不静默省略章节。
 
 ## 7. 已有验证与证据范围
 
-[`novel/model.test.ts`](../src/app/agent/worlds/_components/novel/model.test.ts) 已覆盖：完整人物资料与章节顺序进入上下文；编辑后的文字参与续写；请求中的下一章要求与字数；TXT / Markdown 内容与顺序；不同房间线程区分；客户端关闭工具、限制步数及历史消息召回的参数。
+[`novel/model.test.ts`](../src/app/agent/worlds/_components/novel/model.test.ts) 已覆盖：完整人物资料与章节顺序进入上下文；编辑后的文字参与续写；请求中的下一章要求与字数；TXT / Markdown 内容与顺序；房间与任务请求参数。`src/lib/group-chat/novel.test.ts` 另外模拟上游代理，验证写章与总结的代理地址、鉴权、模型、会话隔离参数、服务端固定指令与无工具策略、SSE 正常结束及未授权请求拒绝。
 
-这些测试不证明实际模型、服务端工具策略、SSE 完整性、IndexedDB 恢复、多标签页竞争或模型叙事质量。已有群聊测试验证群聊领域，不等同于小说生成集成测试。
+这些测试不证明真实代理连通性、IndexedDB 恢复、多标签页竞争或模型叙事质量。已有群聊测试验证群聊领域，不等同于小说生成集成测试。
 
 验证命令：
 
@@ -261,7 +252,7 @@ node_modules/.bin/tsc --noEmit --incremental false
 
 ### 9.2 专用 Writer 服务的目标契约
 
-当前继续复用 `/api/chat`。若以后获准修改后端，再为小说建立专用调用边界；**这里定义职责，不创建接口、不注册 Agent、不修改数据库**。
+当前 `/api/novel` 已提供会话和房间所有权校验、固定 Writer 指令与工具策略、上下文长度校验及取消传播。以下仍是未实现的业务修订、幂等和并发协调目标。
 
 目标服务端请求携带 `roomId`、`novelId`、`generationId`、`expectedRevision`、`worldVersion`、任务类型和任务输入。服务端必须从会话确定用户、校验房间所有权，固定 Writer 指令和无工具策略，验证输入及模型预算，实施同一作品的并发与请求幂等控制，并传播取消信号。
 
@@ -271,7 +262,7 @@ node_modules/.bin/tsc --noEmit --incremental false
 
 持久化策略需要明确选择：若保留本机作品库，服务端任务记录只是生成协调信息，浏览器仍提交成稿；若增加云端作品库，则服务端成为小说修订与成稿的权威来源，IndexedDB 作为缓存与编辑草稿。不能让 Mastra Memory、本机章节和云端章节各自成为可写的正文真相。
 
-跨设备同步、服务端执行互斥、专用 Writer 强制策略和房间级访问控制都依赖后端建设，当前前端禁用按钮及请求字段无法替代这些保证。
+跨设备同步、服务端执行互斥和章节修订检查仍需后端建设，当前前端禁用按钮及请求字段无法替代这些保证。
 
 ## 10. 后续验收顺序
 

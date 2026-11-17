@@ -92,9 +92,9 @@ flowchart TB
 
 #### 开放世界与小说模式
 
-`/agent/worlds` 与 `/agent/worlds/[roomId]` 承载世界设定及两种创作模式。群聊通过 `/api/group-chat` 调度角色与旁白并维护服务端房间存档；小说模式由单个 Writer 统一创作整章，当前复用 `/api/chat` 的 General Agent，以本次指令限定写作职责并关闭工具及历史消息召回。
+`/agent/worlds` 与 `/agent/worlds/[roomId]` 承载世界设定及两种创作模式。群聊通过 `/api/group-chat` 调度角色与旁白并维护服务端房间存档；小说模式通过 `/api/novel` 由单个 Writer 统一创作整章，复用世界 Agent 的代理配置，采用当前世界第一个启用角色的模型（全部禁用时取第一个角色），不启用工具和自动 Memory。
 
-两种模式共享世界设定，分别维护聊天消息和小说章节。小说设定与成稿保存在浏览器 IndexedDB，模式偏好在 localStorage；通用聊天生成链路仍使用 Mastra Memory，不能视为纯本机数据处理。世界备份目前不包含小说。完整模块关系、生命周期、当前限制与待实现设计见 [小说模式架构](./novel-mode.md)。
+两种模式共享世界设定，分别维护聊天消息和小说章节。小说设定与成稿保存在浏览器 IndexedDB，模式偏好在 localStorage；小说请求经过服务端与模型代理，可能被既有日志和观测链路处理，不能视为纯本机数据处理。世界备份目前不包含小说。完整模块关系、生命周期、当前限制与待实现设计见 [小说模式架构](./novel-mode.md)。
 
 ### 3.3 认证 `src/app/[lang]/auth/`
 

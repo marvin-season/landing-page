@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription, Button } from "@landing-page/design-system";
-import { Download, LoaderCircle, PenLine, Square } from "lucide-react";
+import { Download, LoaderCircle, PenLine, Square, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -26,6 +26,20 @@ export function NovelPanel({
     novel.chapters.find((item) => item.id === selected) ??
     novel.chapters.at(-1);
   const disabled = !writer.ready || writer.busy;
+  function deleteChapter() {
+    if (disabled || !chapter) return;
+    if (
+      !window.confirm(
+        `删除“${chapter.title}”及其全部正文？此操作不能撤销，其他章节将保留。`,
+      )
+    )
+      return;
+    const index = novel.chapters.findIndex((item) => item.id === chapter.id);
+    const chapters = novel.chapters.filter((item) => item.id !== chapter.id);
+    writer.update({ ...novel, chapters });
+    setSelected(chapters[Math.max(0, index - 1)]?.id ?? null);
+    setEditing(false);
+  }
   function download(format: "txt" | "md") {
     downloadText(
       `${novel.title.replace(/[\\/:*?"<>|]/g, "_") || "小说"}.${format}`,
@@ -201,14 +215,25 @@ export function NovelPanel({
                   ))}
                 </select>
               </label>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={disabled}
-                onClick={() => setEditing(!editing)}
-              >
-                {editing ? "完成编辑" : "编辑本章"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={disabled}
+                  onClick={() => setEditing(!editing)}
+                >
+                  {editing ? "完成编辑" : "编辑本章"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={disabled}
+                  onClick={deleteChapter}
+                >
+                  <Trash2 data-icon="inline-start" />
+                  删除本章
+                </Button>
+              </div>
             </div>
             {editing ? (
               <FieldGroup>
