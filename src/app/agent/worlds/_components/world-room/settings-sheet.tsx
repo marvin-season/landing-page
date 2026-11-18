@@ -34,13 +34,16 @@ export function SettingsSheet({
   onOpenChange: (open: boolean) => void;
   onSave: (config: WorldConfig) => Promise<void>;
 }) {
+  const novel = room.kind === "novel";
   return (
     <Sheet open={Boolean(editing)} onOpenChange={onOpenChange}>
       <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
         <SheetHeader className="shrink-0 border-b border-border pr-12">
           <SheetTitle>{copying ? "复制为新世界" : "世界设定与存档"}</SheetTitle>
           <SheetDescription>
-            修改设定只影响后续对话。秘密仅提供给对应角色。
+            {novel
+              ? "修改设定只影响后续章节。"
+              : "修改设定只影响后续对话。秘密仅提供给对应角色。"}
           </SheetDescription>
         </SheetHeader>
         {editing && (!ended || copying) ? (
@@ -53,8 +56,9 @@ export function SettingsSheet({
             <WorldEditor
               key={`${copying}-${room.version}`}
               initial={editing}
+              kind={room.kind}
               submitLabel={copying ? "创建世界" : "保存设定"}
-              lockedMembers={!copying && room.status !== "draft"}
+              lockedMembers={!novel && !copying && room.status !== "draft"}
               presets={presets}
               onCancel={() => onOpenChange(false)}
               onSave={onSave}

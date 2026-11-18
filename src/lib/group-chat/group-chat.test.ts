@@ -119,6 +119,66 @@ async function conversationWithQuestion() {
   return { store, room };
 }
 
+test("world type is fixed at creation and preserved in listings and backups", async () => {
+  const store = setup();
+  const handle = createWorldHandlers({
+    store,
+    complete: fakeComplete,
+    getUser: async () => "alice",
+    models: async () => [],
+  });
+  const origin = "http://localhost";
+  const url = `${origin}/api/group-chat/rooms`;
+  const response = await handle(
+    new Request(url, {
+      method: "POST",
+      headers: { origin, "Content-Type": "application/json" },
+      body: JSON.stringify({ ...exampleWorld, kind: "novel" }),
+    }),
+    ["rooms"],
+  );
+  assert.equal(response.status, 201);
+  const { room } = await response.json();
+  assert.equal(room.kind, "novel");
+  const updated = await store.update(
+    "alice",
+    room.id,
+    {
+      ...exampleWorld,
+      kind: "script",
+      priorContext: "旧港停电时，众人已经把客人转移至仓库。",
+    },
+    1,
+  );
+  assert.equal(updated.kind, "novel");
+  assert.equal((await store.list("alice"))[0].kind, "novel");
+  const backup = exportBackup(updated);
+  const restored = await store.import("alice", backup);
+  assert.equal(restored.kind, "novel");
+  assert.equal(restored.config.priorContext, updated.config.priorContext);
+  await assert.rejects(store.begin("alice", restored.id, command()), {
+    code: "wrong_world_kind",
+  });
+  const { kind: _kind, ...legacyBackup } = backup;
+  assert.equal((await store.import("alice", legacyBackup)).kind, "script");
+});
+
+test("script prequel is available to all prompts without becoming an intervention", async () => {
+  const priorContext = "吊桥已被洪水冲毁，众人在港口集合。";
+  const room = await setup().create("alice", { ...exampleWorld, priorContext });
+  const prompts = [
+    actorContext(room, room.config.characters[0]),
+    directorContext(room, room.config.characters),
+    narratorContext(room, "接续当前场景"),
+  ];
+  for (const messages of prompts) {
+    const { world, publicConversation } = contextData(messages);
+    assert.equal(world.priorContext, priorContext);
+    assert.equal(world.latestIntervention, "");
+    assert.deepEqual(publicConversation, []);
+  }
+});
+
 test("narration stays with the dialogue characters until the switch is on", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);

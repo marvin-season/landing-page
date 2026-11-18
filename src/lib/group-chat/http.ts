@@ -9,6 +9,7 @@ import {
   WorldError,
   type WorldEvent,
   type WorldRoom,
+  worldKindSchema,
 } from "./model";
 import type { Complete } from "./provider";
 import type { WorldStore } from "./store";
@@ -19,7 +20,12 @@ const json = (data: unknown, status = 200) =>
     headers: { "Cache-Control": "private, no-store" },
   });
 function view(room: WorldRoom) {
-  return { ...room, messages: room.messages.slice(-100), runs: [] };
+  return {
+    ...room,
+    kind: room.kind ?? "script",
+    messages: room.messages.slice(-100),
+    runs: [],
+  };
 }
 async function body(request: Request): Promise<unknown> {
   if (!request.headers.get("content-type")?.startsWith("application/json"))
@@ -105,11 +111,16 @@ export function createWorldHandlers({
         throw new WorldError("not_found", "接口不存在", 404);
       if (!id && request.method === "GET")
         return json({ rooms: await store.list(ownerId) });
-      if (!id && request.method === "POST")
+      if (!id && request.method === "POST") {
+        const input = z
+          .object({ kind: worldKindSchema.optional() })
+          .passthrough()
+          .parse(await body(request));
         return json(
-          { room: view(await store.create(ownerId, await body(request))) },
+          { room: view(await store.create(ownerId, input, input.kind)) },
           201,
         );
+      }
       if (id === "import" && request.method === "POST")
         return json(
           { room: view(await store.import(ownerId, await body(request))) },

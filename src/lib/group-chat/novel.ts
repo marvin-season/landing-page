@@ -35,6 +35,10 @@ export function createNovelHandler({
     try {
       const { roomId, prompt, task } = inputSchema.parse(await request.json());
       const room = await store.get(ownerId, roomId);
+      if (room.kind !== "novel")
+        throw new WorldError("wrong_world_kind", "请在小说存档中创作章节", 409);
+      if (room.status === "ended")
+        throw new WorldError("ended", "小说已结束", 409);
       const model =
         room.config.characters.find((character) => character.enabled)?.model ||
         room.config.characters[0].model;

@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Switch } from "@landing-page/design-system";
+import { Button } from "@landing-page/design-system";
 import { ArrowLeft, LoaderCircle, Settings2, Users } from "lucide-react";
 import Link from "next/link";
+import type { WorldKind } from "@/lib/group-chat/model";
 
 export function RoomHeader({
   title,
@@ -14,9 +15,7 @@ export function RoomHeader({
   actionPending,
   onOpenNotes,
   onEdit,
-  novelMode,
-  modeDisabled,
-  onNovelModeChange,
+  kind,
 }: {
   title: string;
   running: boolean;
@@ -27,15 +26,18 @@ export function RoomHeader({
   actionPending: boolean;
   onOpenNotes: () => void;
   onEdit: () => void;
-  novelMode: boolean;
-  modeDisabled: boolean;
-  onNovelModeChange: (enabled: boolean) => void;
+  kind: WorldKind;
 }) {
   return (
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon">
-          <Link href="/agent/worlds" aria-label="返回世界列表">
+          <Link
+            href={
+              kind === "novel" ? "/agent/worlds?kind=novel" : "/agent/worlds"
+            }
+            aria-label="返回世界列表"
+          >
             <ArrowLeft />
           </Link>
         </Button>
@@ -54,14 +56,9 @@ export function RoomHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <label className="flex items-center gap-2 text-sm">
-          <Switch
-            checked={novelMode}
-            disabled={modeDisabled}
-            onCheckedChange={onNovelModeChange}
-          />
-          小说模式
-        </label>
+        <span className="text-xs text-muted-foreground">
+          {kind === "novel" ? "小说" : "剧本"}
+        </span>
         <Button
           variant="outline"
           size="sm"

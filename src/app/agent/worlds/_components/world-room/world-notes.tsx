@@ -34,24 +34,27 @@ export function WorldNotes({
   onMention,
 }: {
   room: WorldRoom;
-  onMention: (id: string) => void;
+  onMention?: (id: string) => void;
 }) {
+  const novel = room.kind === "novel";
   return (
     <div className="flex flex-col text-sm">
       <h3 className="mb-1">登场</h3>
-      <NoteCard>
-        <div className="flex items-center gap-2">
-          <span className="flex size-7 shrink-0 items-center justify-center text-xs text-muted-foreground">
-            系
-          </span>
-          <p className="min-w-0 flex-1 truncate font-medium">系统 · 你</p>
-        </div>
-        <p className="text-xs leading-5 text-muted-foreground">
-          {room.config.storyGoal ||
-            "默认以系统身份干预。输入框上方可以改成旁白或任意角色。"}
-        </p>
-      </NoteCard>
-      {room.config.narration ? (
+      {!novel ? (
+        <NoteCard>
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 shrink-0 items-center justify-center text-xs text-muted-foreground">
+              系
+            </span>
+            <p className="min-w-0 flex-1 truncate font-medium">系统 · 你</p>
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {room.config.storyGoal ||
+              "默认以系统身份干预。输入框上方可以改成旁白或任意角色。"}
+          </p>
+        </NoteCard>
+      ) : null}
+      {!novel && room.config.narration ? (
         <NoteCard>
           <p className="font-medium">旁白</p>
           <p className="text-xs leading-5 text-muted-foreground">
@@ -70,17 +73,19 @@ export function WorldNotes({
             />
             <p className="min-w-0 flex-1 truncate font-medium">
               {c.name}
-              {c.enabled ? "" : " · 已禁用"}
+              {novel || c.enabled ? "" : " · 已禁用"}
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 shrink-0 px-2"
-              disabled={!c.enabled || room.status === "ended"}
-              onClick={() => onMention(c.id)}
-            >
-              点名
-            </Button>
+            {onMention ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 shrink-0 px-2"
+                disabled={!c.enabled || room.status === "ended"}
+                onClick={() => onMention(c.id)}
+              >
+                点名
+              </Button>
+            ) : null}
           </div>
           <p className="text-xs leading-5 text-muted-foreground">
             {c.identity}
@@ -95,6 +100,13 @@ export function WorldNotes({
           {room.config.background}
         </p>
       </NoteCard>
+      {room.config.priorContext ? (
+        <NoteCard title="前置剧情">
+          <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
+            {room.config.priorContext}
+          </p>
+        </NoteCard>
+      ) : null}
       <NoteCard title="当前场景">
         <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
           {room.config.scene}
@@ -116,7 +128,8 @@ export function WorldNotes({
       ) : null}
       <NoteCard title="世界规则">
         <p className="whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
-          {room.config.rules || "NPC 自主行动，按当前需求持续推进。"}
+          {room.config.rules ||
+            (novel ? "无额外规则" : "NPC 自主行动，按当前需求持续推进。")}
         </p>
       </NoteCard>
       {room.run ? (
@@ -142,7 +155,7 @@ export function WorldNotesSheet({
   open: boolean;
   room: WorldRoom;
   onOpenChange: (open: boolean) => void;
-  onMention: (id: string) => void;
+  onMention?: (id: string) => void;
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

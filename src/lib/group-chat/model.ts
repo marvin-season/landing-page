@@ -7,6 +7,9 @@ export const idSchema = z
   .min(1)
   .max(100)
   .regex(/^[\w-]+$/);
+export const worldKindSchema = z.enum(["script", "novel"]);
+export type WorldKind = z.infer<typeof worldKindSchema>;
+export const maxPriorContextLength = 8000;
 export const characterSchema = z.object({
   id: idSchema,
   name: text(30).min(1, "请填写角色名称"),
@@ -24,6 +27,7 @@ const currentConfigSchema = z
   .object({
     title: text(60).min(1, "请填写世界名称"),
     background: text(8000).min(1, "请填写世界背景"),
+    priorContext: text(maxPriorContextLength).optional(),
     scene: text(2000).min(1, "请填写初始场景"),
     rules: text(4000),
     facts: text(4000),
@@ -132,6 +136,7 @@ export type WorldRun = {
 export type WorldRoom = {
   id: string;
   ownerId: string;
+  kind?: WorldKind;
   status: "draft" | "active" | "ended";
   config: WorldConfig;
   version: number;
@@ -146,7 +151,7 @@ export type WorldRoom = {
 };
 export type RoomListItem = Pick<
   WorldRoom,
-  "id" | "status" | "updatedAt" | "paused"
+  "id" | "kind" | "status" | "updatedAt" | "paused"
 > & {
   title: string;
   characters: string[];
@@ -180,6 +185,7 @@ export type WorldPreset = z.infer<typeof presetInputSchema> & { id: string };
 export const backupSchema = z.object({
   format: z.literal("world-chat"),
   schemaVersion: z.literal(1),
+  kind: worldKindSchema.optional(),
   config: configSchema,
   snapshots: z
     .array(
@@ -201,6 +207,7 @@ export function exportBackup(room: WorldRoom) {
   return {
     format: "world-chat" as const,
     schemaVersion: 1 as const,
+    kind: room.kind ?? "script",
     config: room.config,
     snapshots: room.snapshots,
     version: room.version,

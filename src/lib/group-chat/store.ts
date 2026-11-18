@@ -11,6 +11,7 @@ import {
   type RunInput,
   type RunStatus,
   WorldError,
+  type WorldKind,
   type WorldMessage,
   type WorldPreset,
   type WorldRoom,
@@ -20,6 +21,7 @@ export const LEASE_MS = 15000;
 export function roomListing(room: WorldRoom): RoomListItem {
   return {
     id: room.id,
+    kind: room.kind ?? "script",
     status: room.status,
     title: room.config.title,
     characters: room.config.characters.map((c) => c.name),
@@ -186,11 +188,12 @@ export function createWorldStore(getClient: () => Client) {
       return room;
     });
   }
-  function fresh(ownerId: string, input: unknown): WorldRoom {
+  function fresh(ownerId: string, input: unknown, kind: WorldKind): WorldRoom {
     const config = configSchema.parse(input);
     return {
       id: randomUUID(),
       ownerId,
+      kind,
       config,
       version: 1,
       snapshots: [{ version: 1, config: structuredClone(config) }],
@@ -206,7 +209,8 @@ export function createWorldStore(getClient: () => Client) {
   }
   return {
     change,
-    create: (ownerId: string, input: unknown) => insert(fresh(ownerId, input)),
+    create: (ownerId: string, input: unknown, kind: WorldKind = "script") =>
+      insert(fresh(ownerId, input, kind)),
     async get(ownerId: string, id: string) {
       return (await change(ownerId, id, () => {})).room;
     },
@@ -215,9 +219,10 @@ export function createWorldStore(getClient: () => Client) {
         sql: "SELECT listing FROM world_rooms WHERE owner_id = ? ORDER BY updated_at DESC LIMIT 200",
         args: [ownerId],
       });
-      return result.rows.map(
-        (row) => JSON.parse(String(row.listing)) as RoomListItem,
-      );
+      return result.rows.map((row) => {
+        const item = JSON.parse(String(row.listing)) as RoomListItem;
+        return { ...item, kind: item.kind ?? "script" };
+      });
     },
     async update(
       ownerId: string,
@@ -321,6 +326,8 @@ export function createWorldStore(getClient: () => Client) {
     },
     async begin(ownerId: string, id: string, input: RunInput) {
       return change(ownerId, id, async (room, tx) => {
+        if (room.kind === "novel")
+          throw new WorldError("wrong_world_kind", "小说不能发起剧本对话", 409);
         const hash = createHash("sha256")
           .update(JSON.stringify(input))
           .digest("hex");
@@ -480,7 +487,9 @@ export function createWorldStore(getClient: () => Client) {
         !versions.has(backup.version)
       )
         throw new WorldError("invalid_backup", "备份配置版本不完整");
-      const room = fresh(ownerId, backup.config);
+      const room = fresh(ownerId, backup.config, backup.kind ?? "script");
+      if (room.kind === "novel" && backup.messages.length)
+        throw new WorldError("invalid_backup", "小说设定备份不能包含剧本对话");
       room.version = backup.version;
       room.snapshots = backup.snapshots;
       const ids = new Map<string, string>();

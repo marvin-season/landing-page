@@ -63,6 +63,8 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 除非特别说明，否则样式默认使用tailwind实现
 
+个人项目，可以修改所有代码，除非特别说明，无需考虑存量数据的迁移和兼容。
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

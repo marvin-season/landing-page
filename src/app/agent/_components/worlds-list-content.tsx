@@ -16,6 +16,7 @@ dayjs.locale("zh-cn");
 
 function roomStatus(room: RoomListItem) {
   if (room.status === "ended") return "已结束";
+  if (room.kind === "novel") return "小说";
   if (room.status === "draft") return "未开始";
   if (room.paused) return "已暂停";
   return "进行中";

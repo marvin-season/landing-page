@@ -20,50 +20,55 @@ export function ArchiveActions({
   onCopy: () => void;
   onEnded: (room: WorldRoom) => void;
 }) {
+  const novel = room.kind === "novel";
   return (
     <div className="flex flex-wrap gap-2">
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={pending}
-        onClick={() =>
-          void onPending(async () => {
-            const response = await fetch(
-              `/api/group-chat/rooms/${room.id}/export?format=markdown`,
-            );
-            if (!response.ok) throw new Error("导出失败");
-            downloadText(
-              `${room.config.title}.md`,
-              await response.text(),
-              "text/markdown",
-            );
-          })
-        }
-      >
-        <Download data-icon="inline-start" />
-        导出对话
-      </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={pending}
-        onClick={() =>
-          void onPending(async () => {
-            const response = await fetch(
-              `/api/group-chat/rooms/${room.id}/export?format=narration`,
-            );
-            if (!response.ok) throw new Error("导出失败");
-            downloadText(
-              `${room.config.title}-旁白叙事.md`,
-              await response.text(),
-              "text/markdown",
-            );
-          })
-        }
-      >
-        <Download data-icon="inline-start" />
-        导出旁白
-      </Button>
+      {!novel ? (
+        <>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={pending}
+            onClick={() =>
+              void onPending(async () => {
+                const response = await fetch(
+                  `/api/group-chat/rooms/${room.id}/export?format=markdown`,
+                );
+                if (!response.ok) throw new Error("导出失败");
+                downloadText(
+                  `${room.config.title}.md`,
+                  await response.text(),
+                  "text/markdown",
+                );
+              })
+            }
+          >
+            <Download data-icon="inline-start" />
+            导出对话
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={pending}
+            onClick={() =>
+              void onPending(async () => {
+                const response = await fetch(
+                  `/api/group-chat/rooms/${room.id}/export?format=narration`,
+                );
+                if (!response.ok) throw new Error("导出失败");
+                downloadText(
+                  `${room.config.title}-旁白叙事.md`,
+                  await response.text(),
+                  "text/markdown",
+                );
+              })
+            }
+          >
+            <Download data-icon="inline-start" />
+            导出旁白
+          </Button>
+        </>
+      ) : null}
       <Button
         size="sm"
         variant="outline"
@@ -84,7 +89,7 @@ export function ArchiveActions({
           })
         }
       >
-        完整备份
+        {novel ? "备份世界设定" : "完整备份"}
       </Button>
       <Button size="sm" variant="outline" onClick={onCopy}>
         <Copy data-icon="inline-start" />

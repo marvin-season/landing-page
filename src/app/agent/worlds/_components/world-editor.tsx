@@ -26,10 +26,12 @@ import {
   type Character,
   configSchema,
   type WorldConfig,
+  type WorldKind,
   type WorldPreset,
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
+import { PriorContextField } from "./prior-context-field";
 
 type SectionKey = "world" | "story" | "cast" | "pace";
 
@@ -96,6 +98,7 @@ export function WorldEditor({
   presets = [],
   onPresetSaved,
   submitLabel,
+  kind = "script",
 }: {
   initial: WorldConfig;
   onSave: (config: WorldConfig) => Promise<void>;
@@ -104,10 +107,13 @@ export function WorldEditor({
   presets?: WorldPreset[];
   onPresetSaved?: () => void;
   submitLabel?: string;
+  kind?: WorldKind;
 }) {
   const [config, setConfig] = useState(() => structuredClone(initial));
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const novel = kind === "novel";
   const [models, setModels] = useState<string[]>([]);
   const [connection, setConnection] = useState("");
   const [presetId, setPresetId] = useState("");
@@ -184,6 +190,7 @@ export function WorldEditor({
       className="flex min-h-0 flex-1 flex-col"
       onSubmit={(e) => {
         e.preventDefault();
+        if (pending || importing) return;
         void action(async () => {
           const parsed = configSchema.safeParse(config);
           if (!parsed.success) throw new Error(parsed.error.issues[0].message);
@@ -193,7 +200,7 @@ export function WorldEditor({
     >
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain px-5 py-4">
         <fieldset
-          disabled={pending}
+          disabled={pending || importing}
           className="flex min-w-0 flex-col gap-3 disabled:opacity-60"
         >
           {!lockedMembers && presets.some((p) => p.kind === "world") ? (
@@ -205,7 +212,11 @@ export function WorldEditor({
                   setPresetId(e.target.value);
                   const preset = presets.find((p) => p.id === e.target.value);
                   if (preset?.kind === "world")
-                    setConfig(structuredClone(preset.content));
+                    setConfig((current) => ({
+                      ...structuredClone(preset.content),
+                      priorContext:
+                        current.priorContext ?? preset.content.priorContext,
+                    }));
                 }}
                 className={selectClassName}
               >
@@ -252,6 +263,11 @@ export function WorldEditor({
                 maxLength={2000}
                 required
               />
+              <PriorContextField
+                value={config.priorContext ?? ""}
+                onChange={(value) => update("priorContext", value)}
+                onImportingChange={setImporting}
+              />
               <TextField
                 label="世界规则"
                 value={config.rules}
@@ -272,43 +288,49 @@ export function WorldEditor({
             id="world-section-story"
             open={openSections.story}
             onOpenChange={(open) => setSection("story", open)}
-            title="故事推进要求"
+            title={novel ? "小说大纲" : "故事推进要求"}
             summary={preview(
               config.storyGoal,
-              config.narration ? "旁白已打开" : "未填写目标",
+              !novel && config.narration ? "旁白已打开" : "未填写目标",
             )}
             icon={ScrollText}
           >
             <FieldGroup>
               <TextField
-                label="当前目标与节奏"
+                label={novel ? "大纲与创作要求" : "当前目标与节奏"}
                 value={config.storyGoal}
                 onChange={(v) => update("storyGoal", v)}
                 multiline
                 maxLength={4000}
-                hint="例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
+                hint={
+                  novel
+                    ? undefined
+                    : "例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
+                }
               />
-              <label className="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5 text-sm">
-                <span>
-                  <span className="font-medium">旁白</span>
-                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-                    打开后由旁白叙述场景和事件。对话角色只说自己的话。
+              {!novel ? (
+                <label className="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5 text-sm">
+                  <span>
+                    <span className="font-medium">旁白</span>
+                    <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                      打开后由旁白叙述场景和事件。对话角色只说自己的话。
+                    </span>
                   </span>
-                </span>
-                <Switch
-                  checked={config.narration}
-                  onCheckedChange={(narration) =>
-                    update("narration", narration)
-                  }
-                />
-              </label>
+                  <Switch
+                    checked={config.narration}
+                    onCheckedChange={(narration) =>
+                      update("narration", narration)
+                    }
+                  />
+                </label>
+              ) : null}
             </FieldGroup>
           </EditorSection>
           <EditorSection
             id="world-section-cast"
             open={openSections.cast}
             onOpenChange={(open) => setSection("cast", open)}
-            title={`NPC · ${config.characters.length}/7`}
+            title={`${novel ? "角色" : "NPC"} · ${config.characters.length}/7`}
             summary={
               config.characters
                 .map(
@@ -377,7 +399,7 @@ export function WorldEditor({
                         {character.name || `角色 ${index + 1}`}
                         {character.enabled ? null : (
                           <span className="ml-2 text-xs font-normal text-muted-foreground">
-                            已禁用
+                            {novel ? "备用模型" : "已禁用"}
                           </span>
                         )}
                       </span>
@@ -457,7 +479,11 @@ export function WorldEditor({
                           }
                           maxLength={600}
                           required
-                          hint="只提供给该角色。希望其他人知道的目标请写入公开背景。"
+                          hint={
+                            novel
+                              ? undefined
+                              : "只提供给该角色。希望其他人知道的目标请写入公开背景。"
+                          }
                         />
                         <TextField
                           label="公开背景"
@@ -476,7 +502,11 @@ export function WorldEditor({
                           }
                           multiline
                           maxLength={1200}
-                          hint="房主可见；只发送给该角色，不提供给其他角色或调度器。"
+                          hint={
+                            novel
+                              ? "由作者掌握，按剧情逐步揭示。"
+                              : "房主可见；只发送给该角色，不提供给其他角色或调度器。"
+                          }
                         />
                         <TextField
                           label="说话风格"
@@ -509,7 +539,7 @@ export function WorldEditor({
                               updateCharacter(character.id, { enabled })
                             }
                           />
-                          允许发言
+                          {novel ? "候选写作模型" : "允许发言"}
                         </label>
                         <div className="flex items-center gap-1">
                           <Button
@@ -554,14 +584,18 @@ export function WorldEditor({
             id="world-section-pace"
             open={openSections.pace}
             onOpenChange={(open) => setSection("pace", open)}
-            title="对话节奏"
-            summary="自动推进，可改成旁白或角色"
+            title={novel ? "写作模型" : "对话节奏"}
+            summary={
+              novel ? "采用第一个启用的候选模型" : "自动推进，可改成旁白或角色"
+            }
             icon={SlidersHorizontal}
           >
-            <p className="text-sm leading-6 text-muted-foreground">
-              进入新世界后，NPC
-              会依据设定和推进要求自动行动，逐条接话，不等待你回答。输入默认是系统干预，也可以改成旁白或某个角色；你还可以暂停、点名或使用“仅下一条”。
-            </p>
+            {!novel ? (
+              <p className="text-sm leading-6 text-muted-foreground">
+                进入新世界后，NPC
+                会依据设定和推进要求自动行动，逐条接话，不等待你回答。输入默认是系统干预，也可以改成旁白或某个角色；你还可以暂停、点名或使用“仅下一条”。
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
@@ -588,7 +622,11 @@ export function WorldEditor({
                 onClick={() =>
                   void action(async () => {
                     await worldRequest("connection", "POST", {
-                      model: config.characters[0].model,
+                      model:
+                        (novel
+                          ? config.characters.find((c) => c.enabled)
+                          : undefined
+                        )?.model ?? config.characters[0].model,
                     });
                     setConnection("连接成功，纯文本流式响应正常。");
                   })
@@ -629,12 +667,12 @@ export function WorldEditor({
             <Button
               type="button"
               variant="ghost"
-              disabled={pending}
+              disabled={pending || importing}
               onClick={() => void savePreset()}
             >
               {presetId ? "更新世界预设" : "保存为世界预设"}
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || importing}>
               {pending
                 ? "正在保存…"
                 : submitLabel || (lockedMembers ? "保存设定" : "创建世界")}

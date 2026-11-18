@@ -20,6 +20,7 @@ function room(): WorldRoom {
   config.characters[1].model = "kiro/auto";
   return {
     id: "novel-room",
+    kind: "novel",
     ownerId: "alice",
     config,
     status: "active",
@@ -146,4 +147,23 @@ test("novel endpoint rejects anonymous, cross-origin, invalid and inaccessible r
   assert.equal(reads, 0);
   assert.equal((await handle(request(body))).status, 404);
   assert.equal(reads, 1);
+});
+
+test("novel endpoint accepts only novel rooms that have not ended", async () => {
+  const saved = room();
+  const body = novelRequest(saved.id, "上下文");
+  const handle = createNovelHandler({
+    getUser: async () => "alice",
+    store: { get: async () => saved },
+    mastra,
+  });
+  saved.kind = "script";
+  const script = await handle(request(body));
+  assert.equal(script.status, 409);
+  assert.match((await script.json()).error, /小说存档/);
+  saved.kind = "novel";
+  saved.status = "ended";
+  const ended = await handle(request(body));
+  assert.equal(ended.status, 409);
+  assert.match((await ended.json()).error, /已结束/);
 });

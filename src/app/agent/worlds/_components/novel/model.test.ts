@@ -16,6 +16,7 @@ import {
 test("writer receives world secrets and edited chapters in order, with the next chapter requirements", () => {
   const config = structuredClone(loadWorldTemplates()[0].config);
   config.characters[0].privateInfo = "尚未揭晓的身份";
+  config.priorContext = "此前众人在码头会合。";
   const novel = createNovel(config);
   novel.chapters = [
     { id: "one", title: "第1章 初见", text: "已编辑的第一章。" },
@@ -24,6 +25,7 @@ test("writer receives world secrets and edited chapters in order, with the next 
   novel.chapterGoal = "揭示线索，但保留身份秘密";
   const prompt = JSON.parse(chapterPrompt(config, novel));
   assert.equal(prompt.world.characters[0].privateInfo, "尚未揭晓的身份");
+  assert.equal(prompt.world.priorContext, config.priorContext);
   assert.deepEqual(
     prompt.completedChapters,
     novel.chapters.map(({ title, text }) => ({ title, text })),

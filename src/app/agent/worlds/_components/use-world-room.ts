@@ -24,11 +24,7 @@ function mergeRoom(previous: WorldRoom | null, next: WorldRoom) {
     ],
   };
 }
-export function useWorldRoom(
-  roomId: string,
-  onAccepted: () => void,
-  allowAutoStart = true,
-) {
+export function useWorldRoom(roomId: string, onAccepted: () => void) {
   const [room, setRoom] = useState<WorldRoom | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -154,8 +150,8 @@ export function useWorldRoom(
   });
   useEffect(() => {
     if (
-      !allowAutoStart ||
       !room ||
+      room.kind === "novel" ||
       room.status !== "draft" ||
       room.paused ||
       room.run ||
@@ -177,7 +173,7 @@ export function useWorldRoom(
     lastCommand.current = command;
     requestId.current = command.clientRequestId;
     stream.send({ roomId: room.id, command });
-  }, [room, stream.send, allowAutoStart]);
+  }, [room, stream.send]);
   function start(
     command: Omit<RunInput, "clientRequestId" | "expectedVersion">,
   ) {

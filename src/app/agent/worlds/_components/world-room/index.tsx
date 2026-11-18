@@ -5,7 +5,7 @@ import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
   WorldConfig,
@@ -33,34 +33,18 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [copying, setCopying] = useState(false);
   const [presets, setPresets] = useState<WorldPreset[]>([]);
   const [actionPending, setActionPending] = useState(false);
-  const [novelMode, setNovelMode] = useState(false);
-  const [modeReady, setModeReady] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
-  useEffect(() => {
-    try {
-      setNovelMode(
-        localStorage.getItem(`world-novel-mode:${roomId}`) === "true",
-      );
-    } catch {
-      /* Mode remains available when browser storage is restricted. */
-    }
-    setModeReady(true);
-  }, [roomId]);
   const submitted = useRef<{ text: string; mentions: AiMentionItem[] } | null>(
     null,
   );
-  const chat = useWorldRoom(
-    roomId,
-    () => {
-      if (submitted.current) {
-        const saved = submitted.current;
-        setDraft((value) => (value === saved.text ? "" : value));
-        setMentions((value) => (value === saved.mentions ? [] : value));
-        submitted.current = null;
-      }
-    },
-    modeReady && !novelMode,
-  );
+  const chat = useWorldRoom(roomId, () => {
+    if (submitted.current) {
+      const saved = submitted.current;
+      setDraft((value) => (value === saved.text ? "" : value));
+      setMentions((value) => (value === saved.mentions ? [] : value));
+      submitted.current = null;
+    }
+  });
   const { room } = chat;
   async function action(work: () => Promise<void>) {
     setActionPending(true);
@@ -84,6 +68,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       </div>
     );
   const loaded = room;
+  const kind = room.kind ?? "script";
+  const novelMode = kind === "novel";
   const running =
     chat.stopping || chat.busy || loaded.run?.status === "running";
   const ended = loaded.status === "ended";
@@ -182,33 +168,11 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           novelBusy ? "正在创作章节…" : chat.phase || loaded.run?.phase || ""
         }
         paused={loaded.paused}
-        reason={novelMode ? "小说模式 · 单智能体创作" : loaded.run?.reason}
+        reason={novelMode ? "章节创作" : loaded.run?.reason}
         actionPending={actionPending}
         onOpenNotes={() => setNotes(true)}
         onEdit={() => void edit()}
-        novelMode={novelMode}
-        modeDisabled={!modeReady || novelBusy || actionPending || chat.stopping}
-        onNovelModeChange={(enabled) => {
-          void action(async () => {
-            if (running) {
-              await chat.stop();
-              const result = await worldRequest<{ room: WorldRoom }>(
-                `rooms/${roomId}`,
-              );
-              if (result.room.run?.status === "running")
-                throw new Error("群聊尚未暂停，请稍后再切换模式。");
-            }
-            setNovelMode(enabled);
-            try {
-              localStorage.setItem(
-                `world-novel-mode:${roomId}`,
-                String(enabled),
-              );
-            } catch {
-              chat.setError("模式已切换，但浏览器未能保存模式偏好。");
-            }
-          });
-        }}
+        kind={kind}
       />
       {novelMode && chat.error ? (
         <Alert>
@@ -270,14 +234,17 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           )}
         </div>
         <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
-          <WorldNotes room={room} onMention={addMention} />
+          <WorldNotes
+            room={room}
+            onMention={novelMode ? undefined : addMention}
+          />
         </aside>
       </div>
       <WorldNotesSheet
         open={notes}
         room={room}
         onOpenChange={setNotes}
-        onMention={addMention}
+        onMention={novelMode ? undefined : addMention}
       />
       <SettingsSheet
         room={room}
@@ -306,7 +273,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             const data = await worldRequest<{ room: WorldRoom }>(
               "rooms",
               "POST",
-              config,
+              { ...config, kind },
             );
             router.push(`/agent/worlds/${data.room.id}`);
           } else {
