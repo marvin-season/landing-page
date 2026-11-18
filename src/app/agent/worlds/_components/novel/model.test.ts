@@ -3,7 +3,6 @@ import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
 import {
   chapterPrompt,
-  chapterSelection,
   createBackground,
   createNovel,
   exportNovel,
@@ -26,11 +25,8 @@ test("a passage rewrite sends the unselected text and replaces only the selected
     { id: "target", title: "本章", text },
     { id: "after", title: "下章", text: "灯还亮着。" },
   ];
-  const normalized = text.replaceAll("\r\n", "\n");
-  const start = normalized.lastIndexOf("她推开了门。");
-  const end = normalized.indexOf("灯亮了。");
-  const range = chapterSelection(text, start, end);
-  assert.ok(range);
+  const start = text.lastIndexOf("她推开了门。");
+  const range = { start, end: start + "她推开了门。".length };
   const prompt = JSON.parse(
     rewritePrompt(config, novel, "target", "补足动作细节", range),
   );
@@ -56,7 +52,6 @@ test("a passage rewrite sends the unselected text and replaces only the selected
     [updated.chapters[0], updated.chapters[2]],
     [novel.chapters[0], novel.chapters[2]],
   );
-  assert.equal(chapterSelection(text, end - 2, end), null);
   assert.throws(
     () =>
       rewritePrompt(config, novel, "target", "", {

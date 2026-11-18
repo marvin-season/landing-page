@@ -559,7 +559,10 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   const isAgentRoute = pathname.startsWith("/agent");
   const worlds = isWorldsPath(pathname);
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [chatCollapsed, setChatCollapsed] = useState(false);
+  const [worldsCollapsed, setWorldsCollapsed] = useState(true);
+  const collapsed = worlds ? worldsCollapsed : chatCollapsed;
+  const setCollapsed = worlds ? setWorldsCollapsed : setChatCollapsed;
   const closeSheet = () => setOpen(false);
   const listContent = (onItemClick?: () => void) =>
     worlds ? (

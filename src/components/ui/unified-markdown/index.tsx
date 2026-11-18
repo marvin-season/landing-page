@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@landing-page/utils";
+import type { ReactNode } from "react";
 import { useIncrementalMarkdown } from "./use-incremental-markdown";
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
@@ -19,6 +20,18 @@ export function UnifiedMarkdown({
   });
 
   return (
+    <MarkdownProse className={className}>{contentComponent}</MarkdownProse>
+  );
+}
+
+export function MarkdownProse({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
     <div
       className={cn(
         "prose prose-slate dark:prose-invert max-w-none",
@@ -26,7 +39,7 @@ export function UnifiedMarkdown({
         className,
       )}
     >
-      {contentComponent}
+      {children}
     </div>
   );
 }

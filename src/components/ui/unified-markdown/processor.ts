@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { unified } from "unified";
+import { type Plugin, unified } from "unified";
 import { visit } from "unist-util-visit";
 import components from "./components";
 
@@ -50,8 +50,11 @@ function rehypeStreamSplitter() {
   };
 }
 
+export type MarkdownTree = Parameters<ReturnType<typeof rehypeHighlight>>[0];
+
 export interface ProcessorOptions {
   streaming?: boolean;
+  transform?: Plugin<[], MarkdownTree>;
 }
 
 export const createProcessor = (options: ProcessorOptions = {}) => {
@@ -62,6 +65,8 @@ export const createProcessor = (options: ProcessorOptions = {}) => {
     .use(remarkRehype)
     .use(rehypeKatex)
     .use(rehypeHighlight, { detect: true, ignoreMissing: true });
+
+  if (options.transform) p.use(options.transform);
 
   if (options.streaming) {
     p.use(rehypeStreamSplitter);

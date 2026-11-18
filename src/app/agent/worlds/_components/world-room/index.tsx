@@ -29,7 +29,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [mentions, setMentions] = useState<AiMentionItem[]>([]);
   const [speakerId, setSpeakerId] = useState("system");
   const [notes, setNotes] = useState(false);
-  const [notesSidebarOpen, setNotesSidebarOpen] = useState(true);
+  const [notesSidebarOpen, setNotesSidebarOpen] = useState(false);
   const [editing, setEditing] = useState<WorldConfig | null>(null);
   const [copying, setCopying] = useState(false);
   const [presets, setPresets] = useState<WorldPreset[]>([]);

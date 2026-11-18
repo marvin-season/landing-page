@@ -136,30 +136,6 @@ export function rewritePrompt(
   return adjacent;
 }
 
-export function chapterSelection(
-  text: string,
-  selectionStart: number,
-  selectionEnd: number,
-): ChapterTextRange | null {
-  let start = selectionStart;
-  let end = selectionEnd;
-  // Textarea offsets count CRLF as one character; the saved Markdown may not.
-  let removed = 0;
-  for (const match of text.matchAll(/\r\n/g)) {
-    const offset = match.index - removed;
-    if (offset >= selectionEnd) break;
-    if (offset < selectionStart) start++;
-    end++;
-    removed++;
-  }
-  const selected = text.slice(start, end);
-  if (!selected.trim()) return null;
-  return {
-    start: start + selected.length - selected.trimStart().length,
-    end: start + selected.trimEnd().length,
-  };
-}
-
 function splitChapterText(text: string, { start, end }: ChapterTextRange) {
   if (
     !Number.isInteger(start) ||
