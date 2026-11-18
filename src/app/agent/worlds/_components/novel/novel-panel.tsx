@@ -17,8 +17,9 @@ import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
 import { BackgroundControls, downloadBackground } from "./background-controls";
 import { ChapterReading, type RewriteTarget } from "./chapter-rewrite";
+import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
-import { chapterTitle, exportNovel } from "./model";
+import { chapterTitle, exportNovel, splitChapterAt } from "./model";
 import { useNovel } from "./use-novel";
 
 export function NovelPanel({
@@ -67,6 +68,16 @@ export function NovelPanel({
   function closeRewrite() {
     writer.discardRewrite();
     setRewriteTarget(null);
+  }
+  function splitChapter(caret: number) {
+    if (chapterActionsLocked || !chapter) return false;
+    const newChapterId = crypto.randomUUID();
+    const next = splitChapterAt(novel, chapter.id, caret, newChapterId);
+    if (!next) return false;
+    writer.update(next);
+    setSelected(newChapterId);
+    setEditing(false);
+    return true;
   }
   function deleteChapter() {
     if (disabled || !chapter) return;
@@ -237,7 +248,7 @@ export function NovelPanel({
         ) : null}
         {chapter ? (
           <section className="flex flex-col gap-4 border-t border-border pt-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 bg-background py-2">
               <label className="flex items-center gap-2 text-sm">
                 章节目录
                 <select
@@ -278,6 +289,11 @@ export function NovelPanel({
                   <Plus data-icon="inline-start" />
                   在本章前插入
                 </Button>
+                <ChapterSplit
+                  chapter={chapter}
+                  disabled={chapterActionsLocked}
+                  onSplit={splitChapter}
+                />
                 <Button
                   size="sm"
                   variant="outline"

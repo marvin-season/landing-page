@@ -205,6 +205,40 @@ export function insertChapterBefore(
   };
 }
 
+export function splitChapterAt(
+  novel: Novel,
+  chapterId: string,
+  caret: number,
+  newChapterId: string,
+): Novel | null {
+  const index = novel.chapters.findIndex(({ id }) => id === chapterId);
+  if (index < 0 || !Number.isInteger(caret) || caret <= 0) return null;
+
+  const chapter = novel.chapters[index];
+  // Textarea offsets count CRLF as one character. Keep the original line endings.
+  let offset = caret;
+  for (const match of chapter.text.matchAll(/\r\n/g)) {
+    if (match.index >= offset) break;
+    offset++;
+  }
+  const before = chapter.text.slice(0, offset);
+  const after = chapter.text.slice(offset);
+  if (!before.trim() || !after.trim()) return null;
+
+  return {
+    ...novel,
+    chapters: [
+      ...novel.chapters.slice(0, index),
+      { ...chapter, text: before },
+      { id: newChapterId, title: chapterTitle(index + 1), text: after },
+      ...novel.chapters.slice(index + 1).map((existing, offset) => {
+        const title = numberedTitle(existing.title, index + 2 + offset);
+        return title === existing.title ? existing : { ...existing, title };
+      }),
+    ],
+  };
+}
+
 export function summaryPrompt(config: WorldConfig, novel: Novel) {
   const history = novelHistory(novel);
   return JSON.stringify({
