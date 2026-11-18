@@ -42,7 +42,9 @@ export function createNovel(config: WorldConfig): Novel {
 }
 
 export const writerInstructions = `你是这部小说唯一的写作智能体，统一负责情节规划、所有人物的言行、叙事、文风和章节衔接。
-根据用户给出的世界、人物、创作要求和已完成章节，直接创作下一章小说。人物是小说素材，不是轮流回复的智能体。
+根据用户给出的世界、人物和创作要求写一章小说。人物是小说素材，不是轮流回复的智能体。
+若 task.mode 为 insert，创作一章可插入 previousChapters 与 followingChapters 之间的新正文。承接前一章结尾，收尾自然接上紧随其后的章节开篇；后续章节是固定下文，不要复述或改写它们，也不要提前兑现下文的事件或伏笔。若没有上一章，则根据世界设定和既有下文写开篇。
+其余情况根据 completedChapters 续写下一章。
 保持人物性格、时间线和伏笔连贯，秘密只能在合适的剧情节点揭示。遵循世界规则与用户指定的叙述视角。
 每次只输出一章完整正文，不输出解释、创作分析、群聊格式或下一章。章节标题由界面提供，不要重复输出标题。
 world.priorContext 和 importedBackground 是已发生的前置剧情，不是本书的已完成章节。参考其中的时间线、人物状态和伏笔，并结合本书的设定和正文续写；不要照抄总结，也不要把未揭晓秘密自动当作所有人物都知道的事实。
@@ -73,6 +75,84 @@ export function chapterPrompt(config: WorldConfig, novel: Novel) {
       requirements: novel.chapterGoal || "承接前文与大纲，推进下一阶段情节。",
     },
   });
+}
+
+function insertionIndex(novel: Novel, beforeId: string) {
+  const index = novel.chapters.findIndex((chapter) => chapter.id === beforeId);
+  if (index < 0) throw new Error("找不到插入位置，请重新选择章节。");
+  return index;
+}
+
+export function chapterTitle(index: number) {
+  return `第${index + 1}章`;
+}
+
+function numberedTitle(title: string, index: number) {
+  return /^第[1-9]\d*章$/.test(title) ? chapterTitle(index) : title;
+}
+
+export function insertChapterPrompt(
+  config: WorldConfig,
+  novel: Novel,
+  beforeId: string,
+  requirements: string,
+) {
+  const index = insertionIndex(novel, beforeId);
+  const chapters = novel.chapters.map(({ title, text }, i) => {
+    const position = i < index ? i : i + 1;
+    return {
+      chapter: position + 1,
+      title: numberedTitle(title, position),
+      text,
+    };
+  });
+  const build = (
+    previousChapters: typeof chapters,
+    followingChapters: typeof chapters,
+  ) =>
+    JSON.stringify({
+      world: config,
+      importedBackground: novel.background,
+      novel: { title: novel.title, style: novel.style, outline: novel.outline },
+      previousChapters,
+      followingChapters,
+      task: {
+        mode: "insert",
+        chapter: index + 1,
+        targetWords: Number(novel.words),
+        requirements:
+          requirements.trim() || "补写一章，保留前后章节的既有剧情和伏笔。",
+      },
+    });
+  const complete = build(chapters.slice(0, index), chapters.slice(index));
+  if (complete.length <= maxNovelPromptLength) return complete;
+
+  const adjacent = build(
+    chapters.slice(Math.max(0, index - 1), index),
+    chapters.slice(index, index + 1),
+  );
+  if (adjacent.length > maxNovelPromptLength)
+    throw new Error("插入点两侧的章节上下文过长，请缩减正文或背景设定后重试。");
+  return adjacent;
+}
+
+export function insertChapterBefore(
+  novel: Novel,
+  beforeId: string,
+  chapter: Omit<Chapter, "title">,
+): Novel {
+  const index = insertionIndex(novel, beforeId);
+  return {
+    ...novel,
+    chapters: [
+      ...novel.chapters.slice(0, index),
+      { ...chapter, title: chapterTitle(index) },
+      ...novel.chapters.slice(index),
+    ].map((existing, position) => {
+      const title = numberedTitle(existing.title, position);
+      return title === existing.title ? existing : { ...existing, title };
+    }),
+  };
 }
 
 export function summaryPrompt(config: WorldConfig, novel: Novel) {

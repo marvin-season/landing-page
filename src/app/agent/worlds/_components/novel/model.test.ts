@@ -6,6 +6,8 @@ import {
   createBackground,
   createNovel,
   exportNovel,
+  insertChapterBefore,
+  insertChapterPrompt,
   maxBackgroundFileBytes,
   maxNovelPromptLength,
   novelRequest,
@@ -15,6 +17,89 @@ import {
   serializeBackground,
   summaryPrompt,
 } from "./model";
+
+test("inserting before chapter five preserves the original sequence, IDs, prose, and custom titles", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapterGoal = "只用于书末续写";
+  novel.chapters = Array.from({ length: 6 }, (_, index) => ({
+    id: String(index + 1),
+    title: index === 5 ? "雨中的重逢" : `第${index + 1}章`,
+    text: `原文 ${index + 1}`,
+  }));
+
+  const prompt = JSON.parse(
+    insertChapterPrompt(config, novel, "5", "  补上旅途  "),
+  );
+  assert.deepEqual(
+    prompt.previousChapters.map((item: { chapter: number }) => item.chapter),
+    [1, 2, 3, 4],
+  );
+  assert.deepEqual(prompt.followingChapters, [
+    { chapter: 6, title: "第6章", text: "原文 5" },
+    { chapter: 7, title: "雨中的重逢", text: "原文 6" },
+  ]);
+  assert.deepEqual(prompt.task, {
+    mode: "insert",
+    chapter: 5,
+    targetWords: 2000,
+    requirements: "补上旅途",
+  });
+
+  const updated = insertChapterBefore(novel, "5", { id: "new", text: "旅途" });
+  assert.deepEqual(updated.chapters.slice(4), [
+    { id: "new", title: "第5章", text: "旅途" },
+    { id: "5", title: "第6章", text: "原文 5" },
+    novel.chapters[5],
+  ]);
+  assert.equal(novel.chapters[4].title, "第5章");
+  assert.equal(updated.chapterGoal, novel.chapterGoal);
+  assert.match(
+    exportNovel(updated, "md"),
+    /## 第5章\n\n旅途\n\n## 第6章\n\n原文 5/,
+  );
+  assert.deepEqual(
+    JSON.parse(chapterPrompt(config, updated))
+      .completedChapters.slice(4)
+      .map((item: { text: string }) => item.text),
+    ["旅途", "原文 5", "原文 6"],
+  );
+  assert.throws(
+    () => insertChapterBefore(novel, "missing", { id: "new", text: "旅途" }),
+    /找不到插入位置/,
+  );
+});
+
+test("insertion at the beginning works and long prompts keep the complete chapters bordering the insertion", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "early", title: "旧事", text: "早".repeat(maxNovelPromptLength) },
+    { id: "previous", title: "前一章", text: "门打开了。" },
+    { id: "following", title: "后一章", text: "她走到街上。" },
+    { id: "late", title: "后来", text: "晚".repeat(maxNovelPromptLength) },
+  ];
+  const prompt = JSON.parse(
+    insertChapterPrompt(config, novel, "following", ""),
+  );
+  assert.deepEqual(prompt.previousChapters, [
+    { chapter: 2, title: "前一章", text: "门打开了。" },
+  ]);
+  assert.deepEqual(prompt.followingChapters, [
+    { chapter: 4, title: "后一章", text: "她走到街上。" },
+  ]);
+  assert.throws(
+    () => insertChapterPrompt(config, novel, "early", ""),
+    /插入点两侧的章节上下文过长/,
+  );
+  novel.chapters = novel.chapters.slice(1);
+  const opening = JSON.parse(
+    insertChapterPrompt(config, novel, "previous", ""),
+  );
+  assert.deepEqual(opening.previousChapters, []);
+  assert.equal(opening.task.chapter, 1);
+  assert.equal(opening.followingChapters[0].text, "门打开了。");
+});
 
 test("a passage rewrite sends the unselected text and replaces only the selected occurrence", () => {
   const config = loadWorldTemplates()[0].config;

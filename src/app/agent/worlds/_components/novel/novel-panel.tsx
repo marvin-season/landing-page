@@ -5,6 +5,7 @@ import {
   Download,
   LoaderCircle,
   PenLine,
+  Plus,
   Square,
   Trash2,
   WandSparkles,
@@ -16,7 +17,7 @@ import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
 import { BackgroundControls, downloadBackground } from "./background-controls";
 import { ChapterReading, type RewriteTarget } from "./chapter-rewrite";
-import { exportNovel } from "./model";
+import { chapterTitle, exportNovel } from "./model";
 import { useNovel } from "./use-novel";
 
 export function NovelPanel({
@@ -26,19 +27,36 @@ export function NovelPanel({
   room: WorldRoom;
   onBusyChange: (busy: boolean) => void;
 }) {
-  const writer = useNovel(room, onBusyChange, downloadBackground);
-  const { novel } = writer;
   const [selected, setSelected] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [insertion, setInsertion] = useState<{
+    beforeId: string;
+    requirements: string;
+  } | null>(null);
+  const writer = useNovel(room, onBusyChange, downloadBackground, (id) => {
+    setSelected(id);
+    setInsertion(null);
+  });
+  const { novel } = writer;
   const [rewriteTarget, setRewriteTarget] = useState<RewriteTarget | null>(
     null,
   );
-  const chapter =
-    novel.chapters.find((item) => item.id === selected) ??
-    novel.chapters.at(-1);
+  const selectedIndex = novel.chapters.findIndex(
+    (item) => item.id === selected,
+  );
+  const chapterIndex =
+    selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
+  const chapter = novel.chapters[chapterIndex];
   const disabled = !writer.ready || writer.busy;
   const ended = room.status === "ended";
   const rewriting = rewriteTarget !== null;
+  const chapterActionsLocked = disabled || rewriting || insertion !== null;
+  const canGenerateChapter =
+    !ended &&
+    Boolean(novel.title.trim()) &&
+    /^\d+$/.test(novel.words) &&
+    Number(novel.words) >= 500 &&
+    Number(novel.words) <= 4000;
   function openRewrite(target: RewriteTarget) {
     writer.discardRewrite();
     setEditing(false);
@@ -109,7 +127,7 @@ export function NovelPanel({
           </div>
         </div>
         <fieldset
-          disabled={disabled || rewriting}
+          disabled={chapterActionsLocked}
           className="flex flex-col gap-4 disabled:opacity-60"
         >
           <FieldGroup>
@@ -154,7 +172,7 @@ export function NovelPanel({
         <BackgroundControls
           background={novel.background}
           exported={writer.backgroundExport}
-          disabled={disabled || rewriting}
+          disabled={chapterActionsLocked}
           canSummarize={
             !ended && novel.chapters.length > 0 && Boolean(novel.title.trim())
           }
@@ -164,28 +182,20 @@ export function NovelPanel({
             writer.generate("summary");
           }}
         />
-        {!rewriting && writer.error ? (
+        {!rewriting && !insertion && writer.error ? (
           <Alert>
             <AlertDescription>{writer.error}</AlertDescription>
           </Alert>
         ) : null}
         <div className="flex flex-wrap items-center gap-3">
-          {writer.busy && writer.task !== "rewrite" ? (
+          {writer.busy && writer.task !== "rewrite" && !insertion ? (
             <Button variant="outline" onClick={writer.stop}>
               <Square data-icon="inline-start" />
               停止生成
             </Button>
           ) : (
             <Button
-              disabled={
-                disabled ||
-                rewriting ||
-                ended ||
-                !novel.title.trim() ||
-                !/^\d+$/.test(novel.words) ||
-                Number(novel.words) < 500 ||
-                Number(novel.words) > 4000
-              }
+              disabled={chapterActionsLocked || !canGenerateChapter}
               onClick={() => {
                 setEditing(false);
                 setSelected(null);
@@ -196,7 +206,7 @@ export function NovelPanel({
               生成第{novel.chapters.length + 1}章
             </Button>
           )}
-          {writer.busy && writer.task !== "rewrite" ? (
+          {writer.busy && writer.task !== "rewrite" && !insertion ? (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" />
               {writer.task === "summary"
@@ -205,7 +215,7 @@ export function NovelPanel({
             </span>
           ) : null}
         </div>
-        {writer.task !== "rewrite" && writer.preview ? (
+        {writer.task !== "rewrite" && !insertion && writer.preview ? (
           <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
             <h3 className="font-serif text-lg">
               {writer.task === "summary"
@@ -227,7 +237,7 @@ export function NovelPanel({
                 <select
                   className="rounded-md border border-input bg-background px-3 py-2"
                   value={chapter.id}
-                  disabled={rewriting}
+                  disabled={rewriting || insertion !== null}
                   onChange={(event) => {
                     setSelected(event.target.value);
                     setEditing(false);
@@ -244,7 +254,7 @@ export function NovelPanel({
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={disabled || rewriting}
+                  disabled={chapterActionsLocked}
                   onClick={() => setEditing(!editing)}
                 >
                   {editing ? "完成编辑" : "编辑本章"}
@@ -252,8 +262,21 @@ export function NovelPanel({
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={chapterActionsLocked || !canGenerateChapter}
+                  onClick={() => {
+                    writer.discardInsertion();
+                    setEditing(false);
+                    setInsertion({ beforeId: chapter.id, requirements: "" });
+                  }}
+                >
+                  <Plus data-icon="inline-start" />
+                  在本章前插入
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   disabled={
-                    disabled || rewriting || ended || !chapter.text.trim()
+                    chapterActionsLocked || ended || !chapter.text.trim()
                   }
                   onClick={() => openRewrite({ atStart: true })}
                 >
@@ -263,7 +286,7 @@ export function NovelPanel({
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={disabled || rewriting}
+                  disabled={chapterActionsLocked}
                   onClick={deleteChapter}
                 >
                   <Trash2 data-icon="inline-start" />
@@ -271,6 +294,90 @@ export function NovelPanel({
                 </Button>
               </div>
             </div>
+            {insertion ? (
+              <form
+                className="flex min-w-0 flex-col gap-3 border-b border-border pb-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (!disabled && canGenerateChapter) {
+                    writer.insertBefore(
+                      insertion.beforeId,
+                      insertion.requirements,
+                    );
+                  }
+                }}
+              >
+                <fieldset disabled={writer.busy}>
+                  <TextField
+                    label="插入章节的创作要求（可选）"
+                    value={insertion.requirements}
+                    multiline
+                    onChange={(requirements) =>
+                      setInsertion({ ...insertion, requirements })
+                    }
+                  />
+                </fieldset>
+                {writer.error ? (
+                  <Alert>
+                    <AlertDescription>{writer.error}</AlertDescription>
+                  </Alert>
+                ) : null}
+                <div className="flex flex-wrap items-center gap-2">
+                  {writer.busy ? (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={writer.stop}
+                      >
+                        <Square data-icon="inline-start" />
+                        停止生成
+                      </Button>
+                      <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircle className="size-4 animate-spin" />
+                        正在创作{chapterTitle(chapterIndex)}…
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        type="submit"
+                        size="sm"
+                        disabled={disabled || !canGenerateChapter}
+                      >
+                        <PenLine data-icon="inline-start" />
+                        生成新{chapterTitle(chapterIndex)}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          writer.discardInsertion();
+                          setInsertion(null);
+                        }}
+                      >
+                        取消
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {writer.inserting && writer.preview ? (
+                  <article className="flex min-w-0 flex-col gap-2 border-l-2 border-border pl-4">
+                    {!writer.busy ? (
+                      <p className="text-sm text-muted-foreground">
+                        未完成草稿
+                      </p>
+                    ) : null}
+                    <UnifiedMarkdown
+                      content={writer.preview}
+                      hasNextChunk={writer.busy}
+                    />
+                  </article>
+                ) : null}
+              </form>
+            ) : null}
             {editing ? (
               <fieldset disabled={disabled} className="min-w-0">
                 <FieldGroup>
@@ -309,7 +416,7 @@ export function NovelPanel({
                 title={chapter.title}
                 text={chapter.text}
                 target={rewriteTarget}
-                canSelect={!disabled && !rewriting && !ended}
+                canSelect={!chapterActionsLocked && !ended}
                 onSelect={openRewrite}
                 draft={writer.rewriteReady ? writer.preview : undefined}
                 writer={writer}

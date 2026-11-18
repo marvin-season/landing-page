@@ -13,8 +13,11 @@ import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
 import {
   type ChapterTextRange,
   chapterPrompt,
+  chapterTitle,
   createBackground,
   createNovel,
+  insertChapterBefore,
+  insertChapterPrompt,
   maxNovelPromptLength,
   type Novel,
   type NovelBackground,
@@ -30,7 +33,8 @@ db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 
 type NovelRun =
-  | { task: "chapter"; title: string }
+  | { task: "chapter"; title: string; beforeId?: never }
+  | { task: "chapter"; beforeId: string; title?: never }
   | { task: "summary"; config: WorldConfig; novel: Novel }
   | {
       task: "rewrite";
@@ -44,6 +48,7 @@ export function useNovel(
   room: WorldRoom,
   onBusyChange: (busy: boolean) => void,
   onBackgroundReady: (background: NovelBackground) => void,
+  onChapterInserted: (id: string) => void,
 ) {
   const key = `${room.ownerId}:${room.id}`;
   const [novel, setNovel] = useState(() => createNovel(room.config));
@@ -53,6 +58,7 @@ export function useNovel(
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
   const [task, setTask] = useState<NovelTask>("chapter");
+  const [inserting, setInserting] = useState(false);
   const [rewriteReady, setRewriteReady] = useState(false);
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
@@ -149,17 +155,26 @@ export function useNovel(
         }
         return;
       }
-      update({
-        ...latest.current,
-        chapters: [
-          ...latest.current.chapters,
-          {
-            id: crypto.randomUUID(),
-            title: captured.title,
-            text,
-          },
-        ],
-      });
+      const chapter = { id: crypto.randomUUID(), text };
+      const current = latest.current;
+      if (captured.beforeId !== undefined) {
+        try {
+          update(insertChapterBefore(current, captured.beforeId, chapter));
+        } catch (error) {
+          setError(error instanceof Error ? error.message : "无法插入新章节。");
+          return;
+        }
+        setInserting(false);
+        onChapterInserted(chapter.id);
+      } else {
+        update({
+          ...current,
+          chapters: [
+            ...current.chapters,
+            { ...chapter, title: captured.title },
+          ],
+        });
+      }
       setPreview("");
     },
     onError(message) {
@@ -172,6 +187,7 @@ export function useNovel(
     input.current = run;
     setError("");
     setTask(run.task);
+    setInserting(run.task === "chapter" && Boolean(run.beforeId));
     if (run.task !== "rewrite") setBackgroundExport(null);
     setRewriteReady(false);
     finished.current = false;
@@ -207,9 +223,36 @@ export function useNovel(
     start(
       task === "summary"
         ? { task, config: room.config, novel: current }
-        : { task, title: `第${current.chapters.length + 1}章` },
+        : { task, title: chapterTitle(current.chapters.length) },
       prompt,
     );
+  }
+
+  function insertBefore(beforeId: string, requirements: string) {
+    if (!ready || generating.current || room.status === "ended") return;
+    try {
+      start(
+        { task: "chapter", beforeId },
+        insertChapterPrompt(
+          room.config,
+          latest.current,
+          beforeId,
+          requirements,
+        ),
+      );
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "无法生成插入章节。");
+    }
+  }
+
+  function discardInsertion() {
+    if (generating.current) return;
+    if (input.current?.task === "chapter" && input.current.beforeId) {
+      input.current = null;
+      setPreview("");
+      setInserting(false);
+    }
+    setError("");
   }
 
   function rewrite(
@@ -285,6 +328,7 @@ export function useNovel(
     busy,
     preview,
     task,
+    inserting,
     rewriteReady,
     backgroundExport,
     importBackground(background: NovelBackground | undefined) {
@@ -294,6 +338,8 @@ export function useNovel(
       update({ ...latest.current, background });
     },
     generate,
+    insertBefore,
+    discardInsertion,
     rewrite,
     discardRewrite,
     applyRewrite,
