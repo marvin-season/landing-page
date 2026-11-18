@@ -43,6 +43,7 @@ export function NovelPanel({
   const [rewriteTarget, setRewriteTarget] = useState<RewriteTarget | null>(
     null,
   );
+  const [compactContext, setCompactContext] = useState(false);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
@@ -442,6 +443,8 @@ export function NovelPanel({
                 onSelect={openRewrite}
                 preview={writer.task === "rewrite" ? writer.preview : ""}
                 draftReady={writer.rewriteReady}
+                compactContext={compactContext}
+                onCompactContextChange={setCompactContext}
                 writer={writer}
                 ended={ended}
                 onClose={closeRewrite}
@@ -451,7 +454,12 @@ export function NovelPanel({
                   return applied;
                 }}
                 onRewrite={(requirements) =>
-                  writer.rewrite(chapter.id, requirements, rewriteTarget?.range)
+                  writer.rewrite(
+                    chapter.id,
+                    requirements,
+                    rewriteTarget?.range,
+                    compactContext,
+                  )
                 }
               />
             )}

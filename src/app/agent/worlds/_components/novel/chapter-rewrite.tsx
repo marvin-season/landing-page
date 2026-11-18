@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import { Button, Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { Check, LoaderCircle, Square, WandSparkles, X } from "lucide-react";
 import {
@@ -30,6 +30,8 @@ export function ChapterReading({
   target,
   preview,
   draftReady,
+  compactContext,
+  onCompactContextChange,
   writer,
   onClose,
   onApply,
@@ -43,6 +45,8 @@ export function ChapterReading({
   target: RewriteTarget | null;
   preview: string;
   draftReady: boolean;
+  compactContext: boolean;
+  onCompactContextChange: (checked: boolean) => void;
   writer: { busy: boolean; error: string; stop: () => void };
   onClose: () => void;
   onApply: () => boolean;
@@ -253,6 +257,15 @@ export function ChapterReading({
                 hidden={!showInstructions}
                 className="w-full resize-none rounded-md border border-input bg-background px-2.5 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
+              {showInstructions ? (
+                <label className="flex items-center justify-between gap-2 py-1 text-sm">
+                  精简上下文
+                  <Switch
+                    checked={compactContext}
+                    onCheckedChange={onCompactContextChange}
+                  />
+                </label>
+              ) : null}
               {!showInstructions ? (
                 <div
                   ref={output}

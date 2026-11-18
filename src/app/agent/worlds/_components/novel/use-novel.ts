@@ -341,6 +341,7 @@ export function useNovel(
     chapterId: string,
     requirements: string,
     range?: ChapterTextRange,
+    compactContext = false,
   ) {
     if (!ready || generating.current || room.status === "ended") return;
     const current = latest.current;
@@ -351,6 +352,7 @@ export function useNovel(
         chapterId,
         requirements,
         range,
+        compactContext,
       );
       start(
         {

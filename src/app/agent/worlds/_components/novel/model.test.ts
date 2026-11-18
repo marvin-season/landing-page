@@ -218,6 +218,67 @@ test("rewrite receives the chosen chapter in place with its original preceding a
   );
 });
 
+test("compact rewrite sends only world settings, the previous chapter, and the selected text", () => {
+  const config = {
+    ...loadWorldTemplates()[0].config,
+    priorContext: "世界前情不发送",
+  };
+  const novel = createNovel(config);
+  const selected = "她收起钥匙。";
+  const before = "本章未选中的开头。";
+  novel.chapters = [
+    { id: "a", title: "更早", text: "更早的正文" },
+    { id: "b", title: "上一章", text: "她推开了门。" },
+    { id: "c", title: "本章", text: `${before}${selected}未选中的结尾。` },
+    { id: "d", title: "下一章", text: "后续的正文" },
+  ];
+  novel.background = createBackground(config, novel, "导入的背景摘要");
+  novel.checkpoint = { throughChapterId: "a", summary: "归档剧情摘要" };
+  novel.outline = "单独编辑的小说大纲";
+
+  const prompt = JSON.parse(
+    rewritePrompt(
+      config,
+      novel,
+      "c",
+      "  收紧节奏  ",
+      { start: before.length, end: before.length + selected.length },
+      true,
+    ),
+  );
+  assert.deepEqual(prompt, {
+    world: {
+      title: config.title,
+      background: config.background,
+      scene: config.scene,
+      rules: config.rules,
+      facts: config.facts,
+      storyGoal: config.storyGoal,
+      characters: config.characters,
+    },
+    previousChapters: [{ chapter: 2, title: "上一章", text: "她推开了门。" }],
+    targetChapter: { chapter: 3, title: "本章", selection: { text: selected } },
+    task: { requirements: "收紧节奏" },
+  });
+
+  const firstChapter = JSON.parse(
+    rewritePrompt(config, novel, "a", "", undefined, true),
+  );
+  assert.deepEqual(firstChapter.previousChapters, []);
+  assert.deepEqual(firstChapter.targetChapter, {
+    chapter: 1,
+    title: "更早",
+    text: "更早的正文",
+  });
+  assert.equal(firstChapter.followingChapters, undefined);
+
+  novel.chapters[1].text = "长".repeat(maxNovelPromptLength);
+  assert.throws(
+    () => rewritePrompt(config, novel, "c", "", undefined, true),
+    /精简上下文仍然过长/,
+  );
+});
+
 test("rewrite keeps both neighboring chapters intact under the request limit", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);

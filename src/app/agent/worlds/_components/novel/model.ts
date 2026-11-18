@@ -261,20 +261,45 @@ export function rewritePrompt(
   chapterId: string,
   requirements: string,
   range?: ChapterTextRange,
+  compactContext = false,
 ) {
   const index = novel.chapters.findIndex((chapter) => chapter.id === chapterId);
   if (index < 0 || !novel.chapters[index].text.trim())
     throw new Error("找不到可重写的章节正文。");
-  const history = novelHistory(novel, index);
-  const chapters = novel.chapters.map(({ title, text }, i) => ({
+  const formatChapter = ({ title, text }: Chapter, i: number) => ({
     chapter: i + 1,
     title,
     text,
-  }));
-  const { text, ...position } = chapters[index];
-  const targetChapter = range
-    ? { ...position, selection: splitChapterText(text, range) }
-    : chapters[index];
+  });
+  const target = formatChapter(novel.chapters[index], index);
+  const { text, ...position } = target;
+  const selection = range ? splitChapterText(text, range) : undefined;
+  const task = {
+    requirements: requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
+  };
+
+  if (compactContext) {
+    const { title, background, scene, rules, facts, storyGoal, characters } =
+      config;
+    const prompt = JSON.stringify({
+      world: { title, background, scene, rules, facts, storyGoal, characters },
+      previousChapters:
+        index === 0
+          ? []
+          : [formatChapter(novel.chapters[index - 1], index - 1)],
+      targetChapter: selection
+        ? { ...position, selection: { text: selection.text } }
+        : target,
+      task,
+    });
+    if (prompt.length > maxNovelPromptLength)
+      throw new Error("精简上下文仍然过长，请缩短选段或上一章正文后重试。");
+    return prompt;
+  }
+
+  const history = novelHistory(novel, index);
+  const chapters = novel.chapters.map(formatChapter);
+  const targetChapter = selection ? { ...position, selection } : target;
   const build = (
     previousChapters: typeof chapters,
     followingChapters: typeof chapters,
@@ -286,10 +311,7 @@ export function rewritePrompt(
       previousChapters,
       targetChapter,
       followingChapters,
-      task: {
-        requirements:
-          requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
-      },
+      task,
     });
   const complete = build(
     chapters.slice(history.count, index),
