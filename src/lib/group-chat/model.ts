@@ -23,7 +23,7 @@ export const characterSchema = z.object({
   enabled: z.boolean(),
   avatar: z.enum(worldAvatars).optional(),
 });
-const currentConfigSchema = z
+export const configSchema = z
   .object({
     title: text(60).min(1, "请填写世界名称"),
     background: text(8000).min(1, "请填写世界背景"),
@@ -57,36 +57,6 @@ const currentConfigSchema = z
         path: ["characters"],
       });
   });
-// Old presets had one human protagonist in addition to up to six NPCs.
-// Preserve that character as an NPC instead of silently removing them.
-export const configSchema = z.preprocess((input) => {
-  if (!input || typeof input !== "object") return input;
-  const legacy = input as Record<string, unknown>;
-  if ("storyGoal" in legacy || typeof legacy.userName !== "string")
-    return input;
-  const characters = z.array(characterSchema).safeParse(legacy.characters);
-  if (!characters.success) return input;
-  const cast = characters.data;
-  if (!cast.some((character) => character.name === legacy.userName)) {
-    let id = "former-player";
-    while (cast.some((character) => character.id === id)) id += "-npc";
-    const role = typeof legacy.userRole === "string" ? legacy.userRole : "";
-    cast.push({
-      id,
-      name: legacy.userName,
-      identity: role.slice(0, 300) || "故事中的一位参与者",
-      personality: "依据已有身份与经历自主判断，与其他角色自然交流。",
-      goal: "结合当前处境和个人身份，自主作出决定并推进故事。",
-      publicInfo: role,
-      privateInfo: "",
-      style: "用第一人称直接说话，像在群聊里发言。",
-      model:
-        cast.find((character) => character.enabled)?.model || "cursor/auto",
-      enabled: true,
-    });
-  }
-  return { ...legacy, storyGoal: "", characters: cast };
-}, currentConfigSchema);
 export type Character = z.infer<typeof characterSchema>;
 export type WorldConfig = z.infer<typeof configSchema>;
 export const messageSchema = z.object({
@@ -94,7 +64,7 @@ export const messageSchema = z.object({
   seq: z.number().int().positive(),
   speakerId: idSchema,
   name: text(60),
-  kind: z.enum(["user", "intervention", "agent", "narrator", "system"]),
+  kind: z.enum(["intervention", "agent", "narrator", "system"]),
   text: z.string().max(12000),
   status: z.enum([
     "streaming",
@@ -136,7 +106,7 @@ export type WorldRun = {
 export type WorldRoom = {
   id: string;
   ownerId: string;
-  kind?: WorldKind;
+  kind: WorldKind;
   status: "draft" | "active" | "ended";
   config: WorldConfig;
   version: number;
@@ -185,7 +155,7 @@ export type WorldPreset = z.infer<typeof presetInputSchema> & { id: string };
 export const backupSchema = z.object({
   format: z.literal("world-chat"),
   schemaVersion: z.literal(1),
-  kind: worldKindSchema.optional(),
+  kind: worldKindSchema,
   config: configSchema,
   snapshots: z
     .array(
@@ -207,7 +177,7 @@ export function exportBackup(room: WorldRoom) {
   return {
     format: "world-chat" as const,
     schemaVersion: 1 as const,
-    kind: room.kind ?? "script",
+    kind: room.kind,
     config: room.config,
     snapshots: room.snapshots,
     version: room.version,

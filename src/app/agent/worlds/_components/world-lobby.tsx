@@ -34,7 +34,6 @@ import {
   type WorldRoom,
 } from "@/lib/group-chat/model";
 import type { WorldTemplate } from "@/lib/group-chat/world-templates";
-import { legacyNovelRoomIds, migrateLegacyNovel } from "./novel/storage";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldEditor } from "./world-editor";
 
@@ -64,19 +63,7 @@ export function WorldLobby({
     queryKey: ["world-presets"],
     queryFn: () => worldRequest<{ presets: WorldPreset[] }>("presets"),
   });
-  const legacyNovels = useQuery({
-    queryKey: ["legacy-world-novels"],
-    queryFn: legacyNovelRoomIds,
-    enabled: novel,
-  });
-  const savedRooms = rooms.data?.rooms.filter(
-    (room) => (room.kind ?? "script") === kind,
-  );
-  const legacyRooms = novel
-    ? rooms.data?.rooms.filter(
-        (room) => room.kind !== "novel" && legacyNovels.data?.includes(room.id),
-      )
-    : undefined;
+  const savedRooms = rooms.data?.rooms.filter((room) => room.kind === kind);
   async function remove(id: string) {
     if (!window.confirm("删除这个世界及其全部存档？此操作不能撤销。")) return;
     setPending(true);
@@ -132,7 +119,7 @@ export function WorldLobby({
                 const backup = backupSchema.parse(
                   JSON.parse(await file.text()),
                 );
-                if ((backup.kind ?? "script") !== kind)
+                if (backup.kind !== kind)
                   throw new Error(`请选择${label}的备份文件。`);
                 const result = await worldRequest<{ room: WorldRoom }>(
                   "rooms/import",
@@ -276,53 +263,6 @@ export function WorldLobby({
             ))}
           </WorldGrid>
         </section>
-        {legacyRooms?.length ? (
-          <section>
-            <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-              本机旧小说
-            </h2>
-            <WorldGrid>
-              {legacyRooms.map((room) => (
-                <WorldCard key={room.id}>
-                  <h3 className="text-sm font-medium">{room.title}</h3>
-                  <WorldCardFooter>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={pending}
-                      onClick={async () => {
-                        setPending(true);
-                        setError("");
-                        try {
-                          const id = await migrateLegacyNovel(room.id);
-                          await Promise.all([
-                            queryClient.invalidateQueries({
-                              queryKey: ["legacy-world-novels"],
-                            }),
-                            queryClient.invalidateQueries({
-                              queryKey: ["world-rooms"],
-                            }),
-                          ]);
-                          router.push(`/agent/worlds/${id}`);
-                        } catch (error) {
-                          setError(
-                            error instanceof Error
-                              ? error.message
-                              : "小说迁移失败",
-                          );
-                        } finally {
-                          setPending(false);
-                        }
-                      }}
-                    >
-                      迁移为独立小说
-                    </Button>
-                  </WorldCardFooter>
-                </WorldCard>
-              ))}
-            </WorldGrid>
-          </section>
-        ) : null}
         {presets.data?.presets.length ? (
           <section>
             <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">

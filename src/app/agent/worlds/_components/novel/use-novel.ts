@@ -7,6 +7,7 @@ import {
   reduceChatStreamState,
   useChatStreamCore,
 } from "@landing-page/utils/stream";
+import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
 import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
 import {
@@ -19,7 +20,9 @@ import {
   summaryPrompt,
 } from "./model";
 
-import { novels } from "./storage";
+const db = new Dexie("world-novels");
+db.version(1).stores({ novels: "key" });
+const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 
 export function useNovel(
   room: WorldRoom,

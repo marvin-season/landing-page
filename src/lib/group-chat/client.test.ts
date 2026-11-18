@@ -8,6 +8,7 @@ function snapshot(id: string, paused = false): WorldRoom {
   return {
     id: "room",
     ownerId: "alice",
+    kind: "script",
     status: "active",
     config: exampleWorld,
     version: 1,

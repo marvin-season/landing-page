@@ -12,6 +12,7 @@ function room(): WorldRoom {
   return {
     id: "test-room",
     ownerId: "alice",
+    kind: "script",
     config: structuredClone(exampleWorld),
     status: "active",
     version: 1,

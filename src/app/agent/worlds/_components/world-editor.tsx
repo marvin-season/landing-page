@@ -98,7 +98,7 @@ export function WorldEditor({
   presets = [],
   onPresetSaved,
   submitLabel,
-  kind = "script",
+  kind,
 }: {
   initial: WorldConfig;
   onSave: (config: WorldConfig) => Promise<void>;
@@ -107,7 +107,7 @@ export function WorldEditor({
   presets?: WorldPreset[];
   onPresetSaved?: () => void;
   submitLabel?: string;
-  kind?: WorldKind;
+  kind: WorldKind;
 }) {
   const [config, setConfig] = useState(() => structuredClone(initial));
   const [error, setError] = useState("");

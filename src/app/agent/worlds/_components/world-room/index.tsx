@@ -68,7 +68,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       </div>
     );
   const loaded = room;
-  const kind = room.kind ?? "script";
+  const { kind } = room;
   const novelMode = kind === "novel";
   const running =
     chat.stopping || chat.busy || loaded.run?.status === "running";

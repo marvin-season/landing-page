@@ -2,7 +2,6 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { type Client, createClient, type Transaction } from "@libsql/client";
-import { upgradeWorldRoom } from "./migration";
 import {
   backupSchema,
   configSchema,
@@ -15,13 +14,14 @@ import {
   type WorldMessage,
   type WorldPreset,
   type WorldRoom,
+  worldKindSchema,
 } from "./model";
 
 export const LEASE_MS = 15000;
 export function roomListing(room: WorldRoom): RoomListItem {
   return {
     id: room.id,
-    kind: room.kind ?? "script",
+    kind: room.kind,
     status: room.status,
     title: room.config.title,
     characters: room.config.characters.map((c) => c.name),
@@ -135,7 +135,9 @@ export function createWorldStore(getClient: () => Client) {
     });
     if (!result.rows[0])
       throw new WorldError("not_found", "房间不存在或无权访问", 404);
-    const room = upgradeWorldRoom(JSON.parse(String(result.rows[0].data)));
+    const room = JSON.parse(String(result.rows[0].data)) as WorldRoom;
+    if (!worldKindSchema.safeParse(room.kind).success)
+      throw new WorldError("not_found", "房间不存在或无权访问", 404);
     if (
       room.run?.status === "running" &&
       (room.run.leaseUntil < Date.now() || room.run.deadline < Date.now())
@@ -216,13 +218,12 @@ export function createWorldStore(getClient: () => Client) {
     },
     async list(ownerId: string) {
       const result = await (await database()).execute({
-        sql: "SELECT listing FROM world_rooms WHERE owner_id = ? ORDER BY updated_at DESC LIMIT 200",
+        sql: "SELECT listing FROM world_rooms WHERE owner_id = ? AND json_extract(listing, '$.kind') IN ('script', 'novel') ORDER BY updated_at DESC LIMIT 200",
         args: [ownerId],
       });
-      return result.rows.map((row) => {
-        const item = JSON.parse(String(row.listing)) as RoomListItem;
-        return { ...item, kind: item.kind ?? "script" };
-      });
+      return result.rows.map(
+        (row) => JSON.parse(String(row.listing)) as RoomListItem,
+      );
     },
     async update(
       ownerId: string,
@@ -487,7 +488,7 @@ export function createWorldStore(getClient: () => Client) {
         !versions.has(backup.version)
       )
         throw new WorldError("invalid_backup", "备份配置版本不完整");
-      const room = fresh(ownerId, backup.config, backup.kind ?? "script");
+      const room = fresh(ownerId, backup.config, backup.kind);
       if (room.kind === "novel" && backup.messages.length)
         throw new WorldError("invalid_backup", "小说设定备份不能包含剧本对话");
       room.version = backup.version;
@@ -504,8 +505,7 @@ export function createWorldStore(getClient: () => Client) {
             (message.kind !== "agent" || !ids.has(message.followUpTo))) ||
           (message.kind === "agent" &&
             !config.characters.some((c) => c.id === message.speakerId)) ||
-          (["user", "intervention"].includes(message.kind) &&
-            message.speakerId !== "user") ||
+          (message.kind === "intervention" && message.speakerId !== "user") ||
           (["system", "narrator"].includes(message.kind) &&
             message.speakerId !== "system") ||
           message.mentions.some(
@@ -530,7 +530,7 @@ export function createWorldStore(getClient: () => Client) {
       room.summary = null;
       room.status = room.messages.length ? "active" : "draft";
       room.paused = true;
-      return insert(upgradeWorldRoom(room));
+      return insert(room);
     },
     async presets(ownerId: string) {
       const rows = await (await database()).execute({

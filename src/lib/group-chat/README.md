@@ -1,4 +1,17 @@
-房间里有三类发言：多位 NPC 只说对白，系统只有一个，旁白只有一个。
+# 开放世界
+
+开放世界首页 `/agent/worlds` 分为剧本和小说。两类共用世界与角色模板，选好模板后可以修改设定再创建。创建房间时必须指定 `kind`（`script` 或 `novel`）；类型保存在服务端，详情页和配置更新接口均不提供切换。
+
+- 剧本通过 `POST /api/group-chat/rooms/:id/runs` 调度角色对白和旁白，过程与正文存入服务端房间。
+- 小说通过 `POST /api/novel` 由单个 Writer 按章生成，不启动剧本对话。小说专用设定和章节保存在当前浏览器的 IndexedDB，世界设定存入服务端。详见[小说架构](../../../docs/novel-mode.md)。
+
+两类房间都可以在创建或编辑世界时添加可选的 `WorldConfig.priorContext`。表单支持粘贴或追加导入 TXT、Markdown，最多 8000 字；导入小说背景总结时只读取总结正文。剧本将前置剧情作为公开世界设定，小说把它和当前设定、已有章节一起交给 Writer。前置剧情不会生成对话消息或增加章节数。
+
+JSON 存档导入、导出均携带 `kind`，小说的 JSON 备份只包含世界设定，章节可在小说详情导出为 TXT 或 Markdown。没有类型的旧房间不会出现在列表中，缺少类型的旧备份无法导入。
+
+## 剧本调度
+
+剧本房间里有三类发言：多位 NPC 只说对白，系统只有一个，旁白只有一个。
 
 用户输入默认是系统。输入框上方可以把这一条改成旁白，或改成任意已启用的角色。写下的内容先入房间，再按下图为后续发言选人。
 
@@ -44,7 +57,7 @@ flowchart TD
   next -->|是| done[status=completed 客户端再开一批]
 ```
 
-房间身份与 Mastra Agent 的对应关系如下。只注册 `actor`、`narrator`、`summary` 三个 Agent；多位 NPC 共用同一个 `actor` 实例，每轮由 `nextTurn` 选人，再将该角色作为 `yourCharacter` 传入。角色身份、私有资料和模型按本次调用提供，不为每个 NPC 单独创建 Agent，也不由 Agent 决定谁接话。
+剧本调度只使用 `actor`、`narrator`、`summary` 三个 Mastra Agent。多位 NPC 共用同一个 `actor` 实例，每轮由 `nextTurn` 选人，再将该角色作为 `yourCharacter` 传入。角色身份、私有资料和模型按本次调用提供，不为每个 NPC 单独创建 Agent，也不由 Agent 决定谁接话。
 
 ```mermaid
 flowchart TD

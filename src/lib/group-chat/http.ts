@@ -22,7 +22,6 @@ const json = (data: unknown, status = 200) =>
 function view(room: WorldRoom) {
   return {
     ...room,
-    kind: room.kind ?? "script",
     messages: room.messages.slice(-100),
     runs: [],
   };
@@ -113,7 +112,7 @@ export function createWorldHandlers({
         return json({ rooms: await store.list(ownerId) });
       if (!id && request.method === "POST") {
         const input = z
-          .object({ kind: worldKindSchema.optional() })
+          .object({ kind: worldKindSchema })
           .passthrough()
           .parse(await body(request));
         return json(

@@ -10,7 +10,6 @@ import {
 } from "./context";
 import { abortRun, createWorldEngine } from "./engine";
 import { createWorldHandlers } from "./http";
-import { upgradeWorldRoom } from "./migration";
 import {
   configSchema,
   exportBackup,
@@ -159,8 +158,10 @@ test("world type is fixed at creation and preserved in listings and backups", as
   await assert.rejects(store.begin("alice", restored.id, command()), {
     code: "wrong_world_kind",
   });
-  const { kind: _kind, ...legacyBackup } = backup;
-  assert.equal((await store.import("alice", legacyBackup)).kind, "script");
+  const { kind: _kind, ...untypedBackup } = backup;
+  await assert.rejects(store.import("alice", untypedBackup), {
+    name: "ZodError",
+  });
 });
 
 test("script prequel is available to all prompts without becoming an intervention", async () => {
@@ -177,6 +178,23 @@ test("script prequel is available to all prompts without becoming an interventio
     assert.equal(world.latestIntervention, "");
     assert.deepEqual(publicConversation, []);
   }
+});
+
+test("storage only lists and opens rooms with an explicit kind", async () => {
+  const client = createClient({ url: ":memory:" });
+  clients.push(client);
+  const store = createWorldStore(() => client);
+  const old = await store.create("alice", exampleWorld);
+  const current = await store.create("alice", exampleWorld, "novel");
+  await client.execute({
+    sql: "UPDATE world_rooms SET data = json_remove(data, '$.kind'), listing = json_remove(listing, '$.kind') WHERE id = ?",
+    args: [old.id],
+  });
+  assert.deepEqual(
+    (await store.list("alice")).map((room) => room.id),
+    [current.id],
+  );
+  await assert.rejects(store.get("alice", old.id), { status: 404 });
 });
 
 test("narration stays with the dialogue characters until the switch is on", async () => {
@@ -293,47 +311,6 @@ test("interventions remain system directions after summarization, never NPC dial
     assert.equal(data.world.user, undefined);
     assert.equal(data.publicConversation[0].kind, "agent");
   }
-});
-
-test("legacy saves and backups retain the human protagonist as an NPC without promoting old speech to instructions", async () => {
-  const store = setup();
-  const room = await store.create("alice", exampleWorld);
-  const { storyGoal: _, ...config } = room.config;
-  const legacyConfig = {
-    ...config,
-    userName: "林舟",
-    userRole: "临时协调员",
-    characters: config.characters.filter((c) => c.id !== "former-player"),
-  };
-  const legacy = JSON.parse(JSON.stringify(room));
-  legacy.config = legacyConfig;
-  legacy.snapshots[0].config = legacyConfig;
-  appendMessage(legacy, {
-    speakerId: "user",
-    name: "林舟",
-    kind: "user",
-    text: "我去查看配电箱。",
-    status: "complete",
-    runId: null,
-    mentions: [],
-  });
-  const backup = structuredClone(exportBackup(legacy));
-  const upgraded = upgradeWorldRoom(legacy);
-  assert.equal(upgraded.config.characters.length, 4);
-  assert.equal(upgraded.messages[0].kind, "agent");
-  assert.equal(upgraded.messages[0].speakerId, "former-player");
-  assert.equal(upgraded.config.storyGoal, "");
-  assert.deepEqual(upgradeWorldRoom(upgraded), upgraded);
-  const imported = await store.import("bob", backup);
-  assert.equal(imported.messages[0].kind, "agent");
-  assert.equal(imported.config.characters.length, 4);
-  assert.equal(imported.paused, true);
-  assert.equal(
-    contextData(actorContext(imported, imported.config.characters[0])).world
-      .latestIntervention,
-    "",
-  );
-  assert.equal(configSchema.parse(imported.config).characters.length, 4);
 });
 
 test("a running story applies a new intervention after aborting the old generation", async () => {
@@ -1265,7 +1242,11 @@ test("HTTP handlers enforce authentication, origin and ownership and stream a re
     ).status,
     403,
   );
-  const response = await request(["rooms"], "POST", exampleWorld);
+  assert.equal((await request(["rooms"], "POST", exampleWorld)).status, 400);
+  const response = await request(["rooms"], "POST", {
+    ...exampleWorld,
+    kind: "script",
+  });
   assert.equal(response.status, 201);
   const { room } = await response.json();
   user = "bob";
