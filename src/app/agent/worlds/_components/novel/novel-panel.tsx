@@ -17,6 +17,7 @@ import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
 import { BackgroundControls, downloadBackground } from "./background-controls";
 import { ChapterReading, type RewriteTarget } from "./chapter-rewrite";
+import { ContextControls } from "./context-controls";
 import { chapterTitle, exportNovel } from "./model";
 import { useNovel } from "./use-novel";
 
@@ -126,6 +127,11 @@ export function NovelPanel({
             </Button>
           </div>
         </div>
+        <ContextControls
+          room={room}
+          writer={writer}
+          disabled={chapterActionsLocked}
+        />
         <fieldset
           disabled={chapterActionsLocked}
           className="flex flex-col gap-4 disabled:opacity-60"
@@ -418,7 +424,8 @@ export function NovelPanel({
                 target={rewriteTarget}
                 canSelect={!chapterActionsLocked && !ended}
                 onSelect={openRewrite}
-                draft={writer.rewriteReady ? writer.preview : undefined}
+                preview={writer.task === "rewrite" ? writer.preview : ""}
+                draftReady={writer.rewriteReady}
                 writer={writer}
                 ended={ended}
                 onClose={closeRewrite}

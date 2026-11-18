@@ -9,7 +9,13 @@ import {
 } from "@landing-page/utils/stream";
 import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
+import { worldRequest } from "@/lib/group-chat/client";
 import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
+import {
+  forkFitsBudget,
+  forkSummaryPrompt,
+  prepareNovelFork,
+} from "./fork-model";
 import {
   type ChapterTextRange,
   chapterPrompt,
@@ -18,7 +24,9 @@ import {
   createNovel,
   insertChapterBefore,
   insertChapterPrompt,
+  invalidateEditedCheckpoint,
   maxNovelPromptLength,
+  maxNovelSummaryLength,
   type Novel,
   type NovelBackground,
   type NovelTask,
@@ -36,6 +44,7 @@ type NovelRun =
   | { task: "chapter"; title: string; beforeId?: never }
   | { task: "chapter"; beforeId: string; title?: never }
   | { task: "summary"; config: WorldConfig; novel: Novel }
+  | { task: "summary"; forFork: true }
   | {
       task: "rewrite";
       chapterId: string;
@@ -60,6 +69,7 @@ export function useNovel(
   const [task, setTask] = useState<NovelTask>("chapter");
   const [inserting, setInserting] = useState(false);
   const [rewriteReady, setRewriteReady] = useState(false);
+  const [forkSummary, setForkSummary] = useState("");
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
   const input = useRef<NovelRun | null>(null);
@@ -90,6 +100,7 @@ export function useNovel(
   }, [key]);
 
   function update(next: Novel) {
+    next = invalidateEditedCheckpoint(latest.current, next);
     setBackgroundExport(null);
     latest.current = next;
     setNovel(next);
@@ -139,6 +150,15 @@ export function useNovel(
         return;
       }
       if (captured.task === "summary") {
+        if ("forFork" in captured) {
+          if (text.length > maxNovelSummaryLength) {
+            setError("摘要超过长度上限，请重新生成或手动输入较短的摘要。");
+          } else {
+            setForkSummary(text);
+          }
+          setPreview("");
+          return;
+        }
         try {
           const background = createBackground(
             captured.config,
@@ -226,6 +246,68 @@ export function useNovel(
         : { task, title: chapterTitle(current.chapters.length) },
       prompt,
     );
+  }
+
+  function summarizeFork() {
+    if (!ready || generating.current || room.status === "ended") return;
+    const current = latest.current;
+    if (!current.chapters.length) return;
+    const prompt = forkSummaryPrompt(room.config, current);
+    if (prompt.length > maxNovelPromptLength) {
+      setError("自动总结的请求已超限，可手动填写剧情摘要。");
+      return;
+    }
+    setForkSummary("");
+    start({ task: "summary", forFork: true }, prompt);
+  }
+
+  function clearFork() {
+    if (generating.current) return;
+    setForkSummary("");
+    setError("");
+    if (input.current?.task === "summary" && "forFork" in input.current) {
+      input.current = null;
+      setPreview("");
+    }
+  }
+
+  async function createFork(summary: string) {
+    if (!ready || generating.current) throw new Error("当前暂不可创建 Fork。");
+    const current = latest.current;
+    const fork = prepareNovelFork(room.config, current, summary);
+    if (
+      !fork ||
+      !forkFitsBudget(fork.length, chapterPrompt(room.config, current).length)
+    )
+      throw new Error("续写上下文仍然超限或没有缩短，请精简摘要。");
+    generating.current = true;
+    onBusyChange(true);
+    try {
+      const { room: created } = await worldRequest<{ room: WorldRoom }>(
+        "rooms",
+        "POST",
+        { ...fork.config, kind: "novel" },
+      );
+      try {
+        await novels.add({
+          key: `${created.ownerId}:${created.id}`,
+          novel: fork.novel,
+        });
+      } catch {
+        try {
+          await worldRequest(`rooms/${created.id}`, "DELETE");
+        } catch {
+          throw new Error(
+            "本地小说写入失败，新建的空分支未能清理；原小说未改动。",
+          );
+        }
+        throw new Error("无法保存小说分支，请检查浏览器存储空间。");
+      }
+      return created.id;
+    } finally {
+      generating.current = false;
+      onBusyChange(false);
+    }
   }
 
   function insertBefore(beforeId: string, requirements: string) {
@@ -330,6 +412,7 @@ export function useNovel(
     task,
     inserting,
     rewriteReady,
+    forkSummary,
     backgroundExport,
     importBackground(background: NovelBackground | undefined) {
       if (!ready || generating.current)
@@ -338,6 +421,9 @@ export function useNovel(
       update({ ...latest.current, background });
     },
     generate,
+    summarizeFork,
+    clearFork,
+    createFork,
     insertBefore,
     discardInsertion,
     rewrite,
