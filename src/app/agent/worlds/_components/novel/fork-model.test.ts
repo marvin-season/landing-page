@@ -73,8 +73,11 @@ test("editing archived prose restores full context while recent edits and a subs
   assert.equal(renew.completedChapters[0].text, "她找到了旧钥匙。");
   assert.equal(renew.completedChapters.length, 1);
   const laterEdit = JSON.parse(rewritePrompt(config, continuation, "c", ""));
-  assert.equal(laterEdit.archivedChapters.throughChapter, 1);
-  assert.equal(laterEdit.previousChapters[0].text, "她找到了旧钥匙。");
+  assert.equal(laterEdit.archivedChapters, undefined);
+  assert.deepEqual(
+    laterEdit.previousChapters.map(({ text }: { text: string }) => text),
+    ["她来到城里。", "她找到了旧钥匙。"],
+  );
   const earlyEdit = JSON.parse(rewritePrompt(config, continuation, "b", ""));
   assert.equal(earlyEdit.archivedChapters, undefined);
   assert.equal(earlyEdit.previousChapters[0].text, "她来到城里。");

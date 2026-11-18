@@ -277,59 +277,37 @@ export function rewritePrompt(
   const target = formatChapter(novel.chapters[index], index);
   const { text, ...position } = target;
   const selection = range ? splitChapterText(text, range) : undefined;
-  const task = {
-    requirements: requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
-  };
-
-  if (compactContext) {
-    const { title, background, scene, rules, facts, storyGoal, characters } =
-      config;
-    const prompt = JSON.stringify({
-      world: { title, background, scene, rules, facts, storyGoal, characters },
-      previousChapters:
-        index === 0
-          ? []
-          : [formatChapter(novel.chapters[index - 1], index - 1)],
-      targetChapter: selection
-        ? { ...position, selection: { text: selection.text } }
-        : target,
-      task,
-    });
-    if (prompt.length > maxNovelPromptLength)
-      throw new Error("精简上下文仍然过长，请缩短选段或上一章正文后重试。");
-    return prompt;
-  }
-
-  const history = novelHistory(novel, index);
-  const chapters = novel.chapters.map(formatChapter);
-  const targetChapter = selection ? { ...position, selection } : target;
-  const build = (
-    previousChapters: typeof chapters,
-    followingChapters: typeof chapters,
-  ) =>
-    JSON.stringify({
-      world: config,
-      ...history.context,
-      novel: { title: novel.title, style: novel.style, outline: novel.outline },
-      previousChapters,
-      targetChapter,
-      followingChapters,
-      task,
-    });
-  const complete = build(
-    chapters.slice(history.count, index),
-    chapters.slice(index + 1),
-  );
-  if (complete.length <= maxNovelPromptLength) return complete;
-
-  // Never drop or truncate the chapters that touch either edge of the rewrite.
-  const adjacent = build(
-    chapters.slice(Math.max(0, index - 1), index),
-    chapters.slice(index + 1, index + 2),
-  );
-  if (adjacent.length > maxNovelPromptLength)
-    throw new Error("本章与相邻章节的上下文过长，请缩减正文或背景设定后重试。");
-  return adjacent;
+  const { title, background, scene, rules, facts, storyGoal, characters } =
+    config;
+  const targetChapter = compactContext
+    ? selection
+      ? { selection: { text: selection.text } }
+      : { text }
+    : selection
+      ? { ...position, selection }
+      : target;
+  const next = novel.chapters[index + 1];
+  const prompt = JSON.stringify({
+    world: { title, background, scene, rules, facts, storyGoal, characters },
+    ...(!compactContext && !selection
+      ? {
+          previousChapters: novel.chapters.slice(0, index).map(formatChapter),
+          followingChapters: next ? [formatChapter(next, index + 1)] : [],
+        }
+      : {}),
+    targetChapter,
+    task: {
+      requirements:
+        requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
+    },
+  });
+  if (prompt.length > maxNovelPromptLength)
+    throw new Error(
+      compactContext
+        ? "精简上下文仍然过长，请缩短润色正文或世界设定后重试。"
+        : "润色上下文过长，请开启「精简上下文」后重试。",
+    );
+  return prompt;
 }
 
 function splitChapterText(text: string, { start, end }: ChapterTextRange) {
