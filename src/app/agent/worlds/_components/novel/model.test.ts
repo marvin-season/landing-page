@@ -3,15 +3,150 @@ import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
 import {
   chapterPrompt,
+  chapterSelection,
   createBackground,
   createNovel,
   exportNovel,
   maxBackgroundFileBytes,
+  maxNovelPromptLength,
   novelRequest,
   parseBackgroundFile,
+  replaceChapterText,
+  rewritePrompt,
   serializeBackground,
   summaryPrompt,
 } from "./model";
+
+test("a passage rewrite sends the unselected text and replaces only the selected occurrence", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  const text = "她推开了门。\r\n\r\n后来，她推开了门。\r\n\r\n灯亮了。";
+  novel.chapters = [
+    { id: "before", title: "上章", text: "门外很安静。" },
+    { id: "target", title: "本章", text },
+    { id: "after", title: "下章", text: "灯还亮着。" },
+  ];
+  const normalized = text.replaceAll("\r\n", "\n");
+  const start = normalized.lastIndexOf("她推开了门。");
+  const end = normalized.indexOf("灯亮了。");
+  const range = chapterSelection(text, start, end);
+  assert.ok(range);
+  const prompt = JSON.parse(
+    rewritePrompt(config, novel, "target", "补足动作细节", range),
+  );
+  assert.deepEqual(prompt.targetChapter.selection, {
+    before: "她推开了门。\r\n\r\n后来，",
+    text: "她推开了门。",
+    after: "\r\n\r\n灯亮了。",
+  });
+  assert.equal(prompt.targetChapter.text, undefined);
+  assert.equal(prompt.previousChapters[0].text, "门外很安静。");
+  assert.equal(prompt.followingChapters[0].text, "灯还亮着。");
+  const updated = replaceChapterText(
+    novel,
+    "target",
+    "她用肩膀顶开了门。",
+    range,
+  );
+  assert.equal(
+    updated.chapters[1].text,
+    "她推开了门。\r\n\r\n后来，她用肩膀顶开了门。\r\n\r\n灯亮了。",
+  );
+  assert.deepEqual(
+    [updated.chapters[0], updated.chapters[2]],
+    [novel.chapters[0], novel.chapters[2]],
+  );
+  assert.equal(chapterSelection(text, end - 2, end), null);
+  assert.throws(
+    () =>
+      rewritePrompt(config, novel, "target", "", {
+        start: 0,
+        end: text.length + 1,
+      }),
+    /选段已失效/,
+  );
+});
+
+test("rewrite receives the chosen chapter in place with its original preceding and following chapters", () => {
+  const config = {
+    ...loadWorldTemplates()[0].config,
+    priorContext: "旧城来信",
+  };
+  const novel = createNovel(config);
+  novel.chapterGoal = "这是下一章的新要求";
+  novel.chapters = [
+    { id: "a", title: "初遇", text: "她在门前停下。" },
+    { id: "b", title: "交锋", text: "她把钥匙交给他。" },
+    { id: "c", title: "开门", text: "他掏出钥匙。" },
+  ];
+  const prompt = JSON.parse(rewritePrompt(config, novel, "b", "  缩短对白  "));
+  assert.deepEqual(prompt.previousChapters, [
+    { chapter: 1, title: "初遇", text: "她在门前停下。" },
+  ]);
+  assert.deepEqual(prompt.targetChapter, {
+    chapter: 2,
+    title: "交锋",
+    text: "她把钥匙交给他。",
+  });
+  assert.deepEqual(prompt.followingChapters, [
+    { chapter: 3, title: "开门", text: "他掏出钥匙。" },
+  ]);
+  assert.equal(prompt.task.requirements, "缩短对白");
+  assert.equal(prompt.world.priorContext, "旧城来信");
+  assert.equal(JSON.stringify(prompt).includes(novel.chapterGoal), false);
+  assert.deepEqual(
+    JSON.parse(rewritePrompt(config, novel, "a", "")).previousChapters,
+    [],
+  );
+  assert.deepEqual(
+    JSON.parse(rewritePrompt(config, novel, "c", "")).followingChapters,
+    [],
+  );
+});
+
+test("rewrite keeps both neighboring chapters intact under the request limit", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "a", title: "较早章节", text: "早".repeat(maxNovelPromptLength) },
+    { id: "b", title: "前一章", text: "门打开了。" },
+    { id: "c", title: "本章", text: "她离开了。" },
+    { id: "d", title: "后一章", text: "她回到家。" },
+    { id: "e", title: "较晚章节", text: "晚".repeat(maxNovelPromptLength) },
+  ];
+  const prompt = JSON.parse(rewritePrompt(config, novel, "c", ""));
+  assert.deepEqual(prompt.previousChapters, [
+    { chapter: 2, title: "前一章", text: "门打开了。" },
+  ]);
+  assert.deepEqual(prompt.followingChapters, [
+    { chapter: 4, title: "后一章", text: "她回到家。" },
+  ]);
+  novel.chapters[3].text = "长".repeat(maxNovelPromptLength);
+  assert.throws(
+    () => rewritePrompt(config, novel, "c", ""),
+    /相邻章节的上下文过长/,
+  );
+});
+
+test("adopting a rewrite changes only its chapter body and future context and export use it", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "one", title: "第一章", text: "旧稿" },
+    { id: "two", title: "第二章", text: "后文" },
+  ];
+  const updated = replaceChapterText(novel, "one", "新稿");
+  assert.deepEqual(updated.chapters, [
+    { id: "one", title: "第一章", text: "新稿" },
+    novel.chapters[1],
+  ]);
+  assert.equal(novel.chapters[0].text, "旧稿");
+  assert.equal(
+    JSON.parse(chapterPrompt(config, updated)).completedChapters[0].text,
+    "新稿",
+  );
+  assert.equal(exportNovel(updated, "md").includes("旧稿"), false);
+});
 
 test("writer receives world secrets and edited chapters in order, with the next chapter requirements", () => {
   const config = structuredClone(loadWorldTemplates()[0].config);

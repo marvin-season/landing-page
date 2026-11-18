@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { Mastra } from "@mastra/core/mastra";
 import {
   novelRequest,
+  rewriteInstructions,
   summaryInstructions,
   writerInstructions,
 } from "@/app/agent/worlds/_components/novel/model";
@@ -44,7 +45,7 @@ function request(body: unknown, origin = "http://localhost") {
 }
 const mastra = new Mastra({ agents: { writer: worldAgents.writer } });
 
-test("novel chapters and summaries stream through the world proxy with server-owned model, instructions and tool policy", async (t) => {
+test("novel writing, summaries and rewrites stream through the world proxy with server-owned model, instructions and tool policy", async (t) => {
   const saved = room();
   const bodies: Array<{ messages: Array<{ content: string }> }> = [];
   t.mock.method(
@@ -90,7 +91,12 @@ test("novel chapters and summaries stream through the world proxy with server-ow
     },
     mastra,
   });
-  for (const task of ["chapter", "summary"] as const) {
+  const cases = [
+    ["chapter", writerInstructions],
+    ["summary", summaryInstructions],
+    ["rewrite", rewriteInstructions],
+  ] as const;
+  for (const [task, instructions] of cases) {
     const response = await handle(
       request({
         ...novelRequest(saved.id, "完整小说上下文", task),
@@ -107,10 +113,7 @@ test("novel chapters and summaries stream through the world proxy with server-ow
     const messages = bodies.at(-1)?.messages;
     assert.deepEqual(
       messages?.map((message) => message.content),
-      [
-        task === "summary" ? summaryInstructions : writerInstructions,
-        "完整小说上下文",
-      ],
+      [instructions, "完整小说上下文"],
     );
   }
 });

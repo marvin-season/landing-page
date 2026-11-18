@@ -15,6 +15,7 @@ export function TextField({
   maxLength = 4000,
   hint,
   required = false,
+  onTextSelect,
 }: {
   label: string;
   value: string;
@@ -23,6 +24,7 @@ export function TextField({
   maxLength?: number;
   hint?: string;
   required?: boolean;
+  onTextSelect?: (start: number, end: number) => void;
 }) {
   const id = useId();
   return (
@@ -36,6 +38,15 @@ export function TextField({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onSelect={
+            onTextSelect
+              ? ({ currentTarget }) =>
+                  onTextSelect(
+                    currentTarget.selectionStart,
+                    currentTarget.selectionEnd,
+                  )
+              : undefined
+          }
           maxLength={maxLength}
           required={required}
           rows={4}

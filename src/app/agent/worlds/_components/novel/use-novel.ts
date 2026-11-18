@@ -11,18 +11,34 @@ import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
 import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
 import {
+  type ChapterTextRange,
   chapterPrompt,
   createBackground,
   createNovel,
+  maxNovelPromptLength,
   type Novel,
   type NovelBackground,
+  type NovelTask,
   novelRequest,
+  replaceChapterText,
+  rewritePrompt,
   summaryPrompt,
 } from "./model";
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
+
+type NovelRun =
+  | { task: "chapter"; title: string }
+  | { task: "summary"; config: WorldConfig; novel: Novel }
+  | {
+      task: "rewrite";
+      chapterId: string;
+      novel: Novel;
+      version: number;
+      range?: ChapterTextRange;
+    };
 
 export function useNovel(
   room: WorldRoom,
@@ -36,18 +52,14 @@ export function useNovel(
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
-  const [task, setTask] = useState<"chapter" | "summary">("chapter");
+  const [task, setTask] = useState<NovelTask>("chapter");
+  const [rewriteReady, setRewriteReady] = useState(false);
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
-  const input = useRef<{
-    task: "chapter" | "summary";
-    config: WorldConfig;
-    novel: Novel;
-  } | null>(null);
+  const input = useRef<NovelRun | null>(null);
   const state = useRef(initialChatStreamState);
   const finished = useRef(false);
   const generating = useRef(false);
-  const chapterTitle = useRef("");
   const latest = useRef(novel);
   const writes = useRef(Promise.resolve());
   useEffect(() => {
@@ -115,6 +127,11 @@ export function useNovel(
       }
       const captured = input.current;
       if (!captured) return;
+      if (captured.task === "rewrite") {
+        setPreview(text);
+        setRewriteReady(true);
+        return;
+      }
       if (captured.task === "summary") {
         try {
           const background = createBackground(
@@ -138,7 +155,7 @@ export function useNovel(
           ...latest.current.chapters,
           {
             id: crypto.randomUUID(),
-            title: chapterTitle.current,
+            title: captured.title,
             text,
           },
         ],
@@ -151,32 +168,12 @@ export function useNovel(
     },
   });
 
-  function generate(task: "chapter" | "summary" = "chapter") {
-    if (!ready || generating.current) return;
+  function start(run: NovelRun, prompt: string) {
+    input.current = run;
     setError("");
-    if (task === "summary" && !latest.current.chapters.length) {
-      setError("请先完成至少一章，再总结导出背景。");
-      return;
-    }
-    const prompt =
-      task === "summary"
-        ? summaryPrompt(room.config, latest.current)
-        : chapterPrompt(room.config, latest.current);
-    // Keep all previous chapters intact rather than silently dropping continuity.
-    if (prompt.length > 150000) {
-      setError(
-        "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
-      );
-      return;
-    }
-    chapterTitle.current = `第${latest.current.chapters.length + 1}章`;
-    input.current = {
-      task,
-      config: structuredClone(room.config),
-      novel: structuredClone(latest.current),
-    };
-    setTask(task);
-    setBackgroundExport(null);
+    setTask(run.task);
+    if (run.task !== "rewrite") setBackgroundExport(null);
+    setRewriteReady(false);
     finished.current = false;
     state.current = initialChatStreamState;
     setPreview("");
@@ -185,8 +182,98 @@ export function useNovel(
     onBusyChange(true);
     stream.send({
       url: "/api/novel",
-      body: novelRequest(room.id, prompt, task),
+      body: novelRequest(room.id, prompt, run.task),
     });
+  }
+
+  function generate(task: "chapter" | "summary" = "chapter") {
+    if (!ready || generating.current || room.status === "ended") return;
+    setError("");
+    const current = latest.current;
+    if (task === "summary" && !current.chapters.length) {
+      setError("请先完成至少一章，再总结导出背景。");
+      return;
+    }
+    const prompt =
+      task === "summary"
+        ? summaryPrompt(room.config, current)
+        : chapterPrompt(room.config, current);
+    if (prompt.length > maxNovelPromptLength) {
+      setError(
+        "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
+      );
+      return;
+    }
+    start(
+      task === "summary"
+        ? { task, config: room.config, novel: current }
+        : { task, title: `第${current.chapters.length + 1}章` },
+      prompt,
+    );
+  }
+
+  function rewrite(
+    chapterId: string,
+    requirements: string,
+    range?: ChapterTextRange,
+  ) {
+    if (!ready || generating.current || room.status === "ended") return;
+    const current = latest.current;
+    try {
+      const prompt = rewritePrompt(
+        room.config,
+        current,
+        chapterId,
+        requirements,
+        range,
+      );
+      start(
+        {
+          task: "rewrite",
+          chapterId,
+          novel: current,
+          version: room.version,
+          range,
+        },
+        prompt,
+      );
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "无法生成重写草稿。");
+    }
+  }
+
+  function discardRewrite() {
+    if (generating.current) return;
+    if (input.current?.task === "rewrite") {
+      input.current = null;
+      setPreview("");
+      setRewriteReady(false);
+    }
+    setError("");
+  }
+
+  function applyRewrite() {
+    const captured = input.current;
+    if (generating.current || !rewriteReady || captured?.task !== "rewrite")
+      return false;
+    if (
+      latest.current !== captured.novel ||
+      room.version !== captured.version ||
+      room.status === "ended"
+    ) {
+      setError("小说或世界设定已变更，请重新生成重写草稿。");
+      return false;
+    }
+    update(
+      replaceChapterText(
+        captured.novel,
+        captured.chapterId,
+        preview,
+        captured.range,
+      ),
+    );
+    discardRewrite();
+    return true;
   }
 
   return {
@@ -198,6 +285,7 @@ export function useNovel(
     busy,
     preview,
     task,
+    rewriteReady,
     backgroundExport,
     importBackground(background: NovelBackground | undefined) {
       if (!ready || generating.current)
@@ -206,6 +294,9 @@ export function useNovel(
       update({ ...latest.current, background });
     },
     generate,
+    rewrite,
+    discardRewrite,
+    applyRewrite,
     stop() {
       stream.stop();
       end();

@@ -4,6 +4,9 @@ import { RequestContext } from "@mastra/core/request-context";
 import { createUIMessageStreamResponse } from "ai";
 import { z } from "zod";
 import {
+  maxNovelPromptLength,
+  novelTaskSchema,
+  rewriteInstructions,
   summaryInstructions,
   writerInstructions,
 } from "@/app/agent/worlds/_components/novel/model";
@@ -14,9 +17,15 @@ import type { WorldStore } from "./store";
 
 const inputSchema = z.object({
   roomId: idSchema,
-  prompt: z.string().trim().min(1).max(150000),
-  task: z.enum(["chapter", "summary"]),
+  prompt: z.string().trim().min(1).max(maxNovelPromptLength),
+  task: novelTaskSchema,
 });
+
+const instructionsByTask = {
+  chapter: writerInstructions,
+  summary: summaryInstructions,
+  rewrite: rewriteInstructions,
+};
 
 export function createNovelHandler({
   getUser,
@@ -56,8 +65,7 @@ export function createNovelHandler({
               parts: [{ type: "text", text: prompt }],
             },
           ],
-          instructions:
-            task === "summary" ? summaryInstructions : writerInstructions,
+          instructions: instructionsByTask[task],
           requestContext,
           abortSignal: request.signal,
           activeTools: [],
