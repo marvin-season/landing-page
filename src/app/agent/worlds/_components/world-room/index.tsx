@@ -190,7 +190,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
               >
-                <div className="absolute -inset-2 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-30 blur-sm" />
+                <div className="absolute inset-0 scale-95 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-40 blur-[2px]" />
               </div>
               <NovelPanel
                 key={room.id}
