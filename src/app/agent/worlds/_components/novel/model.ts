@@ -20,6 +20,9 @@ export const backgroundSchema = z.object({
   summary: z.string().trim().min(1).max(maxNovelSummaryLength),
 });
 export type NovelBackground = z.infer<typeof backgroundSchema>;
+export type ImportedNovelBackground =
+  | NovelBackground
+  | { format: "text"; summary: string };
 export const maxBackgroundFileBytes = 2 * 1024 * 1024;
 export type Novel = {
   title: string;
@@ -28,7 +31,7 @@ export type Novel = {
   chapterGoal: string;
   words: string;
   chapters: Chapter[];
-  background?: NovelBackground;
+  background?: ImportedNovelBackground;
   checkpoint?: { throughChapterId: string; summary: string };
 };
 
@@ -382,21 +385,31 @@ export function createBackground(
   });
 }
 
-export function parseBackgroundFile(text: string): NovelBackground {
+const backgroundMarker = "\n\n<!-- novel-background\n";
+
+function normalizeBackgroundFile(text: string) {
   if (new TextEncoder().encode(text).length > maxBackgroundFileBytes)
     throw new Error("背景文件不能超过 2 MB");
-  const normalized = text
+  return text
     .replace(/^\uFEFF/, "")
-    .replace(/\r\n/g, "\n")
+    .replace(/\r\n?/g, "\n")
     .trimEnd();
-  const marker = "\n\n<!-- novel-background\n";
-  const position = normalized.lastIndexOf(marker);
+}
+
+export function parseBackgroundFile(text: string): NovelBackground {
+  return parseExportedBackground(normalizeBackgroundFile(text));
+}
+
+function parseExportedBackground(normalized: string): NovelBackground {
+  const position = normalized.lastIndexOf(backgroundMarker);
   const header = normalized.match(/^# [^\n]+\n\n/);
   if (position < 0 || !header || !normalized.endsWith("\n-->"))
     throw new Error("请选择“总结并导出背景”生成的 Markdown 文件（.md）。");
   let metadata: unknown;
   try {
-    metadata = JSON.parse(normalized.slice(position + marker.length, -4));
+    metadata = JSON.parse(
+      normalized.slice(position + backgroundMarker.length, -4),
+    );
   } catch {
     throw new Error("背景文件的来源信息损坏，请重新导出 Markdown 背景文件。");
   }
@@ -409,6 +422,21 @@ export function parseBackgroundFile(text: string): NovelBackground {
       "背景文件格式或版本不支持，请选择“总结并导出背景”生成的文件。",
     );
   return result.data;
+}
+
+export function parseImportedBackground(
+  text: string,
+  fileName: string,
+): ImportedNovelBackground {
+  if (!/\.(txt|md)$/i.test(fileName))
+    throw new Error("请选择 TXT 或 Markdown（.md）文件。");
+  const normalized = normalizeBackgroundFile(text);
+  if (/(?:^|\n)<!-- novel-background\b/.test(normalized))
+    return parseExportedBackground(normalized);
+  if (!normalized.trim()) throw new Error("背景文件为空。");
+  if (normalized.length > maxNovelSummaryLength)
+    throw new Error("剧情背景不能超过 20,000 字符。");
+  return { format: "text", summary: normalized };
 }
 
 export function serializeBackground(background: NovelBackground): string {

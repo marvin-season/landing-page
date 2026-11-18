@@ -7,9 +7,11 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import { TextField } from "../fields";
 import {
+  type ImportedNovelBackground,
   maxBackgroundFileBytes,
+  maxNovelSummaryLength,
   type NovelBackground,
-  parseBackgroundFile,
+  parseImportedBackground,
   serializeBackground,
 } from "./model";
 
@@ -31,11 +33,11 @@ export function BackgroundControls({
   onImport,
   onSummarize,
 }: {
-  background?: NovelBackground;
+  background?: ImportedNovelBackground;
   exported: NovelBackground | null;
   disabled: boolean;
   canSummarize: boolean;
-  onImport: (background: NovelBackground | undefined) => void;
+  onImport: (background: ImportedNovelBackground | undefined) => void;
   onSummarize: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -67,14 +69,18 @@ export function BackgroundControls({
             onClick={() => fileRef.current?.click()}
           >
             <Upload data-icon="inline-start" />
-            {importing ? "正在导入…" : background ? "替换导入背景" : "导入背景"}
+            {importing
+              ? "正在导入…"
+              : background
+                ? "替换导入背景"
+                : "导入背景（TXT / MD）"}
           </Button>
         </div>
       </div>
       <input
         ref={fileRef}
         type="file"
-        accept="text/markdown,.md"
+        accept=".txt,.md,text/plain,text/markdown"
         className="hidden"
         disabled={disabled || importing}
         onChange={async (event) => {
@@ -86,7 +92,7 @@ export function BackgroundControls({
           try {
             if (file.size > maxBackgroundFileBytes)
               throw new Error("背景文件不能超过 2 MB");
-            onImport(parseBackgroundFile(await file.text()));
+            onImport(parseImportedBackground(await file.text(), file.name));
           } catch (error) {
             setError(error instanceof Error ? error.message : "背景导入失败");
           } finally {
@@ -104,18 +110,24 @@ export function BackgroundControls({
           disabled={disabled || importing}
           className="flex flex-col gap-3 disabled:opacity-60"
         >
-          <p className="text-xs text-muted-foreground">
-            背景来源：《{background.source.title}》· 截至第{" "}
-            {background.source.chapterCount}{" "}
-            章。包含原世界设定；导入不会覆盖本书设定或追加章节。
-          </p>
+          {background.format === "novel-background" ? (
+            <p className="text-xs text-muted-foreground">
+              背景来源：《{background.source.title}》· 截至第{" "}
+              {background.source.chapterCount}{" "}
+              章。包含原世界设定；导入不会覆盖本书设定或追加章节。
+            </p>
+          ) : null}
           <TextField
             label="已导入的剧情背景"
             value={background.summary}
             multiline
-            maxLength={20000}
+            maxLength={maxNovelSummaryLength}
             onChange={(summary) => onImport({ ...background, summary })}
-            hint="后续章节会参考此背景。可编辑总结，原小说的角色秘密仍按知情范围逐步揭示。"
+            hint={
+              background.format === "novel-background"
+                ? "后续章节会参考此背景。可编辑总结，原小说的角色秘密仍按知情范围逐步揭示。"
+                : undefined
+            }
           />
           <Button
             size="sm"

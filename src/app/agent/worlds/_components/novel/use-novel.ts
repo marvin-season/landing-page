@@ -22,6 +22,7 @@ import {
   chapterTitle,
   createBackground,
   createNovel,
+  type ImportedNovelBackground,
   insertChapterBefore,
   insertChapterPrompt,
   invalidateEditedCheckpoint,
@@ -416,7 +417,7 @@ export function useNovel(
     rewriteReady,
     forkSummary,
     backgroundExport,
-    importBackground(background: NovelBackground | undefined) {
+    importBackground(background: ImportedNovelBackground | undefined) {
       if (!ready || generating.current)
         throw new Error("正在生成或读取小说，请稍后再导入背景。");
       setError("");
