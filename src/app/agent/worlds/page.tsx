@@ -6,11 +6,6 @@ export const metadata: Metadata = {
   title: "开放世界",
   robots: { index: false, follow: false },
 };
-export default async function WorldsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kind?: string | string[] }>;
-}) {
-  const kind = (await searchParams).kind === "novel" ? "novel" : "script";
-  return <WorldLobby key={kind} kind={kind} templates={loadWorldTemplates()} />;
+export default function WorldsPage() {
+  return <WorldLobby templates={loadWorldTemplates()} />;
 }

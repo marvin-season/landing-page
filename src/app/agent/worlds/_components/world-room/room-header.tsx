@@ -44,12 +44,7 @@ export function RoomHeader({
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon">
-          <Link
-            href={
-              kind === "novel" ? "/agent/worlds?kind=novel" : "/agent/worlds"
-            }
-            aria-label="返回世界列表"
-          >
+          <Link href="/agent/worlds" aria-label="返回世界列表">
             <ArrowLeft />
           </Link>
         </Button>
