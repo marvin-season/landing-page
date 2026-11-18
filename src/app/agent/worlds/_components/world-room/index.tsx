@@ -29,6 +29,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [mentions, setMentions] = useState<AiMentionItem[]>([]);
   const [speakerId, setSpeakerId] = useState("system");
   const [notes, setNotes] = useState(false);
+  const [notesSidebarOpen, setNotesSidebarOpen] = useState(true);
   const [editing, setEditing] = useState<WorldConfig | null>(null);
   const [copying, setCopying] = useState(false);
   const [presets, setPresets] = useState<WorldPreset[]>([]);
@@ -171,6 +172,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         reason={novelMode ? "章节创作" : loaded.run?.reason}
         actionPending={actionPending}
         onOpenNotes={() => setNotes(true)}
+        notesSidebarOpen={notesSidebarOpen}
+        onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
         onEdit={() => void edit()}
         kind={kind}
       />
@@ -233,12 +236,14 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             </>
           )}
         </div>
-        <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
-          <WorldNotes
-            room={room}
-            onMention={novelMode ? undefined : addMention}
-          />
-        </aside>
+        {notesSidebarOpen ? (
+          <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
+            <WorldNotes
+              room={room}
+              onMention={novelMode ? undefined : addMention}
+            />
+          </aside>
+        ) : null}
       </div>
       <WorldNotesSheet
         open={notes}

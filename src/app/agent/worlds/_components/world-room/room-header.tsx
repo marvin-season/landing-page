@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
-import { ArrowLeft, LoaderCircle, Settings2, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  LoaderCircle,
+  PanelRightClose,
+  PanelRightOpen,
+  Settings2,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import type { WorldKind } from "@/lib/group-chat/model";
 
@@ -14,6 +21,8 @@ export function RoomHeader({
   reason,
   actionPending,
   onOpenNotes,
+  notesSidebarOpen,
+  onToggleNotesSidebar,
   onEdit,
   kind,
 }: {
@@ -25,9 +34,12 @@ export function RoomHeader({
   reason?: string;
   actionPending: boolean;
   onOpenNotes: () => void;
+  notesSidebarOpen: boolean;
+  onToggleNotesSidebar: () => void;
   onEdit: () => void;
   kind: WorldKind;
 }) {
+  const notesSidebarLabel = notesSidebarOpen ? "收起世界侧栏" : "展开世界侧栏";
   return (
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
@@ -67,6 +79,17 @@ export function RoomHeader({
         >
           <Users data-icon="inline-start" />
           世界
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="hidden size-8 xl:inline-flex"
+          onClick={onToggleNotesSidebar}
+          aria-expanded={notesSidebarOpen}
+          aria-label={notesSidebarLabel}
+          title={notesSidebarLabel}
+        >
+          {notesSidebarOpen ? <PanelRightClose /> : <PanelRightOpen />}
         </Button>
         <Button
           variant="outline"
