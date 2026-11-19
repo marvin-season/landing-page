@@ -12,7 +12,7 @@ export const novelTaskSchema = z.enum(["chapter", "summary", "rewrite"]);
 export type NovelTask = z.infer<typeof novelTaskSchema>;
 export const maxNovelPromptLength = 150000;
 export const maxNovelSummaryLength = 20000;
-export const minChapterTarget = 500;
+export const minChapterTarget = 1000;
 export const defaultChapterTarget = 4000;
 export const maxChapterLength = 8000;
 

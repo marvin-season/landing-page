@@ -387,7 +387,7 @@ test("writer receives world secrets and edited chapters in order, with the next 
     { id: "two", title: "第2章 风起", text: "第二章正文。" },
   ];
   novel.chapterGoal = "揭示线索，但保留身份秘密";
-  novel.words = "500";
+  novel.words = "1000";
   const prompt = JSON.parse(chapterPrompt(config, novel));
   assert.equal(prompt.world.characters[0].privateInfo, "尚未揭晓的身份");
   assert.equal(prompt.world.priorContext, config.priorContext);
@@ -397,7 +397,7 @@ test("writer receives world secrets and edited chapters in order, with the next 
   );
   assert.equal(prompt.task.chapter, 3);
   assert.equal(prompt.task.requirements, novel.chapterGoal);
-  assert.equal(prompt.task.targetWords, 500);
+  assert.equal(prompt.task.targetWords, 1000);
   assert.equal(prompt.task.maxCharacters, 8000);
 });
 
