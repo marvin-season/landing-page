@@ -13,7 +13,6 @@ import {
 } from "@landing-page/design-system";
 import {
   Ellipsis,
-  FileText,
   LoaderCircle,
   PenLine,
   Scissors,
@@ -32,15 +31,17 @@ import {
   NovelFileControls,
 } from "./background-controls";
 import { ChapterEditor } from "./chapter-editor";
+import {
+  ChapterGenerationForm,
+  type ChapterGenerationOptions,
+} from "./chapter-generation-form";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
+  chapterTitle,
   exportNovel,
-  isChapterTargetValid,
-  maxChapterLength,
-  minChapterTarget,
   type NovelWritingContext,
   replaceChapter,
   splitChapterAt,
@@ -69,7 +70,6 @@ export function NovelPanel({
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
-  const generationDraft = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     if (
       editingChapter ||
@@ -127,24 +127,23 @@ export function NovelPanel({
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || rewriting;
-  const canGenerateChapter =
-    !ended && Boolean(novel.title.trim()) && isChapterTargetValid(novel.words);
   const summarizing = writer.task === "summary";
-  const generatingChapter =
-    writer.busy && writer.task === "chapter" && !plotOpen;
-  const chapterNumber = novel.chapters.length + 1;
-  const hasChapterDraft = writer.task === "chapter" && Boolean(writer.preview);
-  const chapterStatus = generatingChapter
-    ? `${hasChapterDraft ? "正在创作" : "等待输出 · "}第 ${chapterNumber} 章`
-    : writer.chapterStopped
-      ? hasChapterDraft
-        ? "已停止接收 · 草稿未保存"
-        : "已停止接收 · 无草稿"
-      : !novel.title.trim()
-        ? "请在设定中填写小说名称"
-        : !isChapterTargetValid(novel.words)
-          ? `每章字数需为 ${minChapterTarget}–${maxChapterLength}`
-          : `第 ${chapterNumber} 章`;
+  const generationOptions = {
+    chapterGoal: novel.chapterGoal,
+    words: novel.words,
+  };
+  function updateGenerationOptions(options: ChapterGenerationOptions) {
+    writer.update({ ...novel, ...options });
+  }
+  function generateNextChapter() {
+    if (!writer.generateChapter()) return;
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    setEditingChapter({
+      id: crypto.randomUUID(),
+      title: chapterTitle(novel.chapters.length),
+      text: "",
+    });
+  }
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
@@ -187,20 +186,34 @@ export function NovelPanel({
     );
   }
   if (editingChapter) {
+    const creating = !novel.chapters.some(({ id }) => id === editingChapter.id);
     return (
       <ChapterEditor
         key={editingChapter.id}
         base={editingChapter}
         chapters={novel.chapters}
+        creation={
+          creating
+            ? {
+                options: generationOptions,
+                onChange: updateGenerationOptions,
+                onGenerate: writer.generateChapter,
+              }
+            : undefined
+        }
         writer={writer}
         ended={ended}
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
         onSave={async (draft) => {
-          const saved = await writer.update(replaceChapter(novel, draft), {
-            persistFirst: true,
-          });
-          if (saved) setEditingChapter(draft);
+          const next = creating
+            ? { ...novel, chapters: [...novel.chapters, draft] }
+            : replaceChapter(novel, draft);
+          const saved = await writer.update(next, { persistFirst: true });
+          if (saved) {
+            setEditingChapter(draft);
+            if (creating) setSelected(draft.id);
+          }
           return saved;
         }}
         onSelectChapter={(id) => {
@@ -257,7 +270,7 @@ export function NovelPanel({
                 setSelected(id);
               }}
               onDownload={download}
-              onSummarize={() => writer.generate("summary")}
+              onSummarize={writer.generateBackground}
             />
           </div>
           {summarizing && writer.busy ? (
@@ -285,16 +298,10 @@ export function NovelPanel({
               <AlertDescription>{writer.error}</AlertDescription>
             </Alert>
           ) : null}
-          {writer.task !== "rewrite" && !plotOpen && writer.preview ? (
-            <article
-              ref={generationDraft}
-              className="flex flex-col gap-4 rounded-lg border border-border p-5"
-            >
+          {summarizing && !plotOpen && writer.preview ? (
+            <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
               <h3 className="font-serif text-lg">
-                {writer.task === "summary"
-                  ? "背景总结"
-                  : `第 ${chapterNumber} 章`}{" "}
-                · {writer.busy ? "生成中" : "未完成草稿"}
+                背景总结 · {writer.busy ? "生成中" : "未完成草稿"}
               </h3>
               <UnifiedMarkdown
                 content={writer.preview}
@@ -442,99 +449,18 @@ export function NovelPanel({
         </div>
       </div>
       {rewriting ? null : (
-        <form
-          className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (continueLocked || !canGenerateChapter || generatingChapter)
-              return;
-            setSelected(null);
-            writer.generate();
-          }}
-        >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-2 rounded-lg border border-input bg-background p-3 focus-within:border-ring">
-            <label className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <span className="text-sm font-medium">下一章要求</span>
-              <textarea
-                value={novel.chapterGoal}
-                disabled={continueLocked}
-                rows={2}
-                maxLength={4000}
-                placeholder="可指定本章事件、伏笔、结尾或情绪；留空则按大纲继续。"
-                onChange={(event) =>
-                  writer.update({ ...novel, chapterGoal: event.target.value })
-                }
-                className="max-h-24 min-h-12 w-full resize-none bg-transparent text-sm leading-6 outline-none disabled:opacity-60"
-              />
-            </label>
-            <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
-              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-                <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                  每章字数
-                  <input
-                    value={novel.words}
-                    disabled={continueLocked}
-                    inputMode="numeric"
-                    maxLength={4}
-                    aria-label="每章字数"
-                    onChange={(event) =>
-                      writer.update({ ...novel, words: event.target.value })
-                    }
-                    className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
-                  />
-                  <span>
-                    {minChapterTarget}–{maxChapterLength}
-                  </span>
-                </label>
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  {generatingChapter ? (
-                    <LoaderCircle className="size-3.5 shrink-0 animate-spin" />
-                  ) : null}
-                  <span>{chapterStatus}</span>
-                </p>
-              </div>
-              <div className="ml-auto flex shrink-0 items-center gap-1">
-                {hasChapterDraft ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="px-2"
-                    onClick={() => generationDraft.current?.scrollIntoView()}
-                  >
-                    <FileText data-icon="inline-start" />
-                    草稿
-                  </Button>
-                ) : null}
-                {generatingChapter ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="min-w-28 whitespace-nowrap"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      writer.stop();
-                    }}
-                  >
-                    <Square data-icon="inline-start" />
-                    停止生成
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    size="sm"
-                    className="min-w-28 whitespace-nowrap"
-                    disabled={continueLocked || !canGenerateChapter}
-                  >
-                    <PenLine data-icon="inline-start" />
-                    {writer.chapterStopped ? "重新生成" : "续写下一章"}
-                  </Button>
-                )}
-              </div>
-            </div>
+        <div className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8">
+          <div className="mx-auto w-full max-w-5xl">
+            <ChapterGenerationForm
+              options={generationOptions}
+              disabled={continueLocked}
+              submitDisabled={!novel.title.trim()}
+              submitLabel="续写下一章"
+              onChange={updateGenerationOptions}
+              onGenerate={generateNextChapter}
+            />
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

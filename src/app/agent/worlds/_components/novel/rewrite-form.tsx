@@ -10,12 +10,13 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
-import { useId, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
+import { WritingInstructions } from "./writing-instructions";
 
 type RewriteControls = {
   preview: string;
@@ -49,7 +50,6 @@ export function RewritePanel({
 }) {
   const form = useRef<HTMLFormElement>(null);
   const instructions = useRef<HTMLTextAreaElement>(null);
-  const instructionsId = useId();
   const showInstructions = !writer.busy && !draftReady;
 
   useLayoutEffect(() => {
@@ -125,17 +125,10 @@ export function RewritePanel({
         )}
       >
         <div className={showInstructions ? "shrink-0" : "hidden"}>
-          <label htmlFor={instructionsId} className="sr-only">
-            润色指令（选填）
-          </label>
-          <textarea
+          <WritingInstructions
             ref={instructions}
-            id={instructionsId}
-            name="requirements"
+            label="润色指令（选填）"
             placeholder="润色指令（选填），例如：收紧对话节奏"
-            rows={2}
-            maxLength={4000}
-            className="block w-full resize-none rounded-md border border-transparent bg-muted/45 px-2.5 py-2 text-sm leading-5 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           />
         </div>
         {!showInstructions ? (
@@ -216,7 +209,10 @@ export function RewritePanel({
             size="sm"
             variant="ghost"
             className="mr-auto"
-            onClick={writer.stop}
+            onClick={(event) => {
+              event.preventDefault();
+              writer.stop();
+            }}
           >
             <Square data-icon="inline-start" />
             停止生成

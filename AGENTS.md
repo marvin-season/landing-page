@@ -59,6 +59,8 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 行为或接口变了，就在同一次改动里更新已经描述它的文档，不要等用户再提。用 `docs/README.md` 定位文档；开放世界看 `docs/open-world/`。只改与本次行为矛盾的句子，不新写文档，不重写无关章节，也不改 `docs/superpowers/` 里的历史规格和计划。不确定有没有文档写到这块时，先查索引再决定。
 
+必要时可以进行最小可行性的重构来简化既有代码和新需求
+
 除非特别说明，否则不需要处理多语言相关改动。明确要求处理多语言时，仅处理中文（`zh`）和英文（`en`）。
 
 除非特别说明，否则不需要考虑无障碍兼容。

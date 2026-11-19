@@ -21,7 +21,6 @@ import { createImportedNovel, type ImportedNovel } from "./import-novel";
 import {
   type Chapter,
   chapterPrompt,
-  chapterTitle,
   createBackground,
   createNovel,
   invalidateEditedCheckpoint,
@@ -53,7 +52,7 @@ db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 
 type NovelRun =
-  | { task: "chapter"; title: string }
+  | { task: "chapter" }
   | { task: "summary"; config: WorldConfig; novel: Novel }
   | { task: "summary"; forFork: true }
   | {
@@ -224,18 +223,9 @@ export function useNovel(
         return;
       }
       if (text.length > maxChapterLength) {
-        setError(
-          `本章超过 ${maxChapterLength} 字，草稿未保存。请降低目标字数后重试。`,
-        );
-        return;
+        setError(`草稿超过 ${maxChapterLength} 字，请缩短后保存。`);
       }
-      const chapter = { id: crypto.randomUUID(), text };
-      const current = latest.current;
-      update({
-        ...current,
-        chapters: [...current.chapters, { ...chapter, title: captured.title }],
-      });
-      setPreview("");
+      setPreview(text);
     },
     onError(message) {
       end();
@@ -263,31 +253,39 @@ export function useNovel(
     });
   }
 
-  function generate(task: "chapter" | "summary" = "chapter") {
+  function generateChapter() {
+    if (!ready || generating.current || room.status === "ended") return false;
+    setError("");
+    const current = latest.current;
+    if (!current.title.trim() || !isChapterTargetValid(current.words))
+      return false;
+    const prompt = chapterPrompt(room.config, current);
+    if (prompt.length > maxNovelPromptLength) {
+      setError(
+        "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
+      );
+      return false;
+    }
+    start({ task: "chapter" }, prompt);
+    return true;
+  }
+
+  function generateBackground() {
     if (!ready || generating.current || room.status === "ended") return;
     setError("");
     const current = latest.current;
-    if (task === "chapter" && !isChapterTargetValid(current.words)) return;
-    if (task === "summary" && !current.chapters.length) {
+    if (!current.chapters.length) {
       setError("请先完成至少一章，再总结导出背景。");
       return;
     }
-    const prompt =
-      task === "summary"
-        ? summaryPrompt(room.config, current)
-        : chapterPrompt(room.config, current);
+    const prompt = summaryPrompt(room.config, current);
     if (prompt.length > maxNovelPromptLength) {
       setError(
         "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
       );
       return;
     }
-    start(
-      task === "summary"
-        ? { task, config: room.config, novel: current }
-        : { task, title: chapterTitle(current.chapters.length) },
-      prompt,
-    );
+    start({ task: "summary", config: room.config, novel: current }, prompt);
   }
 
   function summarizeFork() {
@@ -529,7 +527,8 @@ export function useNovel(
       setForkSummary("");
       return next.chapters[0].id;
     },
-    generate,
+    generateChapter,
+    generateBackground,
     summarizeFork,
     clearFork,
     createFork,

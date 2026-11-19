@@ -2,7 +2,14 @@
 
 import { Button } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { ArrowLeft, GitCompareArrows, PencilLine, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  GitCompareArrows,
+  LoaderCircle,
+  PencilLine,
+  Save,
+  Square,
+} from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -16,6 +23,10 @@ import {
 } from "@/app/agent/_components/use-unsaved-navigation";
 import { ChapterDiffView } from "./chapter-diff-view";
 import {
+  ChapterGenerationForm,
+  type ChapterGenerationOptions,
+} from "./chapter-generation-form";
+import {
   type ChapterTextRange,
   type ChapterTextSelection,
   textareaSelectionRange,
@@ -27,6 +38,7 @@ import type { useNovel } from "./use-novel";
 export function ChapterEditor({
   base,
   chapters,
+  creation,
   writer,
   ended,
   compactContext,
@@ -37,9 +49,15 @@ export function ChapterEditor({
 }: {
   base: Chapter;
   chapters: readonly Chapter[];
+  creation?: {
+    options: ChapterGenerationOptions;
+    onChange: (options: ChapterGenerationOptions) => void;
+    onGenerate: () => boolean;
+  };
   writer: Pick<
     ReturnType<typeof useNovel>,
     | "busy"
+    | "chapterStopped"
     | "error"
     | "stop"
     | "task"
@@ -57,6 +75,7 @@ export function ChapterEditor({
   onExit: () => void;
 }) {
   const [draft, setDraft] = useState(base);
+  const [useGeneratedText, setUseGeneratedText] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
@@ -68,15 +87,31 @@ export function ChapterEditor({
   const mirror = useRef<HTMLDivElement>(null);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
-  const dirty = draft.text !== base.text;
-  const exceedsLimit = draft.text.length > maxChapterLength;
+  const creating = Boolean(creation);
+  const draftText = creation && useGeneratedText ? writer.preview : draft.text;
+  const dirty = draftText !== base.text;
+  const exceedsLimit = draftText.length > maxChapterLength;
   const highlight = target ?? appliedRange;
   const editingLocked = Boolean(target && (writer.busy || writer.rewriteReady));
-  // The workroom protects the in-flight rewrite and its unapplied result.
+  const cannotSave =
+    !dirty ||
+    saving ||
+    editingLocked ||
+    writer.busy ||
+    exceedsLimit ||
+    (creating && !draftText.trim());
   useUnsavedNavigation(
-    dirty && !editingLocked,
-    "章节有未保存的修改，确定放弃并离开吗？",
+    (creating && writer.busy) || (dirty && !editingLocked),
+    creating && writer.busy
+      ? "章节正在生成，离开会中断本次生成。确定离开吗？"
+      : "章节有未保存的修改，确定放弃并离开吗？",
   );
+
+  useLayoutEffect(() => {
+    const input = editor.current;
+    if (creating && writer.busy && draftText && input)
+      input.scrollTop = input.scrollHeight;
+  }, [creating, draftText, writer.busy]);
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -114,14 +149,19 @@ export function ChapterEditor({
   }
 
   async function save() {
-    if (!dirty || saving || editingLocked || exceedsLimit) return;
+    if (cannotSave) return;
     clearTimeout(pendingSelection.current);
     closeRewrite();
     setAppliedRange(null);
     setSaving(true);
     setSaveFailed(false);
+    const next = creation ? { ...base, text: draftText } : draft;
+    if (creation) {
+      setDraft(next);
+      setUseGeneratedText(false);
+    }
     try {
-      const saved = await onSave(draft);
+      const saved = await onSave(next);
       setSaveFailed(!saved);
       if (saved) setShowDiff(false);
     } finally {
@@ -163,7 +203,9 @@ export function ChapterEditor({
             <select
               className="min-w-0 max-w-md truncate rounded-md border border-input bg-background px-3 py-1.5"
               value={base.id}
-              disabled={dirty || saving || editingLocked || writer.busy}
+              disabled={
+                creating || dirty || saving || editingLocked || writer.busy
+              }
               title={dirty ? "保存当前章节后可切换" : undefined}
               onChange={(event) => {
                 closeRewrite();
@@ -171,6 +213,9 @@ export function ChapterEditor({
                 onSelectChapter(event.target.value);
               }}
             >
+              {creation ? (
+                <option value={base.id}>{base.title}（新章）</option>
+              ) : null}
               {chapters.map((chapter, index) => (
                 <option key={chapter.id} value={chapter.id}>
                   {chapter.title || `第${index + 1}章`}
@@ -185,16 +230,33 @@ export function ChapterEditor({
               dirty && saveFailed && "text-destructive",
             )}
           >
-            {saving
-              ? "保存中…"
-              : dirty
-                ? saveFailed
-                  ? "保存失败"
-                  : "未保存"
-                : "已保存"}
+            {creation && writer.busy
+              ? draftText
+                ? "正在生成…"
+                : "等待输出…"
+              : saving
+                ? "保存中…"
+                : creating || dirty
+                  ? saveFailed
+                    ? "保存失败"
+                    : creation && writer.chapterStopped && useGeneratedText
+                      ? "已停止 · 未保存"
+                      : "未保存"
+                  : "已保存"}
           </span>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          {creation && writer.busy ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={writer.stop}
+            >
+              <Square data-icon="inline-start" />
+              停止生成
+            </Button>
+          ) : null}
           {showDiff ? (
             <Button
               size="sm"
@@ -219,27 +281,25 @@ export function ChapterEditor({
               查看修改
             </Button>
           )}
-          <Button
-            size="sm"
-            disabled={
-              !dirty || editingLocked || writer.busy || saving || exceedsLimit
-            }
-            onClick={() => void save()}
-          >
+          <Button size="sm" disabled={cannotSave} onClick={() => void save()}>
             <Save data-icon="inline-start" />
-            保存章节
+            {creation ? "应用草稿" : "保存章节"}
           </Button>
         </div>
       </div>
       {showDiff ? (
         <section className="flex min-h-0 flex-1 flex-col gap-3 p-4 pt-3">
-          <ChapterDiffView base={base} draft={draft} />
+          <ChapterDiffView
+            base={base}
+            draft={creation ? { ...draft, text: draftText } : draft}
+          />
         </section>
       ) : (
         <div
           className={cn(
             "grid flex-1 grid-cols-1 @3xl:grid-cols-2 @3xl:divide-x @3xl:divide-border",
-            target && "@3xl:min-h-72 @3xl:grid-rows-[minmax(0,1fr)]",
+            (target || creation) &&
+              "@3xl:min-h-72 @3xl:grid-rows-[minmax(0,1fr)]",
           )}
         >
           <section className="order-last flex min-w-0 flex-col gap-3 border-t border-border p-4 @3xl:order-0 @3xl:border-t-0">
@@ -251,20 +311,26 @@ export function ChapterEditor({
             <textarea
               aria-label="稳定版本正文"
               readOnly
+              disabled={writer.busy}
               value={base.text}
               className="min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </section>
           <section className="flex min-w-0 flex-col gap-3 p-4">
             <div className="flex min-h-8 items-center">
-              <h2 className="text-sm font-medium">编辑草稿</h2>
+              <h2 className="flex items-center gap-1.5 text-sm font-medium">
+                {creation && writer.busy ? (
+                  <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
+                ) : null}
+                编辑草稿
+              </h2>
               <span
                 className={cn(
                   "ml-auto text-xs text-muted-foreground",
                   exceedsLimit && "text-destructive",
                 )}
               >
-                {draft.text.length} / {maxChapterLength} 字
+                {draftText.length} / {maxChapterLength} 字
               </span>
             </div>
             <div
@@ -296,8 +362,13 @@ export function ChapterEditor({
                 ref={editor}
                 aria-label="章节正文"
                 readOnly={editingLocked || saving}
-                value={draft.text}
-                maxLength={maxChapterLength}
+                disabled={writer.busy}
+                value={draftText}
+                maxLength={
+                  draftText.length > maxChapterLength
+                    ? undefined
+                    : maxChapterLength
+                }
                 onScroll={syncMirror}
                 onBlur={() => clearTimeout(pendingSelection.current)}
                 onPointerDown={() => clearTimeout(pendingSelection.current)}
@@ -305,10 +376,12 @@ export function ChapterEditor({
                   clearTimeout(pendingSelection.current);
                   if (target) closeRewrite();
                   setAppliedRange(null);
+                  setUseGeneratedText(false);
                   setDraft({ ...draft, text: event.target.value });
                 }}
                 onSelect={(event) => {
-                  if (editingLocked || saving) return;
+                  if (creating || editingLocked || saving || writer.busy)
+                    return;
                   const input = event.currentTarget;
                   clearTimeout(pendingSelection.current);
                   pendingSelection.current = setTimeout(() => {
@@ -342,6 +415,32 @@ export function ChapterEditor({
                 )}
               />
             </div>
+            {creation ? (
+              <>
+                {writer.error && !saveFailed ? (
+                  <p role="alert" className="text-xs text-destructive">
+                    {writer.error}
+                  </p>
+                ) : null}
+                <ChapterGenerationForm
+                  options={creation.options}
+                  disabled={ended || saving || writer.busy}
+                  submitLabel="重新生成"
+                  onChange={creation.onChange}
+                  onGenerate={() => {
+                    if (
+                      dirty &&
+                      !window.confirm("重新生成会替换当前草稿，确定继续吗？")
+                    )
+                      return;
+                    if (creation.onGenerate()) {
+                      setUseGeneratedText(true);
+                      setSaveFailed(false);
+                    }
+                  }}
+                />
+              </>
+            ) : null}
             {target ? (
               <RewritePanel
                 key={`${target.start}:${target.end}`}
