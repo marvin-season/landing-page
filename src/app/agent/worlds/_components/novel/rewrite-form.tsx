@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Switch } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import {
   Check,
   LoaderCircle,
@@ -9,17 +10,14 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
+import { useId, useLayoutEffect, useRef } from "react";
 import {
-  type Ref,
-  type RefObject,
-  useId,
-  useLayoutEffect,
-  useRef,
-} from "react";
-import { createPortal } from "react-dom";
-import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
 
-export type RewriteControls = {
+type RewriteControls = {
   preview: string;
   draftReady: boolean;
   compactContext: boolean;
@@ -32,91 +30,8 @@ export type RewriteControls = {
   onRewrite: (requirements: string) => void;
 };
 
-export function RewritePopover({
-  anchor,
-  bounds,
-  atStart = true,
+export function RewritePanel({
   autoFocus = true,
-  ...props
-}: RewriteControls & {
-  anchor: RefObject<HTMLElement | null>;
-  bounds?: RefObject<HTMLElement | null>;
-  atStart?: boolean;
-  autoFocus?: boolean;
-  isPassage: boolean;
-}) {
-  const popup = useRef<HTMLFormElement>(null);
-
-  useLayoutEffect(() => {
-    const form = popup.current;
-    const mark = anchor.current;
-    if (!form || !mark) return;
-    const boundary = bounds?.current;
-    let frame = 0;
-
-    function position() {
-      if (!form || !mark) return;
-      const rects = mark.getClientRects();
-      const rect =
-        rects[atStart ? 0 : rects.length - 1] ?? mark.getBoundingClientRect();
-      const area = boundary?.getBoundingClientRect();
-      const margin = 8;
-      const maxRight =
-        Math.min(window.innerWidth, area?.right ?? window.innerWidth) - margin;
-      const minLeft = Math.max(0, area?.left ?? 0) + margin;
-      const maxBottom = window.innerHeight - margin;
-      if (area) form.style.maxWidth = `${maxRight - minLeft}px`;
-      const anchorTop = Math.max(area?.top ?? margin, rect.top);
-      const anchorBottom = Math.min(area?.bottom ?? maxBottom, rect.bottom);
-      const left = Math.max(
-        minLeft,
-        Math.min(rect.left, maxRight - form.offsetWidth),
-      );
-      const top =
-        anchorBottom + margin + form.offsetHeight <= maxBottom
-          ? anchorBottom + margin
-          : anchorTop - form.offsetHeight - margin;
-
-      form.style.left = `${left}px`;
-      form.style.top = `${Math.max(margin, Math.min(top, maxBottom - form.offsetHeight))}px`;
-      form.style.visibility = "visible";
-    }
-
-    function schedule() {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(position);
-    }
-
-    const observer = new ResizeObserver(schedule);
-    observer.observe(form);
-    if (boundary) observer.observe(boundary);
-    window.addEventListener("scroll", schedule, true);
-    window.addEventListener("resize", schedule);
-    position();
-    schedule();
-    if (autoFocus && window.matchMedia("(pointer: fine)").matches)
-      form.querySelector("textarea")?.focus({ preventScroll: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener("scroll", schedule, true);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [anchor, atStart, autoFocus, bounds]);
-
-  return createPortal(
-    <RewriteForm
-      {...props}
-      formRef={popup}
-      className="invisible fixed z-50 flex max-h-[min(36rem,calc(100dvh-1rem))] w-md max-w-[calc(100vw-1rem)] flex-col overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-lg ring-1 ring-foreground/5"
-    />,
-    document.body,
-  );
-}
-
-export function RewriteForm({
-  className,
-  formRef,
   isPassage,
   preview,
   draftReady,
@@ -129,45 +44,49 @@ export function RewriteForm({
   onApply,
   onRewrite,
 }: RewriteControls & {
-  className: string;
-  formRef?: Ref<HTMLFormElement>;
+  autoFocus?: boolean;
   isPassage: boolean;
 }) {
-  const output = useRef<HTMLDivElement>(null);
-  const followOutput = useRef(true);
+  const form = useRef<HTMLFormElement>(null);
+  const instructions = useRef<HTMLTextAreaElement>(null);
   const instructionsId = useId();
   const showInstructions = !writer.busy && !draftReady;
 
   useLayoutEffect(() => {
-    const element = output.current;
-    if (writer.busy && preview && element && followOutput.current) {
-      element.scrollTop = element.scrollHeight;
+    if (!showInstructions) {
+      form.current?.focus({ preventScroll: true });
+    } else if (autoFocus && window.matchMedia("(pointer: fine)").matches) {
+      instructions.current?.focus({ preventScroll: true });
     }
-  }, [preview, writer.busy]);
+  }, [autoFocus, showInstructions]);
 
   return (
     <form
-      ref={formRef}
-      className={className}
+      ref={form}
+      className={cn(
+        "flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground outline-none",
+        showInstructions ? "max-h-[min(16rem,55dvh)]" : "h-[min(26rem,48dvh)]",
+        isPassage
+          ? "@3xl:max-h-[60%]"
+          : "mx-auto mb-4 w-[calc(100%-2rem)] max-w-3xl",
+      )}
+      tabIndex={-1}
       onSubmit={(event) => {
         event.preventDefault();
         if (showInstructions && !ended) {
           const requirements = new FormData(event.currentTarget).get(
             "requirements",
           );
-          followOutput.current = true;
           onRewrite(String(requirements ?? ""));
         }
       }}
       onKeyDown={(event) => {
-        if (event.key === "Escape" && !writer.busy) onClose();
+        if (event.key === "Escape" && showInstructions) onClose();
       }}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
-            <WandSparkles className="size-4" />
-          </span>
+      <div className="flex min-h-10 shrink-0 items-center justify-between gap-3 px-3 py-1.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <WandSparkles className="size-4 shrink-0 text-primary" />
           <h3 className="text-sm font-semibold">
             {isPassage ? "润色选段" : "润色整章"}
           </h3>
@@ -180,6 +99,11 @@ export function RewriteForm({
             <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
             生成中
           </span>
+        ) : draftReady ? (
+          <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden />
+            待应用
+          </span>
         ) : (
           <Button
             type="button"
@@ -190,61 +114,70 @@ export function RewriteForm({
             title="关闭润色"
             onClick={onClose}
           >
-            <X />
+            <X className="size-4" />
           </Button>
         )}
       </div>
-      <div className="flex min-h-0 flex-col gap-3 px-4 py-3">
-        <div className={showInstructions ? "flex flex-col gap-2" : "hidden"}>
-          <label
-            htmlFor={instructionsId}
-            className="flex items-baseline justify-between gap-2 text-xs font-medium"
-          >
-            润色指令
-            <span className="font-normal text-muted-foreground">选填</span>
+      <div
+        className={cn(
+          "flex min-h-0 flex-col",
+          showInstructions ? "gap-2 overflow-y-auto px-3" : "flex-1 gap-1 px-2",
+        )}
+      >
+        <div className={showInstructions ? "shrink-0" : "hidden"}>
+          <label htmlFor={instructionsId} className="sr-only">
+            润色指令（选填）
           </label>
           <textarea
+            ref={instructions}
             id={instructionsId}
             name="requirements"
-            placeholder="例如：收紧对话节奏，保留悬念"
-            rows={3}
+            placeholder="润色指令（选填），例如：收紧对话节奏"
+            rows={2}
             maxLength={4000}
-            className="w-full resize-none rounded-md border border-input bg-background px-2.5 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="block w-full resize-none rounded-md border border-transparent bg-muted/45 px-2.5 py-2 text-sm leading-5 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           />
         </div>
         {!showInstructions ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-medium">
-            <span>润色草稿</span>
-            {draftReady ? (
-              <span className="text-muted-foreground">待应用</span>
-            ) : null}
-          </div>
-        ) : null}
-        {!showInstructions ? (
-          <div
-            ref={output}
-            className="min-h-20 max-h-[45dvh] overflow-y-auto overscroll-contain wrap-break-word rounded-md border border-border bg-muted/35 px-3 py-2"
-            onScroll={(event) => {
-              const { scrollHeight, clientHeight, scrollTop } =
-                event.currentTarget;
-              followOutput.current =
-                scrollHeight - clientHeight - scrollTop <= 24;
-            }}
+          <Conversation
+            className="min-h-0 rounded-md bg-muted/25"
+            role="region"
+            aria-label="润色草稿"
+            initial="instant"
+            resize="instant"
           >
-            <UnifiedMarkdown
-              content={preview}
-              hasNextChunk={writer.busy}
-              className="prose-sm"
+            <ConversationContent
+              className="gap-0 px-3 pt-3 pb-10 sm:px-4"
+              scrollClassName="overflow-y-auto overscroll-contain"
+            >
+              {preview ? (
+                <div className="wrap-break-word whitespace-pre-wrap text-sm leading-7">
+                  {preview}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">等待正文…</p>
+              )}
+            </ConversationContent>
+            <ConversationScrollButton
+              className="right-2 bottom-2 left-auto size-8 translate-x-0"
+              aria-label="跳到草稿末尾"
+              title="跳到草稿末尾"
             />
-          </div>
+          </Conversation>
         ) : null}
         {writer.error ? (
-          <p role="alert" className="wrap-break-word text-xs text-destructive">
+          <p
+            role="alert"
+            className={cn(
+              "shrink-0 wrap-break-word text-xs text-destructive",
+              !showInstructions && "px-1 py-1",
+            )}
+          >
             {writer.error}
           </p>
         ) : null}
       </div>
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border px-4 py-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 px-3 py-2">
         {showInstructions ? (
           <label className="mr-auto flex items-center gap-2 text-xs text-muted-foreground">
             <Switch
@@ -255,9 +188,16 @@ export function RewriteForm({
           </label>
         ) : null}
         {showInstructions && onDelete ? (
-          <Button type="button" size="sm" variant="ghost" onClick={onDelete}>
-            <Trash2 data-icon="inline-start" />
-            删除选区
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="size-8"
+            aria-label="删除选区"
+            title="删除选区"
+            onClick={onDelete}
+          >
+            <Trash2 className="size-4" />
           </Button>
         ) : null}
         {draftReady ? (
@@ -274,11 +214,12 @@ export function RewriteForm({
           <Button
             type="button"
             size="sm"
-            variant="outline"
+            variant="ghost"
+            className="mr-auto"
             onClick={writer.stop}
           >
             <Square data-icon="inline-start" />
-            停止
+            停止生成
           </Button>
         ) : (
           <Button type="submit" size="sm" disabled={ended}>

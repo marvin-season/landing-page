@@ -22,6 +22,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
+import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
@@ -38,6 +39,7 @@ import {
   replaceChapter,
   splitChapterAt,
 } from "./model";
+import { RewritePanel } from "./rewrite-form";
 import { useNovel } from "./use-novel";
 
 export function NovelPanel({
@@ -71,7 +73,18 @@ export function NovelPanel({
   });
   const { novel } = writer;
   const [rewriting, setRewriting] = useState(false);
+  const [appliedRewrite, setAppliedRewrite] = useState<{
+    chapterId: string;
+    length: number;
+  }>();
   const [compactContext, setCompactContext] = useState(false);
+  const streamingRewrite = writer.task === "rewrite" && writer.busy;
+  useUnsavedNavigation(
+    streamingRewrite || writer.rewriteReady,
+    streamingRewrite
+      ? "润色正在生成，离开会中断本次润色。确定离开吗？"
+      : "润色草稿尚未应用，离开会丢失草稿。确定离开吗？",
+  );
   const rewriteFromMenu = useRef(false);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
@@ -94,6 +107,7 @@ export function NovelPanel({
     setRewriting(true);
   }
   function closeRewrite() {
+    if (writer.busy) return;
     writer.discardRewrite();
     setRewriting(false);
   }
@@ -158,7 +172,7 @@ export function NovelPanel({
       />
     );
   }
-  return (
+  const readingContent = (
     <div
       ref={readingPanel}
       className="flex min-h-0 flex-1 flex-col overflow-y-auto"
@@ -294,6 +308,7 @@ export function NovelPanel({
                   value={chapter.id}
                   disabled={rewriting || insertion !== null}
                   onChange={(event) => {
+                    setAppliedRewrite(undefined);
                     setSelected(event.target.value);
                   }}
                 >
@@ -480,25 +495,10 @@ export function NovelPanel({
               title={chapter.title}
               text={chapter.text}
               rewriting={rewriting}
-              preview={writer.task === "rewrite" ? writer.preview : ""}
-              draftReady={writer.rewriteReady}
-              compactContext={compactContext}
-              onCompactContextChange={setCompactContext}
-              writer={writer}
-              ended={ended}
-              onClose={closeRewrite}
-              onApply={() => {
-                const applied = writer.applyRewrite();
-                if (applied) setRewriting(false);
-                return applied;
-              }}
-              onRewrite={(requirements) =>
-                writer.rewrite(
-                  chapter.id,
-                  requirements,
-                  undefined,
-                  compactContext,
-                )
+              appliedLength={
+                appliedRewrite?.chapterId === chapter.id
+                  ? appliedRewrite.length
+                  : undefined
               }
             />
           </section>
@@ -509,5 +509,33 @@ export function NovelPanel({
         )}
       </div>
     </div>
+  );
+  return (
+    <>
+      {readingContent}
+      {chapter && rewriting ? (
+        <RewritePanel
+          isPassage={false}
+          preview={writer.task === "rewrite" ? writer.preview : ""}
+          draftReady={writer.rewriteReady}
+          compactContext={compactContext}
+          onCompactContextChange={setCompactContext}
+          writer={writer}
+          ended={ended}
+          onClose={closeRewrite}
+          onApply={() => {
+            if (!writer.applyRewrite()) return;
+            setAppliedRewrite({
+              chapterId: chapter.id,
+              length: writer.preview.length,
+            });
+            setRewriting(false);
+          }}
+          onRewrite={(requirements) =>
+            writer.rewrite(chapter.id, requirements, undefined, compactContext)
+          }
+        />
+      ) : null}
+    </>
   );
 }

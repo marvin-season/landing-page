@@ -21,7 +21,7 @@ import {
   textareaSelectionRange,
 } from "./chapter-text";
 import type { Chapter } from "./model";
-import { RewritePopover } from "./rewrite-form";
+import { RewritePanel } from "./rewrite-form";
 import type { useNovel } from "./use-novel";
 
 export function ChapterEditor({
@@ -65,15 +65,17 @@ export function ChapterEditor({
     null,
   );
   const editor = useRef<HTMLTextAreaElement>(null);
-  const editorFrame = useRef<HTMLDivElement>(null);
   const mirror = useRef<HTMLDivElement>(null);
-  const mark = useRef<HTMLElement>(null);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const dirty = draft.text !== base.text;
   const highlight = target ?? appliedRange;
   const editingLocked = Boolean(target && (writer.busy || writer.rewriteReady));
-  useUnsavedNavigation(dirty, "章节有未保存的修改，确定放弃并离开吗？");
+  // The workroom protects the in-flight rewrite and its unapplied result.
+  useUnsavedNavigation(
+    dirty && !editingLocked,
+    "章节有未保存的修改，确定放弃并离开吗？",
+  );
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -104,6 +106,8 @@ export function ChapterEditor({
   useEffect(() => () => clearTimeout(pendingSelection.current), []);
 
   function closeRewrite() {
+    if (writer.busy) return;
+    clearTimeout(pendingSelection.current);
     writer.discardRewrite();
     setTarget(null);
   }
@@ -142,7 +146,7 @@ export function ChapterEditor({
           <select
             className="min-w-0 max-w-md truncate rounded-md border border-input bg-background px-3 py-1.5"
             value={base.id}
-            disabled={dirty || saving || writer.busy}
+            disabled={dirty || saving || editingLocked || writer.busy}
             title={dirty ? "保存当前章节后可切换" : undefined}
             onChange={(event) => {
               closeRewrite();
@@ -195,7 +199,7 @@ export function ChapterEditor({
           <Button
             size="sm"
             variant="ghost"
-            disabled={writer.busy || saving}
+            disabled={writer.busy || editingLocked || saving}
             onClick={() => {
               if (!confirmAgentNavigation()) return;
               onExit();
@@ -224,7 +228,12 @@ export function ChapterEditor({
           <ChapterDiffView base={base} draft={draft} />
         </section>
       ) : (
-        <div className="grid flex-1 grid-cols-1 @3xl:grid-cols-2 @3xl:divide-x @3xl:divide-border">
+        <div
+          className={cn(
+            "grid flex-1 grid-cols-1 @3xl:grid-cols-2 @3xl:divide-x @3xl:divide-border",
+            target && "@3xl:min-h-72 @3xl:grid-rows-[minmax(0,1fr)]",
+          )}
+        >
           <section className="order-last flex min-w-0 flex-col gap-3 border-t border-border p-4 @3xl:order-0 @3xl:border-t-0">
             <div className="flex min-h-8 items-center">
               <h2 className="text-sm font-medium text-muted-foreground">
@@ -243,8 +252,10 @@ export function ChapterEditor({
               <h2 className="text-sm font-medium">编辑草稿</h2>
             </div>
             <div
-              ref={editorFrame}
-              className="relative flex min-h-48 flex-1 rounded-md bg-background"
+              className={cn(
+                "relative flex min-h-48 flex-1 rounded-md bg-background",
+                target && "@3xl:min-h-0",
+              )}
             >
               {highlight ? (
                 <div
@@ -254,7 +265,6 @@ export function ChapterEditor({
                 >
                   {draft.text.slice(0, highlight.start)}
                   <mark
-                    ref={mark}
                     className={cn(
                       "text-transparent",
                       target ? "bg-primary/25" : "bg-emerald-500/25",
@@ -312,15 +322,13 @@ export function ChapterEditor({
                 className={cn(
                   "relative min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   target && "selection:bg-transparent",
+                  target && "@3xl:min-h-0",
                 )}
               />
             </div>
             {target ? (
-              <RewritePopover
+              <RewritePanel
                 key={`${target.start}:${target.end}`}
-                anchor={mark}
-                bounds={editorFrame}
-                atStart={target.direction === "backward"}
                 autoFocus={false}
                 isPassage
                 preview={writer.task === "rewrite" ? writer.preview : ""}
@@ -343,15 +351,16 @@ export function ChapterEditor({
                   });
                   setTarget(null);
                 }}
-                onRewrite={(requirements) =>
+                onRewrite={(requirements) => {
+                  clearTimeout(pendingSelection.current);
                   writer.rewrite(
                     draft.id,
                     requirements,
                     { start: target.start, end: target.end },
                     compactContext,
                     draft,
-                  )
-                }
+                  );
+                }}
               />
             ) : null}
           </section>

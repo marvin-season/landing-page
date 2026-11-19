@@ -1,44 +1,30 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { MarkdownProse } from "@/components/ui/unified-markdown";
 import { renderChapterMarkdown } from "./chapter-markdown";
-import type { ChapterTextRange } from "./chapter-text";
-import { type RewriteControls, RewritePopover } from "./rewrite-form";
 
 export function ChapterReading({
   title,
   text,
   rewriting,
-  preview,
-  draftReady,
-  compactContext,
-  onCompactContextChange,
-  writer,
-  onClose,
-  onApply,
-  onRewrite,
-  ended,
-}: Omit<RewriteControls, "onApply"> & {
+  appliedLength,
+}: {
   title: string;
   text: string;
   rewriting: boolean;
-  onApply: () => boolean;
+  appliedLength?: number;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
-  const [appliedRange, setAppliedRange] = useState<ChapterTextRange>();
-  const markStart = rewriting ? 0 : appliedRange?.start;
-  const markEnd = rewriting ? text.length : appliedRange?.end;
+  const markEnd = rewriting ? text.length : appliedLength;
   const content = useMemo(
     () =>
       renderChapterMarkdown(
         text,
-        markStart !== undefined && markEnd !== undefined
-          ? { start: markStart, end: markEnd }
-          : undefined,
+        markEnd !== undefined ? { start: 0, end: markEnd } : undefined,
       ),
-    [markEnd, markStart, text],
+    [markEnd, text],
   );
   useLayoutEffect(() => {
     if (rewriting) heading.current?.scrollIntoView({ block: "nearest" });
@@ -50,7 +36,7 @@ export function ChapterReading({
         <h3 ref={heading} className="font-serif text-xl">
           {title}
         </h3>
-        {!rewriting && appliedRange ? (
+        {!rewriting && appliedLength !== undefined ? (
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Check className="size-3.5 text-emerald-500" />
             已应用润色
@@ -68,23 +54,6 @@ export function ChapterReading({
           {content}
         </MarkdownProse>
       </div>
-      {rewriting ? (
-        <RewritePopover
-          anchor={heading}
-          isPassage={false}
-          preview={preview}
-          draftReady={draftReady}
-          compactContext={compactContext}
-          onCompactContextChange={onCompactContextChange}
-          writer={writer}
-          ended={ended}
-          onClose={onClose}
-          onRewrite={onRewrite}
-          onApply={() => {
-            if (onApply()) setAppliedRange({ start: 0, end: preview.length });
-          }}
-        />
-      ) : null}
     </article>
   );
 }
