@@ -48,13 +48,13 @@ export function ChapterGenerationForm({
       />
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          生成上限
+          每章字数
           <input
             value={options.words}
             disabled={disabled}
             inputMode="numeric"
             maxLength={4}
-            aria-label="每章生成字数上限"
+            aria-label="每章字数"
             onChange={(event) =>
               onChange({ ...options, words: event.target.value })
             }

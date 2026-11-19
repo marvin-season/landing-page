@@ -57,7 +57,7 @@ export function ChapterEditor({
   writer: Pick<
     ReturnType<typeof useNovel>,
     | "busy"
-    | "chapterGenerationOutcome"
+    | "chapterStopped"
     | "error"
     | "stop"
     | "task"
@@ -90,9 +90,8 @@ export function ChapterEditor({
   const pendingCaret = useRef<number | null>(null);
   const creating = Boolean(creation);
   const draftText = creation && useGeneratedText ? writer.preview : draft.text;
-  const generationOutcome = writer.chapterGenerationOutcome;
   const revealGeneratedText =
-    creating && useGeneratedText && generationOutcome?.kind !== "stopped";
+    creating && useGeneratedText && !writer.chapterStopped;
   // Reveal a burst over a few frames without delaying ordinary text deltas.
   const newTextLength = draftText.length - revealedLength;
   const frameLength = revealGeneratedText
@@ -108,9 +107,6 @@ export function ChapterEditor({
       : frameLength;
   const visibleText = draftText.slice(0, visibleLength);
   const editorBusy = writer.busy || visibleLength < draftText.length;
-  const overGenerationLimit =
-    generationOutcome?.kind === "completed" &&
-    draftText.length > generationOutcome.limit;
   const dirty = draftText !== base.text;
   const exceedsLimit = draftText.length > maxChapterLength;
   const highlight = target ?? appliedRange;
@@ -267,9 +263,7 @@ export function ChapterEditor({
                 : creating || dirty
                   ? saveFailed
                     ? "保存失败"
-                    : creation &&
-                        useGeneratedText &&
-                        generationOutcome?.kind === "stopped"
+                    : creation && writer.chapterStopped && useGeneratedText
                       ? "已停止 · 未保存"
                       : "未保存"
                   : "已保存"}
@@ -450,12 +444,6 @@ export function ChapterEditor({
                 {writer.error && !saveFailed ? (
                   <p role="alert" className="text-xs text-destructive">
                     {writer.error}
-                  </p>
-                ) : null}
-                {overGenerationLimit && !editorBusy ? (
-                  <p role="status" className="text-xs text-muted-foreground">
-                    草稿 {draftText.length} 字，超过设定的{" "}
-                    {generationOutcome.limit} 字上限，已保留全文。
                   </p>
                 ) : null}
                 <ChapterGenerationForm

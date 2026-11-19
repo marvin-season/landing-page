@@ -397,12 +397,8 @@ test("writer receives world secrets and edited chapters in order, with the next 
   );
   assert.equal(prompt.task.chapter, 3);
   assert.equal(prompt.task.requirements, novel.chapterGoal);
-  assert.equal(prompt.task.targetWords, 450);
-  assert.equal(prompt.task.maxCharacters, 500);
-  assert.match(
-    prompt.task.lengthInstructions,
-    /500 个字符.*自然收束.*完整篇章/,
-  );
+  assert.equal(prompt.task.targetWords, 500);
+  assert.equal(prompt.task.maxCharacters, 8000);
 });
 
 test("summary export imports into a different novel as background without replacing its chapters or settings", () => {

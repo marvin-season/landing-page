@@ -127,7 +127,6 @@ export function invalidateEditedCheckpoint(current: Novel, next: Novel) {
 
 export function chapterPrompt(config: WorldConfig, novel: Novel) {
   const history = novelHistory(novel);
-  const maxCharacters = Number(novel.words);
   return JSON.stringify({
     world: config,
     ...history.context,
@@ -140,9 +139,8 @@ export function chapterPrompt(config: WorldConfig, novel: Novel) {
       })),
     task: {
       chapter: novel.chapters.length + 1,
-      targetWords: Math.floor(maxCharacters * 0.9),
-      maxCharacters,
-      lengthInstructions: `正文最多 ${maxCharacters} 个字符（含标点、空格和换行）。动笔前按 targetWords 规划篇幅并预留收尾空间；预算紧时缩小本章事件范围，压缩描写与对话。情节要在预算内自然收束，输出完整篇章。`,
+      targetWords: Number(novel.words),
+      maxCharacters: maxChapterLength,
       requirements: novel.chapterGoal || "承接前文与大纲，推进下一阶段情节。",
     },
   });
