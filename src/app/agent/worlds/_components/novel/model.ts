@@ -52,6 +52,10 @@ export type Novel = {
   background?: ImportedNovelBackground;
   checkpoint?: { throughChapterId: string; summary: string };
 };
+export type NovelWritingContext = Pick<
+  Novel,
+  "title" | "style" | "outline" | "words"
+>;
 
 export function createNovel(config: WorldConfig): Novel {
   return {

@@ -5,7 +5,7 @@ import { Alert, AlertDescription, Button } from "@landing-page/design-system";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { confirmAgentNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
@@ -15,7 +15,8 @@ import type {
   WorldRoom,
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "../character-avatar";
-import { NovelPanel } from "../novel/novel-panel";
+import type { NovelWritingContext } from "../novel/model";
+import { type NovelContextBridge, NovelPanel } from "../novel/novel-panel";
 import { useWorldRoom } from "../use-world-room";
 import { ArchiveActions } from "./archive-actions";
 import { RoomComposer } from "./room-composer";
@@ -36,6 +37,30 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [presets, setPresets] = useState<WorldPreset[]>([]);
   const [actionPending, setActionPending] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
+  const [novelContext, setNovelContext] = useState<NovelWritingContext | null>(
+    null,
+  );
+  const [novelSettled, setNovelSettled] = useState(false);
+  const saveNovelContext = useRef<
+    ((context: NovelWritingContext) => Promise<boolean>) | null
+  >(null);
+  const onNovelContext = useCallback((value: NovelContextBridge | null) => {
+    saveNovelContext.current = value?.save ?? null;
+    setNovelSettled(value?.settled ?? false);
+    setNovelContext((current) => {
+      const next = value?.context ?? null;
+      if (
+        current &&
+        next &&
+        current.title === next.title &&
+        current.style === next.style &&
+        current.outline === next.outline &&
+        current.words === next.words
+      )
+        return current;
+      return next;
+    });
+  }, []);
   const submitted = useRef<{ text: string; mentions: AiMentionItem[] } | null>(
     null,
   );
@@ -197,6 +222,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 key={room.id}
                 room={room}
                 onBusyChange={setNovelBusy}
+                onContext={onNovelContext}
               />
             </div>
           ) : (
@@ -283,10 +309,13 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             }}
           />
         }
+        includeNovelContext={novelMode && !copying}
+        novelContext={novelContext}
+        novelContextReady={novelSettled}
         onOpenChange={(open) => {
           if (!open) setEditing(null);
         }}
-        onSave={async (config) => {
+        onSave={async (config, writingContext) => {
           if (copying) {
             if (!confirmAgentNavigation()) return;
             const data = await worldRequest<{ room: WorldRoom }>(
@@ -296,6 +325,10 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             );
             router.push(`/agent/worlds/${data.room.id}`);
           } else {
+            if (writingContext) {
+              const saved = await saveNovelContext.current?.(writingContext);
+              if (!saved) throw new Error("小说设定未能保存到本机。");
+            }
             const data = await worldRequest<{ room: WorldRoom }>(
               `rooms/${loaded.id}`,
               "PATCH",

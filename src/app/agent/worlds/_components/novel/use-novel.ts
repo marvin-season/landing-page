@@ -32,6 +32,7 @@ import {
   type Novel,
   type NovelBackground,
   type NovelTask,
+  type NovelWritingContext,
   novelRequest,
   replaceChapter,
   replaceChapterText,
@@ -137,6 +138,16 @@ export function useNovel(
       () => true,
       () => false,
     );
+  }
+  function updateContext(context: NovelWritingContext) {
+    const current = latest.current;
+    return update({
+      ...current,
+      title: context.title,
+      style: context.style,
+      outline: context.outline,
+      words: context.words,
+    });
   }
   function end() {
     generating.current = false;
@@ -487,6 +498,7 @@ export function useNovel(
   return {
     novel,
     update,
+    updateContext,
     ready,
     error,
     saving,

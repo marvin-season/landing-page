@@ -4,11 +4,6 @@ import {
   Alert,
   AlertDescription,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -19,16 +14,14 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUpRight,
-  BookOpen,
   MessageSquare,
   Plus,
-  ScrollText,
   Trash2,
   Upload,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactElement, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
 import { worldRequest } from "@/lib/group-chat/client";
 import {
@@ -50,49 +43,6 @@ const workFilters = [
 ] as const;
 type WorkFilter = (typeof workFilters)[number]["value"];
 
-function WorldKindMenu({
-  children,
-  onChoose,
-}: {
-  children: ReactElement;
-  onChoose: (kind: WorldKind) => void;
-}) {
-  const selectedKind = useRef<WorldKind | null>(null);
-  return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        onCloseAutoFocus={() => {
-          // Open the editor after the menu gives focus back to its trigger.
-          const kind = selectedKind.current;
-          selectedKind.current = null;
-          if (kind) onChoose(kind);
-        }}
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onSelect={() => {
-              selectedKind.current = "script";
-            }}
-          >
-            <ScrollText />
-            剧本
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => {
-              selectedKind.current = "novel";
-            }}
-          >
-            <BookOpen />
-            小说
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
   const defaultConfig =
     templates.find((template) => template.id === "fog-harbor")?.config ??
@@ -102,6 +52,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
   const [editing, setEditing] = useState<{
     config: WorldConfig;
     kind: WorldKind;
+    derived: boolean;
   } | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -119,10 +70,13 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
     workFilter === "all"
       ? rooms.data?.rooms
       : rooms.data?.rooms.filter((room) => room.kind === workFilter);
-  const editingNovel = editing?.kind === "novel";
-  const editingLabel = editingNovel ? "小说" : "剧本";
-  function startEditing(config: WorldConfig, kind: WorldKind) {
-    setEditing({ config: structuredClone(config), kind });
+  const editingLabel = editing?.kind === "novel" ? "小说" : "剧本";
+  function startEditing(config: WorldConfig, derived = false) {
+    setEditing({
+      config: structuredClone(config),
+      kind: "script",
+      derived,
+    });
   }
   async function remove(id: string) {
     if (!window.confirm("删除这个世界及其全部存档？此操作不能撤销。")) return;
@@ -154,14 +108,10 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
               导入存档
             </Button>
             {defaultConfig ? (
-              <WorldKindMenu
-                onChoose={(kind) => startEditing(defaultConfig, kind)}
-              >
-                <Button>
-                  <Plus data-icon="inline-start" />
-                  创建作品
-                </Button>
-              </WorldKindMenu>
+              <Button onClick={() => startEditing(defaultConfig)}>
+                <Plus data-icon="inline-start" />
+                创建作品
+              </Button>
             ) : null}
           </div>
           <input
@@ -226,18 +176,15 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                     <span className="text-xs text-muted-foreground">
                       {world.config.characters.length} 位角色
                     </span>
-                    <WorldKindMenu
-                      onChoose={(kind) => startEditing(world.config, kind)}
+                    <Button
+                      size="sm"
+                      variant="text"
+                      className="gap-1.5 px-0 h-7"
+                      onClick={() => startEditing(world.config, true)}
                     >
-                      <Button
-                        size="sm"
-                        variant="text"
-                        className="gap-1.5 px-0 h-7"
-                      >
-                        使用模板
-                        <ArrowUpRight className="size-3.5" />
-                      </Button>
-                    </WorldKindMenu>
+                      使用模板
+                      <ArrowUpRight className="size-3.5" />
+                    </Button>
                   </WorldCardFooter>
                 </WorldCard>
               ))}
@@ -350,13 +297,13 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                   </div>
                   <WorldCardFooter>
                     {preset.kind === "world" ? (
-                      <WorldKindMenu
-                        onChoose={(kind) => startEditing(preset.content, kind)}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => startEditing(preset.content)}
                       >
-                        <Button size="sm" variant="outline">
-                          使用
-                        </Button>
-                      </WorldKindMenu>
+                        使用
+                      </Button>
                     ) : null}
                     <Button
                       size="icon"
@@ -394,37 +341,61 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
       >
         <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-2xl">
           <SheetHeader className="shrink-0 border-b border-border pr-12">
-            <SheetTitle>创建{editingLabel}</SheetTitle>
+            <SheetTitle>
+              {editing?.derived ? "从模板派生" : "创建作品"}
+            </SheetTitle>
             <SheetDescription>
-              {editingNovel
-                ? "设定世界、角色和大纲。"
-                : "设定世界、角色和推进要求。创建后自动开始。"}
+              小说和剧本的设定项不同。切换后填写对应内容，确认后进入作品。
             </SheetDescription>
           </SheetHeader>
           {editing ? (
-            <WorldEditor
-              initial={editing.config}
-              kind={editing.kind}
-              submitLabel={`创建${editingLabel}`}
-              presets={presets.data?.presets}
-              onPresetSaved={() => {
-                void queryClient.invalidateQueries({
-                  queryKey: ["world-presets"],
-                });
-              }}
-              onCancel={() => setEditing(null)}
-              onSave={async (config) => {
-                const result = await worldRequest<{ room: WorldRoom }>(
-                  "rooms",
-                  "POST",
-                  { ...config, kind: editing.kind },
-                );
-                void queryClient.invalidateQueries({
-                  queryKey: ["world-rooms"],
-                });
-                router.push(`/agent/worlds/${result.room.id}`);
-              }}
-            />
+            <>
+              <div className="shrink-0 px-5 pt-3">
+                <Tabs
+                  value={editing.kind}
+                  onValueChange={(kind) => {
+                    if (kind !== "script" && kind !== "novel") return;
+                    setEditing((current) =>
+                      current ? { ...current, kind } : current,
+                    );
+                  }}
+                >
+                  <TabsList aria-label="作品类型">
+                    <TabsTrigger type="button" value="script">
+                      剧本
+                    </TabsTrigger>
+                    <TabsTrigger type="button" value="novel">
+                      小说
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              <WorldEditor
+                initial={editing.config}
+                kind={editing.kind}
+                submitLabel={
+                  editing.derived ? "确认派生" : `创建${editingLabel}`
+                }
+                presets={presets.data?.presets}
+                onPresetSaved={() => {
+                  void queryClient.invalidateQueries({
+                    queryKey: ["world-presets"],
+                  });
+                }}
+                onCancel={() => setEditing(null)}
+                onSave={async (config) => {
+                  const result = await worldRequest<{ room: WorldRoom }>(
+                    "rooms",
+                    "POST",
+                    { ...config, kind: editing.kind },
+                  );
+                  void queryClient.invalidateQueries({
+                    queryKey: ["world-rooms"],
+                  });
+                  router.push(`/agent/worlds/${result.room.id}`);
+                }}
+              />
+            </>
           ) : null}
         </SheetContent>
       </Sheet>

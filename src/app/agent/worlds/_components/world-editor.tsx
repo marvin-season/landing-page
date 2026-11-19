@@ -31,6 +31,13 @@ import {
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
+import {
+  defaultChapterTarget,
+  isChapterTargetValid,
+  maxChapterLength,
+  minChapterTarget,
+  type NovelWritingContext,
+} from "./novel/model";
 import { PriorContextField } from "./prior-context-field";
 
 type SectionKey = "world" | "story" | "cast" | "pace";
@@ -99,17 +106,23 @@ export function WorldEditor({
   onPresetSaved,
   submitLabel,
   kind,
+  initialNovelContext,
 }: {
   initial: WorldConfig;
-  onSave: (config: WorldConfig) => Promise<void>;
+  onSave: (
+    config: WorldConfig,
+    novelContext?: NovelWritingContext,
+  ) => Promise<void>;
   onCancel: () => void;
   lockedMembers?: boolean;
   presets?: WorldPreset[];
   onPresetSaved?: () => void;
   submitLabel?: string;
   kind: WorldKind;
+  initialNovelContext?: NovelWritingContext;
 }) {
   const [config, setConfig] = useState(() => structuredClone(initial));
+  const [novelContext, setNovelContext] = useState(initialNovelContext);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -139,6 +152,14 @@ export function WorldEditor({
   }
   function update<K extends keyof WorldConfig>(key: K, value: WorldConfig[K]) {
     setConfig((c) => ({ ...c, [key]: value }));
+  }
+  function updateNovelContext<K extends keyof NovelWritingContext>(
+    key: K,
+    value: NovelWritingContext[K],
+  ) {
+    setNovelContext((current) =>
+      current ? { ...current, [key]: value } : current,
+    );
   }
   function updateCharacter(id: string, patch: Partial<Character>) {
     setConfig((c) => ({
@@ -192,9 +213,22 @@ export function WorldEditor({
         e.preventDefault();
         if (pending || importing) return;
         void action(async () => {
-          const parsed = configSchema.safeParse(config);
+          const writingContext = novel ? novelContext : undefined;
+          if (writingContext && !writingContext.title.trim())
+            throw new Error("请填写小说名称");
+          if (writingContext && !isChapterTargetValid(writingContext.words))
+            throw new Error(
+              `每章目标字数需为 ${minChapterTarget}–${maxChapterLength} 的整数。`,
+            );
+          const nextConfig = writingContext
+            ? {
+                ...config,
+                storyGoal: writingContext.outline.trim().slice(0, 4000),
+              }
+            : config;
+          const parsed = configSchema.safeParse(nextConfig);
           if (!parsed.success) throw new Error(parsed.error.issues[0].message);
-          await onSave(parsed.data);
+          await onSave(parsed.data, writingContext);
         });
       }}
     >
@@ -288,26 +322,63 @@ export function WorldEditor({
             id="world-section-story"
             open={openSections.story}
             onOpenChange={(open) => setSection("story", open)}
-            title={novel ? "小说大纲" : "故事推进要求"}
+            title={
+              novel ? (novelContext ? "创作设定" : "小说大纲") : "故事推进要求"
+            }
             summary={preview(
-              config.storyGoal,
+              novel && novelContext ? novelContext.outline : config.storyGoal,
               !novel && config.narration ? "旁白已打开" : "未填写目标",
             )}
             icon={ScrollText}
           >
             <FieldGroup>
-              <TextField
-                label={novel ? "大纲与创作要求" : "当前目标与节奏"}
-                value={config.storyGoal}
-                onChange={(v) => update("storyGoal", v)}
-                multiline
-                maxLength={4000}
-                hint={
-                  novel
-                    ? undefined
-                    : "例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
-                }
-              />
+              {novel && novelContext ? (
+                <>
+                  <TextField
+                    label="小说名称"
+                    value={novelContext.title}
+                    onChange={(title) => updateNovelContext("title", title)}
+                    maxLength={100}
+                    required
+                  />
+                  <TextField
+                    label="文风与叙述视角"
+                    value={novelContext.style}
+                    onChange={(style) => updateNovelContext("style", style)}
+                    multiline
+                  />
+                  <TextField
+                    label="小说大纲与创作要求"
+                    value={novelContext.outline}
+                    onChange={(outline) =>
+                      updateNovelContext("outline", outline)
+                    }
+                    multiline
+                    maxLength={12000}
+                    hint="沿用世界背景、规则与全部角色设定；角色秘密由作者统一掌握，按剧情逐步揭示。"
+                  />
+                  <TextField
+                    label={`每章目标字数（${minChapterTarget}–${maxChapterLength}）`}
+                    value={novelContext.words}
+                    onChange={(words) => updateNovelContext("words", words)}
+                    maxLength={4}
+                    hint={`默认 ${defaultChapterTarget} 字，正文最多 ${maxChapterLength} 字。`}
+                  />
+                </>
+              ) : (
+                <TextField
+                  label={novel ? "大纲与创作要求" : "当前目标与节奏"}
+                  value={config.storyGoal}
+                  onChange={(v) => update("storyGoal", v)}
+                  multiline
+                  maxLength={4000}
+                  hint={
+                    novel
+                      ? undefined
+                      : "例如：先让大家调查停电原因，再逐步揭露各自隐瞒的线索。你是系统操作者，所有登场角色都是 NPC。"
+                  }
+                />
+              )}
               {!novel ? (
                 <label className="flex items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5 text-sm">
                   <span>

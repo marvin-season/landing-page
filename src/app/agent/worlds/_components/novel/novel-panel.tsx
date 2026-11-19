@@ -20,12 +20,11 @@ import {
   Trash2,
   WandSparkles,
 } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
-import { FieldGroup, TextField } from "../fields";
 import {
   downloadBackground,
   NovelBackgroundPreview,
@@ -37,11 +36,11 @@ import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
-  defaultChapterTarget,
   exportNovel,
   isChapterTargetValid,
   maxChapterLength,
   minChapterTarget,
+  type NovelWritingContext,
   replaceChapter,
   splitChapterAt,
 } from "./model";
@@ -49,12 +48,20 @@ import { PlotSheet } from "./plot-sheet";
 import { RewritePanel } from "./rewrite-form";
 import { useNovel } from "./use-novel";
 
+export type NovelContextBridge = {
+  settled: boolean;
+  context: NovelWritingContext | null;
+  save: (context: NovelWritingContext) => Promise<boolean>;
+};
+
 export function NovelPanel({
   room,
   onBusyChange,
+  onContext,
 }: {
   room: WorldRoom;
   onBusyChange: (busy: boolean) => void;
+  onContext?: (value: NovelContextBridge | null) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -74,6 +81,32 @@ export function NovelPanel({
   const [plotOpen, setPlotOpen] = useState(false);
   const writer = useNovel(room, onBusyChange, downloadBackground);
   const { novel } = writer;
+  const publishContext = useRef(onContext);
+  const saveContext = useRef(writer.updateContext);
+  publishContext.current = onContext;
+  saveContext.current = writer.updateContext;
+  useEffect(() => {
+    if (!writer.ready && !writer.error) return;
+    publishContext.current?.({
+      settled: true,
+      context: writer.ready
+        ? {
+            title: novel.title,
+            style: novel.style,
+            outline: novel.outline,
+            words: novel.words,
+          }
+        : null,
+      save: (next) => saveContext.current(next),
+    });
+  }, [
+    novel.outline,
+    novel.style,
+    novel.title,
+    novel.words,
+    writer.error,
+    writer.ready,
+  ]);
   const [rewriting, setRewriting] = useState(false);
   const [appliedRewrite, setAppliedRewrite] = useState<{
     chapterId: string;
@@ -176,291 +209,285 @@ export function NovelPanel({
       />
     );
   }
+  const continueLocked = chapterActionsLocked || ended;
   const readingContent = (
-    <div
-      ref={readingPanel}
-      className="flex min-h-0 flex-1 flex-col overflow-y-auto"
-    >
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-xl">小说创作</h2>
-            <p className="text-sm text-muted-foreground">
-              一个写作智能体统一创作，每次生成一章。已完成{" "}
-              {novel.chapters.length} 章。
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {writer.saving
-                ? "正在保存…"
-                : "设定与章节保存在当前浏览器，可随时导出整本小说。"}
-            </p>
-          </div>
-          <NovelFileControls
-            disabled={chapterActionsLocked}
-            canSummarize={!ended && Boolean(novel.title.trim())}
-            hasChapters={novel.chapters.length > 0}
-            importing={importing}
-            onImportingChange={setImporting}
-            onImport={async (imported) => {
-              if (
-                !window.confirm(
-                  `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div
+        ref={readingPanel}
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+      >
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <h2 className="font-serif text-xl">小说创作</h2>
+              <p className="text-sm text-muted-foreground">
+                一个写作智能体统一创作，每次生成一章。已完成{" "}
+                {novel.chapters.length} 章。
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {writer.saving
+                  ? "正在保存…"
+                  : "名称、文风、大纲和每章字数在右上角设定中修改，章节保存在当前浏览器。"}
+              </p>
+            </div>
+            <NovelFileControls
+              disabled={chapterActionsLocked}
+              canSummarize={!ended && Boolean(novel.title.trim())}
+              hasChapters={novel.chapters.length > 0}
+              importing={importing}
+              onImportingChange={setImporting}
+              onImport={async (imported) => {
+                if (
+                  !window.confirm(
+                    `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+                  )
                 )
-              )
-                return;
-              const id = await writer.importNovel(imported);
-              if (!id) return;
-              setAppliedRewrite(undefined);
-              setCompactContext(false);
-              setSelected(id);
-            }}
-            onDownload={download}
-            onSummarize={() => writer.generate("summary")}
-          />
-        </div>
-        {summarizing && writer.busy ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <Button size="sm" variant="outline" onClick={writer.stop}>
-              <Square data-icon="inline-start" />
-              停止总结
-            </Button>
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <LoaderCircle className="size-4 animate-spin" />
-              正在总结剧情背景…
-            </span>
-          </div>
-        ) : null}
-        {writer.backgroundExport ? (
-          <NovelBackgroundPreview exported={writer.backgroundExport} />
-        ) : null}
-        <fieldset
-          disabled={chapterActionsLocked}
-          className="flex flex-col gap-4 disabled:opacity-60"
-        >
-          <FieldGroup>
-            <TextField
-              label="小说名称"
-              value={novel.title}
-              maxLength={100}
-              onChange={(title) => writer.update({ ...novel, title })}
-            />
-            <TextField
-              label="文风与叙述视角"
-              value={novel.style}
-              multiline
-              onChange={(style) => writer.update({ ...novel, style })}
-            />
-            <TextField
-              label="小说大纲与创作要求"
-              value={novel.outline}
-              multiline
-              maxLength={12000}
-              onChange={(outline) => writer.update({ ...novel, outline })}
-              hint="沿用世界背景、规则与全部角色设定；角色秘密由作者统一掌握，按剧情逐步揭示。"
-            />
-            <TextField
-              label="下一章要求"
-              value={novel.chapterGoal}
-              multiline
-              onChange={(chapterGoal) =>
-                writer.update({ ...novel, chapterGoal })
-              }
-              hint="可指定本章事件、伏笔、结尾或情绪；留空则按大纲继续。"
-            />
-            <TextField
-              label={`每章目标字数（${minChapterTarget}–${maxChapterLength}）`}
-              value={novel.words}
-              maxLength={4}
-              onChange={(words) => writer.update({ ...novel, words })}
-              hint={`默认 ${defaultChapterTarget} 字，正文最多 ${maxChapterLength} 字。`}
-            />
-          </FieldGroup>
-        </fieldset>
-        <ContextControls
-          room={room}
-          writer={writer}
-          disabled={chapterActionsLocked}
-        />
-        {!rewriting && !plotOpen && writer.error ? (
-          <Alert>
-            <AlertDescription>{writer.error}</AlertDescription>
-          </Alert>
-        ) : null}
-        <div className="flex flex-wrap items-center gap-3">
-          {generatingChapter ? (
-            <Button variant="outline" onClick={writer.stop}>
-              <Square data-icon="inline-start" />
-              停止生成
-            </Button>
-          ) : (
-            <Button
-              disabled={chapterActionsLocked || !canGenerateChapter}
-              onClick={() => {
-                setSelected(null);
-                writer.generate();
+                  return;
+                const id = await writer.importNovel(imported);
+                if (!id) return;
+                setAppliedRewrite(undefined);
+                setCompactContext(false);
+                setSelected(id);
               }}
-            >
-              <PenLine data-icon="inline-start" />
-              生成第{novel.chapters.length + 1}章
-            </Button>
-          )}
-          {generatingChapter ? (
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <LoaderCircle className="size-4 animate-spin" />
-              正在创作第{novel.chapters.length + 1}章…
-            </span>
-          ) : null}
-        </div>
-        {writer.task !== "rewrite" && !plotOpen && writer.preview ? (
-          <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
-            <h3 className="font-serif text-lg">
-              {writer.task === "summary"
-                ? "背景总结"
-                : `第${novel.chapters.length + 1}章`}{" "}
-              · {writer.busy ? "生成中" : "未完成草稿"}
-            </h3>
-            <UnifiedMarkdown
-              content={writer.preview}
-              hasNextChunk={writer.busy}
+              onDownload={download}
+              onSummarize={() => writer.generate("summary")}
             />
-          </article>
-        ) : null}
-        {chapter ? (
-          <section className="flex flex-col gap-4 border-t border-border pt-5">
-            <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
-              <label className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
-                章节目录
-                <select
-                  className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
-                  value={chapter.id}
-                  disabled={rewriting || importing}
-                  onChange={(event) => {
-                    setAppliedRewrite(undefined);
-                    setSelected(event.target.value);
-                  }}
-                >
-                  {novel.chapters.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={chapterActionsLocked}
-                  onClick={() => {
-                    readingScroll.current =
-                      readingPanel.current?.scrollTop ?? 0;
-                    writer.discardRewrite();
-                    setEditingChapter(chapter);
-                  }}
-                >
-                  <PenLine data-icon="inline-start" />
-                  编辑本章
-                </Button>
-                <PlotSheet
-                  chapters={novel.chapters}
-                  disabled={chapterActionsLocked || ended}
-                  open={plotOpen}
-                  onOpenChange={setPlotOpen}
-                  writer={writer}
-                  onApplied={(id) => {
-                    setAppliedRewrite(undefined);
-                    setSelected(id);
-                  }}
-                />
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      ref={chapterMenuTrigger}
-                      size="sm"
-                      variant="outline"
-                      disabled={chapterActionsLocked}
-                    >
-                      <Ellipsis data-icon="inline-start" />
-                      章节操作
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    onCloseAutoFocus={(event) => {
-                      const action = actionFromMenu.current;
-                      actionFromMenu.current = null;
-                      if (!action) return;
-                      event.preventDefault();
-                      if (action === "rewrite") openRewrite();
-                      else setSplitting(true);
+          </div>
+          {summarizing && writer.busy ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button size="sm" variant="outline" onClick={writer.stop}>
+                <Square data-icon="inline-start" />
+                停止总结
+              </Button>
+              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                <LoaderCircle className="size-4 animate-spin" />
+                正在总结剧情背景…
+              </span>
+            </div>
+          ) : null}
+          {writer.backgroundExport ? (
+            <NovelBackgroundPreview exported={writer.backgroundExport} />
+          ) : null}
+          <ContextControls
+            room={room}
+            writer={writer}
+            disabled={chapterActionsLocked}
+          />
+          {!rewriting && !plotOpen && writer.error ? (
+            <Alert>
+              <AlertDescription>{writer.error}</AlertDescription>
+            </Alert>
+          ) : null}
+          {writer.task !== "rewrite" && !plotOpen && writer.preview ? (
+            <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
+              <h3 className="font-serif text-lg">
+                {writer.task === "summary"
+                  ? "背景总结"
+                  : `第${novel.chapters.length + 1}章`}{" "}
+                · {writer.busy ? "生成中" : "未完成草稿"}
+              </h3>
+              <UnifiedMarkdown
+                content={writer.preview}
+                hasNextChunk={writer.busy}
+              />
+            </article>
+          ) : null}
+          {chapter ? (
+            <section className="flex flex-col gap-4 border-t border-border pt-5">
+              <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
+                <label className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
+                  章节目录
+                  <select
+                    className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
+                    value={chapter.id}
+                    disabled={rewriting || importing}
+                    onChange={(event) => {
+                      setAppliedRewrite(undefined);
+                      setSelected(event.target.value);
                     }}
                   >
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        disabled={!/\S\s*\S/u.test(chapter.text)}
-                        onSelect={() => {
-                          actionFromMenu.current = "split";
-                        }}
-                      >
-                        <Scissors />
-                        拆分本章
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          chapterActionsLocked || ended || !chapter.text.trim()
-                        }
-                        onSelect={() => {
-                          actionFromMenu.current = "rewrite";
-                        }}
-                      >
-                        <WandSparkles />
-                        润色整章
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        variant="destructive"
+                    {novel.chapters.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={chapterActionsLocked}
+                    onClick={() => {
+                      readingScroll.current =
+                        readingPanel.current?.scrollTop ?? 0;
+                      writer.discardRewrite();
+                      setEditingChapter(chapter);
+                    }}
+                  >
+                    <PenLine data-icon="inline-start" />
+                    编辑本章
+                  </Button>
+                  <PlotSheet
+                    chapters={novel.chapters}
+                    disabled={chapterActionsLocked || ended}
+                    open={plotOpen}
+                    onOpenChange={setPlotOpen}
+                    writer={writer}
+                    onApplied={(id) => {
+                      setAppliedRewrite(undefined);
+                      setSelected(id);
+                    }}
+                  />
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        ref={chapterMenuTrigger}
+                        size="sm"
+                        variant="outline"
                         disabled={chapterActionsLocked}
-                        onSelect={deleteChapter}
                       >
-                        <Trash2 />
-                        删除本章
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                        <Ellipsis data-icon="inline-start" />
+                        章节操作
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      onCloseAutoFocus={(event) => {
+                        const action = actionFromMenu.current;
+                        actionFromMenu.current = null;
+                        if (!action) return;
+                        event.preventDefault();
+                        if (action === "rewrite") openRewrite();
+                        else setSplitting(true);
+                      }}
+                    >
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          disabled={!/\S\s*\S/u.test(chapter.text)}
+                          onSelect={() => {
+                            actionFromMenu.current = "split";
+                          }}
+                        >
+                          <Scissors />
+                          拆分本章
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={
+                            chapterActionsLocked ||
+                            ended ||
+                            !chapter.text.trim()
+                          }
+                          onSelect={() => {
+                            actionFromMenu.current = "rewrite";
+                          }}
+                        >
+                          <WandSparkles />
+                          润色整章
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          disabled={chapterActionsLocked}
+                          onSelect={deleteChapter}
+                        >
+                          <Trash2 />
+                          删除本章
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-            </div>
-            <ChapterSplit
-              chapter={chapter}
-              disabled={chapterActionsLocked}
-              open={splitting}
-              onOpenChange={setSplitting}
-              onCloseAutoFocus={(event) => {
-                event.preventDefault();
-                chapterMenuTrigger.current?.focus();
-              }}
-              onSplit={splitChapter}
-            />
-            <ChapterReading
-              key={chapter.id}
-              title={chapter.title}
-              text={chapter.text}
-              rewriting={rewriting}
-              appliedLength={
-                appliedRewrite?.chapterId === chapter.id
-                  ? appliedRewrite.length
-                  : undefined
-              }
-            />
-          </section>
-        ) : (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            填写创作要求生成第一章，或导入已有小说。
-          </p>
-        )}
+              <ChapterSplit
+                chapter={chapter}
+                disabled={chapterActionsLocked}
+                open={splitting}
+                onOpenChange={setSplitting}
+                onCloseAutoFocus={(event) => {
+                  event.preventDefault();
+                  chapterMenuTrigger.current?.focus();
+                }}
+                onSplit={splitChapter}
+              />
+              <ChapterReading
+                key={chapter.id}
+                title={chapter.title}
+                text={chapter.text}
+                rewriting={rewriting}
+                appliedLength={
+                  appliedRewrite?.chapterId === chapter.id
+                    ? appliedRewrite.length
+                    : undefined
+                }
+              />
+            </section>
+          ) : (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              在下方填写下一章要求后续写，或导入已有小说。
+            </p>
+          )}
+        </div>
       </div>
+      {rewriting ? null : (
+        <form
+          className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (continueLocked || !canGenerateChapter || generatingChapter)
+              return;
+            setSelected(null);
+            writer.generate();
+          }}
+        >
+          <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 sm:flex-row sm:items-end">
+            <label className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <span className="text-sm font-medium">下一章要求</span>
+              <textarea
+                value={novel.chapterGoal}
+                disabled={continueLocked}
+                rows={2}
+                maxLength={4000}
+                placeholder="可指定本章事件、伏笔、结尾或情绪；留空则按大纲继续。"
+                onChange={(event) =>
+                  writer.update({ ...novel, chapterGoal: event.target.value })
+                }
+                className="max-h-24 min-h-16 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+              />
+            </label>
+            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+              {generatingChapter ? (
+                <Button type="button" variant="outline" onClick={writer.stop}>
+                  <Square data-icon="inline-start" />
+                  停止生成
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={continueLocked || !canGenerateChapter}
+                >
+                  <PenLine data-icon="inline-start" />
+                  续写下一章
+                </Button>
+              )}
+              {generatingChapter ? (
+                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <LoaderCircle className="size-4 animate-spin" />
+                  正在创作第{novel.chapters.length + 1}章…
+                </span>
+              ) : !novel.title.trim() || !isChapterTargetValid(novel.words) ? (
+                <p className="text-xs text-muted-foreground">
+                  {!novel.title.trim()
+                    ? "请先在右上角设定中填写小说名称。"
+                    : `每章字数需为 ${minChapterTarget}–${maxChapterLength}，请在设定中修改。`}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </form>
+      )}
     </div>
   );
   return (
