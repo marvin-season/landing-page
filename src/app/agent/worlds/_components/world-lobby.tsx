@@ -71,10 +71,14 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
       ? rooms.data?.rooms
       : rooms.data?.rooms.filter((room) => room.kind === workFilter);
   const editingLabel = editing?.kind === "novel" ? "小说" : "剧本";
-  function startEditing(config: WorldConfig, derived = false) {
+  function startEditing(
+    config: WorldConfig,
+    derived = false,
+    kind: WorldKind = "script",
+  ) {
     setEditing({
       config: structuredClone(config),
-      kind: "script",
+      kind,
       derived,
     });
   }
@@ -180,7 +184,9 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                       size="sm"
                       variant="text"
                       className="gap-1.5 px-0 h-7"
-                      onClick={() => startEditing(world.config, true)}
+                      onClick={() =>
+                        startEditing(world.config, true, world.kind)
+                      }
                     >
                       使用模板
                       <ArrowUpRight className="size-3.5" />
