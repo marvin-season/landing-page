@@ -136,7 +136,7 @@ export function preparePlotEdit(
             requirements:
               mode === "stitch"
                 ? `改写前一章结尾和后一章开头，让两章之间的情节过渡自然。保留两章边界和关键事件，与未改写的前后文衔接，不复述未改写正文。作者要求：${request}。只输出一个合法 JSON 对象，保留 ending 和 opening 两个字符串字段，无代码围栏。ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`
-                : `按原顺序将两章重写成一章，删去重复叙述和拖沓段落，保留关键事件、伏笔和人物变化，与前后章节衔接。只输出一章小说正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
+                : `按原顺序将两章重写成一章，删去重复叙述和拖沓段落，保留关键事件、伏笔和人物变化，与前后章节衔接。${request ? `作者要求：${request}。` : ""}只输出一章小说正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
           },
         });
   if (prompt.length > maxNovelPromptLength)

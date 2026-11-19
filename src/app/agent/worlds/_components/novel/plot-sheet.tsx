@@ -182,7 +182,6 @@ export function PlotSheet({
                     className="peer sr-only"
                     onChange={() => {
                       setMode(value);
-                      setRequirements("");
                       writer.discardRewrite();
                     }}
                   />
@@ -194,17 +193,16 @@ export function PlotSheet({
               ))}
             </div>
           </fieldset>
-          {!draft && mode !== "merge" ? (
-            <fieldset disabled={writer.busy}>
-              <TextField
-                label={mode === "stitch" ? "过渡要求" : "插入剧情要求"}
-                value={requirements}
-                onChange={setRequirements}
-                maxLength={4000}
-                multiline
-              />
-            </fieldset>
-          ) : null}
+          <fieldset disabled={locked}>
+            <TextField
+              label={mode === "merge" ? "本次写作要求（选填）" : "本次写作要求"}
+              value={requirements}
+              onChange={setRequirements}
+              maxLength={4000}
+              multiline
+              required={mode !== "merge"}
+            />
+          </fieldset>
           {writer.busy ? (
             <p
               role="status"
