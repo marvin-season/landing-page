@@ -27,7 +27,7 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
-import { BackgroundControls, downloadBackground } from "./background-controls";
+import { downloadBackground, NovelFileControls } from "./background-controls";
 import { ChapterEditor } from "./chapter-editor";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
@@ -35,7 +35,11 @@ import { ContextControls } from "./context-controls";
 import {
   type Chapter,
   chapterTitle,
+  defaultChapterTarget,
   exportNovel,
+  isChapterTargetValid,
+  maxChapterLength,
+  minChapterTarget,
   replaceChapter,
   splitChapterAt,
 } from "./model";
@@ -50,6 +54,7 @@ export function NovelPanel({
   onBusyChange: (busy: boolean) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
@@ -92,15 +97,11 @@ export function NovelPanel({
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
-  const disabled = !writer.ready || writer.busy;
+  const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || rewriting || insertion !== null;
   const canGenerateChapter =
-    !ended &&
-    Boolean(novel.title.trim()) &&
-    /^\d+$/.test(novel.words) &&
-    Number(novel.words) >= 500 &&
-    Number(novel.words) <= 4000;
+    !ended && Boolean(novel.title.trim()) && isChapterTargetValid(novel.words);
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
@@ -232,22 +233,35 @@ export function NovelPanel({
               hint="可指定本章事件、伏笔、结尾或情绪；留空则按大纲继续。"
             />
             <TextField
-              label="每章目标字数（500–4000）"
+              label={`每章目标字数（${minChapterTarget}–${maxChapterLength}）`}
               value={novel.words}
               maxLength={4}
               onChange={(words) => writer.update({ ...novel, words })}
-              hint="目标字数供模型参考，实际篇幅可能有所浮动。"
+              hint={`默认 ${defaultChapterTarget} 字，正文最多 ${maxChapterLength} 字。`}
             />
           </FieldGroup>
         </fieldset>
-        <BackgroundControls
-          background={novel.background}
+        <NovelFileControls
           exported={writer.backgroundExport}
           disabled={chapterActionsLocked}
           canSummarize={
             !ended && novel.chapters.length > 0 && Boolean(novel.title.trim())
           }
-          onImport={writer.importBackground}
+          importing={importing}
+          onImportingChange={setImporting}
+          onImport={async (imported) => {
+            if (
+              !window.confirm(
+                `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+              )
+            )
+              return;
+            const id = await writer.importNovel(imported);
+            if (!id) return;
+            setAppliedRewrite(undefined);
+            setCompactContext(false);
+            setSelected(id);
+          }}
           onSummarize={() => {
             writer.generate("summary");
           }}
@@ -306,7 +320,7 @@ export function NovelPanel({
                 <select
                   className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
                   value={chapter.id}
-                  disabled={rewriting || insertion !== null}
+                  disabled={rewriting || insertion !== null || importing}
                   onChange={(event) => {
                     setAppliedRewrite(undefined);
                     setSelected(event.target.value);
@@ -504,7 +518,7 @@ export function NovelPanel({
           </section>
         ) : (
           <p className="py-8 text-center text-sm text-muted-foreground">
-            填写创作要求，开始生成第一章。
+            填写创作要求生成第一章，或导入已有小说。
           </p>
         )}
       </div>

@@ -17,16 +17,18 @@ import {
   forkSummaryPrompt,
   prepareNovelFork,
 } from "./fork-model";
+import { createImportedNovel, type ImportedNovel } from "./import-novel";
 import {
   type Chapter,
   chapterPrompt,
   chapterTitle,
   createBackground,
   createNovel,
-  type ImportedNovelBackground,
   insertChapterBefore,
   insertChapterPrompt,
   invalidateEditedCheckpoint,
+  isChapterTargetValid,
+  maxChapterLength,
   maxNovelPromptLength,
   maxNovelSummaryLength,
   type Novel,
@@ -186,6 +188,12 @@ export function useNovel(
         }
         return;
       }
+      if (text.length > maxChapterLength) {
+        setError(
+          `本章超过 ${maxChapterLength} 字，草稿未保存。请降低目标字数后重试。`,
+        );
+        return;
+      }
       const chapter = { id: crypto.randomUUID(), text };
       const current = latest.current;
       if (captured.beforeId !== undefined) {
@@ -237,6 +245,7 @@ export function useNovel(
     if (!ready || generating.current || room.status === "ended") return;
     setError("");
     const current = latest.current;
+    if (task === "chapter" && !isChapterTargetValid(current.words)) return;
     if (task === "summary" && !current.chapters.length) {
       setError("请先完成至少一章，再总结导出背景。");
       return;
@@ -323,6 +332,7 @@ export function useNovel(
 
   function insertBefore(beforeId: string, requirements: string) {
     if (!ready || generating.current || room.status === "ended") return;
+    if (!isChapterTargetValid(latest.current.words)) return;
     try {
       start(
         { task: "chapter", beforeId },
@@ -411,6 +421,13 @@ export function useNovel(
       preview,
       captured.range,
     );
+    const chapter = next.chapters.find(({ id }) => id === captured.chapterId);
+    if (!chapter || chapter.text.length > maxChapterLength) {
+      setError(
+        `应用后本章会超过 ${maxChapterLength} 字，请缩短润色内容后重试。`,
+      );
+      return null;
+    }
     discardRewrite();
     return next;
   }
@@ -439,11 +456,21 @@ export function useNovel(
     rewriteReady,
     forkSummary,
     backgroundExport,
-    importBackground(background: ImportedNovelBackground | undefined) {
+    async importNovel(imported: ImportedNovel) {
       if (!ready || generating.current)
-        throw new Error("正在生成或读取小说，请稍后再导入背景。");
+        throw new Error("正在生成或读取小说，请稍后再导入。");
       setError("");
-      update({ ...latest.current, background });
+      const next = createImportedNovel(room.config, imported);
+      if (!(await update(next, { persistFirst: true }))) {
+        setError("导入未能保存，原小说已保留。请检查浏览器存储空间后重试。");
+        return null;
+      }
+      input.current = null;
+      setPreview("");
+      setInserting(false);
+      setRewriteReady(false);
+      setForkSummary("");
+      return next.chapters[0].id;
     },
     generate,
     summarizeFork,

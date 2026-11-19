@@ -20,7 +20,7 @@ import {
   type ChapterTextSelection,
   textareaSelectionRange,
 } from "./chapter-text";
-import type { Chapter } from "./model";
+import { type Chapter, maxChapterLength } from "./model";
 import { RewritePanel } from "./rewrite-form";
 import type { useNovel } from "./use-novel";
 
@@ -69,6 +69,7 @@ export function ChapterEditor({
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const dirty = draft.text !== base.text;
+  const exceedsLimit = draft.text.length > maxChapterLength;
   const highlight = target ?? appliedRange;
   const editingLocked = Boolean(target && (writer.busy || writer.rewriteReady));
   // The workroom protects the in-flight rewrite and its unapplied result.
@@ -113,7 +114,7 @@ export function ChapterEditor({
   }
 
   async function save() {
-    if (!dirty || saving || editingLocked) return;
+    if (!dirty || saving || editingLocked || exceedsLimit) return;
     clearTimeout(pendingSelection.current);
     closeRewrite();
     setAppliedRange(null);
@@ -220,7 +221,9 @@ export function ChapterEditor({
           )}
           <Button
             size="sm"
-            disabled={!dirty || editingLocked || writer.busy || saving}
+            disabled={
+              !dirty || editingLocked || writer.busy || saving || exceedsLimit
+            }
             onClick={() => void save()}
           >
             <Save data-icon="inline-start" />
@@ -255,6 +258,14 @@ export function ChapterEditor({
           <section className="flex min-w-0 flex-col gap-3 p-4">
             <div className="flex min-h-8 items-center">
               <h2 className="text-sm font-medium">编辑草稿</h2>
+              <span
+                className={cn(
+                  "ml-auto text-xs text-muted-foreground",
+                  exceedsLimit && "text-destructive",
+                )}
+              >
+                {draft.text.length} / {maxChapterLength} 字
+              </span>
             </div>
             <div
               className={cn(
@@ -286,7 +297,7 @@ export function ChapterEditor({
                 aria-label="章节正文"
                 readOnly={editingLocked || saving}
                 value={draft.text}
-                maxLength={40000}
+                maxLength={maxChapterLength}
                 onScroll={syncMirror}
                 onBlur={() => clearTimeout(pendingSelection.current)}
                 onPointerDown={() => clearTimeout(pendingSelection.current)}

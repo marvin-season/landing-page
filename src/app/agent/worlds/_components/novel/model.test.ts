@@ -12,10 +12,8 @@ import {
   invalidateEditedCheckpoint,
   maxBackgroundFileBytes,
   maxNovelPromptLength,
-  maxNovelSummaryLength,
   novelRequest,
   parseBackgroundFile,
-  parseImportedBackground,
   replaceChapter,
   replaceChapterText,
   rewritePrompt,
@@ -80,7 +78,8 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   assert.deepEqual(prompt.task, {
     mode: "insert",
     chapter: 5,
-    targetWords: 2000,
+    targetWords: 4000,
+    maxCharacters: 8000,
     requirements: "补上旅途",
   });
 
@@ -270,7 +269,10 @@ test("compact rewrite sends world settings and requirements with only the select
       characters: config.characters,
     },
     targetChapter: { selection: { text: selected } },
-    task: { requirements: "收紧节奏" },
+    task: {
+      maxCharacters: 8000 - (novel.chapters[2].text.length - selected.length),
+      requirements: "收紧节奏",
+    },
   });
 
   novel.chapters[1].text = "长".repeat(maxNovelPromptLength);
@@ -280,6 +282,7 @@ test("compact rewrite sends world settings and requirements with only the select
   assert.deepEqual(compactChapter, {
     ...prompt,
     targetChapter: { text: novel.chapters[2].text },
+    task: { ...prompt.task, maxCharacters: 8000 },
   });
 
   novel.chapters[2].text = "长".repeat(maxNovelPromptLength);
@@ -393,7 +396,8 @@ test("writer receives world secrets and edited chapters in order, with the next 
   );
   assert.equal(prompt.task.chapter, 3);
   assert.equal(prompt.task.requirements, novel.chapterGoal);
-  assert.equal(prompt.task.targetWords, 2000);
+  assert.equal(prompt.task.targetWords, 4000);
+  assert.equal(prompt.task.maxCharacters, 8000);
 });
 
 test("summary export imports into a different novel as background without replacing its chapters or settings", () => {
@@ -453,35 +457,6 @@ test("summary requests merge inherited background with completed chapters, witho
   assert.equal(request.prompt, JSON.stringify(prompt));
 });
 
-test("plain TXT and Markdown imports are available as plot context without becoming chapters", () => {
-  const config = loadWorldTemplates()[0].config;
-  const novel = createNovel(config);
-  for (const [file, source, summary] of [
-    [
-      "剧情.TXT",
-      "\uFEFF她来到了港口。\r\n灯塔熄灭了。",
-      "她来到了港口。\n灯塔熄灭了。",
-    ],
-    ["剧情.md", "## 前情\n\n- 灯塔熄灭了。", "## 前情\n\n- 灯塔熄灭了。"],
-  ]) {
-    novel.background = parseImportedBackground(source, file);
-    const prompt = JSON.parse(chapterPrompt(config, novel));
-    assert.deepEqual(prompt.importedBackground, { format: "text", summary });
-    assert.deepEqual(prompt.completedChapters, []);
-    assert.equal(prompt.task.chapter, 1);
-  }
-  assert.throws(() => parseImportedBackground(" \n", "空.txt"), /为空/);
-  assert.throws(() => parseImportedBackground("{}", "备份.json"), /TXT/);
-  assert.throws(
-    () =>
-      parseImportedBackground(
-        "字".repeat(maxNovelSummaryLength + 1),
-        "剧情.md",
-      ),
-    /20,000/,
-  );
-});
-
 test("background import rejects malformed, oversized and incompatible files", () => {
   assert.throws(() => parseBackgroundFile("普通小说正文"), /Markdown/);
   assert.throws(
@@ -532,15 +507,6 @@ test("edited Markdown body imports with Windows line endings while metadata and 
     config.characters[0].privateInfo,
   );
   assert.deepEqual(imported.source, background.source);
-  assert.deepEqual(parseImportedBackground(text, "总结.md"), imported);
-  assert.throws(
-    () =>
-      parseImportedBackground(
-        text.replace('"schemaVersion": 1', '"schemaVersion": 2'),
-        "总结.md",
-      ),
-    /格式或版本/,
-  );
   assert.throws(
     () =>
       parseBackgroundFile(

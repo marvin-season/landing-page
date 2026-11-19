@@ -12,6 +12,19 @@ export const novelTaskSchema = z.enum(["chapter", "summary", "rewrite"]);
 export type NovelTask = z.infer<typeof novelTaskSchema>;
 export const maxNovelPromptLength = 150000;
 export const maxNovelSummaryLength = 20000;
+export const minChapterTarget = 500;
+export const defaultChapterTarget = 4000;
+export const maxChapterLength = 8000;
+
+export function isChapterTargetValid(value: string) {
+  const target = Number(value);
+  return (
+    /^\d+$/.test(value) &&
+    target >= minChapterTarget &&
+    target <= maxChapterLength
+  );
+}
+
 export const backgroundSchema = z.object({
   format: z.literal("novel-background"),
   schemaVersion: z.literal(1),
@@ -46,7 +59,7 @@ export function createNovel(config: WorldConfig): Novel {
     style: "第三人称，注重人物塑造、场景描写和自然对白。",
     outline: config.storyGoal,
     chapterGoal: "",
-    words: "2000",
+    words: String(defaultChapterTarget),
     chapters: [],
   };
 }
@@ -126,6 +139,7 @@ export function chapterPrompt(config: WorldConfig, novel: Novel) {
     task: {
       chapter: novel.chapters.length + 1,
       targetWords: Number(novel.words),
+      maxCharacters: maxChapterLength,
       requirements: novel.chapterGoal || "承接前文与大纲，推进下一阶段情节。",
     },
   });
@@ -139,6 +153,22 @@ function insertionIndex(novel: Novel, beforeId: string) {
 
 export function chapterTitle(index: number) {
   return `第${index + 1}章`;
+}
+
+export function isTxtChapterHeading(line: string) {
+  return /^第[ \t　]*[0-9０-９〇零一二三四五六七八九十百千万两]+[ \t　]*章(?:$|[ \t　:：、.．·\-－—（(][^\r\n]*)$/.test(
+    line.trim(),
+  );
+}
+
+export function escapeTxtChapterLine(line: string) {
+  return isTxtChapterHeading(line.replace(/^\\+/, "")) ? `\\${line}` : line;
+}
+
+export function unescapeTxtChapterLine(line: string) {
+  return line.startsWith("\\") && isTxtChapterHeading(line.replace(/^\\+/, ""))
+    ? line.slice(1)
+    : line;
 }
 
 function numberedTitle(title: string, index: number) {
@@ -175,6 +205,7 @@ export function insertChapterPrompt(
         mode: "insert",
         chapter: index + 1,
         targetWords: Number(novel.words),
+        maxCharacters: maxChapterLength,
         requirements:
           requirements.trim() || "补写一章，保留前后章节的既有剧情和伏笔。",
       },
@@ -297,6 +328,11 @@ export function rewritePrompt(
       : {}),
     targetChapter,
     task: {
+      maxCharacters: Math.max(
+        0,
+        maxChapterLength -
+          (selection ? text.length - selection.text.length : 0),
+      ),
       requirements:
         requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
     },
@@ -395,21 +431,6 @@ function parseExportedBackground(normalized: string): NovelBackground {
   return result.data;
 }
 
-export function parseImportedBackground(
-  text: string,
-  fileName: string,
-): ImportedNovelBackground {
-  if (!/\.(txt|md)$/i.test(fileName))
-    throw new Error("请选择 TXT 或 Markdown（.md）文件。");
-  const normalized = normalizeBackgroundFile(text);
-  if (/(?:^|\n)<!-- novel-background\b/.test(normalized))
-    return parseExportedBackground(normalized);
-  if (!normalized.trim()) throw new Error("背景文件为空。");
-  if (normalized.length > maxNovelSummaryLength)
-    throw new Error("剧情背景不能超过 20,000 字符。");
-  return { format: "text", summary: normalized };
-}
-
 export function serializeBackground(background: NovelBackground): string {
   const { summary, ...metadata } = background;
   // Preserve source settings for re-import without adding them to readable prose.
@@ -422,8 +443,30 @@ export function serializeBackground(background: NovelBackground): string {
 
 export function exportNovel(novel: Novel, format: "txt" | "md") {
   const heading = format === "md" ? "# " : "";
-  const chapterHeading = format === "md" ? "## " : "";
-  return `${heading}${novel.title}\n\n${novel.chapters.map((chapter) => `${chapterHeading}${chapter.title}\n\n${chapter.text.trim()}`).join("\n\n")}\n`;
+  const chapters = novel.chapters.map((chapter, index) => {
+    let title = chapter.title;
+    if (format === "md") {
+      title = `## ${title}`;
+    } else {
+      title = title.replace(/[\r\n]+/g, " ").trim();
+      if (!isTxtChapterHeading(title)) {
+        const number = chapterTitle(index);
+        title = title ? `${number} ${title}` : number;
+      }
+    }
+    const text = chapter.text.trim();
+    const body =
+      format === "txt"
+        ? text
+            .split(/\r\n?|\n/)
+            .map(escapeTxtChapterLine)
+            .join("\n")
+        : text;
+    return `${title}\n\n${body}`;
+  });
+  const title =
+    format === "txt" ? escapeTxtChapterLine(novel.title) : novel.title;
+  return `${heading}${title}\n\n${chapters.join("\n\n")}\n`;
 }
 
 export function novelRequest(
