@@ -68,20 +68,29 @@ export function NovelPanel({
   const [selected, setSelected] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [thinkingChapter, setThinkingChapter] = useState<Chapter | null>(null);
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
     if (
       editingChapter ||
+      thinkingChapter ||
       !readingPanel.current ||
       readingScroll.current === null
     )
       return;
     readingPanel.current.scrollTop = readingScroll.current;
     readingScroll.current = null;
-  }, [editingChapter]);
+  }, [editingChapter, thinkingChapter]);
   const [plotOpen, setPlotOpen] = useState(false);
-  const writer = useNovel(room, onBusyChange, downloadBackground);
+  const writer = useNovel(
+    room,
+    (busy) => {
+      if (!busy) setThinkingChapter(null);
+      onBusyChange(busy);
+    },
+    downloadBackground,
+  );
   const { novel } = writer;
   const publishContext = useRef(onContext);
   const saveContext = useRef(writer.updateContext);
@@ -109,9 +118,10 @@ export function NovelPanel({
   const [compactContext, setCompactContext] = useState(false);
   const streamingRewrite =
     (plotOpen || writer.task === "rewrite") && writer.busy;
+  const waitingForText = Boolean(thinkingChapter);
   useUnsavedNavigation(
-    streamingRewrite || writer.rewriteReady,
-    streamingRewrite
+    waitingForText || streamingRewrite || writer.rewriteReady,
+    waitingForText || streamingRewrite
       ? "草稿正在生成，离开会中断本次生成。确定离开吗？"
       : "草稿尚未应用，离开会丢失草稿。确定离开吗？",
   );
@@ -136,13 +146,20 @@ export function NovelPanel({
     writer.update({ ...novel, ...options });
   }
   function generateNextChapter() {
-    if (!writer.generateChapter()) return;
-    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
-    setEditingChapter({
+    const next: Chapter = {
       id: crypto.randomUUID(),
       title: chapterTitle(novel.chapters.length),
       text: "",
-    });
+    };
+    if (
+      !writer.generateChapter(() => {
+        setThinkingChapter(null);
+        setEditingChapter(next);
+      })
+    )
+      return;
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    setThinkingChapter(next);
   }
   function openRewrite() {
     writer.discardRewrite();
@@ -309,15 +326,15 @@ export function NovelPanel({
               />
             </article>
           ) : null}
-          {chapter ? (
+          {chapter || thinkingChapter ? (
             <section className="flex flex-col gap-4 border-t border-border pt-5">
               <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
                 <label className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
                   章节目录
                   <select
                     className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
-                    value={chapter.id}
-                    disabled={rewriting || importing}
+                    value={thinkingChapter?.id ?? chapter?.id}
+                    disabled={waitingForText || rewriting || importing}
                     onChange={(event) => {
                       setAppliedRewrite(undefined);
                       setSelected(event.target.value);
@@ -328,118 +345,142 @@ export function NovelPanel({
                         {item.title}
                       </option>
                     ))}
+                    {thinkingChapter ? (
+                      <option value={thinkingChapter.id}>
+                        {thinkingChapter.title}（正在构思）
+                      </option>
+                    ) : null}
                   </select>
                 </label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={chapterActionsLocked}
-                    onClick={() => {
-                      readingScroll.current =
-                        readingPanel.current?.scrollTop ?? 0;
-                      writer.discardRewrite();
-                      setEditingChapter(chapter);
-                    }}
-                  >
-                    <PenLine data-icon="inline-start" />
-                    编辑本章
+                {thinkingChapter ? (
+                  <Button size="sm" variant="outline" onClick={writer.stop}>
+                    <Square data-icon="inline-start" />
+                    停止生成
                   </Button>
-                  <PlotSheet
-                    chapters={novel.chapters}
-                    disabled={chapterActionsLocked || ended}
-                    open={plotOpen}
-                    onOpenChange={setPlotOpen}
-                    writer={writer}
-                    onApplied={(id) => {
-                      setAppliedRewrite(undefined);
-                      setSelected(id);
-                    }}
-                  />
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        ref={chapterMenuTrigger}
-                        size="sm"
-                        variant="outline"
-                        disabled={chapterActionsLocked}
-                      >
-                        <Ellipsis data-icon="inline-start" />
-                        章节操作
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      onCloseAutoFocus={(event) => {
-                        const action = actionFromMenu.current;
-                        actionFromMenu.current = null;
-                        if (!action) return;
-                        event.preventDefault();
-                        if (action === "rewrite") openRewrite();
-                        else setSplitting(true);
+                ) : chapter ? (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterActionsLocked}
+                      onClick={() => {
+                        readingScroll.current =
+                          readingPanel.current?.scrollTop ?? 0;
+                        writer.discardRewrite();
+                        setEditingChapter(chapter);
                       }}
                     >
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          disabled={!/\S\s*\S/u.test(chapter.text)}
-                          onSelect={() => {
-                            actionFromMenu.current = "split";
-                          }}
-                        >
-                          <Scissors />
-                          拆分本章
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={
-                            chapterActionsLocked ||
-                            ended ||
-                            !chapter.text.trim()
-                          }
-                          onSelect={() => {
-                            actionFromMenu.current = "rewrite";
-                          }}
-                        >
-                          <WandSparkles />
-                          润色整章
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          variant="destructive"
+                      <PenLine data-icon="inline-start" />
+                      编辑本章
+                    </Button>
+                    <PlotSheet
+                      chapters={novel.chapters}
+                      disabled={chapterActionsLocked || ended}
+                      open={plotOpen}
+                      onOpenChange={setPlotOpen}
+                      writer={writer}
+                      onApplied={(id) => {
+                        setAppliedRewrite(undefined);
+                        setSelected(id);
+                      }}
+                    />
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          ref={chapterMenuTrigger}
+                          size="sm"
+                          variant="outline"
                           disabled={chapterActionsLocked}
-                          onSelect={deleteChapter}
                         >
-                          <Trash2 />
-                          删除本章
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                          <Ellipsis data-icon="inline-start" />
+                          章节操作
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        onCloseAutoFocus={(event) => {
+                          const action = actionFromMenu.current;
+                          actionFromMenu.current = null;
+                          if (!action) return;
+                          event.preventDefault();
+                          if (action === "rewrite") openRewrite();
+                          else setSplitting(true);
+                        }}
+                      >
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            disabled={!/\S\s*\S/u.test(chapter.text)}
+                            onSelect={() => {
+                              actionFromMenu.current = "split";
+                            }}
+                          >
+                            <Scissors />
+                            拆分本章
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              chapterActionsLocked ||
+                              ended ||
+                              !chapter.text.trim()
+                            }
+                            onSelect={() => {
+                              actionFromMenu.current = "rewrite";
+                            }}
+                          >
+                            <WandSparkles />
+                            润色整章
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            disabled={chapterActionsLocked}
+                            onSelect={deleteChapter}
+                          >
+                            <Trash2 />
+                            删除本章
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ) : null}
               </div>
-              <ChapterSplit
-                chapter={chapter}
-                disabled={chapterActionsLocked}
-                open={splitting}
-                onOpenChange={setSplitting}
-                onCloseAutoFocus={(event) => {
-                  event.preventDefault();
-                  chapterMenuTrigger.current?.focus();
-                }}
-                onSplit={splitChapter}
-              />
-              <ChapterReading
-                key={chapter.id}
-                title={chapter.title}
-                text={chapter.text}
-                rewriting={rewriting}
-                appliedLength={
-                  appliedRewrite?.chapterId === chapter.id
-                    ? appliedRewrite.length
-                    : undefined
-                }
-              />
+              {thinkingChapter ? (
+                <p
+                  role="status"
+                  className="flex items-center gap-2 py-5 text-sm text-muted-foreground"
+                >
+                  <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
+                  {thinkingChapter.title}正在构思…
+                </p>
+              ) : chapter ? (
+                <>
+                  <ChapterSplit
+                    chapter={chapter}
+                    disabled={chapterActionsLocked}
+                    open={splitting}
+                    onOpenChange={setSplitting}
+                    onCloseAutoFocus={(event) => {
+                      event.preventDefault();
+                      chapterMenuTrigger.current?.focus();
+                    }}
+                    onSplit={splitChapter}
+                  />
+                  <ChapterReading
+                    key={chapter.id}
+                    title={chapter.title}
+                    text={chapter.text}
+                    rewriting={rewriting}
+                    appliedLength={
+                      appliedRewrite?.chapterId === chapter.id
+                        ? appliedRewrite.length
+                        : undefined
+                    }
+                  />
+                </>
+              ) : null}
             </section>
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">

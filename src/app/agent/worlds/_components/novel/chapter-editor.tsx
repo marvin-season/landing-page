@@ -76,6 +76,7 @@ export function ChapterEditor({
 }) {
   const [draft, setDraft] = useState(base);
   const [useGeneratedText, setUseGeneratedText] = useState(true);
+  const [revealedLength, setRevealedLength] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
@@ -90,6 +91,23 @@ export function ChapterEditor({
   const creating = Boolean(creation);
   const draftText = creation && useGeneratedText ? writer.preview : draft.text;
   const generationOutcome = writer.chapterGenerationOutcome;
+  const revealGeneratedText =
+    creating && useGeneratedText && generationOutcome?.kind !== "stopped";
+  // Reveal a burst over a few frames without delaying ordinary text deltas.
+  const newTextLength = draftText.length - revealedLength;
+  const frameLength = revealGeneratedText
+    ? Math.min(
+        draftText.length,
+        revealedLength + Math.max(24, Math.ceil(newTextLength / 8)),
+      )
+    : draftText.length;
+  const visibleLength =
+    frameLength < draftText.length &&
+    (draftText.codePointAt(frameLength - 1) ?? 0) > 0xffff
+      ? frameLength + 1
+      : frameLength;
+  const visibleText = draftText.slice(0, visibleLength);
+  const editorBusy = writer.busy || visibleLength < draftText.length;
   const overGenerationLimit =
     generationOutcome?.kind === "completed" &&
     draftText.length > generationOutcome.limit;
@@ -101,7 +119,7 @@ export function ChapterEditor({
     !dirty ||
     saving ||
     editingLocked ||
-    writer.busy ||
+    editorBusy ||
     exceedsLimit ||
     (creating && !draftText.trim());
   useUnsavedNavigation(
@@ -112,10 +130,16 @@ export function ChapterEditor({
   );
 
   useLayoutEffect(() => {
+    if (revealedLength === visibleLength || !revealGeneratedText) return;
+    const frame = requestAnimationFrame(() => setRevealedLength(visibleLength));
+    return () => cancelAnimationFrame(frame);
+  }, [revealGeneratedText, revealedLength, visibleLength]);
+
+  useLayoutEffect(() => {
     const input = editor.current;
-    if (creating && writer.busy && draftText && input)
+    if (revealGeneratedText && visibleText && input)
       input.scrollTop = input.scrollHeight;
-  }, [creating, draftText, writer.busy]);
+  }, [revealGeneratedText, visibleText]);
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -191,7 +215,7 @@ export function ChapterEditor({
             size="sm"
             variant="ghost"
             className="shrink-0"
-            disabled={writer.busy || editingLocked || saving}
+            disabled={editorBusy || editingLocked || saving}
             onClick={() => {
               if (!confirmAgentNavigation()) return;
               onExit();
@@ -234,7 +258,7 @@ export function ChapterEditor({
               dirty && saveFailed && "text-destructive",
             )}
           >
-            {creation && writer.busy
+            {creation && editorBusy
               ? draftText
                 ? "正在生成…"
                 : "等待输出…"
@@ -267,7 +291,7 @@ export function ChapterEditor({
             <Button
               size="sm"
               variant="outline"
-              disabled={writer.busy || saving}
+              disabled={editorBusy || saving}
               onClick={() => setShowDiff(false)}
             >
               <PencilLine data-icon="inline-start" />
@@ -277,7 +301,7 @@ export function ChapterEditor({
             <Button
               size="sm"
               variant="outline"
-              disabled={!dirty || editingLocked || writer.busy || saving}
+              disabled={!dirty || editingLocked || editorBusy || saving}
               onClick={() => {
                 closeRewrite();
                 setShowDiff(true);
@@ -317,7 +341,7 @@ export function ChapterEditor({
             <textarea
               aria-label="稳定版本正文"
               readOnly
-              disabled={writer.busy}
+              disabled={editorBusy}
               value={base.text}
               className="min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -325,7 +349,7 @@ export function ChapterEditor({
           <section className="flex min-w-0 flex-col gap-3 p-4">
             <div className="flex min-h-8 items-center">
               <h2 className="flex items-center gap-1.5 text-sm font-medium">
-                {creation && writer.busy ? (
+                {creation && editorBusy ? (
                   <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
                 ) : null}
                 编辑草稿
@@ -336,7 +360,7 @@ export function ChapterEditor({
                   exceedsLimit && "text-destructive",
                 )}
               >
-                {draftText.length} / {maxChapterLength} 字
+                {visibleLength} / {maxChapterLength} 字
               </span>
             </div>
             <div
@@ -368,8 +392,8 @@ export function ChapterEditor({
                 ref={editor}
                 aria-label="章节正文"
                 readOnly={editingLocked || saving}
-                disabled={writer.busy}
-                value={draftText}
+                disabled={editorBusy}
+                value={visibleText}
                 maxLength={
                   draftText.length > maxChapterLength
                     ? undefined
@@ -428,7 +452,7 @@ export function ChapterEditor({
                     {writer.error}
                   </p>
                 ) : null}
-                {overGenerationLimit ? (
+                {overGenerationLimit && !editorBusy ? (
                   <p role="status" className="text-xs text-muted-foreground">
                     草稿 {draftText.length} 字，超过设定的{" "}
                     {generationOutcome.limit} 字上限，已保留全文。
@@ -436,7 +460,7 @@ export function ChapterEditor({
                 ) : null}
                 <ChapterGenerationForm
                   options={creation.options}
-                  disabled={ended || saving || writer.busy}
+                  disabled={ended || saving || editorBusy}
                   submitLabel="重新生成"
                   onChange={creation.onChange}
                   onGenerate={() => {
@@ -446,6 +470,7 @@ export function ChapterEditor({
                     )
                       return;
                     if (creation.onGenerate()) {
+                      setRevealedLength(0);
                       setUseGeneratedText(true);
                       setSaveFailed(false);
                     }

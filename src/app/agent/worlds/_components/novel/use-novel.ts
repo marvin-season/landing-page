@@ -9,6 +9,7 @@ import {
 } from "@landing-page/utils/stream";
 import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
 import type { ChapterTextRange } from "./chapter-text";
@@ -52,7 +53,7 @@ db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 
 type NovelRun =
-  | { task: "chapter"; limit: number }
+  | { task: "chapter"; limit: number; onFirstText?: () => void }
   | { task: "summary"; config: WorldConfig; novel: Novel }
   | { task: "summary"; forFork: true }
   | {
@@ -167,8 +168,18 @@ export function useNovel(
       }
       state.current = reduceChatStreamState(state.current, event);
       const run = input.current;
-      if (!run || !("plot" in run))
-        setPreview(getChatStreamText(state.current));
+      if (run && "plot" in run) return;
+      const text = getChatStreamText(state.current);
+      if (run?.task === "chapter" && run.onFirstText && text.trim()) {
+        const onFirstText = run.onFirstText;
+        run.onFirstText = undefined;
+        flushSync(() => {
+          setPreview(text);
+          onFirstText();
+        });
+        return;
+      }
+      setPreview(text);
     },
     onComplete() {
       end();
@@ -253,7 +264,7 @@ export function useNovel(
     });
   }
 
-  function generateChapter() {
+  function generateChapter(onFirstText?: () => void) {
     if (!ready || generating.current || room.status === "ended") return false;
     setError("");
     const current = latest.current;
@@ -266,7 +277,10 @@ export function useNovel(
       );
       return false;
     }
-    start({ task: "chapter", limit: Number(current.words) }, prompt);
+    start(
+      { task: "chapter", limit: Number(current.words), onFirstText },
+      prompt,
+    );
     return true;
   }
 
