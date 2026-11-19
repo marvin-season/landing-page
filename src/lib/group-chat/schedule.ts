@@ -142,26 +142,29 @@ export function nextTurn(room: WorldRoom, turn: number): TurnPlan {
       ? room.config.characters.find((c) => c.id === mentioned && c.enabled)
       : (directSpeaker ?? fallback ?? eligible[0]);
   if (!speaker) throw new WorldError("no_characters", "没有可发言的角色");
+  const hasStoryMessages = room.messages.some(
+    (m) =>
+      m.status === "complete" && (m.kind === "narrator" || m.kind === "agent"),
+  );
   const narrating =
     narrationOn &&
     (mentioned === "system" ||
       cue?.ask === false ||
       stalled ||
       narrationDue ||
-      (!mentioned &&
-        !cue &&
-        !directSpeaker &&
-        !room.messages.some(
-          (m) =>
-            m.status === "complete" &&
-            (m.kind === "narrator" || m.kind === "agent"),
-        )));
+      (!mentioned && !cue && !directSpeaker && !hasStoryMessages));
   const direction = narrating
     ? cue && !cue.ask
-      ? "依据最新系统干预叙述当前场景。"
-      : "承接当前场景和角色言行，写一段旁白。"
+      ? "依据最新系统干预叙述当前场景与可见变化。"
+      : !hasStoryMessages
+        ? "依据初始场景、前置剧情与已知事实写一段开场旁白，建立当下情境。"
+        : stalled
+          ? "当前对话出现重复或停滞，请落实角色已表露的行动结果或引入合理的场景变化，打破僵局。"
+          : "承接刚才的角色言行，写出可见的动作结果或场景变化，推进一小步。"
     : cue
-      ? "以角色身份回应最新系统干预。"
-      : "轮到你发言。";
+      ? "在故事内以角色身份自然回应最新系统干预，不跳出戏外对操作者说话。"
+      : directSpeaker
+        ? "刚有角色直接同你说话或向你发问，请当场回应对方并推进对话。"
+        : "轮到你发言，结合当前情境与自身目标自然接话，把互动往前推进一步。";
   return { kind: narrating ? "narrate" : "speak", speaker, direction };
 }

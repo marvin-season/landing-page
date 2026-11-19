@@ -132,12 +132,19 @@ export function preparePlotEdit(
                 unchangedAfter: after.slice(0, contextLength),
               }
             : {}),
-          task: {
-            requirements:
-              mode === "stitch"
-                ? `改写前一章结尾和后一章开头，让两章之间的情节过渡自然。保留两章边界和关键事件，与未改写的前后文衔接，不复述未改写正文。作者要求：${request}。只输出一个合法 JSON 对象，保留 ending 和 opening 两个字符串字段，无代码围栏。ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`
-                : `按原顺序将两章重写成一章，删去重复叙述和拖沓段落，保留关键事件、伏笔和人物变化，与前后章节衔接。${request ? `作者要求：${request}。` : ""}只输出一章小说正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
-          },
+          task:
+            mode === "stitch"
+              ? {
+                  mode,
+                  endingMaxCharacters: endingLimit,
+                  openingMaxCharacters: openingLimit,
+                  requirements: `改写前一章结尾（ending）和后一章开头（opening），消除生硬跳切、重复叙述或时间断层，让两章过渡自然。保留两章分界与关键事件，严丝合缝承接 unchangedBefore 末尾并接回 unchangedAfter 开头，绝不复述未改写原文。作者要求：${request}。只输出无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`,
+                }
+              : {
+                  mode,
+                  maxCharacters: maxChapterLength,
+                  requirements: `按原时间顺序将 first 与 second 两章融合重写为一章连贯正文，删去交界处的重复铺垫、拖沓叙述及任何残留的章名、分节号或拼接痕迹，保留关键事件、细节伏笔与人物变化，并与前后章节自然衔接。${request ? `作者要求：${request}。` : ""}只输出合并后的单章小说纯正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
+                },
         });
   if (prompt.length > maxNovelPromptLength)
     throw new Error("本次剧情整理的上下文过长，请先精简设定或正文。");

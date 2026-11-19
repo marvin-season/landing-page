@@ -55,6 +55,10 @@ test("stitch changes only the transition and keeps both chapter IDs and titles",
     "stitch",
     "加一句道别",
   );
+  const stitchTask = JSON.parse(edit.prompt).task;
+  assert.equal(stitchTask.mode, "stitch");
+  assert.ok(stitchTask.endingMaxCharacters > 0);
+  assert.ok(stitchTask.openingMaxCharacters > 0);
   const draft = readPlotDraft(
     edit,
     '```json\n{"ending":"她挥手道别。","opening":"走到车站时，天已黑了。"}\n```',
@@ -98,8 +102,10 @@ test("merge replaces the pair with a new chapter and renumbers only default titl
     "merge",
     "  保留争执的具体原因  ",
   );
-  const { requirements } = JSON.parse(edit.prompt).task;
-  assert.match(requirements, /作者要求：保留争执的具体原因。/);
+  const mergeTask = JSON.parse(edit.prompt).task;
+  assert.equal(mergeTask.mode, "merge");
+  assert.equal(mergeTask.maxCharacters, 8000);
+  assert.match(mergeTask.requirements, /作者要求：保留争执的具体原因。/);
   assert.throws(() => readPlotDraft(edit, "长".repeat(8001)), /8000/);
   const draft = readPlotDraft(edit, "争执过后，她独自去了车站。");
   const saved = applyPlotDraft(withCheckpoint, edit, draft);
