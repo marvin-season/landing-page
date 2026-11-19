@@ -31,13 +31,7 @@ import {
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
-import {
-  defaultChapterTarget,
-  isChapterTargetValid,
-  maxChapterLength,
-  minChapterTarget,
-  type NovelWritingContext,
-} from "./novel/model";
+import type { NovelWritingContext } from "./novel/model";
 import { PriorContextField } from "./prior-context-field";
 
 type SectionKey = "world" | "story" | "cast" | "pace";
@@ -216,10 +210,6 @@ export function WorldEditor({
           const writingContext = novel ? novelContext : undefined;
           if (writingContext && !writingContext.title.trim())
             throw new Error("请填写小说名称");
-          if (writingContext && !isChapterTargetValid(writingContext.words))
-            throw new Error(
-              `每章目标字数需为 ${minChapterTarget}–${maxChapterLength} 的整数。`,
-            );
           const nextConfig = writingContext
             ? {
                 ...config,
@@ -356,13 +346,6 @@ export function WorldEditor({
                     multiline
                     maxLength={12000}
                     hint="沿用世界背景、规则与全部角色设定；角色秘密由作者统一掌握，按剧情逐步揭示。"
-                  />
-                  <TextField
-                    label={`每章目标字数（${minChapterTarget}–${maxChapterLength}）`}
-                    value={novelContext.words}
-                    onChange={(words) => updateNovelContext("words", words)}
-                    maxLength={4}
-                    hint={`默认 ${defaultChapterTarget} 字，正文最多 ${maxChapterLength} 字。`}
                   />
                 </>
               ) : (

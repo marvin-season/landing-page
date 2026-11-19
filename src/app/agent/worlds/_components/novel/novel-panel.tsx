@@ -13,6 +13,7 @@ import {
 } from "@landing-page/design-system";
 import {
   Ellipsis,
+  FileText,
   LoaderCircle,
   PenLine,
   Scissors,
@@ -68,6 +69,7 @@ export function NovelPanel({
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
+  const generationDraft = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     if (
       editingChapter ||
@@ -94,19 +96,11 @@ export function NovelPanel({
             title: novel.title,
             style: novel.style,
             outline: novel.outline,
-            words: novel.words,
           }
         : null,
       save: (next) => saveContext.current(next),
     });
-  }, [
-    novel.outline,
-    novel.style,
-    novel.title,
-    novel.words,
-    writer.error,
-    writer.ready,
-  ]);
+  }, [novel.outline, novel.style, novel.title, writer.error, writer.ready]);
   const [rewriting, setRewriting] = useState(false);
   const [appliedRewrite, setAppliedRewrite] = useState<{
     chapterId: string;
@@ -138,6 +132,19 @@ export function NovelPanel({
   const summarizing = writer.task === "summary";
   const generatingChapter =
     writer.busy && writer.task === "chapter" && !plotOpen;
+  const chapterNumber = novel.chapters.length + 1;
+  const hasChapterDraft = writer.task === "chapter" && Boolean(writer.preview);
+  const chapterStatus = generatingChapter
+    ? `${hasChapterDraft ? "正在创作" : "等待输出 · "}第 ${chapterNumber} 章`
+    : writer.chapterStopped
+      ? hasChapterDraft
+        ? "已停止接收 · 草稿未保存"
+        : "已停止接收 · 无草稿"
+      : !novel.title.trim()
+        ? "请在设定中填写小说名称"
+        : !isChapterTargetValid(novel.words)
+          ? `每章字数需为 ${minChapterTarget}–${maxChapterLength}`
+          : `第 ${chapterNumber} 章`;
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
@@ -227,7 +234,7 @@ export function NovelPanel({
               <p className="text-xs text-muted-foreground">
                 {writer.saving
                   ? "正在保存…"
-                  : "名称、文风、大纲和每章字数在右上角设定中修改，章节保存在当前浏览器。"}
+                  : "名称、文风和大纲在右上角设定中修改，章节保存在当前浏览器。"}
               </p>
             </div>
             <NovelFileControls
@@ -279,11 +286,14 @@ export function NovelPanel({
             </Alert>
           ) : null}
           {writer.task !== "rewrite" && !plotOpen && writer.preview ? (
-            <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
+            <article
+              ref={generationDraft}
+              className="flex flex-col gap-4 rounded-lg border border-border p-5"
+            >
               <h3 className="font-serif text-lg">
                 {writer.task === "summary"
                   ? "背景总结"
-                  : `第${novel.chapters.length + 1}章`}{" "}
+                  : `第 ${chapterNumber} 章`}{" "}
                 · {writer.busy ? "生成中" : "未完成草稿"}
               </h3>
               <UnifiedMarkdown
@@ -442,7 +452,7 @@ export function NovelPanel({
             writer.generate();
           }}
         >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="mx-auto flex w-full max-w-5xl flex-col gap-2 rounded-lg border border-input bg-background p-3 focus-within:border-ring">
             <label className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="text-sm font-medium">下一章要求</span>
               <textarea
@@ -454,36 +464,74 @@ export function NovelPanel({
                 onChange={(event) =>
                   writer.update({ ...novel, chapterGoal: event.target.value })
                 }
-                className="max-h-24 min-h-16 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                className="max-h-24 min-h-12 w-full resize-none bg-transparent text-sm leading-6 outline-none disabled:opacity-60"
               />
             </label>
-            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
-              {generatingChapter ? (
-                <Button type="button" variant="outline" onClick={writer.stop}>
-                  <Square data-icon="inline-start" />
-                  停止生成
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={continueLocked || !canGenerateChapter}
-                >
-                  <PenLine data-icon="inline-start" />
-                  续写下一章
-                </Button>
-              )}
-              {generatingChapter ? (
-                <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <LoaderCircle className="size-4 animate-spin" />
-                  正在创作第{novel.chapters.length + 1}章…
-                </span>
-              ) : !novel.title.trim() || !isChapterTargetValid(novel.words) ? (
-                <p className="text-xs text-muted-foreground">
-                  {!novel.title.trim()
-                    ? "请先在右上角设定中填写小说名称。"
-                    : `每章字数需为 ${minChapterTarget}–${maxChapterLength}，请在设定中修改。`}
+            <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  每章字数
+                  <input
+                    value={novel.words}
+                    disabled={continueLocked}
+                    inputMode="numeric"
+                    maxLength={4}
+                    aria-label="每章字数"
+                    onChange={(event) =>
+                      writer.update({ ...novel, words: event.target.value })
+                    }
+                    className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                  />
+                  <span>
+                    {minChapterTarget}–{maxChapterLength}
+                  </span>
+                </label>
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {generatingChapter ? (
+                    <LoaderCircle className="size-3.5 shrink-0 animate-spin" />
+                  ) : null}
+                  <span>{chapterStatus}</span>
                 </p>
-              ) : null}
+              </div>
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                {hasChapterDraft ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="px-2"
+                    onClick={() => generationDraft.current?.scrollIntoView()}
+                  >
+                    <FileText data-icon="inline-start" />
+                    草稿
+                  </Button>
+                ) : null}
+                {generatingChapter ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="min-w-28 whitespace-nowrap"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      writer.stop();
+                    }}
+                  >
+                    <Square data-icon="inline-start" />
+                    停止生成
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="min-w-28 whitespace-nowrap"
+                    disabled={continueLocked || !canGenerateChapter}
+                  >
+                    <PenLine data-icon="inline-start" />
+                    {writer.chapterStopped ? "重新生成" : "续写下一章"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </form>

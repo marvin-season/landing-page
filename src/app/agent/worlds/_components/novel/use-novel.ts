@@ -84,6 +84,7 @@ export function useNovel(
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
   const [task, setTask] = useState<NovelTask>("chapter");
+  const [chapterStopped, setChapterStopped] = useState(false);
   const [rewriteReady, setRewriteReady] = useState(false);
   const [plotDraft, setPlotDraft] = useState<PlotDraft | null>(null);
   const [forkSummary, setForkSummary] = useState("");
@@ -146,7 +147,6 @@ export function useNovel(
       title: context.title,
       style: context.style,
       outline: context.outline,
-      words: context.words,
     });
   }
   function end() {
@@ -247,6 +247,7 @@ export function useNovel(
     input.current = run;
     setError("");
     setTask(run.task);
+    setChapterStopped(false);
     if (!("plot" in run) && run.task !== "rewrite") setBackgroundExport(null);
     setRewriteReady(false);
     setPlotDraft(null);
@@ -505,6 +506,7 @@ export function useNovel(
     busy,
     preview,
     task,
+    chapterStopped,
     rewriteReady,
     plotDraft,
     editPlot,
@@ -522,6 +524,7 @@ export function useNovel(
       }
       input.current = null;
       setPreview("");
+      setChapterStopped(false);
       setRewriteReady(false);
       setForkSummary("");
       return next.chapters[0].id;
@@ -537,7 +540,12 @@ export function useNovel(
     stop() {
       stream.stop();
       end();
-      setError("已停止，本次草稿未计入正文或导出文件，可以重新生成。");
+      const run = input.current;
+      if (run?.task === "chapter" && !("plot" in run)) {
+        setChapterStopped(true);
+      } else {
+        setError("已停止，本次草稿未计入正文或导出文件，可以重新生成。");
+      }
     },
   };
 }
