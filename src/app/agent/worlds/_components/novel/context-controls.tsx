@@ -107,7 +107,7 @@ export function ContextControls({
               disabled={disabled || !novel.chapters.length}
             >
               <GitFork data-icon="inline-start" />
-              Fork 小说
+              创建续写分支
             </Button>
           </SheetTrigger>
         </div>
@@ -118,7 +118,7 @@ export function ContextControls({
       </section>
       <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-xl">
         <SheetHeader className="shrink-0 border-b border-border pr-12">
-          <SheetTitle>Fork 小说</SheetTitle>
+          <SheetTitle>创建续写分支</SheetTitle>
           <SheetDescription>
             新会话 · 保留全部正文 · 压缩前 {forkChapterCount(novel)} 章
           </SheetDescription>
@@ -194,7 +194,7 @@ export function ContextControls({
                 router.push(`/agent/worlds/${id}`);
               } catch (error) {
                 setError(
-                  error instanceof Error ? error.message : "无法创建小说分支。",
+                  error instanceof Error ? error.message : "无法创建续写分支。",
                 );
                 setCreating(false);
               }
@@ -205,7 +205,7 @@ export function ContextControls({
             ) : (
               <GitFork data-icon="inline-start" />
             )}
-            {creating ? "正在创建…" : "创建分支"}
+            {creating ? "正在创建…" : "创建续写分支"}
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -292,7 +292,8 @@ export function useNovel(
   }
 
   async function createFork(summary: string) {
-    if (!ready || generating.current) throw new Error("当前暂不可创建 Fork。");
+    if (!ready || generating.current)
+      throw new Error("当前暂不可创建续写分支。");
     const current = latest.current;
     const fork = prepareNovelFork(room.config, current, summary);
     if (

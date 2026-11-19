@@ -27,7 +27,7 @@ export function prepareNovelFork(
   const through = novel.chapters[forkChapterCount(novel) - 1];
   if (!through || !summary || summary.length > maxNovelSummaryLength)
     return null;
-  const suffix = " · Fork";
+  const suffix = " · 续写分支";
   const nextConfig = {
     ...config,
     title: config.title.slice(0, 60 - suffix.length).trimEnd() + suffix,
