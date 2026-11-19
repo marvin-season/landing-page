@@ -57,7 +57,7 @@ export function ChapterEditor({
   writer: Pick<
     ReturnType<typeof useNovel>,
     | "busy"
-    | "chapterStopped"
+    | "chapterGenerationOutcome"
     | "error"
     | "stop"
     | "task"
@@ -89,6 +89,10 @@ export function ChapterEditor({
   const pendingCaret = useRef<number | null>(null);
   const creating = Boolean(creation);
   const draftText = creation && useGeneratedText ? writer.preview : draft.text;
+  const generationOutcome = writer.chapterGenerationOutcome;
+  const overGenerationLimit =
+    generationOutcome?.kind === "completed" &&
+    draftText.length > generationOutcome.limit;
   const dirty = draftText !== base.text;
   const exceedsLimit = draftText.length > maxChapterLength;
   const highlight = target ?? appliedRange;
@@ -239,7 +243,9 @@ export function ChapterEditor({
                 : creating || dirty
                   ? saveFailed
                     ? "保存失败"
-                    : creation && writer.chapterStopped && useGeneratedText
+                    : creation &&
+                        useGeneratedText &&
+                        generationOutcome?.kind === "stopped"
                       ? "已停止 · 未保存"
                       : "未保存"
                   : "已保存"}
@@ -420,6 +426,12 @@ export function ChapterEditor({
                 {writer.error && !saveFailed ? (
                   <p role="alert" className="text-xs text-destructive">
                     {writer.error}
+                  </p>
+                ) : null}
+                {overGenerationLimit ? (
+                  <p role="status" className="text-xs text-muted-foreground">
+                    草稿 {draftText.length} 字，超过设定的{" "}
+                    {generationOutcome.limit} 字上限，已保留全文。
                   </p>
                 ) : null}
                 <ChapterGenerationForm

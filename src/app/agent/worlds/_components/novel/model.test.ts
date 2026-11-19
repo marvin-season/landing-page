@@ -387,6 +387,7 @@ test("writer receives world secrets and edited chapters in order, with the next 
     { id: "two", title: "第2章 风起", text: "第二章正文。" },
   ];
   novel.chapterGoal = "揭示线索，但保留身份秘密";
+  novel.words = "500";
   const prompt = JSON.parse(chapterPrompt(config, novel));
   assert.equal(prompt.world.characters[0].privateInfo, "尚未揭晓的身份");
   assert.equal(prompt.world.priorContext, config.priorContext);
@@ -396,8 +397,12 @@ test("writer receives world secrets and edited chapters in order, with the next 
   );
   assert.equal(prompt.task.chapter, 3);
   assert.equal(prompt.task.requirements, novel.chapterGoal);
-  assert.equal(prompt.task.targetWords, 4000);
-  assert.equal(prompt.task.maxCharacters, 8000);
+  assert.equal(prompt.task.targetWords, 450);
+  assert.equal(prompt.task.maxCharacters, 500);
+  assert.match(
+    prompt.task.lengthInstructions,
+    /500 个字符.*自然收束.*完整篇章/,
+  );
 });
 
 test("summary export imports into a different novel as background without replacing its chapters or settings", () => {
