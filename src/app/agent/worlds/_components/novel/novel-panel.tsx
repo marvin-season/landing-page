@@ -21,16 +21,23 @@ import {
   Trash2,
   WandSparkles,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
 import { BackgroundControls, downloadBackground } from "./background-controls";
-import { ChapterReading, type RewriteTarget } from "./chapter-rewrite";
+import { ChapterEditor } from "./chapter-editor";
+import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
-import { chapterTitle, exportNovel, splitChapterAt } from "./model";
+import {
+  type Chapter,
+  chapterTitle,
+  exportNovel,
+  replaceChapter,
+  splitChapterAt,
+} from "./model";
 import { useNovel } from "./use-novel";
 
 export function NovelPanel({
@@ -41,7 +48,19 @@ export function NovelPanel({
   onBusyChange: (busy: boolean) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const readingPanel = useRef<HTMLDivElement>(null);
+  const readingScroll = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    if (
+      editingChapter ||
+      !readingPanel.current ||
+      readingScroll.current === null
+    )
+      return;
+    readingPanel.current.scrollTop = readingScroll.current;
+    readingScroll.current = null;
+  }, [editingChapter]);
   const [insertion, setInsertion] = useState<{
     beforeId: string;
     requirements: string;
@@ -51,9 +70,7 @@ export function NovelPanel({
     setInsertion(null);
   });
   const { novel } = writer;
-  const [rewriteTarget, setRewriteTarget] = useState<RewriteTarget | null>(
-    null,
-  );
+  const [rewriting, setRewriting] = useState(false);
   const [compactContext, setCompactContext] = useState(false);
   const rewriteFromMenu = useRef(false);
   const selectedIndex = novel.chapters.findIndex(
@@ -64,7 +81,6 @@ export function NovelPanel({
   const chapter = novel.chapters[chapterIndex];
   const disabled = !writer.ready || writer.busy;
   const ended = room.status === "ended";
-  const rewriting = rewriteTarget !== null;
   const chapterActionsLocked = disabled || rewriting || insertion !== null;
   const canGenerateChapter =
     !ended &&
@@ -72,15 +88,14 @@ export function NovelPanel({
     /^\d+$/.test(novel.words) &&
     Number(novel.words) >= 500 &&
     Number(novel.words) <= 4000;
-  function openRewrite(target: RewriteTarget) {
+  function openRewrite() {
     writer.discardRewrite();
-    setEditing(false);
     window.getSelection()?.removeAllRanges();
-    setRewriteTarget(target);
+    setRewriting(true);
   }
   function closeRewrite() {
     writer.discardRewrite();
-    setRewriteTarget(null);
+    setRewriting(false);
   }
   function splitChapter(caret: number) {
     if (chapterActionsLocked || !chapter) return false;
@@ -89,7 +104,6 @@ export function NovelPanel({
     if (!next) return false;
     writer.update(next);
     setSelected(newChapterId);
-    setEditing(false);
     return true;
   }
   function deleteChapter() {
@@ -104,7 +118,6 @@ export function NovelPanel({
     const chapters = novel.chapters.filter((item) => item.id !== chapter.id);
     writer.update({ ...novel, chapters });
     setSelected(chapters[Math.max(0, index - 1)]?.id ?? null);
-    setEditing(false);
   }
   function download(format: "txt" | "md") {
     downloadText(
@@ -115,8 +128,41 @@ export function NovelPanel({
         : "text/plain;charset=utf-8",
     );
   }
+  if (editingChapter) {
+    return (
+      <ChapterEditor
+        key={editingChapter.id}
+        base={editingChapter}
+        chapters={novel.chapters}
+        writer={writer}
+        ended={ended}
+        compactContext={compactContext}
+        onCompactContextChange={setCompactContext}
+        onSave={async (draft) => {
+          const saved = await writer.update(replaceChapter(novel, draft), {
+            persistFirst: true,
+          });
+          if (saved) setEditingChapter(draft);
+          return saved;
+        }}
+        onSelectChapter={(id) => {
+          const next = novel.chapters.find((item) => item.id === id);
+          if (!next) return;
+          setSelected(id);
+          setEditingChapter(next);
+        }}
+        onExit={() => {
+          writer.discardRewrite();
+          setEditingChapter(null);
+        }}
+      />
+    );
+  }
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+    <div
+      ref={readingPanel}
+      className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+    >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -189,7 +235,6 @@ export function NovelPanel({
           }
           onImport={writer.importBackground}
           onSummarize={() => {
-            setEditing(false);
             writer.generate("summary");
           }}
         />
@@ -208,7 +253,6 @@ export function NovelPanel({
             <Button
               disabled={chapterActionsLocked || !canGenerateChapter}
               onClick={() => {
-                setEditing(false);
                 setSelected(null);
                 writer.generate();
               }}
@@ -251,7 +295,6 @@ export function NovelPanel({
                   disabled={rewriting || insertion !== null}
                   onChange={(event) => {
                     setSelected(event.target.value);
-                    setEditing(false);
                   }}
                 >
                   {novel.chapters.map((item) => (
@@ -266,9 +309,14 @@ export function NovelPanel({
                   size="sm"
                   variant="outline"
                   disabled={chapterActionsLocked}
-                  onClick={() => setEditing(!editing)}
+                  onClick={() => {
+                    readingScroll.current =
+                      readingPanel.current?.scrollTop ?? 0;
+                    writer.discardRewrite();
+                    setEditingChapter(chapter);
+                  }}
                 >
-                  {editing ? "完成编辑" : "编辑本章"}
+                  编辑本章
                 </Button>
                 <ChapterSplit
                   chapter={chapter}
@@ -288,7 +336,7 @@ export function NovelPanel({
                       if (!rewriteFromMenu.current) return;
                       rewriteFromMenu.current = false;
                       event.preventDefault();
-                      openRewrite({ atStart: true });
+                      openRewrite();
                     }}
                   >
                     <DropdownMenuGroup>
@@ -296,7 +344,6 @@ export function NovelPanel({
                         disabled={chapterActionsLocked || !canGenerateChapter}
                         onSelect={() => {
                           writer.discardInsertion();
-                          setEditing(false);
                           setInsertion({
                             beforeId: chapter.id,
                             requirements: "",
@@ -428,68 +475,32 @@ export function NovelPanel({
                 ) : null}
               </form>
             ) : null}
-            {editing ? (
-              <fieldset disabled={disabled} className="min-w-0">
-                <FieldGroup>
-                  <TextField
-                    label="章节标题"
-                    value={chapter.title}
-                    onChange={(title) =>
-                      writer.update({
-                        ...novel,
-                        chapters: novel.chapters.map((item) =>
-                          item.id === chapter.id ? { ...item, title } : item,
-                        ),
-                      })
-                    }
-                  />
-                  <TextField
-                    label="章节正文"
-                    value={chapter.text}
-                    multiline
-                    maxLength={40000}
-                    onChange={(text) => {
-                      writer.update({
-                        ...novel,
-                        chapters: novel.chapters.map((item) =>
-                          item.id === chapter.id ? { ...item, text } : item,
-                        ),
-                      });
-                    }}
-                    hint="修改后的正文将用于下一章创作与整本导出。"
-                  />
-                </FieldGroup>
-              </fieldset>
-            ) : (
-              <ChapterReading
-                key={chapter.id}
-                title={chapter.title}
-                text={chapter.text}
-                target={rewriteTarget}
-                canSelect={!chapterActionsLocked && !ended}
-                onSelect={openRewrite}
-                preview={writer.task === "rewrite" ? writer.preview : ""}
-                draftReady={writer.rewriteReady}
-                compactContext={compactContext}
-                onCompactContextChange={setCompactContext}
-                writer={writer}
-                ended={ended}
-                onClose={closeRewrite}
-                onApply={() => {
-                  const applied = writer.applyRewrite();
-                  if (applied) setRewriteTarget(null);
-                  return applied;
-                }}
-                onRewrite={(requirements) =>
-                  writer.rewrite(
-                    chapter.id,
-                    requirements,
-                    rewriteTarget?.range,
-                    compactContext,
-                  )
-                }
-              />
-            )}
+            <ChapterReading
+              key={chapter.id}
+              title={chapter.title}
+              text={chapter.text}
+              rewriting={rewriting}
+              preview={writer.task === "rewrite" ? writer.preview : ""}
+              draftReady={writer.rewriteReady}
+              compactContext={compactContext}
+              onCompactContextChange={setCompactContext}
+              writer={writer}
+              ended={ended}
+              onClose={closeRewrite}
+              onApply={() => {
+                const applied = writer.applyRewrite();
+                if (applied) setRewriting(false);
+                return applied;
+              }}
+              onRewrite={(requirements) =>
+                writer.rewrite(
+                  chapter.id,
+                  requirements,
+                  undefined,
+                  compactContext,
+                )
+              }
+            />
           </section>
         ) : (
           <p className="py-8 text-center text-sm text-muted-foreground">

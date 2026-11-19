@@ -17,6 +17,7 @@ import {
   prepareNovelFork,
 } from "./fork-model";
 import {
+  type Chapter,
   type ChapterTextRange,
   chapterPrompt,
   chapterTitle,
@@ -32,6 +33,7 @@ import {
   type NovelBackground,
   type NovelTask,
   novelRequest,
+  replaceChapter,
   replaceChapterText,
   rewritePrompt,
   summaryPrompt,
@@ -52,6 +54,7 @@ type NovelRun =
       novel: Novel;
       version: number;
       range?: ChapterTextRange;
+      draft?: Chapter;
     };
 
 export function useNovel(
@@ -100,21 +103,28 @@ export function useNovel(
     };
   }, [key]);
 
-  function update(next: Novel) {
+  function update(next: Novel, { persistFirst = false } = {}) {
     next = invalidateEditedCheckpoint(latest.current, next);
-    setBackgroundExport(null);
-    latest.current = next;
-    setNovel(next);
+    function publish() {
+      setBackgroundExport(null);
+      latest.current = next;
+      setNovel(next);
+    }
+    if (!persistFirst) publish();
     setSaving(true);
-    writes.current = writes.current
-      .then(async () => {
-        await novels.put({ key, novel: next });
-        if (latest.current === next) setSaving(false);
-      })
-      .catch(() => {
-        setSaving(false);
-        setError("小说未能保存到本机，请先导出章节，避免刷新后丢失。");
-      });
+    const write = writes.current.then(async () => {
+      await novels.put({ key, novel: next });
+      if (persistFirst) publish();
+      if (latest.current === next) setSaving(false);
+    });
+    writes.current = write.catch(() => {
+      setSaving(false);
+      setError("小说未能保存到本机，请先导出章节，避免刷新后丢失。");
+    });
+    return write.then(
+      () => true,
+      () => false,
+    );
   }
   function end() {
     generating.current = false;
@@ -343,13 +353,14 @@ export function useNovel(
     requirements: string,
     range?: ChapterTextRange,
     compactContext = false,
+    draft?: Chapter,
   ) {
     if (!ready || generating.current || room.status === "ended") return;
     const current = latest.current;
     try {
       const prompt = rewritePrompt(
         room.config,
-        current,
+        draft ? replaceChapter(current, draft) : current,
         chapterId,
         requirements,
         range,
@@ -362,6 +373,7 @@ export function useNovel(
           novel: current,
           version: room.version,
           range,
+          draft,
         },
         prompt,
       );
@@ -380,28 +392,38 @@ export function useNovel(
     setError("");
   }
 
-  function applyRewrite() {
+  function resolveRewrite(draft?: Chapter) {
     const captured = input.current;
     if (generating.current || !rewriteReady || captured?.task !== "rewrite")
-      return false;
+      return null;
     if (
       latest.current !== captured.novel ||
+      captured.draft !== draft ||
       room.version !== captured.version ||
       room.status === "ended"
     ) {
       setError("小说或世界设定已变更，请重新生成重写草稿。");
-      return false;
+      return null;
     }
-    update(
-      replaceChapterText(
-        captured.novel,
-        captured.chapterId,
-        preview,
-        captured.range,
-      ),
+    const next = replaceChapterText(
+      draft ? replaceChapter(captured.novel, draft) : captured.novel,
+      captured.chapterId,
+      preview,
+      captured.range,
     );
     discardRewrite();
+    return next;
+  }
+
+  function applyRewrite() {
+    const next = resolveRewrite();
+    if (!next) return false;
+    update(next);
     return true;
+  }
+
+  function applyDraftRewrite(draft: Chapter) {
+    return resolveRewrite(draft)?.chapters.find(({ id }) => id === draft.id);
   }
 
   return {
@@ -432,6 +454,7 @@ export function useNovel(
     rewrite,
     discardRewrite,
     applyRewrite,
+    applyDraftRewrite,
     stop() {
       stream.stop();
       end();

@@ -496,7 +496,6 @@ function DesktopCollapsedContent({
   onExpand: () => void;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const worlds = isWorldsPath(pathname);
   const createMutation = useCreateThread();
 
@@ -513,12 +512,9 @@ function DesktopCollapsedContent({
           <Globe className="size-4" />
         </DesktopRailLink>
         {worlds ? (
-          <DesktopRailButton
-            label="创建世界"
-            onClick={() => router.push("/agent/worlds")}
-          >
+          <DesktopRailLink href="/agent/worlds" label="创建世界">
             <Plus className="size-4" />
-          </DesktopRailButton>
+          </DesktopRailLink>
         ) : (
           <DesktopRailButton
             label="新建对话"

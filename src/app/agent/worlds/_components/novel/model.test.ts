@@ -15,11 +15,13 @@ import {
   novelRequest,
   parseBackgroundFile,
   parseImportedBackground,
+  replaceChapter,
   replaceChapterText,
   rewritePrompt,
   serializeBackground,
   splitChapterAt,
   summaryPrompt,
+  textareaSourceOffset,
 } from "./model";
 
 test("splitting preserves source text and puts the new chapter before the renumbered following chapters", () => {
@@ -307,6 +309,49 @@ test("whole chapter rewrite asks for compact mode when preceding chapters exceed
   assert.deepEqual(prompt.followingChapters, [
     { chapter: 4, title: "后一章", text: "她回到家。" },
   ]);
+});
+
+test("a draft passage rewrite uses the edited snapshot and leaves the saved chapter intact", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  const stable = { id: "a", title: "原题", text: "原文。" };
+  novel.chapters = [stable];
+  const draft = {
+    ...stable,
+    title: "新标题",
+    text: "手动改的开头。\r\n\r\n她敲门。\r\n门开了。\r\n保留的结尾。",
+  };
+  const workingNovel = replaceChapter(novel, draft);
+  const displayed = draft.text.replaceAll("\r\n", "\n");
+  const range = {
+    start: textareaSourceOffset(draft.text, displayed.indexOf("她敲门")),
+    end: textareaSourceOffset(
+      draft.text,
+      displayed.indexOf("门开了。") + "门开了。".length,
+    ),
+  };
+  const prompt = JSON.parse(
+    rewritePrompt(config, workingNovel, draft.id, "缩短", range),
+  );
+  assert.deepEqual(prompt.targetChapter, {
+    chapter: 1,
+    title: "新标题",
+    selection: {
+      before: "手动改的开头。\r\n\r\n",
+      text: "她敲门。\r\n门开了。",
+      after: "\r\n保留的结尾。",
+    },
+  });
+  const updated = replaceChapterText(workingNovel, draft.id, "她推门。", range);
+  assert.equal(
+    updated.chapters[0].text,
+    "手动改的开头。\r\n\r\n她推门。\r\n保留的结尾。",
+  );
+  assert.deepEqual(novel.chapters[0], {
+    id: "a",
+    title: "原题",
+    text: "原文。",
+  });
 });
 
 test("adopting a rewrite changes only its chapter body and future context and export use it", () => {

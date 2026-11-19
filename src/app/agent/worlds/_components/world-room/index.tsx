@@ -6,6 +6,7 @@ import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { confirmAgentNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
   WorldConfig,
@@ -287,6 +288,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         }}
         onSave={async (config) => {
           if (copying) {
+            if (!confirmAgentNavigation()) return;
             const data = await worldRequest<{ room: WorldRoom }>(
               "rooms",
               "POST",

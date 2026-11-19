@@ -218,12 +218,7 @@ export function splitChapterAt(
   if (index < 0 || !Number.isInteger(caret) || caret <= 0) return null;
 
   const chapter = novel.chapters[index];
-  // Textarea offsets count CRLF as one character. Keep the original line endings.
-  let offset = caret;
-  for (const match of chapter.text.matchAll(/\r\n/g)) {
-    if (match.index >= offset) break;
-    offset++;
-  }
+  const offset = textareaSourceOffset(chapter.text, caret);
   const before = chapter.text.slice(0, offset);
   const after = chapter.text.slice(offset);
   if (!before.trim() || !after.trim()) return null;
@@ -324,6 +319,25 @@ function splitChapterText(text: string, { start, end }: ChapterTextRange) {
     before: text.slice(0, start),
     text: text.slice(start, end),
     after: text.slice(end),
+  };
+}
+
+// The browser's textarea counts CRLF as one character.
+export function textareaSourceOffset(text: string, position: number) {
+  let offset = position;
+  for (const match of text.matchAll(/\r\n/g)) {
+    if (match.index >= offset) break;
+    offset++;
+  }
+  return offset;
+}
+
+export function replaceChapter(novel: Novel, chapter: Chapter): Novel {
+  return {
+    ...novel,
+    chapters: novel.chapters.map((item) =>
+      item.id === chapter.id ? chapter : item,
+    ),
   };
 }
 
