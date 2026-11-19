@@ -23,27 +23,16 @@
 
 ## 2. 模块与依赖
 
-```mermaid
-flowchart TD
-  Room[WorldRoomView：按存档类型渲染详情] --> Chat[useWorldRoom：房间读取与剧本运行]
-  Room --> Panel[NovelPanel：创作要求、章节编辑与导出]
-  Panel --> Hook[useNovel：读取存档、生成与保存]
-  Hook --> Model[model.ts：小说结构、上下文、请求与导出文本]
-  Hook --> Store[Dexie / IndexedDB：world-novels]
-  Hook --> Core[共享 useChatStreamCore 与 AI SDK 状态归约]
-  Core --> API[POST /api/novel：会话认证与房间所有权校验]
-  API --> Writer[World Novel Writer：单 Writer 职责]
-  Writer --> LLM[开放世界代理与首个启用角色的模型]
-```
+参见[小说模块关系流程图](./flowcharts.md#小说模块关系)。
 
 代码入口：
 
-- [`world-room/index.tsx`](../src/app/agent/worlds/_components/world-room/index.tsx)：按房间类型呈现剧本或小说界面，复用世界设定面板。
-- [`use-world-room.ts`](../src/app/agent/worlds/_components/use-world-room.ts)：读取、轮询房间，只为剧本自动开始对话。
-- [`novel/novel-panel.tsx`](../src/app/agent/worlds/_components/novel/novel-panel.tsx)：输入创作要求，选择与编辑章节，展示流式草稿，触发 TXT / Markdown 下载。
-- [`novel/use-novel.ts`](../src/app/agent/worlds/_components/novel/use-novel.ts)：协调本机存档、生成请求、流事件、完成判定和写入队列。
-- [`novel/model.ts`](../src/app/agent/worlds/_components/novel/model.ts)：`Novel` / `Chapter`、默认值、Writer 指令、上下文构造、请求参数和导出文本。
-- [`/api/novel`](../src/app/api/novel/route.ts)、[`novel.ts`](../src/lib/group-chat/novel.ts) 与 [`world-agents.ts`](../mastra-server/agents/world-agents.ts)：校验会话、来源和房间所有权，由同一世界 Agent 工厂创建的 Writer 负责生成。
+- [`world-room/index.tsx`](../../src/app/agent/worlds/_components/world-room/index.tsx)：按房间类型呈现剧本或小说界面，复用世界设定面板。
+- [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts)：读取、轮询房间，只为剧本自动开始对话。
+- [`novel/novel-panel.tsx`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)：输入创作要求，选择与编辑章节，展示流式草稿，触发 TXT / Markdown 下载。
+- [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)：协调本机存档、生成请求、流事件、完成判定和写入队列。
+- [`novel/model.ts`](../../src/app/agent/worlds/_components/novel/model.ts)：`Novel` / `Chapter`、默认值、Writer 指令、上下文构造、请求参数和导出文本。
+- [`/api/novel`](../../src/app/api/novel/route.ts)、[`novel.ts`](../../src/lib/group-chat/novel.ts) 与 [`world-agents.ts`](../../mastra-server/agents/world-agents.ts)：校验会话、来源和房间所有权，由同一世界 Agent 工厂创建的 Writer 负责生成。
 
 页面层依赖现有原子组件、字段组件与 `UnifiedMarkdown`；流生命周期、取消和文本归约复用 `@landing-page/utils/stream`。不为小说重复实现 SSE 解析器，也不接入群聊的选人、旁白轮次和连续批次逻辑。
 
@@ -128,29 +117,7 @@ Writer 由世界 Agent 工厂创建，使用相同的 `GROUP_CHAT_BASE_URL` / `G
 
 普通续写保存到书末；补写完整结束才按已有章节 ID 插入，界面切换到新章。形如「第5章」的默认章名按新位置编号；自定义标题、原有章节 ID 和正文保留。停止或失败时不改变章节顺序。
 
-```mermaid
-sequenceDiagram
-  actor User as 用户
-  participant UI as NovelPanel
-  participant Hook as useNovel
-  participant API as /api/novel + Writer
-  participant DB as IndexedDB
-  User->>UI: 生成下一章
-  UI->>Hook: generate()
-  Hook->>Hook: 就绪与重复触发检查，构造完整上下文
-  Hook->>API: 一个章节请求
-  loop 正文流
-    API-->>Hook: UIMessageChunk
-    Hook-->>UI: preview
-  end
-  alt 收到正常 finish，流完成且正文非空
-    Hook->>Hook: 追加或插入到内存 chapters
-    Hook->>DB: 排队保存整本小说
-    DB-->>Hook: 成功或保存错误
-  else 停止、协议错误、截断或连接提前结束
-    Hook-->>UI: 保留内存草稿与错误，不保存新章节
-  end
-```
+参见[小说章节生成流程图](./flowcharts.md#小说章节生成)。
 
 当前 `finish` 事件有 `finishReason` 时要求为 `stop`；缺失原因的 `finish` 也会被接受。还必须等流正常结束并检查正文非空，才追加章节。没有 `finish` 的连接结束，以及 `length` 等非正常完成原因，都不能成为已完成章节。
 
@@ -200,7 +167,7 @@ TXT 导出保留用户和模型的正文原文，不额外移除 Markdown 语法
 
 ## 7. 已有验证与证据范围
 
-[`novel/model.test.ts`](../src/app/agent/worlds/_components/novel/model.test.ts) 已覆盖：完整人物资料与章节顺序进入上下文；编辑后的文字参与续写；请求中的下一章要求与字数；TXT / Markdown 内容与顺序；房间与任务请求参数。`src/lib/group-chat/novel.test.ts` 另外模拟上游代理，验证写章与总结的代理地址、鉴权、模型、会话隔离参数、服务端固定指令与无工具策略、SSE 正常结束及未授权请求拒绝。
+[`novel/model.test.ts`](../../src/app/agent/worlds/_components/novel/model.test.ts) 已覆盖：完整人物资料与章节顺序进入上下文；编辑后的文字参与续写；请求中的下一章要求与字数；TXT / Markdown 内容与顺序；房间与任务请求参数。`src/lib/group-chat/novel.test.ts` 另外模拟上游代理，验证写章与总结的代理地址、鉴权、模型、会话隔离参数、服务端固定指令与无工具策略、SSE 正常结束及未授权请求拒绝。
 
 这些测试不证明真实代理连通性、IndexedDB 恢复、多标签页竞争或模型叙事质量。已有群聊测试验证群聊领域，不等同于小说生成集成测试。
 
@@ -288,4 +255,4 @@ node_modules/.bin/tsc --noEmit --incremental false
 4. **长篇质量**：同一个 Writer 处理剧情档案与续写；验证摘要修订失效、关键伏笔与人物状态保留、预算不足时有明确行为，不以测试通过代替真实模型质量评估。
 5. **端到端**：实际小说模型连接、生成—保存—刷新恢复—编辑—续写—导出，以及世界复制、删除和结构化备份往返。UI 由用户手工验收，不启动 headless Chrome。
 
-相关入口：[架构总览](./architecture.md)、[世界群聊使用与实现](./group-chat.md)、[世界群聊内部运行机制](../src/lib/group-chat/README.md)、[共享流说明](../src/lib/stream/README.md)。
+相关入口：[开放世界文档](./README.md)、[剧本群聊使用与实现](./group-chat.md)、[开放世界运行架构](./architecture.md)、[共享流说明](../../src/lib/stream/README.md)。

@@ -1,4 +1,4 @@
-# 开放世界
+# 开放世界运行架构
 
 开放世界首页 `/agent/worlds` 展示通用模板和「我的作品」。选择模板后，再选剧本或小说并编辑设定；模板不带类型标签，作品卡片会标明类型。创建房间时必须指定 `kind`（`script` 或 `novel`）；类型保存在服务端，详情页和配置更新接口均不提供切换。
 
@@ -11,12 +11,12 @@ JSON 存档导入、导出均携带 `kind`，小说的 JSON 备份只包含世�
 
 ## 小说架构
 
-1. **页面**：房间详情根据服务端保存的 `kind` 渲染 [NovelPanel](../../app/agent/worlds/_components/novel/novel-panel.tsx)。用户编辑书名、文风和大纲，手动触发下一章或背景总结。小说房间不运行剧本的角色调度。
-2. **上下文**：[useNovel](../../app/agent/worlds/_components/novel/use-novel.ts) 通过 [小说模型](../../app/agent/worlds/_components/novel/model.ts) 组装请求。写章时，Writer 一次读取完整世界设定（含人物私有资料和前置剧情）、已导入的背景、按顺序排列的已完成章节和本章要求。背景总结读取已发生的内容，省略未来大纲和下一章要求。
-3. **生成**：[`/api/novel`](../../app/api/novel/route.ts) 由 [createNovelHandler](./novel.ts) 校验登录、请求来源和房间所有权，只接受未结束的小说房间。同一个 `world-writer` Agent 处理写章与总结，使用第一个启用角色的模型（全部禁用时用第一个角色的模型），通过开放世界代理流式返回文本，不启用工具或自动 Memory。
+1. **页面**：房间详情根据服务端保存的 `kind` 渲染 [NovelPanel](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)。用户编辑书名、文风和大纲，手动触发下一章或背景总结。小说房间不运行剧本的角色调度。
+2. **上下文**：[useNovel](../../src/app/agent/worlds/_components/novel/use-novel.ts) 通过[小说模型](../../src/app/agent/worlds/_components/novel/model.ts)组装请求。写章时，Writer 读取世界设定、剧情背景、相关章节和本章要求。背景总结读取已发生的内容，省略未来大纲和下一章要求。
+3. **生成**：[`/api/novel`](../../src/app/api/novel/route.ts) 由 [createNovelHandler](../../src/lib/group-chat/novel.ts) 校验登录、请求来源和房间所有权，只接受未结束的小说房间。同一个 `world-writer` Agent 处理写章、润色与总结，使用第一个启用角色的模型（全部禁用时用第一个角色的模型），通过开放世界代理流式返回文本，不启用工具或自动 Memory。
 4. **保存**：流式草稿先留在页面内存。收到完整结束信号且正文非空时才追加或插入章节；停止、报错或截断都不会进入成稿。小说专用设定和章节以 `${ownerId}:${roomId}` 为键保存在当前浏览器的 `world-novels` IndexedDB。背景总结可以导出为 Markdown，供其他房间导入；它不追加章节，也不覆盖目标房间的世界设定。
 
-世界设定随房间存到服务端，小说专用设定和正文不会随房间跨设备同步。完整的请求契约、数据边界和后续设计见[小说模式架构](../../../docs/novel-mode.md)。
+世界设定随房间存到服务端，小说专用设定和正文不会随房间跨设备同步。完整的请求契约、数据边界和后续设计见[小说模式架构](./novel-mode.md)。
 
 选择已有章节后，可通过「在本章前插入」补写一章。它复用 `chapter` 任务，向同一个 Writer 发送插入点之前和之后的章节；全书超限时保留紧邻插入点的章节。完整生成后按目标章 ID 插入，默认章名按新位置编号，自定义标题和原有正文保留。
 
@@ -28,7 +28,7 @@ JSON 存档导入、导出均携带 `kind`，小说的 JSON 备份只包含世�
 
 剧本房间里有三类发言：多位 NPC 只说对白，系统只有一个，旁白只有一个。
 
-用户输入默认是系统。输入框上方可以把这一条改成旁白，或改成任意已启用的角色。写下的内容先入房间，再按下图为后续发言选人。
+用户输入默认是系统。输入框上方可以把这一条改成旁白，或改成任意已启用的角色。写下的内容先入房间，调度器再为后续发言选人。
 
 - 系统：这一条是干预。问句交给角色用对白回答；旁白打开时，场景类干预由旁白叙述。
 - 旁白：这一条就是旁白正文，不再另写一条旁白。
@@ -38,74 +38,11 @@ JSON 存档导入、导出均携带 `kind`，小说的 JSON 备份只包含世�
 
 角色根据背景故事、自身身份、性格、经历、目标和当前对话自主判断，以自己的口吻发言。通用提示词只限定本人视角、信息边界和对白形式，不规定每轮必须给出新信息、作出决定、追问或推进剧情。普通轮次的 direction 仅为“轮到你发言”；世界设定和角色资料决定具体内容。旁白用简短一段承接场景与角色言行，角色的决定和对白由各自表达；摘要保留重要事实、关系与未决事项。
 
-```mermaid
-flowchart TD
-  input[用户写下一条] --> identity{输入身份}
-  identity -->|系统，默认| systemMsg[系统干预入房间]
-  identity -->|旁白| narrationMsg[旁白正文入房间，不再另写]
-  identity -->|某个已启用角色| roleMsg[该角色对白入房间]
-  systemMsg --> start
-  narrationMsg --> start
-  roleMsg --> start
-  start[本批开始] --> summary{未摘要历史过长?}
-  summary -->|是| sumAgent[summary 压缩公开剧情]
-  sumAgent --> summary
-  summary -->|否| pick{下一条怎么选}
-  pick -->|用户 @ 了某位角色| named[该角色说对白]
-  pick -->|角色对白里点名，且对谈未停滞| reply[被点名的角色说对白]
-  pick -->|系统问句| ask[最近最少发言的角色用对白回答]
-  pick -->|旁白关闭| talk[角色只说对白]
-  pick -->|旁白打开，且是开场、场景干预、对谈重复或已到叙事间隔| narrate[旁白落实行动并推进场景]
-  pick -->|其余情况| least[最近最少发言的角色说对白]
-  named --> actorAgent[actor 生成被选中角色的对白]
-  reply --> actorAgent
-  ask --> actorAgent
-  talk --> actorAgent
-  least --> actorAgent
-  actorAgent --> line[一条角色对白]
-  narrate --> narratorAgent[narrator 生成场景叙述]
-  narratorAgent --> narrator[一条旁白]
-  line --> visible[房间里出现一条消息]
-  narrator --> visible
-  visible --> next{本批条数用完?}
-  next -->|否| summary
-  next -->|是| done[status=completed 客户端再开一批]
-```
+参见[剧本调度流程图](./flowcharts.md#剧本调度)。
 
 剧本调度只使用 `actor`、`narrator`、`summary` 三个 Mastra Agent。多位 NPC 共用同一个 `actor` 实例，每轮由 `nextTurn` 选人，再将该角色作为 `yourCharacter` 传入。角色身份、私有资料和模型按本次调用提供，不为每个 NPC 单独创建 Agent，也不由 Agent 决定谁接话。
 
-```mermaid
-flowchart TD
-  operator[用户／故事外的系统操作者，不是 Agent] --> identity{本条输入身份}
-  identity -->|系统| intervention[系统干预]
-  identity -->|旁白| narration[已经发生的旁白正文]
-  identity -->|已启用角色| dialogue[该角色已经说出的对白]
-  intervention --> history[group-chat 管理的房间历史与摘要]
-  narration --> history
-  dialogue --> history
-
-  npcs[多位 NPC，各自配置身份、私有资料和模型] --> schedule[schedule.ts / nextTurn 选择本轮角色或旁白]
-  history --> schedule
-  schedule -->|选中一位 NPC| actorContext[actorContext：公开世界与历史、该角色资料、direction]
-  npcs -->|只取被选中角色的完整资料| actorContext
-  schedule -->|需要旁白，且旁白已开启| narratorContext[narratorContext：公开世界与历史、direction]
-  history -->|历史过长时| summaryContext[summaryContext：旧摘要、事实基线、待压缩公开历史]
-
-  subgraph agents[三个 Mastra Agent，均不启用自动 Memory 或工具]
-    actor[actor：所有 NPC 共用，按本次角色模型生成]
-    narrator[narrator：全世界共用的旁白]
-    summary[summary：后台公开剧情整理者]
-  end
-  actorContext -->|provider.ts 按次传入指令和上下文| actor
-  narratorContext -->|provider.ts 按次传入指令和上下文| narrator
-  summaryContext -->|provider.ts 按次传入指令和上下文| summary
-  actor --> actorOutput[仅被选中角色的对白，不代写他人]
-  narrator --> narratorOutput[场景、环境事件和可见结果，不代写对白]
-  summary --> summaryOutput[新的公开剧情摘要，不作为房间发言]
-  actorOutput --> history
-  narratorOutput --> history
-  summaryOutput --> history
-```
+参见[剧本角色与上下文流程图](./flowcharts.md#剧本角色与上下文)。
 
 操作者直接写下的角色对白或旁白先作为已发生的剧情入房间，不调用 Agent 重写；之后才安排后续发言。`context.ts` 负责私有信息隔离：`actor` 只能看到本角色的私有资料和公开信息，`narrator`、`summary` 只接收公开信息。Agent 本身不保存角色历史，房间历史与摘要由 group-chat 存档维护。
 
@@ -119,37 +56,4 @@ Magpie 的“上下文窗口”按本次请求中的 `user` 消息划分轮次�
 
 进程启动时 `route.ts` 调用一次 `createWorldHandlers`。里面的 `createWorldEngine(worldStore, completeText)` 只执行这一次，得到 `execute`。之后每一批发言都调用这个 `execute`。测试要换假的 `complete`，所以每个用例会再调用一次 `createWorldEngine`。
 
-```mermaid
-flowchart TD
-  route[route.ts] --> handlers[createWorldHandlers]
-  handlers --> engine["createWorldEngine(worldStore, completeText)"]
-  engine --> execute[execute]
-  ui[useWorldRoom] --> story[worldStoryStream]
-  ui --> request[worldRequest]
-  story --> stream[worldStream]
-  stream --> runs["POST rooms/:id/runs"]
-  request --> other["其余 /api/group-chat"]
-  runs --> handle[handle]
-  other --> handle
-  handle -->|列表、配置、导入导出| store[worldStore]
-  handle -->|连接测试| complete[completeText]
-  handle -->|开跑| begin[store.begin]
-  begin --> execute
-  handle -->|暂停、结束、删除| abort[abortRun]
-  execute --> batch{summaryBatch 过长?}
-  batch -->|是| summary["summaryContext → call(summary)"]
-  summary --> complete
-  summary --> batch
-  batch -->|否| plan[nextTurn]
-  plan --> draft[appendMessage]
-  draft -->|旁白| narrator["narratorContext → call(narrator)"]
-  draft -->|对白| actor["actorContext → call(actor)"]
-  narrator --> complete
-  actor --> complete
-  complete --> agent["mastra.getAgent(purpose).stream"]
-  narrator --> saved[store.during 写入正文]
-  actor --> saved
-  saved --> more{turn < run.limit?}
-  more -->|是| batch
-  more -->|否| finish[finishRun]
-```
+参见[剧本接口与引擎流程图](./flowcharts.md#剧本接口与引擎)。

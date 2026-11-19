@@ -94,7 +94,7 @@ flowchart TB
 
 `/agent/worlds` 与 `/agent/worlds/[roomId]` 承载世界设定及两种创作模式。群聊通过 `/api/group-chat` 调度角色与旁白并维护服务端房间存档；小说模式通过 `/api/novel` 由单个 Writer 统一创作整章，复用世界 Agent 的代理配置，采用当前世界第一个启用角色的模型（全部禁用时取第一个角色），不启用工具和自动 Memory。
 
-首页展示通用模板和作品列表。选择模板后再决定创建剧本还是小说，作品卡片显示类型。房间类型在创建时写入服务端，详情中不能更改。两类房间均可编辑或导入前置剧情作为生成上下文。小说专用设定与成稿仍保存在浏览器 IndexedDB，世界备份只包含小说的世界设定。完整模块关系、生命周期和当前限制见 [小说模式架构](./novel-mode.md)。
+首页展示通用模板和作品列表。选择模板后再决定创建剧本还是小说，作品卡片显示类型。房间类型在创建时写入服务端，详情中不能更改。两类房间均可编辑或导入前置剧情作为生成上下文。小说专用设定与成稿仍保存在浏览器 IndexedDB，世界备份只包含小说的世界设定。完整模块关系、生命周期和当前限制见[开放世界文档](./open-world/README.md)。
 
 ### 3.3 认证 `src/app/[lang]/auth/`
 
@@ -166,7 +166,7 @@ flowchart TB
 - [技术栈清单](./tech-stack.md)
 - [i18n](./i18n.md)
 - [Mastra 目录说明](../mastra-server/README.md)
-- [开放世界小说模式架构](./novel-mode.md)
+- [开放世界文档](./open-world/README.md)
 - 根目录 [README](../README.md)
 
 版本与依赖以仓库内 `package.json` 为准；`docs/tech-stack.md` 中的版本号若与 `package.json` 不一致，以 **`package.json` 为权威**。
