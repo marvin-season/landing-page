@@ -140,38 +140,60 @@ export function ChapterEditor({
 
   return (
     <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
-      <div className="sticky top-0 z-10 flex items-center border-b border-border bg-background px-4 py-2">
-        <label className="flex min-w-0 items-center gap-2 text-sm">
-          <span className="shrink-0">章节目录</span>
-          <select
-            className="min-w-0 max-w-md truncate rounded-md border border-input bg-background px-3 py-1.5"
-            value={base.id}
-            disabled={dirty || saving || editingLocked || writer.busy}
-            title={dirty ? "保存当前章节后可切换" : undefined}
-            onChange={(event) => {
-              closeRewrite();
-              setShowDiff(false);
-              onSelectChapter(event.target.value);
+      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-2">
+        <div className="flex min-w-0 max-w-full items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="shrink-0"
+            disabled={writer.busy || editingLocked || saving}
+            onClick={() => {
+              if (!confirmAgentNavigation()) return;
+              onExit();
             }}
           >
-            {chapters.map((chapter, index) => (
-              <option key={chapter.id} value={chapter.id}>
-                {chapter.title || `第${index + 1}章`}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="flex min-h-8 flex-wrap items-center justify-between gap-2 px-4 pt-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-sm font-medium">
-            {showDiff ? "修改对比" : "编辑草稿"}
-          </h2>
-          {dirty ? (
-            <span className="text-xs text-muted-foreground">未保存</span>
-          ) : null}
+            <ArrowLeft data-icon="inline-start" />
+            返回阅读
+          </Button>
+          <label className="flex min-w-0 items-center gap-2 text-sm">
+            <span className="sr-only shrink-0 min-[420px]:not-sr-only">
+              章节目录
+            </span>
+            <select
+              className="min-w-0 max-w-md truncate rounded-md border border-input bg-background px-3 py-1.5"
+              value={base.id}
+              disabled={dirty || saving || editingLocked || writer.busy}
+              title={dirty ? "保存当前章节后可切换" : undefined}
+              onChange={(event) => {
+                closeRewrite();
+                setShowDiff(false);
+                onSelectChapter(event.target.value);
+              }}
+            >
+              {chapters.map((chapter, index) => (
+                <option key={chapter.id} value={chapter.id}>
+                  {chapter.title || `第${index + 1}章`}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span
+            role="status"
+            className={cn(
+              "min-w-12 shrink-0 whitespace-nowrap text-xs text-muted-foreground",
+              dirty && saveFailed && "text-destructive",
+            )}
+          >
+            {saving
+              ? "保存中…"
+              : dirty
+                ? saveFailed
+                  ? "保存失败"
+                  : "未保存"
+                : "已保存"}
+          </span>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
           {showDiff ? (
             <Button
               size="sm"
@@ -198,31 +220,14 @@ export function ChapterEditor({
           )}
           <Button
             size="sm"
-            variant="ghost"
-            disabled={writer.busy || editingLocked || saving}
-            onClick={() => {
-              if (!confirmAgentNavigation()) return;
-              onExit();
-            }}
-          >
-            <ArrowLeft data-icon="inline-start" />
-            返回阅读
-          </Button>
-          <Button
-            size="sm"
             disabled={!dirty || editingLocked || writer.busy || saving}
             onClick={() => void save()}
           >
             <Save data-icon="inline-start" />
-            {saving ? "正在保存…" : "保存章节"}
+            保存章节
           </Button>
         </div>
       </div>
-      {saveFailed ? (
-        <p role="alert" className="px-4 pt-2 text-sm text-destructive">
-          保存失败，请重试。
-        </p>
-      ) : null}
       {showDiff ? (
         <section className="flex min-h-0 flex-1 flex-col gap-3 p-4 pt-3">
           <ChapterDiffView base={base} draft={draft} />
