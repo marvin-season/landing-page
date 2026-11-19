@@ -9,9 +9,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@landing-page/design-system";
-import { Scissors } from "lucide-react";
 import { useId, useState } from "react";
 import { FieldGroup } from "../fields";
 import type { Chapter } from "./model";
@@ -19,39 +17,41 @@ import type { Chapter } from "./model";
 export function ChapterSplit({
   chapter,
   disabled,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
   onSplit,
 }: {
   chapter: Chapter;
   disabled: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
   onSplit: (caret: number) => boolean;
 }) {
   const fieldId = useId();
-  const [open, setOpen] = useState(false);
   const [caret, setCaret] = useState<number | null>(null);
   const text = chapter.text.replace(/\r\n?/g, "\n");
   const before = caret === null ? "" : text.slice(0, caret).trim();
   const after = caret === null ? "" : text.slice(caret).trim();
-  const canSplit = Boolean(before && after);
+  const canSplit = open && Boolean(before && after);
+
+  function close() {
+    setCaret(null);
+    onOpenChange(false);
+  }
 
   return (
     <Sheet
       open={open}
       onOpenChange={(nextOpen) => {
-        if (nextOpen) setCaret(null);
-        setOpen(nextOpen);
+        if (!nextOpen) close();
       }}
     >
-      <SheetTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={disabled || !/\S\s*\S/u.test(text)}
-        >
-          <Scissors data-icon="inline-start" />
-          拆分本章
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-xl">
+      <SheetContent
+        className="w-full sm:max-w-xl"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
         <SheetHeader className="pr-12">
           <SheetTitle>拆分本章</SheetTitle>
           <SheetDescription className="wrap-break-word">
@@ -101,7 +101,7 @@ export function ChapterSplit({
           <Button
             disabled={disabled || !canSplit}
             onClick={() => {
-              if (caret !== null && onSplit(caret)) setOpen(false);
+              if (caret !== null && onSplit(caret)) close();
             }}
           >
             确认拆分

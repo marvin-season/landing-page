@@ -12,11 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
 import {
-  Download,
   Ellipsis,
   LoaderCircle,
   PenLine,
   Plus,
+  Scissors,
   Square,
   Trash2,
   WandSparkles,
@@ -27,7 +27,11 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { FieldGroup, TextField } from "../fields";
-import { downloadBackground, NovelFileControls } from "./background-controls";
+import {
+  downloadBackground,
+  NovelBackgroundPreview,
+  NovelFileControls,
+} from "./background-controls";
 import { ChapterEditor } from "./chapter-editor";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
@@ -90,7 +94,9 @@ export function NovelPanel({
       ? "润色正在生成，离开会中断本次润色。确定离开吗？"
       : "润色草稿尚未应用，离开会丢失草稿。确定离开吗？",
   );
-  const rewriteFromMenu = useRef(false);
+  const [splitting, setSplitting] = useState(false);
+  const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
+  const actionFromMenu = useRef<"rewrite" | "split" | null>(null);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
@@ -102,6 +108,9 @@ export function NovelPanel({
   const chapterActionsLocked = disabled || rewriting || insertion !== null;
   const canGenerateChapter =
     !ended && Boolean(novel.title.trim()) && isChapterTargetValid(novel.words);
+  const summarizing = writer.task === "summary";
+  const generatingChapter =
+    writer.busy && writer.task === "chapter" && !insertion;
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
@@ -192,12 +201,44 @@ export function NovelPanel({
                 : "设定与章节保存在当前浏览器，可随时导出整本小说。"}
             </p>
           </div>
+          <NovelFileControls
+            disabled={chapterActionsLocked}
+            canSummarize={!ended && Boolean(novel.title.trim())}
+            hasChapters={novel.chapters.length > 0}
+            importing={importing}
+            onImportingChange={setImporting}
+            onImport={async (imported) => {
+              if (
+                !window.confirm(
+                  `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+                )
+              )
+                return;
+              const id = await writer.importNovel(imported);
+              if (!id) return;
+              setAppliedRewrite(undefined);
+              setCompactContext(false);
+              setSelected(id);
+            }}
+            onDownload={download}
+            onSummarize={() => writer.generate("summary")}
+          />
         </div>
-        <ContextControls
-          room={room}
-          writer={writer}
-          disabled={chapterActionsLocked}
-        />
+        {summarizing && writer.busy ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="sm" variant="outline" onClick={writer.stop}>
+              <Square data-icon="inline-start" />
+              停止总结
+            </Button>
+            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <LoaderCircle className="size-4 animate-spin" />
+              正在总结剧情背景…
+            </span>
+          </div>
+        ) : null}
+        {writer.backgroundExport ? (
+          <NovelBackgroundPreview exported={writer.backgroundExport} />
+        ) : null}
         <fieldset
           disabled={chapterActionsLocked}
           className="flex flex-col gap-4 disabled:opacity-60"
@@ -241,30 +282,10 @@ export function NovelPanel({
             />
           </FieldGroup>
         </fieldset>
-        <NovelFileControls
-          exported={writer.backgroundExport}
+        <ContextControls
+          room={room}
+          writer={writer}
           disabled={chapterActionsLocked}
-          canSummarize={
-            !ended && novel.chapters.length > 0 && Boolean(novel.title.trim())
-          }
-          importing={importing}
-          onImportingChange={setImporting}
-          onImport={async (imported) => {
-            if (
-              !window.confirm(
-                `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
-              )
-            )
-              return;
-            const id = await writer.importNovel(imported);
-            if (!id) return;
-            setAppliedRewrite(undefined);
-            setCompactContext(false);
-            setSelected(id);
-          }}
-          onSummarize={() => {
-            writer.generate("summary");
-          }}
         />
         {!rewriting && !insertion && writer.error ? (
           <Alert>
@@ -272,7 +293,7 @@ export function NovelPanel({
           </Alert>
         ) : null}
         <div className="flex flex-wrap items-center gap-3">
-          {writer.busy && writer.task !== "rewrite" && !insertion ? (
+          {generatingChapter ? (
             <Button variant="outline" onClick={writer.stop}>
               <Square data-icon="inline-start" />
               停止生成
@@ -289,12 +310,10 @@ export function NovelPanel({
               生成第{novel.chapters.length + 1}章
             </Button>
           )}
-          {writer.busy && writer.task !== "rewrite" && !insertion ? (
+          {generatingChapter ? (
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" />
-              {writer.task === "summary"
-                ? "正在总结剧情背景…"
-                : `正在创作第${novel.chapters.length + 1}章…`}
+              正在创作第{novel.chapters.length + 1}章…
             </span>
           ) : null}
         </div>
@@ -345,27 +364,30 @@ export function NovelPanel({
                     setEditingChapter(chapter);
                   }}
                 >
+                  <PenLine data-icon="inline-start" />
                   编辑本章
                 </Button>
-                <ChapterSplit
-                  chapter={chapter}
-                  disabled={chapterActionsLocked}
-                  onSplit={splitChapter}
-                />
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="outline">
+                    <Button
+                      ref={chapterMenuTrigger}
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterActionsLocked}
+                    >
                       <Ellipsis data-icon="inline-start" />
-                      更多
+                      章节操作
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
                     onCloseAutoFocus={(event) => {
-                      if (!rewriteFromMenu.current) return;
-                      rewriteFromMenu.current = false;
+                      const action = actionFromMenu.current;
+                      actionFromMenu.current = null;
+                      if (!action) return;
                       event.preventDefault();
-                      openRewrite();
+                      if (action === "rewrite") openRewrite();
+                      else setSplitting(true);
                     }}
                   >
                     <DropdownMenuGroup>
@@ -383,26 +405,24 @@ export function NovelPanel({
                         在本章前插入
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        disabled={!/\S\s*\S/u.test(chapter.text)}
+                        onSelect={() => {
+                          actionFromMenu.current = "split";
+                        }}
+                      >
+                        <Scissors />
+                        拆分本章
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         disabled={
                           chapterActionsLocked || ended || !chapter.text.trim()
                         }
                         onSelect={() => {
-                          rewriteFromMenu.current = true;
+                          actionFromMenu.current = "rewrite";
                         }}
                       >
                         <WandSparkles />
                         润色整章
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem onSelect={() => download("txt")}>
-                        <Download />
-                        导出整本 TXT
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => download("md")}>
-                        <Download />
-                        导出整本 Markdown
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
@@ -420,6 +440,17 @@ export function NovelPanel({
                 </DropdownMenu>
               </div>
             </div>
+            <ChapterSplit
+              chapter={chapter}
+              disabled={chapterActionsLocked}
+              open={splitting}
+              onOpenChange={setSplitting}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                chapterMenuTrigger.current?.focus();
+              }}
+              onSplit={splitChapter}
+            />
             {insertion ? (
               <form
                 className="flex min-w-0 flex-col gap-3 border-b border-border pb-4"
