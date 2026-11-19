@@ -85,6 +85,7 @@ export function ChapterEditor({
     null,
   );
   const editor = useRef<HTMLTextAreaElement>(null);
+  const generatedScrollTop = useRef<number | null>(null);
   const mirror = useRef<HTMLDivElement>(null);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
@@ -133,9 +134,10 @@ export function ChapterEditor({
 
   useLayoutEffect(() => {
     const input = editor.current;
-    if (revealGeneratedText && visibleText && input)
-      input.scrollTop = input.scrollHeight;
-  }, [revealGeneratedText, visibleText]);
+    if (!creating || !useGeneratedText || !visibleText || !input) return;
+    // Updating the textarea value can move the viewport to the caret.
+    input.scrollTop = generatedScrollTop.current ?? input.scrollHeight;
+  }, [creating, useGeneratedText, visibleText]);
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -335,7 +337,6 @@ export function ChapterEditor({
             <textarea
               aria-label="稳定版本正文"
               readOnly
-              disabled={editorBusy}
               value={base.text}
               className="min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -385,15 +386,24 @@ export function ChapterEditor({
               <textarea
                 ref={editor}
                 aria-label="章节正文"
-                readOnly={editingLocked || saving}
-                disabled={editorBusy}
+                readOnly={editorBusy || editingLocked || saving}
                 value={visibleText}
                 maxLength={
                   draftText.length > maxChapterLength
                     ? undefined
                     : maxChapterLength
                 }
-                onScroll={syncMirror}
+                onScroll={(event) => {
+                  if (creating && useGeneratedText) {
+                    const { scrollTop, scrollHeight, clientHeight } =
+                      event.currentTarget;
+                    generatedScrollTop.current =
+                      scrollHeight - clientHeight - scrollTop <= 2
+                        ? null
+                        : scrollTop;
+                  }
+                  syncMirror();
+                }}
                 onBlur={() => clearTimeout(pendingSelection.current)}
                 onPointerDown={() => clearTimeout(pendingSelection.current)}
                 onChange={(event) => {
@@ -458,6 +468,7 @@ export function ChapterEditor({
                     )
                       return;
                     if (creation.onGenerate()) {
+                      generatedScrollTop.current = null;
                       setRevealedLength(0);
                       setUseGeneratedText(true);
                       setSaveFailed(false);
