@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
+import { textareaSourceOffset } from "./chapter-text";
 import {
   chapterPrompt,
   createBackground,
@@ -21,7 +22,6 @@ import {
   serializeBackground,
   splitChapterAt,
   summaryPrompt,
-  textareaSourceOffset,
 } from "./model";
 
 test("splitting preserves source text and puts the new chapter before the renumbered following chapters", () => {

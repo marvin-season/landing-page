@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MarkdownProse } from "@/components/ui/unified-markdown";
 import { renderChapterMarkdown } from "./chapter-markdown";
-import type { ChapterTextRange } from "./model";
+import type { ChapterTextRange } from "./chapter-text";
 import { type RewriteControls, RewritePopover } from "./rewrite-form";
 
 export function ChapterReading({

@@ -15,10 +15,11 @@ import {
   useUnsavedNavigation,
 } from "@/app/agent/_components/use-unsaved-navigation";
 import {
-  type Chapter,
   type ChapterTextRange,
-  textareaSourceOffset,
-} from "./model";
+  type ChapterTextSelection,
+  textareaSelectionRange,
+} from "./chapter-text";
+import type { Chapter } from "./model";
 import { RewritePopover } from "./rewrite-form";
 import type { useNovel } from "./use-novel";
 
@@ -57,9 +58,7 @@ export function ChapterEditor({
   const [draft, setDraft] = useState(base);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
-  const [target, setTarget] = useState<
-    (ChapterTextRange & { atStart: boolean }) | null
-  >(null);
+  const [target, setTarget] = useState<ChapterTextSelection | null>(null);
   const [appliedRange, setAppliedRange] = useState<ChapterTextRange | null>(
     null,
   );
@@ -261,23 +260,24 @@ export function ChapterEditor({
                   if (document.activeElement !== input) return;
                   const { selectionStart, selectionEnd, selectionDirection } =
                     input;
-                  if (selectionStart === selectionEnd) {
+                  const selection = textareaSelectionRange(
+                    draft.text,
+                    selectionStart,
+                    selectionEnd,
+                    selectionDirection,
+                  );
+                  if (!selection) {
                     if (target) closeRewrite();
                     return;
                   }
-                  const start = textareaSourceOffset(
-                    draft.text,
-                    selectionStart,
-                  );
-                  const end = textareaSourceOffset(draft.text, selectionEnd);
-                  if (target?.start === start && target.end === end) return;
+                  if (
+                    target?.start === selection.start &&
+                    target.end === selection.end
+                  )
+                    return;
                   writer.discardRewrite();
                   setAppliedRange(null);
-                  setTarget({
-                    start,
-                    end,
-                    atStart: selectionDirection === "backward",
-                  });
+                  setTarget(selection);
                 }, 100);
               }}
               className={cn(
@@ -291,7 +291,7 @@ export function ChapterEditor({
               key={`${target.start}:${target.end}`}
               anchor={mark}
               bounds={editorFrame}
-              atStart={target.atStart}
+              atStart={target.direction === "backward"}
               autoFocus={false}
               isPassage
               preview={writer.task === "rewrite" ? writer.preview : ""}

@@ -11,6 +11,7 @@ import Dexie, { type Table } from "dexie";
 import { useEffect, useRef, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { WorldConfig, WorldRoom } from "@/lib/group-chat/model";
+import type { ChapterTextRange } from "./chapter-text";
 import {
   forkFitsBudget,
   forkSummaryPrompt,
@@ -18,7 +19,6 @@ import {
 } from "./fork-model";
 import {
   type Chapter,
-  type ChapterTextRange,
   chapterPrompt,
   chapterTitle,
   createBackground,

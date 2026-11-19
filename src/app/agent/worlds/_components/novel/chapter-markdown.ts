@@ -4,7 +4,7 @@ import {
   createProcessor,
   type MarkdownTree,
 } from "@/components/ui/unified-markdown/processor";
-import type { ChapterTextRange } from "./model";
+import type { ChapterTextRange } from "./chapter-text";
 
 type MarkdownChild = MarkdownTree["children"][number];
 type Element = Extract<MarkdownChild, { type: "element" }>;

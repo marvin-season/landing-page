@@ -1,5 +1,5 @@
 import { sourceOffsets } from "./chapter-markdown";
-import type { ChapterTextRange } from "./model";
+import type { ChapterTextRange } from "./chapter-text";
 
 const sourceSelector = "[data-source-start][data-source-end]";
 

@@ -1,8 +1,13 @@
 import { z } from "zod";
 import { configSchema, type WorldConfig } from "@/lib/group-chat/model";
+import {
+  type ChapterTextRange,
+  replaceTextRange,
+  splitChapterText,
+  textareaSourceOffset,
+} from "./chapter-text";
 
 export type Chapter = { id: string; title: string; text: string };
-export type ChapterTextRange = { start: number; end: number };
 export const novelTaskSchema = z.enum(["chapter", "summary", "rewrite"]);
 export type NovelTask = z.infer<typeof novelTaskSchema>;
 export const maxNovelPromptLength = 150000;
@@ -305,33 +310,6 @@ export function rewritePrompt(
   return prompt;
 }
 
-function splitChapterText(text: string, { start, end }: ChapterTextRange) {
-  if (
-    !Number.isInteger(start) ||
-    !Number.isInteger(end) ||
-    start < 0 ||
-    start >= end ||
-    end > text.length ||
-    !text.slice(start, end).trim()
-  )
-    throw new Error("选段已失效，请重新选择正文。");
-  return {
-    before: text.slice(0, start),
-    text: text.slice(start, end),
-    after: text.slice(end),
-  };
-}
-
-// The browser's textarea counts CRLF as one character.
-export function textareaSourceOffset(text: string, position: number) {
-  let offset = position;
-  for (const match of text.matchAll(/\r\n/g)) {
-    if (match.index >= offset) break;
-    offset++;
-  }
-  return offset;
-}
-
 export function replaceChapter(novel: Novel, chapter: Chapter): Novel {
   return {
     ...novel,
@@ -351,9 +329,10 @@ export function replaceChapterText(
     ...novel,
     chapters: novel.chapters.map((chapter) => {
       if (chapter.id !== chapterId) return chapter;
-      if (!range) return { ...chapter, text };
-      const { before, after } = splitChapterText(chapter.text, range);
-      return { ...chapter, text: before + text + after };
+      return {
+        ...chapter,
+        text: replaceTextRange(chapter.text, text, range),
+      };
     }),
   };
 }
