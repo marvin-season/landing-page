@@ -1,59 +1,126 @@
 # 开放世界运行架构
 
-开放世界首页 `/agent/worlds` 展示通用模板和「我的作品」。选择模板后，再选剧本或小说并编辑设定；模板不带类型标签，作品卡片会标明类型。创建房间时必须指定 `kind`（`script` 或 `novel`）；类型保存在服务端，详情页和配置更新接口均不提供切换。
+## 1. 页面
 
-- 剧本通过 `POST /api/group-chat/rooms/:id/runs` 调度角色对白和旁白，过程与正文存入服务端房间。
-- 小说通过 `POST /api/novel` 由单个 Writer 按章生成，不启动剧本对话。小说专用设定和章节保存在当前浏览器的 IndexedDB，世界设定存入服务端。见下文「小说架构」。
+| 路由 | 组件 | 职责 |
+| --- | --- | --- |
+| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 模板、我的作品（全部 / 剧本 / 小说筛选）、我的预设、导入 JSON 存档、创建作品 |
+| `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
-两类房间都可以在创建或编辑世界时添加可选的 `WorldConfig.priorContext`。表单支持粘贴或追加导入 TXT、Markdown，最多 8000 字；导入小说背景总结时只读取总结正文。剧本将前置剧情作为公开世界设定，小说把它和当前设定、已有章节一起交给 Writer。前置剧情不会生成对话消息或增加章节数。
+**创建作品**：大厅的「创建作品」以 `fog-harbor` 模板为初始值，「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。
 
-JSON 存档导入、导出均携带 `kind`，小说的 JSON 备份只包含世界设定，章节可在小说详情导出为 TXT 或 Markdown。没有类型的旧房间不会出现在列表中，缺少类型的旧备份无法导入。
+**详情页共用部分**：
 
-## 小说架构
+- [`RoomHeader`](../../src/app/agent/worlds/_components/world-room/room-header.tsx)：标题、运行状态、类型标签、世界侧栏开关和「设定」按钮。剧本运行中或小说生成中时「设定」不可用。
+- [`WorldNotes`](../../src/app/agent/worlds/_components/world-room/world-notes.tsx)：宽屏显示为右侧栏，窄屏显示为抽屉，展示角色公开资料、背景、前置剧情、场景、事实、规则；剧本另外显示系统操作者、旁白、剧情摘要、本批发言数与用量，并可点名角色。
+- [`SettingsSheet`](../../src/app/agent/worlds/_components/world-room/settings-sheet.tsx)：上方是 [`ArchiveActions`](../../src/app/agent/worlds/_components/world-room/archive-actions.tsx)（导出、备份、复制世界、结束故事），下方是 `WorldEditor`。故事结束后只保留存档操作。小说房间的编辑器额外显示小说名称、文风、大纲和每章字数，见[小说模式 · 设定来源](./novel-mode.md#3-设定来源)。
 
-1. **页面**：房间详情根据服务端保存的 `kind` 渲染 [NovelPanel](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)。用户编辑书名、文风和大纲，手动触发下一章或背景总结。小说房间不运行剧本的角色调度。
-2. **上下文**：[useNovel](../../src/app/agent/worlds/_components/novel/use-novel.ts) 通过[小说模型](../../src/app/agent/worlds/_components/novel/model.ts)组装请求。写章时，Writer 读取世界设定、剧情背景、相关章节和本章要求。背景总结读取已发生的内容，省略未来大纲和下一章要求。
-3. **生成**：[`/api/novel`](../../src/app/api/novel/route.ts) 由 [createNovelHandler](../../src/lib/group-chat/novel.ts) 校验登录、请求来源和房间所有权，只接受未结束的小说房间。同一个 `world-writer` Agent 处理写章、润色与总结，使用第一个启用角色的模型（全部禁用时用第一个角色的模型），通过开放世界代理流式返回文本，不启用工具或自动 Memory。
-4. **保存**：流式草稿先留在页面内存。收到完整结束信号且正文非空时才追加续写章节；剧情整理还需用户确认后才保存。停止、报错或截断都不会进入成稿。小说专用设定和章节以 `${ownerId}:${roomId}` 为键保存在当前浏览器的 `world-novels` IndexedDB。背景总结可以导出为 Markdown，供其他房间导入；它不追加章节，也不覆盖目标房间的世界设定。
+## 2. 模块分层
 
-世界设定随房间存到服务端，小说专用设定和正文不会随房间跨设备同步。完整的请求契约、数据边界和后续设计见[小说模式架构](./novel-mode.md)。
+| 层 | 位置 | 内容 |
+| --- | --- | --- |
+| 页面与表单 | `src/app/agent/worlds/` | 大厅、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
+| 房间读取与剧本运行 | [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts) | 读取与轮询房间、剧本自动开场、发起 / 暂停 / 重试运行、加载更早消息 |
+| 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts) | IndexedDB 读写、Writer 请求、流式草稿、完成判定、分支创建 |
+| 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`fork-model.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、导入导出、章节文本与差异 |
+| 浏览器客户端 | [`client.ts`](../../src/lib/group-chat/client.ts) | `worldRequest`、`worldStream`（单批 SSE）、`worldStoryStream`（自动接续多批）、`downloadText` |
+| Route Handlers | [`api/group-chat/[[...path]]`](../../src/app/api/group-chat/[[...path]]/route.ts)、[`api/novel`](../../src/app/api/novel/route.ts) | 登录、同源校验、房间所有权、请求解析 |
+| 领域与服务 | `src/lib/group-chat/` | `model.ts` 数据契约、`http.ts` 路由分发、`store.ts` 存档、`engine.ts` 运行、`schedule.ts` 选人、`context.ts` 上下文、`provider.ts` 模型调用、`session.ts` 会话标识、`novel.ts` Writer 接口、`world-templates.ts` 模板 |
+| Agent | [`mastra-server/agents/world-agents.ts`](../../mastra-server/agents/world-agents.ts) | `world-actor`、`world-narrator`、`world-summary`、`world-writer` |
 
-「剧情整理」在章节矩阵中选择相邻两章，可粘合过渡、合并为一章或在两章之间插入新章。粘合和合并复用 `rewrite` 任务，插入复用 `chapter` 任务；全部操作都需确认草稿后才写入本机存档。
+流式传输复用 `@landing-page/utils/stream` 的 `useChatStreamCore`：剧本用自定义适配器 `worldStoryStream`，小说用 `aiSdkChatStreamAdapter` 解析 AI SDK UI 消息流。两边都不另写 SSE 解析器。
 
-「续写上下文」显示下一次续写 JSON 的字符数与 150,000 字符上限，并非模型实际 token 占用。「创建续写分支」用现有房间创建接口开出新小说房间和代理会话；本机分支保留完整正文，续写改发剧情摘要和最近章节，创建前显示长度变化。原小说未改动，摘要覆盖的正文被修改后会恢复使用原文。
+## 3. 房间与世界配置
 
-已完成章节可发起 `rewrite` 任务。在编辑模式右侧划选正文，或在阅读模式点击「润色整章」，都可以从浮层输入可选的润色指令。所有请求都发送世界模板设定和润色要求。默认选段润色发送本章，默认整章润色另外发送全部前文和紧邻的下一章。开启「精简上下文」时，选段只发送选中的文字，整章只发送本章正文。生成时浮层隐藏指令框并流式展示草稿，完整结束后才允许应用替换。选段替换只修改编辑草稿；应用后高亮替换位置，丢弃则保留原文。
+`WorldRoom`（[`model.ts`](../../src/lib/group-chat/model.ts)）包含 `kind`、`status`（`draft` / `active` / `ended`）、`config`、`version`、`snapshots`、`messages`、`summary`、`run`、`runs`、`paused`。
 
-## 剧本调度
+- `kind` 为 `script` 或 `novel`，创建和导入时必填。配置更新接口不接受 `kind`；列表只返回这两类房间。
+- 每次 `configure` 使 `version + 1` 并追加配置快照。剧本消息记录生成时的 `configVersion`。
+- 小说房间不会发起运行，`status` 保持 `draft`，直到结束故事变为 `ended`。
 
-剧本房间里有三类发言：多位 NPC 只说对白，系统只有一个，旁白只有一个。
+`WorldConfig` 字段：
 
-用户输入默认是系统。输入框上方可以把这一条改成旁白，或改成任意已启用的角色。写下的内容先入房间，调度器再为后续发言选人。
+| 字段 | 约束 | 剧本用途 | 小说用途 |
+| --- | --- | --- | --- |
+| `title` | ≤60 | 世界名称 | 世界名称；首次打开小说时作为书名默认值 |
+| `background` | 必填，≤8000 | 公开世界设定 | Writer 上下文 |
+| `priorContext` | 可选，≤8000 | 已发生的前置剧情，作为公开设定 | 已发生的前置剧情，随完整世界设定发送 |
+| `scene` | 必填，≤2000 | 初始场景 | Writer 上下文 |
+| `rules` / `facts` | ≤4000 | 世界规则 / 公共事实；`facts` 也是摘要的事实基线 | Writer 上下文 |
+| `storyGoal` | ≤4000 | 故事推进要求 | 保存小说设定时写入小说大纲 |
+| `narration` | 默认 `false` | 旁白开关 | 不使用（编辑器不显示） |
+| `characters` | 2～7 位，名称、ID 唯一 | NPC；`enabled` 控制能否发言 | 角色资料全部交给 Writer；第一个启用角色的 `model` 作为写作模型 |
+| `maxTurns` | 1～10 | 每批发言条数（模板为 3，编辑器不提供修改） | 不使用 |
 
-- 系统：这一条是干预。问句交给角色用对白回答；旁白打开时，场景类干预由旁白叙述。
-- 旁白：这一条就是旁白正文，不再另写一条旁白。
-- 角色：这一条就是该角色已经说出的对白。接下来由其他角色接话；句中点名或 @ 仍优先交给被点到的角色。
+角色字段：`name`、`identity`、`personality`、`goal`、`publicInfo`、`privateInfo`、`style`、`model`（默认 `cursor/auto`）、`enabled`、可选 `avatar`。
 
-`narration` 默认关闭。打开后，开场、场景类系统干预、已重复的对谈，以及连续三条对白后的进展由旁白叙述。角色间的直接点名可延后一条旁白，连续四条对白后安排叙述；操作者显式点名和系统问句优先交给角色。计数跨批次累计，每条旁白后恢复角色对白。
+**前置剧情**：[`PriorContextField`](../../src/app/agent/worlds/_components/prior-context-field.tsx) 支持粘贴，或从 TXT / Markdown（≤2 MB）追加导入，合并后不超过 8000 字。导入小说的「背景总结」文件时只取总结正文，不读取文件里的元数据。前置剧情不生成剧本消息，也不增加章节数。
 
-角色根据背景故事、自身身份、性格、经历、目标和当前对话自主判断，以自己的口吻发言。通用提示词只限定本人视角、信息边界和对白形式，不规定每轮必须给出新信息、作出决定、追问或推进剧情。普通轮次的 direction 仅为“轮到你发言”；世界设定和角色资料决定具体内容。旁白用简短一段承接场景与角色言行，角色的决定和对白由各自表达；摘要保留重要事实、关系与未决事项。
+## 4. 数据归属
 
-参见[剧本调度流程图](./flowcharts.md#剧本调度)。
+| 数据 | 权威来源 | 说明 |
+| --- | --- | --- |
+| 房间、世界配置、配置快照、剧本消息、剧情摘要、运行记录 | 服务端 libSQL `world_rooms`（每个房间一份 JSON 文档加列表摘要） | 默认 `file:./db/group-chat.db`，与 Mastra 单聊数据库分开 |
+| 运行请求幂等与暂停封锁 | `world_requests` | 以 `(room_id, clientRequestId)` 去重；暂停时写入 `cancelled` 封锁迟到的请求 |
+| 世界预设、角色预设 | `world_presets` | 与房间互不影响，创建房间时复制配置快照 |
+| 小说设定、章节、续写摘要 | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 不随房间跨设备同步；删除或复制房间都不处理这份数据 |
+| 生成中的小说草稿 | `useNovel` 内存 | 刷新或离开页面后丢失 |
 
-剧本调度只使用 `actor`、`narrator`、`summary` 三个 Mastra Agent。多位 NPC 共用同一个 `actor` 实例，每轮由 `nextTurn` 选人，再将该角色作为 `yourCharacter` 传入。角色身份、私有资料和模型按本次调用提供，不为每个 NPC 单独创建 Agent，也不由 Agent 决定谁接话。
+## 5. 接口
 
-参见[剧本角色与上下文流程图](./flowcharts.md#剧本角色与上下文)。
+`/api/group-chat/*` 由 [`createWorldHandlers`](../../src/lib/group-chat/http.ts) 分发。所有请求都要求登录，非 GET 请求要求同源 `Origin`，房间读写都会校验所有者。
 
-操作者直接写下的角色对白或旁白先作为已发生的剧情入房间，不调用 Agent 重写；之后才安排后续发言。`context.ts` 负责私有信息隔离：`actor` 只能看到本角色的私有资料和公开信息，`narrator`、`summary` 只接收公开信息。Agent 本身不保存角色历史，房间历史与摘要由 group-chat 存档维护。
+| 方法与路径 | 作用 |
+| --- | --- |
+| `GET models` | 通过 OpenAI SDK 读取代理 `/models` |
+| `POST connection` | 用指定模型做一次纯文本连接测试 |
+| `GET/POST presets`，`PATCH/DELETE presets/:id` | 预设列表、新建、更新、删除 |
+| `GET rooms` / `POST rooms` | 作品列表（最多 200 个）/ 创建房间（必须带 `kind`） |
+| `POST rooms/import` | 导入 `world-chat` JSON 备份（≤6 MB），生成新房间 |
+| `GET rooms/:id` | 房间视图，消息只返回最近 100 条 |
+| `GET rooms/:id/messages?before=seq` | 向前分页加载消息 |
+| `GET rooms/:id/export[?format=markdown\|narration]` | JSON 备份 / 对话 Markdown / 旁白 Markdown |
+| `PATCH rooms/:id` | `configure`（带 `expectedVersion`）、`rename`、`end` |
+| `DELETE rooms/:id` | 删除房间及幂等记录，并中止进行中的运行 |
+| `POST rooms/:id/runs` | 剧本运行：写入输入，返回 SSE 事件流；仅保存不运行时返回 JSON |
+| `POST rooms/:id/stop` | 暂停运行并封锁对应请求 |
 
-`actor` 和 `narrator` 每次生成依次发送 system 指令、固定初始化资料、按发生顺序排列的未摘要公开历史、本轮状态与任务。当前角色已完成的对白（或当前旁白已完成的叙述）以 `assistant` 原文消息传入，其他发言及干预以独立的 `user.publicEvent` 消息传入，保留发言者、消息类型、seq 和提及信息；失败、未完成和已摘要的消息不进入历史。`actor` 的初始化资料包含公开世界设定和本角色完整资料，`narrator` 仅包含公开世界设定。摘要、最近干预和 direction 放在最后一条，让固定资料和持续追加的历史保持稳定前缀。`summary` 仍使用三条资料消息：system 指令、固定事实基线、旧摘要与待压缩公开历史。
+`POST /api/novel` 由 [`createNovelHandler`](../../src/lib/group-chat/novel.ts) 处理，见[小说模式 · Writer 接口](./novel-mode.md#5-writer-接口)。
 
-Magpie 的“上下文窗口”按本次请求中的 `user` 消息划分轮次，而非累计接口调用数。此前将全部历史塞进一条 JSON 时，即使同一会话已请求多次，也只显示初始化和动态资料两轮。拆分后会展示多轮消息，但轮数仍不等于房间发言条数或请求次数；每个角色有自己的会话视角，历史压缩后展示的轮数也会减少。
+## 6. Agent 与模型代理
 
-`session.ts` 按所有者、房间、Agent 用途、NPC ID（仅 actor）、模型和配置计算稳定的哈希标识。`engine.ts` 随调用传入，`provider.ts` 通过本次 RequestContext 交给世界 Agent，最终以 `X-Magpie-Session` 请求头发给 Magpie。连续批次、暂停后继续、重试和摘要更新沿用标识；配置或模型变化、另建或导入房间时切换标识。哈希请求头不包含明文角色秘密，不使用全局可变的角色或会话配置。
+四个世界 Agent 由同一个工厂创建，模型在每次调用时由 `RequestContext` 提供：
 
-本机 Magpie Cursor 插件依据会话标识和首条 user 消息生成 `conversation_id`，因此两者都需要稳定。这使同一角色的请求可以复用上游会话标识并争取命中提示词缓存，不代表代理会保存全部剧情供下一次只传增量。每次仍发送完整的有效上下文（固定设定、已有摘要和本次所需公开历史），每条回复仍有一次接口调用；实际缓存命中及收益由代理和模型决定。
+| Agent | 用途 | 调用方 |
+| --- | --- | --- |
+| `world-actor` | NPC 对白，所有 NPC 共用一个实例 | `engine.ts` → `provider.ts` |
+| `world-narrator` | 旁白 | 同上 |
+| `world-summary` | 剧本公开历史摘要 | 同上 |
+| `world-writer` | 小说写章、润色、剧情整理、背景总结 | `novel.ts` → `handleChatStream` |
 
-进程启动时 `route.ts` 调用一次 `createWorldHandlers`。里面的 `createWorldEngine(worldStore, completeText)` 只执行这一次，得到 `execute`。之后每一批发言都调用这个 `execute`。测试要换假的 `complete`，所以每个用例会再调用一次 `createWorldEngine`。
+- 统一连接 `GROUP_CHAT_BASE_URL`（默认 `http://127.0.0.1:3425/v1`），密钥为 `GROUP_CHAT_API_KEY`（默认 `magpie`）。模型 ID 原样传给代理。
+- 请求体强制加上 `tool_choice: "none"`，不注册工具，不启用自动 Memory。剧本收到工具流时直接报错。
+- 每次调用的 system 指令由 `context.ts`（剧本）或小说 `model.ts`（小说）提供，Agent 自身只有一句通用指令。选人逻辑属于 `schedule.ts`，与 Agent 无关。
 
-参见[剧本接口与引擎流程图](./flowcharts.md#剧本接口与引擎)。
+**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界、导入备份或创建续写分支时会换新标识。请求头里只有哈希，不含明文配置。
+
+本机 Magpie 代理根据会话标识和首条 user 消息派生上游会话，用来争取提示词缓存命中。每次调用仍然发送完整的有效上下文；缓存是否命中、能省多少，由代理和模型决定。
+
+## 7. 模板、预设、备份与复制
+
+- **模板**：`public/worlds/*.json` 和不提交的 `public/worlds/local/*.json`，文件名就是模板 ID。每个文件需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验，且每个角色都要有 `avatar`；任一模板无效时页面加载失败。
+- **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
+- **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
+- **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。
+- **复制世界**：用当前配置和类型新建房间。剧本消息、小说章节都不复制。
+
+## 8. 验证
+
+```sh
+nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板
+nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、续写分支、章节文本、Markdown 位置映射、差异
+nr check
+node_modules/.bin/tsc --noEmit --incremental false
+```
+
+单元测试覆盖控制流、存档与协议边界，不验证真实代理连通性、IndexedDB 恢复或模型生成质量。UI 由用户手工验收。
