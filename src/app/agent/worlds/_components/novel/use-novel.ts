@@ -24,8 +24,6 @@ import {
   chapterTitle,
   createBackground,
   createNovel,
-  insertChapterBefore,
-  insertChapterPrompt,
   invalidateEditedCheckpoint,
   isChapterTargetValid,
   maxChapterLength,
@@ -40,16 +38,29 @@ import {
   rewritePrompt,
   summaryPrompt,
 } from "./model";
+import {
+  applyPlotDraft,
+  type ChapterPair,
+  type PlotDraft,
+  type PlotMode,
+  preparePlotEdit,
+  readPlotDraft,
+} from "./plot-edit";
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
 
 type NovelRun =
-  | { task: "chapter"; title: string; beforeId?: never }
-  | { task: "chapter"; beforeId: string; title?: never }
+  | { task: "chapter"; title: string }
   | { task: "summary"; config: WorldConfig; novel: Novel }
   | { task: "summary"; forFork: true }
+  | {
+      task: "rewrite" | "chapter";
+      plot: ReturnType<typeof preparePlotEdit>;
+      novel: Novel;
+      version: number;
+    }
   | {
       task: "rewrite";
       chapterId: string;
@@ -63,7 +74,6 @@ export function useNovel(
   room: WorldRoom,
   onBusyChange: (busy: boolean) => void,
   onBackgroundReady: (background: NovelBackground) => void,
-  onChapterInserted: (id: string) => void,
 ) {
   const key = `${room.ownerId}:${room.id}`;
   const [novel, setNovel] = useState(() => createNovel(room.config));
@@ -73,8 +83,8 @@ export function useNovel(
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
   const [task, setTask] = useState<NovelTask>("chapter");
-  const [inserting, setInserting] = useState(false);
   const [rewriteReady, setRewriteReady] = useState(false);
+  const [plotDraft, setPlotDraft] = useState<PlotDraft | null>(null);
   const [forkSummary, setForkSummary] = useState("");
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
@@ -144,7 +154,9 @@ export function useNovel(
         finished.current = true;
       }
       state.current = reduceChatStreamState(state.current, event);
-      setPreview(getChatStreamText(state.current));
+      const run = input.current;
+      if (!run || !("plot" in run))
+        setPreview(getChatStreamText(state.current));
     },
     onComplete() {
       end();
@@ -157,6 +169,18 @@ export function useNovel(
       }
       const captured = input.current;
       if (!captured) return;
+      if ("plot" in captured) {
+        try {
+          setPlotDraft(readPlotDraft(captured.plot, text));
+        } catch (error) {
+          setError(
+            error instanceof Error ? error.message : "无法读取剧情草稿。",
+          );
+          return;
+        }
+        setRewriteReady(true);
+        return;
+      }
       if (captured.task === "rewrite") {
         setPreview(text);
         setRewriteReady(true);
@@ -196,24 +220,10 @@ export function useNovel(
       }
       const chapter = { id: crypto.randomUUID(), text };
       const current = latest.current;
-      if (captured.beforeId !== undefined) {
-        try {
-          update(insertChapterBefore(current, captured.beforeId, chapter));
-        } catch (error) {
-          setError(error instanceof Error ? error.message : "无法插入新章节。");
-          return;
-        }
-        setInserting(false);
-        onChapterInserted(chapter.id);
-      } else {
-        update({
-          ...current,
-          chapters: [
-            ...current.chapters,
-            { ...chapter, title: captured.title },
-          ],
-        });
-      }
+      update({
+        ...current,
+        chapters: [...current.chapters, { ...chapter, title: captured.title }],
+      });
       setPreview("");
     },
     onError(message) {
@@ -226,9 +236,9 @@ export function useNovel(
     input.current = run;
     setError("");
     setTask(run.task);
-    setInserting(run.task === "chapter" && Boolean(run.beforeId));
-    if (run.task !== "rewrite") setBackgroundExport(null);
+    if (!("plot" in run) && run.task !== "rewrite") setBackgroundExport(null);
     setRewriteReady(false);
+    setPlotDraft(null);
     finished.current = false;
     state.current = initialChatStreamState;
     setPreview("");
@@ -331,34 +341,6 @@ export function useNovel(
     }
   }
 
-  function insertBefore(beforeId: string, requirements: string) {
-    if (!ready || generating.current || room.status === "ended") return;
-    if (!isChapterTargetValid(latest.current.words)) return;
-    try {
-      start(
-        { task: "chapter", beforeId },
-        insertChapterPrompt(
-          room.config,
-          latest.current,
-          beforeId,
-          requirements,
-        ),
-      );
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "无法生成插入章节。");
-    }
-  }
-
-  function discardInsertion() {
-    if (generating.current) return;
-    if (input.current?.task === "chapter" && input.current.beforeId) {
-      input.current = null;
-      setPreview("");
-      setInserting(false);
-    }
-    setError("");
-  }
-
   function rewrite(
     chapterId: string,
     requirements: string,
@@ -395,17 +377,24 @@ export function useNovel(
 
   function discardRewrite() {
     if (generating.current) return;
-    if (input.current?.task === "rewrite") {
+    const captured = input.current;
+    if (captured && (captured.task === "rewrite" || "plot" in captured)) {
       input.current = null;
       setPreview("");
       setRewriteReady(false);
+      setPlotDraft(null);
     }
     setError("");
   }
 
   function resolveRewrite(draft?: Chapter) {
     const captured = input.current;
-    if (generating.current || !rewriteReady || captured?.task !== "rewrite")
+    if (
+      generating.current ||
+      !rewriteReady ||
+      captured?.task !== "rewrite" ||
+      "plot" in captured
+    )
       return null;
     if (
       latest.current !== captured.novel ||
@@ -444,6 +433,57 @@ export function useNovel(
     return resolveRewrite(draft)?.chapters.find(({ id }) => id === draft.id);
   }
 
+  function editPlot(ids: ChapterPair, mode: PlotMode, requirements: string) {
+    if (!ready || generating.current || room.status === "ended") return;
+    const current = latest.current;
+    try {
+      const plot = preparePlotEdit(
+        room.config,
+        current,
+        ids,
+        mode,
+        requirements,
+      );
+      start(
+        {
+          task: mode === "insert" ? "chapter" : "rewrite",
+          plot,
+          novel: current,
+          version: room.version,
+        },
+        plot.prompt,
+      );
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "无法生成剧情草稿。");
+    }
+  }
+
+  async function applyPlot() {
+    const captured = input.current;
+    if (generating.current || !plotDraft || !captured || !("plot" in captured))
+      return null;
+    if (
+      latest.current !== captured.novel ||
+      captured.version !== room.version ||
+      room.status === "ended"
+    ) {
+      setError("小说或世界设定已变更，请重新生成剧情草稿。");
+      return null;
+    }
+    generating.current = true;
+    try {
+      const next = applyPlotDraft(captured.novel, captured.plot, plotDraft);
+      if (!(await update(next, { persistFirst: true }))) {
+        setError("保存失败，原章节仍保留。请重试。");
+        return null;
+      }
+    } finally {
+      generating.current = false;
+    }
+    discardRewrite();
+    return plotDraft.chapters[0].id;
+  }
+
   return {
     novel,
     update,
@@ -453,8 +493,10 @@ export function useNovel(
     busy,
     preview,
     task,
-    inserting,
     rewriteReady,
+    plotDraft,
+    editPlot,
+    applyPlot,
     forkSummary,
     backgroundExport,
     async importNovel(imported: ImportedNovel) {
@@ -468,7 +510,6 @@ export function useNovel(
       }
       input.current = null;
       setPreview("");
-      setInserting(false);
       setRewriteReady(false);
       setForkSummary("");
       return next.chapters[0].id;
@@ -477,8 +518,6 @@ export function useNovel(
     summarizeFork,
     clearFork,
     createFork,
-    insertBefore,
-    discardInsertion,
     rewrite,
     discardRewrite,
     applyRewrite,

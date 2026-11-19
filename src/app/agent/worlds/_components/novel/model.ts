@@ -171,7 +171,7 @@ export function unescapeTxtChapterLine(line: string) {
     : line;
 }
 
-function numberedTitle(title: string, index: number) {
+export function numberedTitle(title: string, index: number) {
   return /^第[1-9]\d*章$/.test(title) ? chapterTitle(index) : title;
 }
 

@@ -15,7 +15,6 @@ import {
   Ellipsis,
   LoaderCircle,
   PenLine,
-  Plus,
   Scissors,
   Square,
   Trash2,
@@ -38,7 +37,6 @@ import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
-  chapterTitle,
   defaultChapterTarget,
   exportNovel,
   isChapterTargetValid,
@@ -47,6 +45,7 @@ import {
   replaceChapter,
   splitChapterAt,
 } from "./model";
+import { PlotSheet } from "./plot-sheet";
 import { RewritePanel } from "./rewrite-form";
 import { useNovel } from "./use-novel";
 
@@ -72,14 +71,8 @@ export function NovelPanel({
     readingPanel.current.scrollTop = readingScroll.current;
     readingScroll.current = null;
   }, [editingChapter]);
-  const [insertion, setInsertion] = useState<{
-    beforeId: string;
-    requirements: string;
-  } | null>(null);
-  const writer = useNovel(room, onBusyChange, downloadBackground, (id) => {
-    setSelected(id);
-    setInsertion(null);
-  });
+  const [plotOpen, setPlotOpen] = useState(false);
+  const writer = useNovel(room, onBusyChange, downloadBackground);
   const { novel } = writer;
   const [rewriting, setRewriting] = useState(false);
   const [appliedRewrite, setAppliedRewrite] = useState<{
@@ -87,12 +80,13 @@ export function NovelPanel({
     length: number;
   }>();
   const [compactContext, setCompactContext] = useState(false);
-  const streamingRewrite = writer.task === "rewrite" && writer.busy;
+  const streamingRewrite =
+    (plotOpen || writer.task === "rewrite") && writer.busy;
   useUnsavedNavigation(
     streamingRewrite || writer.rewriteReady,
     streamingRewrite
-      ? "润色正在生成，离开会中断本次润色。确定离开吗？"
-      : "润色草稿尚未应用，离开会丢失草稿。确定离开吗？",
+      ? "草稿正在生成，离开会中断本次生成。确定离开吗？"
+      : "草稿尚未应用，离开会丢失草稿。确定离开吗？",
   );
   const [splitting, setSplitting] = useState(false);
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
@@ -105,12 +99,12 @@ export function NovelPanel({
   const chapter = novel.chapters[chapterIndex];
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
-  const chapterActionsLocked = disabled || rewriting || insertion !== null;
+  const chapterActionsLocked = disabled || rewriting;
   const canGenerateChapter =
     !ended && Boolean(novel.title.trim()) && isChapterTargetValid(novel.words);
   const summarizing = writer.task === "summary";
   const generatingChapter =
-    writer.busy && writer.task === "chapter" && !insertion;
+    writer.busy && writer.task === "chapter" && !plotOpen;
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
@@ -287,7 +281,7 @@ export function NovelPanel({
           writer={writer}
           disabled={chapterActionsLocked}
         />
-        {!rewriting && !insertion && writer.error ? (
+        {!rewriting && !plotOpen && writer.error ? (
           <Alert>
             <AlertDescription>{writer.error}</AlertDescription>
           </Alert>
@@ -317,7 +311,7 @@ export function NovelPanel({
             </span>
           ) : null}
         </div>
-        {writer.task !== "rewrite" && !insertion && writer.preview ? (
+        {writer.task !== "rewrite" && !plotOpen && writer.preview ? (
           <article className="flex flex-col gap-4 rounded-lg border border-border p-5">
             <h3 className="font-serif text-lg">
               {writer.task === "summary"
@@ -339,7 +333,7 @@ export function NovelPanel({
                 <select
                   className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
                   value={chapter.id}
-                  disabled={rewriting || insertion !== null || importing}
+                  disabled={rewriting || importing}
                   onChange={(event) => {
                     setAppliedRewrite(undefined);
                     setSelected(event.target.value);
@@ -367,6 +361,17 @@ export function NovelPanel({
                   <PenLine data-icon="inline-start" />
                   编辑本章
                 </Button>
+                <PlotSheet
+                  chapters={novel.chapters}
+                  disabled={chapterActionsLocked || ended}
+                  open={plotOpen}
+                  onOpenChange={setPlotOpen}
+                  writer={writer}
+                  onApplied={(id) => {
+                    setAppliedRewrite(undefined);
+                    setSelected(id);
+                  }}
+                />
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -391,19 +396,6 @@ export function NovelPanel({
                     }}
                   >
                     <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        disabled={chapterActionsLocked || !canGenerateChapter}
-                        onSelect={() => {
-                          writer.discardInsertion();
-                          setInsertion({
-                            beforeId: chapter.id,
-                            requirements: "",
-                          });
-                        }}
-                      >
-                        <Plus />
-                        在本章前插入
-                      </DropdownMenuItem>
                       <DropdownMenuItem
                         disabled={!/\S\s*\S/u.test(chapter.text)}
                         onSelect={() => {
@@ -451,90 +443,6 @@ export function NovelPanel({
               }}
               onSplit={splitChapter}
             />
-            {insertion ? (
-              <form
-                className="flex min-w-0 flex-col gap-3 border-b border-border pb-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (!disabled && canGenerateChapter) {
-                    writer.insertBefore(
-                      insertion.beforeId,
-                      insertion.requirements,
-                    );
-                  }
-                }}
-              >
-                <fieldset disabled={writer.busy}>
-                  <TextField
-                    label="插入章节的创作要求（可选）"
-                    value={insertion.requirements}
-                    multiline
-                    onChange={(requirements) =>
-                      setInsertion({ ...insertion, requirements })
-                    }
-                  />
-                </fieldset>
-                {writer.error ? (
-                  <Alert>
-                    <AlertDescription>{writer.error}</AlertDescription>
-                  </Alert>
-                ) : null}
-                <div className="flex flex-wrap items-center gap-2">
-                  {writer.busy ? (
-                    <>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={writer.stop}
-                      >
-                        <Square data-icon="inline-start" />
-                        停止生成
-                      </Button>
-                      <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircle className="size-4 animate-spin" />
-                        正在创作{chapterTitle(chapterIndex)}…
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        type="submit"
-                        size="sm"
-                        disabled={disabled || !canGenerateChapter}
-                      >
-                        <PenLine data-icon="inline-start" />
-                        生成新{chapterTitle(chapterIndex)}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          writer.discardInsertion();
-                          setInsertion(null);
-                        }}
-                      >
-                        取消
-                      </Button>
-                    </>
-                  )}
-                </div>
-                {writer.inserting && writer.preview ? (
-                  <article className="flex min-w-0 flex-col gap-2 border-l-2 border-border pl-4">
-                    {!writer.busy ? (
-                      <p className="text-sm text-muted-foreground">
-                        未完成草稿
-                      </p>
-                    ) : null}
-                    <UnifiedMarkdown
-                      content={writer.preview}
-                      hasNextChunk={writer.busy}
-                    />
-                  </article>
-                ) : null}
-              </form>
-            ) : null}
             <ChapterReading
               key={chapter.id}
               title={chapter.title}
