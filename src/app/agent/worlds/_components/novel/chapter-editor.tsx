@@ -220,7 +220,7 @@ export function ChapterEditor({
 
   return (
     <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-2">
+      <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
         <div className="flex min-w-0 max-w-full items-center gap-2">
           <Button
             size="sm"
@@ -352,8 +352,8 @@ export function ChapterEditor({
               "@3xl:min-h-72 @3xl:grid-rows-[minmax(0,1fr)]",
           )}
         >
-          <section className="order-last flex min-w-0 flex-col gap-3 border-t border-border p-4 @3xl:order-0 @3xl:border-t-0">
-            <div className="flex min-h-8 items-center">
+          <section className="order-last flex min-w-0 flex-col gap-2 border-t border-border p-4 @3xl:order-0 @3xl:border-t-0">
+            <div className="flex min-h-6 shrink-0 items-center">
               <h2 className="text-sm font-medium text-muted-foreground">
                 稳定版本
               </h2>
@@ -365,8 +365,8 @@ export function ChapterEditor({
               className="min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </section>
-          <section className="flex min-w-0 flex-col gap-3 p-4">
-            <div className="flex min-h-8 items-center">
+          <section className="flex min-w-0 flex-col gap-2 p-4">
+            <div className="flex min-h-6 shrink-0 items-center">
               <h2 className="flex items-center gap-1.5 text-sm font-medium">
                 {generation && editorBusy ? (
                   <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />

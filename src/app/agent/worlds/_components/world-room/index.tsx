@@ -37,6 +37,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [presets, setPresets] = useState<WorldPreset[]>([]);
   const [actionPending, setActionPending] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
+  const [novelEditing, setNovelEditing] = useState(false);
   const [novelContext, setNovelContext] = useState<NovelWritingContext | null>(
     null,
   );
@@ -186,22 +187,24 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   }
   return (
     <div className="flex h-full min-h-0 flex-col text-foreground">
-      <RoomHeader
-        title={loaded.config.title}
-        running={running || novelBusy}
-        ended={ended}
-        phase={
-          novelBusy ? "正在创作章节…" : chat.phase || loaded.run?.phase || ""
-        }
-        paused={loaded.paused}
-        reason={novelMode ? "章节创作" : loaded.run?.reason}
-        actionPending={actionPending}
-        onOpenNotes={() => setNotes(true)}
-        notesSidebarOpen={notesSidebarOpen}
-        onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
-        onEdit={() => void edit()}
-        kind={kind}
-      />
+      {novelMode && novelEditing ? null : (
+        <RoomHeader
+          title={loaded.config.title}
+          running={running || novelBusy}
+          ended={ended}
+          phase={
+            novelBusy ? "正在创作章节…" : chat.phase || loaded.run?.phase || ""
+          }
+          paused={loaded.paused}
+          reason={novelMode ? "章节创作" : loaded.run?.reason}
+          actionPending={actionPending}
+          onOpenNotes={() => setNotes(true)}
+          notesSidebarOpen={notesSidebarOpen}
+          onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
+          onEdit={() => void edit()}
+          kind={kind}
+        />
+      )}
       {novelMode && chat.error ? (
         <Alert>
           <AlertDescription>{chat.error}</AlertDescription>
@@ -221,6 +224,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 key={room.id}
                 room={room}
                 onBusyChange={setNovelBusy}
+                onEditingChange={setNovelEditing}
                 onContext={onNovelContext}
               />
             </div>

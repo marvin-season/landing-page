@@ -59,10 +59,12 @@ export type NovelContextBridge = {
 export function NovelPanel({
   room,
   onBusyChange,
+  onEditingChange,
   onContext,
 }: {
   room: WorldRoom;
   onBusyChange: (busy: boolean) => void;
+  onEditingChange: (editing: boolean) => void;
   onContext?: (value: NovelContextBridge | null) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -72,6 +74,10 @@ export function NovelPanel({
     mode: "manual" | "chapter" | "rewrite";
     initialText?: string;
   } | null>(null);
+  const isEditing = editingChapter !== null;
+  useLayoutEffect(() => {
+    onEditingChange(isEditing);
+  }, [isEditing, onEditingChange]);
   const [thinkingChapter, setThinkingChapter] = useState<Chapter | null>(null);
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
