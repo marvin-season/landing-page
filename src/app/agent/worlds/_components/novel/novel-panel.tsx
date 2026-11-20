@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from "@landing-page/design-system";
 import {
+  Combine,
   Ellipsis,
   LoaderCircle,
   PenLine,
@@ -61,12 +62,14 @@ export type NovelContextBridge = {
 
 export function NovelPanel({
   room,
+  fileToolbar,
   onBusyChange,
   onEditingChange,
   onAtTopChange,
   onContext,
 }: {
   room: WorldRoom;
+  fileToolbar: HTMLElement | null;
   onBusyChange: (busy: boolean) => void;
   onEditingChange: (editing: boolean) => void;
   onAtTopChange: (atTop: boolean) => void;
@@ -156,13 +159,16 @@ export function NovelPanel({
   );
   const [splitting, setSplitting] = useState(false);
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
-  const actionFromMenu = useRef<"rewrite" | "split" | null>(null);
+  const actionFromMenu = useRef<"rewrite" | "split" | "plot" | null>(null);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
+  const hasPlotPair = novel.chapters.some(({ text }, index) =>
+    Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
+  );
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || rewriting;
@@ -379,42 +385,36 @@ export function NovelPanel({
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 pb-[calc(var(--composer-dock-height,0px)+1.5rem)]">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <h2 className="font-serif text-xl">小说创作</h2>
-              <p className="text-sm text-muted-foreground">
-                一个写作智能体统一创作，每次生成一章。已完成{" "}
-                {novel.chapters.length} 章。
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {writer.saving
-                  ? "正在保存…"
-                  : "名称、文风和大纲在右上角设定中修改，章节保存在当前浏览器。"}
-              </p>
-            </div>
-            <NovelFileControls
-              disabled={chapterActionsLocked}
-              canSummarize={!ended && Boolean(novel.title.trim())}
-              hasChapters={novel.chapters.length > 0}
-              importing={importing}
-              onImportingChange={setImporting}
-              onImport={async (imported) => {
-                if (
-                  !window.confirm(
-                    `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
-                  )
-                )
-                  return;
-                const id = await writer.importNovel(imported);
-                if (!id) return;
-                setAppliedRewrite(undefined);
-                setCompactContext(false);
-                setSelected(id);
-              }}
-              onDownload={download}
-              onSummarize={writer.generateBackground}
-            />
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h2 className="font-serif text-xl">小说创作</h2>
+            <p className="text-xs text-muted-foreground">
+              已完成 {novel.chapters.length} 章
+              {writer.saving ? " · 正在保存…" : null}
+            </p>
           </div>
+          <NovelFileControls
+            toolbar={fileToolbar}
+            disabled={chapterActionsLocked}
+            canSummarize={!ended && Boolean(novel.title.trim())}
+            hasChapters={novel.chapters.length > 0}
+            importing={importing}
+            onImportingChange={setImporting}
+            onImport={async (imported) => {
+              if (
+                !window.confirm(
+                  `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+                )
+              )
+                return;
+              const id = await writer.importNovel(imported);
+              if (!id) return;
+              setAppliedRewrite(undefined);
+              setCompactContext(false);
+              setSelected(id);
+            }}
+            onDownload={download}
+            onSummarize={writer.generateBackground}
+          />
           {summarizing && writer.busy ? (
             <div className="flex flex-wrap items-center gap-3">
               <Button size="sm" variant="outline" onClick={writer.stop}>
@@ -498,17 +498,6 @@ export function NovelPanel({
                       <PenLine data-icon="inline-start" />
                       编辑本章
                     </Button>
-                    <PlotSheet
-                      chapters={novel.chapters}
-                      disabled={chapterActionsLocked || ended}
-                      open={plotOpen}
-                      onOpenChange={setPlotOpen}
-                      writer={writer}
-                      onApplied={(id) => {
-                        setAppliedRewrite(undefined);
-                        setSelected(id);
-                      }}
-                    />
                     <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -529,7 +518,11 @@ export function NovelPanel({
                           if (!action) return;
                           event.preventDefault();
                           if (action === "rewrite") openRewrite();
-                          else setSplitting(true);
+                          else if (action === "split") setSplitting(true);
+                          else {
+                            writer.discardRewrite();
+                            setPlotOpen(true);
+                          }
                         }}
                       >
                         <DropdownMenuGroup>
@@ -554,6 +547,17 @@ export function NovelPanel({
                           >
                             <WandSparkles />
                             润色整章
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              chapterActionsLocked || ended || !hasPlotPair
+                            }
+                            onSelect={() => {
+                              actionFromMenu.current = "plot";
+                            }}
+                          >
+                            <Combine />
+                            剧情整理
                           </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
@@ -582,6 +586,20 @@ export function NovelPanel({
                 </p>
               ) : chapter ? (
                 <>
+                  <PlotSheet
+                    chapters={novel.chapters}
+                    open={plotOpen}
+                    onOpenChange={setPlotOpen}
+                    onCloseAutoFocus={(event) => {
+                      event.preventDefault();
+                      chapterMenuTrigger.current?.focus();
+                    }}
+                    writer={writer}
+                    onApplied={(id) => {
+                      setAppliedRewrite(undefined);
+                      setSelected(id);
+                    }}
+                  />
                   <ChapterSplit
                     chapter={chapter}
                     disabled={chapterActionsLocked}

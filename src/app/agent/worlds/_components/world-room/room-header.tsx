@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import type { Ref } from "react";
 import { PromptHistoryDialog } from "../novel/prompt-history-dialog";
 
 export function RoomHeader({
@@ -24,6 +25,7 @@ export function RoomHeader({
   notesSidebarOpen,
   onToggleNotesSidebar,
   onEdit,
+  fileToolbarRef,
   promptHistoryKey,
 }: {
   title: string;
@@ -37,6 +39,7 @@ export function RoomHeader({
   notesSidebarOpen: boolean;
   onToggleNotesSidebar: () => void;
   onEdit: () => void;
+  fileToolbarRef?: Ref<HTMLDivElement>;
   promptHistoryKey?: string;
 }) {
   const notesSidebarLabel = notesSidebarOpen ? "收起世界侧栏" : "展开世界侧栏";
@@ -63,6 +66,9 @@ export function RoomHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {fileToolbarRef ? (
+          <div ref={fileToolbarRef} className="contents" />
+        ) : null}
         {promptHistoryKey ? (
           <PromptHistoryDialog roomKey={promptHistoryKey} />
         ) : null}

@@ -11,8 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
-import { ChevronDown, Download, FileText, Upload } from "lucide-react";
+import {
+  Download,
+  FileText,
+  FolderOpen,
+  LoaderCircle,
+  Upload,
+} from "lucide-react";
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import {
@@ -33,6 +40,7 @@ export function downloadBackground(background: NovelBackground) {
 }
 
 export function NovelFileControls({
+  toolbar,
   disabled,
   canSummarize,
   hasChapters,
@@ -42,6 +50,7 @@ export function NovelFileControls({
   onDownload,
   onSummarize,
 }: {
+  toolbar: HTMLElement | null;
   disabled: boolean;
   canSummarize: boolean;
   hasChapters: boolean;
@@ -54,49 +63,70 @@ export function NovelFileControls({
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={disabled || importing}
-          onClick={() => fileRef.current?.click()}
-        >
-          <Upload data-icon="inline-start" />
-          {importing ? "正在导入…" : "导入小说"}
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="outline" disabled={!hasChapters}>
-              <Download data-icon="inline-start" />
-              导出
-              <ChevronDown data-icon="inline-end" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={() => onDownload("txt")}>
-                <FileText />
-                导出整本 TXT
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onDownload("md")}>
-                <FileText />
-                导出整本 Markdown
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                disabled={disabled || importing || !canSummarize}
-                onSelect={onSummarize}
-              >
-                <Download />
-                总结并导出背景
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+    <>
+      {toolbar
+        ? createPortal(
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  aria-label="小说文件"
+                  title="小说文件"
+                  className="px-2"
+                >
+                  {importing ? (
+                    <LoaderCircle
+                      data-icon="inline-start"
+                      className="animate-spin motion-reduce:animate-none"
+                    />
+                  ) : (
+                    <FolderOpen data-icon="inline-start" />
+                  )}
+                  <span className="hidden sm:inline">文件</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={disabled || importing}
+                    onSelect={() => fileRef.current?.click()}
+                  >
+                    <Upload />
+                    {importing ? "正在导入…" : "导入小说"}
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={!hasChapters}
+                    onSelect={() => onDownload("txt")}
+                  >
+                    <FileText />
+                    导出整本 TXT
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!hasChapters}
+                    onSelect={() => onDownload("md")}
+                  >
+                    <FileText />
+                    导出整本 Markdown
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={
+                      disabled || importing || !canSummarize || !hasChapters
+                    }
+                    onSelect={onSummarize}
+                  >
+                    <Download />
+                    总结并导出背景
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>,
+            toolbar,
+          )
+        : null}
       <input
         ref={fileRef}
         type="file"
@@ -125,7 +155,7 @@ export function NovelFileControls({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
-    </div>
+    </>
   );
 }
 

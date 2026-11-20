@@ -45,6 +45,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [actionPending, setActionPending] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
   const [novelEditing, setNovelEditing] = useState(false);
+  const [novelFileToolbar, setNovelFileToolbar] =
+    useState<HTMLDivElement | null>(null);
   const [atContentTop, setAtContentTop] = useState(true);
   const [novelContext, setNovelContext] = useState<NovelWritingContext | null>(
     null,
@@ -214,6 +216,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               notesSidebarOpen={notesSidebarOpen}
               onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
               onEdit={() => void edit()}
+              fileToolbarRef={novelMode ? setNovelFileToolbar : undefined}
               promptHistoryKey={
                 novelMode ? `${room.ownerId}:${room.id}` : undefined
               }
@@ -239,6 +242,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               <NovelPanel
                 key={room.id}
                 room={room}
+                fileToolbar={novelFileToolbar}
                 onBusyChange={setNovelBusy}
                 onEditingChange={setNovelEditing}
                 onAtTopChange={setAtContentTop}

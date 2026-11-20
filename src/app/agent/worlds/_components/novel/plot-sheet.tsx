@@ -10,7 +10,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@landing-page/design-system";
 import {
   Check,
@@ -36,16 +35,16 @@ const options = [
 
 export function PlotSheet({
   chapters,
-  disabled,
   open,
   onOpenChange,
+  onCloseAutoFocus,
   writer,
   onApplied,
 }: {
   chapters: readonly Chapter[];
-  disabled: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
   writer: Pick<
     ReturnType<typeof useNovel>,
     | "editPlot"
@@ -72,9 +71,6 @@ export function PlotSheet({
       ? resolveChapterPair(chapters, [selected[0], selected[1]])
       : null;
   const canStart = Boolean(pair && (mode === "merge" || requirements.trim()));
-  const hasPair = chapters.some(({ text }, index) =>
-    Boolean(text.trim() && chapters[index + 1]?.text.trim()),
-  );
 
   function close() {
     writer.discardRewrite();
@@ -88,24 +84,17 @@ export function PlotSheet({
     <Sheet
       open={open}
       onOpenChange={(next) => {
-        if (next) {
-          if (disabled || !hasPair) return;
-          writer.discardRewrite();
-          onOpenChange(true);
-        } else if (!writer.busy && !applying) {
+        if (!next && !writer.busy && !applying) {
           if (draft && !window.confirm("剧情草稿尚未应用，确定丢弃吗？"))
             return;
           close();
         }
       }}
     >
-      <SheetTrigger asChild>
-        <Button size="sm" variant="outline" disabled={disabled || !hasPair}>
-          <Combine data-icon="inline-start" />
-          剧情整理
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-xl">
+      <SheetContent
+        className="w-full gap-0 overflow-hidden sm:max-w-xl"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
         <SheetHeader className="shrink-0 border-b border-border pr-12">
           <SheetTitle>剧情整理</SheetTitle>
           <SheetDescription>

@@ -66,9 +66,16 @@ export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button type="button" variant="outline" size="sm">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          aria-label="提示词历史"
+          title="提示词历史"
+          className="px-2"
+        >
           <History data-icon="inline-start" />
-          提示词历史
+          <span className="hidden sm:inline">提示词历史</span>
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
