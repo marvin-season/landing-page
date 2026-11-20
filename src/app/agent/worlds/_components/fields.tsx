@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@landing-page/design-system";
+import { Input, Textarea } from "@landing-page/design-system";
 import type { ReactNode } from "react";
 import { useId } from "react";
 
@@ -32,14 +32,14 @@ export function TextField({
         {required ? " *" : ""}
       </label>
       {multiline ? (
-        <textarea
+        <Textarea
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           maxLength={maxLength}
           required={required}
           rows={4}
-          className="min-h-24 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-24"
         />
       ) : (
         <Input

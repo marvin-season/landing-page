@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import { Button, Textarea } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import {
   ArrowLeft,
@@ -358,11 +358,12 @@ export function ChapterEditor({
                 稳定版本
               </h2>
             </div>
-            <textarea
+            <Textarea
+              variant="plain"
               aria-label="稳定版本正文"
               readOnly
               value={base.text}
-              className="min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="min-h-48 flex-1 resize-none leading-7"
             />
           </section>
           <section className="flex min-w-0 flex-col gap-2 p-4">
@@ -384,7 +385,7 @@ export function ChapterEditor({
             </div>
             <div
               className={cn(
-                "relative flex min-h-48 flex-1 rounded-md bg-background",
+                "relative flex min-h-48 flex-1",
                 target && "@3xl:min-h-0",
               )}
             >
@@ -407,8 +408,9 @@ export function ChapterEditor({
                   {"\u200b"}
                 </div>
               ) : null}
-              <textarea
+              <Textarea
                 ref={editor}
+                variant="plain"
                 aria-label="章节正文"
                 readOnly={editorBusy || editingLocked || saving}
                 placeholder={
@@ -473,7 +475,7 @@ export function ChapterEditor({
                   }, 100);
                 }}
                 className={cn(
-                  "relative min-h-48 w-full flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "relative min-h-48 flex-1 resize-none leading-7",
                   target && "selection:bg-transparent",
                   target && "@3xl:min-h-0",
                 )}

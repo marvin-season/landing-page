@@ -74,6 +74,7 @@ export {
 export { Toaster } from "./sonner";
 export { Switch } from "./switch";
 export { default, Tag, type TagProps } from "./tag";
+export { Textarea } from "./textarea";
 export {
   Tooltip,
   TooltipContent,

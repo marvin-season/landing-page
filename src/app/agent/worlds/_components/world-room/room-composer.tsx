@@ -113,7 +113,7 @@ export function RoomComposer({
               </span>
             </div>
             <AiInput
-              className="rounded-2xl p-2 shadow-none"
+              className="rounded-lg p-2 shadow-none border-border/55 bg-muted/25 transition-colors duration-150 focus-within:border-ring/45 focus-within:ring-0"
               value={draft}
               onValueChange={onDraftChange}
               mentions={mentions}

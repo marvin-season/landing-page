@@ -9,6 +9,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Textarea,
 } from "@landing-page/design-system";
 import { useId, useState } from "react";
 import { FieldGroup } from "../fields";
@@ -64,14 +65,14 @@ export function ChapterSplit({
               <label htmlFor={fieldId} className="text-sm font-medium">
                 拆分位置（光标或选区起点）
               </label>
-              <textarea
+              <Textarea
                 id={fieldId}
                 readOnly
                 value={text}
                 onSelect={({ currentTarget }) => {
                   setCaret(currentTarget.selectionStart);
                 }}
-                className="h-[45dvh] min-h-24 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-[45dvh] min-h-24 resize-none"
               />
             </div>
             {canSplit ? (
