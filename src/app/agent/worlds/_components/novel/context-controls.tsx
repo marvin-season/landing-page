@@ -90,7 +90,7 @@ export function ContextControls({
         writer.clearFork();
       }}
     >
-      <section className="flex flex-col gap-2 border-y border-border py-3">
+      <section className="flex flex-col gap-2 border-t border-border pt-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-col gap-1">
             <h3 className="text-sm font-medium">续写上下文</h3>

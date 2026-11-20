@@ -10,6 +10,7 @@ import {
   CollapsibleTitle,
   CollapsibleTrigger,
   Input,
+  SelectItem,
   Switch,
 } from "@landing-page/design-system";
 import {
@@ -33,11 +34,11 @@ import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
 import type { NovelWritingContext } from "./novel/model";
 import { PriorContextField } from "./prior-context-field";
+import { WorldSelect } from "./world-select";
 
 type SectionKey = "world" | "story" | "cast" | "pace";
 
-const selectClassName =
-  "h-9 w-full appearance-none rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const noPreset = "no-preset";
 
 function preview(value: string, fallback: string) {
   const line = value.trim().split("\n")[0] ?? "";
@@ -228,13 +229,15 @@ export function WorldEditor({
           className="flex min-w-0 flex-col gap-3 disabled:opacity-60"
         >
           {!lockedMembers && presets.some((p) => p.kind === "world") ? (
-            <label className="flex flex-col gap-2 px-1 text-sm font-medium">
-              使用世界预设
-              <select
-                value={presetId}
-                onChange={(e) => {
-                  setPresetId(e.target.value);
-                  const preset = presets.find((p) => p.id === e.target.value);
+            <div className="flex flex-col gap-2 px-1 text-sm font-medium">
+              <span>使用世界预设</span>
+              <WorldSelect
+                label="使用世界预设"
+                value={presetId || noPreset}
+                disabled={pending || importing}
+                onValueChange={(value) => {
+                  setPresetId(value === noPreset ? "" : value);
+                  const preset = presets.find((p) => p.id === value);
                   if (preset?.kind === "world")
                     setConfig((current) => ({
                       ...structuredClone(preset.content),
@@ -242,18 +245,18 @@ export function WorldEditor({
                         current.priorContext ?? preset.content.priorContext,
                     }));
                 }}
-                className={selectClassName}
+                className="w-full"
               >
-                <option value="">自定义世界</option>
+                <SelectItem value={noPreset}>自定义世界</SelectItem>
                 {presets
                   .filter((p) => p.kind === "world")
                   .map((p) => (
-                    <option key={p.id} value={p.id}>
+                    <SelectItem key={p.id} value={p.id}>
                       {p.name}
-                    </option>
+                    </SelectItem>
                   ))}
-              </select>
-            </label>
+              </WorldSelect>
+            </div>
           ) : null}
           <EditorSection
             id="world-section-world"
@@ -466,17 +469,19 @@ export function WorldEditor({
                   <CollapsibleContent variant="collapse">
                     <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
                       {presets.some((p) => p.kind === "character") ? (
-                        <label className="flex flex-col gap-2 text-sm">
-                          使用角色预设
-                          <select
-                            value={characterPresetIds[character.id] ?? ""}
-                            onChange={(e) => {
+                        <div className="flex flex-col gap-2 text-sm">
+                          <span>使用角色预设</span>
+                          <WorldSelect
+                            label="使用角色预设"
+                            value={characterPresetIds[character.id] || noPreset}
+                            disabled={pending || importing}
+                            onValueChange={(value) => {
                               setCharacterPresetIds((ids) => ({
                                 ...ids,
-                                [character.id]: e.target.value,
+                                [character.id]: value === noPreset ? "" : value,
                               }));
                               const preset = presets.find(
-                                (p) => p.id === e.target.value,
+                                (p) => p.id === value,
                               );
                               if (preset?.kind === "character")
                                 updateCharacter(character.id, {
@@ -484,18 +489,18 @@ export function WorldEditor({
                                   id: character.id,
                                 });
                             }}
-                            className={selectClassName}
+                            className="w-full"
                           >
-                            <option value="">选择预设</option>
+                            <SelectItem value={noPreset}>选择预设</SelectItem>
                             {presets
                               .filter((p) => p.kind === "character")
                               .map((p) => (
-                                <option value={p.id} key={p.id}>
+                                <SelectItem value={p.id} key={p.id}>
                                   {p.name}
-                                </option>
+                                </SelectItem>
                               ))}
-                          </select>
-                        </label>
+                          </WorldSelect>
+                        </div>
                       ) : null}
                       <FieldGroup>
                         <TextField

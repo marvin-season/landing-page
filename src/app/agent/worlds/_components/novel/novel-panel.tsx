@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SelectItem,
 } from "@landing-page/design-system";
 import {
   Ellipsis,
@@ -26,6 +27,7 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { ComposerDock, FloatingComposer } from "../floating-composer";
+import { WorldSelect } from "../world-select";
 import {
   downloadBackground,
   NovelBackgroundPreview,
@@ -452,29 +454,29 @@ export function NovelPanel({
           {chapter || thinkingChapter ? (
             <section className="flex flex-col gap-4 border-t border-border pt-5">
               <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
-                <label className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
-                  章节目录
-                  <select
-                    className="rounded-md border border-input px-3 py-2 min-w-0 flex-1 truncate"
-                    value={thinkingChapter?.id ?? chapter?.id}
+                <div className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
+                  <WorldSelect
+                    label="章节目录"
+                    className="flex-1"
+                    value={thinkingChapter?.id ?? chapter?.id ?? ""}
                     disabled={waitingForText || rewriting || importing}
-                    onChange={(event) => {
+                    onValueChange={(value) => {
                       setAppliedRewrite(undefined);
-                      setSelected(event.target.value);
+                      setSelected(value);
                     }}
                   >
                     {novel.chapters.map((item) => (
-                      <option key={item.id} value={item.id}>
+                      <SelectItem key={item.id} value={item.id}>
                         {item.title}
-                      </option>
+                      </SelectItem>
                     ))}
                     {thinkingChapter ? (
-                      <option value={thinkingChapter.id}>
+                      <SelectItem value={thinkingChapter.id}>
                         {thinkingChapter.title}（正在构思）
-                      </option>
+                      </SelectItem>
                     ) : null}
-                  </select>
-                </label>
+                  </WorldSelect>
+                </div>
                 {thinkingChapter ? (
                   <Button size="sm" variant="outline" onClick={writer.stop}>
                     <Square data-icon="inline-start" />

@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from "@landing-page/design-system";
+import { SelectItem, SelectSeparator } from "@landing-page/design-system";
+import { WorldSelect } from "../world-select";
 
 export function inputPlaceholder(speaker: string, label: string) {
   if (speaker === "narrator")
@@ -48,29 +42,26 @@ export function InputSpeakerSelect({
   return (
     <div className="mb-1 flex items-center gap-1.5">
       <span className="text-xs text-muted-foreground">输入身份</span>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger
-          size="sm"
-          aria-label="输入身份"
-          className="h-6 gap-1 px-2 py-0 text-xs data-[size=sm]:h-6 [&_svg]:size-3"
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="system" className="py-1 text-xs">
-            系统
+      <WorldSelect
+        value={value}
+        onValueChange={onChange}
+        size="sm"
+        label="输入身份"
+        className="h-6 gap-1 px-2 py-0 text-xs data-[size=sm]:h-6 [&_svg]:size-3"
+      >
+        <SelectItem value="system" className="py-1 text-xs">
+          系统
+        </SelectItem>
+        <SelectItem value="narrator" className="py-1 text-xs">
+          旁白
+        </SelectItem>
+        {characters.length ? <SelectSeparator /> : null}
+        {characters.map((item) => (
+          <SelectItem key={item.id} value={item.id} className="py-1 text-xs">
+            {item.label}
           </SelectItem>
-          <SelectItem value="narrator" className="py-1 text-xs">
-            旁白
-          </SelectItem>
-          <SelectSeparator />
-          {characters.map((item) => (
-            <SelectItem key={item.id} value={item.id} className="py-1 text-xs">
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        ))}
+      </WorldSelect>
     </div>
   );
 }

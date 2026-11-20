@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Textarea } from "@landing-page/design-system";
+import { Button, SelectItem, Textarea } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import {
   confirmAgentNavigation,
   useUnsavedNavigation,
 } from "@/app/agent/_components/use-unsaved-navigation";
+import { WorldSelect } from "../world-select";
 import { ChapterDiffView } from "./chapter-diff-view";
 import {
   type ChapterTextRange,
@@ -240,12 +241,14 @@ export function ChapterEditor({
             <ArrowLeft data-icon="inline-start" />
             返回阅读
           </Button>
-          <label className="flex min-w-0 items-center gap-2 text-sm">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
             <span className="sr-only shrink-0 min-[420px]:not-sr-only">
               章节目录
             </span>
-            <select
-              className="min-w-0 max-w-md truncate rounded-md border border-input bg-background px-3 py-1.5"
+            <WorldSelect
+              label="章节目录"
+              size="sm"
+              className="max-w-md"
               value={base.id}
               disabled={
                 generatingDraft ||
@@ -255,22 +258,22 @@ export function ChapterEditor({
                 writer.busy
               }
               title={dirty ? "保存当前章节后可切换" : undefined}
-              onChange={(event) => {
+              onValueChange={(value) => {
                 closeRewrite();
                 setShowDiff(false);
-                onSelectChapter(event.target.value);
+                onSelectChapter(value);
               }}
             >
               {generation?.kind === "chapter" ? (
-                <option value={base.id}>{base.title}（新章）</option>
+                <SelectItem value={base.id}>{base.title}（新章）</SelectItem>
               ) : null}
               {chapters.map((chapter, index) => (
-                <option key={chapter.id} value={chapter.id}>
+                <SelectItem key={chapter.id} value={chapter.id}>
                   {chapter.title || `第${index + 1}章`}
-                </option>
+                </SelectItem>
               ))}
-            </select>
-          </label>
+            </WorldSelect>
+          </div>
           <span
             role="status"
             className={cn(
