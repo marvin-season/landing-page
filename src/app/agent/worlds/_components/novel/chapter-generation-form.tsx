@@ -1,6 +1,7 @@
 import { Button, Switch } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { PenLine, WandSparkles } from "lucide-react";
-import { type ReactNode, useLayoutEffect, useRef } from "react";
+import { type ReactNode, type Ref, useLayoutEffect, useRef } from "react";
 import {
   isChapterTargetValid,
   maxChapterLength,
@@ -15,14 +16,20 @@ export type ChapterGenerationOptions = {
 
 function WritingGenerationForm({
   children,
+  embedded,
   onSubmit,
 }: {
   children: ReactNode;
+  embedded?: boolean;
   onSubmit: () => void;
 }) {
   return (
     <form
-      className="flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-lg border border-input bg-background p-3 focus-within:border-ring"
+      className={cn(
+        "flex w-full min-w-0 shrink-0 flex-col gap-2",
+        !embedded &&
+          "rounded-lg border border-input bg-background p-3 focus-within:border-ring",
+      )}
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
@@ -36,6 +43,8 @@ function WritingGenerationForm({
 export function ChapterGenerationForm({
   options,
   disabled,
+  embedded,
+  inputRef,
   submitDisabled = false,
   submitLabel,
   onChange,
@@ -43,6 +52,8 @@ export function ChapterGenerationForm({
 }: {
   options: ChapterGenerationOptions;
   disabled: boolean;
+  embedded?: boolean;
+  inputRef?: Ref<HTMLTextAreaElement>;
   submitDisabled?: boolean;
   submitLabel: string;
   onChange: (next: ChapterGenerationOptions) => void;
@@ -51,12 +62,15 @@ export function ChapterGenerationForm({
   const validTarget = isChapterTargetValid(options.words);
   return (
     <WritingGenerationForm
+      embedded={embedded}
       onSubmit={() => {
         if (!disabled && !submitDisabled && validTarget) onGenerate();
       }}
     >
       <h3 className="text-sm font-medium">下一章要求</h3>
       <WritingInstructions
+        ref={inputRef}
+        plain={embedded}
         label="下一章要求"
         value={options.chapterGoal}
         disabled={disabled}
@@ -103,6 +117,7 @@ export function ChapterRewriteForm({
   compactContext,
   onCompactContextChange,
   disabled,
+  embedded,
   submitLabel,
   onGenerate,
   onCancel,
@@ -112,6 +127,7 @@ export function ChapterRewriteForm({
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
   disabled: boolean;
+  embedded?: boolean;
   submitLabel: string;
   onGenerate: () => void;
   onCancel?: () => void;
@@ -124,10 +140,14 @@ export function ChapterRewriteForm({
   }, [autoFocus]);
 
   return (
-    <WritingGenerationForm onSubmit={() => !disabled && onGenerate()}>
+    <WritingGenerationForm
+      embedded={embedded}
+      onSubmit={() => !disabled && onGenerate()}
+    >
       <h3 className="text-sm font-medium">润色整章</h3>
       <WritingInstructions
         ref={instructions}
+        plain={embedded}
         label="润色指令（选填）"
         value={requirements}
         disabled={disabled}

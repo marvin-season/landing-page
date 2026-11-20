@@ -25,6 +25,7 @@ import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-naviga
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
+import { ComposerDock, FloatingComposer } from "../floating-composer";
 import {
   downloadBackground,
   NovelBackgroundPreview,
@@ -84,6 +85,7 @@ export function NovelPanel({
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
+  const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
     const panel = readingPanel.current;
@@ -332,14 +334,49 @@ export function NovelPanel({
     );
   }
   const continueLocked = chapterActionsLocked || ended;
+  const composer = (
+    <FloatingComposer
+      label="继续创作下一章"
+      draft={generationOptions.chapterGoal.trim()}
+      forceOpen={rewriting}
+      onFocusInput={() =>
+        chapterGoalInput.current?.focus({ preventScroll: true })
+      }
+    >
+      {rewriting ? (
+        <ChapterRewriteForm
+          embedded
+          requirements={rewriteRequirements}
+          onChange={setRewriteRequirements}
+          compactContext={compactContext}
+          onCompactContextChange={setCompactContext}
+          disabled={disabled || ended}
+          submitLabel="开始润色"
+          onGenerate={generateRewrite}
+          onCancel={closeRewrite}
+        />
+      ) : (
+        <ChapterGenerationForm
+          embedded
+          inputRef={chapterGoalInput}
+          options={generationOptions}
+          disabled={continueLocked}
+          submitDisabled={!novel.title.trim()}
+          submitLabel="续写下一章"
+          onChange={updateGenerationOptions}
+          onGenerate={generateNextChapter}
+        />
+      )}
+    </FloatingComposer>
+  );
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <ComposerDock composer={composer}>
       <div
         ref={readingPanel}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto"
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 pb-[calc(var(--composer-dock-height,0px)+1.5rem)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
               <h2 className="font-serif text-xl">小说创作</h2>
@@ -575,31 +612,6 @@ export function NovelPanel({
           )}
         </div>
       </div>
-      <div className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8">
-        <div className="mx-auto w-full max-w-5xl">
-          {rewriting ? (
-            <ChapterRewriteForm
-              requirements={rewriteRequirements}
-              onChange={setRewriteRequirements}
-              compactContext={compactContext}
-              onCompactContextChange={setCompactContext}
-              disabled={disabled || ended}
-              submitLabel="开始润色"
-              onGenerate={generateRewrite}
-              onCancel={closeRewrite}
-            />
-          ) : (
-            <ChapterGenerationForm
-              options={generationOptions}
-              disabled={continueLocked}
-              submitDisabled={!novel.title.trim()}
-              submitLabel="续写下一章"
-              onChange={updateGenerationOptions}
-              onGenerate={generateNextChapter}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+    </ComposerDock>
   );
 }

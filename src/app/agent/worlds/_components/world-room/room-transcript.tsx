@@ -36,7 +36,7 @@ export function RoomTranscript({
         }
       }}
     >
-      <ConversationContent className="mx-auto w-full max-w-6xl gap-0 px-4 py-6 sm:px-6">
+      <ConversationContent className="mx-auto w-full max-w-6xl gap-0 px-4 py-6 sm:px-6 after:h-[var(--composer-dock-height,0px)] after:shrink-0">
         {(room.messages[0]?.seq ?? 1) > 1 ? (
           <Button variant="ghost" size="sm" onClick={onLoadEarlier}>
             加载更早的对话
@@ -78,7 +78,7 @@ export function RoomTranscript({
           ),
         )}
       </ConversationContent>
-      <ConversationScrollButton />
+      <ConversationScrollButton className="bottom-[calc(var(--composer-dock-height,0px)+1rem)]" />
     </Conversation>
   );
 }

@@ -21,6 +21,7 @@ import type {
   WorldRoom,
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "../character-avatar";
+import { ComposerDock } from "../floating-composer";
 import type { NovelWritingContext } from "../novel/model";
 import { type NovelContextBridge, NovelPanel } from "../novel/novel-panel";
 import { useWorldRoom } from "../use-world-room";
@@ -243,54 +244,57 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               />
             </div>
           ) : (
-            <>
+            <ComposerDock
+              composer={
+                <RoomComposer
+                  draft={draft}
+                  mentions={mentions}
+                  mentionItems={mentionItems}
+                  speaker={speaker}
+                  speakerLabel={speakerLabel}
+                  paused={loaded.paused}
+                  running={running}
+                  stopping={chat.stopping}
+                  pending={chat.pending}
+                  actionPending={actionPending}
+                  ended={ended}
+                  draftStatus={loaded.status === "draft"}
+                  error={chat.error}
+                  onRetrySubmission={chat.retrySubmission}
+                  onDraftChange={setDraft}
+                  onMentionsChange={setMentions}
+                  onSpeakerChange={setSpeakerId}
+                  onSend={send}
+                  onStop={() => void chat.stop()}
+                  onContinue={() =>
+                    chat.start({
+                      mode: "auto",
+                      text: "",
+                      mentions: [],
+                      speaker: "system",
+                      resume: true,
+                    })
+                  }
+                  onStep={() =>
+                    chat.start({
+                      mode: "step",
+                      text: "",
+                      mentions: [],
+                      speaker: "system",
+                      resume: true,
+                    })
+                  }
+                  onCopy={() => void edit(true)}
+                />
+              }
+            >
               <RoomTranscript
                 room={room}
                 onAtTopChange={setAtContentTop}
                 onLoadEarlier={() => void chat.loadEarlier()}
                 onRetry={retryFor}
               />
-              <RoomComposer
-                draft={draft}
-                mentions={mentions}
-                mentionItems={mentionItems}
-                speaker={speaker}
-                speakerLabel={speakerLabel}
-                paused={loaded.paused}
-                running={running}
-                stopping={chat.stopping}
-                pending={chat.pending}
-                actionPending={actionPending}
-                ended={ended}
-                draftStatus={loaded.status === "draft"}
-                error={chat.error}
-                onRetrySubmission={chat.retrySubmission}
-                onDraftChange={setDraft}
-                onMentionsChange={setMentions}
-                onSpeakerChange={setSpeakerId}
-                onSend={send}
-                onStop={() => void chat.stop()}
-                onContinue={() =>
-                  chat.start({
-                    mode: "auto",
-                    text: "",
-                    mentions: [],
-                    speaker: "system",
-                    resume: true,
-                  })
-                }
-                onStep={() =>
-                  chat.start({
-                    mode: "step",
-                    text: "",
-                    mentions: [],
-                    speaker: "system",
-                    resume: true,
-                  })
-                }
-                onCopy={() => void edit(true)}
-              />
-            </>
+            </ComposerDock>
           )}
         </div>
         {notesSidebarOpen ? (
