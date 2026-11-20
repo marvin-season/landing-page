@@ -10,7 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import type { WorldKind } from "@/lib/group-chat/model";
+import { PromptHistoryDialog } from "../novel/prompt-history-dialog";
 
 export function RoomHeader({
   title,
@@ -24,8 +24,7 @@ export function RoomHeader({
   notesSidebarOpen,
   onToggleNotesSidebar,
   onEdit,
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: <explanation>
-  kind,
+  promptHistoryKey,
 }: {
   title: string;
   running: boolean;
@@ -38,7 +37,7 @@ export function RoomHeader({
   notesSidebarOpen: boolean;
   onToggleNotesSidebar: () => void;
   onEdit: () => void;
-  kind: WorldKind;
+  promptHistoryKey?: string;
 }) {
   const notesSidebarLabel = notesSidebarOpen ? "收起世界侧栏" : "展开世界侧栏";
   return (
@@ -64,6 +63,9 @@ export function RoomHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {promptHistoryKey ? (
+          <PromptHistoryDialog roomKey={promptHistoryKey} />
+        ) : null}
         <Button
           variant="outline"
           size="sm"

@@ -214,7 +214,9 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               notesSidebarOpen={notesSidebarOpen}
               onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
               onEdit={() => void edit()}
-              kind={kind}
+              promptHistoryKey={
+                novelMode ? `${room.ownerId}:${room.id}` : undefined
+              }
             />
           </CollapsibleContent>
         </Collapsible>

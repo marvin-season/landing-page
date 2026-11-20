@@ -51,6 +51,7 @@ import {
   preparePlotEdit,
   readPlotDraft,
 } from "./plot-edit";
+import { recordNovelPrompt } from "./prompt-history";
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
@@ -337,6 +338,7 @@ export function useNovel(
     }
     backup.start({ mode: "chapter", chapter, version: room.version });
     start({ task: "chapter", onFirstText }, prompt);
+    void recordNovelPrompt(key, "chapter", current.chapterGoal);
     return true;
   }
 
@@ -467,6 +469,11 @@ export function useNovel(
         },
         prompt,
       );
+      void recordNovelPrompt(
+        key,
+        range ? "selection" : "rewrite",
+        requirements,
+      );
       return true;
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成重写草稿。");
@@ -584,6 +591,7 @@ export function useNovel(
         },
         plot.prompt,
       );
+      void recordNovelPrompt(key, mode, requirements);
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成剧情草稿。");
     }
