@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@landing-page/design-system";
+import { useRef } from "react";
+import type { StickToBottomContext } from "use-stick-to-bottom";
 import {
   Conversation,
   ConversationContent,
@@ -13,15 +15,27 @@ import { UnfinishedReplyStack } from "./unfinished-reply-stack";
 
 export function RoomTranscript({
   room,
+  onAtTopChange,
   onLoadEarlier,
   onRetry,
 }: {
   room: WorldRoom;
+  onAtTopChange: (atTop: boolean) => void;
   onLoadEarlier: () => void;
   onRetry: (message: WorldMessage) => (() => void) | undefined;
 }) {
+  const conversation = useRef<StickToBottomContext>(null);
   return (
-    <Conversation className="min-h-0">
+    <Conversation
+      className="min-h-0"
+      contextRef={conversation}
+      onScrollCapture={(event) => {
+        const scrollArea = conversation.current?.scrollRef.current;
+        if (scrollArea && event.target === scrollArea) {
+          onAtTopChange(scrollArea.scrollTop <= 0);
+        }
+      }}
+    >
       <ConversationContent className="mx-auto w-full max-w-6xl gap-0 px-4 py-6 sm:px-6">
         {(room.messages[0]?.seq ?? 1) > 1 ? (
           <Button variant="ghost" size="sm" onClick={onLoadEarlier}>

@@ -24,6 +24,7 @@ export function RoomHeader({
   notesSidebarOpen,
   onToggleNotesSidebar,
   onEdit,
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: <explanation>
   kind,
 }: {
   title: string;
@@ -63,9 +64,6 @@ export function RoomHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">
-          {kind === "novel" ? "小说" : "剧本"}
-        </span>
         <Button
           variant="outline"
           size="sm"

@@ -60,11 +60,13 @@ export function NovelPanel({
   room,
   onBusyChange,
   onEditingChange,
+  onAtTopChange,
   onContext,
 }: {
   room: WorldRoom;
   onBusyChange: (busy: boolean) => void;
   onEditingChange: (editing: boolean) => void;
+  onAtTopChange: (atTop: boolean) => void;
   onContext?: (value: NovelContextBridge | null) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -84,16 +86,14 @@ export function NovelPanel({
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
-    if (
-      editingChapter ||
-      thinkingChapter ||
-      !readingPanel.current ||
-      readingScroll.current === null
-    )
-      return;
-    readingPanel.current.scrollTop = readingScroll.current;
-    readingScroll.current = null;
-  }, [editingChapter, thinkingChapter]);
+    const panel = readingPanel.current;
+    if (editingChapter || thinkingChapter || !panel) return;
+    if (readingScroll.current !== null) {
+      panel.scrollTop = readingScroll.current;
+      readingScroll.current = null;
+    }
+    onAtTopChange(panel.scrollTop <= 0);
+  }, [editingChapter, thinkingChapter, onAtTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
   const writer = useNovel(
     room,
@@ -337,6 +337,7 @@ export function NovelPanel({
       <div
         ref={readingPanel}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+        onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
           <div className="flex flex-wrap items-start justify-between gap-3">

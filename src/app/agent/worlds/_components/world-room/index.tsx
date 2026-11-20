@@ -1,7 +1,13 @@
 "use client";
 
 import type { AiMentionItem } from "@landing-page/biz-ui";
-import { Alert, AlertDescription, Button } from "@landing-page/design-system";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Collapsible,
+  CollapsibleContent,
+} from "@landing-page/design-system";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,6 +44,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [actionPending, setActionPending] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
   const [novelEditing, setNovelEditing] = useState(false);
+  const [atContentTop, setAtContentTop] = useState(true);
   const [novelContext, setNovelContext] = useState<NovelWritingContext | null>(
     null,
   );
@@ -187,24 +194,30 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   }
   return (
     <div className="flex h-full min-h-0 flex-col text-foreground">
-      {novelMode && novelEditing ? null : (
-        <RoomHeader
-          title={loaded.config.title}
-          running={running || novelBusy}
-          ended={ended}
-          phase={
-            novelBusy ? "正在创作章节…" : chat.phase || loaded.run?.phase || ""
-          }
-          paused={loaded.paused}
-          reason={novelMode ? "章节创作" : loaded.run?.reason}
-          actionPending={actionPending}
-          onOpenNotes={() => setNotes(true)}
-          notesSidebarOpen={notesSidebarOpen}
-          onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
-          onEdit={() => void edit()}
-          kind={kind}
-        />
-      )}
+      {!editing && !(novelMode && novelEditing) ? (
+        <Collapsible open={atContentTop} className="shrink-0">
+          <CollapsibleContent variant="collapse" inert={!atContentTop}>
+            <RoomHeader
+              title={loaded.config.title}
+              running={running || novelBusy}
+              ended={ended}
+              phase={
+                novelBusy
+                  ? "正在创作章节…"
+                  : chat.phase || loaded.run?.phase || ""
+              }
+              paused={loaded.paused}
+              reason={novelMode ? "章节创作" : loaded.run?.reason}
+              actionPending={actionPending}
+              onOpenNotes={() => setNotes(true)}
+              notesSidebarOpen={notesSidebarOpen}
+              onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
+              onEdit={() => void edit()}
+              kind={kind}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+      ) : null}
       {novelMode && chat.error ? (
         <Alert>
           <AlertDescription>{chat.error}</AlertDescription>
@@ -225,6 +238,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 room={room}
                 onBusyChange={setNovelBusy}
                 onEditingChange={setNovelEditing}
+                onAtTopChange={setAtContentTop}
                 onContext={onNovelContext}
               />
             </div>
@@ -232,6 +246,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             <>
               <RoomTranscript
                 room={room}
+                onAtTopChange={setAtContentTop}
                 onLoadEarlier={() => void chat.loadEarlier()}
                 onRetry={retryFor}
               />
