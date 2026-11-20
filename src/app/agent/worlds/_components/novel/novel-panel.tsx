@@ -169,8 +169,8 @@ export function NovelPanel({
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
   const continuationHint = chapter
-    ? `续写位置：「${chapter.title}」之后，生成${chapterTitle(chapterIndex + 1)}`
-    : "续写位置：生成第1章";
+    ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。参考范围：当前章及之前。`
+    : "续写位置：第1章。参考范围：世界和小说设定。";
   const hasPlotPair = novel.chapters.some(({ text }, index) =>
     Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
   );

@@ -37,6 +37,12 @@ const options = [
   { value: "insert", label: "剧情插入", icon: ListPlus },
 ] as const;
 
+const scopeHints = {
+  stitch: "改写范围：所选前章的结尾和后章的开头。章节数不变。",
+  merge: "应用后：将所选两章替换为一章。",
+  insert: "新增位置：所选两章之间。只参考所选两章的正文。",
+} satisfies Record<PlotMode, string>;
+
 export function PlotSheet({
   chapters,
   hasPlotPair,
@@ -222,6 +228,11 @@ export function PlotSheet({
                 </label>
               ))}
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {mode === "insert" && (atStart || !hasPlotPair)
+                ? "新增位置：第一章之前。只参考通用设定和本次写作要求。"
+                : scopeHints[mode]}
+            </p>
           </fieldset>
           <fieldset disabled={locked}>
             <TextField

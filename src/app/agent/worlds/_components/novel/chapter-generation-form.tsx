@@ -70,9 +70,6 @@ export function ChapterGenerationForm({
       }}
     >
       <h3 className="text-sm font-medium">下一章要求</h3>
-      {hint ? (
-        <p className="break-words pr-8 text-xs text-muted-foreground">{hint}</p>
-      ) : null}
       <WritingInstructions
         ref={inputRef}
         plain={embedded}
@@ -112,6 +109,9 @@ export function ChapterGenerationForm({
           {submitLabel}
         </Button>
       </div>
+      {hint ? (
+        <p className="break-words text-xs text-muted-foreground">{hint}</p>
+      ) : null}
     </WritingGenerationForm>
   );
 }
