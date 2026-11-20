@@ -65,16 +65,26 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   }));
 
   const prompt = JSON.parse(
-    insertChapterPrompt(config, novel, "5", "  补上旅途  "),
+    insertChapterPrompt(
+      { ...config, priorContext: "世界前置剧情。" },
+      {
+        ...novel,
+        background: { format: "text", summary: "导入的前情。" },
+        checkpoint: { throughChapterId: "2", summary: "旧章摘要。" },
+      },
+      "5",
+      "  补上旅途  ",
+    ),
   );
-  assert.deepEqual(
-    prompt.previousChapters.map((item: { chapter: number }) => item.chapter),
-    [1, 2, 3, 4],
-  );
+  assert.deepEqual(prompt.previousChapters, [
+    { chapter: 4, title: "第4章", text: "原文 4" },
+  ]);
   assert.deepEqual(prompt.followingChapters, [
     { chapter: 6, title: "第6章", text: "原文 5" },
-    { chapter: 7, title: "雨中的重逢", text: "原文 6" },
   ]);
+  assert.equal(prompt.world.priorContext, "世界前置剧情。");
+  assert.equal(prompt.importedBackground.summary, "导入的前情。");
+  assert.equal(prompt.archivedChapters, undefined);
   assert.deepEqual(prompt.task, {
     mode: "insert",
     chapter: 5,
@@ -107,7 +117,7 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   );
 });
 
-test("long interchapter prompts keep the complete chapters bordering the insertion", () => {
+test("interchapter insertion counts only the selected chapters toward the context limit", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [

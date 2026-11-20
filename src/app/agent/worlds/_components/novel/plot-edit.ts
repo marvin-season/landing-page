@@ -123,12 +123,16 @@ export function preparePlotEdit(
       style: novel.style,
       outline: novel.outline,
     },
-    previousChapters: [neighbor(novel.chapters[index - 1], true)].filter(
-      Boolean,
-    ),
-    followingChapters: [neighbor(novel.chapters[index + 2], false)].filter(
-      Boolean,
-    ),
+    ...(mode === "merge"
+      ? {
+          previousChapters: [neighbor(novel.chapters[index - 1], true)].filter(
+            Boolean,
+          ),
+          followingChapters: [
+            neighbor(novel.chapters[index + 2], false),
+          ].filter(Boolean),
+        }
+      : {}),
     targetChapter: {
       title: `${first.title} / ${second.title}`,
       text: JSON.stringify(

@@ -101,10 +101,9 @@ export function novelCheckpointCount(novel: Novel) {
     : 0;
 }
 
-function novelHistory(novel: Novel, targetIndex = Infinity) {
+function novelHistory(novel: Novel) {
   const count = novelCheckpointCount(novel);
-  // Keep both chapters immediately adjacent to an edit as full prose.
-  if (novel.checkpoint && count && targetIndex > count) {
+  if (novel.checkpoint && count) {
     return {
       count,
       context: {
@@ -223,40 +222,22 @@ export function insertChapterPrompt(
     return prompt;
   }
 
-  const history = novelHistory(novel, index);
-  const chapters = novel.chapters.map(({ title, text }, i) => {
-    const position = i < index ? i : i + 1;
-    return {
-      chapter: position + 1,
-      title: numberedTitle(title, position),
-      text,
-    };
+  const chapterContext = ({ title, text }: Chapter, position: number) => ({
+    chapter: position + 1,
+    title: numberedTitle(title, position),
+    text,
   });
-  const build = (
-    previousChapters: typeof chapters,
-    followingChapters: typeof chapters,
-  ) =>
-    JSON.stringify({
-      world: config,
-      ...history.context,
-      novel: settings,
-      previousChapters,
-      followingChapters,
-      task,
-    });
-  const complete = build(
-    chapters.slice(history.count, index),
-    chapters.slice(index),
-  );
-  if (complete.length <= maxNovelPromptLength) return complete;
-
-  const adjacent = build(
-    chapters.slice(Math.max(0, index - 1), index),
-    chapters.slice(index, index + 1),
-  );
-  if (adjacent.length > maxNovelPromptLength)
+  const prompt = JSON.stringify({
+    world: config,
+    importedBackground: novel.background,
+    novel: settings,
+    previousChapters: [chapterContext(novel.chapters[index - 1], index - 1)],
+    followingChapters: [chapterContext(novel.chapters[index], index + 1)],
+    task,
+  });
+  if (prompt.length > maxNovelPromptLength)
     throw new Error("插入点两侧的章节上下文过长，请缩减正文或背景设定后重试。");
-  return adjacent;
+  return prompt;
 }
 
 export function insertChapterBefore(

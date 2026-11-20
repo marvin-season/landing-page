@@ -56,7 +56,12 @@ test("stitch changes only the transition and keeps both chapter IDs and titles",
     "stitch",
     "加一句道别",
   );
-  const stitchTask = JSON.parse(edit.prompt).task;
+  const prompt = JSON.parse(edit.prompt);
+  const stitchTask = prompt.task;
+  assert.equal(prompt.previousChapters, undefined);
+  assert.equal(prompt.followingChapters, undefined);
+  assert.equal(prompt.unchangedBefore, untouchedBefore.slice(-600));
+  assert.equal(prompt.unchangedAfter, untouchedAfter.slice(0, 600));
   assert.equal(stitchTask.mode, "stitch");
   assert.ok(stitchTask.endingMaxCharacters > 0);
   assert.ok(stitchTask.openingMaxCharacters > 0);
