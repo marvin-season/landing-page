@@ -1,5 +1,6 @@
-import { Button } from "@landing-page/design-system";
-import { PenLine } from "lucide-react";
+import { Button, Switch } from "@landing-page/design-system";
+import { PenLine, WandSparkles } from "lucide-react";
+import { type ReactNode, useLayoutEffect, useRef } from "react";
 import {
   isChapterTargetValid,
   maxChapterLength,
@@ -11,6 +12,26 @@ export type ChapterGenerationOptions = {
   chapterGoal: string;
   words: string;
 };
+
+function WritingGenerationForm({
+  children,
+  onSubmit,
+}: {
+  children: ReactNode;
+  onSubmit: () => void;
+}) {
+  return (
+    <form
+      className="flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-lg border border-input bg-background p-3 focus-within:border-ring"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      {children}
+    </form>
+  );
+}
 
 export function ChapterGenerationForm({
   options,
@@ -29,10 +50,8 @@ export function ChapterGenerationForm({
 }) {
   const validTarget = isChapterTargetValid(options.words);
   return (
-    <form
-      className="flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-lg border border-input bg-background p-3 focus-within:border-ring"
-      onSubmit={(event) => {
-        event.preventDefault();
+    <WritingGenerationForm
+      onSubmit={() => {
         if (!disabled && !submitDisabled && validTarget) onGenerate();
       }}
     >
@@ -74,6 +93,82 @@ export function ChapterGenerationForm({
           {submitLabel}
         </Button>
       </div>
-    </form>
+    </WritingGenerationForm>
+  );
+}
+
+export function ChapterRewriteForm({
+  requirements,
+  onChange,
+  compactContext,
+  onCompactContextChange,
+  disabled,
+  submitLabel,
+  onGenerate,
+  onCancel,
+}: {
+  requirements: string;
+  onChange: (requirements: string) => void;
+  compactContext: boolean;
+  onCompactContextChange: (checked: boolean) => void;
+  disabled: boolean;
+  submitLabel: string;
+  onGenerate: () => void;
+  onCancel?: () => void;
+}) {
+  const instructions = useRef<HTMLTextAreaElement>(null);
+  const autoFocus = Boolean(onCancel);
+  useLayoutEffect(() => {
+    if (autoFocus && window.matchMedia("(pointer: fine)").matches)
+      instructions.current?.focus({ preventScroll: true });
+  }, [autoFocus]);
+
+  return (
+    <WritingGenerationForm onSubmit={() => !disabled && onGenerate()}>
+      <h3 className="text-sm font-medium">润色整章</h3>
+      <WritingInstructions
+        ref={instructions}
+        label="润色指令（选填）"
+        value={requirements}
+        disabled={disabled}
+        placeholder="润色指令（选填），例如：收紧对话节奏"
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (!disabled && event.key === "Escape") onCancel?.();
+        }}
+      />
+      <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Switch
+            checked={compactContext}
+            disabled={disabled}
+            onCheckedChange={onCompactContextChange}
+          />
+          精简上下文
+        </label>
+        <div className="ml-auto flex items-center gap-2">
+          {onCancel ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              disabled={disabled}
+              onClick={onCancel}
+            >
+              取消
+            </Button>
+          ) : null}
+          <Button
+            type="submit"
+            size="sm"
+            className="min-w-28 whitespace-nowrap"
+            disabled={disabled}
+          >
+            <WandSparkles data-icon="inline-start" />
+            {submitLabel}
+          </Button>
+        </div>
+      </div>
+    </WritingGenerationForm>
   );
 }

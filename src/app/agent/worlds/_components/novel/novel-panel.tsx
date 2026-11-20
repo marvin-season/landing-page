@@ -34,6 +34,7 @@ import { ChapterEditor } from "./chapter-editor";
 import {
   ChapterGenerationForm,
   type ChapterGenerationOptions,
+  ChapterRewriteForm,
 } from "./chapter-generation-form";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
@@ -47,7 +48,6 @@ import {
   splitChapterAt,
 } from "./model";
 import { PlotSheet } from "./plot-sheet";
-import { RewritePanel } from "./rewrite-form";
 import { useNovel } from "./use-novel";
 
 export type NovelContextBridge = {
@@ -67,8 +67,14 @@ export function NovelPanel({
 }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
-  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [editingChapter, setEditingChapter] = useState<{
+    chapter: Chapter;
+    mode: "manual" | "chapter" | "rewrite";
+    initialText?: string;
+  } | null>(null);
   const [thinkingChapter, setThinkingChapter] = useState<Chapter | null>(null);
+  const [rewriteRequirements, setRewriteRequirements] = useState("");
+  const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
@@ -90,6 +96,18 @@ export function NovelPanel({
       onBusyChange(busy);
     },
     downloadBackground,
+    (restored) => {
+      if (restored.mode === "rewrite") {
+        setSelected(restored.chapter.id);
+        setRewriteRequirements(restored.requirements ?? "");
+        setCompactContext(restored.compactContext ?? false);
+      }
+      setEditingChapter({
+        chapter: restored.chapter,
+        mode: restored.mode,
+        initialText: restored.text,
+      });
+    },
   );
   const { novel } = writer;
   const publishContext = useRef(onContext);
@@ -115,9 +133,10 @@ export function NovelPanel({
     chapterId: string;
     length: number;
   }>();
-  const [compactContext, setCompactContext] = useState(false);
   const streamingRewrite =
-    (plotOpen || writer.task === "rewrite") && writer.busy;
+    editingChapter?.mode !== "rewrite" &&
+    (plotOpen || writer.task === "rewrite") &&
+    writer.busy;
   const waitingForText = Boolean(thinkingChapter);
   useUnsavedNavigation(
     waitingForText || streamingRewrite || writer.rewriteReady,
@@ -152,24 +171,36 @@ export function NovelPanel({
       text: "",
     };
     if (
-      !writer.generateChapter(() => {
+      !writer.generateChapter(next, () => {
         setThinkingChapter(null);
-        setEditingChapter(next);
+        setEditingChapter({ chapter: next, mode: "chapter" });
       })
     )
       return;
     readingScroll.current = readingPanel.current?.scrollTop ?? 0;
     setThinkingChapter(next);
   }
+  function generateRewrite() {
+    if (
+      !chapter ||
+      !writer.rewrite(chapter.id, rewriteRequirements, { compactContext })
+    )
+      return;
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    setRewriting(false);
+    setEditingChapter({ chapter, mode: "rewrite" });
+  }
   function openRewrite() {
     writer.discardRewrite();
     window.getSelection()?.removeAllRanges();
+    setRewriteRequirements("");
     setRewriting(true);
   }
   function closeRewrite() {
     if (writer.busy) return;
     writer.discardRewrite();
     setRewriting(false);
+    requestAnimationFrame(() => chapterMenuTrigger.current?.focus());
   }
   function splitChapter(caret: number) {
     if (chapterActionsLocked || !chapter) return false;
@@ -203,33 +234,80 @@ export function NovelPanel({
     );
   }
   if (editingChapter) {
-    const creating = !novel.chapters.some(({ id }) => id === editingChapter.id);
+    const { chapter: base, mode, initialText } = editingChapter;
     return (
       <ChapterEditor
-        key={editingChapter.id}
-        base={editingChapter}
+        key={base.id}
+        base={base}
         chapters={novel.chapters}
-        creation={
-          creating
+        initialText={initialText}
+        generation={
+          mode === "chapter"
             ? {
-                options: generationOptions,
-                onChange: updateGenerationOptions,
-                onGenerate: writer.generateChapter,
+                kind: mode,
+                onGenerate: () => writer.generateChapter(base),
+                renderForm: (props) => (
+                  <ChapterGenerationForm
+                    {...props}
+                    options={generationOptions}
+                    submitLabel="重新生成"
+                    onChange={updateGenerationOptions}
+                  />
+                ),
               }
-            : undefined
+            : mode === "rewrite"
+              ? {
+                  kind: mode,
+                  onGenerate: () => {
+                    const chapter = novel.chapters.find(
+                      ({ id }) => id === base.id,
+                    );
+                    if (
+                      !writer.rewrite(base.id, rewriteRequirements, {
+                        compactContext,
+                      })
+                    )
+                      return false;
+                    if (chapter && chapter !== base)
+                      setEditingChapter({ chapter, mode });
+                    return true;
+                  },
+                  renderForm: (props) => (
+                    <ChapterRewriteForm
+                      {...props}
+                      requirements={rewriteRequirements}
+                      onChange={setRewriteRequirements}
+                      compactContext={compactContext}
+                      onCompactContextChange={setCompactContext}
+                      submitLabel="重新生成"
+                    />
+                  ),
+                }
+              : undefined
         }
         writer={writer}
         ended={ended}
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
         onSave={async (draft) => {
-          const next = creating
-            ? { ...novel, chapters: [...novel.chapters, draft] }
-            : replaceChapter(novel, draft);
-          const saved = await writer.update(next, { persistFirst: true });
+          const saved =
+            mode === "rewrite"
+              ? await writer.saveChapterRewrite(draft)
+              : await writer.update(
+                  mode === "chapter"
+                    ? { ...novel, chapters: [...novel.chapters, draft] }
+                    : replaceChapter(novel, draft),
+                  { persistFirst: true },
+                );
           if (saved) {
-            setEditingChapter(draft);
-            if (creating) setSelected(draft.id);
+            if (mode !== "manual") writer.clearDraftBackup();
+            setEditingChapter({ chapter: draft, mode: "manual" });
+            if (mode === "chapter") setSelected(draft.id);
+            if (mode === "rewrite")
+              setAppliedRewrite({
+                chapterId: draft.id,
+                length: draft.text.length,
+              });
           }
           return saved;
         }}
@@ -237,9 +315,10 @@ export function NovelPanel({
           const next = novel.chapters.find((item) => item.id === id);
           if (!next) return;
           setSelected(id);
-          setEditingChapter(next);
+          setEditingChapter({ chapter: next, mode: "manual" });
         }}
         onExit={() => {
+          if (mode !== "manual") writer.clearDraftBackup();
           writer.discardRewrite();
           setEditingChapter(null);
         }}
@@ -247,7 +326,7 @@ export function NovelPanel({
     );
   }
   const continueLocked = chapterActionsLocked || ended;
-  const readingContent = (
+  return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div
         ref={readingPanel}
@@ -310,7 +389,7 @@ export function NovelPanel({
             writer={writer}
             disabled={chapterActionsLocked}
           />
-          {!rewriting && !plotOpen && writer.error ? (
+          {!plotOpen && writer.error ? (
             <Alert>
               <AlertDescription>{writer.error}</AlertDescription>
             </Alert>
@@ -367,7 +446,7 @@ export function NovelPanel({
                         readingScroll.current =
                           readingPanel.current?.scrollTop ?? 0;
                         writer.discardRewrite();
-                        setEditingChapter(chapter);
+                        setEditingChapter({ chapter, mode: "manual" });
                       }}
                     >
                       <PenLine data-icon="inline-start" />
@@ -489,9 +568,20 @@ export function NovelPanel({
           )}
         </div>
       </div>
-      {rewriting ? null : (
-        <div className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8">
-          <div className="mx-auto w-full max-w-5xl">
+      <div className="shrink-0 border-t border-border bg-background/80 px-5 py-3 backdrop-blur-xs sm:px-8">
+        <div className="mx-auto w-full max-w-5xl">
+          {rewriting ? (
+            <ChapterRewriteForm
+              requirements={rewriteRequirements}
+              onChange={setRewriteRequirements}
+              compactContext={compactContext}
+              onCompactContextChange={setCompactContext}
+              disabled={disabled || ended}
+              submitLabel="开始润色"
+              onGenerate={generateRewrite}
+              onCancel={closeRewrite}
+            />
+          ) : (
             <ChapterGenerationForm
               options={generationOptions}
               disabled={continueLocked}
@@ -500,37 +590,9 @@ export function NovelPanel({
               onChange={updateGenerationOptions}
               onGenerate={generateNextChapter}
             />
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
-  );
-  return (
-    <>
-      {readingContent}
-      {chapter && rewriting ? (
-        <RewritePanel
-          isPassage={false}
-          preview={writer.task === "rewrite" ? writer.preview : ""}
-          draftReady={writer.rewriteReady}
-          compactContext={compactContext}
-          onCompactContextChange={setCompactContext}
-          writer={writer}
-          ended={ended}
-          onClose={closeRewrite}
-          onApply={() => {
-            if (!writer.applyRewrite()) return;
-            setAppliedRewrite({
-              chapterId: chapter.id,
-              length: writer.preview.length,
-            });
-            setRewriting(false);
-          }}
-          onRewrite={(requirements) =>
-            writer.rewrite(chapter.id, requirements, undefined, compactContext)
-          }
-        />
-      ) : null}
-    </>
   );
 }
