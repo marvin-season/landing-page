@@ -549,9 +549,7 @@ export function NovelPanel({
                             润色整章
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            disabled={
-                              chapterActionsLocked || ended || !hasPlotPair
-                            }
+                            disabled={chapterActionsLocked || ended}
                             onSelect={() => {
                               actionFromMenu.current = "plot";
                             }}
@@ -588,6 +586,7 @@ export function NovelPanel({
                 <>
                   <PlotSheet
                     chapters={novel.chapters}
+                    hasPlotPair={hasPlotPair}
                     open={plotOpen}
                     onOpenChange={setPlotOpen}
                     onCloseAutoFocus={(event) => {

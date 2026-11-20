@@ -45,9 +45,9 @@ import {
 } from "./model";
 import {
   applyPlotDraft,
-  type ChapterPair,
   type PlotDraft,
   type PlotMode,
+  type PlotSelection,
   preparePlotEdit,
   readPlotDraft,
 } from "./plot-edit";
@@ -571,7 +571,7 @@ export function useNovel(
     return resolveRewrite(draft)?.chapters.find(({ id }) => id === draft.id);
   }
 
-  function editPlot(ids: ChapterPair, mode: PlotMode, requirements: string) {
+  function editPlot(ids: PlotSelection, mode: PlotMode, requirements: string) {
     if (!ready || generating.current || room.status === "ended") return;
     const current = latest.current;
     try {

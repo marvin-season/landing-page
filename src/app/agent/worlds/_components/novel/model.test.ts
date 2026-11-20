@@ -107,7 +107,7 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   );
 });
 
-test("insertion at the beginning works and long prompts keep the complete chapters bordering the insertion", () => {
+test("long interchapter prompts keep the complete chapters bordering the insertion", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [
@@ -126,16 +126,47 @@ test("insertion at the beginning works and long prompts keep the complete chapte
     { chapter: 4, title: "后一章", text: "她走到街上。" },
   ]);
   assert.throws(
-    () => insertChapterPrompt(config, novel, "early", ""),
+    () => insertChapterPrompt(config, novel, "previous", ""),
     /插入点两侧的章节上下文过长/,
   );
-  novel.chapters = novel.chapters.slice(1);
+});
+
+test("opening insertion sends only basic settings and the author's request, even with long existing prose", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "first", title: "旧开篇", text: "早".repeat(maxNovelPromptLength) },
+  ];
+  novel.checkpoint = { throughChapterId: "first", summary: "旧稿摘要" };
+  novel.background = { format: "text", summary: "导入背景" };
+  novel.chapterGoal = "只用于书末续写";
   const opening = JSON.parse(
-    insertChapterPrompt(config, novel, "previous", ""),
+    insertChapterPrompt(
+      { ...config, priorContext: "世界前置剧情" },
+      novel,
+      "first",
+      "  从下雨的早晨写起  ",
+    ),
   );
-  assert.deepEqual(opening.previousChapters, []);
-  assert.equal(opening.task.chapter, 1);
-  assert.equal(opening.followingChapters[0].text, "门打开了。");
+  assert.deepEqual(opening, {
+    world: {
+      title: config.title,
+      background: config.background,
+      scene: config.scene,
+      rules: config.rules,
+      facts: config.facts,
+      storyGoal: config.storyGoal,
+      characters: config.characters,
+    },
+    novel: { title: novel.title, style: novel.style, outline: novel.outline },
+    task: {
+      mode: "insert",
+      chapter: 1,
+      targetWords: 4000,
+      maxCharacters: 8000,
+      requirements: "从下雨的早晨写起",
+    },
+  });
 });
 
 test("a passage rewrite sends the unselected text and replaces only the selected occurrence", () => {

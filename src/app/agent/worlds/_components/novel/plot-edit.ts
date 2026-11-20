@@ -13,7 +13,8 @@ import {
 } from "./model";
 
 export type PlotMode = "stitch" | "merge" | "insert";
-export type ChapterPair = readonly [string, string];
+type ChapterPair = readonly [string, string];
+export type PlotSelection = ChapterPair | readonly [string];
 
 const transitionLength = 1200;
 const contextLength = 600;
@@ -63,19 +64,32 @@ function transitionBoundary(text: string, fromEnd: boolean) {
 export function preparePlotEdit(
   config: WorldConfig,
   novel: Novel,
-  ids: ChapterPair,
+  ids: PlotSelection,
   mode: PlotMode,
   requirements: string,
 ) {
-  const pair = resolveChapterPair(novel.chapters, ids);
-  if (!pair) throw new Error("请选择两个相邻的章节。");
-  const { index, first, second } = pair;
-  if (!first.text.trim() || !second.text.trim())
+  const pair =
+    ids.length === 2 ? resolveChapterPair(novel.chapters, ids) : null;
+  if (pair && (!pair.first.text.trim() || !pair.second.text.trim()))
     throw new Error("请先为两个章节填写正文。");
   const request = requirements.trim();
-  if (mode !== "merge" && !request) throw new Error("请填写剧情要求。");
-  if (mode === "insert" && !isChapterTargetValid(novel.words))
-    throw new Error("请先在小说页设置有效的目标字数。");
+  if (mode === "insert") {
+    if (!pair && (ids.length !== 1 || novel.chapters[0]?.id !== ids[0]))
+      throw new Error("请选择第一章之前或两个相邻的章节。");
+    if (!request) throw new Error("请填写剧情要求。");
+    if (!isChapterTargetValid(novel.words))
+      throw new Error("请先在小说页设置有效的目标字数。");
+    const beforeId = pair?.second.id ?? ids[0];
+    return {
+      mode,
+      beforeId,
+      index: pair ? pair.index + 1 : 0,
+      prompt: insertChapterPrompt(config, novel, beforeId, request),
+    };
+  }
+  if (!pair) throw new Error("请选择两个相邻的章节。");
+  if (mode === "stitch" && !request) throw new Error("请填写剧情要求。");
+  const { index, first, second } = pair;
 
   const endingStart = transitionBoundary(first.text, true);
   const openingEnd = transitionBoundary(second.text, false);
@@ -102,50 +116,47 @@ export function preparePlotEdit(
         ? chapter.text.slice(-contextLength)
         : chapter.text.slice(0, contextLength),
     };
-  const prompt =
-    mode === "insert"
-      ? insertChapterPrompt(config, novel, second.id, request)
-      : JSON.stringify({
-          world: config,
-          novel: {
-            title: novel.title,
-            style: novel.style,
-            outline: novel.outline,
+  const prompt = JSON.stringify({
+    world: config,
+    novel: {
+      title: novel.title,
+      style: novel.style,
+      outline: novel.outline,
+    },
+    previousChapters: [neighbor(novel.chapters[index - 1], true)].filter(
+      Boolean,
+    ),
+    followingChapters: [neighbor(novel.chapters[index + 2], false)].filter(
+      Boolean,
+    ),
+    targetChapter: {
+      title: `${first.title} / ${second.title}`,
+      text: JSON.stringify(
+        mode === "stitch"
+          ? { ending, opening }
+          : { first: first.text, second: second.text },
+      ),
+    },
+    ...(mode === "stitch"
+      ? {
+          unchangedBefore: before.slice(-contextLength),
+          unchangedAfter: after.slice(0, contextLength),
+        }
+      : {}),
+    task:
+      mode === "stitch"
+        ? {
+            mode,
+            endingMaxCharacters: endingLimit,
+            openingMaxCharacters: openingLimit,
+            requirements: `改写前一章结尾（ending）和后一章开头（opening），消除生硬跳切、重复叙述或时间断层，让两章过渡自然。保留两章分界与关键事件，严丝合缝承接 unchangedBefore 末尾并接回 unchangedAfter 开头，绝不复述未改写原文。作者要求：${request}。只输出无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`,
+          }
+        : {
+            mode,
+            maxCharacters: maxChapterLength,
+            requirements: `按原时间顺序将 first 与 second 两章融合重写为一章连贯正文，删去交界处的重复铺垫、拖沓叙述及任何残留的章名、分节号或拼接痕迹，保留关键事件、细节伏笔与人物变化，并与前后章节自然衔接。${request ? `作者要求：${request}。` : ""}只输出合并后的单章小说纯正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
           },
-          previousChapters: [neighbor(novel.chapters[index - 1], true)].filter(
-            Boolean,
-          ),
-          followingChapters: [
-            neighbor(novel.chapters[index + 2], false),
-          ].filter(Boolean),
-          targetChapter: {
-            title: `${first.title} / ${second.title}`,
-            text: JSON.stringify(
-              mode === "stitch"
-                ? { ending, opening }
-                : { first: first.text, second: second.text },
-            ),
-          },
-          ...(mode === "stitch"
-            ? {
-                unchangedBefore: before.slice(-contextLength),
-                unchangedAfter: after.slice(0, contextLength),
-              }
-            : {}),
-          task:
-            mode === "stitch"
-              ? {
-                  mode,
-                  endingMaxCharacters: endingLimit,
-                  openingMaxCharacters: openingLimit,
-                  requirements: `改写前一章结尾（ending）和后一章开头（opening），消除生硬跳切、重复叙述或时间断层，让两章过渡自然。保留两章分界与关键事件，严丝合缝承接 unchangedBefore 末尾并接回 unchangedAfter 开头，绝不复述未改写原文。作者要求：${request}。只输出无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`,
-                }
-              : {
-                  mode,
-                  maxCharacters: maxChapterLength,
-                  requirements: `按原时间顺序将 first 与 second 两章融合重写为一章连贯正文，删去交界处的重复铺垫、拖沓叙述及任何残留的章名、分节号或拼接痕迹，保留关键事件、细节伏笔与人物变化，并与前后章节自然衔接。${request ? `作者要求：${request}。` : ""}只输出合并后的单章小说纯正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
-                },
-        });
+  });
   if (prompt.length > maxNovelPromptLength)
     throw new Error("本次剧情整理的上下文过长，请先精简设定或正文。");
   return {
@@ -166,7 +177,6 @@ export type PlotDraft = { mode: PlotMode; chapters: Chapter[] };
 
 export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
   const text = output.trim();
-  const { first, second, index } = edit.pair;
   if (!text) throw new Error("没有生成正文，请重试。");
   if (edit.mode !== "stitch") {
     if (text.length > maxChapterLength)
@@ -178,13 +188,14 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
           id: crypto.randomUUID(),
           title:
             edit.mode === "insert"
-              ? chapterTitle(index + 1)
-              : first.title || chapterTitle(index),
+              ? chapterTitle(edit.index)
+              : edit.pair.first.title || chapterTitle(edit.pair.index),
           text,
         },
       ],
     };
   }
+  const { first, second } = edit.pair;
   let result: z.infer<typeof stitchResult>;
   try {
     const json = text.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)?.[1] ?? text;
@@ -217,8 +228,8 @@ export function applyPlotDraft(
   edit: PlotEdit,
   draft: PlotDraft,
 ): Novel {
-  if (draft.mode === "insert")
-    return insertChapterBefore(novel, edit.pair.second.id, draft.chapters[0]);
+  if (edit.mode === "insert")
+    return insertChapterBefore(novel, edit.beforeId, draft.chapters[0]);
   const { index } = edit.pair;
   const following = novel.chapters.slice(index + 2);
   return {
