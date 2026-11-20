@@ -81,6 +81,7 @@ export function NovelPanel({
     chapter: Chapter;
     mode: "manual" | "chapter" | "rewrite";
     initialText?: string;
+    afterChapterId?: string | null;
   } | null>(null);
   const isEditing = editingChapter !== null;
   useLayoutEffect(() => {
@@ -119,6 +120,7 @@ export function NovelPanel({
         chapter: restored.chapter,
         mode: restored.mode,
         initialText: restored.text,
+        afterChapterId: restored.afterChapterId,
       });
     },
   );
@@ -166,6 +168,9 @@ export function NovelPanel({
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
+  const continuationHint = chapter
+    ? `续写位置：「${chapter.title}」之后，生成${chapterTitle(chapterIndex + 1)}`
+    : "续写位置：生成第1章";
   const hasPlotPair = novel.chapters.some(({ text }, index) =>
     Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
   );
@@ -181,15 +186,16 @@ export function NovelPanel({
     writer.update({ ...novel, ...options });
   }
   function generateNextChapter() {
+    const afterChapterId = chapter?.id ?? null;
     const next: Chapter = {
       id: crypto.randomUUID(),
-      title: chapterTitle(novel.chapters.length),
+      title: chapterTitle(chapterIndex + 1),
       text: "",
     };
     if (
-      !writer.generateChapter(next, () => {
+      !writer.generateChapter(next, afterChapterId, () => {
         setThinkingChapter(null);
-        setEditingChapter({ chapter: next, mode: "chapter" });
+        setEditingChapter({ chapter: next, mode: "chapter", afterChapterId });
       })
     )
       return;
@@ -250,7 +256,7 @@ export function NovelPanel({
     );
   }
   if (editingChapter) {
-    const { chapter: base, mode, initialText } = editingChapter;
+    const { chapter: base, mode, initialText, afterChapterId } = editingChapter;
     return (
       <ChapterEditor
         key={base.id}
@@ -261,7 +267,7 @@ export function NovelPanel({
           mode === "chapter"
             ? {
                 kind: mode,
-                onGenerate: () => writer.generateChapter(base),
+                onGenerate: () => writer.generateChapter(base, afterChapterId),
                 renderForm: (props) => (
                   <ChapterGenerationForm
                     {...props}
@@ -306,19 +312,26 @@ export function NovelPanel({
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
         onSave={async (draft) => {
+          if (mode === "chapter") {
+            const saved = await writer.saveChapterContinuation(
+              draft,
+              afterChapterId,
+            );
+            if (!saved) return false;
+            writer.clearDraftBackup();
+            setEditingChapter({ chapter: saved, mode: "manual" });
+            setSelected(saved.id);
+            return true;
+          }
           const saved =
             mode === "rewrite"
               ? await writer.saveChapterRewrite(draft)
-              : await writer.update(
-                  mode === "chapter"
-                    ? { ...novel, chapters: [...novel.chapters, draft] }
-                    : replaceChapter(novel, draft),
-                  { persistFirst: true },
-                );
+              : await writer.update(replaceChapter(novel, draft), {
+                  persistFirst: true,
+                });
           if (saved) {
             if (mode !== "manual") writer.clearDraftBackup();
             setEditingChapter({ chapter: draft, mode: "manual" });
-            if (mode === "chapter") setSelected(draft.id);
             if (mode === "rewrite")
               setAppliedRewrite({
                 chapterId: draft.id,
@@ -367,6 +380,7 @@ export function NovelPanel({
         <ChapterGenerationForm
           embedded
           inputRef={chapterGoalInput}
+          hint={continuationHint}
           options={generationOptions}
           disabled={continueLocked}
           submitDisabled={!novel.title.trim()}
@@ -433,6 +447,7 @@ export function NovelPanel({
           <ContextControls
             room={room}
             writer={writer}
+            chapterCount={chapterIndex + 1}
             disabled={chapterActionsLocked}
           />
           {!plotOpen && writer.error ? (

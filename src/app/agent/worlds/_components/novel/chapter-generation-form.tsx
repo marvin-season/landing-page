@@ -45,6 +45,7 @@ export function ChapterGenerationForm({
   disabled,
   embedded,
   inputRef,
+  hint,
   submitDisabled = false,
   submitLabel,
   onChange,
@@ -54,6 +55,7 @@ export function ChapterGenerationForm({
   disabled: boolean;
   embedded?: boolean;
   inputRef?: Ref<HTMLTextAreaElement>;
+  hint?: string;
   submitDisabled?: boolean;
   submitLabel: string;
   onChange: (next: ChapterGenerationOptions) => void;
@@ -68,6 +70,9 @@ export function ChapterGenerationForm({
       }}
     >
       <h3 className="text-sm font-medium">下一章要求</h3>
+      {hint ? (
+        <p className="break-words pr-8 text-xs text-muted-foreground">{hint}</p>
+      ) : null}
       <WritingInstructions
         ref={inputRef}
         plain={embedded}

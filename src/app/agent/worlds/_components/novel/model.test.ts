@@ -3,7 +3,9 @@ import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
 import { textareaSourceOffset } from "./chapter-text";
 import {
+  applyChapterContinuation,
   chapterPrompt,
+  continuationIndex,
   createBackground,
   createNovel,
   exportNovel,
@@ -21,6 +23,54 @@ import {
   splitChapterAt,
   summaryPrompt,
 } from "./model";
+
+test("continuation sends chapters only through the selected one and never sends an archive covering later chapters", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "first", title: "第1章", text: "开篇。" },
+    { id: "selected", title: "第2章", text: "从这里继续。" },
+    { id: "later", title: "第3章", text: "已有后文。" },
+  ];
+  novel.checkpoint = { throughChapterId: "later", summary: "包含后文的摘要。" };
+  const through = continuationIndex(novel, "selected");
+  assert.equal(through, 2);
+  const prompt = JSON.parse(chapterPrompt(config, novel, through));
+  assert.equal(prompt.task.chapter, 3);
+  assert.deepEqual(prompt.completedChapters, [
+    { title: "第1章", text: "开篇。" },
+    { title: "第2章", text: "从这里继续。" },
+  ]);
+  assert.equal(prompt.archivedChapters, undefined);
+  novel.checkpoint = { throughChapterId: "first", summary: "开篇摘要。" };
+  const summarized = JSON.parse(chapterPrompt(config, novel, through));
+  assert.equal(summarized.archivedChapters.summary, "开篇摘要。");
+  assert.deepEqual(summarized.completedChapters, [prompt.completedChapters[1]]);
+});
+
+test("saving a continuation inserts it after its anchor and preserves existing downstream prose", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.chapters = [
+    { id: "selected", title: "前奏", text: "前文。" },
+    { id: "later", title: "第2章", text: "后文。" },
+    { id: "end", title: "尾声", text: "结尾。" },
+  ];
+  const draft = { id: "new", title: "第2章", text: "续写正文。" };
+  assert.deepEqual(
+    applyChapterContinuation(novel, draft, "selected")?.chapters,
+    [
+      novel.chapters[0],
+      draft,
+      { ...novel.chapters[1], title: "第3章" },
+      novel.chapters[2],
+    ],
+  );
+  assert.equal(applyChapterContinuation(novel, draft, "missing"), null);
+  assert.deepEqual(
+    applyChapterContinuation({ ...novel, chapters: [] }, draft, null)?.chapters,
+    [{ ...draft, title: "第1章" }],
+  );
+});
 
 test("splitting preserves source text and puts the new chapter before the renumbered following chapters", () => {
   const novel = createNovel(loadWorldTemplates()[0].config);

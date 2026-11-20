@@ -24,8 +24,10 @@ import {
 } from "./fork-model";
 import { createImportedNovel, type ImportedNovel } from "./import-novel";
 import {
+  applyChapterContinuation,
   type Chapter,
   chapterPrompt,
+  continuationIndex,
   createBackground,
   createNovel,
   invalidateEditedCheckpoint,
@@ -323,23 +325,55 @@ export function useNovel(
     });
   }
 
-  function generateChapter(chapter: Chapter, onFirstText?: () => void) {
+  function generateChapter(
+    chapter: Chapter,
+    afterChapterId: string | null | undefined,
+    onFirstText?: () => void,
+  ) {
     if (!ready || generating.current || room.status === "ended") return false;
     setError("");
     const current = latest.current;
     if (!current.title.trim() || !isChapterTargetValid(current.words))
       return false;
-    const prompt = chapterPrompt(room.config, current);
+    const index = continuationIndex(current, afterChapterId);
+    if (index === null) {
+      setError("找不到续写起点，请返回阅读页重新选择章节。");
+      return false;
+    }
+    const prompt = chapterPrompt(room.config, current, index);
     if (prompt.length > maxNovelPromptLength) {
       setError(
         "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
       );
       return false;
     }
-    backup.start({ mode: "chapter", chapter, version: room.version });
+    backup.start({
+      mode: "chapter",
+      chapter,
+      afterChapterId,
+      version: room.version,
+    });
     start({ task: "chapter", onFirstText }, prompt);
     void recordNovelPrompt(key, "chapter", current.chapterGoal);
     return true;
+  }
+
+  async function saveChapterContinuation(
+    chapter: Chapter,
+    afterChapterId: string | null | undefined,
+  ) {
+    const next = applyChapterContinuation(
+      latest.current,
+      chapter,
+      afterChapterId,
+    );
+    if (!next) {
+      setError("找不到续写起点，无法保存到原位置。");
+      return null;
+    }
+    return (await update(next, { persistFirst: true }))
+      ? (next.chapters.find(({ id }) => id === chapter.id) ?? null)
+      : null;
   }
 
   function generateBackground() {
@@ -660,6 +694,7 @@ export function useNovel(
       return next.chapters[0].id;
     },
     generateChapter,
+    saveChapterContinuation,
     generateBackground,
     summarizeFork,
     clearFork,
