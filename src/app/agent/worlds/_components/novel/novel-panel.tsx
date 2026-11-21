@@ -13,6 +13,8 @@ import {
   SelectItem,
 } from "@landing-page/design-system";
 import {
+  ChevronLeft,
+  ChevronRight,
   Combine,
   Ellipsis,
   LoaderCircle,
@@ -22,7 +24,13 @@ import {
   Trash2,
   WandSparkles,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -91,6 +99,8 @@ export function NovelPanel({
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
+  const chapterAnchor = useRef<HTMLElement>(null);
+  const scrollChapterIntoView = useRef(false);
   const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
@@ -168,6 +178,50 @@ export function NovelPanel({
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
+  const chapterSwitchLocked = waitingForText || rewriting || importing;
+  const previousChapter =
+    chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : undefined;
+  const nextChapter = novel.chapters[chapterIndex + 1];
+  const goToChapter = useCallback((id: string) => {
+    setAppliedRewrite(undefined);
+    setSelected(id);
+    scrollChapterIntoView.current = true;
+  }, []);
+  useLayoutEffect(() => {
+    if (!chapter?.id || !scrollChapterIntoView.current) return;
+    scrollChapterIntoView.current = false;
+    chapterAnchor.current?.scrollIntoView({ block: "start" });
+  }, [chapter?.id]);
+  useEffect(() => {
+    if (editingChapter || chapterSwitchLocked) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey)
+        return;
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest(
+          "input, textarea, select, [contenteditable='true'], [role='combobox'], [role='dialog'], [role='listbox'], [role='menu']",
+        )
+      )
+        return;
+      if (document.querySelector("[role='dialog']")) return;
+      const destination =
+        event.key === "ArrowLeft" ? previousChapter : nextChapter;
+      if (!destination) return;
+      event.preventDefault();
+      goToChapter(destination.id);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    chapterSwitchLocked,
+    editingChapter,
+    goToChapter,
+    nextChapter,
+    previousChapter,
+  ]);
   const continuationHint = chapter
     ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。参考范围：当前章及之前。`
     : "续写位置：第1章。参考范围：世界和小说设定。";
@@ -467,14 +521,31 @@ export function NovelPanel({
             </article>
           ) : null}
           {chapter || thinkingChapter ? (
-            <section className="flex flex-col gap-4 border-t border-border pt-5">
+            <section
+              ref={chapterAnchor}
+              className="flex flex-col gap-4 border-t border-border pt-5"
+            >
               <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
-                <div className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
+                <div className="flex min-w-0 max-w-md flex-[1_1_18rem] items-center gap-1">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-9 shrink-0"
+                    aria-label="上一章"
+                    title="上一章（←）"
+                    disabled={chapterSwitchLocked || !previousChapter}
+                    onClick={() => {
+                      if (previousChapter) goToChapter(previousChapter.id);
+                    }}
+                  >
+                    <ChevronLeft />
+                  </Button>
                   <WorldSelect
                     label="章节目录"
-                    className="flex-1"
+                    className="min-w-0 flex-1"
                     value={thinkingChapter?.id ?? chapter?.id ?? ""}
-                    disabled={waitingForText || rewriting || importing}
+                    disabled={chapterSwitchLocked}
                     onValueChange={(value) => {
                       setAppliedRewrite(undefined);
                       setSelected(value);
@@ -491,6 +562,20 @@ export function NovelPanel({
                       </SelectItem>
                     ) : null}
                   </WorldSelect>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-9 shrink-0"
+                    aria-label="下一章"
+                    title="下一章（→）"
+                    disabled={chapterSwitchLocked || !nextChapter}
+                    onClick={() => {
+                      if (nextChapter) goToChapter(nextChapter.id);
+                    }}
+                  >
+                    <ChevronRight />
+                  </Button>
                 </div>
                 {thinkingChapter ? (
                   <Button size="sm" variant="outline" onClick={writer.stop}>
@@ -636,6 +721,35 @@ export function NovelPanel({
                         : undefined
                     }
                   />
+                  <nav
+                    aria-label="章节切换"
+                    className="flex items-center justify-between gap-3 border-t border-border pt-4"
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterSwitchLocked || !previousChapter}
+                      onClick={() => {
+                        if (previousChapter) goToChapter(previousChapter.id);
+                      }}
+                    >
+                      <ChevronLeft data-icon="inline-start" />
+                      上一章
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterSwitchLocked || !nextChapter}
+                      onClick={() => {
+                        if (nextChapter) goToChapter(nextChapter.id);
+                      }}
+                    >
+                      下一章
+                      <ChevronRight data-icon="inline-start" />
+                    </Button>
+                  </nav>
                 </>
               ) : null}
             </section>
