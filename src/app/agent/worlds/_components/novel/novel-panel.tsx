@@ -309,6 +309,22 @@ export function NovelPanel({
         : "text/plain;charset=utf-8",
     );
   }
+  async function saveToServer() {
+    const response = await fetch("/api/novel/save-txt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: novel.title,
+        text: exportNovel(novel, "txt"),
+      }),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      path?: string;
+    };
+    if (!response.ok) throw new Error(data.error || "保存到服务器失败。");
+    return data.path || "data/novels";
+  }
   if (editingChapter) {
     const { chapter: base, mode, initialText, afterChapterId } = editingChapter;
     return (
@@ -481,6 +497,7 @@ export function NovelPanel({
               setSelected(id);
             }}
             onDownload={download}
+            onSaveToServer={saveToServer}
             onSummarize={writer.generateBackground}
           />
           {summarizing && writer.busy ? (

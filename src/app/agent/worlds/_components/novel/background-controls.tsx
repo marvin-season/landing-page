@@ -11,10 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
+import { isDevelopment } from "@landing-page/utils";
 import {
   Download,
   FileText,
   FolderOpen,
+  HardDrive,
   LoaderCircle,
   Upload,
 } from "lucide-react";
@@ -48,6 +50,7 @@ export function NovelFileControls({
   onImportingChange,
   onImport,
   onDownload,
+  onSaveToServer,
   onSummarize,
 }: {
   toolbar: HTMLElement | null;
@@ -58,10 +61,13 @@ export function NovelFileControls({
   onImportingChange: (importing: boolean) => void;
   onImport: (novel: ImportedNovel) => Promise<void>;
   onDownload: (format: "txt" | "md") => void;
+  onSaveToServer: () => Promise<string>;
   onSummarize: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
+  const [serverPath, setServerPath] = useState("");
+  const [saving, setSaving] = useState(false);
   return (
     <>
       {toolbar
@@ -105,6 +111,29 @@ export function NovelFileControls({
                     <FileText />
                     导出整本 TXT
                   </DropdownMenuItem>
+                  {isDevelopment ? (
+                    <DropdownMenuItem
+                      disabled={!hasChapters || saving}
+                      onSelect={() => {
+                        setError("");
+                        setServerPath("");
+                        setSaving(true);
+                        void onSaveToServer()
+                          .then(setServerPath)
+                          .catch((saveError) => {
+                            setError(
+                              saveError instanceof Error
+                                ? saveError.message
+                                : "保存到服务器失败。",
+                            );
+                          })
+                          .finally(() => setSaving(false));
+                      }}
+                    >
+                      <HardDrive />
+                      {saving ? "正在保存…" : "保存到服务器"}
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuItem
                     disabled={!hasChapters}
                     onSelect={() => onDownload("md")}
@@ -154,6 +183,9 @@ export function NovelFileControls({
         <Alert>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      ) : null}
+      {serverPath ? (
+        <p className="text-sm text-muted-foreground">已写入 {serverPath}</p>
       ) : null}
     </>
   );

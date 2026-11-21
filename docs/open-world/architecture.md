@@ -117,7 +117,7 @@
 ## 8. 验证
 
 ```sh
-nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板
+nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板、开发模式小说 TXT 落盘
 nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、续写分支、章节文本、Markdown 位置映射、差异
 nr check
 node_modules/.bin/tsc --noEmit --incremental false
