@@ -99,40 +99,36 @@ export function ContextControls({
         writer.clearFork();
       }}
     >
-      <section className="flex flex-col gap-2 border-t border-border pt-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm font-medium">续写上下文</h3>
-            <p className="text-xs tabular-nums text-muted-foreground">
-              {number.format(length)} / {number.format(maxNovelPromptLength)}{" "}
-              字符
-              {checkpointCount ? ` · 前 ${checkpointCount} 章使用摘要` : ""}
-            </p>
-          </div>
-          <SheetTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={disabled || !novel.chapters.length}
-            >
-              <GitFork data-icon="inline-start" />
-              创建续写分支
-            </Button>
-          </SheetTrigger>
-        </div>
-        <Progress
-          aria-label="续写请求字符占用"
-          value={Math.min(100, (length / maxNovelPromptLength) * 100)}
-        />
-      </section>
+      <SheetTrigger asChild>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-9"
+          disabled={disabled || !novel.chapters.length}
+        >
+          <GitFork data-icon="inline-start" />
+          上下文
+        </Button>
+      </SheetTrigger>
       <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-xl">
         <SheetHeader className="shrink-0 border-b border-border pr-12">
-          <SheetTitle>创建续写分支</SheetTitle>
+          <SheetTitle>续写上下文</SheetTitle>
           <SheetDescription>
             新会话 · 保留全部正文 · 压缩前 {forkChapterCount(novel)} 章
           </SheetDescription>
         </SheetHeader>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs tabular-nums text-muted-foreground">
+              从当前章续写 · {number.format(length)} /{" "}
+              {number.format(maxNovelPromptLength)} 字符
+              {checkpointCount ? ` · 前 ${checkpointCount} 章使用摘要` : ""}
+            </p>
+            <Progress
+              aria-label="续写请求字符占用"
+              value={Math.min(100, (length / maxNovelPromptLength) * 100)}
+            />
+          </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-sm tabular-nums text-muted-foreground">
               书末续写 · {number.format(forkBaseLength)} →{" "}

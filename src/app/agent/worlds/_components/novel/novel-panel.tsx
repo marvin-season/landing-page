@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  SelectItem,
 } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import {
@@ -37,7 +36,6 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { ComposerDock, FloatingComposer } from "../floating-composer";
-import { WorldSelect } from "../world-select";
 import {
   downloadBackground,
   NovelBackgroundPreview,
@@ -49,6 +47,7 @@ import {
   type ChapterGenerationOptions,
   ChapterRewriteForm,
 } from "./chapter-generation-form";
+import { ChapterIndex } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
@@ -81,6 +80,7 @@ export function NovelPanel({
   onEditingChange,
   onAtTopChange,
   onContext,
+  onChapterStatus,
 }: {
   room: WorldRoom;
   fileToolbar: HTMLElement | null;
@@ -88,6 +88,7 @@ export function NovelPanel({
   onEditingChange: (editing: boolean) => void;
   onAtTopChange: (atTop: boolean) => void;
   onContext?: (value: NovelContextBridge | null) => void;
+  onChapterStatus?: (status: { count: number; saving: boolean }) => void;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -172,6 +173,12 @@ export function NovelPanel({
     },
   );
   const { novel } = writer;
+  useEffect(() => {
+    onChapterStatus?.({
+      count: novel.chapters.length,
+      saving: writer.saving,
+    });
+  }, [novel.chapters.length, onChapterStatus, writer.saving]);
   const publishContext = useRef(onContext);
   const saveContext = useRef(writer.updateContext);
   publishContext.current = onContext;
@@ -548,13 +555,6 @@ export function NovelPanel({
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 pb-[calc(var(--composer-dock-height,0px)+1.5rem)]">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h2 className="font-serif text-xl">小说创作</h2>
-            <p className="text-xs text-muted-foreground">
-              已完成 {novel.chapters.length} 章
-              {writer.saving ? " · 正在保存…" : null}
-            </p>
-          </div>
           <NovelFileControls
             toolbar={fileToolbar}
             disabled={chapterActionsLocked}
@@ -599,12 +599,6 @@ export function NovelPanel({
           {writer.backgroundExport ? (
             <NovelBackgroundPreview exported={writer.backgroundExport} />
           ) : null}
-          <ContextControls
-            room={room}
-            writer={writer}
-            chapterCount={chapterIndex + 1}
-            disabled={chapterActionsLocked}
-          />
           {!plotOpen && writer.error ? (
             <Alert>
               <AlertDescription>{writer.error}</AlertDescription>
@@ -622,12 +616,9 @@ export function NovelPanel({
             </article>
           ) : null}
           {chapter || thinkingChapter ? (
-            <section
-              ref={chapterAnchor}
-              className="flex flex-col gap-4 border-t border-border pt-5"
-            >
+            <section ref={chapterAnchor} className="flex flex-col gap-4">
               <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
-                <div className="flex min-w-48 max-w-md flex-[1_1_16rem] items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1">
                   <Button
                     type="button"
                     size="icon"
@@ -642,27 +633,26 @@ export function NovelPanel({
                   >
                     <ChevronLeft />
                   </Button>
-                  <WorldSelect
-                    label="章节目录"
-                    className="w-full min-w-0"
+                  <ChapterIndex
+                    chapters={[
+                      ...novel.chapters.map((item) => ({
+                        id: item.id,
+                        title: item.title,
+                      })),
+                      ...(thinkingChapter
+                        ? [
+                            {
+                              id: thinkingChapter.id,
+                              title: thinkingChapter.title,
+                              pending: true,
+                            },
+                          ]
+                        : []),
+                    ]}
                     value={thinkingChapter?.id ?? chapter?.id ?? ""}
                     disabled={chapterSwitchLocked}
-                    onValueChange={(value) => {
-                      setAppliedRewrite(undefined);
-                      setSelected(value);
-                    }}
-                  >
-                    {novel.chapters.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.title}
-                      </SelectItem>
-                    ))}
-                    {thinkingChapter ? (
-                      <SelectItem value={thinkingChapter.id}>
-                        {thinkingChapter.title}（正在构思）
-                      </SelectItem>
-                    ) : null}
-                  </WorldSelect>
+                    onSelect={goToChapter}
+                  />
                   <Button
                     type="button"
                     size="icon"
@@ -690,110 +680,118 @@ export function NovelPanel({
                     {formatChapterLength(chapter.text.length, novel.words)}
                   </p>
                 ) : null}
-                {thinkingChapter ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="ml-auto h-9"
-                    onClick={writer.stop}
-                  >
-                    <Square data-icon="inline-start" />
-                    停止生成
-                  </Button>
-                ) : chapter ? (
-                  <div className="ml-auto flex shrink-0 items-center gap-2">
+                <div className="ml-auto flex shrink-0 items-center gap-2">
+                  <ContextControls
+                    room={room}
+                    writer={writer}
+                    chapterCount={chapterIndex + 1}
+                    disabled={chapterActionsLocked}
+                  />
+                  {thinkingChapter ? (
                     <Button
                       size="sm"
                       variant="outline"
                       className="h-9"
-                      disabled={chapterActionsLocked}
-                      onClick={() => {
-                        readingScroll.current =
-                          readingPanel.current?.scrollTop ?? 0;
-                        writer.discardRewrite();
-                        setEditingChapter({ chapter, mode: "manual" });
-                      }}
+                      onClick={writer.stop}
                     >
-                      <PenLine data-icon="inline-start" />
-                      编辑本章
+                      <Square data-icon="inline-start" />
+                      停止生成
                     </Button>
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          ref={chapterMenuTrigger}
-                          size="sm"
-                          variant="outline"
-                          className="h-9"
-                          disabled={chapterActionsLocked}
-                        >
-                          <Ellipsis data-icon="inline-start" />
-                          章节操作
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="min-w-44"
-                        onCloseAutoFocus={(event) => {
-                          const action = actionFromMenu.current;
-                          actionFromMenu.current = null;
-                          if (!action) return;
-                          event.preventDefault();
-                          if (action === "rewrite") openRewrite();
-                          else if (action === "split") setSplitting(true);
-                          else {
-                            writer.discardRewrite();
-                            setPlotOpen(true);
-                          }
+                  ) : chapter ? (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-9"
+                        disabled={chapterActionsLocked}
+                        onClick={() => {
+                          readingScroll.current =
+                            readingPanel.current?.scrollTop ?? 0;
+                          writer.discardRewrite();
+                          setEditingChapter({ chapter, mode: "manual" });
                         }}
                       >
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            disabled={!/\S\s*\S/u.test(chapter.text)}
-                            onSelect={() => {
-                              actionFromMenu.current = "split";
-                            }}
-                          >
-                            <Scissors />
-                            拆分本章
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              chapterActionsLocked ||
-                              ended ||
-                              !chapter.text.trim()
-                            }
-                            onSelect={() => {
-                              actionFromMenu.current = "rewrite";
-                            }}
-                          >
-                            <WandSparkles />
-                            润色整章
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={chapterActionsLocked || ended}
-                            onSelect={() => {
-                              actionFromMenu.current = "plot";
-                            }}
-                          >
-                            <Combine />
-                            剧情整理
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            variant="destructive"
+                        <PenLine data-icon="inline-start" />
+                        编辑本章
+                      </Button>
+                      <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            ref={chapterMenuTrigger}
+                            size="sm"
+                            variant="outline"
+                            className="h-9"
                             disabled={chapterActionsLocked}
-                            onSelect={deleteChapter}
                           >
-                            <Trash2 />
-                            删除本章
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                ) : null}
+                            <Ellipsis data-icon="inline-start" />
+                            章节操作
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="min-w-44"
+                          onCloseAutoFocus={(event) => {
+                            const action = actionFromMenu.current;
+                            actionFromMenu.current = null;
+                            if (!action) return;
+                            event.preventDefault();
+                            if (action === "rewrite") openRewrite();
+                            else if (action === "split") setSplitting(true);
+                            else {
+                              writer.discardRewrite();
+                              setPlotOpen(true);
+                            }
+                          }}
+                        >
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              disabled={!/\S\s*\S/u.test(chapter.text)}
+                              onSelect={() => {
+                                actionFromMenu.current = "split";
+                              }}
+                            >
+                              <Scissors />
+                              拆分本章
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={
+                                chapterActionsLocked ||
+                                ended ||
+                                !chapter.text.trim()
+                              }
+                              onSelect={() => {
+                                actionFromMenu.current = "rewrite";
+                              }}
+                            >
+                              <WandSparkles />
+                              润色整章
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={chapterActionsLocked || ended}
+                              onSelect={() => {
+                                actionFromMenu.current = "plot";
+                              }}
+                            >
+                              <Combine />
+                              剧情整理
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              disabled={chapterActionsLocked}
+                              onSelect={deleteChapter}
+                            >
+                              <Trash2 />
+                              删除本章
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  ) : null}
+                </div>
               </div>
               {thinkingChapter ? (
                 <p

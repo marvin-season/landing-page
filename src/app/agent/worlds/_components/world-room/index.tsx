@@ -45,6 +45,10 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [presets, setPresets] = useState<WorldPreset[]>([]);
   const [actionPending, setActionPending] = useState(false);
   const [novelBusy, setNovelBusy] = useState(false);
+  const [novelChapterStatus, setNovelChapterStatus] = useState<{
+    count: number;
+    saving: boolean;
+  } | null>(null);
   const [novelEditing, setNovelEditing] = useState(false);
   const [novelFileToolbar, setNovelFileToolbar] =
     useState<HTMLDivElement | null>(null);
@@ -212,7 +216,13 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                     : chat.phase || loaded.run?.phase || ""
                 }
                 paused={loaded.paused}
-                reason={novelMode ? "章节创作" : loaded.run?.reason}
+                reason={
+                  novelMode
+                    ? novelChapterStatus
+                      ? `已完成 ${novelChapterStatus.count} 章${novelChapterStatus.saving ? " · 正在保存…" : ""}`
+                      : "章节创作"
+                    : loaded.run?.reason
+                }
                 actionPending={actionPending}
                 onOpenNotes={() => setNotes(true)}
                 notesSidebarOpen={notesSidebarOpen}
@@ -250,6 +260,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   onBusyChange={setNovelBusy}
                   onEditingChange={setNovelEditing}
                   onAtTopChange={setAtContentTop}
+                  onChapterStatus={setNovelChapterStatus}
                   onContext={onNovelContext}
                 />
               </div>

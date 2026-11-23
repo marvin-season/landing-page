@@ -110,7 +110,7 @@ export function ChapterGenerationForm({
         </Button>
       </div>
       {hint ? (
-        <p className="break-words text-xs text-muted-foreground">{hint}</p>
+        <p className="wrap-break-word text-xs text-muted-foreground">{hint}</p>
       ) : null}
     </WritingGenerationForm>
   );
