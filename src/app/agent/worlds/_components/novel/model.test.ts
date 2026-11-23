@@ -108,6 +108,10 @@ test("renaming a chapter from the reading page keeps custom titles and restores 
     formatChapterLength(4128, novel.words),
     "本章 4,128 / 目标 4,000 字",
   );
+  assert.equal(
+    formatChapterLength(2000, novel.words),
+    "本章 2,000 / 目标 4,000 字 · 偏短",
+  );
   assert.equal(formatChapterLength(12, "很多"), "本章 12 字");
 
   const named = renameChapter(novel, "b", "  花园夜谈 \n");

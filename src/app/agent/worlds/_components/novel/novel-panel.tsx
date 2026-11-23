@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   SelectItem,
 } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import {
   ChevronLeft,
   ChevronRight,
@@ -55,6 +56,7 @@ import type { ChapterTextSelection } from "./chapter-text";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
+  chapterLengthShortfall,
   chapterTitle,
   exportNovel,
   formatChapterLength,
@@ -677,7 +679,14 @@ export function NovelPanel({
                   </Button>
                 </div>
                 {chapter && !thinkingChapter ? (
-                  <p className="w-full text-xs tabular-nums text-muted-foreground">
+                  <p
+                    className={cn(
+                      "w-full text-xs tabular-nums",
+                      chapterLengthShortfall(chapter.text.length, novel.words)
+                        ? "text-amber-700 dark:text-amber-400"
+                        : "text-muted-foreground",
+                    )}
+                  >
                     {formatChapterLength(chapter.text.length, novel.words)}
                   </p>
                 ) : null}
@@ -870,21 +879,23 @@ export function NovelPanel({
               ) : null}
             </section>
           ) : (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              在下方填写下一章要求后续写，或导入已有小说。
-            </p>
+            <div className="flex flex-col items-center gap-4 py-10 text-center">
+              <p className="max-w-sm text-sm text-muted-foreground">
+                还没有章节。写下下一章要求开始续写，或从文件菜单导入已有小说。
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                disabled={continueLocked}
+                onClick={() => setComposerRequest((count) => count + 1)}
+              >
+                <PenLine data-icon="inline-start" />
+                填写下一章要求
+              </Button>
+            </div>
           )}
         </div>
       </div>
     </ComposerDock>
   );
 }
-/**
- *
- * 
-女主：160cm* 50kg, 舞蹈生，小网红，几万粉丝，长相精致，身材出众，爱拍点热门抖音小视频，视频里面微微带点擦边，是很多人的梦中女神和意淫对象
-男主：165cm, 60kg，大一认识了女主，发现是同校生，加了好友，追求到手、情绪升温、确定恋爱关系，
-男二：185cm*70kg, 某职工，和女二有过一段婚姻，后面驾校认识女主，加了好友，是很稀有的高颜值、好身材的帅哥
-女二：男二的前妻，因婚后不和离婚，175cmx60kg,很有气质，人妻、少妇感拉满，御姐类型
- * 
- */

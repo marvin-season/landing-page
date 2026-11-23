@@ -24,8 +24,8 @@ export function UnfinishedReplyStack({
         <CollapsibleChevron />
         <span>
           {messages.length > 1
-            ? `${messages.length} 条未完成回复 · 不计入后续剧情`
-            : "未完成 · 不计入后续剧情"}
+            ? `${messages.length} 条未完成回复已折叠 · 展开可查看已生成片段`
+            : "1 条未完成回复已折叠 · 展开可查看已生成片段"}
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent>

@@ -209,10 +209,17 @@ export function chapterTitle(index: number) {
 
 export const maxChapterTitleLength = 80;
 
+export function chapterLengthShortfall(length: number, words: string) {
+  if (!isChapterTargetValid(words) || length <= 0) return false;
+  return length < Number(words) * 0.75;
+}
+
 export function formatChapterLength(length: number, words: string) {
   const current = length.toLocaleString("zh-CN");
   if (!isChapterTargetValid(words)) return `本章 ${current} 字`;
-  return `本章 ${current} / 目标 ${Number(words).toLocaleString("zh-CN")} 字`;
+  const target = Number(words).toLocaleString("zh-CN");
+  const base = `本章 ${current} / 目标 ${target} 字`;
+  return chapterLengthShortfall(length, words) ? `${base} · 偏短` : base;
 }
 
 export function renameChapter(

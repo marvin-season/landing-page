@@ -29,6 +29,14 @@ export function MessageBubble({
     .filter((name) => !message.text.includes(name));
   const text = [...missingMentions, message.text].filter(Boolean).join(" ");
   const unfinished = isUnfinishedReply(message);
+  const unfinishedLabel =
+    message.status === "truncated"
+      ? "已截断"
+      : message.status === "interrupted"
+        ? "已中断"
+        : message.status === "failed"
+          ? "生成失败"
+          : "未完成";
   const character = characters.find((item) => item.id === message.speakerId);
   const role = narrator
     ? message.operator
@@ -43,7 +51,7 @@ export function MessageBubble({
     <article
       className={cn(
         "flex items-start gap-3 border-b border-border py-4",
-        unfinished && "opacity-60",
+        unfinished && "bg-muted/30",
       )}
     >
       {narrator ? null : character ? (
@@ -83,10 +91,13 @@ export function MessageBubble({
           )}
         </div>
         {unfinished ? (
-          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span>未完成 · 不计入后续剧情</span>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>
+              {unfinishedLabel}
+              {text ? " · 已保留上方片段" : ""} · 不计入后续剧情
+            </span>
             {onRetry ? (
-              <Button size="sm" variant="ghost" onClick={onRetry}>
+              <Button size="sm" variant="outline" onClick={onRetry}>
                 <RotateCcw data-icon="inline-start" />
                 重试这一条
               </Button>
