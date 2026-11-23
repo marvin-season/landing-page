@@ -9,7 +9,6 @@ import {
   novelRequestBudget,
   novelRequestBytes,
   novelWithCompression,
-  parseCompressionRate,
   planCompressionBatch,
   smallerNovelBudget,
 } from "./context-compression";
@@ -59,11 +58,7 @@ test("compression options set the target for the entire rolling summary and forw
     novelRequestBudget,
   );
   assert.ok(automatic);
-  assert.equal(JSON.parse(automatic.prompt).task.targetCharacters, 150);
-  assert.equal(parseCompressionRate("99"), 99);
-  for (const invalid of ["", "0", "100", "1.5", "1e1"]) {
-    assert.equal(parseCompressionRate(invalid), null);
-  }
+  assert.equal(JSON.parse(automatic.prompt).task.targetCharacters, 750);
 });
 
 test("budgets serialized request bytes separately from prompt characters", () => {

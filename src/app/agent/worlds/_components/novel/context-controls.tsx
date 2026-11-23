@@ -31,7 +31,6 @@ import {
   maxCompressionTarget,
   novelRequestBudget,
   novelRequestBytes,
-  parseCompressionRate,
 } from "./context-compression";
 import { chapterPrompt, novelCheckpointCount } from "./model";
 import type { useNovel } from "./use-novel";
@@ -53,12 +52,9 @@ export function ContextControls({
   const { novel } = writer;
   const config = room.config;
   const [open, setOpen] = useState(false);
-  const [compressionRate, setCompressionRate] = useState(
-    String(defaultCompressionRate),
-  );
+  const [rate, setRate] = useState(defaultCompressionRate);
   const [compressionPrompt, setCompressionPrompt] = useState("");
   const rateId = useId();
-  const rate = parseCompressionRate(compressionRate);
   const chapterCount = novel.chapters.length;
   const { characters, bytes } = useMemo(() => {
     if (!open) return { characters: 0, bytes: 0 };
@@ -135,27 +131,27 @@ export function ContextControls({
             <fieldset disabled={pending}>
               <FieldGroup>
                 <div className="flex flex-col gap-2">
-                  <label htmlFor={rateId} className="text-sm font-medium">
-                    压缩率（%）
-                  </label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Input
-                      id={rateId}
-                      inputMode="numeric"
-                      maxLength={2}
-                      value={compressionRate}
-                      onChange={(event) =>
-                        setCompressionRate(event.target.value)
-                      }
-                      aria-invalid={rate === null}
-                      className="w-24"
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {rate === null
-                        ? "请输入 1–99 的整数"
-                        : `目标约为原文的 ${100 - rate}%，最多 ${maxCompressionTarget} 字`}
-                    </span>
+                  <div className="flex items-center justify-between gap-2">
+                    <label htmlFor={rateId} className="text-sm font-medium">
+                      压缩率
+                    </label>
+                    <span className="text-sm tabular-nums">{rate}%</span>
                   </div>
+                  <Input
+                    id={rateId}
+                    type="range"
+                    min={1}
+                    max={99}
+                    value={rate}
+                    aria-valuetext={`${rate}%`}
+                    onChange={(event) =>
+                      setRate(event.currentTarget.valueAsNumber)
+                    }
+                    className="h-5 cursor-pointer border-0 px-0 py-0 accent-primary shadow-none dark:bg-transparent shinchan:bg-transparent apple:bg-transparent apple:backdrop-blur-none"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    目标约为原文的 {100 - rate}%，最多 {maxCompressionTarget} 字
+                  </p>
                 </div>
                 <TextField
                   label="压缩提示词（选填）"
@@ -188,9 +184,8 @@ export function ContextControls({
           ) : (
             <Button
               variant="outline"
-              disabled={!canCompress || rate === null || pending}
+              disabled={!canCompress || pending}
               onClick={() => {
-                if (rate === null) return;
                 writer.compressContext({
                   rate,
                   instructions: compressionPrompt,

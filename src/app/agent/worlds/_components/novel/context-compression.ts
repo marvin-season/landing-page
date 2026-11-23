@@ -13,15 +13,10 @@ export const novelRequestBudget = {
   characters: maxNovelPromptLength,
   bytes: 384 * 1024,
 };
-export const defaultCompressionRate = 90;
+export const defaultCompressionRate = 50;
 export const maxCompressionTarget = 4000;
 export const maxCompressionPromptLength = 2000;
 export type CompressionOptions = { rate: number; instructions: string };
-
-export function parseCompressionRate(input: string) {
-  const rate = Number(input);
-  return /^\d{1,2}$/.test(input) && rate >= 1 && rate <= 99 ? rate : null;
-}
 
 const encoder = new TextEncoder();
 
