@@ -2,13 +2,13 @@
 
 import {
   Button,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Textarea,
 } from "@landing-page/design-system";
 import { useId, useState } from "react";
@@ -43,22 +43,19 @@ export function ChapterSplit({
   }
 
   return (
-    <Sheet
+    <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) close();
       }}
     >
-      <SheetContent
-        className="w-full sm:max-w-xl"
-        onCloseAutoFocus={onCloseAutoFocus}
-      >
-        <SheetHeader className="pr-12">
-          <SheetTitle>拆分本章</SheetTitle>
-          <SheetDescription className="wrap-break-word">
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
+        <DialogHeader className="pr-12">
+          <DialogTitle>拆分本章</DialogTitle>
+          <DialogDescription className="wrap-break-word">
             {chapter.title}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
           <FieldGroup>
             <div className="flex flex-col gap-2">
@@ -95,10 +92,10 @@ export function ChapterSplit({
             ) : null}
           </FieldGroup>
         </div>
-        <SheetFooter className="flex-row justify-end">
-          <SheetClose asChild>
+        <DialogFooter className="flex-row justify-end">
+          <DialogClose asChild>
             <Button variant="outline">取消</Button>
-          </SheetClose>
+          </DialogClose>
           <Button
             disabled={disabled || !canSplit}
             onClick={() => {
@@ -107,8 +104,8 @@ export function ChapterSplit({
           >
             确认拆分
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -2,6 +2,8 @@
 
 import {
   Button,
+  Dialog,
+  DialogContent,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -157,17 +159,27 @@ export function WorldNotesSheet({
   onOpenChange: (open: boolean) => void;
   onMention?: (id: string) => void;
 }) {
+  const panel = (
+    <>
+      <SheetHeader>
+        <SheetTitle>世界与角色</SheetTitle>
+        <SheetDescription>公开设定与当前剧情</SheetDescription>
+      </SheetHeader>
+      <div className="p-4">
+        <WorldNotes room={room} onMention={onMention} />
+      </div>
+    </>
+  );
+  if (room.kind === "novel") {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="overflow-y-auto">{panel}</DialogContent>
+      </Dialog>
+    );
+  }
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>世界与角色</SheetTitle>
-          <SheetDescription>公开设定与当前剧情</SheetDescription>
-        </SheetHeader>
-        <div className="p-4">
-          <WorldNotes room={room} onMention={onMention} />
-        </div>
-      </SheetContent>
+      <SheetContent className="overflow-y-auto">{panel}</SheetContent>
     </Sheet>
   );
 }

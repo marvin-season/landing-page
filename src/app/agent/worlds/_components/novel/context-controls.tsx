@@ -4,14 +4,14 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
   Progress,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
 } from "@landing-page/design-system";
 import { GitFork, LoaderCircle, Sparkles, Square } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -89,7 +89,7 @@ export function ContextControls({
   const pending = writer.busy || creating;
   const fits = fork !== null && forkFitsBudget(fork.length, forkBaseLength);
   return (
-    <Sheet
+    <Dialog
       open={open}
       onOpenChange={(next) => {
         if (pending) return;
@@ -99,7 +99,7 @@ export function ContextControls({
         writer.clearFork();
       }}
     >
-      <SheetTrigger asChild>
+      <DialogTrigger asChild>
         <Button
           size="sm"
           variant="outline"
@@ -109,14 +109,14 @@ export function ContextControls({
           <GitFork data-icon="inline-start" />
           上下文
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-xl">
-        <SheetHeader className="shrink-0 border-b border-border pr-12">
-          <SheetTitle>续写上下文</SheetTitle>
-          <SheetDescription>
+      </DialogTrigger>
+      <DialogContent className="gap-0">
+        <DialogHeader className="shrink-0 border-b border-border pr-12">
+          <DialogTitle>续写上下文</DialogTitle>
+          <DialogDescription>
             新会话 · 保留全部正文 · 压缩前 {forkChapterCount(novel)} 章
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
           <div className="flex flex-col gap-2">
             <p className="text-xs tabular-nums text-muted-foreground">
@@ -188,7 +188,7 @@ export function ContextControls({
             </Alert>
           ) : null}
         </div>
-        <SheetFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
+        <DialogFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
           <Button
             disabled={!fits || pending}
             onClick={async () => {
@@ -212,8 +212,8 @@ export function ContextControls({
             )}
             {creating ? "正在创建…" : "创建续写分支"}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

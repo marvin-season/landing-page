@@ -53,6 +53,7 @@ function EditorSection({
   summary,
   icon: Icon,
   actions,
+  plain = false,
   children,
 }: {
   id: string;
@@ -62,10 +63,16 @@ function EditorSection({
   summary: string;
   icon: typeof BookOpen;
   actions?: ReactNode;
+  plain?: boolean;
   children: ReactNode;
 }) {
   return (
-    <Collapsible id={id} variant="card" open={open} onOpenChange={onOpenChange}>
+    <Collapsible
+      id={id}
+      variant={plain ? "plain" : "card"}
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <div className="flex items-center">
         <CollapsibleTrigger variant="flush" className="min-w-0 flex-1">
           <Icon data-icon="inline-start" aria-hidden="true" />
@@ -84,7 +91,13 @@ function EditorSection({
         ) : null}
       </div>
       <CollapsibleContent variant="collapse">
-        <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
+        <div
+          className={
+            plain
+              ? "flex flex-col gap-4 px-3 pt-1 pb-2"
+              : "flex flex-col gap-4 border-t border-border px-4 py-4"
+          }
+        >
           {children}
         </div>
       </CollapsibleContent>
@@ -102,6 +115,7 @@ export function WorldEditor({
   submitLabel,
   kind,
   initialNovelContext,
+  plain = false,
 }: {
   initial: WorldConfig;
   onSave: (
@@ -115,6 +129,7 @@ export function WorldEditor({
   submitLabel?: string;
   kind: WorldKind;
   initialNovelContext?: NovelWritingContext;
+  plain?: boolean;
 }) {
   const [config, setConfig] = useState(() => structuredClone(initial));
   const [novelContext, setNovelContext] = useState(initialNovelContext);
@@ -223,7 +238,13 @@ export function WorldEditor({
         });
       }}
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain px-5 py-4">
+      <div
+        className={
+          plain
+            ? "flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-y-contain px-5 py-4"
+            : "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain px-5 py-4"
+        }
+      >
         <fieldset
           disabled={pending || importing}
           className="flex min-w-0 flex-col gap-3 disabled:opacity-60"
@@ -265,6 +286,7 @@ export function WorldEditor({
             title="世界与规则"
             summary={preview(config.title, "未命名世界")}
             icon={BookOpen}
+            plain={plain}
           >
             <FieldGroup>
               <TextField
@@ -323,6 +345,7 @@ export function WorldEditor({
               !novel && config.narration ? "旁白已打开" : "未填写目标",
             )}
             icon={ScrollText}
+            plain={plain}
           >
             <FieldGroup>
               {novel && novelContext ? (
@@ -426,12 +449,14 @@ export function WorldEditor({
                 </Button>
               ) : null
             }
+            plain={plain}
           >
             <div className="flex flex-col gap-3">
               {config.characters.map((character, index) => (
                 <Collapsible
                   key={character.id}
-                  variant="card"
+                  variant={plain ? "plain" : "card"}
+                  className={plain ? "rounded-lg bg-muted/30" : undefined}
                   open={openCharacterIds.has(character.id)}
                   onOpenChange={(open) =>
                     setOpenCharacterIds((current) => {
@@ -467,7 +492,13 @@ export function WorldEditor({
                     <CollapsibleChevron />
                   </CollapsibleTrigger>
                   <CollapsibleContent variant="collapse">
-                    <div className="flex flex-col gap-4 border-t border-border px-4 py-4">
+                    <div
+                      className={
+                        plain
+                          ? "flex flex-col gap-4 px-4 pt-1 pb-4"
+                          : "flex flex-col gap-4 border-t border-border px-4 py-4"
+                      }
+                    >
                       {presets.some((p) => p.kind === "character") ? (
                         <div className="flex flex-col gap-2 text-sm">
                           <span>使用角色预设</span>
@@ -590,7 +621,13 @@ export function WorldEditor({
                           />
                         </label>
                       </FieldGroup>
-                      <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
+                      <div
+                        className={
+                          plain
+                            ? "flex items-center justify-between gap-3"
+                            : "flex items-center justify-between gap-3 border-t border-border pt-3"
+                        }
+                      >
                         <label className="flex items-center gap-2 text-sm">
                           <Switch
                             checked={character.enabled}
@@ -648,6 +685,7 @@ export function WorldEditor({
               novel ? "采用第一个启用的候选模型" : "自动推进，可改成旁白或角色"
             }
             icon={SlidersHorizontal}
+            plain={plain}
           >
             {!novel ? (
               <p className="text-sm leading-6 text-muted-foreground">

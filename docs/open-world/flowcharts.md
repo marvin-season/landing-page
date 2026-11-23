@@ -140,7 +140,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   actor User as 用户
-  participant UI as NovelPanel / 编辑器 / 抽屉
+  participant UI as NovelPanel / 编辑器 / 对话框
   participant Hook as useNovel
   participant API as /api/novel + Writer
   participant DB as IndexedDB

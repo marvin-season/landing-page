@@ -4,12 +4,12 @@ import {
   Alert,
   AlertDescription,
   Button,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@landing-page/design-system";
 import {
   Check,
@@ -139,7 +139,7 @@ export function PlotSheet({
   }
 
   return (
-    <Sheet
+    <Dialog
       open={open}
       onOpenChange={(next) => {
         if (!next && !writer.busy && !applying) {
@@ -149,20 +149,17 @@ export function PlotSheet({
         }
       }}
     >
-      <SheetContent
-        className="w-full gap-0 overflow-hidden sm:max-w-xl"
-        onCloseAutoFocus={onCloseAutoFocus}
-      >
-        <SheetHeader className="shrink-0 border-b border-border pr-12">
-          <SheetTitle>剧情整理</SheetTitle>
-          <SheetDescription>
+      <DialogContent className="gap-0" onCloseAutoFocus={onCloseAutoFocus}>
+        <DialogHeader className="shrink-0 border-b border-border pr-12">
+          <DialogTitle>剧情整理</DialogTitle>
+          <DialogDescription>
             {atStart
               ? "插入位置 · 第一章之前"
               : hasPlotPair
                 ? `相邻章节 · 已选 ${selected.length} / 2`
                 : "剧情插入"}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
         <form
           id={form}
           className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4"
@@ -317,7 +314,7 @@ export function PlotSheet({
             </Alert>
           ) : null}
         </form>
-        <SheetFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
+        <DialogFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
           {writer.busy ? (
             <Button type="button" variant="outline" onClick={writer.stop}>
               <Square data-icon="inline-start" />
@@ -365,8 +362,8 @@ export function PlotSheet({
               生成草稿
             </Button>
           )}
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
