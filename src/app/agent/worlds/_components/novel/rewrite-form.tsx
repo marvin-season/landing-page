@@ -16,6 +16,7 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
+import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { WritingInstructions } from "./writing-instructions";
 
 type RewriteControls = {
@@ -23,7 +24,12 @@ type RewriteControls = {
   draftReady: boolean;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
-  writer: { busy: boolean; error: string; stop: () => void };
+  writer: {
+    busy: boolean;
+    error: string;
+    stop: () => void;
+    draftIncomplete?: boolean;
+  };
   ended: boolean;
   onClose: () => void;
   onDelete?: () => void;
@@ -51,6 +57,17 @@ export function RewritePanel({
   const form = useRef<HTMLFormElement>(null);
   const instructions = useRef<HTMLTextAreaElement>(null);
   const showInstructions = !writer.busy && !draftReady;
+
+  useRegisterPromptReuse({
+    selection: (text) => {
+      if (!isPassage || !showInstructions || ended) return false;
+      const field = instructions.current;
+      if (!field) return false;
+      field.value = text;
+      field.focus({ preventScroll: true });
+      return true;
+    },
+  });
 
   useLayoutEffect(() => {
     if (!showInstructions) {
@@ -160,9 +177,12 @@ export function RewritePanel({
         ) : null}
         {writer.error ? (
           <p
-            role="alert"
+            role={writer.draftIncomplete ? "status" : "alert"}
             className={cn(
-              "shrink-0 wrap-break-word text-xs text-destructive",
+              "shrink-0 wrap-break-word text-xs",
+              writer.draftIncomplete
+                ? "text-muted-foreground"
+                : "text-destructive",
               !showInstructions && "px-1 py-1",
             )}
           >

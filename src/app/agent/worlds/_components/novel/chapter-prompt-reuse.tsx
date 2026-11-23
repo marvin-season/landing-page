@@ -7,11 +7,19 @@ import {
   useEffect,
   useRef,
 } from "react";
+export type NovelPromptReuseKind =
+  | "chapter"
+  | "rewrite"
+  | "selection"
+  | "stitch"
+  | "merge"
+  | "insert";
 
-type ReuseChapterPrompt = (text: string) => boolean;
+type ReusePrompt = (text: string) => boolean;
+type ReuseHandlers = Partial<Record<NovelPromptReuseKind, ReusePrompt>>;
 
-const ChapterPromptReuseContext = createContext<{
-  current: ReuseChapterPrompt;
+const NovelPromptReuseContext = createContext<{
+  current: ReuseHandlers;
 } | null>(null);
 
 export function ChapterPromptReuseProvider({
@@ -19,29 +27,49 @@ export function ChapterPromptReuseProvider({
 }: {
   children: ReactNode;
 }) {
-  const registry = useRef<ReuseChapterPrompt>(() => false);
+  const registry = useRef<ReuseHandlers>({});
   return (
-    <ChapterPromptReuseContext.Provider value={registry}>
+    <NovelPromptReuseContext.Provider value={registry}>
       {children}
-    </ChapterPromptReuseContext.Provider>
+    </NovelPromptReuseContext.Provider>
   );
 }
 
-export function useRegisterChapterPromptReuse(reuse: ReuseChapterPrompt) {
-  const registry = useContext(ChapterPromptReuseContext);
-  const latest = useRef(reuse);
-  latest.current = reuse;
+export function useRegisterPromptReuse(handlers: ReuseHandlers) {
+  const registry = useContext(NovelPromptReuseContext);
+  const latest = useRef(handlers);
+  latest.current = handlers;
+  const kinds = Object.keys(handlers).sort().join(",");
   useEffect(() => {
     if (!registry) return;
-    const installed: ReuseChapterPrompt = (text) => latest.current(text);
-    registry.current = installed;
+    const installed: ReuseHandlers = {};
+    for (const kind of kinds
+      .split(",")
+      .filter(Boolean) as NovelPromptReuseKind[]) {
+      const run: ReusePrompt = (text) => latest.current[kind]?.(text) ?? false;
+      installed[kind] = run;
+      registry.current[kind] = run;
+    }
     return () => {
-      if (registry.current === installed) registry.current = () => false;
+      for (const kind of Object.keys(installed) as NovelPromptReuseKind[]) {
+        if (registry.current[kind] === installed[kind])
+          delete registry.current[kind];
+      }
     };
-  }, [registry]);
+  }, [kinds, registry]);
+}
+
+export function useRegisterChapterPromptReuse(reuse: ReusePrompt) {
+  useRegisterPromptReuse({ chapter: reuse });
 }
 
 export function useReuseChapterPrompt() {
-  const registry = useContext(ChapterPromptReuseContext);
-  return (text: string) => registry?.current(text) ?? false;
+  const reuse = useReusePrompt();
+  return (text: string) => reuse("chapter", text);
+}
+
+export function useReusePrompt() {
+  const registry = useContext(NovelPromptReuseContext);
+  return (kind: NovelPromptReuseKind, text: string) =>
+    registry?.current[kind]?.(text) ?? false;
 }

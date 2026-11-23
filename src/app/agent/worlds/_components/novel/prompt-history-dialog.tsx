@@ -4,19 +4,31 @@ import { Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
 import { History, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useReuseChapterPrompt } from "./chapter-prompt-reuse";
+import {
+  type NovelPromptReuseKind,
+  useReusePrompt,
+} from "./chapter-prompt-reuse";
 import {
   type NovelPrompt,
   promptLabels,
   readNovelPrompts,
 } from "./prompt-history";
 
+const fillLabels = {
+  chapter: "填入下一章要求",
+  rewrite: "填入润色指令",
+  selection: "填入选段润色指令",
+  stitch: "填入粘合要求",
+  merge: "填入合并要求",
+  insert: "填入插入要求",
+} as const satisfies Record<NovelPromptReuseKind, string>;
+
 function PromptHistoryList({
   roomKey,
-  onUseChapterPrompt,
+  onUsePrompt,
 }: {
   roomKey: string;
-  onUseChapterPrompt: (text: string) => boolean;
+  onUsePrompt: (kind: NovelPromptReuseKind, text: string) => boolean;
 }) {
   const [result, setResult] = useState<NovelPrompt[] | "error" | null>(null);
   const [blocked, setBlocked] = useState(false);
@@ -55,7 +67,7 @@ function PromptHistoryList({
     <div className="flex min-h-0 flex-col">
       {blocked ? (
         <p role="status" className="px-5 pt-3 text-xs text-muted-foreground">
-          正在生成、润色、导入或故事已结束时，不能填入下一章要求。
+          正在生成、润色、导入、故事已结束，或对应面板未打开时，不能填入该要求。
         </p>
       ) : null}
       <ol className="min-h-0 divide-y divide-border/60 overflow-y-auto overscroll-contain px-5">
@@ -70,20 +82,18 @@ function PromptHistoryList({
             <p className="wrap-anywhere whitespace-pre-wrap text-sm leading-6">
               {text}
             </p>
-            {kind === "chapter" ? (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="self-start"
-                onClick={() => {
-                  if (onUseChapterPrompt(text)) return;
-                  setBlocked(true);
-                }}
-              >
-                填入下一章要求
-              </Button>
-            ) : null}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="self-start"
+              onClick={() => {
+                if (onUsePrompt(kind, text)) return;
+                setBlocked(true);
+              }}
+            >
+              {fillLabels[kind]}
+            </Button>
           </li>
         ))}
       </ol>
@@ -93,7 +103,7 @@ function PromptHistoryList({
 
 export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
   const [open, setOpen] = useState(false);
-  const reuseChapterPrompt = useReuseChapterPrompt();
+  const reusePrompt = useReusePrompt();
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
@@ -117,7 +127,7 @@ export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
               提示词历史
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              从最新到最早显示已提交的写作要求。续写要求可以填回下一章输入框。
+              从最新到最早显示已提交的写作要求。可将要求填回对应输入框，不会自动提交。
             </Dialog.Description>
             <Dialog.Close asChild>
               <Button
@@ -134,8 +144,8 @@ export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
           <PromptHistoryList
             key={roomKey}
             roomKey={roomKey}
-            onUseChapterPrompt={(text) => {
-              if (!reuseChapterPrompt(text)) return false;
+            onUsePrompt={(kind, text) => {
+              if (!reusePrompt(kind, text)) return false;
               setOpen(false);
               return true;
             }}

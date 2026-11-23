@@ -48,9 +48,10 @@ import {
   type ChapterGenerationOptions,
   ChapterRewriteForm,
 } from "./chapter-generation-form";
-import { useRegisterChapterPromptReuse } from "./chapter-prompt-reuse";
+import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
+import type { ChapterTextSelection } from "./chapter-text";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
@@ -61,6 +62,7 @@ import {
   replaceChapter,
   splitChapterAt,
 } from "./model";
+import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { useNovel } from "./use-novel";
 
@@ -92,6 +94,12 @@ export function NovelPanel({
     mode: "manual" | "chapter" | "rewrite";
     initialText?: string;
     afterChapterId?: string | null;
+    initialSelection?: ChapterTextSelection;
+  } | null>(null);
+  const [plotRestore, setPlotRestore] = useState<{
+    mode: PlotMode;
+    ids: PlotSelection;
+    requirements: string;
   } | null>(null);
   const isEditing = editingChapter !== null;
   useLayoutEffect(() => {
@@ -135,6 +143,30 @@ export function NovelPanel({
         initialText: restored.text,
         afterChapterId: restored.afterChapterId,
       });
+    },
+    (pending) => {
+      if (pending.kind === "selection") {
+        setSelected(pending.chapterId);
+        setEditingChapter({
+          chapter: {
+            id: pending.chapterId,
+            title: pending.chapterTitle,
+            text: pending.baseText,
+          },
+          mode: "manual",
+          initialSelection: {
+            ...pending.range,
+            direction: "forward",
+          },
+        });
+        return;
+      }
+      setPlotRestore({
+        mode: pending.mode,
+        ids: pending.ids,
+        requirements: pending.requirements,
+      });
+      setPlotOpen(true);
     },
   );
   const { novel } = writer;
@@ -242,7 +274,23 @@ export function NovelPanel({
     setComposerRequest((count) => count + 1);
     return true;
   }
-  useRegisterChapterPromptReuse(reuseChapterGoal);
+  function reuseRewritePrompt(text: string) {
+    if (!writer.ready || writer.busy || importing || ended) return false;
+    if (rewriting || editingChapter?.mode === "rewrite") {
+      setRewriteRequirements(text);
+      return true;
+    }
+    if (editingChapter) return false;
+    writer.discardRewrite();
+    window.getSelection()?.removeAllRanges();
+    setRewriteRequirements(text);
+    setRewriting(true);
+    return true;
+  }
+  useRegisterPromptReuse({
+    chapter: reuseChapterGoal,
+    rewrite: reuseRewritePrompt,
+  });
   const generationOptions = {
     chapterGoal: novel.chapterGoal,
     words: novel.words,
@@ -347,13 +395,20 @@ export function NovelPanel({
     return "已恢复本地备份。";
   }
   if (editingChapter) {
-    const { chapter: base, mode, initialText, afterChapterId } = editingChapter;
+    const {
+      chapter: base,
+      mode,
+      initialText,
+      afterChapterId,
+      initialSelection,
+    } = editingChapter;
     return (
       <ChapterEditor
         key={base.id}
         base={base}
         chapters={novel.chapters}
         initialText={initialText}
+        initialSelection={initialSelection}
         generation={
           mode === "chapter"
             ? {
@@ -737,15 +792,20 @@ export function NovelPanel({
                     chapters={novel.chapters}
                     hasPlotPair={hasPlotPair}
                     open={plotOpen}
-                    onOpenChange={setPlotOpen}
+                    onOpenChange={(open) => {
+                      setPlotOpen(open);
+                      if (!open) setPlotRestore(null);
+                    }}
                     onCloseAutoFocus={(event) => {
                       event.preventDefault();
                       chapterMenuTrigger.current?.focus();
                     }}
                     writer={writer}
+                    restored={plotRestore}
                     onApplied={(id) => {
                       setAppliedRewrite(undefined);
                       setSelected(id);
+                      setPlotRestore(null);
                     }}
                   />
                   <ChapterSplit

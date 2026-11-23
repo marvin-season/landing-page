@@ -64,7 +64,7 @@
 | 运行请求幂等与暂停封锁 | `world_requests` | 以 `(room_id, clientRequestId)` 去重；暂停时写入 `cancelled` 封锁迟到的请求 |
 | 世界预设、角色预设 | `world_presets` | 与房间互不影响，创建房间时复制配置快照 |
 | 小说设定、章节、续写摘要 | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 不随房间跨设备同步；删除或复制房间都不处理这份数据 |
-| 生成中的小说草稿 | `useNovel` 内存 | 刷新或离开页面后丢失 |
+| 生成中的小说草稿 | `useNovel` 内存；待应用结果另有本机备份 | 流式过程只在内存；续写 / 整章润色 / 选段润色 / 剧情整理的待应用结果刷新后可恢复 |
 
 ## 5. 接口
 

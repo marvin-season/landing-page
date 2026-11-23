@@ -37,6 +37,7 @@ export function ChapterEditor({
   base,
   chapters,
   initialText,
+  initialSelection,
   generation,
   writer,
   ended,
@@ -49,6 +50,7 @@ export function ChapterEditor({
   base: Chapter;
   chapters: readonly Chapter[];
   initialText?: string;
+  initialSelection?: ChapterTextSelection;
   generation?: {
     kind: "chapter" | "rewrite";
     onGenerate: () => boolean;
@@ -61,6 +63,7 @@ export function ChapterEditor({
     ReturnType<typeof useNovel>,
     | "busy"
     | "generationStopped"
+    | "draftIncomplete"
     | "draftBackupFailed"
     | "backupDraftText"
     | "error"
@@ -89,7 +92,9 @@ export function ChapterEditor({
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
-  const [target, setTarget] = useState<ChapterTextSelection | null>(null);
+  const [target, setTarget] = useState<ChapterTextSelection | null>(
+    () => initialSelection ?? null,
+  );
   const [appliedRange, setAppliedRange] = useState<ChapterTextRange | null>(
     null,
   );
@@ -290,9 +295,13 @@ export function ChapterEditor({
                 : generatingDraft || dirty
                   ? saveFailed
                     ? "保存失败"
-                    : generation && writer.generationStopped && useGeneratedText
-                      ? "已停止 · 未保存"
-                      : "未保存"
+                    : generation && writer.draftIncomplete && useGeneratedText
+                      ? "未写完 · 未保存"
+                      : generation &&
+                          writer.generationStopped &&
+                          useGeneratedText
+                        ? "已停止 · 未保存"
+                        : "未保存"
                   : "已保存"}
           </span>
         </div>
@@ -492,7 +501,15 @@ export function ChapterEditor({
                   </p>
                 ) : null}
                 {writer.error ? (
-                  <p role="alert" className="text-xs text-destructive">
+                  <p
+                    role={writer.draftIncomplete ? "status" : "alert"}
+                    className={cn(
+                      "text-xs",
+                      writer.draftIncomplete
+                        ? "text-muted-foreground"
+                        : "text-destructive",
+                    )}
+                  >
                     {writer.error}
                   </p>
                 ) : null}

@@ -20,9 +20,10 @@ import {
   Square,
   WandSparkles,
 } from "lucide-react";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { TextField } from "../fields";
+import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import type { Chapter } from "./model";
 import {
   type PlotMode,
@@ -51,6 +52,7 @@ export function PlotSheet({
   onCloseAutoFocus,
   writer,
   onApplied,
+  restored,
 }: {
   chapters: readonly Chapter[];
   hasPlotPair: boolean;
@@ -68,12 +70,23 @@ export function PlotSheet({
     | "stop"
   >;
   onApplied: (id: string) => void;
+  restored?: {
+    mode: PlotMode;
+    ids: PlotSelection;
+    requirements: string;
+  } | null;
 }) {
   const fieldName = useId();
   const form = useId();
-  const [selection, setSelection] = useState<string[] | "start">([]);
-  const [preferredMode, setMode] = useState<PlotMode>("stitch");
-  const [requirements, setRequirements] = useState("");
+  const [selection, setSelection] = useState<string[] | "start">(() =>
+    restored ? (restored.ids.length === 1 ? "start" : [...restored.ids]) : [],
+  );
+  const [preferredMode, setMode] = useState<PlotMode>(
+    () => restored?.mode ?? "stitch",
+  );
+  const [requirements, setRequirements] = useState(
+    () => restored?.requirements ?? "",
+  );
   const [applying, setApplying] = useState(false);
   const draft = writer.plotDraft;
   const locked = writer.busy || applying || draft !== null;
@@ -94,6 +107,28 @@ export function PlotSheet({
         ? [pair.first.id, pair.second.id]
         : null;
   const canStart = Boolean(target && (mode === "merge" || requirements.trim()));
+
+  useEffect(() => {
+    if (!restored) return;
+    setMode(restored.mode);
+    setRequirements(restored.requirements);
+    setSelection(restored.ids.length === 1 ? "start" : [...restored.ids]);
+  }, [restored]);
+
+  function fillRequirements(nextMode: PlotMode, text: string) {
+    if (writer.busy || applying || draft !== null) return false;
+    if ((nextMode === "stitch" || nextMode === "merge") && !hasPlotPair)
+      return false;
+    setMode(nextMode);
+    setRequirements(text);
+    onOpenChange(true);
+    return true;
+  }
+  useRegisterPromptReuse({
+    stitch: (text) => fillRequirements("stitch", text),
+    merge: (text) => fillRequirements("merge", text),
+    insert: (text) => fillRequirements("insert", text),
+  });
 
   function close() {
     writer.discardRewrite();
