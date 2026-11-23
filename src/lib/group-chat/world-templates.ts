@@ -29,7 +29,7 @@ export type WorldTemplate = {
   config: WorldConfig;
 };
 
-const templatesDir = join(process.cwd(), "public/worlds");
+const templatesDir = join(process.cwd(), "data", "novels", "template");
 
 function jsonFiles(dir: string) {
   if (!existsSync(dir)) return [];

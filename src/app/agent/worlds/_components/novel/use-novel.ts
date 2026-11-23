@@ -1,5 +1,6 @@
 "use client";
 
+import { isDevelopment } from "@landing-page/utils";
 import {
   aiSdkChatStreamAdapter,
   getChatStreamText,
@@ -24,10 +25,13 @@ import {
 } from "./fork-model";
 import { createImportedNovel, type ImportedNovel } from "./import-novel";
 import {
+  applyChapterContinuation,
   type Chapter,
   chapterPrompt,
+  continuationIndex,
   createBackground,
   createNovel,
+  exportNovel,
   invalidateEditedCheckpoint,
   isChapterTargetValid,
   maxChapterLength,
@@ -44,10 +48,18 @@ import {
   summaryPrompt,
 } from "./model";
 import {
+  loadServerNovel,
+  restoreNovelBackup,
+  type ServerNovel,
+  saveNovelToServer,
+  syncNovelFromServer,
+} from "./novel-server-sync";
+import { type NovelSyncDivergence, novelSyncStatus } from "./novel-sync";
+import {
   applyPlotDraft,
-  type ChapterPair,
   type PlotDraft,
   type PlotMode,
+  type PlotSelection,
   preparePlotEdit,
   readPlotDraft,
 } from "./plot-edit";
@@ -55,7 +67,8 @@ import { recordNovelPrompt } from "./prompt-history";
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
-const novels: Table<{ key: string; novel: Novel }, string> = db.table("novels");
+const novels: Table<{ key: string; novel: Novel; previous?: Novel }, string> =
+  db.table("novels");
 
 type NovelRun =
   | { task: "chapter"; onFirstText?: () => void }
@@ -98,12 +111,20 @@ export function useNovel(
   const [forkSummary, setForkSummary] = useState("");
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
+  const [syncPrompt, setSyncPrompt] = useState<NovelSyncDivergence | null>(
+    null,
+  );
+  const [serverSynced, setServerSynced] = useState(false);
+  const [hasLocalBackup, setHasLocalBackup] = useState(false);
   const input = useRef<NovelRun | null>(null);
   const state = useRef(initialChatStreamState);
   const finished = useRef(false);
   const generating = useRef(false);
   const latest = useRef(novel);
   const writes = useRef(Promise.resolve());
+  const previousRef = useRef<Novel | undefined>(undefined);
+  const serverCopy = useRef<ServerNovel | null>(null);
+  const serverSync = useRef<Promise<unknown> | null>(null);
   const backup = useMemo(
     () =>
       createChapterDraftBackup(
@@ -113,17 +134,59 @@ export function useNovel(
       ),
     [key],
   );
+  const configRef = useRef(room.config);
+  const roomIdRef = useRef(room.id);
+  configRef.current = room.config;
+  roomIdRef.current = room.id;
   const restoreEditor = useEffectEvent(onDraftRestored);
+  function publishSync(novel: Novel) {
+    const status = novelSyncStatus(
+      novel,
+      serverCopy.current,
+      exportNovel(novel, "txt"),
+    );
+    setSyncPrompt(status.kind === "diverged" ? status.reason : null);
+    setServerSynced(status.kind === "match");
+    return status;
+  }
   useEffect(() => {
     let active = true;
-    novels
-      .get(key)
-      .then((saved) => {
+    Promise.all([
+      novels.get(key),
+      isDevelopment ? loadServerNovel(roomIdRef.current) : null,
+    ])
+      .then(async ([saved, server]) => {
         if (!active) return;
-        if (saved) {
-          latest.current = saved.novel;
-          setNovel(saved.novel);
+        let novel = saved?.novel ?? createNovel(configRef.current);
+        previousRef.current = saved?.previous;
+        setHasLocalBackup(Boolean(saved?.previous));
+        serverCopy.current = server;
+        const status = novelSyncStatus(
+          novel,
+          server,
+          exportNovel(novel, "txt"),
+        );
+        if (
+          status.kind === "match" &&
+          (novel.updatedAt !== status.updatedAt ||
+            novel.syncedAt !== status.updatedAt)
+        ) {
+          novel = {
+            ...novel,
+            updatedAt: status.updatedAt,
+            syncedAt: status.updatedAt,
+          };
+          await novels.put({
+            key,
+            novel,
+            previous: previousRef.current,
+          });
         }
+        if (!active) return;
+        latest.current = novel;
+        setNovel(novel);
+        setSyncPrompt(status.kind === "diverged" ? status.reason : null);
+        setServerSynced(status.kind === "match");
         const restored = backup.read();
         if (restored) {
           const current = latest.current.chapters.find(
@@ -150,8 +213,7 @@ export function useNovel(
         setReady(true);
       })
       .catch(() => {
-        if (active)
-          setError("无法读取本机小说存档，请检查浏览器存储权限后刷新。");
+        if (active) setError("无法读取小说存档，请刷新后重试。");
       });
     return () => {
       active = false;
@@ -170,17 +232,25 @@ export function useNovel(
     };
   }, [backup]);
 
-  function update(next: Novel, { persistFirst = false } = {}) {
+  function update(next: Novel, { persistFirst = false, touch = true } = {}) {
     next = invalidateEditedCheckpoint(latest.current, next);
+    if (
+      touch &&
+      exportNovel(latest.current, "txt") !== exportNovel(next, "txt")
+    ) {
+      next = { ...next, updatedAt: Date.now() };
+    }
+    const previous = previousRef.current;
     function publish() {
       setBackgroundExport(null);
       latest.current = next;
       setNovel(next);
+      publishSync(next);
     }
     if (!persistFirst) publish();
     setSaving(true);
     const write = writes.current.then(async () => {
-      await novels.put({ key, novel: next });
+      await novels.put({ key, novel: next, previous });
       if (persistFirst) publish();
       if (latest.current === next) setSaving(false);
     });
@@ -323,23 +393,55 @@ export function useNovel(
     });
   }
 
-  function generateChapter(chapter: Chapter, onFirstText?: () => void) {
+  function generateChapter(
+    chapter: Chapter,
+    afterChapterId: string | null | undefined,
+    onFirstText?: () => void,
+  ) {
     if (!ready || generating.current || room.status === "ended") return false;
     setError("");
     const current = latest.current;
     if (!current.title.trim() || !isChapterTargetValid(current.words))
       return false;
-    const prompt = chapterPrompt(room.config, current);
+    const index = continuationIndex(current, afterChapterId);
+    if (index === null) {
+      setError("找不到续写起点，请返回阅读页重新选择章节。");
+      return false;
+    }
+    const prompt = chapterPrompt(room.config, current, index);
     if (prompt.length > maxNovelPromptLength) {
       setError(
         "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
       );
       return false;
     }
-    backup.start({ mode: "chapter", chapter, version: room.version });
+    backup.start({
+      mode: "chapter",
+      chapter,
+      afterChapterId,
+      version: room.version,
+    });
     start({ task: "chapter", onFirstText }, prompt);
     void recordNovelPrompt(key, "chapter", current.chapterGoal);
     return true;
+  }
+
+  async function saveChapterContinuation(
+    chapter: Chapter,
+    afterChapterId: string | null | undefined,
+  ) {
+    const next = applyChapterContinuation(
+      latest.current,
+      chapter,
+      afterChapterId,
+    );
+    if (!next) {
+      setError("找不到续写起点，无法保存到原位置。");
+      return null;
+    }
+    return (await update(next, { persistFirst: true }))
+      ? (next.chapters.find(({ id }) => id === chapter.id) ?? null)
+      : null;
   }
 
   function generateBackground() {
@@ -571,7 +673,7 @@ export function useNovel(
     return resolveRewrite(draft)?.chapters.find(({ id }) => id === draft.id);
   }
 
-  function editPlot(ids: ChapterPair, mode: PlotMode, requirements: string) {
+  function editPlot(ids: PlotSelection, mode: PlotMode, requirements: string) {
     if (!ready || generating.current || room.status === "ended") return;
     const current = latest.current;
     try {
@@ -623,12 +725,34 @@ export function useNovel(
     return plotDraft.chapters[0].id;
   }
 
+  const syncHost = {
+    busy: () => !ready || generating.current,
+    lock: serverSync,
+    novel: () => latest.current,
+    roomId: () => roomIdRef.current,
+    server: serverCopy,
+    previous: previousRef,
+    rememberBackup(backupNovel: Novel | undefined) {
+      previousRef.current = backupNovel;
+      setHasLocalBackup(Boolean(backupNovel));
+    },
+    publish: publishSync,
+    update,
+    clearDraft: () => backup.clear(),
+  };
+
   return {
     novel,
     update,
     updateContext,
     ready,
     error,
+    syncPrompt,
+    serverSynced,
+    hasLocalBackup,
+    saveToServer: () => saveNovelToServer(syncHost),
+    syncFromServer: () => syncNovelFromServer(syncHost),
+    restoreLocalBackup: () => restoreNovelBackup(syncHost),
     draftBackupFailed,
     backupDraftText: backup.write,
     clearDraftBackup: backup.clear,
@@ -660,6 +784,7 @@ export function useNovel(
       return next.chapters[0].id;
     },
     generateChapter,
+    saveChapterContinuation,
     generateBackground,
     summarizeFork,
     clearFork,

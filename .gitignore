@@ -18,8 +18,8 @@ node_modules
 /out/
 /public/pdfjs/
 /public/bbq-pwa/sw.js
-/public/worlds/local/*
-!/public/worlds/local/.gitkeep
+/data/novels/template/local/*
+!/data/novels/template/local/.gitkeep
 
 # production
 /build

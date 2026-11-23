@@ -108,7 +108,7 @@
 
 ## 7. 模板、预设、备份与复制
 
-- **模板**：`public/worlds/*.json` 和不提交的 `public/worlds/local/*.json`，文件名就是模板 ID。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
+- **模板**：`data/novels/template/*.json` 和不提交的 `data/novels/template/local/*.json`，文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
 - **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
 - **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
 - **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。
@@ -117,7 +117,7 @@
 ## 8. 验证
 
 ```sh
-nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板
+nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板、开发模式小说 TXT 落盘
 nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、续写分支、章节文本、Markdown 位置映射、差异
 nr check
 node_modules/.bin/tsc --noEmit --incremental false

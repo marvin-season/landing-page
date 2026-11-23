@@ -11,10 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@landing-page/design-system";
+import { isDevelopment } from "@landing-page/utils";
 import {
   Download,
   FileText,
   FolderOpen,
+  HardDrive,
+  HardDriveDownload,
+  History,
   LoaderCircle,
   Upload,
 } from "lucide-react";
@@ -28,6 +32,7 @@ import {
   parseNovelFile,
 } from "./import-novel";
 import { type NovelBackground, serializeBackground } from "./model";
+import type { NovelSyncDivergence } from "./novel-sync";
 
 export function downloadBackground(background: NovelBackground) {
   const name = background.source.title.replace(/[\\/:*?"<>|]/g, "_") || "小说";
@@ -39,6 +44,16 @@ export function downloadBackground(background: NovelBackground) {
   );
 }
 
+function syncPromptText(reason: NovelSyncDivergence) {
+  const lead = {
+    local: "本地正文在上次同步之后有修改。",
+    server: "服务器上的小说在上次同步之后有修改。",
+    both: "本地和服务器在上次同步之后都有修改。",
+    unknown: "本地和服务器上的小说不一致。",
+  }[reason];
+  return `${lead}请选择同步方向。被覆盖的一份会留下唯一备份，更早的备份会被删除。`;
+}
+
 export function NovelFileControls({
   toolbar,
   disabled,
@@ -48,6 +63,12 @@ export function NovelFileControls({
   onImportingChange,
   onImport,
   onDownload,
+  onSaveToServer,
+  onSyncFromServer,
+  onRestoreLocal,
+  canRestoreLocal,
+  syncPrompt,
+  serverSynced,
   onSummarize,
 }: {
   toolbar: HTMLElement | null;
@@ -58,10 +79,36 @@ export function NovelFileControls({
   onImportingChange: (importing: boolean) => void;
   onImport: (novel: ImportedNovel) => Promise<void>;
   onDownload: (format: "txt" | "md") => void;
+  onSaveToServer: () => Promise<string | null>;
+  onSyncFromServer: () => Promise<string | null>;
+  onRestoreLocal: () => Promise<string | null>;
+  canRestoreLocal: boolean;
+  syncPrompt: NovelSyncDivergence | null;
+  serverSynced: boolean;
   onSummarize: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [pending, setPending] = useState<"" | "save" | "load" | "restore">("");
+  function run(
+    kind: "save" | "load" | "restore",
+    action: () => Promise<string | null>,
+  ) {
+    setError("");
+    setNotice("");
+    setPending(kind);
+    void action()
+      .then((next) => {
+        if (next) setNotice(next);
+      })
+      .catch((syncError) => {
+        setError(
+          syncError instanceof Error ? syncError.message : "同步小说失败。",
+        );
+      })
+      .finally(() => setPending(""));
+  }
   return (
     <>
       {toolbar
@@ -105,6 +152,39 @@ export function NovelFileControls({
                     <FileText />
                     导出整本 TXT
                   </DropdownMenuItem>
+                  {isDevelopment ? (
+                    serverSynced ? (
+                      <p className="px-2 py-1.5 text-sm text-muted-foreground">
+                        数据已同步
+                      </p>
+                    ) : (
+                      <>
+                        <DropdownMenuItem
+                          disabled={!hasChapters || Boolean(pending)}
+                          onSelect={() => run("save", onSaveToServer)}
+                        >
+                          <HardDrive />
+                          {pending === "save" ? "正在保存…" : "保存到服务器"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={Boolean(pending)}
+                          onSelect={() => run("load", onSyncFromServer)}
+                        >
+                          <HardDriveDownload />
+                          {pending === "load" ? "正在同步…" : "从服务器同步"}
+                        </DropdownMenuItem>
+                      </>
+                    )
+                  ) : null}
+                  {isDevelopment && canRestoreLocal ? (
+                    <DropdownMenuItem
+                      disabled={Boolean(pending)}
+                      onSelect={() => run("restore", onRestoreLocal)}
+                    >
+                      <History />
+                      {pending === "restore" ? "正在恢复…" : "恢复本地备份"}
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuItem
                     disabled={!hasChapters}
                     onSelect={() => onDownload("md")}
@@ -150,10 +230,41 @@ export function NovelFileControls({
           }
         }}
       />
+      {isDevelopment && serverSynced ? (
+        <p className="text-sm text-muted-foreground">数据已同步</p>
+      ) : null}
+      {isDevelopment && syncPrompt ? (
+        <Alert>
+          <AlertDescription>
+            <span className="block">{syncPromptText(syncPrompt)}</span>
+            <span className="mt-3 flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={disabled || Boolean(pending)}
+                onClick={() => run("save", onSaveToServer)}
+              >
+                保存到服务器
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={disabled || Boolean(pending)}
+                onClick={() => run("load", onSyncFromServer)}
+              >
+                从服务器同步
+              </Button>
+            </span>
+          </AlertDescription>
+        </Alert>
+      ) : null}
       {error ? (
         <Alert>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      ) : null}
+      {notice ? (
+        <p className="text-sm text-muted-foreground">{notice}</p>
       ) : null}
     </>
   );

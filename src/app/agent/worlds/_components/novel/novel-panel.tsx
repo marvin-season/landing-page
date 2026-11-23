@@ -13,6 +13,8 @@ import {
   SelectItem,
 } from "@landing-page/design-system";
 import {
+  ChevronLeft,
+  ChevronRight,
   Combine,
   Ellipsis,
   LoaderCircle,
@@ -22,7 +24,13 @@ import {
   Trash2,
   WandSparkles,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -81,6 +89,7 @@ export function NovelPanel({
     chapter: Chapter;
     mode: "manual" | "chapter" | "rewrite";
     initialText?: string;
+    afterChapterId?: string | null;
   } | null>(null);
   const isEditing = editingChapter !== null;
   useLayoutEffect(() => {
@@ -90,6 +99,8 @@ export function NovelPanel({
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
+  const chapterAnchor = useRef<HTMLElement>(null);
+  const scrollChapterIntoView = useRef(false);
   const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
@@ -119,6 +130,7 @@ export function NovelPanel({
         chapter: restored.chapter,
         mode: restored.mode,
         initialText: restored.text,
+        afterChapterId: restored.afterChapterId,
       });
     },
   );
@@ -166,6 +178,53 @@ export function NovelPanel({
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
+  const chapterSwitchLocked = waitingForText || rewriting || importing;
+  const previousChapter =
+    chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : undefined;
+  const nextChapter = novel.chapters[chapterIndex + 1];
+  const goToChapter = useCallback((id: string) => {
+    setAppliedRewrite(undefined);
+    setSelected(id);
+    scrollChapterIntoView.current = true;
+  }, []);
+  useLayoutEffect(() => {
+    if (!chapter?.id || !scrollChapterIntoView.current) return;
+    scrollChapterIntoView.current = false;
+    chapterAnchor.current?.scrollIntoView({ block: "start" });
+  }, [chapter?.id]);
+  useEffect(() => {
+    if (editingChapter || chapterSwitchLocked) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey)
+        return;
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest(
+          "input, textarea, select, [contenteditable='true'], [role='combobox'], [role='dialog'], [role='listbox'], [role='menu']",
+        )
+      )
+        return;
+      if (document.querySelector("[role='dialog']")) return;
+      const destination =
+        event.key === "ArrowLeft" ? previousChapter : nextChapter;
+      if (!destination) return;
+      event.preventDefault();
+      goToChapter(destination.id);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    chapterSwitchLocked,
+    editingChapter,
+    goToChapter,
+    nextChapter,
+    previousChapter,
+  ]);
+  const continuationHint = chapter
+    ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。参考范围：当前章及之前。`
+    : "续写位置：第1章。参考范围：世界和小说设定。";
   const hasPlotPair = novel.chapters.some(({ text }, index) =>
     Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
   );
@@ -181,15 +240,16 @@ export function NovelPanel({
     writer.update({ ...novel, ...options });
   }
   function generateNextChapter() {
+    const afterChapterId = chapter?.id ?? null;
     const next: Chapter = {
       id: crypto.randomUUID(),
-      title: chapterTitle(novel.chapters.length),
+      title: chapterTitle(chapterIndex + 1),
       text: "",
     };
     if (
-      !writer.generateChapter(next, () => {
+      !writer.generateChapter(next, afterChapterId, () => {
         setThinkingChapter(null);
-        setEditingChapter({ chapter: next, mode: "chapter" });
+        setEditingChapter({ chapter: next, mode: "chapter", afterChapterId });
       })
     )
       return;
@@ -249,8 +309,34 @@ export function NovelPanel({
         : "text/plain;charset=utf-8",
     );
   }
+  async function saveToServer() {
+    if (
+      !window.confirm(
+        "用本地正文覆盖服务器文件。服务器上现在的正文会保留为唯一备份，更早的备份会被删除。",
+      )
+    )
+      return null;
+    const path = await writer.saveToServer();
+    return `已写入 ${path}`;
+  }
+  async function syncFromServer() {
+    if (
+      !window.confirm(
+        "用服务器正文覆盖本地书名和章节。现在的本地正文会保留为唯一备份，更早的本地备份会被替换。文风和大纲会保留。",
+      )
+    )
+      return null;
+    await writer.syncFromServer();
+    return "已从服务器同步到本地。上一份本地正文留在备份里。";
+  }
+  async function restoreLocalBackup() {
+    if (!window.confirm("恢复上一份本地备份。现在的本地正文会保留为唯一备份。"))
+      return null;
+    await writer.restoreLocalBackup();
+    return "已恢复本地备份。";
+  }
   if (editingChapter) {
-    const { chapter: base, mode, initialText } = editingChapter;
+    const { chapter: base, mode, initialText, afterChapterId } = editingChapter;
     return (
       <ChapterEditor
         key={base.id}
@@ -261,7 +347,7 @@ export function NovelPanel({
           mode === "chapter"
             ? {
                 kind: mode,
-                onGenerate: () => writer.generateChapter(base),
+                onGenerate: () => writer.generateChapter(base, afterChapterId),
                 renderForm: (props) => (
                   <ChapterGenerationForm
                     {...props}
@@ -306,19 +392,26 @@ export function NovelPanel({
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
         onSave={async (draft) => {
+          if (mode === "chapter") {
+            const saved = await writer.saveChapterContinuation(
+              draft,
+              afterChapterId,
+            );
+            if (!saved) return false;
+            writer.clearDraftBackup();
+            setEditingChapter({ chapter: saved, mode: "manual" });
+            setSelected(saved.id);
+            return true;
+          }
           const saved =
             mode === "rewrite"
               ? await writer.saveChapterRewrite(draft)
-              : await writer.update(
-                  mode === "chapter"
-                    ? { ...novel, chapters: [...novel.chapters, draft] }
-                    : replaceChapter(novel, draft),
-                  { persistFirst: true },
-                );
+              : await writer.update(replaceChapter(novel, draft), {
+                  persistFirst: true,
+                });
           if (saved) {
             if (mode !== "manual") writer.clearDraftBackup();
             setEditingChapter({ chapter: draft, mode: "manual" });
-            if (mode === "chapter") setSelected(draft.id);
             if (mode === "rewrite")
               setAppliedRewrite({
                 chapterId: draft.id,
@@ -367,6 +460,7 @@ export function NovelPanel({
         <ChapterGenerationForm
           embedded
           inputRef={chapterGoalInput}
+          hint={continuationHint}
           options={generationOptions}
           disabled={continueLocked}
           submitDisabled={!novel.title.trim()}
@@ -413,6 +507,12 @@ export function NovelPanel({
               setSelected(id);
             }}
             onDownload={download}
+            onSaveToServer={saveToServer}
+            onSyncFromServer={syncFromServer}
+            onRestoreLocal={restoreLocalBackup}
+            canRestoreLocal={writer.hasLocalBackup}
+            syncPrompt={writer.syncPrompt}
+            serverSynced={writer.serverSynced}
             onSummarize={writer.generateBackground}
           />
           {summarizing && writer.busy ? (
@@ -433,6 +533,7 @@ export function NovelPanel({
           <ContextControls
             room={room}
             writer={writer}
+            chapterCount={chapterIndex + 1}
             disabled={chapterActionsLocked}
           />
           {!plotOpen && writer.error ? (
@@ -452,14 +553,31 @@ export function NovelPanel({
             </article>
           ) : null}
           {chapter || thinkingChapter ? (
-            <section className="flex flex-col gap-4 border-t border-border pt-5">
+            <section
+              ref={chapterAnchor}
+              className="flex flex-col gap-4 border-t border-border pt-5"
+            >
               <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
-                <div className="flex items-center gap-2 text-sm min-w-0 max-w-72 flex-[1_1_13rem] whitespace-nowrap">
+                <div className="flex min-w-0 max-w-md flex-[1_1_18rem] items-center gap-1">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-9 shrink-0"
+                    aria-label="上一章"
+                    title="上一章（←）"
+                    disabled={chapterSwitchLocked || !previousChapter}
+                    onClick={() => {
+                      if (previousChapter) goToChapter(previousChapter.id);
+                    }}
+                  >
+                    <ChevronLeft />
+                  </Button>
                   <WorldSelect
                     label="章节目录"
-                    className="flex-1"
+                    className="min-w-0 flex-1"
                     value={thinkingChapter?.id ?? chapter?.id ?? ""}
-                    disabled={waitingForText || rewriting || importing}
+                    disabled={chapterSwitchLocked}
                     onValueChange={(value) => {
                       setAppliedRewrite(undefined);
                       setSelected(value);
@@ -476,6 +594,20 @@ export function NovelPanel({
                       </SelectItem>
                     ) : null}
                   </WorldSelect>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-9 shrink-0"
+                    aria-label="下一章"
+                    title="下一章（→）"
+                    disabled={chapterSwitchLocked || !nextChapter}
+                    onClick={() => {
+                      if (nextChapter) goToChapter(nextChapter.id);
+                    }}
+                  >
+                    <ChevronRight />
+                  </Button>
                 </div>
                 {thinkingChapter ? (
                   <Button size="sm" variant="outline" onClick={writer.stop}>
@@ -549,9 +681,7 @@ export function NovelPanel({
                             润色整章
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            disabled={
-                              chapterActionsLocked || ended || !hasPlotPair
-                            }
+                            disabled={chapterActionsLocked || ended}
                             onSelect={() => {
                               actionFromMenu.current = "plot";
                             }}
@@ -588,6 +718,7 @@ export function NovelPanel({
                 <>
                   <PlotSheet
                     chapters={novel.chapters}
+                    hasPlotPair={hasPlotPair}
                     open={plotOpen}
                     onOpenChange={setPlotOpen}
                     onCloseAutoFocus={(event) => {
@@ -622,6 +753,35 @@ export function NovelPanel({
                         : undefined
                     }
                   />
+                  <nav
+                    aria-label="章节切换"
+                    className="flex items-center justify-between gap-3 border-t border-border pt-4"
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterSwitchLocked || !previousChapter}
+                      onClick={() => {
+                        if (previousChapter) goToChapter(previousChapter.id);
+                      }}
+                    >
+                      <ChevronLeft data-icon="inline-start" />
+                      上一章
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={chapterSwitchLocked || !nextChapter}
+                      onClick={() => {
+                        if (nextChapter) goToChapter(nextChapter.id);
+                      }}
+                    >
+                      下一章
+                      <ChevronRight data-icon="inline-start" />
+                    </Button>
+                  </nav>
                 </>
               ) : null}
             </section>
@@ -635,3 +795,12 @@ export function NovelPanel({
     </ComposerDock>
   );
 }
+/**
+ *
+ * 
+女主：160cm* 50kg, 舞蹈生，小网红，几万粉丝，长相精致，身材出众，爱拍点热门抖音小视频，视频里面微微带点擦边，是很多人的梦中女神和意淫对象
+男主：165cm, 60kg，大一认识了女主，发现是同校生，加了好友，追求到手、情绪升温、确定恋爱关系，
+男二：185cm*70kg, 某职工，和女二有过一段婚姻，后面驾校认识女主，加了好友，是很稀有的高颜值、好身材的帅哥
+女二：男二的前妻，因婚后不和离婚，175cmx60kg,很有气质，人妻、少妇感拉满，御姐类型
+ * 
+ */

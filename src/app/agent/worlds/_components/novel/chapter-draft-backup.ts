@@ -9,6 +9,7 @@ const draftSchema = z.object({
   }),
   text: z.string(),
   version: z.number().int(),
+  afterChapterId: z.string().min(1).nullable().optional(),
   requirements: z.string().optional(),
   compactContext: z.boolean().optional(),
 });

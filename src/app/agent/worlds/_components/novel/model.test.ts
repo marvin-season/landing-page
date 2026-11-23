@@ -3,7 +3,9 @@ import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
 import { textareaSourceOffset } from "./chapter-text";
 import {
+  applyChapterContinuation,
   chapterPrompt,
+  continuationIndex,
   createBackground,
   createNovel,
   exportNovel,
@@ -21,6 +23,54 @@ import {
   splitChapterAt,
   summaryPrompt,
 } from "./model";
+
+test("continuation sends chapters only through the selected one and never sends an archive covering later chapters", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "first", title: "第1章", text: "开篇。" },
+    { id: "selected", title: "第2章", text: "从这里继续。" },
+    { id: "later", title: "第3章", text: "已有后文。" },
+  ];
+  novel.checkpoint = { throughChapterId: "later", summary: "包含后文的摘要。" };
+  const through = continuationIndex(novel, "selected");
+  assert.equal(through, 2);
+  const prompt = JSON.parse(chapterPrompt(config, novel, through));
+  assert.equal(prompt.task.chapter, 3);
+  assert.deepEqual(prompt.completedChapters, [
+    { title: "第1章", text: "开篇。" },
+    { title: "第2章", text: "从这里继续。" },
+  ]);
+  assert.equal(prompt.archivedChapters, undefined);
+  novel.checkpoint = { throughChapterId: "first", summary: "开篇摘要。" };
+  const summarized = JSON.parse(chapterPrompt(config, novel, through));
+  assert.equal(summarized.archivedChapters.summary, "开篇摘要。");
+  assert.deepEqual(summarized.completedChapters, [prompt.completedChapters[1]]);
+});
+
+test("saving a continuation inserts it after its anchor and preserves existing downstream prose", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.chapters = [
+    { id: "selected", title: "前奏", text: "前文。" },
+    { id: "later", title: "第2章", text: "后文。" },
+    { id: "end", title: "尾声", text: "结尾。" },
+  ];
+  const draft = { id: "new", title: "第2章", text: "续写正文。" };
+  assert.deepEqual(
+    applyChapterContinuation(novel, draft, "selected")?.chapters,
+    [
+      novel.chapters[0],
+      draft,
+      { ...novel.chapters[1], title: "第3章" },
+      novel.chapters[2],
+    ],
+  );
+  assert.equal(applyChapterContinuation(novel, draft, "missing"), null);
+  assert.deepEqual(
+    applyChapterContinuation({ ...novel, chapters: [] }, draft, null)?.chapters,
+    [{ ...draft, title: "第1章" }],
+  );
+});
 
 test("splitting preserves source text and puts the new chapter before the renumbered following chapters", () => {
   const novel = createNovel(loadWorldTemplates()[0].config);
@@ -65,16 +115,26 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   }));
 
   const prompt = JSON.parse(
-    insertChapterPrompt(config, novel, "5", "  补上旅途  "),
+    insertChapterPrompt(
+      { ...config, priorContext: "世界前置剧情。" },
+      {
+        ...novel,
+        background: { format: "text", summary: "导入的前情。" },
+        checkpoint: { throughChapterId: "2", summary: "旧章摘要。" },
+      },
+      "5",
+      "  补上旅途  ",
+    ),
   );
-  assert.deepEqual(
-    prompt.previousChapters.map((item: { chapter: number }) => item.chapter),
-    [1, 2, 3, 4],
-  );
+  assert.deepEqual(prompt.previousChapters, [
+    { chapter: 4, title: "第4章", text: "原文 4" },
+  ]);
   assert.deepEqual(prompt.followingChapters, [
     { chapter: 6, title: "第6章", text: "原文 5" },
-    { chapter: 7, title: "雨中的重逢", text: "原文 6" },
   ]);
+  assert.equal(prompt.world.priorContext, "世界前置剧情。");
+  assert.equal(prompt.importedBackground.summary, "导入的前情。");
+  assert.equal(prompt.archivedChapters, undefined);
   assert.deepEqual(prompt.task, {
     mode: "insert",
     chapter: 5,
@@ -107,7 +167,7 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   );
 });
 
-test("insertion at the beginning works and long prompts keep the complete chapters bordering the insertion", () => {
+test("interchapter insertion counts only the selected chapters toward the context limit", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [
@@ -126,16 +186,47 @@ test("insertion at the beginning works and long prompts keep the complete chapte
     { chapter: 4, title: "后一章", text: "她走到街上。" },
   ]);
   assert.throws(
-    () => insertChapterPrompt(config, novel, "early", ""),
+    () => insertChapterPrompt(config, novel, "previous", ""),
     /插入点两侧的章节上下文过长/,
   );
-  novel.chapters = novel.chapters.slice(1);
+});
+
+test("opening insertion sends only basic settings and the author's request, even with long existing prose", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "first", title: "旧开篇", text: "早".repeat(maxNovelPromptLength) },
+  ];
+  novel.checkpoint = { throughChapterId: "first", summary: "旧稿摘要" };
+  novel.background = { format: "text", summary: "导入背景" };
+  novel.chapterGoal = "只用于书末续写";
   const opening = JSON.parse(
-    insertChapterPrompt(config, novel, "previous", ""),
+    insertChapterPrompt(
+      { ...config, priorContext: "世界前置剧情" },
+      novel,
+      "first",
+      "  从下雨的早晨写起  ",
+    ),
   );
-  assert.deepEqual(opening.previousChapters, []);
-  assert.equal(opening.task.chapter, 1);
-  assert.equal(opening.followingChapters[0].text, "门打开了。");
+  assert.deepEqual(opening, {
+    world: {
+      title: config.title,
+      background: config.background,
+      scene: config.scene,
+      rules: config.rules,
+      facts: config.facts,
+      storyGoal: config.storyGoal,
+      characters: config.characters,
+    },
+    novel: { title: novel.title, style: novel.style, outline: novel.outline },
+    task: {
+      mode: "insert",
+      chapter: 1,
+      targetWords: 4000,
+      maxCharacters: 8000,
+      requirements: "从下雨的早晨写起",
+    },
+  });
 });
 
 test("a passage rewrite sends the unselected text and replaces only the selected occurrence", () => {

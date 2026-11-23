@@ -45,6 +45,7 @@ export function ChapterGenerationForm({
   disabled,
   embedded,
   inputRef,
+  hint,
   submitDisabled = false,
   submitLabel,
   onChange,
@@ -54,6 +55,7 @@ export function ChapterGenerationForm({
   disabled: boolean;
   embedded?: boolean;
   inputRef?: Ref<HTMLTextAreaElement>;
+  hint?: string;
   submitDisabled?: boolean;
   submitLabel: string;
   onChange: (next: ChapterGenerationOptions) => void;
@@ -107,6 +109,9 @@ export function ChapterGenerationForm({
           {submitLabel}
         </Button>
       </div>
+      {hint ? (
+        <p className="break-words text-xs text-muted-foreground">{hint}</p>
+      ) : null}
     </WritingGenerationForm>
   );
 }

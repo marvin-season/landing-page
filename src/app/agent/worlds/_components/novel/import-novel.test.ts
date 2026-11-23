@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadWorldTemplates } from "@/lib/group-chat/world-templates";
-import { createImportedNovel, parseNovelFile } from "./import-novel";
+import {
+  applyServerExport,
+  createImportedNovel,
+  parseNovelFile,
+} from "./import-novel";
 import { chapterPrompt, createNovel, exportNovel } from "./model";
 
 test("novel exports import as editable chapters in both formats", () => {
@@ -122,6 +126,25 @@ test("the imported book starts fresh and continuation contains only its chapters
   assert.equal(prompt.task.chapter, 2);
   assert.equal(prompt.archivedChapters, undefined);
   assert.equal(prompt.importedBackground, undefined);
+});
+
+test("server export replaces chapters and keeps writing settings", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.title = "旧港";
+  novel.style = "第一人称";
+  novel.chapters = [{ id: "a", title: "第1章", text: "灯。" }];
+  const same = applyServerExport(novel, exportNovel(novel, "txt"), "旧港.txt");
+  assert.equal(same.chapters[0], novel.chapters[0]);
+  assert.equal(same.style, "第一人称");
+  const changed = applyServerExport(
+    novel,
+    "旧港\n\n第1章\n\n另一盏灯。\n",
+    "旧港.txt",
+  );
+  assert.notEqual(changed.chapters[0].id, "a");
+  assert.equal(changed.chapters[0].text, "另一盏灯。");
+  assert.equal(changed.style, "第一人称");
+  assert.equal(changed.outline, novel.outline);
 });
 
 test("rejects empty manuscripts and exported background summaries", () => {

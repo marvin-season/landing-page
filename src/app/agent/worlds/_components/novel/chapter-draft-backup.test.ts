@@ -59,6 +59,26 @@ test("clearing an applied or discarded draft cancels a pending write", () => {
   assert.equal(open().read(), null);
 });
 
+test("a restored continuation draft keeps its selected chapter as the save position", () => {
+  const storage = memoryStorage();
+  const open = () =>
+    createChapterDraftBackup(
+      "author:room",
+      () => storage,
+      () => {},
+    );
+  const draft = open();
+  draft.start({
+    mode: "chapter",
+    chapter: { id: "new", title: "第2章", text: "" },
+    version: 2,
+    afterChapterId: "selected",
+  });
+  draft.write("续写正文。");
+  draft.flush();
+  assert.equal(open().read()?.afterChapterId, "selected");
+});
+
 test("a failed backup can retry the latest text when storage is available", () => {
   const storage = memoryStorage();
   let blocked = false;

@@ -38,6 +38,7 @@ test("plot edits require adjacent chapters and treat the selection in book order
     /剧情要求/,
   );
   const edit = preparePlotEdit(config, novel, ["c", "b"], "merge", "");
+  assert.ok(edit.mode === "merge");
   assert.equal(edit.pair.first.id, "b");
   assert.equal(edit.pair.second.id, "c");
 });
@@ -55,7 +56,12 @@ test("stitch changes only the transition and keeps both chapter IDs and titles",
     "stitch",
     "加一句道别",
   );
-  const stitchTask = JSON.parse(edit.prompt).task;
+  const prompt = JSON.parse(edit.prompt);
+  const stitchTask = prompt.task;
+  assert.equal(prompt.previousChapters, undefined);
+  assert.equal(prompt.followingChapters, undefined);
+  assert.equal(prompt.unchangedBefore, untouchedBefore.slice(-600));
+  assert.equal(prompt.unchangedAfter, untouchedAfter.slice(0, 600));
   assert.equal(stitchTask.mode, "stitch");
   assert.ok(stitchTask.endingMaxCharacters > 0);
   assert.ok(stitchTask.openingMaxCharacters > 0);
@@ -151,4 +157,23 @@ test("insert drafts a chapter between the pair and preserves both neighbors", ()
   );
   assert.equal(saved.chapters[1].text, novel.chapters[1].text);
   assert.equal(saved.chapters[3].text, novel.chapters[2].text);
+});
+
+test("insert before the only chapter works without existing prose", () => {
+  const original = { id: "original", title: "第1章", text: "" };
+  const novel = { ...book(), chapters: [original] };
+  const edit = preparePlotEdit(
+    config,
+    novel,
+    [original.id],
+    "insert",
+    "交代她为何出发",
+  );
+  const draft = readPlotDraft(edit, "她读完信，动身前往车站。");
+  assert.equal(draft.chapters[0].title, "第1章");
+  assert.deepEqual(novel.chapters, [original]);
+  assert.deepEqual(applyPlotDraft(novel, edit, draft).chapters, [
+    draft.chapters[0],
+    { ...original, title: "第2章" },
+  ]);
 });

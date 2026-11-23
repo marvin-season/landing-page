@@ -24,7 +24,11 @@ import { useId, useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { TextField } from "../fields";
 import type { Chapter } from "./model";
-import { type PlotMode, resolveChapterPair } from "./plot-edit";
+import {
+  type PlotMode,
+  type PlotSelection,
+  resolveChapterPair,
+} from "./plot-edit";
 import type { useNovel } from "./use-novel";
 
 const options = [
@@ -33,8 +37,15 @@ const options = [
   { value: "insert", label: "剧情插入", icon: ListPlus },
 ] as const;
 
+const scopeHints = {
+  stitch: "改写范围：所选前章的结尾和后章的开头。章节数不变。",
+  merge: "应用后：将所选两章替换为一章。",
+  insert: "新增位置：所选两章之间。只参考所选两章的正文。",
+} satisfies Record<PlotMode, string>;
+
 export function PlotSheet({
   chapters,
+  hasPlotPair,
   open,
   onOpenChange,
   onCloseAutoFocus,
@@ -42,6 +53,7 @@ export function PlotSheet({
   onApplied,
 }: {
   chapters: readonly Chapter[];
+  hasPlotPair: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCloseAutoFocus: (event: Event) => void;
@@ -59,22 +71,33 @@ export function PlotSheet({
 }) {
   const fieldName = useId();
   const form = useId();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [mode, setMode] = useState<PlotMode>("stitch");
+  const [selection, setSelection] = useState<string[] | "start">([]);
+  const [preferredMode, setMode] = useState<PlotMode>("stitch");
   const [requirements, setRequirements] = useState("");
   const [applying, setApplying] = useState(false);
   const draft = writer.plotDraft;
   const locked = writer.busy || applying || draft !== null;
+  const mode = hasPlotPair ? preferredMode : "insert";
+  const firstChapter = chapters[0];
+  const canInsertAtStart = mode === "insert" && Boolean(firstChapter);
+  const atStart = canInsertAtStart && selection === "start";
+  const selected = selection === "start" ? [] : selection;
   const anchor = chapters.findIndex(({ id }) => id === selected[0]);
   const pair =
     selected.length === 2
       ? resolveChapterPair(chapters, [selected[0], selected[1]])
       : null;
-  const canStart = Boolean(pair && (mode === "merge" || requirements.trim()));
+  const target: PlotSelection | null =
+    atStart && firstChapter
+      ? [firstChapter.id]
+      : pair
+        ? [pair.first.id, pair.second.id]
+        : null;
+  const canStart = Boolean(target && (mode === "merge" || requirements.trim()));
 
   function close() {
     writer.discardRewrite();
-    setSelected([]);
+    setSelection([]);
     setMode("stitch");
     setRequirements("");
     onOpenChange(false);
@@ -98,7 +121,11 @@ export function PlotSheet({
         <SheetHeader className="shrink-0 border-b border-border pr-12">
           <SheetTitle>剧情整理</SheetTitle>
           <SheetDescription>
-            相邻章节 · 已选 {selected.length} / 2
+            {atStart
+              ? "插入位置 · 第一章之前"
+              : hasPlotPair
+                ? `相邻章节 · 已选 ${selected.length} / 2`
+                : "剧情插入"}
           </SheetDescription>
         </SheetHeader>
         <form
@@ -106,15 +133,33 @@ export function PlotSheet({
           className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4"
           onSubmit={(event) => {
             event.preventDefault();
-            if (!locked && canStart)
-              writer.editPlot([selected[0], selected[1]], mode, requirements);
+            if (!locked && canStart && target)
+              writer.editPlot(target, mode, requirements);
           }}
         >
           <fieldset disabled={locked} className="flex flex-col gap-2">
-            <legend className="mb-2 text-sm font-medium">选择相邻的两章</legend>
+            <legend className="mb-2 text-sm font-medium">
+              {canInsertAtStart ? "选择插入位置" : "选择相邻的两章"}
+            </legend>
+            {canInsertAtStart && (atStart || !draft) ? (
+              <Button
+                type="button"
+                size="sm"
+                variant={atStart ? "default" : "outline"}
+                className="self-start"
+                aria-pressed={atStart}
+                onClick={() => {
+                  writer.discardRewrite();
+                  setSelection(atStart ? [] : "start");
+                }}
+              >
+                <ListPlus data-icon="inline-start" />
+                第一章之前
+              </Button>
+            ) : null}
             <div
               className="grid max-h-[min(34dvh,18rem)] grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-2 overflow-y-auto p-1"
-              hidden={draft !== null}
+              hidden={draft !== null || !hasPlotPair}
             >
               {chapters.map((chapter, index) => {
                 const active = selected.includes(chapter.id);
@@ -138,7 +183,7 @@ export function PlotSheet({
                     title={chapter.title}
                     onClick={() => {
                       writer.discardRewrite();
-                      setSelected(
+                      setSelection(
                         active
                           ? selected.filter((id) => id !== chapter.id)
                           : [...selected, chapter.id],
@@ -168,9 +213,11 @@ export function PlotSheet({
                     type="radio"
                     name={fieldName}
                     checked={mode === value}
+                    disabled={!hasPlotPair && value !== "insert"}
                     className="peer sr-only"
                     onChange={() => {
                       setMode(value);
+                      if (selection === "start") setSelection([]);
                       writer.discardRewrite();
                     }}
                   />
@@ -181,6 +228,11 @@ export function PlotSheet({
                 </label>
               ))}
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {mode === "insert" && (atStart || !hasPlotPair)
+                ? "新增位置：第一章之前。只参考通用设定和本次写作要求。"
+                : scopeHints[mode]}
+            </p>
           </fieldset>
           <fieldset disabled={locked}>
             <TextField

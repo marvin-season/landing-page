@@ -37,6 +37,7 @@ const number = new Intl.NumberFormat("zh-CN");
 export function ContextControls({
   room,
   writer,
+  chapterCount,
   disabled,
 }: {
   room: WorldRoom;
@@ -51,6 +52,7 @@ export function ContextControls({
     | "clearFork"
     | "stop"
   >;
+  chapterCount: number;
   disabled: boolean;
 }) {
   const router = useRouter();
@@ -62,10 +64,17 @@ export function ContextControls({
   const [error, setError] = useState("");
   const summary = edited ?? writer.forkSummary;
   const length = useMemo(
-    () => chapterPrompt(config, novel).length,
-    [config, novel],
+    () => chapterPrompt(config, novel, chapterCount).length,
+    [config, novel, chapterCount],
   );
-  const checkpointCount = novelCheckpointCount(novel);
+  const checkpointCount = novelCheckpointCount(novel, chapterCount);
+  const forkBaseLength = useMemo(
+    () =>
+      open && chapterCount < novel.chapters.length
+        ? chapterPrompt(config, novel).length
+        : length,
+    [config, novel, open, chapterCount, length],
+  );
   const canSummarize = useMemo(
     () =>
       open &&
@@ -78,7 +87,7 @@ export function ContextControls({
     [config, novel, open, summary],
   );
   const pending = writer.busy || creating;
-  const fits = fork !== null && forkFitsBudget(fork.length, length);
+  const fits = fork !== null && forkFitsBudget(fork.length, forkBaseLength);
   return (
     <Sheet
       open={open}
@@ -126,7 +135,7 @@ export function ContextControls({
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-sm tabular-nums text-muted-foreground">
-              {number.format(length)} →{" "}
+              书末续写 · {number.format(forkBaseLength)} →{" "}
               {fork ? number.format(fork.length) : "待计算"} 字符
             </span>
             {writer.busy ? (

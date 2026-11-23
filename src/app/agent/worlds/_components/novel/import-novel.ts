@@ -5,6 +5,7 @@ import {
   type Chapter,
   chapterTitle,
   createNovel,
+  invalidateEditedCheckpoint,
   isTxtChapterHeading,
   maxChapterLength,
   type Novel,
@@ -142,6 +143,29 @@ function addChapter(
   function partTitle() {
     return title && part > 1 ? `${title}（续 ${part}）` : title;
   }
+}
+
+export function applyServerExport(
+  current: Novel,
+  source: string,
+  fileName: string,
+): Novel {
+  const imported = parseNovelFile(source, fileName);
+  const chapters = imported.chapters.map(({ title, text }, index) => {
+    const name = title || chapterTitle(index);
+    const existing = current.chapters[index];
+    if (existing?.title === name && existing.text === text) return existing;
+    return {
+      id: crypto.randomUUID(),
+      title: name,
+      text,
+    };
+  });
+  return invalidateEditedCheckpoint(current, {
+    ...current,
+    title: imported.title || current.title,
+    chapters,
+  });
 }
 
 export function createImportedNovel(
