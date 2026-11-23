@@ -1,10 +1,11 @@
 "use client";
 
-import { Button } from "@landing-page/design-system";
+import { Button, Input } from "@landing-page/design-system";
 import { Check } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MarkdownProse } from "@/components/ui/unified-markdown";
 import { renderChapterMarkdown } from "./chapter-markdown";
+import { maxChapterTitleLength } from "./model";
 
 export function ChapterReading({
   title,
@@ -13,6 +14,8 @@ export function ChapterReading({
   rewriting,
   appliedLength,
   reuseDisabled,
+  renameDisabled,
+  onRename,
   onReuseBrief,
 }: {
   title: string;
@@ -21,9 +24,15 @@ export function ChapterReading({
   rewriting: boolean;
   appliedLength?: number;
   reuseDisabled?: boolean;
+  renameDisabled?: boolean;
+  onRename?: (title: string) => void;
   onReuseBrief?: (brief: string) => void;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
+  const titleInput = useRef<HTMLInputElement>(null);
+  const cancelRename = useRef(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(title);
   const markEnd = rewriting ? text.length : appliedLength;
   const content = useMemo(
     () =>
@@ -36,13 +45,63 @@ export function ChapterReading({
   useLayoutEffect(() => {
     if (rewriting) heading.current?.scrollIntoView({ block: "nearest" });
   }, [rewriting]);
+  useLayoutEffect(() => {
+    if (!editingTitle) return;
+    titleInput.current?.focus();
+    titleInput.current?.select();
+  }, [editingTitle]);
+
+  function commitTitle() {
+    if (cancelRename.current) {
+      cancelRename.current = false;
+      return;
+    }
+    setEditingTitle(false);
+    const next = titleDraft.replace(/[\r\n]+/g, " ").trim();
+    if (next !== title) onRename?.(next);
+  }
 
   return (
     <article className="flex flex-col gap-4 pb-8">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 ref={heading} className="font-serif text-xl">
-          {title}
-        </h3>
+        {editingTitle ? (
+          <Input
+            ref={titleInput}
+            aria-label="章名"
+            className="h-auto max-w-xl font-serif text-xl"
+            maxLength={maxChapterTitleLength}
+            value={titleDraft}
+            onChange={(event) => setTitleDraft(event.target.value)}
+            onBlur={commitTitle}
+            onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing) return;
+              if (event.key === "Enter") {
+                event.preventDefault();
+                event.currentTarget.blur();
+              } else if (event.key === "Escape") {
+                event.preventDefault();
+                cancelRename.current = true;
+                setTitleDraft(title);
+                setEditingTitle(false);
+              }
+            }}
+          />
+        ) : (
+          <h3 ref={heading} className="font-serif text-xl">
+            <button
+              type="button"
+              className="rounded-sm px-1 -mx-1 text-left enabled:hover:bg-muted/60 disabled:cursor-default"
+              disabled={renameDisabled || !onRename}
+              title={renameDisabled ? undefined : "修改章名"}
+              onClick={() => {
+                setTitleDraft(title);
+                setEditingTitle(true);
+              }}
+            >
+              {title}
+            </button>
+          </h3>
+        )}
         {!rewriting && appliedLength !== undefined ? (
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Check className="size-3.5 text-emerald-500" />

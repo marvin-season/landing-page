@@ -9,6 +9,7 @@ import {
   createBackground,
   createNovel,
   exportNovel,
+  formatChapterLength,
   insertChapterBefore,
   insertChapterPrompt,
   invalidateEditedCheckpoint,
@@ -17,6 +18,7 @@ import {
   novelRequest,
   parseBackgroundFile,
   rememberChapterBrief,
+  renameChapter,
   replaceChapter,
   replaceChapterText,
   rewritePrompt,
@@ -92,6 +94,34 @@ test("a saved continuation keeps the requirement sent for that draft, and later 
   assert.equal(
     exportNovel(saved ?? novel, "txt").includes("推进感情线"),
     false,
+  );
+});
+
+test("renaming a chapter from the reading page keeps custom titles and restores the default number", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.words = "4000";
+  novel.chapters = [
+    { id: "a", title: "第1章", text: "甲" },
+    { id: "b", title: "第2章", text: "乙" },
+  ];
+  assert.equal(
+    formatChapterLength(4128, novel.words),
+    "本章 4,128 / 目标 4,000 字",
+  );
+  assert.equal(formatChapterLength(12, "很多"), "本章 12 字");
+
+  const named = renameChapter(novel, "b", "  花园夜谈 \n");
+  assert.ok(named);
+  assert.notEqual(named, novel);
+  assert.equal(named.chapters[1].title, "花园夜谈");
+  assert.equal(named.chapters[1].text, "乙");
+  assert.equal(named.chapters[0].title, "第1章");
+  assert.equal(renameChapter(named, "b", "   ")?.chapters[1].title, "第2章");
+  assert.equal(renameChapter(novel, "a", "第1章"), novel);
+  assert.equal(renameChapter(novel, "missing", "名字"), null);
+  assert.equal(
+    renameChapter(novel, "b", "名".repeat(90))?.chapters[1].title.length,
+    80,
   );
 });
 

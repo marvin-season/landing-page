@@ -207,6 +207,36 @@ export function chapterTitle(index: number) {
   return `第${index + 1}章`;
 }
 
+export const maxChapterTitleLength = 80;
+
+export function formatChapterLength(length: number, words: string) {
+  const current = length.toLocaleString("zh-CN");
+  if (!isChapterTargetValid(words)) return `本章 ${current} 字`;
+  return `本章 ${current} / 目标 ${Number(words).toLocaleString("zh-CN")} 字`;
+}
+
+export function renameChapter(
+  novel: Novel,
+  chapterId: string,
+  title: string,
+): Novel | null {
+  const index = novel.chapters.findIndex((chapter) => chapter.id === chapterId);
+  if (index < 0) return null;
+  const nextTitle =
+    title
+      .replace(/[\r\n]+/g, " ")
+      .trim()
+      .slice(0, maxChapterTitleLength) || chapterTitle(index);
+  const current = novel.chapters[index];
+  if (current.title === nextTitle) return novel;
+  return {
+    ...novel,
+    chapters: novel.chapters.map((chapter, position) =>
+      position === index ? { ...chapter, title: nextTitle } : chapter,
+    ),
+  };
+}
+
 export function rememberChapterBrief(
   chapter: Chapter,
   brief: string | undefined,

@@ -1,0 +1,10 @@
+---
+description: AI 创建的 git 提交必须在说明末尾注明模型
+alwaysApply: true
+---
+
+# AI 提交
+
+由 AI 创建的 git 提交，提交说明末尾单独一行写 `AI提交：模型名`。
+
+例：`AI提交：Grok 4.7`

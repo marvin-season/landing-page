@@ -53,11 +53,15 @@ No JavaScript test runner is currently configured in `package.json`. For now, ru
 
 Recent commits use Conventional Commit prefixes such as `feat:`, `fix:`, `chore:`, and `refactor:`. Keep subjects short and imperative, for example `feat: add chat transcript export`. Pull requests should include a concise description, linked issue, screenshots or recordings for UI changes, environment notes, and verification commands.
 
+AI 创建的提交，说明末尾必须单独一行写 `AI提交：模型名`，例如 `AI提交：Grok 4.7`。
+
 ## Architecture & Agent Notes
 
 Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or stream behavior. See `docs/auth.md` before changing login, page gates, roles, or API auth. See `docs/i18n.md` before editing localized copy. Stream chat, admin, Mastra, and Python agent details are documented in `src/lib/stream/README.md`, `src/app/[lang]/admin/README.md`, `mastra-server/README.md`, and `agent-server/README.md`. The index is `docs/README.md`.
 
 行为或接口变了，就在同一次改动里更新已经描述它的文档，不要等用户再提。用 `docs/README.md` 定位文档；开放世界看 `docs/open-world/`。只改与本次行为矛盾的句子，不新写文档，不重写无关章节，也不改 `docs/superpowers/` 里的历史规格和计划。不确定有没有文档写到这块时，先查索引再决定。
+
+改小说模式的行为、功能或界面时，同一次改动必须更新产品迭代表 `docs/open-world/novel-iterations.md`：新的一轮在原表补一行，状态变化改原行。类型只写「新特性」「功能优化」或「UI优化」，状态只写「未开始」「已实现」「已交付」。只收该文档开头四条定位里的需求。行为细节写在 `docs/open-world/novel-mode.md`，迭代表只记迭代和状态。这是更新已有迭代表，不是新写文档。
 
 必要时可以进行最小可行性的重构来简化既有代码和新需求
 

@@ -43,6 +43,7 @@ import {
   type NovelWritingContext,
   novelRequest,
   rememberChapterBrief,
+  renameChapter as renameStoredChapter,
   replaceChapter,
   replaceChapterText,
   rewritePrompt,
@@ -269,6 +270,11 @@ export function useNovel(
     const current = latest.current;
     if (current.chapterGoal === chapterGoal) return Promise.resolve(true);
     return update({ ...current, chapterGoal });
+  }
+  function renameChapter(chapterId: string, title: string) {
+    const next = renameStoredChapter(latest.current, chapterId, title);
+    if (!next || next === latest.current) return Promise.resolve(true);
+    return update(next);
   }
   function updateContext(context: NovelWritingContext) {
     const current = latest.current;
@@ -759,6 +765,7 @@ export function useNovel(
     novel,
     update,
     updateChapterGoal,
+    renameChapter,
     updateContext,
     ready,
     error,

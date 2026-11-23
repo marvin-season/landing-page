@@ -56,6 +56,7 @@ import {
   type Chapter,
   chapterTitle,
   exportNovel,
+  formatChapterLength,
   type NovelWritingContext,
   replaceChapter,
   splitChapterAt,
@@ -620,6 +621,11 @@ export function NovelPanel({
                     <ChevronRight />
                   </Button>
                 </div>
+                {chapter && !thinkingChapter ? (
+                  <p className="w-full text-xs tabular-nums text-muted-foreground">
+                    {formatChapterLength(chapter.text.length, novel.words)}
+                  </p>
+                ) : null}
                 {thinkingChapter ? (
                   <Button size="sm" variant="outline" onClick={writer.stop}>
                     <Square data-icon="inline-start" />
@@ -760,6 +766,10 @@ export function NovelPanel({
                     brief={chapter.brief}
                     rewriting={rewriting}
                     reuseDisabled={continueLocked}
+                    renameDisabled={chapterActionsLocked}
+                    onRename={(title) => {
+                      void writer.renameChapter(chapter.id, title);
+                    }}
                     onReuseBrief={reuseChapterGoal}
                     appliedLength={
                       appliedRewrite?.chapterId === chapter.id
