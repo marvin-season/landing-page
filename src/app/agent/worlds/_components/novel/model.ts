@@ -7,7 +7,12 @@ import {
   textareaSourceOffset,
 } from "./chapter-text";
 
-export type Chapter = { id: string; title: string; text: string };
+export type Chapter = {
+  id: string;
+  title: string;
+  text: string;
+  brief?: string;
+};
 export const novelTaskSchema = z.enum(["chapter", "summary", "rewrite"]);
 export type NovelTask = z.infer<typeof novelTaskSchema>;
 export const maxNovelPromptLength = 150000;
@@ -200,6 +205,19 @@ function insertionIndex(novel: Novel, beforeId: string) {
 
 export function chapterTitle(index: number) {
   return `第${index + 1}章`;
+}
+
+export function rememberChapterBrief(
+  chapter: Chapter,
+  brief: string | undefined,
+): Chapter {
+  const text = brief?.trim();
+  if (!text) {
+    if (chapter.brief === undefined) return chapter;
+    const { brief: _removed, ...rest } = chapter;
+    return rest;
+  }
+  return chapter.brief === text ? chapter : { ...chapter, brief: text };
 }
 
 export function isTxtChapterHeading(line: string) {

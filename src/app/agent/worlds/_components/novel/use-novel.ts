@@ -42,6 +42,7 @@ import {
   type NovelTask,
   type NovelWritingContext,
   novelRequest,
+  rememberChapterBrief,
   replaceChapter,
   replaceChapterText,
   rewritePrompt,
@@ -120,6 +121,7 @@ export function useNovel(
   const state = useRef(initialChatStreamState);
   const finished = useRef(false);
   const generating = useRef(false);
+  const continuationBrief = useRef<string | undefined>(undefined);
   const latest = useRef(novel);
   const writes = useRef(Promise.resolve());
   const previousRef = useRef<Novel | undefined>(undefined);
@@ -262,6 +264,11 @@ export function useNovel(
       () => true,
       () => false,
     );
+  }
+  function updateChapterGoal(chapterGoal: string) {
+    const current = latest.current;
+    if (current.chapterGoal === chapterGoal) return Promise.resolve(true);
+    return update({ ...current, chapterGoal });
   }
   function updateContext(context: NovelWritingContext) {
     const current = latest.current;
@@ -415,9 +422,11 @@ export function useNovel(
       );
       return false;
     }
+    const brief = current.chapterGoal.trim();
+    continuationBrief.current = brief;
     backup.start({
       mode: "chapter",
-      chapter,
+      chapter: rememberChapterBrief(chapter, brief),
       afterChapterId,
       version: room.version,
     });
@@ -430,18 +439,23 @@ export function useNovel(
     chapter: Chapter,
     afterChapterId: string | null | undefined,
   ) {
+    const brief =
+      continuationBrief.current !== undefined
+        ? continuationBrief.current
+        : chapter.brief;
+    const stored = rememberChapterBrief(chapter, brief);
     const next = applyChapterContinuation(
       latest.current,
-      chapter,
+      stored,
       afterChapterId,
     );
     if (!next) {
       setError("找不到续写起点，无法保存到原位置。");
       return null;
     }
-    return (await update(next, { persistFirst: true }))
-      ? (next.chapters.find(({ id }) => id === chapter.id) ?? null)
-      : null;
+    if (!(await update(next, { persistFirst: true }))) return null;
+    continuationBrief.current = undefined;
+    return next.chapters.find(({ id }) => id === chapter.id) ?? null;
   }
 
   function generateBackground() {
@@ -744,6 +758,7 @@ export function useNovel(
   return {
     novel,
     update,
+    updateChapterGoal,
     updateContext,
     ready,
     error,

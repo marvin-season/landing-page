@@ -1,0 +1,20 @@
+---
+description: 改小说模式的功能或界面时，同步更新产品迭代表的状态
+globs:
+  - docs/open-world/novel-*.md
+  - src/app/agent/worlds/_components/novel/**
+  - src/app/api/novel/**
+  - src/lib/group-chat/novel.ts
+alwaysApply: false
+---
+
+# 小说模式迭代表
+
+改小说模式的行为、功能或界面时，在同一次改动里更新 `docs/open-world/novel-iterations.md`。
+
+- 新的一轮改原表，补一行。类型写「新特性」「功能优化」或「UI优化」。
+- 状态只使用「未开始」「已实现」「已交付」。开始写代码改为已实现；提交并成为当前产品行为后改为已交付。
+- 改状态时改原行，不另起重复的一行。
+- 只收服务该文档开头四条定位的需求。行为细节写在 `docs/open-world/novel-mode.md`，迭代表只记迭代和状态。
+
+例：阅读页加上本章字数后，把 N12 的状态从未开始改为已实现，并在 `novel-mode.md` 写明阅读页显示的字数。

@@ -16,6 +16,7 @@ import {
   maxNovelPromptLength,
   novelRequest,
   parseBackgroundFile,
+  rememberChapterBrief,
   replaceChapter,
   replaceChapterText,
   rewritePrompt,
@@ -69,6 +70,28 @@ test("saving a continuation inserts it after its anchor and preserves existing d
   assert.deepEqual(
     applyChapterContinuation({ ...novel, chapters: [] }, draft, null)?.chapters,
     [{ ...draft, title: "第1章" }],
+  );
+});
+
+test("a saved continuation keeps the requirement sent for that draft, and later prompts omit it", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [{ id: "a", title: "第1章", text: "前文。" }];
+  const draft = rememberChapterBrief(
+    { id: "b", title: "第2章", text: "后文。" },
+    "  推进感情线  ",
+  );
+  const saved = applyChapterContinuation(novel, draft, "a");
+  assert.equal(saved?.chapters[1].brief, "推进感情线");
+  assert.equal(
+    JSON.parse(chapterPrompt(config, saved ?? novel)).completedChapters[1]
+      .brief,
+    undefined,
+  );
+  assert.equal(rememberChapterBrief(draft, "  ").brief, undefined);
+  assert.equal(
+    exportNovel(saved ?? novel, "txt").includes("推进感情线"),
+    false,
   );
 });
 

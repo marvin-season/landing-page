@@ -22,6 +22,7 @@ import type {
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "../character-avatar";
 import { ComposerDock } from "../floating-composer";
+import { ChapterPromptReuseProvider } from "../novel/chapter-prompt-reuse";
 import type { NovelWritingContext } from "../novel/model";
 import { type NovelContextBridge, NovelPanel } from "../novel/novel-panel";
 import { useWorldRoom } from "../use-world-room";
@@ -196,181 +197,185 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     setEditing(structuredClone(loaded.config));
   }
   return (
-    <div className="flex h-full min-h-0 flex-col text-foreground">
-      {!editing && !(novelMode && novelEditing) ? (
-        <Collapsible open={atContentTop} className="shrink-0">
-          <CollapsibleContent variant="collapse" inert={!atContentTop}>
-            <RoomHeader
-              title={loaded.config.title}
-              running={running || novelBusy}
-              ended={ended}
-              phase={
-                novelBusy
-                  ? "正在创作章节…"
-                  : chat.phase || loaded.run?.phase || ""
-              }
-              paused={loaded.paused}
-              reason={novelMode ? "章节创作" : loaded.run?.reason}
-              actionPending={actionPending}
-              onOpenNotes={() => setNotes(true)}
-              notesSidebarOpen={notesSidebarOpen}
-              onToggleNotesSidebar={() => setNotesSidebarOpen((open) => !open)}
-              onEdit={() => void edit()}
-              fileToolbarRef={novelMode ? setNovelFileToolbar : undefined}
-              promptHistoryKey={
-                novelMode ? `${room.ownerId}:${room.id}` : undefined
-              }
-            />
-          </CollapsibleContent>
-        </Collapsible>
-      ) : null}
-      {novelMode && chat.error ? (
-        <Alert>
-          <AlertDescription>{chat.error}</AlertDescription>
-        </Alert>
-      ) : null}
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {novelMode ? (
-            <div className="relative isolate flex min-h-0 flex-1 flex-col">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-              >
-                <div className="absolute inset-0 scale-90 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-10 blur-xs" />
-              </div>
-              <NovelPanel
-                key={room.id}
-                room={room}
-                fileToolbar={novelFileToolbar}
-                onBusyChange={setNovelBusy}
-                onEditingChange={setNovelEditing}
-                onAtTopChange={setAtContentTop}
-                onContext={onNovelContext}
+    <ChapterPromptReuseProvider>
+      <div className="flex h-full min-h-0 flex-col text-foreground">
+        {!editing && !(novelMode && novelEditing) ? (
+          <Collapsible open={atContentTop} className="shrink-0">
+            <CollapsibleContent variant="collapse" inert={!atContentTop}>
+              <RoomHeader
+                title={loaded.config.title}
+                running={running || novelBusy}
+                ended={ended}
+                phase={
+                  novelBusy
+                    ? "正在创作章节…"
+                    : chat.phase || loaded.run?.phase || ""
+                }
+                paused={loaded.paused}
+                reason={novelMode ? "章节创作" : loaded.run?.reason}
+                actionPending={actionPending}
+                onOpenNotes={() => setNotes(true)}
+                notesSidebarOpen={notesSidebarOpen}
+                onToggleNotesSidebar={() =>
+                  setNotesSidebarOpen((open) => !open)
+                }
+                onEdit={() => void edit()}
+                fileToolbarRef={novelMode ? setNovelFileToolbar : undefined}
+                promptHistoryKey={
+                  novelMode ? `${room.ownerId}:${room.id}` : undefined
+                }
               />
-            </div>
-          ) : (
-            <ComposerDock
-              composer={
-                <RoomComposer
-                  draft={draft}
-                  mentions={mentions}
-                  mentionItems={mentionItems}
-                  speaker={speaker}
-                  speakerLabel={speakerLabel}
-                  paused={loaded.paused}
-                  running={running}
-                  stopping={chat.stopping}
-                  pending={chat.pending}
-                  actionPending={actionPending}
-                  ended={ended}
-                  draftStatus={loaded.status === "draft"}
-                  error={chat.error}
-                  onRetrySubmission={chat.retrySubmission}
-                  onDraftChange={setDraft}
-                  onMentionsChange={setMentions}
-                  onSpeakerChange={setSpeakerId}
-                  onSend={send}
-                  onStop={() => void chat.stop()}
-                  onContinue={() =>
-                    chat.start({
-                      mode: "auto",
-                      text: "",
-                      mentions: [],
-                      speaker: "system",
-                      resume: true,
-                    })
-                  }
-                  onStep={() =>
-                    chat.start({
-                      mode: "step",
-                      text: "",
-                      mentions: [],
-                      speaker: "system",
-                      resume: true,
-                    })
-                  }
-                  onCopy={() => void edit(true)}
-                />
-              }
-            >
-              <RoomTranscript
-                room={room}
-                onAtTopChange={setAtContentTop}
-                onLoadEarlier={() => void chat.loadEarlier()}
-                onRetry={retryFor}
-              />
-            </ComposerDock>
-          )}
-        </div>
-        {notesSidebarOpen ? (
-          <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
-            <WorldNotes
-              room={room}
-              onMention={novelMode ? undefined : addMention}
-            />
-          </aside>
+            </CollapsibleContent>
+          </Collapsible>
         ) : null}
-      </div>
-      <WorldNotesSheet
-        open={notes}
-        room={room}
-        onOpenChange={setNotes}
-        onMention={novelMode ? undefined : addMention}
-      />
-      <SettingsSheet
-        room={room}
-        ended={ended}
-        editing={editing}
-        copying={copying}
-        presets={presets}
-        archive={
-          <ArchiveActions
-            room={room}
-            ended={ended}
-            pending={actionPending}
-            onPending={action}
-            onCopy={copyConfig}
-            onEnded={(next) => {
-              chat.setRoom(next);
-              setEditing(null);
-            }}
-          />
-        }
-        includeNovelContext={novelMode && !copying}
-        novelContext={novelContext}
-        novelContextReady={novelSettled}
-        onOpenChange={(open) => {
-          if (!open) setEditing(null);
-        }}
-        onSave={async (config, writingContext) => {
-          if (copying) {
-            if (!confirmAgentNavigation()) return;
-            const data = await worldRequest<{ room: WorldRoom }>(
-              "rooms",
-              "POST",
-              { ...config, kind },
-            );
-            router.push(`/agent/worlds/${data.room.id}`);
-          } else {
-            if (writingContext) {
-              const saved = await saveNovelContext.current?.(writingContext);
-              if (!saved) throw new Error("小说设定未能保存到本机。");
-            }
-            const data = await worldRequest<{ room: WorldRoom }>(
-              `rooms/${loaded.id}`,
-              "PATCH",
-              {
-                action: "configure",
-                expectedVersion: loaded.version,
-                config,
-              },
-            );
-            chat.setRoom(data.room);
+        {novelMode && chat.error ? (
+          <Alert>
+            <AlertDescription>{chat.error}</AlertDescription>
+          </Alert>
+        ) : null}
+        <div className="flex min-h-0 flex-1">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {novelMode ? (
+              <div className="relative isolate flex min-h-0 flex-1 flex-col">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+                >
+                  <div className="absolute inset-0 scale-90 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-10 blur-xs" />
+                </div>
+                <NovelPanel
+                  key={room.id}
+                  room={room}
+                  fileToolbar={novelFileToolbar}
+                  onBusyChange={setNovelBusy}
+                  onEditingChange={setNovelEditing}
+                  onAtTopChange={setAtContentTop}
+                  onContext={onNovelContext}
+                />
+              </div>
+            ) : (
+              <ComposerDock
+                composer={
+                  <RoomComposer
+                    draft={draft}
+                    mentions={mentions}
+                    mentionItems={mentionItems}
+                    speaker={speaker}
+                    speakerLabel={speakerLabel}
+                    paused={loaded.paused}
+                    running={running}
+                    stopping={chat.stopping}
+                    pending={chat.pending}
+                    actionPending={actionPending}
+                    ended={ended}
+                    draftStatus={loaded.status === "draft"}
+                    error={chat.error}
+                    onRetrySubmission={chat.retrySubmission}
+                    onDraftChange={setDraft}
+                    onMentionsChange={setMentions}
+                    onSpeakerChange={setSpeakerId}
+                    onSend={send}
+                    onStop={() => void chat.stop()}
+                    onContinue={() =>
+                      chat.start({
+                        mode: "auto",
+                        text: "",
+                        mentions: [],
+                        speaker: "system",
+                        resume: true,
+                      })
+                    }
+                    onStep={() =>
+                      chat.start({
+                        mode: "step",
+                        text: "",
+                        mentions: [],
+                        speaker: "system",
+                        resume: true,
+                      })
+                    }
+                    onCopy={() => void edit(true)}
+                  />
+                }
+              >
+                <RoomTranscript
+                  room={room}
+                  onAtTopChange={setAtContentTop}
+                  onLoadEarlier={() => void chat.loadEarlier()}
+                  onRetry={retryFor}
+                />
+              </ComposerDock>
+            )}
+          </div>
+          {notesSidebarOpen ? (
+            <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-border px-4 py-5 xl:block">
+              <WorldNotes
+                room={room}
+                onMention={novelMode ? undefined : addMention}
+              />
+            </aside>
+          ) : null}
+        </div>
+        <WorldNotesSheet
+          open={notes}
+          room={room}
+          onOpenChange={setNotes}
+          onMention={novelMode ? undefined : addMention}
+        />
+        <SettingsSheet
+          room={room}
+          ended={ended}
+          editing={editing}
+          copying={copying}
+          presets={presets}
+          archive={
+            <ArchiveActions
+              room={room}
+              ended={ended}
+              pending={actionPending}
+              onPending={action}
+              onCopy={copyConfig}
+              onEnded={(next) => {
+                chat.setRoom(next);
+                setEditing(null);
+              }}
+            />
           }
-          setEditing(null);
-        }}
-      />
-    </div>
+          includeNovelContext={novelMode && !copying}
+          novelContext={novelContext}
+          novelContextReady={novelSettled}
+          onOpenChange={(open) => {
+            if (!open) setEditing(null);
+          }}
+          onSave={async (config, writingContext) => {
+            if (copying) {
+              if (!confirmAgentNavigation()) return;
+              const data = await worldRequest<{ room: WorldRoom }>(
+                "rooms",
+                "POST",
+                { ...config, kind },
+              );
+              router.push(`/agent/worlds/${data.room.id}`);
+            } else {
+              if (writingContext) {
+                const saved = await saveNovelContext.current?.(writingContext);
+                if (!saved) throw new Error("小说设定未能保存到本机。");
+              }
+              const data = await worldRequest<{ room: WorldRoom }>(
+                `rooms/${loaded.id}`,
+                "PATCH",
+                {
+                  action: "configure",
+                  expectedVersion: loaded.version,
+                  config,
+                },
+              );
+              chat.setRoom(data.room);
+            }
+            setEditing(null);
+          }}
+        />
+      </div>
+    </ChapterPromptReuseProvider>
   );
 }

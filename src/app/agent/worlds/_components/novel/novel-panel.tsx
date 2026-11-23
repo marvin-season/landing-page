@@ -48,6 +48,7 @@ import {
   type ChapterGenerationOptions,
   ChapterRewriteForm,
 } from "./chapter-generation-form";
+import { useRegisterChapterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
 import { ContextControls } from "./context-controls";
@@ -113,6 +114,7 @@ export function NovelPanel({
     onAtTopChange(panel.scrollTop <= 0);
   }, [editingChapter, thinkingChapter, onAtTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
+  const [composerRequest, setComposerRequest] = useState(0);
   const writer = useNovel(
     room,
     (busy) => {
@@ -232,6 +234,14 @@ export function NovelPanel({
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || rewriting;
   const summarizing = writer.task === "summary";
+  function reuseChapterGoal(text: string) {
+    if (!writer.ready || writer.busy || importing || rewriting || ended)
+      return false;
+    void writer.updateChapterGoal(text);
+    setComposerRequest((count) => count + 1);
+    return true;
+  }
+  useRegisterChapterPromptReuse(reuseChapterGoal);
   const generationOptions = {
     chapterGoal: novel.chapterGoal,
     words: novel.words,
@@ -440,6 +450,7 @@ export function NovelPanel({
       label="继续创作下一章"
       draft={generationOptions.chapterGoal.trim()}
       forceOpen={rewriting}
+      requestOpen={composerRequest}
       onFocusInput={() =>
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
@@ -746,7 +757,10 @@ export function NovelPanel({
                     key={chapter.id}
                     title={chapter.title}
                     text={chapter.text}
+                    brief={chapter.brief}
                     rewriting={rewriting}
+                    reuseDisabled={continueLocked}
+                    onReuseBrief={reuseChapterGoal}
                     appliedLength={
                       appliedRewrite?.chapterId === chapter.id
                         ? appliedRewrite.length

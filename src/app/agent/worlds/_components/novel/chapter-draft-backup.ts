@@ -6,6 +6,7 @@ const draftSchema = z.object({
     id: z.string().min(1),
     title: z.string(),
     text: z.string(),
+    brief: z.string().optional(),
   }),
   text: z.string(),
   version: z.number().int(),

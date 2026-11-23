@@ -70,13 +70,20 @@ test("a restored continuation draft keeps its selected chapter as the save posit
   const draft = open();
   draft.start({
     mode: "chapter",
-    chapter: { id: "new", title: "第2章", text: "" },
+    chapter: {
+      id: "new",
+      title: "第2章",
+      text: "",
+      brief: "推进感情线",
+    },
     version: 2,
     afterChapterId: "selected",
   });
   draft.write("续写正文。");
   draft.flush();
-  assert.equal(open().read()?.afterChapterId, "selected");
+  const restored = open().read();
+  assert.equal(restored?.afterChapterId, "selected");
+  assert.equal(restored?.chapter.brief, "推进感情线");
 });
 
 test("a failed backup can retry the latest text when storage is available", () => {

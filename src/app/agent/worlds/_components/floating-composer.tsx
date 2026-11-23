@@ -54,18 +54,28 @@ export function FloatingComposer({
   label,
   draft,
   forceOpen = false,
+  requestOpen = 0,
   onFocusInput,
   children,
 }: {
   label: string;
   draft?: string;
   forceOpen?: boolean;
+  requestOpen?: number;
   onFocusInput: () => void;
   children: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const focusInput = useRef(onFocusInput);
+  focusInput.current = onFocusInput;
   const open = expanded || forceOpen;
+
+  useLayoutEffect(() => {
+    if (!requestOpen) return;
+    setExpanded(true);
+    requestAnimationFrame(() => focusInput.current());
+  }, [requestOpen]);
 
   return (
     <Collapsible

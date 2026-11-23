@@ -4,14 +4,22 @@ import { Button } from "@landing-page/design-system";
 import * as Dialog from "@radix-ui/react-dialog";
 import { History, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useReuseChapterPrompt } from "./chapter-prompt-reuse";
 import {
   type NovelPrompt,
   promptLabels,
   readNovelPrompts,
 } from "./prompt-history";
 
-function PromptHistoryList({ roomKey }: { roomKey: string }) {
+function PromptHistoryList({
+  roomKey,
+  onUseChapterPrompt,
+}: {
+  roomKey: string;
+  onUseChapterPrompt: (text: string) => boolean;
+}) {
   const [result, setResult] = useState<NovelPrompt[] | "error" | null>(null);
+  const [blocked, setBlocked] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -44,27 +52,50 @@ function PromptHistoryList({ roomKey }: { roomKey: string }) {
   }
 
   return (
-    <ol className="min-h-0 divide-y divide-border/60 overflow-y-auto overscroll-contain px-5">
-      {result.map(({ id, kind, text, createdAt }) => (
-        <li key={id} className="flex flex-col gap-2 py-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>{promptLabels[kind]}</span>
-            <time dateTime={new Date(createdAt).toISOString()}>
-              {new Date(createdAt).toLocaleString("zh-CN", { hour12: false })}
-            </time>
-          </div>
-          <p className="wrap-anywhere whitespace-pre-wrap text-sm leading-6">
-            {text}
-          </p>
-        </li>
-      ))}
-    </ol>
+    <div className="flex min-h-0 flex-col">
+      {blocked ? (
+        <p role="status" className="px-5 pt-3 text-xs text-muted-foreground">
+          正在生成、润色、导入或故事已结束时，不能填入下一章要求。
+        </p>
+      ) : null}
+      <ol className="min-h-0 divide-y divide-border/60 overflow-y-auto overscroll-contain px-5">
+        {result.map(({ id, kind, text, createdAt }) => (
+          <li key={id} className="flex flex-col gap-2 py-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span>{promptLabels[kind]}</span>
+              <time dateTime={new Date(createdAt).toISOString()}>
+                {new Date(createdAt).toLocaleString("zh-CN", { hour12: false })}
+              </time>
+            </div>
+            <p className="wrap-anywhere whitespace-pre-wrap text-sm leading-6">
+              {text}
+            </p>
+            {kind === "chapter" ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="self-start"
+                onClick={() => {
+                  if (onUseChapterPrompt(text)) return;
+                  setBlocked(true);
+                }}
+              >
+                填入下一章要求
+              </Button>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
 export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
+  const [open, setOpen] = useState(false);
+  const reuseChapterPrompt = useReuseChapterPrompt();
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <Button
           type="button"
@@ -86,7 +117,7 @@ export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
               提示词历史
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              从最新到最早显示已提交的写作要求。
+              从最新到最早显示已提交的写作要求。续写要求可以填回下一章输入框。
             </Dialog.Description>
             <Dialog.Close asChild>
               <Button
@@ -100,7 +131,15 @@ export function PromptHistoryDialog({ roomKey }: { roomKey: string }) {
               </Button>
             </Dialog.Close>
           </div>
-          <PromptHistoryList key={roomKey} roomKey={roomKey} />
+          <PromptHistoryList
+            key={roomKey}
+            roomKey={roomKey}
+            onUseChapterPrompt={(text) => {
+              if (!reuseChapterPrompt(text)) return false;
+              setOpen(false);
+              return true;
+            }}
+          />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
