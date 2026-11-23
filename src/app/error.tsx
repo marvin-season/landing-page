@@ -23,7 +23,7 @@ export default function GlobalError({
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,color-mix(in_oklab,var(--destructive)_10%,transparent),transparent_58%)]"
           />
           <div className="relative flex max-w-md flex-col items-center gap-4 text-center">
-            <h1 className="text-6xl font-bold tracking-tight text-muted-foreground/40">
+            <h1 className="text-6xl font-bold tracking-tight text-black">
               出错了
             </h1>
             <p className="text-sm leading-relaxed text-muted-foreground">

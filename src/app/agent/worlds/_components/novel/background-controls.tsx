@@ -117,10 +117,9 @@ export function NovelFileControls({
               <DropdownMenuTrigger asChild>
                 <Button
                   size="sm"
-                  variant="ghost"
+                  variant="outline"
                   aria-label="小说文件"
                   title="小说文件"
-                  className="px-2"
                 >
                   {importing ? (
                     <LoaderCircle
@@ -133,7 +132,7 @@ export function NovelFileControls({
                   <span className="hidden sm:inline">文件</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="min-w-52">
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     disabled={disabled || importing}
@@ -152,39 +151,6 @@ export function NovelFileControls({
                     <FileText />
                     导出整本 TXT
                   </DropdownMenuItem>
-                  {isDevelopment ? (
-                    serverSynced ? (
-                      <p className="px-2 py-1.5 text-sm text-muted-foreground">
-                        数据已同步
-                      </p>
-                    ) : (
-                      <>
-                        <DropdownMenuItem
-                          disabled={!hasChapters || Boolean(pending)}
-                          onSelect={() => run("save", onSaveToServer)}
-                        >
-                          <HardDrive />
-                          {pending === "save" ? "正在保存…" : "保存到服务器"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={Boolean(pending)}
-                          onSelect={() => run("load", onSyncFromServer)}
-                        >
-                          <HardDriveDownload />
-                          {pending === "load" ? "正在同步…" : "从服务器同步"}
-                        </DropdownMenuItem>
-                      </>
-                    )
-                  ) : null}
-                  {isDevelopment && canRestoreLocal ? (
-                    <DropdownMenuItem
-                      disabled={Boolean(pending)}
-                      onSelect={() => run("restore", onRestoreLocal)}
-                    >
-                      <History />
-                      {pending === "restore" ? "正在恢复…" : "恢复本地备份"}
-                    </DropdownMenuItem>
-                  ) : null}
                   <DropdownMenuItem
                     disabled={!hasChapters}
                     onSelect={() => onDownload("md")}
@@ -202,6 +168,45 @@ export function NovelFileControls({
                     总结并导出背景
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
+                {isDevelopment ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      {serverSynced ? (
+                        <DropdownMenuItem disabled>
+                          <HardDrive />
+                          数据已同步
+                        </DropdownMenuItem>
+                      ) : (
+                        <>
+                          <DropdownMenuItem
+                            disabled={!hasChapters || Boolean(pending)}
+                            onSelect={() => run("save", onSaveToServer)}
+                          >
+                            <HardDrive />
+                            {pending === "save" ? "正在保存…" : "保存到服务器"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={Boolean(pending)}
+                            onSelect={() => run("load", onSyncFromServer)}
+                          >
+                            <HardDriveDownload />
+                            {pending === "load" ? "正在同步…" : "从服务器同步"}
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      {canRestoreLocal ? (
+                        <DropdownMenuItem
+                          disabled={Boolean(pending)}
+                          onSelect={() => run("restore", onRestoreLocal)}
+                        >
+                          <History />
+                          {pending === "restore" ? "正在恢复…" : "恢复本地备份"}
+                        </DropdownMenuItem>
+                      ) : null}
+                    </DropdownMenuGroup>
+                  </>
+                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>,
             toolbar,

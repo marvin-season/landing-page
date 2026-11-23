@@ -38,6 +38,7 @@ Biome is the source of truth for formatting and linting. It uses 2-space indenta
 
 ## Implementation & Reuse
 
+- 组件化开发。优先使用 `@landing-page/design-system` 里已有的组件，例如 Button、Input、Select、DropdownMenu。不要用原生标签或另一套样式重做这些控件。
 - 尽可能使用已有组件，不要重复定义组件。先在 `packages/design-system`、`packages/biz-ui` 和当前路由的 `_components` 中查找，已有组件能覆盖需求时直接复用。
 - 复用样式不要通过定义或导出 Tailwind 类名变量（如 `xxxCls`）实现，而应采用无头组件、组合组件及明确的 `variant` 统一封装样式。调用处通过组件和插槽组合 UI，不再拼接共享类名；仅使用一次的样式直接写在对应元素上。
 - `cn()` / `cls()` 仅用于组件内部合并局部样式和条件类名，按普通函数传参，不使用带插值的模板标签写法，避免类名合并顺序覆盖圆角、背景等样式。

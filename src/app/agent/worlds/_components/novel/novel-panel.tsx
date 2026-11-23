@@ -626,8 +626,8 @@ export function NovelPanel({
               ref={chapterAnchor}
               className="flex flex-col gap-4 border-t border-border pt-5"
             >
-              <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 backdrop-blur-xs p-2 -mx-2">
-                <div className="flex min-w-0 max-w-md flex-[1_1_18rem] items-center gap-1">
+              <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
+                <div className="flex min-w-48 max-w-md flex-[1_1_16rem] items-center gap-1">
                   <Button
                     type="button"
                     size="icon"
@@ -644,7 +644,7 @@ export function NovelPanel({
                   </Button>
                   <WorldSelect
                     label="章节目录"
-                    className="min-w-0 flex-1"
+                    className="w-full min-w-0"
                     value={thinkingChapter?.id ?? chapter?.id ?? ""}
                     disabled={chapterSwitchLocked}
                     onValueChange={(value) => {
@@ -681,7 +681,7 @@ export function NovelPanel({
                 {chapter && !thinkingChapter ? (
                   <p
                     className={cn(
-                      "w-full text-xs tabular-nums",
+                      "shrink-0 whitespace-nowrap text-xs tabular-nums",
                       chapterLengthShortfall(chapter.text.length, novel.words)
                         ? "text-amber-700 dark:text-amber-400"
                         : "text-muted-foreground",
@@ -691,15 +691,21 @@ export function NovelPanel({
                   </p>
                 ) : null}
                 {thinkingChapter ? (
-                  <Button size="sm" variant="outline" onClick={writer.stop}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-9"
+                    onClick={writer.stop}
+                  >
                     <Square data-icon="inline-start" />
                     停止生成
                   </Button>
                 ) : chapter ? (
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="ml-auto flex shrink-0 items-center gap-2">
                     <Button
                       size="sm"
                       variant="outline"
+                      className="h-9"
                       disabled={chapterActionsLocked}
                       onClick={() => {
                         readingScroll.current =
@@ -717,6 +723,7 @@ export function NovelPanel({
                           ref={chapterMenuTrigger}
                           size="sm"
                           variant="outline"
+                          className="h-9"
                           disabled={chapterActionsLocked}
                         >
                           <Ellipsis data-icon="inline-start" />
@@ -725,6 +732,7 @@ export function NovelPanel({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
+                        className="min-w-44"
                         onCloseAutoFocus={(event) => {
                           const action = actionFromMenu.current;
                           actionFromMenu.current = null;

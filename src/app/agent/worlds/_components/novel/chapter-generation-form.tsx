@@ -1,4 +1,4 @@
-import { Button, Switch } from "@landing-page/design-system";
+import { Button, Input, Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { PenLine, WandSparkles } from "lucide-react";
 import { type ReactNode, type Ref, useLayoutEffect, useRef } from "react";
@@ -84,7 +84,7 @@ export function ChapterGenerationForm({
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
           每章字数
-          <input
+          <Input
             value={options.words}
             disabled={disabled}
             inputMode="numeric"
@@ -93,7 +93,7 @@ export function ChapterGenerationForm({
             onChange={(event) =>
               onChange({ ...options, words: event.target.value })
             }
-            className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+            className="h-8 w-16 px-2 text-sm"
           />
           <span>
             {minChapterTarget}–{maxChapterLength}
