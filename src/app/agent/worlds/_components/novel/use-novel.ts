@@ -19,15 +19,21 @@ import {
 } from "./chapter-draft-backup";
 import type { ChapterTextRange } from "./chapter-text";
 import {
-  forkFitsBudget,
-  forkSummaryPrompt,
-  prepareNovelFork,
-} from "./fork-model";
+  type CompressionCursor,
+  type CompressionOptions,
+  compressedChapterPrompt,
+  fitsNovelRequest,
+  initialCompressionCursor,
+  isNovelRequestTooLarge,
+  novelRequestBudget,
+  novelWithCompression,
+  planCompressionBatch,
+  smallerNovelBudget,
+} from "./context-compression";
 import { createImportedNovel, type ImportedNovel } from "./import-novel";
 import {
   applyChapterContinuation,
   type Chapter,
-  chapterPrompt,
   continuationIndex,
   createBackground,
   createNovel,
@@ -41,6 +47,7 @@ import {
   type NovelBackground,
   type NovelTask,
   type NovelWritingContext,
+  novelCheckpointCount,
   novelRequest,
   rememberChapterBrief,
   renameChapter as renameStoredChapter,
@@ -80,10 +87,30 @@ db.version(1).stores({ novels: "key" });
 const novels: Table<{ key: string; novel: Novel; previous?: Novel }, string> =
   db.table("novels");
 
+type Compression = {
+  novel: Novel;
+  config: WorldConfig;
+  through: number;
+  cursor: CompressionCursor;
+  budget: typeof novelRequestBudget;
+  retries: number;
+  options?: CompressionOptions;
+};
+type ChapterRun = {
+  task: "chapter";
+  compression: Compression;
+  onFirstText?: () => void;
+};
+type CompressionRun = {
+  task: "summary";
+  compression: Compression;
+  batch: NonNullable<ReturnType<typeof planCompressionBatch>>;
+  continuation?: ChapterRun;
+};
 type NovelRun =
-  | { task: "chapter"; onFirstText?: () => void }
+  | ChapterRun
   | { task: "summary"; config: WorldConfig; novel: Novel }
-  | { task: "summary"; forFork: true }
+  | CompressionRun
   | {
       task: "rewrite" | "chapter";
       plot: ReturnType<typeof preparePlotEdit>;
@@ -122,7 +149,7 @@ export function useNovel(
   const [draftIncomplete, setDraftIncomplete] = useState(false);
   const [rewriteReady, setRewriteReady] = useState(false);
   const [plotDraft, setPlotDraft] = useState<PlotDraft | null>(null);
-  const [forkSummary, setForkSummary] = useState("");
+  const [compressing, setCompressing] = useState(false);
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
   const [syncPrompt, setSyncPrompt] = useState<NovelSyncDivergence | null>(
@@ -337,6 +364,7 @@ export function useNovel(
   function end() {
     generating.current = false;
     setBusy(false);
+    setCompressing(false);
     onBusyChange(false);
   }
   const stream = useChatStreamCore({
@@ -351,6 +379,7 @@ export function useNovel(
       state.current = reduceChatStreamState(state.current, event);
       const run = input.current;
       if (run && "plot" in run) return;
+      if (run?.task === "summary" && "batch" in run) return;
       const text = getChatStreamText(state.current);
       if (run?.task === "chapter" || (run?.task === "rewrite" && !run.range))
         backup.write(text);
@@ -366,8 +395,39 @@ export function useNovel(
       setPreview(text);
     },
     onComplete() {
-      end();
       const text = getChatStreamText(state.current).trim();
+      const captured = input.current;
+      if (captured?.task === "summary" && "batch" in captured) {
+        if (
+          !finished.current ||
+          incomplete.current ||
+          !text ||
+          text.length > maxNovelSummaryLength
+        ) {
+          end();
+          setError("剧情摘要未生成完整或过长，请重试压缩。");
+          return;
+        }
+        const compression = {
+          ...captured.compression,
+          cursor: {
+            index: captured.batch.index,
+            offset: captured.batch.offset,
+            summary: text,
+          },
+        };
+        const continuation = captured.continuation;
+        if (continuation) {
+          if (!continueChapter({ ...continuation, compression })) end();
+        } else if (compression.cursor.index < compression.through) {
+          if (!compress(compression)) end();
+        } else {
+          saveCheckpoint(compression);
+          end();
+        }
+        return;
+      }
+      end();
       if (!finished.current || !text) {
         backup.flush();
         setDraftIncomplete(false);
@@ -376,7 +436,6 @@ export function useNovel(
         );
         return;
       }
-      const captured = input.current;
       if (!captured) return;
       const cutShort = incomplete.current;
       const cutShortNotice = incompleteNovelDraftNotice;
@@ -387,10 +446,7 @@ export function useNovel(
           pendingBackup.write({
             kind: "plot",
             mode: captured.plot.mode,
-            ids:
-              captured.plotIds.length === 1
-                ? [captured.plotIds[0]]
-                : [captured.plotIds[0], captured.plotIds[1]],
+            ids: [...captured.plotIds],
             requirements: captured.plotRequirements,
             draft,
             version: captured.version,
@@ -439,15 +495,6 @@ export function useNovel(
           setPreview("");
           return;
         }
-        if ("forFork" in captured) {
-          if (text.length > maxNovelSummaryLength) {
-            setError("摘要超过长度上限，请重新生成或手动输入较短的摘要。");
-          } else {
-            setForkSummary(text);
-          }
-          setPreview("");
-          return;
-        }
         try {
           const background = createBackground(
             captured.config,
@@ -464,6 +511,7 @@ export function useNovel(
         }
         return;
       }
+      if (captured.task === "chapter") saveCheckpoint(captured.compression);
       if (text.length > maxChapterLength) {
         setError(`草稿超过 ${maxChapterLength} 字，请缩短后保存。`);
         setDraftIncomplete(cutShort);
@@ -476,6 +524,36 @@ export function useNovel(
       setPreview(text);
     },
     onError(message) {
+      const run = input.current;
+      if (
+        run &&
+        !("plot" in run) &&
+        "compression" in run &&
+        isNovelRequestTooLarge(message)
+      ) {
+        const current = run.compression;
+        const noChapterText = !getChatStreamText(state.current).trim();
+        if (current.retries < 4 && (run.task === "summary" || noChapterText)) {
+          const prompt =
+            run.task === "summary"
+              ? run.batch.prompt
+              : continuationPrompt(current);
+          const next = {
+            ...current,
+            retries: current.retries + 1,
+            budget: smallerNovelBudget(
+              room.id,
+              prompt,
+              run.task,
+              current.budget,
+            ),
+          };
+          if (compress(next, run.task === "chapter" ? run : run.continuation))
+            return;
+          end();
+          return;
+        }
+      }
       backup.flush();
       end();
       setDraftIncomplete(false);
@@ -483,10 +561,12 @@ export function useNovel(
     },
   });
 
-  function start(run: NovelRun, prompt: string) {
+  function start(run: NovelRun, prompt: string): void {
     input.current = run;
     setError("");
-    setTask(run.task);
+    const archiving = run.task === "summary" && "batch" in run;
+    setCompressing(archiving);
+    setTask(archiving && run.continuation ? "chapter" : run.task);
     setGenerationStopped(false);
     setDraftIncomplete(false);
     if (!("plot" in run) && run.task !== "rewrite") setBackgroundExport(null);
@@ -506,6 +586,72 @@ export function useNovel(
     });
   }
 
+  function createCompression(novel: Novel, through: number): Compression {
+    return {
+      novel,
+      config: room.config,
+      through,
+      cursor: initialCompressionCursor(novel, through),
+      budget: novelRequestBudget,
+      retries: 0,
+    };
+  }
+
+  function continuationPrompt({ config, novel, through, cursor }: Compression) {
+    return compressedChapterPrompt(config, novel, through, cursor);
+  }
+
+  function continueChapter(run: ChapterRun): boolean {
+    const { compression } = run;
+    if (!compression.cursor.offset) {
+      const prompt = continuationPrompt(compression);
+      if (fitsNovelRequest(room.id, prompt, "chapter", compression.budget)) {
+        start(run, prompt);
+        return true;
+      }
+    }
+    return compress(compression, run);
+  }
+
+  function compress(
+    compression: Compression,
+    continuation?: ChapterRun,
+  ): boolean {
+    const { config, novel, cursor, through, budget } = compression;
+    const batch = planCompressionBatch(
+      room.id,
+      config,
+      novel,
+      cursor,
+      continuation && cursor.index < through - 1 ? through - 1 : through,
+      budget,
+      compression.options,
+    );
+    if (!batch) {
+      setError("上下文仍超限，请缩短世界设定、导入背景或本次写作要求后重试。");
+      return false;
+    }
+    start({ task: "summary", compression, batch, continuation }, batch.prompt);
+    return true;
+  }
+
+  function saveCheckpoint({ novel, cursor }: Compression) {
+    const current = latest.current;
+    if (
+      current.chapters !== novel.chapters ||
+      current.background !== novel.background ||
+      novelCheckpointCount(current) > cursor.index
+    )
+      return;
+    const { checkpoint } = novelWithCompression(novel, cursor);
+    if (
+      checkpoint &&
+      (current.checkpoint?.throughChapterId !== checkpoint.throughChapterId ||
+        current.checkpoint?.summary !== checkpoint.summary)
+    )
+      void update({ ...current, checkpoint }, { touch: false });
+  }
+
   function generateChapter(
     chapter: Chapter,
     afterChapterId: string | null | undefined,
@@ -521,13 +667,14 @@ export function useNovel(
       setError("找不到续写起点，请返回阅读页重新选择章节。");
       return false;
     }
-    const prompt = chapterPrompt(room.config, current, index);
-    if (prompt.length > maxNovelPromptLength) {
-      setError(
-        "小说已超出本次完整上下文容量，请导出当前卷并在新世界继续创作。",
-      );
+    if (
+      !continueChapter({
+        task: "chapter",
+        compression: createCompression(current, index),
+        onFirstText,
+      })
+    )
       return false;
-    }
     const brief = current.chapterGoal.trim();
     continuationBrief.current = brief;
     pendingBackup.clear();
@@ -537,7 +684,6 @@ export function useNovel(
       afterChapterId,
       version: room.version,
     });
-    start({ task: "chapter", onFirstText }, prompt);
     void recordNovelPrompt(key, "chapter", current.chapterGoal);
     return true;
   }
@@ -585,61 +731,47 @@ export function useNovel(
     start({ task: "summary", config: room.config, novel: current }, prompt);
   }
 
-  function summarizeFork() {
+  function compressContext(options: CompressionOptions) {
     if (!ready || generating.current || room.status === "ended") return;
     const current = latest.current;
     if (!current.chapters.length) return;
-    const prompt = forkSummaryPrompt(room.config, current);
-    if (prompt.length > maxNovelPromptLength) {
-      setError("自动总结的请求已超限，可手动填写剧情摘要。");
-      return;
-    }
-    setForkSummary("");
-    start({ task: "summary", forFork: true }, prompt);
+    const through = Math.max(
+      1,
+      current.chapters.length - 1,
+      novelCheckpointCount(current),
+    );
+    compress({
+      ...createCompression(current, through),
+      cursor: { index: 0, offset: 0, summary: "" },
+      options,
+    });
   }
 
-  function clearFork() {
-    if (generating.current) return;
-    setForkSummary("");
-    setError("");
-    if (input.current?.task === "summary" && "forFork" in input.current) {
-      input.current = null;
-      setPreview("");
-    }
-  }
-
-  async function createFork(summary: string) {
-    if (!ready || generating.current)
-      throw new Error("当前暂不可创建续写分支。");
+  async function createFork() {
+    if (!ready || generating.current) throw new Error("当前暂不可复制小说。");
     const current = latest.current;
-    const fork = prepareNovelFork(room.config, current, summary);
-    if (
-      !fork ||
-      !forkFitsBudget(fork.length, chapterPrompt(room.config, current).length)
-    )
-      throw new Error("续写上下文仍然超限或没有缩短，请精简摘要。");
     generating.current = true;
     onBusyChange(true);
     try {
       const { room: created } = await worldRequest<{ room: WorldRoom }>(
         "rooms",
         "POST",
-        { ...fork.config, kind: "novel" },
+        { ...room.config, kind: "novel" },
       );
       try {
         await novels.add({
           key: `${created.ownerId}:${created.id}`,
-          novel: fork.novel,
+          novel: current,
         });
       } catch {
         try {
           await worldRequest(`rooms/${created.id}`, "DELETE");
         } catch {
           throw new Error(
-            "本地小说写入失败，新建的空分支未能清理；原小说未改动。",
+            "本地小说写入失败，新建的空房间未能清理；原小说未改动。",
           );
         }
-        throw new Error("无法保存小说分支，请检查浏览器存储空间。");
+        throw new Error("无法保存小说副本，请检查浏览器存储空间。");
       }
       return created.id;
     } finally {
@@ -890,6 +1022,7 @@ export function useNovel(
     clearDraftBackup: backup.clear,
     saving,
     busy,
+    compressing,
     preview,
     task,
     generationStopped,
@@ -898,7 +1031,6 @@ export function useNovel(
     plotDraft,
     editPlot,
     applyPlot,
-    forkSummary,
     backgroundExport,
     async importNovel(imported: ImportedNovel) {
       if (!ready || generating.current)
@@ -914,14 +1046,12 @@ export function useNovel(
       setGenerationStopped(false);
       setDraftIncomplete(false);
       setRewriteReady(false);
-      setForkSummary("");
       return next.chapters[0].id;
     },
     generateChapter,
     saveChapterContinuation,
     generateBackground,
-    summarizeFork,
-    clearFork,
+    compressContext,
     createFork,
     rewrite,
     discardRewrite,
@@ -932,6 +1062,10 @@ export function useNovel(
       backup.flush();
       end();
       const run = input.current;
+      if (run?.task === "summary" && "batch" in run) {
+        setError("已停止压缩上下文，原正文和摘要已保留。");
+        return;
+      }
       if (
         run &&
         !("plot" in run) &&

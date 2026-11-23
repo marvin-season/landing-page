@@ -13,8 +13,7 @@ import {
 } from "./model";
 
 export type PlotMode = "stitch" | "merge" | "insert";
-type ChapterPair = readonly [string, string];
-export type PlotSelection = ChapterPair | readonly [string];
+export type PlotSelection = readonly string[];
 
 const transitionLength = 1200;
 const contextLength = 600;
@@ -23,15 +22,20 @@ const stitchResult = z.object({
   opening: z.string().trim().min(1),
 });
 
-export function resolveChapterPair(
+export function resolveChapterRange(
   chapters: readonly Chapter[],
-  ids: ChapterPair,
+  ids: PlotSelection,
 ) {
-  const first = chapters.findIndex(({ id }) => id === ids[0]);
-  const second = chapters.findIndex(({ id }) => id === ids[1]);
-  if (first < 0 || second < 0 || Math.abs(first - second) !== 1) return null;
-  const index = Math.min(first, second);
-  return { index, first: chapters[index], second: chapters[index + 1] };
+  if (ids.length === 0) return null;
+  const selected = new Set(ids);
+  if (selected.size !== ids.length) return null;
+  const index = chapters.findIndex(({ id }) => selected.has(id));
+  if (index < 0) return null;
+  const end = index + ids.length;
+  const range = chapters.slice(index, end);
+  if (range.length !== ids.length || !range.every(({ id }) => selected.has(id)))
+    return null;
+  return { index, end, chapters: range };
 }
 
 function transitionBoundary(text: string, fromEnd: boolean) {
@@ -68,11 +72,60 @@ export function preparePlotEdit(
   mode: PlotMode,
   requirements: string,
 ) {
+  const request = requirements.trim();
+  const range = resolveChapterRange(novel.chapters, ids);
+  if (mode === "merge") {
+    if (!range || ids.length < 2) throw new Error("请选择至少两个相邻的章节。");
+    if (range.chapters.some(({ text }) => !text.trim()))
+      throw new Error("请先为所选章节填写正文。");
+
+    const { index, end } = range;
+    const previous = novel.chapters[index - 1];
+    const following = novel.chapters[end];
+    const prompt = JSON.stringify({
+      world: config,
+      novel: {
+        title: novel.title,
+        style: novel.style,
+        outline: novel.outline,
+      },
+      previousChapters: previous
+        ? [{ title: previous.title, text: previous.text.slice(-contextLength) }]
+        : [],
+      followingChapters: following
+        ? [
+            {
+              title: following.title,
+              text: following.text.slice(0, contextLength),
+            },
+          ]
+        : [],
+      targetChapter: {
+        text: JSON.stringify(
+          range.chapters.map(({ title, text }) => ({ title, text })),
+        ),
+      },
+      task: {
+        mode,
+        maxCharacters: maxChapterLength,
+        requirements: `按原章序将选中的 ${ids.length} 章压缩重写为一章连贯正文。优先保留关键事件的因果、伏笔与人物变化，删减重复铺垫、次要描写及原章名、分节号，抹平各章接缝并自然衔接前后文。${request ? `作者要求：${request}。` : ""}只输出合并后的单章小说正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
+      },
+    });
+    if (prompt.length > maxNovelPromptLength)
+      throw new Error("本次剧情合并的上下文过长，请减少所选章节或精简设定。");
+    return { mode, range, prompt };
+  }
+
   const pair =
-    ids.length === 2 ? resolveChapterPair(novel.chapters, ids) : null;
+    range && ids.length === 2
+      ? {
+          index: range.index,
+          first: range.chapters[0],
+          second: range.chapters[1],
+        }
+      : null;
   if (pair && (!pair.first.text.trim() || !pair.second.text.trim()))
     throw new Error("请先为两个章节填写正文。");
-  const request = requirements.trim();
   if (mode === "insert") {
     if (!pair && (ids.length !== 1 || novel.chapters[0]?.id !== ids[0]))
       throw new Error("请选择第一章之前或两个相邻的章节。");
@@ -88,13 +141,13 @@ export function preparePlotEdit(
     };
   }
   if (!pair) throw new Error("请选择两个相邻的章节。");
-  if (mode === "stitch" && !request) throw new Error("请填写剧情要求。");
-  const { index, first, second } = pair;
+  if (!request) throw new Error("请填写剧情要求。");
+  const { first, second } = pair;
 
   const endingStart = transitionBoundary(first.text, true);
   const openingEnd = transitionBoundary(second.text, false);
-  const before = mode === "stitch" ? first.text.slice(0, endingStart) : "";
-  const after = mode === "stitch" ? second.text.slice(openingEnd) : "";
+  const before = first.text.slice(0, endingStart);
+  const after = second.text.slice(openingEnd);
   const ending = first.text.slice(endingStart);
   const opening = second.text.slice(0, openingEnd);
   // Include the untouched whitespace when calculating the replacement budget.
@@ -106,16 +159,9 @@ export function preparePlotEdit(
     maxChapterLength - before.length - endingPrefix.length - endingGap.length;
   const openingLimit =
     maxChapterLength - after.length - openingGap.length - openingSuffix.length;
-  if (mode === "stitch" && (endingLimit < 1 || openingLimit < 1))
+  if (endingLimit < 1 || openingLimit < 1)
     throw new Error("章节原文过长，请先缩短正文再粘合。");
 
-  const neighbor = (chapter: Chapter | undefined, fromEnd: boolean) =>
-    chapter && {
-      title: chapter.title,
-      text: fromEnd
-        ? chapter.text.slice(-contextLength)
-        : chapter.text.slice(0, contextLength),
-    };
   const prompt = JSON.stringify({
     world: config,
     novel: {
@@ -123,43 +169,18 @@ export function preparePlotEdit(
       style: novel.style,
       outline: novel.outline,
     },
-    ...(mode === "merge"
-      ? {
-          previousChapters: [neighbor(novel.chapters[index - 1], true)].filter(
-            Boolean,
-          ),
-          followingChapters: [
-            neighbor(novel.chapters[index + 2], false),
-          ].filter(Boolean),
-        }
-      : {}),
     targetChapter: {
       title: `${first.title} / ${second.title}`,
-      text: JSON.stringify(
-        mode === "stitch"
-          ? { ending, opening }
-          : { first: first.text, second: second.text },
-      ),
+      text: JSON.stringify({ ending, opening }),
     },
-    ...(mode === "stitch"
-      ? {
-          unchangedBefore: before.slice(-contextLength),
-          unchangedAfter: after.slice(0, contextLength),
-        }
-      : {}),
-    task:
-      mode === "stitch"
-        ? {
-            mode,
-            endingMaxCharacters: endingLimit,
-            openingMaxCharacters: openingLimit,
-            requirements: `改写前一章结尾（ending）和后一章开头（opening），消除生硬跳切、重复叙述或时间断层，让两章过渡自然。保留两章分界与关键事件，严丝合缝承接 unchangedBefore 末尾并接回 unchangedAfter 开头，绝不复述未改写原文。作者要求：${request}。只输出无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`,
-          }
-        : {
-            mode,
-            maxCharacters: maxChapterLength,
-            requirements: `按原时间顺序将 first 与 second 两章融合重写为一章连贯正文，删去交界处的重复铺垫、拖沓叙述及任何残留的章名、分节号或拼接痕迹，保留关键事件、细节伏笔与人物变化，并与前后章节自然衔接。${request ? `作者要求：${request}。` : ""}只输出合并后的单章小说纯正文，不输出章名、JSON 或说明，最多 ${maxChapterLength} 字符。`,
-          },
+    unchangedBefore: before.slice(-contextLength),
+    unchangedAfter: after.slice(0, contextLength),
+    task: {
+      mode,
+      endingMaxCharacters: endingLimit,
+      openingMaxCharacters: openingLimit,
+      requirements: `改写前一章结尾（ending）和后一章开头（opening），消除生硬跳切、重复叙述或时间断层，让两章过渡自然。保留两章分界与关键事件，严丝合缝承接 unchangedBefore 末尾并接回 unchangedAfter 开头，绝不复述未改写原文。作者要求：${request}。只输出无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，ending 最多 ${endingLimit} 字符，opening 最多 ${openingLimit} 字符。`,
+    },
   });
   if (prompt.length > maxNovelPromptLength)
     throw new Error("本次剧情整理的上下文过长，请先精简设定或正文。");
@@ -193,7 +214,7 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
           title:
             edit.mode === "insert"
               ? chapterTitle(edit.index)
-              : edit.pair.first.title || chapterTitle(edit.pair.index),
+              : edit.range.chapters[0].title || chapterTitle(edit.range.index),
           text,
         },
       ],
@@ -234,14 +255,16 @@ export function applyPlotDraft(
 ): Novel {
   if (edit.mode === "insert")
     return insertChapterBefore(novel, edit.beforeId, draft.chapters[0]);
-  const { index } = edit.pair;
-  const following = novel.chapters.slice(index + 2);
+  const { index } = edit.mode === "merge" ? edit.range : edit.pair;
+  const following = novel.chapters.slice(
+    edit.mode === "merge" ? edit.range.end : index + 2,
+  );
   return {
     ...novel,
     chapters: [
       ...novel.chapters.slice(0, index),
-      ...draft.chapters,
-      ...(draft.mode === "merge"
+      ...(edit.mode === "merge" ? [draft.chapters[0]] : draft.chapters),
+      ...(edit.mode === "merge"
         ? following.map((chapter, offset) => {
             const title = numberedTitle(chapter.title, index + 1 + offset);
             return title === chapter.title ? chapter : { ...chapter, title };

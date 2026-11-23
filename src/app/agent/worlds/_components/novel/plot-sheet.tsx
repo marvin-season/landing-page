@@ -10,6 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Textarea,
 } from "@landing-page/design-system";
 import {
   Check,
@@ -22,13 +23,12 @@ import {
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
-import { TextField } from "../fields";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
-import type { Chapter } from "./model";
+import { type Chapter, maxChapterLength } from "./model";
 import {
   type PlotMode,
   type PlotSelection,
-  resolveChapterPair,
+  resolveChapterRange,
 } from "./plot-edit";
 import type { useNovel } from "./use-novel";
 
@@ -37,12 +37,6 @@ const options = [
   { value: "merge", label: "剧情合并", icon: Combine },
   { value: "insert", label: "剧情插入", icon: ListPlus },
 ] as const;
-
-const scopeHints = {
-  stitch: "改写范围：所选前章的结尾和后章的开头。章节数不变。",
-  merge: "应用后：将所选两章替换为一章。",
-  insert: "新增位置：所选两章之间。只参考所选两章的正文。",
-} satisfies Record<PlotMode, string>;
 
 export function PlotSheet({
   chapters,
@@ -78,6 +72,7 @@ export function PlotSheet({
 }) {
   const fieldName = useId();
   const form = useId();
+  const requirementsId = useId();
   const [selection, setSelection] = useState<string[] | "start">(() =>
     restored ? (restored.ids.length === 1 ? "start" : [...restored.ids]) : [],
   );
@@ -95,18 +90,26 @@ export function PlotSheet({
   const canInsertAtStart = mode === "insert" && Boolean(firstChapter);
   const atStart = canInsertAtStart && selection === "start";
   const selected = selection === "start" ? [] : selection;
-  const anchor = chapters.findIndex(({ id }) => id === selected[0]);
-  const pair =
-    selected.length === 2
-      ? resolveChapterPair(chapters, [selected[0], selected[1]])
-      : null;
+  const range = resolveChapterRange(chapters, selected);
+  const selectedCount = range?.chapters.length ?? 0;
+  const hasValidRange =
+    range &&
+    (mode === "merge" ? selectedCount >= 2 : selectedCount === 2) &&
+    range.chapters.every(({ text }) => text.trim());
   const target: PlotSelection | null =
     atStart && firstChapter
       ? [firstChapter.id]
-      : pair
-        ? [pair.first.id, pair.second.id]
+      : hasValidRange
+        ? range.chapters.map(({ id }) => id)
         : null;
   const canStart = Boolean(target && (mode === "merge" || requirements.trim()));
+  const sourceLength =
+    mode === "merge"
+      ? (range?.chapters.reduce(
+          (sum, chapter) => sum + chapter.text.length,
+          0,
+        ) ?? 0)
+      : 0;
 
   useEffect(() => {
     if (!restored) return;
@@ -119,7 +122,7 @@ export function PlotSheet({
     if (writer.busy || applying || draft !== null) return false;
     if ((nextMode === "stitch" || nextMode === "merge") && !hasPlotPair)
       return false;
-    setMode(nextMode);
+    changeMode(nextMode);
     setRequirements(text);
     onOpenChange(true);
     return true;
@@ -129,6 +132,15 @@ export function PlotSheet({
     merge: (text) => fillRequirements("merge", text),
     insert: (text) => fillRequirements("insert", text),
   });
+
+  function changeMode(nextMode: PlotMode) {
+    setMode(nextMode);
+    if (
+      (selection === "start" && nextMode !== "insert") ||
+      (nextMode !== "merge" && selected.length > 2)
+    )
+      setSelection([]);
+  }
 
   function close() {
     writer.discardRewrite();
@@ -150,132 +162,174 @@ export function PlotSheet({
       }}
     >
       <DialogContent className="gap-0" onCloseAutoFocus={onCloseAutoFocus}>
-        <DialogHeader className="shrink-0 border-b border-border pr-12">
+        <DialogHeader className="shrink-0 border-b border-border pr-12 py-3">
           <DialogTitle>剧情整理</DialogTitle>
-          <DialogDescription>
-            {atStart
-              ? "插入位置 · 第一章之前"
-              : hasPlotPair
-                ? `相邻章节 · 已选 ${selected.length} / 2`
-                : "剧情插入"}
+          <DialogDescription className="sr-only">
+            选择整理方式与章节，生成草稿后确认应用。
           </DialogDescription>
         </DialogHeader>
         <form
           id={form}
-          className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4"
+          className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3"
           onSubmit={(event) => {
             event.preventDefault();
             if (!locked && canStart && target)
               writer.editPlot(target, mode, requirements);
           }}
         >
-          <fieldset disabled={locked} className="flex flex-col gap-2">
-            <legend className="mb-2 text-sm font-medium">
-              {canInsertAtStart ? "选择插入位置" : "选择相邻的两章"}
-            </legend>
-            {canInsertAtStart && (atStart || !draft) ? (
-              <Button
-                type="button"
-                size="sm"
-                variant={atStart ? "default" : "outline"}
-                className="self-start"
-                aria-pressed={atStart}
-                onClick={() => {
-                  writer.discardRewrite();
-                  setSelection(atStart ? [] : "start");
-                }}
-              >
-                <ListPlus data-icon="inline-start" />
-                第一章之前
-              </Button>
-            ) : null}
-            <div
-              className="grid max-h-[min(34dvh,18rem)] grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-2 overflow-y-auto p-1"
-              hidden={draft !== null || !hasPlotPair}
-            >
-              {chapters.map((chapter, index) => {
-                const active = selected.includes(chapter.id);
-                const adjacentText =
-                  chapters[index - 1]?.text.trim() ||
-                  chapters[index + 1]?.text.trim();
-                const available =
-                  active ||
-                  (selected.length === 0 && adjacentText) ||
-                  (selected.length === 1 && Math.abs(index - anchor) === 1);
-                return (
+          {!draft ? (
+            <>
+              <fieldset disabled={locked}>
+                <legend className="sr-only">整理方式</legend>
+                <div className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-muted/40 p-1">
+                  {options.map(({ value, label, icon: Icon }) => (
+                    <label key={value} className="group relative min-w-0">
+                      <input
+                        type="radio"
+                        name={fieldName}
+                        checked={mode === value}
+                        disabled={!hasPlotPair && value !== "insert"}
+                        className="peer sr-only"
+                        onChange={() => {
+                          changeMode(value);
+                          writer.discardRewrite();
+                        }}
+                      />
+                      <span className="flex min-h-7 flex-wrap items-center justify-center gap-1 rounded-md px-1 py-1 text-xs text-muted-foreground peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring group-has-disabled:opacity-60">
+                        <Icon className="size-3.5 shrink-0" />
+                        {label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset disabled={locked} className="flex flex-col gap-1">
+                <legend className="sr-only">章节选择</legend>
+                <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                  <p className="text-xs font-medium">
+                    {canInsertAtStart
+                      ? "插入位置"
+                      : mode === "merge"
+                        ? "连续章节（至少两章）"
+                        : "相邻两章"}
+                  </p>
+                  {mode === "merge" && range ? (
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs text-muted-foreground tabular-nums">
+                        {selectedCount === 1
+                          ? `第 ${range.index + 1} 章`
+                          : `第 ${range.index + 1}–${range.end} 章`}
+                        {" · "}
+                        {sourceLength.toLocaleString("zh-CN")} 字
+                      </p>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2"
+                        onClick={() => {
+                          writer.discardRewrite();
+                          setSelection([]);
+                        }}
+                      >
+                        清空
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+                {canInsertAtStart ? (
                   <Button
-                    key={chapter.id}
                     type="button"
-                    size="icon"
-                    variant={active ? "default" : "outline"}
-                    className="aspect-square h-auto w-full min-w-0 flex-col gap-1 rounded-lg px-1"
-                    disabled={!available || !chapter.text.trim()}
-                    aria-pressed={active}
-                    aria-label={`第 ${index + 1} 章：${chapter.title}`}
-                    title={chapter.title}
+                    size="sm"
+                    variant={atStart ? "default" : "outline"}
+                    className="self-start h-7"
+                    aria-pressed={atStart}
                     onClick={() => {
                       writer.discardRewrite();
-                      setSelection(
-                        active
-                          ? selected.filter((id) => id !== chapter.id)
-                          : [...selected, chapter.id],
-                      );
+                      setSelection(atStart ? [] : "start");
                     }}
                   >
-                    <span className="text-base tabular-nums">{index + 1}</span>
-                    <span className="w-full truncate text-[10px]">
-                      {chapter.title}
-                    </span>
+                    <ListPlus data-icon="inline-start" />
+                    第一章之前
                   </Button>
-                );
-              })}
-            </div>
-            {pair ? (
-              <p className="break-words text-xs text-muted-foreground">
-                {pair.first.title} → {pair.second.title}
-              </p>
-            ) : null}
-          </fieldset>
-          <fieldset disabled={locked}>
-            <legend className="sr-only">整理方式</legend>
-            <div className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-muted/40 p-1">
-              {options.map(({ value, label, icon: Icon }) => (
-                <label key={value} className="group relative min-w-0">
-                  <input
-                    type="radio"
-                    name={fieldName}
-                    checked={mode === value}
-                    disabled={!hasPlotPair && value !== "insert"}
-                    className="peer sr-only"
-                    onChange={() => {
-                      setMode(value);
-                      if (selection === "start") setSelection([]);
-                      writer.discardRewrite();
-                    }}
-                  />
-                  <span className="flex min-h-9 flex-wrap items-center justify-center gap-1 rounded-md px-1 py-1.5 text-xs text-muted-foreground peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring group-has-disabled:opacity-60">
-                    <Icon className="size-3.5 shrink-0" />
-                    {label}
-                  </span>
+                ) : null}
+                <div
+                  className="grid max-h-[min(26dvh,10rem)] grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-1 overflow-y-auto p-1"
+                  hidden={!hasPlotPair}
+                >
+                  {chapters.map((chapter, index) => {
+                    const active =
+                      !!range && index >= range.index && index < range.end;
+                    const insideRange =
+                      !!range && index > range.index && index < range.end - 1;
+                    const adjacentText =
+                      chapters[index - 1]?.text.trim() ||
+                      chapters[index + 1]?.text.trim();
+                    const available =
+                      chapter.text.trim() &&
+                      (active ||
+                        (range
+                          ? (mode === "merge" || selectedCount === 1) &&
+                            (index === range.index - 1 || index === range.end)
+                          : adjacentText));
+                    return (
+                      <Button
+                        key={chapter.id}
+                        type="button"
+                        size="icon"
+                        variant={active ? "default" : "outline"}
+                        className="h-8 w-full min-w-0 rounded-md px-1 text-xs tabular-nums"
+                        disabled={!available}
+                        aria-disabled={insideRange || undefined}
+                        aria-pressed={active}
+                        aria-label={`第 ${index + 1} 章：${chapter.title}`}
+                        title={chapter.title}
+                        onClick={() => {
+                          if (insideRange) return;
+                          writer.discardRewrite();
+                          const ids = range?.chapters.map(({ id }) => id) ?? [];
+                          setSelection(
+                            active
+                              ? ids.filter((id) => id !== chapter.id)
+                              : [...ids, chapter.id],
+                          );
+                        }}
+                      >
+                        {index + 1}
+                      </Button>
+                    );
+                  })}
+                </div>
+                {hasValidRange && mode !== "merge" ? (
+                  <p className="break-words text-xs text-muted-foreground">
+                    {range.chapters[0].title} → {range.chapters[1].title}
+                  </p>
+                ) : null}
+              </fieldset>
+              <fieldset disabled={locked} className="flex flex-col gap-1">
+                <label htmlFor={requirementsId} className="text-xs font-medium">
+                  本次写作要求{mode === "merge" ? "（选填）" : " *"}
                 </label>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {mode === "insert" && (atStart || !hasPlotPair)
-                ? "新增位置：第一章之前。只参考通用设定和本次写作要求。"
-                : scopeHints[mode]}
-            </p>
-          </fieldset>
-          <fieldset disabled={locked}>
-            <TextField
-              label={mode === "merge" ? "本次写作要求（选填）" : "本次写作要求"}
-              value={requirements}
-              onChange={setRequirements}
-              maxLength={4000}
-              multiline
-              required={mode !== "merge"}
-            />
-          </fieldset>
+                <Textarea
+                  id={requirementsId}
+                  value={requirements}
+                  onChange={(event) => setRequirements(event.target.value)}
+                  maxLength={4000}
+                  rows={2}
+                  required={mode !== "merge"}
+                />
+              </fieldset>
+              {mode === "merge" ? (
+                <Alert className="px-2 py-1.5">
+                  <AlertDescription className="text-xs">
+                    仅合并为一章，最多{" "}
+                    {maxChapterLength.toLocaleString("zh-CN")}{" "}
+                    字，正文可能大幅缩短。
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+            </>
+          ) : null}
           {writer.busy ? (
             <p
               role="status"
@@ -286,19 +340,21 @@ export function PlotSheet({
             </p>
           ) : null}
           {draft ? (
-            <div className="flex flex-col gap-4 border-t border-border pt-4">
-              <h3 className="text-sm font-medium">草稿预览</h3>
-              {draft.mode === "merge" ? (
-                <Alert>
-                  <AlertDescription>
-                    应用后，这两章将替换为一章。
-                  </AlertDescription>
-                </Alert>
-              ) : null}
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-border pb-2">
+                <h3 className="text-sm font-medium">草稿预览</h3>
+                {draft.mode === "merge" ? (
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    {selectedCount} 章合为 1 章 · 原文{" "}
+                    {sourceLength.toLocaleString("zh-CN")} 字{" → "}草稿{" "}
+                    {draft.chapters[0].text.length.toLocaleString("zh-CN")} 字
+                  </p>
+                ) : null}
+              </div>
               {draft.chapters.map((chapter) => (
                 <article
                   key={chapter.id}
-                  className="flex min-w-0 flex-col gap-2"
+                  className="flex min-w-0 flex-col gap-1"
                 >
                   <h4 className="break-words font-serif text-base">
                     {chapter.title}
@@ -309,14 +365,19 @@ export function PlotSheet({
             </div>
           ) : null}
           {writer.error ? (
-            <Alert>
+            <Alert className="px-2 py-1.5">
               <AlertDescription>{writer.error}</AlertDescription>
             </Alert>
           ) : null}
         </form>
-        <DialogFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
+        <DialogFooter className="shrink-0 border-t border-border flex-row flex-wrap justify-end px-3 py-2">
           {writer.busy ? (
-            <Button type="button" variant="outline" onClick={writer.stop}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={writer.stop}
+            >
               <Square data-icon="inline-start" />
               停止生成
             </Button>
@@ -324,6 +385,7 @@ export function PlotSheet({
             <>
               <Button
                 type="button"
+                size="sm"
                 variant="ghost"
                 disabled={applying}
                 onClick={writer.discardRewrite}
@@ -332,6 +394,7 @@ export function PlotSheet({
               </Button>
               <Button
                 type="button"
+                size="sm"
                 disabled={applying}
                 onClick={async () => {
                   setApplying(true);
@@ -357,7 +420,7 @@ export function PlotSheet({
               </Button>
             </>
           ) : (
-            <Button type="submit" form={form} disabled={!canStart}>
+            <Button type="submit" size="sm" form={form} disabled={!canStart}>
               <WandSparkles data-icon="inline-start" />
               生成草稿
             </Button>

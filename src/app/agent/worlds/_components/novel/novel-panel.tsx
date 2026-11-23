@@ -31,6 +31,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -275,7 +276,7 @@ export function NovelPanel({
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || rewriting;
-  const summarizing = writer.task === "summary";
+  const summarizing = writer.task === "summary" && !writer.compressing;
   function reuseChapterGoal(text: string) {
     if (!writer.ready || writer.busy || importing || rewriting || ended)
       return false;
@@ -555,6 +556,16 @@ export function NovelPanel({
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 pb-[calc(var(--composer-dock-height,0px)+1.5rem)]">
+          {fileToolbar
+            ? createPortal(
+                <ContextControls
+                  room={room}
+                  writer={writer}
+                  disabled={chapterActionsLocked}
+                />,
+                fileToolbar,
+              )
+            : null}
           <NovelFileControls
             toolbar={fileToolbar}
             disabled={chapterActionsLocked}
@@ -576,6 +587,7 @@ export function NovelPanel({
               setSelected(id);
             }}
             onDownload={download}
+            onFork={writer.createFork}
             onSaveToServer={saveToServer}
             onSyncFromServer={syncFromServer}
             onRestoreLocal={restoreLocalBackup}
@@ -681,12 +693,6 @@ export function NovelPanel({
                   </p>
                 ) : null}
                 <div className="ml-auto flex shrink-0 items-center gap-2">
-                  <ContextControls
-                    room={room}
-                    writer={writer}
-                    chapterCount={chapterIndex + 1}
-                    disabled={chapterActionsLocked}
-                  />
                   {thinkingChapter ? (
                     <Button
                       size="sm"
@@ -799,7 +805,9 @@ export function NovelPanel({
                   className="flex items-center gap-2 py-5 text-sm text-muted-foreground"
                 >
                   <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
-                  {thinkingChapter.title}正在构思…
+                  {writer.compressing
+                    ? "正在压缩模型上下文…"
+                    : `${thinkingChapter.title}正在构思…`}
                 </p>
               ) : chapter ? (
                 <>

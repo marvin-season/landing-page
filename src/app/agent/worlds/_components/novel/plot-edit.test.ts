@@ -30,6 +30,20 @@ test("plot edits require adjacent chapters and treat the selection in book order
     /相邻/,
   );
   assert.throws(
+    () => preparePlotEdit(config, novel, ["b"], "merge", ""),
+    /至少两个/,
+  );
+  assert.throws(
+    () => preparePlotEdit(config, novel, ["a", "b", "d"], "merge", ""),
+    /相邻/,
+  );
+  for (const mode of ["stitch", "insert"] as const) {
+    assert.throws(
+      () => preparePlotEdit(config, novel, ["b", "c", "d"], mode, "整理"),
+      /两个相邻/,
+    );
+  }
+  assert.throws(
     () => preparePlotEdit(config, novel, ["b", "c"], "stitch", " "),
     /剧情要求/,
   );
@@ -39,8 +53,15 @@ test("plot edits require adjacent chapters and treat the selection in book order
   );
   const edit = preparePlotEdit(config, novel, ["c", "b"], "merge", "");
   assert.ok(edit.mode === "merge");
-  assert.equal(edit.pair.first.id, "b");
-  assert.equal(edit.pair.second.id, "c");
+  assert.deepEqual(
+    edit.range.chapters.map(({ id }) => id),
+    ["b", "c"],
+  );
+  novel.chapters[2].text = " ";
+  assert.throws(
+    () => preparePlotEdit(config, novel, ["b", "c", "d"], "merge", ""),
+    /填写正文/,
+  );
 });
 
 test("stitch changes only the transition and keeps both chapter IDs and titles", () => {
@@ -95,8 +116,9 @@ test("stitch changes only the transition and keeps both chapter IDs and titles",
   );
 });
 
-test("merge replaces the pair with a new chapter and renumbers only default titles", () => {
+test("merge rewrites a consecutive range into one chapter and renumbers only default titles", () => {
   const novel = book();
+  novel.chapters.splice(4, 0, { id: "f", title: "第5章", text: "天亮了。" });
   const withCheckpoint = {
     ...novel,
     checkpoint: { throughChapterId: "c", summary: "已归档的情节。" },
@@ -104,27 +126,34 @@ test("merge replaces the pair with a new chapter and renumbers only default titl
   const edit = preparePlotEdit(
     config,
     withCheckpoint,
-    ["b", "c"],
+    ["d", "b", "c"],
     "merge",
     "  保留争执的具体原因  ",
   );
-  const mergeTask = JSON.parse(edit.prompt).task;
+  const prompt = JSON.parse(edit.prompt);
+  const mergeTask = prompt.task;
+  assert.deepEqual(
+    JSON.parse(prompt.targetChapter.text),
+    novel.chapters.slice(1, 4).map(({ title, text }) => ({ title, text })),
+  );
+  assert.equal(prompt.previousChapters[0].text, novel.chapters[0].text);
+  assert.equal(prompt.followingChapters[0].text, novel.chapters[4].text);
   assert.equal(mergeTask.mode, "merge");
   assert.equal(mergeTask.maxCharacters, 8000);
   assert.match(mergeTask.requirements, /作者要求：保留争执的具体原因。/);
   assert.throws(() => readPlotDraft(edit, "长".repeat(8001)), /8000/);
-  const draft = readPlotDraft(edit, "争执过后，她独自去了车站。");
+  const draft = readPlotDraft(edit, "争执过后，她独自去了车站，找到了失物。");
   const saved = applyPlotDraft(withCheckpoint, edit, draft);
   assert.deepEqual(
     saved.chapters.map(({ id }) => id),
-    ["a", draft.chapters[0].id, "d", "e"],
+    ["a", draft.chapters[0].id, "f", "e"],
   );
-  assert.ok(!["b", "c"].includes(saved.chapters[1].id));
+  assert.ok(!["b", "c", "d"].includes(saved.chapters[1].id));
   assert.deepEqual(
     saved.chapters.map(({ title }) => title),
     ["序幕", "第2章", "第3章", "尾声"],
   );
-  assert.equal(saved.chapters[2].text, novel.chapters[3].text);
+  assert.equal(saved.chapters[2].text, novel.chapters[4].text);
   assert.equal(
     invalidateEditedCheckpoint(withCheckpoint, saved).checkpoint,
     undefined,

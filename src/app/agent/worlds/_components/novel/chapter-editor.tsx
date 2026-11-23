@@ -247,9 +247,6 @@ export function ChapterEditor({
             返回阅读
           </Button>
           <div className="flex min-w-0 items-center gap-2 text-sm">
-            <span className="sr-only shrink-0 min-[420px]:not-sr-only">
-              章节目录
-            </span>
             <WorldSelect
               label="章节目录"
               size="sm"

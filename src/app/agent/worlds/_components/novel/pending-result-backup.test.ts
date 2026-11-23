@@ -47,7 +47,7 @@ test("selection and plot pending results survive a reload per room", () => {
   plot.write({
     kind: "plot",
     mode: "merge",
-    ids: ["a", "b"],
+    ids: ["a", "b", "c"],
     requirements: "去重",
     draft: {
       mode: "merge",
@@ -55,7 +55,9 @@ test("selection and plot pending results survive a reload per room", () => {
     },
     version: 4,
   });
-  assert.equal(open().read()?.kind, "plot");
+  const restored = open().read();
+  assert.ok(restored?.kind === "plot");
+  assert.deepEqual(restored.ids, ["a", "b", "c"]);
   plot.clear();
   assert.equal(open().read(), null);
 });

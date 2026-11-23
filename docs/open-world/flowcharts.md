@@ -117,17 +117,17 @@ flowchart TD
   Settings -->|"configure（storyGoal = 大纲）"| GroupAPI["/api/group-chat"]
   Panel --> Editor[ChapterEditor / RewritePanel]
   Panel --> Plot[PlotSheet]
-  Panel --> Fork[ContextControls]
+  Panel --> Context[ContextControls]
   Panel --> Files[NovelFileControls]
   Panel --> Hook[useNovel]
   Editor --> Hook
   Plot --> Hook
-  Fork --> Hook
+  Context --> Hook
   Files --> Hook
-  Hook --> Model[model.ts / plot-edit.ts / fork-model.ts / import-novel.ts]
+  Hook --> Model[model.ts / plot-edit.ts / context-compression.ts / import-novel.ts]
   Hook --> DB[(IndexedDB world-novels)]
   Hook --> Core[useChatStreamCore + aiSdkChatStreamAdapter]
-  Fork -->|创建分支房间| GroupAPI
+  Hook -->|文件菜单 Fork：复制小说房间| GroupAPI
   Core --> API["POST /api/novel：登录、同源、所有权、kind = novel"]
   API --> Writer[world-writer：按 task 选择指令]
   Writer --> LLM[开放世界代理与第一个启用角色的模型]
@@ -145,8 +145,14 @@ sequenceDiagram
   participant API as /api/novel + Writer
   participant DB as IndexedDB
   User->>UI: 触发任务
-  UI->>Hook: generate / rewrite / editPlot / summarizeFork
+  UI->>Hook: generate / rewrite / editPlot / compressContext
   Hook->>Hook: 检查就绪与重复提交，构造 prompt 并校验长度
+  opt 续写上下文需要压缩
+    loop 分批整理前文
+      Hook->>API: summary 请求
+      API-->>Hook: 返回更新后的剧情摘要
+    end
+  end
   Hook->>API: { roomId, prompt, task }
   loop 正文流
     API-->>Hook: UIMessageChunk

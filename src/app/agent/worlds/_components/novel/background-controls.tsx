@@ -16,12 +16,14 @@ import {
   Download,
   FileText,
   FolderOpen,
+  GitFork,
   HardDrive,
   HardDriveDownload,
   History,
   LoaderCircle,
   Upload,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
@@ -63,6 +65,7 @@ export function NovelFileControls({
   onImportingChange,
   onImport,
   onDownload,
+  onFork,
   onSaveToServer,
   onSyncFromServer,
   onRestoreLocal,
@@ -79,6 +82,7 @@ export function NovelFileControls({
   onImportingChange: (importing: boolean) => void;
   onImport: (novel: ImportedNovel) => Promise<void>;
   onDownload: (format: "txt" | "md") => void;
+  onFork: () => Promise<string>;
   onSaveToServer: () => Promise<string | null>;
   onSyncFromServer: () => Promise<string | null>;
   onRestoreLocal: () => Promise<string | null>;
@@ -87,10 +91,23 @@ export function NovelFileControls({
   serverSynced: boolean;
   onSummarize: () => void;
 }) {
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [pending, setPending] = useState<"" | "save" | "load" | "restore">("");
+  const [forking, setForking] = useState(false);
+  async function fork() {
+    setError("");
+    setForking(true);
+    try {
+      const id = await onFork();
+      router.push(`/agent/worlds/${id}`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "无法复制小说。");
+      setForking(false);
+    }
+  }
   function run(
     kind: "save" | "load" | "restore",
     action: () => Promise<string | null>,
@@ -135,11 +152,20 @@ export function NovelFileControls({
               <DropdownMenuContent align="end" className="min-w-52">
                 <DropdownMenuGroup>
                   <DropdownMenuItem
-                    disabled={disabled || importing}
+                    disabled={disabled || importing || forking}
                     onSelect={() => fileRef.current?.click()}
                   >
                     <Upload />
                     {importing ? "正在导入…" : "导入小说"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={
+                      disabled || importing || forking || Boolean(pending)
+                    }
+                    onSelect={() => void fork()}
+                  >
+                    <GitFork />
+                    {forking ? "正在复制…" : "Fork"}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -160,7 +186,11 @@ export function NovelFileControls({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={
-                      disabled || importing || !canSummarize || !hasChapters
+                      disabled ||
+                      importing ||
+                      forking ||
+                      !canSummarize ||
+                      !hasChapters
                     }
                     onSelect={onSummarize}
                   >
@@ -180,14 +210,16 @@ export function NovelFileControls({
                       ) : (
                         <>
                           <DropdownMenuItem
-                            disabled={!hasChapters || Boolean(pending)}
+                            disabled={
+                              !hasChapters || forking || Boolean(pending)
+                            }
                             onSelect={() => run("save", onSaveToServer)}
                           >
                             <HardDrive />
                             {pending === "save" ? "正在保存…" : "保存到服务器"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            disabled={Boolean(pending)}
+                            disabled={forking || Boolean(pending)}
                             onSelect={() => run("load", onSyncFromServer)}
                           >
                             <HardDriveDownload />
@@ -197,7 +229,7 @@ export function NovelFileControls({
                       )}
                       {canRestoreLocal ? (
                         <DropdownMenuItem
-                          disabled={Boolean(pending)}
+                          disabled={forking || Boolean(pending)}
                           onSelect={() => run("restore", onRestoreLocal)}
                         >
                           <History />
@@ -217,11 +249,11 @@ export function NovelFileControls({
         type="file"
         accept=".txt,.md,text/plain,text/markdown"
         className="hidden"
-        disabled={disabled || importing}
+        disabled={disabled || importing || forking}
         onChange={async (event) => {
           const file = event.target.files?.[0];
           event.target.value = "";
-          if (!file || disabled || importing) return;
+          if (!file || disabled || importing || forking) return;
           setError("");
           onImportingChange(true);
           try {
@@ -246,7 +278,7 @@ export function NovelFileControls({
               <Button
                 size="sm"
                 variant="outline"
-                disabled={disabled || Boolean(pending)}
+                disabled={disabled || forking || Boolean(pending)}
                 onClick={() => run("save", onSaveToServer)}
               >
                 保存到服务器
@@ -254,7 +286,7 @@ export function NovelFileControls({
               <Button
                 size="sm"
                 variant="outline"
-                disabled={disabled || Boolean(pending)}
+                disabled={disabled || forking || Boolean(pending)}
                 onClick={() => run("load", onSyncFromServer)}
               >
                 从服务器同步

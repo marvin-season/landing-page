@@ -4,6 +4,12 @@ import {
   Alert,
   AlertDescription,
   Button,
+  Collapsible,
+  CollapsibleChevron,
+  CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
+  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,25 +17,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Input,
   Progress,
 } from "@landing-page/design-system";
-import { GitFork, LoaderCircle, Sparkles, Square } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { LoaderCircle, Minimize2, Square } from "lucide-react";
+import { useId, useMemo, useState } from "react";
+import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import type { WorldRoom } from "@/lib/group-chat/model";
-import { TextField } from "../fields";
+import { FieldGroup, TextField } from "../fields";
 import {
-  forkChapterCount,
-  forkFitsBudget,
-  forkSummaryPrompt,
-  prepareNovelFork,
-} from "./fork-model";
-import {
-  chapterPrompt,
-  maxNovelPromptLength,
-  maxNovelSummaryLength,
-  novelCheckpointCount,
-} from "./model";
+  defaultCompressionRate,
+  maxCompressionPromptLength,
+  maxCompressionTarget,
+  novelRequestBudget,
+  novelRequestBytes,
+  parseCompressionRate,
+} from "./context-compression";
+import { chapterPrompt, novelCheckpointCount } from "./model";
 import type { useNovel } from "./use-novel";
 
 const number = new Intl.NumberFormat("zh-CN");
@@ -37,181 +41,166 @@ const number = new Intl.NumberFormat("zh-CN");
 export function ContextControls({
   room,
   writer,
-  chapterCount,
   disabled,
 }: {
   room: WorldRoom;
   writer: Pick<
     ReturnType<typeof useNovel>,
-    | "novel"
-    | "busy"
-    | "error"
-    | "forkSummary"
-    | "summarizeFork"
-    | "createFork"
-    | "clearFork"
-    | "stop"
+    "novel" | "busy" | "error" | "compressing" | "compressContext" | "stop"
   >;
-  chapterCount: number;
   disabled: boolean;
 }) {
-  const router = useRouter();
   const { novel } = writer;
   const config = room.config;
   const [open, setOpen] = useState(false);
-  const [edited, setEdited] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [error, setError] = useState("");
-  const summary = edited ?? writer.forkSummary;
-  const length = useMemo(
-    () => chapterPrompt(config, novel, chapterCount).length,
-    [config, novel, chapterCount],
+  const [compressionRate, setCompressionRate] = useState(
+    String(defaultCompressionRate),
   );
-  const checkpointCount = novelCheckpointCount(novel, chapterCount);
-  const forkBaseLength = useMemo(
-    () =>
-      open && chapterCount < novel.chapters.length
-        ? chapterPrompt(config, novel).length
-        : length,
-    [config, novel, open, chapterCount, length],
-  );
-  const canSummarize = useMemo(
-    () =>
-      open &&
-      room.status !== "ended" &&
-      forkSummaryPrompt(config, novel).length <= maxNovelPromptLength,
-    [config, novel, open, room.status],
-  );
-  const fork = useMemo(
-    () => (open ? prepareNovelFork(config, novel, summary) : null),
-    [config, novel, open, summary],
-  );
-  const pending = writer.busy || creating;
-  const fits = fork !== null && forkFitsBudget(fork.length, forkBaseLength);
+  const [compressionPrompt, setCompressionPrompt] = useState("");
+  const rateId = useId();
+  const rate = parseCompressionRate(compressionRate);
+  const chapterCount = novel.chapters.length;
+  const { characters, bytes } = useMemo(() => {
+    if (!open) return { characters: 0, bytes: 0 };
+    const prompt = chapterPrompt(config, novel, chapterCount);
+    return {
+      characters: prompt.length,
+      bytes: novelRequestBytes(room.id, prompt, "chapter"),
+    };
+  }, [config, novel, chapterCount, open, room.id]);
+  const archivedCount = novelCheckpointCount(novel);
+  const summary = archivedCount ? novel.checkpoint?.summary : undefined;
+  const canCompress = chapterCount > 0 && room.status !== "ended";
+  const pending = writer.busy;
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
         if (pending) return;
         setOpen(next);
-        setEdited(null);
-        setError("");
-        writer.clearFork();
       }}
     >
       <DialogTrigger asChild>
         <Button
           size="sm"
           variant="outline"
-          className="h-9"
-          disabled={disabled || !novel.chapters.length}
+          disabled={disabled}
+          aria-label="上下文"
+          title="上下文"
         >
-          <GitFork data-icon="inline-start" />
-          上下文
+          <Minimize2 data-icon="inline-start" />
+          <span className="hidden sm:inline">上下文</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="gap-0">
         <DialogHeader className="shrink-0 border-b border-border pr-12">
           <DialogTitle>续写上下文</DialogTitle>
-          <DialogDescription>
-            新会话 · 保留全部正文 · 压缩前 {forkChapterCount(novel)} 章
-          </DialogDescription>
+          <DialogDescription>书末续写</DialogDescription>
         </DialogHeader>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
           <div className="flex flex-col gap-2">
             <p className="text-xs tabular-nums text-muted-foreground">
-              从当前章续写 · {number.format(length)} /{" "}
-              {number.format(maxNovelPromptLength)} 字符
-              {checkpointCount ? ` · 前 ${checkpointCount} 章使用摘要` : ""}
+              {number.format(characters)} /{" "}
+              {number.format(novelRequestBudget.characters)} 字符 ·{" "}
+              {number.format(Math.round(bytes / 1024))} /{" "}
+              {novelRequestBudget.bytes / 1024} KiB
+              {archivedCount ? ` · 前 ${archivedCount} 章使用摘要` : ""}
             </p>
             <Progress
-              aria-label="续写请求字符占用"
-              value={Math.min(100, (length / maxNovelPromptLength) * 100)}
+              aria-label="续写请求占用"
+              value={Math.min(
+                100,
+                Math.max(
+                  characters / novelRequestBudget.characters,
+                  bytes / novelRequestBudget.bytes,
+                ) * 100,
+              )}
             />
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-sm tabular-nums text-muted-foreground">
-              书末续写 · {number.format(forkBaseLength)} →{" "}
-              {fork ? number.format(fork.length) : "待计算"} 字符
-            </span>
-            {writer.busy ? (
-              <Button size="sm" variant="outline" onClick={writer.stop}>
-                <Square data-icon="inline-start" />
-                停止总结
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={!canSummarize || creating}
-                onClick={() => {
-                  setEdited(null);
-                  setError("");
-                  writer.summarizeFork();
-                }}
-              >
-                <Sparkles data-icon="inline-start" />
-                自动总结
-              </Button>
-            )}
-          </div>
-          {writer.busy ? (
+          {summary ? (
+            <Collapsible>
+              <CollapsibleTrigger variant="default">
+                <CollapsibleTitle>摘要预览</CollapsibleTitle>
+                <CollapsibleDescription>
+                  前 {archivedCount} 章
+                </CollapsibleDescription>
+                <CollapsibleChevron />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="px-2.5 pt-3">
+                <UnifiedMarkdown content={summary} />
+              </CollapsibleContent>
+            </Collapsible>
+          ) : null}
+          {canCompress ? (
+            <fieldset disabled={pending}>
+              <FieldGroup>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor={rateId} className="text-sm font-medium">
+                    压缩率（%）
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input
+                      id={rateId}
+                      inputMode="numeric"
+                      maxLength={2}
+                      value={compressionRate}
+                      onChange={(event) =>
+                        setCompressionRate(event.target.value)
+                      }
+                      aria-invalid={rate === null}
+                      className="w-24"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {rate === null
+                        ? "请输入 1–99 的整数"
+                        : `目标约为原文的 ${100 - rate}%，最多 ${maxCompressionTarget} 字`}
+                    </span>
+                  </div>
+                </div>
+                <TextField
+                  label="压缩提示词（选填）"
+                  value={compressionPrompt}
+                  onChange={setCompressionPrompt}
+                  maxLength={maxCompressionPromptLength}
+                  multiline
+                />
+              </FieldGroup>
+            </fieldset>
+          ) : null}
+          {writer.compressing ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" />
-              正在整理剧情摘要…
+              正在压缩模型上下文…
             </p>
           ) : null}
-          <fieldset disabled={pending}>
-            <TextField
-              label="剧情摘要"
-              value={summary}
-              onChange={(value) => {
-                setEdited(value);
-                setError("");
-              }}
-              maxLength={maxNovelSummaryLength}
-              multiline
-              hint={
-                !canSummarize
-                  ? "无法自动总结，可手动填写已覆盖章节的剧情与继承背景。"
-                  : undefined
-              }
-            />
-          </fieldset>
-          {error || writer.error || (fork && !fits) ? (
+          {writer.error ? (
             <Alert>
-              <AlertDescription>
-                {error ||
-                  writer.error ||
-                  "分支上下文仍超限或没有缩短，请精简摘要。"}
-              </AlertDescription>
+              <AlertDescription>{writer.error}</AlertDescription>
             </Alert>
           ) : null}
         </div>
         <DialogFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
-          <Button
-            disabled={!fits || pending}
-            onClick={async () => {
-              setCreating(true);
-              setError("");
-              try {
-                const id = await writer.createFork(summary);
-                router.push(`/agent/worlds/${id}`);
-              } catch (error) {
-                setError(
-                  error instanceof Error ? error.message : "无法创建续写分支。",
-                );
-                setCreating(false);
-              }
-            }}
-          >
-            {creating ? (
-              <LoaderCircle data-icon="inline-start" className="animate-spin" />
-            ) : (
-              <GitFork data-icon="inline-start" />
-            )}
-            {creating ? "正在创建…" : "创建续写分支"}
-          </Button>
+          {writer.compressing ? (
+            <Button variant="outline" onClick={writer.stop}>
+              <Square data-icon="inline-start" />
+              停止压缩
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              disabled={!canCompress || rate === null || pending}
+              onClick={() => {
+                if (rate === null) return;
+                writer.compressContext({
+                  rate,
+                  instructions: compressionPrompt,
+                });
+              }}
+            >
+              <Minimize2 data-icon="inline-start" />
+              压缩上下文
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

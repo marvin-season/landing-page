@@ -67,7 +67,7 @@ export function RoomHeader({
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2">
         {fileToolbarRef ? (
-          <div ref={fileToolbarRef} className="flex items-center" />
+          <div ref={fileToolbarRef} className="flex items-center gap-2" />
         ) : null}
         {promptHistoryKey ? (
           <PromptHistoryDialog roomKey={promptHistoryKey} />

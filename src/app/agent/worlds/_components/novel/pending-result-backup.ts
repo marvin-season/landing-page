@@ -24,10 +24,7 @@ const pendingSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("plot"),
     mode: z.enum(["stitch", "merge", "insert"]),
-    ids: z.union([
-      z.tuple([z.string().min(1), z.string().min(1)]),
-      z.tuple([z.string().min(1)]),
-    ]),
+    ids: z.array(z.string().min(1)).min(1),
     requirements: z.string(),
     draft: z.object({
       mode: z.enum(["stitch", "merge", "insert"]),
