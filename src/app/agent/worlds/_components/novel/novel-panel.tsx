@@ -99,6 +99,7 @@ export function NovelPanel({
     initialText?: string;
     afterChapterId?: string | null;
     initialSelection?: ChapterTextSelection;
+    manualNext?: boolean;
   } | null>(null);
   const [plotRestore, setPlotRestore] = useState<{
     mode: PlotMode;
@@ -227,6 +228,21 @@ export function NovelPanel({
   const previousChapter =
     chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : undefined;
   const nextChapter = novel.chapters[chapterIndex + 1];
+  const chapterEntries = [
+    ...novel.chapters.map((item) => ({
+      id: item.id,
+      title: item.title,
+    })),
+    ...(thinkingChapter
+      ? [
+          {
+            id: thinkingChapter.id,
+            title: thinkingChapter.title,
+            pending: true,
+          },
+        ]
+      : []),
+  ];
   const goToChapter = useCallback((id: string) => {
     setAppliedRewrite(undefined);
     setSelected(id);
@@ -325,6 +341,23 @@ export function NovelPanel({
     readingScroll.current = readingPanel.current?.scrollTop ?? 0;
     setThinkingChapter(next);
   }
+  function startNextChapterManually() {
+    if (chapterActionsLocked) return;
+    const afterChapterId = chapter?.id ?? null;
+    const next: Chapter = {
+      id: crypto.randomUUID(),
+      title: chapterTitle(chapterIndex + 1),
+      text: "",
+    };
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    writer.discardRewrite();
+    setEditingChapter({
+      chapter: next,
+      mode: "chapter",
+      afterChapterId,
+      manualNext: true,
+    });
+  }
   function generateRewrite() {
     if (
       !chapter ||
@@ -411,6 +444,7 @@ export function NovelPanel({
       initialText,
       afterChapterId,
       initialSelection,
+      manualNext,
     } = editingChapter;
     return (
       <ChapterEditor
@@ -420,7 +454,7 @@ export function NovelPanel({
         initialText={initialText}
         initialSelection={initialSelection}
         generation={
-          mode === "chapter"
+          mode === "chapter" && !manualNext
             ? {
                 kind: mode,
                 onGenerate: () => writer.generateChapter(base, afterChapterId),
@@ -541,9 +575,11 @@ export function NovelPanel({
           options={generationOptions}
           disabled={continueLocked}
           submitDisabled={!novel.title.trim()}
-          submitLabel="续写下一章"
+          submitLabel="AI 续写"
           onChange={updateGenerationOptions}
           onGenerate={generateNextChapter}
+          manualDisabled={chapterActionsLocked}
+          onWriteManually={startNextChapterManually}
         />
       )}
     </FloatingComposer>
@@ -630,56 +666,12 @@ export function NovelPanel({
           {chapter || thinkingChapter ? (
             <section ref={chapterAnchor} className="flex flex-col gap-4">
               <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
-                <div className="flex shrink-0 items-center gap-1">
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="outline"
-                    className="size-9 shrink-0"
-                    aria-label="上一章"
-                    title="上一章（←）"
-                    disabled={chapterSwitchLocked || !previousChapter}
-                    onClick={() => {
-                      if (previousChapter) goToChapter(previousChapter.id);
-                    }}
-                  >
-                    <ChevronLeft />
-                  </Button>
-                  <ChapterIndex
-                    chapters={[
-                      ...novel.chapters.map((item) => ({
-                        id: item.id,
-                        title: item.title,
-                      })),
-                      ...(thinkingChapter
-                        ? [
-                            {
-                              id: thinkingChapter.id,
-                              title: thinkingChapter.title,
-                              pending: true,
-                            },
-                          ]
-                        : []),
-                    ]}
-                    value={thinkingChapter?.id ?? chapter?.id ?? ""}
-                    disabled={chapterSwitchLocked}
-                    onSelect={goToChapter}
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="outline"
-                    className="size-9 shrink-0"
-                    aria-label="下一章"
-                    title="下一章（→）"
-                    disabled={chapterSwitchLocked || !nextChapter}
-                    onClick={() => {
-                      if (nextChapter) goToChapter(nextChapter.id);
-                    }}
-                  >
-                    <ChevronRight />
-                  </Button>
-                </div>
+                <ChapterIndex
+                  chapters={chapterEntries}
+                  value={thinkingChapter?.id ?? chapter?.id ?? ""}
+                  disabled={chapterSwitchLocked}
+                  onSelect={goToChapter}
+                />
                 {chapter && !thinkingChapter ? (
                   <p
                     className={cn(

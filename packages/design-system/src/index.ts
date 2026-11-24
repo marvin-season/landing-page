@@ -58,6 +58,11 @@ export {
   LayoutSider,
   type LayoutSiderProps,
 } from "./layout";
+export { Pagination } from "./pagination";
+export {
+  getPaginationItems,
+  type PaginationEntry,
+} from "./pagination-items";
 export { Progress } from "./progress";
 export {
   Select,

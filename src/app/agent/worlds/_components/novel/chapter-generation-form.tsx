@@ -50,6 +50,8 @@ export function ChapterGenerationForm({
   submitLabel,
   onChange,
   onGenerate,
+  onWriteManually,
+  manualDisabled,
 }: {
   options: ChapterGenerationOptions;
   disabled: boolean;
@@ -60,6 +62,8 @@ export function ChapterGenerationForm({
   submitLabel: string;
   onChange: (next: ChapterGenerationOptions) => void;
   onGenerate: () => void;
+  onWriteManually?: () => void;
+  manualDisabled?: boolean;
 }) {
   const validTarget = isChapterTargetValid(options.words);
   return (
@@ -99,15 +103,30 @@ export function ChapterGenerationForm({
             {minChapterTarget}–{maxChapterLength}
           </span>
         </label>
-        <Button
-          type="submit"
-          size="sm"
-          className="ml-auto min-w-28 whitespace-nowrap"
-          disabled={disabled || submitDisabled || !validTarget}
-        >
-          <PenLine data-icon="inline-start" />
-          {submitLabel}
-        </Button>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {onWriteManually ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="whitespace-nowrap"
+              disabled={manualDisabled ?? disabled}
+              onClick={onWriteManually}
+            >
+              <PenLine data-icon="inline-start" />
+              手动写下一章
+            </Button>
+          ) : null}
+          <Button
+            type="submit"
+            size="sm"
+            className="min-w-28 whitespace-nowrap"
+            disabled={disabled || submitDisabled || !validTarget}
+          >
+            <WandSparkles data-icon="inline-start" />
+            {submitLabel}
+          </Button>
+        </div>
       </div>
       {hint ? (
         <p className="wrap-break-word text-xs text-muted-foreground">{hint}</p>

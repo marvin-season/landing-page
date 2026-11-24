@@ -99,6 +99,7 @@ export function ChapterEditor({
     null,
   );
   const editor = useRef<HTMLTextAreaElement>(null);
+  const focusedNewChapter = useRef(false);
   const generatedScrollTop = useRef<number | null>(null);
   const mirror = useRef<HTMLDivElement>(null);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -145,6 +146,13 @@ export function ChapterEditor({
         ? "草稿尚未应用，确定离开吗？"
         : "章节有未保存的修改，确定放弃并离开吗？",
   );
+
+  const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);
+  useLayoutEffect(() => {
+    if (focusedNewChapter.current || generation || !isNewChapter) return;
+    focusedNewChapter.current = true;
+    editor.current?.focus({ preventScroll: true });
+  }, [generation, isNewChapter]);
 
   useLayoutEffect(() => {
     if (revealedLength === visibleLength || !revealGeneratedText) return;
@@ -266,7 +274,7 @@ export function ChapterEditor({
                 onSelectChapter(value);
               }}
             >
-              {generation?.kind === "chapter" ? (
+              {isNewChapter ? (
                 <SelectItem value={base.id}>{base.title}（新章）</SelectItem>
               ) : null}
               {chapters.map((chapter, index) => (
