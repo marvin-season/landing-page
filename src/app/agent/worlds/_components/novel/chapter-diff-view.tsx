@@ -51,7 +51,7 @@ export function ChapterDiffView({
   );
 
   return (
-    <div className="flex min-h-48 min-w-0 flex-1 flex-col overflow-hidden rounded-md border border-input bg-background">
+    <div className="flex min-h-48 min-w-0 flex-1 flex-col overflow-hidden bg-background">
       <div className="grid shrink-0 grid-cols-2 border-b border-border bg-muted/40 text-sm font-medium">
         <div className="border-r border-border px-3 py-1 text-muted-foreground">
           稳定版本

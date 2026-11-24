@@ -178,6 +178,7 @@ export function ChapterRewriteForm({
       <WritingInstructions
         ref={inputRef ?? instructions}
         plain={embedded}
+        className="focus:border-transparent"
         label="润色指令（选填）"
         value={requirements}
         disabled={disabled}

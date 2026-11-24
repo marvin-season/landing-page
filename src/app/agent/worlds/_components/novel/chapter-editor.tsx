@@ -113,11 +113,14 @@ export function ChapterEditor({
   const [appliedRange, setAppliedRange] = useState<ChapterTextRange | null>(
     null,
   );
+  const [caretBefore, setCaretBefore] = useState<string | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
   const polishInput = useRef<HTMLTextAreaElement>(null);
   const focusedNewChapter = useRef(false);
   const generatedScrollTop = useRef<number | null>(null);
   const mirror = useRef<HTMLDivElement>(null);
+  const caretMirror = useRef<HTMLDivElement>(null);
+  const caretBar = useRef<HTMLDivElement>(null);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const generatingDraft = Boolean(generation);
@@ -238,6 +241,40 @@ export function ChapterEditor({
     layer.scrollTop = input.scrollTop;
   }, []);
 
+  const placeCaretBar = useCallback(() => {
+    const input = editor.current;
+    const mirrorLayer = caretMirror.current;
+    const bar = caretBar.current;
+    if (!input || !mirrorLayer || !bar) return;
+    if (document.activeElement !== input) {
+      bar.style.visibility = "hidden";
+      return;
+    }
+    mirrorLayer.style.width = `${input.clientWidth}px`;
+    const style = getComputedStyle(input);
+    const lineHeight = Number.parseFloat(style.lineHeight) || 28;
+    const padBottom = Number.parseFloat(style.paddingBottom) || 0;
+    const lineTop =
+      mirrorLayer.scrollHeight - padBottom - lineHeight - input.scrollTop;
+    bar.style.visibility = "visible";
+    bar.style.top = `${input.clientTop + lineTop}px`;
+    bar.style.height = `${lineHeight}px`;
+  }, []);
+
+  const syncCaret = useCallback(() => {
+    const input = editor.current;
+    if (!input || document.activeElement !== input) {
+      setCaretBefore(null);
+      return;
+    }
+    const caret =
+      input.selectionDirection === "backward"
+        ? input.selectionStart
+        : input.selectionEnd;
+    const before = input.value.slice(0, caret);
+    setCaretBefore((current) => (current === before ? current : before));
+  }, []);
+
   useLayoutEffect(() => {
     const input = editor.current;
     if (!highlight || !input) return;
@@ -246,6 +283,43 @@ export function ChapterEditor({
     observer.observe(input);
     return () => observer.disconnect();
   }, [highlight, syncMirror]);
+
+  // Remeasure after the caret prefix and the textarea value commit.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: those values are the committed mirror and textarea text
+  useLayoutEffect(() => {
+    syncCaret();
+    placeCaretBar();
+  }, [caretBefore, placeCaretBar, syncCaret, visibleText]);
+
+  useEffect(() => {
+    const input = editor.current;
+    if (!input) return;
+    const onScroll = () => {
+      syncMirror();
+      placeCaretBar();
+    };
+    const observer = new ResizeObserver(() => {
+      const mirrorLayer = caretMirror.current;
+      if (mirrorLayer) mirrorLayer.style.width = `${input.clientWidth}px`;
+      placeCaretBar();
+    });
+    input.addEventListener("scroll", onScroll);
+    input.addEventListener("focus", syncCaret);
+    input.addEventListener("blur", syncCaret);
+    input.addEventListener("keyup", syncCaret);
+    input.addEventListener("mouseup", syncCaret);
+    document.addEventListener("selectionchange", syncCaret);
+    observer.observe(input);
+    return () => {
+      input.removeEventListener("scroll", onScroll);
+      input.removeEventListener("focus", syncCaret);
+      input.removeEventListener("blur", syncCaret);
+      input.removeEventListener("keyup", syncCaret);
+      input.removeEventListener("mouseup", syncCaret);
+      document.removeEventListener("selectionchange", syncCaret);
+      observer.disconnect();
+    };
+  }, [placeCaretBar, syncCaret, syncMirror]);
 
   useEffect(() => () => clearTimeout(pendingSelection.current), []);
 
@@ -547,10 +621,24 @@ export function ChapterEditor({
               </div>
               <div
                 className={cn(
-                  "relative flex min-h-48 flex-1",
+                  "relative flex min-h-48 flex-1 overflow-hidden",
                   target && "@3xl:min-h-0",
                 )}
               >
+                <div
+                  ref={caretBar}
+                  aria-hidden
+                  className="pointer-events-none absolute right-px left-px bg-foreground/5"
+                  style={{ visibility: "hidden" }}
+                />
+                <div
+                  ref={caretMirror}
+                  aria-hidden
+                  className="pointer-events-none invisible absolute top-0 overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7"
+                >
+                  {caretBefore}
+                  {"\u200b"}
+                </div>
                 {highlight ? (
                   <div
                     ref={mirror}
@@ -645,7 +733,7 @@ export function ChapterEditor({
                     }, 100);
                   }}
                   className={cn(
-                    "relative min-h-48 flex-1 resize-none leading-7",
+                    "relative min-h-48 flex-1 resize-none leading-7 focus:border-transparent",
                     target && "selection:bg-transparent",
                     target && "@3xl:min-h-0",
                   )}
