@@ -30,7 +30,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
 import { useUnsavedNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -130,6 +129,8 @@ export function NovelPanel({
     onScrollTopChange(panel.scrollTop);
   }, [editingChapter, thinkingChapter, onScrollTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
+  const [contextOpen, setContextOpen] = useState(false);
+  const fileMenuTrigger = useRef<HTMLButtonElement>(null);
   const [composerRequest, setComposerRequest] = useState(0);
   const [polishComposerRequest, setPolishComposerRequest] = useState(0);
   const writer = useNovel(
@@ -518,18 +519,19 @@ export function NovelPanel({
         onScroll={(event) => onScrollTopChange(event.currentTarget.scrollTop)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 [--reading-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)] pb-(--reading-bottom-padding)">
-          {fileToolbar
-            ? createPortal(
-                <ContextControls
-                  room={room}
-                  writer={writer}
-                  disabled={chapterActionsLocked}
-                />,
-                fileToolbar,
-              )
-            : null}
+          <ContextControls
+            room={room}
+            writer={writer}
+            open={contextOpen}
+            onOpenChange={setContextOpen}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              fileMenuTrigger.current?.focus();
+            }}
+          />
           <NovelFileControls
             toolbar={fileToolbar}
+            triggerRef={fileMenuTrigger}
             disabled={chapterActionsLocked}
             canSummarize={!ended && Boolean(novel.title.trim())}
             hasChapters={novel.chapters.length > 0}
@@ -550,6 +552,7 @@ export function NovelPanel({
             }}
             onDownload={download}
             onFork={writer.createFork}
+            onOpenContext={() => setContextOpen(true)}
             onSaveToServer={saveToServer}
             onSyncFromServer={syncFromServer}
             onRestoreLocal={restoreLocalBackup}

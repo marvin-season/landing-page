@@ -21,10 +21,11 @@ import {
   HardDriveDownload,
   History,
   LoaderCircle,
+  Minimize2,
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { type RefObject, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -58,6 +59,7 @@ function syncPromptText(reason: NovelSyncDivergence) {
 
 export function NovelFileControls({
   toolbar,
+  triggerRef,
   disabled,
   hasChapters,
   importing,
@@ -65,6 +67,7 @@ export function NovelFileControls({
   onImport,
   onDownload,
   onFork,
+  onOpenContext,
   onSaveToServer,
   onSyncFromServer,
   onRestoreLocal,
@@ -73,6 +76,7 @@ export function NovelFileControls({
   serverSynced,
 }: {
   toolbar: HTMLElement | null;
+  triggerRef: RefObject<HTMLButtonElement | null>;
   disabled: boolean;
   canSummarize: boolean;
   hasChapters: boolean;
@@ -81,6 +85,7 @@ export function NovelFileControls({
   onImport: (novel: ImportedNovel) => Promise<void>;
   onDownload: (format: "txt" | "md") => void;
   onFork: () => Promise<string>;
+  onOpenContext: () => void;
   onSaveToServer: () => Promise<string | null>;
   onSyncFromServer: () => Promise<string | null>;
   onRestoreLocal: () => Promise<string | null>;
@@ -91,6 +96,7 @@ export function NovelFileControls({
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const openContextAfterMenuClose = useRef(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [pending, setPending] = useState<"" | "save" | "load" | "restore">("");
@@ -131,6 +137,7 @@ export function NovelFileControls({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  ref={triggerRef}
                   size="sm"
                   variant="outline"
                   aria-label="小说文件"
@@ -147,7 +154,16 @@ export function NovelFileControls({
                   <span className="hidden sm:inline">文件</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-52">
+              <DropdownMenuContent
+                align="end"
+                className="min-w-52"
+                onCloseAutoFocus={(event) => {
+                  if (!openContextAfterMenuClose.current) return;
+                  openContextAfterMenuClose.current = false;
+                  event.preventDefault();
+                  onOpenContext();
+                }}
+              >
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     disabled={disabled || importing || forking}
@@ -164,6 +180,15 @@ export function NovelFileControls({
                   >
                     <GitFork />
                     {forking ? "正在复制…" : "Fork"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={disabled}
+                    onSelect={() => {
+                      openContextAfterMenuClose.current = true;
+                    }}
+                  >
+                    <Minimize2 />
+                    上下文
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

@@ -16,7 +16,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   Input,
   Progress,
 } from "@landing-page/design-system";
@@ -40,18 +39,21 @@ const number = new Intl.NumberFormat("zh-CN");
 export function ContextControls({
   room,
   writer,
-  disabled,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
 }: {
   room: WorldRoom;
   writer: Pick<
     ReturnType<typeof useNovel>,
     "novel" | "busy" | "error" | "compressing" | "compressContext" | "stop"
   >;
-  disabled: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
 }) {
   const { novel } = writer;
   const config = room.config;
-  const [open, setOpen] = useState(false);
   const [rate, setRate] = useState(defaultCompressionRate);
   const [compressionPrompt, setCompressionPrompt] = useState("");
   const rateId = useId();
@@ -73,22 +75,10 @@ export function ContextControls({
       open={open}
       onOpenChange={(next) => {
         if (pending) return;
-        setOpen(next);
+        onOpenChange(next);
       }}
     >
-      <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={disabled}
-          aria-label="上下文"
-          title="上下文"
-        >
-          <Minimize2 data-icon="inline-start" />
-          <span className="hidden sm:inline">上下文</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="gap-0">
+      <DialogContent className="gap-0" onCloseAutoFocus={onCloseAutoFocus}>
         <DialogHeader className="shrink-0 border-b border-border pr-12">
           <DialogTitle>续写上下文</DialogTitle>
           <DialogDescription>书末续写</DialogDescription>

@@ -557,6 +557,9 @@ export function AgentSidebar({ user }: AgentSidebarProps) {
   const [open, setOpen] = useState(false);
   const [chatCollapsed, setChatCollapsed] = useState(false);
   const [worldsCollapsed, setWorldsCollapsed] = useState(true);
+  if (worlds) {
+    return null;
+  }
   const collapsed = worlds ? worldsCollapsed : chatCollapsed;
   const setCollapsed = worlds ? setWorldsCollapsed : setChatCollapsed;
   const closeSheet = () => setOpen(false);
