@@ -116,6 +116,8 @@ export function ChapterEditor({
   const [caretBefore, setCaretBefore] = useState<string | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
   const polishInput = useRef<HTMLTextAreaElement>(null);
+  const seenSelection = useRef("");
+  const [selectionExpand, setSelectionExpand] = useState(0);
   const focusedNewChapter = useRef(false);
   const generatedScrollTop = useRef<number | null>(null);
   const mirror = useRef<HTMLDivElement>(null);
@@ -323,6 +325,13 @@ export function ChapterEditor({
 
   useEffect(() => () => clearTimeout(pendingSelection.current), []);
 
+  const selectionKey = target ? `${target.start}:${target.end}` : "";
+  useLayoutEffect(() => {
+    if (selectionKey && selectionKey !== seenSelection.current)
+      setSelectionExpand((count) => count + 1);
+    seenSelection.current = selectionKey;
+  }, [selectionKey]);
+
   function closeRewrite() {
     if (writer.busy) return;
     clearTimeout(pendingSelection.current);
@@ -398,6 +407,7 @@ export function ChapterEditor({
       draft={rewriteRequirements.trim()}
       forceOpen={selectionPending}
       requestOpen={composerRequest}
+      expandRequest={selectionExpand}
       onFocusInput={() => polishInput.current?.focus({ preventScroll: true })}
     >
       {selectionPending && target ? (
@@ -462,12 +472,7 @@ export function ChapterEditor({
 
   return (
     <ComposerDock composer={polishAvailable ? polishComposer : null}>
-      <div
-        className={cn(
-          "@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95",
-          polishAvailable && "pb-(--composer-dock-height)",
-        )}
-      >
+      <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
         <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
           <div className="flex min-w-0 max-w-full items-center gap-2">
             <Button
@@ -734,6 +739,7 @@ export function ChapterEditor({
                   }}
                   className={cn(
                     "relative min-h-48 flex-1 resize-none leading-7 focus:border-transparent",
+                    polishAvailable && "scroll-pb-(--composer-dock-height)",
                     target && "selection:bg-transparent",
                     target && "@3xl:min-h-0",
                   )}

@@ -65,6 +65,7 @@ export function FloatingComposer({
   draft,
   forceOpen = false,
   requestOpen = 0,
+  expandRequest = 0,
   onFocusInput,
   children,
 }: {
@@ -72,6 +73,8 @@ export function FloatingComposer({
   draft?: string;
   forceOpen?: boolean;
   requestOpen?: number;
+  /** Opens the composer without moving focus, so a text selection can stay put. */
+  expandRequest?: number;
   onFocusInput: () => void;
   children: ReactNode;
 }) {
@@ -86,6 +89,11 @@ export function FloatingComposer({
     setExpanded(true);
     requestAnimationFrame(() => focusInput.current());
   }, [requestOpen]);
+
+  useLayoutEffect(() => {
+    if (!expandRequest) return;
+    setExpanded(true);
+  }, [expandRequest]);
 
   return (
     <Collapsible
