@@ -2,37 +2,44 @@
 
 import { cn } from "@landing-page/utils";
 import { useMemo } from "react";
-import { buildChapterDiff } from "./chapter-diff";
+import { buildChapterDiff, type ChapterDiffLine } from "./chapter-diff";
 import type { Chapter } from "./model";
 
 function DiffCell({
   line,
-  lineNumber,
   side,
-  kind,
 }: {
-  line: string | null;
-  lineNumber: number | null;
+  line: ChapterDiffLine | null;
   side: "left" | "right";
-  kind: "equal" | "changed" | "removed" | "added";
 }) {
-  const changed =
-    side === "left"
-      ? kind === "removed" || kind === "changed"
-      : kind === "added" || kind === "changed";
+  const inlineHighlight =
+    side === "left" ? "bg-red-500/25 line-through" : "bg-emerald-500/25";
   return (
     <div
       className={cn(
         "flex min-h-7 min-w-0 border-b border-border/50 px-3 py-1 font-mono text-sm leading-5",
-        changed && (side === "left" ? "bg-red-500/10" : "bg-emerald-500/10"),
+        line?.wholeLine &&
+          (side === "left" ? "bg-red-500/10" : "bg-emerald-500/10"),
         line === null && "bg-muted/20",
       )}
     >
       <span className="w-10 shrink-0 select-none pr-3 text-right text-xs text-muted-foreground/70">
-        {lineNumber ?? ""}
+        {line?.number ?? ""}
       </span>
       <span className="min-w-0 flex-1 whitespace-pre-wrap wrap-break-word">
-        {line ?? "\u00a0"}
+        {line?.parts.map((part) => (
+          <span
+            key={part.start}
+            className={part.changed ? inlineHighlight : undefined}
+          >
+            {part.text}
+          </span>
+        )) ?? "\u00a0"}
+        {line?.changedBreak ? (
+          <span title="换行" className={cn("select-none", inlineHighlight)}>
+            {"\u21b5"}
+          </span>
+        ) : null}
       </span>
     </div>
   );
@@ -60,23 +67,13 @@ export function ChapterDiffView({
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         <div className="grid min-w-[42rem] grid-cols-2">
-          {rows.map((row, index) => (
+          {rows.map((row) => (
             <div
               className="contents"
-              key={`${row.leftNumber}:${row.rightNumber}:${index}`}
+              key={`${row.left?.number}:${row.right?.number}`}
             >
-              <DiffCell
-                line={row.left}
-                lineNumber={row.leftNumber}
-                side="left"
-                kind={row.kind}
-              />
-              <DiffCell
-                line={row.right}
-                lineNumber={row.rightNumber}
-                side="right"
-                kind={row.kind}
-              />
+              <DiffCell line={row.left} side="left" />
+              <DiffCell line={row.right} side="right" />
             </div>
           ))}
         </div>

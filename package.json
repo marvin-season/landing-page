@@ -64,6 +64,7 @@
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.23",
     "dexie": "^4.4.6",
+    "diff": "^9.0.0",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "embla-carousel-wheel-gestures": "^8.1.0",

@@ -23,7 +23,7 @@
 | [`plot-edit.ts`](../../src/app/agent/worlds/_components/novel/plot-edit.ts) | 剧情粘合、合并、插入的上下文构造、草稿解析与应用 |
 | [`context-compression.ts`](../../src/app/agent/worlds/_components/novel/context-compression.ts) | 续写请求预算、摘要分批和覆盖范围 |
 | [`import-novel.ts`](../../src/app/agent/worlds/_components/novel/import-novel.ts) | TXT / Markdown 解析为章节 |
-| `chapter-editor.tsx`、`rewrite-form.tsx`、`chapter-diff(-view)`、`chapter-text.ts` | 居中编辑草稿、底部润色输入、行级差异、textarea 偏移与选段替换 |
+| `chapter-editor.tsx`、`rewrite-form.tsx`、`chapter-diff(-view)`、`chapter-text.ts` | 居中编辑草稿、底部润色输入、行对齐与逐字差异、textarea 偏移与选段替换 |
 | `chapter-rewrite.tsx`、`chapter-markdown.ts` | 阅读模式渲染，将 Markdown 渲染结果映射回原文位置，用于高亮润色范围 |
 | `plot-sheet.tsx`、`chapter-split.tsx`、`context-controls.tsx`、`background-controls.tsx` | 剧情整理、拆章、续写上下文与分支、导入导出与背景总结 |
 | [`novel.ts`](../../src/lib/group-chat/novel.ts) | `/api/novel` 服务端处理 |
@@ -147,7 +147,7 @@ start(run, prompt) → 清空草稿与错误 → stream.send(/api/novel)
 - **手动开写下一章**：从阅读页底部「手动写下一章」进入。草稿区为空，自行撰写，目录中显示为「新章」。点「保存章节」后才插入续写起点之后。未输入正文时可以直接返回。不调用模型，不写入本章要求，也不进入生成草稿备份。
 - **保存**：「保存章节」写入成功后，草稿成为新的稳定版本；失败则保留草稿并标记“保存失败”。超过上限时不能保存。
 - **生成草稿备份**：续写和整章润色从收到正文起，在当前浏览器按账号和作品备份编辑草稿，手动修改也会备份。续写草稿同时记录续写起点。选段润色与剧情整理在生成出待应用结果后也会备份。刷新后回到同一作品会自动恢复草稿或待应用结果，生成不会接着运行。成功应用或确认丢弃后会清除备份。
-- **查看修改**：按行对比稳定版本和当前草稿，可以直接在对比页保存或应用草稿。两边行数之积超过 200 万时，退化为整段删除加整段新增。
+- **查看修改**：双栏对比稳定版本和当前草稿，对齐相邻的相似行，只给实际增删的文字和换行上色。整行新增或删除时标出整行。大范围重写超出细比上限时，会保留首尾一致的文字，将其余区域标为替换。可以直接在对比页保存或应用草稿。
 - **切换章节**：草稿有未保存修改、正在保存、正在润色或有待应用的润色草稿时，目录不可切换。
 - **离开保护**：有未保存修改时，离开页面或「返回阅读」都会提示确认。
 
