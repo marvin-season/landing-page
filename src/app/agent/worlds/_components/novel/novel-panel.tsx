@@ -40,12 +40,14 @@ import {
   NovelBackgroundPreview,
   NovelFileControls,
 } from "./background-controls";
+import type { ChapterDraftBackup } from "./chapter-draft-backup";
 import { ChapterEditor } from "./chapter-editor";
+import { observeChapterEditorDrafts } from "./chapter-editor-drafts";
 import {
   ChapterGenerationForm,
   type ChapterGenerationOptions,
 } from "./chapter-generation-form";
-import { ChapterIndex } from "./chapter-index";
+import { ChapterIndex, type ChapterIndexEntry } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
 import { ChapterSplit } from "./chapter-split";
@@ -55,6 +57,7 @@ import {
   type Chapter,
   chapterLengthShortfall,
   chapterTitle,
+  continuationIndex,
   exportNovel,
   formatChapterLength,
   type NovelWritingContext,
@@ -104,12 +107,26 @@ export function NovelPanel({
     initialSelection?: ChapterTextSelection;
     manualNext?: boolean;
   } | null>(null);
+  const [newChapterDraft, setNewChapterDraft] =
+    useState<ChapterDraftBackup | null>(null);
+  const [discardingDraft, setDiscardingDraft] = useState(false);
   const [plotRestore, setPlotRestore] = useState<{
     mode: PlotMode;
     ids: PlotSelection;
     requirements: string;
   } | null>(null);
   const isEditing = editingChapter !== null;
+  const [draftTexts, setDraftTexts] = useState<ReadonlyMap<string, string>>(
+    () => new Map(),
+  );
+  useEffect(() => {
+    if (isEditing) return;
+    const subscription = observeChapterEditorDrafts(roomKey).subscribe({
+      next: setDraftTexts,
+      error: () => setDraftTexts(new Map()),
+    });
+    return () => subscription.unsubscribe();
+  }, [isEditing, roomKey]);
   useLayoutEffect(() => {
     onEditingChange(isEditing);
   }, [isEditing, onEditingChange]);
@@ -141,17 +158,8 @@ export function NovelPanel({
     },
     downloadBackground,
     (restored) => {
-      if (restored.mode === "rewrite") {
-        setSelected(restored.chapter.id);
-        setRewriteRequirements(restored.requirements ?? "");
-        setCompactContext(restored.compactContext ?? false);
-      }
-      setEditingChapter({
-        chapter: restored.chapter,
-        mode: restored.mode,
-        initialText: restored.text,
-        afterChapterId: restored.afterChapterId,
-      });
+      setNewChapterDraft(restored);
+      setSelected(restored.chapter.id);
     },
     (pending) => {
       if (pending.kind === "selection") {
@@ -226,24 +234,39 @@ export function NovelPanel({
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
   const chapterSwitchLocked = waitingForText || importing;
-  const previousChapter =
-    chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : undefined;
-  const nextChapter = novel.chapters[chapterIndex + 1];
-  const chapterEntries = [
-    ...novel.chapters.map((item) => ({
-      id: item.id,
-      title: item.title,
-    })),
-    ...(thinkingChapter
-      ? [
-          {
-            id: thinkingChapter.id,
-            title: thinkingChapter.title,
-            pending: true,
-          },
-        ]
-      : []),
-  ];
+  function hasDraft(chapter: Chapter) {
+    const text = draftTexts.get(chapter.id);
+    return text !== undefined && text !== chapter.text;
+  }
+  const chapterEntries: ChapterIndexEntry[] = novel.chapters.map((item) => ({
+    id: item.id,
+    title: item.title,
+    hasDraft: hasDraft(item),
+  }));
+  if (newChapterDraft) {
+    const index =
+      continuationIndex(novel, newChapterDraft.afterChapterId) ??
+      novel.chapters.length;
+    chapterEntries.splice(index, 0, {
+      id: newChapterDraft.chapter.id,
+      title: newChapterDraft.chapter.title,
+      hasDraft: true,
+    });
+  }
+  if (thinkingChapter) {
+    chapterEntries.push({
+      id: thinkingChapter.id,
+      title: thinkingChapter.title,
+      pending: true,
+    });
+  }
+  const showingNewDraft = newChapterDraft?.chapter.id === selected;
+  const readingChapterId = showingNewDraft ? selected : chapter?.id;
+  const readingIndex = chapterEntries.findIndex(
+    ({ id }) => id === readingChapterId,
+  );
+  const previousChapter = chapterEntries[readingIndex - 1];
+  const nextChapter = chapterEntries[readingIndex + 1];
   const selectChapter = useCallback((id: string) => {
     setAppliedRewrite(undefined);
     setSelected(id);
@@ -255,7 +278,7 @@ export function NovelPanel({
   }, [novel.chapters, roomKey, selected]);
   const { chapterAnchor, goToChapter } = useChapterNavigation({
     readingPanel,
-    chapterId: chapter?.id,
+    chapterId: readingChapterId ?? undefined,
     previousId: previousChapter?.id,
     nextId: nextChapter?.id,
     keyboardDisabled: isEditing || chapterSwitchLocked,
@@ -270,9 +293,10 @@ export function NovelPanel({
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled;
+  const newChapterLocked = chapterActionsLocked || Boolean(newChapterDraft);
   const summarizing = writer.task === "summary" && !writer.compressing;
   function reuseChapterGoal(text: string) {
-    if (!writer.ready || writer.busy || importing || ended) return false;
+    if (newChapterLocked || ended) return false;
     void writer.updateChapterGoal(text);
     setComposerRequest((count) => count + 1);
     return true;
@@ -286,6 +310,7 @@ export function NovelPanel({
     writer.update({ ...novel, ...options });
   }
   function generateNextChapter() {
+    if (newChapterLocked) return;
     const afterChapterId = chapter?.id ?? null;
     const next: Chapter = {
       id: crypto.randomUUID(),
@@ -303,7 +328,7 @@ export function NovelPanel({
     setThinkingChapter(next);
   }
   function startNextChapterManually() {
-    if (chapterActionsLocked) return;
+    if (newChapterLocked) return;
     const afterChapterId = chapter?.id ?? null;
     const next: Chapter = {
       id: crypto.randomUUID(),
@@ -312,6 +337,7 @@ export function NovelPanel({
     };
     readingScroll.current = readingPanel.current?.scrollTop ?? 0;
     writer.discardRewrite();
+    writer.startManualChapter(next, afterChapterId);
     setEditingChapter({
       chapter: next,
       mode: "chapter",
@@ -319,11 +345,34 @@ export function NovelPanel({
       manualNext: true,
     });
   }
-  function beginChapterRewrite(draft: Chapter) {
+  function resumeNewChapterDraft() {
+    if (!newChapterDraft || chapterActionsLocked || discardingDraft) return;
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    writer.discardRewrite();
+    setEditingChapter({
+      chapter: newChapterDraft.chapter,
+      mode: "chapter",
+      initialText: newChapterDraft.text,
+      afterChapterId: newChapterDraft.afterChapterId,
+      manualNext: newChapterDraft.manual,
+    });
+  }
+  async function discardNewChapterDraft() {
+    if (!newChapterDraft || chapterActionsLocked || discardingDraft) return;
+    if (!window.confirm("确定丢弃这份新章草稿吗？")) return;
+    setDiscardingDraft(true);
+    try {
+      if (!(await writer.clearDraftBackup())) return;
+      setNewChapterDraft(null);
+      setSelected(newChapterDraft.afterChapterId ?? null);
+    } finally {
+      setDiscardingDraft(false);
+    }
+  }
+  function beginChapterRewrite(chapterId: string) {
     if (
-      !writer.rewrite(draft.id, rewriteRequirements, {
+      !writer.rewrite(chapterId, rewriteRequirements, {
         compactContext,
-        draft,
       })
     )
       return false;
@@ -331,11 +380,6 @@ export function NovelPanel({
       current ? { ...current, mode: "rewrite" } : current,
     );
     return true;
-  }
-  function keepDraft() {
-    setEditingChapter((current) =>
-      current ? { ...current, mode: "manual" } : current,
-    );
   }
   function splitChapter(caret: number) {
     if (chapterActionsLocked || !chapter) return false;
@@ -379,6 +423,7 @@ export function NovelPanel({
     return `已写入 ${path}`;
   }
   async function syncFromServer() {
+    if (newChapterDraft) throw new Error("请先保存草稿。");
     if (
       !window.confirm(
         "用服务器正文覆盖本地书名和章节。现在的本地正文会保留为唯一备份，更早的本地备份会被替换。文风和大纲会保留。",
@@ -389,6 +434,7 @@ export function NovelPanel({
     return "已从服务器同步到本地。上一份本地正文留在备份里。";
   }
   async function restoreLocalBackup() {
+    if (newChapterDraft) throw new Error("请先保存草稿。");
     if (!window.confirm("恢复上一份本地备份。现在的本地正文会保留为唯一备份。"))
       return null;
     await writer.restoreLocalBackup();
@@ -405,7 +451,8 @@ export function NovelPanel({
     } = editingChapter;
     return (
       <ChapterEditor
-        key={base.id}
+        key={JSON.stringify([roomKey, base.id])}
+        roomKey={roomKey}
         base={base}
         chapters={novel.chapters}
         initialText={initialText}
@@ -427,7 +474,7 @@ export function NovelPanel({
             : mode === "rewrite"
               ? {
                   kind: mode,
-                  onGenerate: () => beginChapterRewrite(base),
+                  onGenerate: () => beginChapterRewrite(base.id),
                   renderForm: () => null,
                 }
               : undefined
@@ -443,7 +490,8 @@ export function NovelPanel({
               afterChapterId,
             );
             if (!saved) return false;
-            writer.clearDraftBackup();
+            await writer.clearDraftBackup();
+            setNewChapterDraft(null);
             setEditingChapter({ chapter: saved, mode: "manual" });
             setSelected(saved.id);
             return true;
@@ -455,7 +503,6 @@ export function NovelPanel({
                   persistFirst: true,
                 });
           if (saved) {
-            if (mode !== "manual") writer.clearDraftBackup();
             setEditingChapter({ chapter: draft, mode: "manual" });
             if (mode === "rewrite")
               setAppliedRewrite({
@@ -468,11 +515,17 @@ export function NovelPanel({
         onSelectChapter={(id) => {
           const next = novel.chapters.find((item) => item.id === id);
           if (!next) return;
+          writer.discardRewrite();
           setSelected(id);
           setEditingChapter({ chapter: next, mode: "manual" });
         }}
-        onExit={() => {
-          if (mode !== "manual") writer.clearDraftBackup();
+        onExit={async () => {
+          if (mode === "chapter") {
+            const pending = await writer.checkpointDraftBackup();
+            if (pending === undefined) return;
+            setNewChapterDraft(pending);
+            setSelected(pending?.chapter.id ?? afterChapterId ?? null);
+          }
           writer.discardRewrite();
           setPolishComposerRequest(0);
           setEditingChapter(null);
@@ -481,13 +534,12 @@ export function NovelPanel({
         onRewriteRequirementsChange={setRewriteRequirements}
         composerRequest={polishComposerRequest}
         onRequestComposer={() => setPolishComposerRequest((count) => count + 1)}
-        onBeginChapterRewrite={beginChapterRewrite}
-        onKeepDraft={keepDraft}
+        onBeginChapterRewrite={() => beginChapterRewrite(base.id)}
       />
     );
   }
   const continueLocked = chapterActionsLocked || ended;
-  const composer = (
+  const composer = newChapterDraft ? null : (
     <FloatingComposer
       label="继续创作下一章"
       draft={generationOptions.chapterGoal.trim()}
@@ -506,7 +558,7 @@ export function NovelPanel({
         submitLabel="AI 续写"
         onChange={updateGenerationOptions}
         onGenerate={generateNextChapter}
-        manualDisabled={chapterActionsLocked}
+        manualDisabled={newChapterLocked}
         onWriteManually={startNextChapterManually}
       />
     </FloatingComposer>
@@ -538,6 +590,7 @@ export function NovelPanel({
             importing={importing}
             onImportingChange={setImporting}
             onImport={async (imported) => {
+              if (newChapterDraft) throw new Error("请先保存草稿。");
               if (
                 !window.confirm(
                   `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
@@ -592,7 +645,7 @@ export function NovelPanel({
               />
             </article>
           ) : null}
-          {chapter || thinkingChapter ? (
+          {chapter || thinkingChapter || showingNewDraft ? (
             <section
               ref={chapterAnchor}
               className="flex flex-col gap-4 min-h-[calc(100cqh-var(--reading-bottom-padding))]"
@@ -600,11 +653,11 @@ export function NovelPanel({
               <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
                 <ChapterIndex
                   chapters={chapterEntries}
-                  value={thinkingChapter?.id ?? chapter?.id ?? ""}
+                  value={thinkingChapter?.id ?? readingChapterId ?? ""}
                   disabled={chapterSwitchLocked}
                   onSelect={goToChapter}
                 />
-                {chapter && !thinkingChapter ? (
+                {chapter && !thinkingChapter && !showingNewDraft ? (
                   <p
                     className={cn(
                       "shrink-0 whitespace-nowrap text-xs tabular-nums",
@@ -614,6 +667,11 @@ export function NovelPanel({
                     )}
                   >
                     {formatChapterLength(chapter.text.length, novel.words)}
+                    {hasDraft(chapter) ? (
+                      <span className="ml-2 font-medium text-destructive">
+                        草稿未同步，点击编辑本章进入草稿
+                      </span>
+                    ) : null}
                   </p>
                 ) : null}
                 <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -627,7 +685,7 @@ export function NovelPanel({
                       <Square data-icon="inline-start" />
                       停止生成
                     </Button>
-                  ) : chapter ? (
+                  ) : chapter && !showingNewDraft ? (
                     <>
                       <Button
                         size="sm"
@@ -683,7 +741,11 @@ export function NovelPanel({
                               拆分本章
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              disabled={chapterActionsLocked || ended}
+                              disabled={
+                                chapterActionsLocked ||
+                                ended ||
+                                Boolean(newChapterDraft)
+                              }
                               onSelect={() => {
                                 actionFromMenu.current = "plot";
                               }}
@@ -696,7 +758,10 @@ export function NovelPanel({
                           <DropdownMenuGroup>
                             <DropdownMenuItem
                               variant="destructive"
-                              disabled={chapterActionsLocked}
+                              disabled={
+                                chapterActionsLocked ||
+                                newChapterDraft?.afterChapterId === chapter.id
+                              }
                               onSelect={deleteChapter}
                             >
                               <Trash2 />
@@ -719,6 +784,39 @@ export function NovelPanel({
                     ? "正在压缩模型上下文…"
                     : `${thinkingChapter.title}正在构思…`}
                 </p>
+              ) : showingNewDraft && newChapterDraft ? (
+                <div className="flex flex-col items-start gap-3 py-5">
+                  <h3 className="font-serif text-xl">
+                    {newChapterDraft.chapter.title}
+                  </h3>
+                  <p className="text-sm font-medium text-destructive">
+                    请先保存草稿
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      disabled={chapterActionsLocked || discardingDraft}
+                      onClick={resumeNewChapterDraft}
+                    >
+                      <PenLine data-icon="inline-start" />
+                      编辑草稿
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={chapterActionsLocked || discardingDraft}
+                      onClick={() => void discardNewChapterDraft()}
+                    >
+                      <Trash2 data-icon="inline-start" />
+                      丢弃草稿
+                    </Button>
+                  </div>
+                  {writer.draftBackupFailed ? (
+                    <p role="alert" className="text-xs text-destructive">
+                      未能更新本机草稿，请重试。
+                    </p>
+                  ) : null}
+                </div>
               ) : chapter ? (
                 <>
                   <PlotSheet
@@ -757,7 +855,7 @@ export function NovelPanel({
                     title={chapter.title}
                     text={chapter.text}
                     brief={chapter.brief}
-                    reuseDisabled={continueLocked}
+                    reuseDisabled={continueLocked || Boolean(newChapterDraft)}
                     renameDisabled={chapterActionsLocked}
                     onRename={(title) => {
                       void writer.renameChapter(chapter.id, title);

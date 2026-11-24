@@ -142,6 +142,7 @@ export function ChapterRewriteForm({
   compactContext,
   onCompactContextChange,
   disabled,
+  submitDisabled,
   embedded,
   inputRef,
   submitLabel,
@@ -155,6 +156,7 @@ export function ChapterRewriteForm({
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
   disabled: boolean;
+  submitDisabled?: boolean;
   embedded?: boolean;
   inputRef?: Ref<HTMLTextAreaElement>;
   submitLabel: string;
@@ -172,7 +174,7 @@ export function ChapterRewriteForm({
   return (
     <WritingGenerationForm
       embedded={embedded}
-      onSubmit={() => !disabled && onGenerate()}
+      onSubmit={() => !disabled && !submitDisabled && onGenerate()}
     >
       <h3 className="text-sm font-medium">{title}</h3>
       <WritingInstructions
@@ -227,7 +229,7 @@ export function ChapterRewriteForm({
             type="submit"
             size="sm"
             className="min-w-28 whitespace-nowrap"
-            disabled={disabled}
+            disabled={disabled || submitDisabled}
           >
             <WandSparkles data-icon="inline-start" />
             {submitLabel}

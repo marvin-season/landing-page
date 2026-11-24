@@ -17,6 +17,7 @@ import {
   type ChapterDraftBackup,
   createChapterDraftBackup,
 } from "./chapter-draft-backup";
+import { migrateChapterEditorDraft } from "./chapter-editor-drafts";
 import type { ChapterTextRange } from "./chapter-text";
 import {
   type CompressionCursor,
@@ -125,8 +126,6 @@ type NovelRun =
       novel: Novel;
       version: number;
       range?: ChapterTextRange;
-      draft?: Chapter;
-      restoredBase?: Chapter;
     };
 
 export function useNovel(
@@ -169,12 +168,7 @@ export function useNovel(
   const serverCopy = useRef<ServerNovel | null>(null);
   const serverSync = useRef<Promise<unknown> | null>(null);
   const backup = useMemo(
-    () =>
-      createChapterDraftBackup(
-        key,
-        () => window.localStorage,
-        setDraftBackupFailed,
-      ),
+    () => createChapterDraftBackup(key, setDraftBackupFailed),
     [key],
   );
   const pendingBackup = useMemo(
@@ -240,31 +234,29 @@ export function useNovel(
         setNovel(novel);
         setSyncPrompt(status.kind === "diverged" ? status.reason : null);
         setServerSynced(status.kind === "match");
-        const restored = backup.read();
+        const restored = await backup.read();
+        if (!active) return;
         let restoredEditor = false;
         if (restored) {
           const current = latest.current.chapters.find(
             ({ id }) => id === restored.chapter.id,
           );
-          if (
-            (restored.mode === "chapter" && current) ||
-            current?.text === restored.text
-          ) {
+          if (restored.mode === "rewrite") {
+            try {
+              if (current && current.text !== restored.text)
+                await migrateChapterEditorDraft(key, current.id, restored.text);
+              if (active) backup.clear();
+            } catch {
+              if (active) setDraftBackupFailed(true);
+            }
+          } else if (current) {
             backup.clear();
           } else {
-            if (restored.mode === "rewrite") {
-              input.current = {
-                task: "rewrite",
-                chapterId: restored.chapter.id,
-                novel: latest.current,
-                version: restored.version,
-                restoredBase: restored.chapter,
-              };
-            }
             restoreEditor(restored);
             restoredEditor = true;
           }
         }
+        if (!active) return;
         if (!restoredEditor) {
           const pending = pendingBackup.read();
           const restoredPending = pending
@@ -381,8 +373,7 @@ export function useNovel(
       if (run && "plot" in run) return;
       if (run?.task === "summary" && "batch" in run) return;
       const text = getChatStreamText(state.current);
-      if (run?.task === "chapter" || (run?.task === "rewrite" && !run.range))
-        backup.write(text);
+      if (run?.task === "chapter") backup.write(text);
       if (run?.task === "chapter" && run.onFirstText && text.trim()) {
         const onFirstText = run.onFirstText;
         run.onFirstText = undefined;
@@ -465,9 +456,9 @@ export function useNovel(
         return;
       }
       if (captured.task === "rewrite" && captured.range) {
-        const chapter =
-          captured.draft ??
-          captured.novel.chapters.find(({ id }) => id === captured.chapterId);
+        const chapter = captured.novel.chapters.find(
+          ({ id }) => id === captured.chapterId,
+        );
         if (chapter) {
           pendingBackup.write({
             kind: "selection",
@@ -519,8 +510,10 @@ export function useNovel(
         setDraftIncomplete(cutShort);
         setError(cutShort ? cutShortNotice : "");
       }
-      backup.write(text);
-      backup.flush();
+      if (captured.task === "chapter") {
+        backup.write(text);
+        backup.flush();
+      }
       setPreview(text);
     },
     onError(message) {
@@ -679,13 +672,22 @@ export function useNovel(
     continuationBrief.current = brief;
     pendingBackup.clear();
     backup.start({
-      mode: "chapter",
       chapter: rememberChapterBrief(chapter, brief),
       afterChapterId,
       version: room.version,
     });
     void recordNovelPrompt(key, current.chapterGoal);
     return true;
+  }
+
+  function startManualChapter(chapter: Chapter, afterChapterId: string | null) {
+    continuationBrief.current = undefined;
+    backup.start({
+      chapter,
+      afterChapterId,
+      version: room.version,
+      manual: true,
+    });
   }
 
   async function saveChapterContinuation(
@@ -786,11 +788,9 @@ export function useNovel(
     {
       range,
       compactContext = false,
-      draft,
     }: {
       range?: ChapterTextRange;
       compactContext?: boolean;
-      draft?: Chapter;
     } = {},
   ) {
     if (!ready || generating.current || room.status === "ended") return false;
@@ -798,26 +798,12 @@ export function useNovel(
     try {
       const prompt = rewritePrompt(
         room.config,
-        draft ? replaceChapter(current, draft) : current,
+        current,
         chapterId,
         requirements,
         range,
         compactContext,
       );
-      if (!range) {
-        const chapter = current.chapters.find(({ id }) => id === chapterId);
-        if (!chapter) return false;
-        pendingBackup.clear();
-        backup.start({
-          mode: "rewrite",
-          chapter,
-          version: room.version,
-          requirements,
-          compactContext,
-        });
-      } else {
-        backup.clear();
-      }
       start(
         {
           task: "rewrite",
@@ -825,7 +811,6 @@ export function useNovel(
           novel: current,
           version: room.version,
           range,
-          draft,
         },
         prompt,
       );
@@ -854,18 +839,22 @@ export function useNovel(
     setError("");
   }
 
-  function resolveRewrite(draft?: Chapter) {
+  function applyDraftRewrite(draft: Chapter) {
     const captured = input.current;
     if (
       generating.current ||
       !rewriteReady ||
       captured?.task !== "rewrite" ||
-      "plot" in captured
+      "plot" in captured ||
+      !captured.range
     )
       return null;
     if (
       latest.current !== captured.novel ||
-      captured.draft !== draft ||
+      captured.chapterId !== draft.id ||
+      !captured.novel.chapters.some(
+        ({ id, text }) => id === draft.id && text === draft.text,
+      ) ||
       room.version !== captured.version ||
       room.status === "ended"
     ) {
@@ -873,7 +862,7 @@ export function useNovel(
       return null;
     }
     const next = replaceChapterText(
-      draft ? replaceChapter(captured.novel, draft) : captured.novel,
+      captured.novel,
       captured.chapterId,
       preview,
       captured.range,
@@ -886,7 +875,7 @@ export function useNovel(
       return null;
     }
     discardRewrite();
-    return next;
+    return chapter;
   }
 
   async function saveChapterRewrite(chapter: Chapter) {
@@ -909,14 +898,7 @@ export function useNovel(
     if (
       latest.current !== captured.novel ||
       room.version !== captured.version ||
-      room.status === "ended" ||
-      (captured.restoredBase &&
-        !latest.current.chapters.some(
-          ({ id, text, title }) =>
-            id === captured.restoredBase?.id &&
-            text === captured.restoredBase.text &&
-            title === captured.restoredBase.title,
-        ))
+      room.status === "ended"
     ) {
       setError("小说或世界设定已变更，请重新生成重写草稿。");
       return false;
@@ -926,10 +908,6 @@ export function useNovel(
     });
     if (saved) discardRewrite();
     return saved;
-  }
-
-  function applyDraftRewrite(draft: Chapter) {
-    return resolveRewrite(draft)?.chapters.find(({ id }) => id === draft.id);
   }
 
   function editPlot(ids: PlotSelection, mode: PlotMode, requirements: string) {
@@ -1018,6 +996,7 @@ export function useNovel(
     restoreLocalBackup: () => restoreNovelBackup(syncHost),
     draftBackupFailed,
     backupDraftText: backup.write,
+    checkpointDraftBackup: backup.checkpoint,
     clearDraftBackup: backup.clear,
     saving,
     busy,
@@ -1048,6 +1027,7 @@ export function useNovel(
       return next.chapters[0].id;
     },
     generateChapter,
+    startManualChapter,
     saveChapterContinuation,
     generateBackground,
     compressContext,

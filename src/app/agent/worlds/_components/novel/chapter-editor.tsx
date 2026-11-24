@@ -34,9 +34,11 @@ import {
 } from "./chapter-text";
 import { type Chapter, maxChapterLength } from "./model";
 import { RewritePanel } from "./rewrite-form";
+import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
 
 export function ChapterEditor({
+  roomKey,
   base,
   chapters,
   initialText,
@@ -54,8 +56,8 @@ export function ChapterEditor({
   composerRequest,
   onRequestComposer,
   onBeginChapterRewrite,
-  onKeepDraft,
 }: {
+  roomKey: string;
   base: Chapter;
   chapters: readonly Chapter[];
   initialText?: string;
@@ -89,13 +91,12 @@ export function ChapterEditor({
   onCompactContextChange: (checked: boolean) => void;
   onSave: (chapter: Chapter) => Promise<boolean>;
   onSelectChapter: (id: string) => void;
-  onExit: () => void;
+  onExit: () => void | Promise<void>;
   rewriteRequirements: string;
   onRewriteRequirementsChange: (requirements: string) => void;
   composerRequest: number;
   onRequestComposer: () => void;
-  onBeginChapterRewrite: (draft: Chapter) => boolean;
-  onKeepDraft: () => void;
+  onBeginChapterRewrite: () => boolean;
 }) {
   const [draft, setDraft] = useState(() =>
     initialText === undefined ? base : { ...base, text: initialText },
@@ -126,8 +127,33 @@ export function ChapterEditor({
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const generatingDraft = Boolean(generation);
+  const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);
+  const waitingForRewrite =
+    generation?.kind === "rewrite" &&
+    useGeneratedText &&
+    !writer.preview.trim();
   const draftText =
-    generation && useGeneratedText ? writer.preview : draft.text;
+    generation && useGeneratedText && (!waitingForRewrite || writer.busy)
+      ? writer.preview
+      : draft.text;
+  const draftStatus = useChapterEditorDraft(
+    roomKey,
+    base.id,
+    !isNewChapter && !waitingForRewrite,
+    draftText === base.text ? undefined : draftText,
+    (text) => {
+      setDraft((current) => ({ ...current, text }));
+      if (initialSelection && text !== base.text) {
+        writer.discardRewrite({ selectionOnly: true });
+        setTarget(null);
+      }
+    },
+  );
+  const draftLoading = draftStatus === "loading";
+  const draftReadFailed = draftStatus === "read-error";
+  const draftUnavailable = draftLoading || draftReadFailed;
+  const draftWriting = draftStatus === "saving";
+  const draftWriteFailed = draftStatus === "write-error";
   const currentDraft = generation ? { ...base, text: draftText } : draft;
   const revealGeneratedText =
     generatingDraft && useGeneratedText && !writer.generationStopped;
@@ -151,28 +177,35 @@ export function ChapterEditor({
     (!generatingDraft || !useGeneratedText || Boolean(draftText.trim()));
   const exceedsLimit = draftText.length > maxChapterLength;
   const highlight = target ?? appliedRange;
-  const editingLocked = Boolean(target && (writer.busy || writer.rewriteReady));
+  const editingLocked =
+    !draftUnavailable &&
+    Boolean(target && (writer.busy || writer.rewriteReady));
   const cannotSave =
     !dirty ||
+    draftUnavailable ||
     saving ||
     editingLocked ||
     editorBusy ||
     exceedsLimit ||
-    (generatingDraft && !draftText.trim());
-  const selectionPending = Boolean(
-    target && (writer.busy || writer.rewriteReady),
-  );
+    ((generatingDraft || isNewChapter) && !draftText.trim());
+  const selectionPending = editingLocked;
   const polishLabel = target ? "润色选段" : "润色本章";
   const polishAvailable = !showDiff && generation?.kind !== "chapter";
+  const polishNeedsSave = !generatingDraft && (dirty || isNewChapter);
   useUnsavedNavigation(
     (generatingDraft && writer.busy) ||
       selectionPending ||
-      (dirty && !editingLocked),
+      draftWriting ||
+      (dirty && !editingLocked && (isNewChapter || draftWriteFailed)),
     (generatingDraft || target) && writer.busy
       ? "章节正在生成，离开会中断本次生成。确定离开吗？"
-      : generatingDraft || selectionPending
-        ? "草稿尚未应用，确定离开吗？"
-        : "章节有未保存的修改，确定放弃并离开吗？",
+      : isNewChapter
+        ? "新章尚未保存为正文，确定离开吗？"
+        : selectionPending
+          ? "草稿尚未应用，确定离开吗？"
+          : draftWriting
+            ? "正在将草稿保存到本机，确定离开吗？"
+            : "草稿未能保存到本机，确定离开吗？",
   );
   useRegisterPromptReuse((text) => {
     if (writer.busy || writer.rewriteReady || ended || saving || showDiff)
@@ -182,7 +215,6 @@ export function ChapterEditor({
     return true;
   });
 
-  const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);
   useLayoutEffect(() => {
     if (focusedNewChapter.current || generation || !isNewChapter) return;
     focusedNewChapter.current = true;
@@ -205,8 +237,7 @@ export function ChapterEditor({
   useLayoutEffect(() => {
     if (generation?.kind !== "rewrite" || writer.busy || !useGeneratedText)
       return;
-    if (!writer.preview.trim()) return;
-    setDraft({ ...base, text: writer.preview });
+    if (writer.preview.trim()) setDraft({ ...base, text: writer.preview });
     setUseGeneratedText(false);
   }, [base, generation?.kind, useGeneratedText, writer.busy, writer.preview]);
 
@@ -348,37 +379,31 @@ export function ChapterEditor({
     const { start, end } = target;
     const before = draft.text.slice(0, start);
     pendingCaret.current = before.replace(/\r\n?/g, "\n").length;
-    setDraft({ ...draft, text: before + draft.text.slice(end) });
+    const text = before + draft.text.slice(end);
+    if (isNewChapter) writer.backupDraftText(text);
+    setDraft({ ...draft, text });
     setAppliedRange(null);
     closeRewrite();
   }
 
   function submitPolish() {
-    if (saving || ended || editorBusy) return;
+    if (saving || ended || editorBusy || draftUnavailable || polishNeedsSave)
+      return;
     if (target) {
       if (!draft.text.slice(target.start, target.end).trim()) return;
       if (
         !writer.rewrite(draft.id, rewriteRequirements, {
           range: { start: target.start, end: target.end },
           compactContext,
-          draft,
         })
       )
         return;
-      if (generation?.kind === "rewrite") onKeepDraft();
       return;
     }
     if (!draftText.trim()) return;
-    if (
-      dirty &&
-      !window.confirm(
-        generation?.kind === "rewrite"
-          ? "重新生成会替换当前草稿，确定继续吗？"
-          : "润色会替换当前草稿，确定继续吗？",
-      )
-    )
+    if (dirty && !window.confirm("重新生成会替换当前草稿，确定继续吗？"))
       return;
-    if (!onBeginChapterRewrite(currentDraft)) return;
+    if (!onBeginChapterRewrite()) return;
     generatedScrollTop.current = null;
     setRevealedLength(0);
     setUseGeneratedText(true);
@@ -424,7 +449,6 @@ export function ChapterEditor({
             writer.rewrite(draft.id, requirements, {
               range: { start: target.start, end: target.end },
               compactContext,
-              draft,
             });
           }}
         />
@@ -441,12 +465,18 @@ export function ChapterEditor({
             ended ||
             saving ||
             editorBusy ||
+            draftUnavailable ||
             (target
               ? !draft.text.slice(target.start, target.end).trim()
               : !draftText.trim())
           }
+          submitDisabled={polishNeedsSave}
           submitLabel={
-            !target && generation?.kind === "rewrite" ? "重新生成" : "开始润色"
+            polishNeedsSave
+              ? "保存章节后可润色"
+              : generation?.kind === "rewrite"
+                ? "重新生成"
+                : "开始润色"
           }
           onGenerate={submitPolish}
           onDelete={target ? deleteSelection : undefined}
@@ -464,15 +494,15 @@ export function ChapterEditor({
               size="sm"
               variant="ghost"
               className="shrink-0"
-              disabled={editorBusy || editingLocked || saving}
-              onClick={() => {
-                if (generation) {
-                  if (dirty && !window.confirm("确定丢弃草稿并返回阅读吗？"))
-                    return;
-                } else if (!confirmAgentNavigation()) {
-                  return;
+              disabled={editorBusy || editingLocked || saving || draftWriting}
+              onClick={async () => {
+                if (!isNewChapter && !confirmAgentNavigation()) return;
+                if (isNewChapter) setSaving(true);
+                try {
+                  await onExit();
+                } finally {
+                  if (isNewChapter) setSaving(false);
                 }
-                onExit();
               }}
             >
               <ArrowLeft data-icon="inline-start" />
@@ -485,13 +515,14 @@ export function ChapterEditor({
                 className="max-w-md"
                 value={base.id}
                 disabled={
-                  generatingDraft ||
-                  dirty ||
+                  isNewChapter ||
+                  draftWriting ||
+                  (dirty && draftWriteFailed) ||
                   saving ||
                   editingLocked ||
-                  writer.busy
+                  editorBusy
                 }
-                title={dirty ? "保存当前章节后可切换" : undefined}
+                title={draftWriteFailed ? "草稿未能保存到本机" : undefined}
                 onValueChange={(value) => {
                   closeRewrite();
                   setShowDiff(false);
@@ -512,7 +543,10 @@ export function ChapterEditor({
               role="status"
               className={cn(
                 "min-w-12 shrink-0 whitespace-nowrap text-xs text-muted-foreground",
-                dirty && saveFailed && "text-destructive",
+                (draftReadFailed ||
+                  draftWriteFailed ||
+                  (dirty && saveFailed)) &&
+                  "text-destructive",
               )}
             >
               {generation && editorBusy
@@ -521,17 +555,21 @@ export function ChapterEditor({
                   : "等待输出…"
                 : saving
                   ? "保存中…"
-                  : generatingDraft || dirty
-                    ? saveFailed
-                      ? "保存失败"
-                      : generation && writer.draftIncomplete && useGeneratedText
-                        ? "未写完 · 未保存"
-                        : generation &&
-                            writer.generationStopped &&
-                            useGeneratedText
-                          ? "已停止 · 未保存"
-                          : "未保存"
-                    : "已保存"}
+                  : draftLoading
+                    ? "读取草稿中…"
+                    : draftReadFailed
+                      ? "草稿读取失败"
+                      : draftWriteFailed
+                        ? "草稿未能保存到本机"
+                        : saveFailed
+                          ? "保存章节失败"
+                          : draftWriting
+                            ? "保存草稿中…"
+                            : dirty && !isNewChapter
+                              ? "草稿已存本机"
+                              : generatingDraft || dirty
+                                ? "未保存"
+                                : "已保存"}
             </span>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -590,8 +628,19 @@ export function ChapterEditor({
             className={cn(
               "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
               (target || generation) && "@3xl:min-h-72",
+              !isNewChapter && "@3xl:max-w-none @3xl:flex-row",
             )}
           >
+            {!isNewChapter ? (
+              <section className="hidden min-h-0 min-w-0 flex-1 flex-col gap-2 border-r border-border p-4 @3xl:flex">
+                <h2 className="flex min-h-6 shrink-0 items-center text-sm font-medium text-muted-foreground">
+                  已保存正文
+                </h2>
+                <div className="min-h-0 flex-1 overflow-y-auto wrap-break-word whitespace-pre-wrap px-3 py-2 pb-(--composer-dock-height) text-sm leading-7">
+                  {base.text}
+                </div>
+              </section>
+            ) : null}
             <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-4">
               <div className="flex min-h-6 shrink-0 items-center">
                 <h2 className="flex items-center gap-1.5 text-sm font-medium">
@@ -652,13 +701,15 @@ export function ChapterEditor({
                   ref={editor}
                   variant="plain"
                   aria-label="章节正文"
-                  readOnly={editorBusy || editingLocked || saving}
+                  readOnly={
+                    editorBusy || editingLocked || saving || draftUnavailable
+                  }
                   placeholder={
                     generation?.kind === "rewrite" && writer.busy
                       ? "等待输出…"
                       : undefined
                   }
-                  value={visibleText}
+                  value={draftLoading ? "" : visibleText}
                   maxLength={
                     draftText.length > maxChapterLength
                       ? undefined
@@ -682,7 +733,8 @@ export function ChapterEditor({
                     if (target) closeRewrite();
                     setAppliedRange(null);
                     setUseGeneratedText(false);
-                    if (generation) writer.backupDraftText(event.target.value);
+                    if (isNewChapter)
+                      writer.backupDraftText(event.target.value);
                     setDraft({ ...draft, text: event.target.value });
                   }}
                   onSelect={(event) => {
@@ -690,6 +742,7 @@ export function ChapterEditor({
                       generatingDraft ||
                       editingLocked ||
                       saving ||
+                      draftUnavailable ||
                       writer.busy
                     )
                       return;
@@ -730,13 +783,13 @@ export function ChapterEditor({
                   )}
                 />
               </div>
+              {isNewChapter && writer.draftBackupFailed ? (
+                <p role="alert" className="text-xs text-destructive">
+                  草稿未能保存到本机，请重试或先保存章节。
+                </p>
+              ) : null}
               {generation ? (
                 <>
-                  {writer.draftBackupFailed ? (
-                    <p role="alert" className="text-xs text-destructive">
-                      草稿备份失败，刷新前请先应用草稿或复制正文。
-                    </p>
-                  ) : null}
                   {writer.error &&
                   (generation.kind === "chapter" || !selectionPending) ? (
                     <p

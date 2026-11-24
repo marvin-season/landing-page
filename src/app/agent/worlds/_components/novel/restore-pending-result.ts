@@ -18,7 +18,6 @@ export type RestoredPendingRun =
       novel: Novel;
       version: number;
       range: ChapterTextRange;
-      draft: Novel["chapters"][number];
     }
   | {
       task: "rewrite" | "chapter";
@@ -59,7 +58,6 @@ export function restorePendingResult(
         novel,
         version: pending.version,
         range: pending.range,
-        draft: chapter,
       },
       task: "rewrite",
       preview: pending.preview,

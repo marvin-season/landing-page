@@ -1,111 +1,79 @@
+import "fake-indexeddb/auto";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createChapterDraftBackup } from "./chapter-draft-backup";
 
 const source = {
-  mode: "rewrite",
-  chapter: { id: "chapter-1", title: "Chapter 1", text: "Original." },
+  chapter: { id: "new", title: "Chapter 2", text: "", brief: "Next step" },
   version: 2,
-  requirements: "Shorten the opening.",
-  compactContext: true,
-} as const;
+  afterChapterId: "selected",
+};
 
-function memoryStorage() {
-  const entries = new Map<string, string>();
-  return {
-    getItem: (key: string) => entries.get(key) ?? null,
-    setItem: (key: string, value: string) => entries.set(key, value),
-    removeItem: (key: string) => entries.delete(key),
-  };
+function open(roomKey: string) {
+  return createChapterDraftBackup(roomKey, () => {});
 }
 
-test("a reload recovers the latest draft text and rewrite source", () => {
-  const storage = memoryStorage();
-  const open = (key = "author:room") =>
-    createChapterDraftBackup(
-      key,
-      () => storage,
-      () => {},
-    );
-  const draft = open();
+test("recovers continuation text, requirements and insertion position from IndexedDB", async () => {
+  const draft = open("author:first-room");
   draft.start(source);
   draft.write("First streamed text.");
   draft.write("Last streamed text.");
-  draft.flush();
+  await draft.flush();
 
-  const restored = open();
-  assert.deepEqual(restored.read(), { ...source, text: "Last streamed text." });
-  assert.equal(open("another-author:room").read(), null);
-  assert.equal(open("author:another-room").read(), null);
-  restored.write("Edited after recovery.");
-  restored.flush();
-  assert.equal(open().read()?.text, "Edited after recovery.");
+  assert.deepEqual(await open("author:first-room").read(), {
+    ...source,
+    mode: "chapter",
+    text: "Last streamed text.",
+  });
+  assert.equal(await open("another-author:first-room").read(), null);
+  assert.equal(await open("author:other-room").read(), null);
 });
 
-test("clearing an applied or discarded draft cancels a pending write", () => {
-  const storage = memoryStorage();
-  const open = () =>
-    createChapterDraftBackup(
-      "author:room",
-      () => storage,
-      () => {},
-    );
-  const draft = open();
+test("clearing an applied continuation cancels pending writes", async () => {
+  const draft = open("author:second-room");
   draft.start(source);
   draft.write("First streamed text.");
   draft.write("Pending text.");
-  draft.clear();
-  draft.flush();
-  assert.equal(open().read(), null);
+  await draft.clear();
+  await draft.flush();
+  assert.equal(await open("author:second-room").read(), null);
 });
 
-test("a restored continuation draft keeps its selected chapter as the save position", () => {
-  const storage = memoryStorage();
-  const open = () =>
-    createChapterDraftBackup(
-      "author:room",
-      () => storage,
-      () => {},
-    );
-  const draft = open();
-  draft.start({
+test("manual new chapters survive returning to reading and can be resumed after reload", async () => {
+  const key = "author:manual-draft";
+  const draft = open(key);
+  const manual = {
+    ...source,
+    chapter: { ...source.chapter, brief: undefined },
+    manual: true,
+  };
+  draft.start(manual);
+  assert.equal(await draft.checkpoint(), null);
+  draft.write("First edit.");
+  draft.write("Latest edit.");
+  assert.deepEqual(await draft.checkpoint(), {
+    ...manual,
     mode: "chapter",
-    chapter: {
-      id: "new",
-      title: "第2章",
-      text: "",
-      brief: "推进感情线",
-    },
-    version: 2,
-    afterChapterId: "selected",
+    text: "Latest edit.",
   });
-  draft.write("续写正文。");
-  draft.flush();
-  const restored = open().read();
-  assert.equal(restored?.afterChapterId, "selected");
-  assert.equal(restored?.chapter.brief, "推进感情线");
+
+  const restored = open(key);
+  assert.equal((await restored.read())?.manual, true);
+  restored.write("Edited after returning to the draft.");
+  assert.equal(
+    (await restored.checkpoint())?.text,
+    "Edited after returning to the draft.",
+  );
+  assert.equal(await restored.clear(), true);
+  assert.equal(await open(key).read(), null);
 });
 
-test("a failed backup can retry the latest text when storage is available", () => {
-  const storage = memoryStorage();
-  let blocked = false;
-  let failed = false;
-  const draft = createChapterDraftBackup(
-    "author:room",
-    () => {
-      if (blocked) throw new Error("Storage blocked");
-      return storage;
-    },
-    (value) => {
-      failed = value;
-    },
-  );
+test("returning to reading flushes the final AI continuation edit", async () => {
+  const key = "author:ai-draft";
+  const draft = open(key);
   draft.start(source);
-  blocked = true;
-  draft.write("Still in memory.");
-  assert.equal(failed, true);
-  blocked = false;
-  draft.flush();
-  assert.equal(failed, false);
-  assert.equal(draft.read()?.text, "Still in memory.");
+  draft.write("AI output.");
+  draft.write("With a final edit.");
+  assert.equal((await draft.checkpoint())?.text, "With a final edit.");
+  assert.equal((await open(key).read())?.afterChapterId, "selected");
 });

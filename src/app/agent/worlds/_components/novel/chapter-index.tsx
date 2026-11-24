@@ -6,6 +6,7 @@ export type ChapterIndexEntry = {
   id: string;
   title: string;
   pending?: boolean;
+  hasDraft?: boolean;
 };
 
 export function ChapterIndex({
@@ -44,18 +45,30 @@ export function ChapterIndex({
         const chapter = chapterAt(page);
         if (chapter && chapter.id !== value) onSelect(chapter.id);
       }}
-      getPageTitle={(page) => chapterAt(page)?.title}
+      getPageLabel={(page) =>
+        chapterAt(page)?.hasDraft ? (
+          <span className="font-semibold text-destructive">{page}</span>
+        ) : (
+          page
+        )
+      }
+      getPageTitle={(page) => {
+        const chapter = chapterAt(page);
+        return chapter?.hasDraft ? `${chapter.title} · 有草稿` : chapter?.title;
+      }}
       getPageClassName={(page) =>
         chapterAt(page)?.pending
           ? "border border-dashed border-primary/50"
-          : undefined
+          : page === selected + 1 && chapterAt(page)?.hasDraft
+            ? "bg-destructive/10 hover:bg-destructive/15"
+            : undefined
       }
       getPageAriaLabel={(page) => {
         const chapter = chapterAt(page);
         if (!chapter) return undefined;
         return chapter.pending
           ? `第${page}章 ${chapter.title}，正在构思`
-          : `第${page}章 ${chapter.title}`;
+          : `第${page}章 ${chapter.title}${chapter.hasDraft ? "，有草稿" : ""}`;
       }}
     />
   );
