@@ -364,26 +364,11 @@ export function ChapterEditor({
       ) : (
         <div
           className={cn(
-            "grid flex-1 grid-cols-1 @3xl:grid-cols-2 @3xl:divide-x @3xl:divide-border",
-            (target || generation) &&
-              "@3xl:min-h-72 @3xl:grid-rows-[minmax(0,1fr)]",
+            "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
+            (target || generation) && "@3xl:min-h-72",
           )}
         >
-          <section className="order-last flex min-w-0 flex-col gap-2 border-t border-border p-4 @3xl:order-0 @3xl:border-t-0">
-            <div className="flex min-h-6 shrink-0 items-center">
-              <h2 className="text-sm font-medium text-muted-foreground">
-                稳定版本
-              </h2>
-            </div>
-            <Textarea
-              variant="plain"
-              aria-label="稳定版本正文"
-              readOnly
-              value={base.text}
-              className="min-h-48 flex-1 resize-none leading-7"
-            />
-          </section>
-          <section className="flex min-w-0 flex-col gap-2 p-4">
+          <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-4">
             <div className="flex min-h-6 shrink-0 items-center">
               <h2 className="flex items-center gap-1.5 text-sm font-medium">
                 {generation && editorBusy ? (

@@ -559,7 +559,7 @@ export function NovelPanel({
     <ComposerDock composer={composer}>
       <div
         ref={readingPanel}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable [container-type:size]"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable @container-size"
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 [--reading-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)] pb-(--reading-bottom-padding)">
