@@ -417,6 +417,7 @@ export function ChapterEditor({
           autoFocus={false}
           isPassage
           preview={writer.task === "rewrite" ? writer.preview : ""}
+          requirements={rewriteRequirements}
           draftReady={writer.rewriteReady}
           compactContext={compactContext}
           onCompactContextChange={onCompactContextChange}

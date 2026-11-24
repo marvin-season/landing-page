@@ -20,6 +20,7 @@ import { WritingInstructions } from "./writing-instructions";
 
 type RewriteControls = {
   preview: string;
+  requirements?: string;
   draftReady: boolean;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
@@ -40,6 +41,7 @@ export function RewritePanel({
   autoFocus = true,
   isPassage,
   preview,
+  requirements = "",
   draftReady,
   compactContext,
   onCompactContextChange,
@@ -58,6 +60,7 @@ export function RewritePanel({
   const form = useRef<HTMLFormElement>(null);
   const instructions = useRef<HTMLTextAreaElement>(null);
   const showInstructions = !writer.busy && !draftReady;
+  const submittedRequirements = requirements.trim();
 
   useLayoutEffect(() => {
     if (!showInstructions) {
@@ -141,6 +144,11 @@ export function RewritePanel({
             placeholder="润色指令（选填），例如：收紧对话节奏"
           />
         </div>
+        {!showInstructions && submittedRequirements ? (
+          <p className="max-h-16 shrink-0 overflow-y-auto px-1 wrap-break-word text-sm leading-5">
+            {submittedRequirements}
+          </p>
+        ) : null}
         {!showInstructions ? (
           <Conversation
             className="min-h-0 rounded-md bg-muted/25"
