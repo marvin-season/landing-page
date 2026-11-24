@@ -669,7 +669,7 @@ export function NovelPanel({
                     {formatChapterLength(chapter.text.length, novel.words)}
                     {hasDraft(chapter) ? (
                       <span className="ml-2 font-medium text-destructive">
-                        草稿未同步，点击编辑本章进入草稿
+                        草稿未同步，点击「编辑本章」进入
                       </span>
                     ) : null}
                   </p>

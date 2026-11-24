@@ -61,12 +61,12 @@ export function ChapterDiffView({
     <div className="flex min-h-48 min-w-0 flex-1 flex-col overflow-hidden bg-background">
       <div className="grid shrink-0 grid-cols-2 border-b border-border bg-muted/40 text-sm font-medium">
         <div className="border-r border-border px-3 py-1 text-muted-foreground">
-          稳定版本
+          原稿
         </div>
-        <div className="px-3 py-1">编辑草稿</div>
+        <div className="px-3 py-1">草稿</div>
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="grid min-w-[42rem] grid-cols-2">
+        <div className="grid min-w-2xl grid-cols-2">
           {rows.map((row) => (
             <div
               className="contents"
