@@ -174,28 +174,12 @@ export function ChapterEditor({
         ? "草稿尚未应用，确定离开吗？"
         : "章节有未保存的修改，确定放弃并离开吗？",
   );
-  useRegisterPromptReuse({
-    rewrite: (text) => {
-      if (
-        generation?.kind === "chapter" ||
-        target ||
-        writer.busy ||
-        writer.rewriteReady ||
-        ended ||
-        saving
-      )
-        return false;
-      onRewriteRequirementsChange(text);
-      onRequestComposer();
-      return true;
-    },
-    selection: (text) => {
-      if (!target || writer.busy || writer.rewriteReady || ended || saving)
-        return false;
-      onRewriteRequirementsChange(text);
-      onRequestComposer();
-      return true;
-    },
+  useRegisterPromptReuse((text) => {
+    if (writer.busy || writer.rewriteReady || ended || saving || showDiff)
+      return false;
+    onRewriteRequirementsChange(text);
+    if (polishAvailable) onRequestComposer();
+    return true;
   });
 
   const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);

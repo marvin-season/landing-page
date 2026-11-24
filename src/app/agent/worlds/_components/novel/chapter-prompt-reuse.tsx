@@ -7,19 +7,11 @@ import {
   useEffect,
   useRef,
 } from "react";
-export type NovelPromptReuseKind =
-  | "chapter"
-  | "rewrite"
-  | "selection"
-  | "stitch"
-  | "merge"
-  | "insert";
 
 type ReusePrompt = (text: string) => boolean;
-type ReuseHandlers = Partial<Record<NovelPromptReuseKind, ReusePrompt>>;
 
 const NovelPromptReuseContext = createContext<{
-  current: ReuseHandlers;
+  current: ReusePrompt[];
 } | null>(null);
 
 export function ChapterPromptReuseProvider({
@@ -27,7 +19,7 @@ export function ChapterPromptReuseProvider({
 }: {
   children: ReactNode;
 }) {
-  const registry = useRef<ReuseHandlers>({});
+  const registry = useRef<ReusePrompt[]>([]);
   return (
     <NovelPromptReuseContext.Provider value={registry}>
       {children}
@@ -35,41 +27,28 @@ export function ChapterPromptReuseProvider({
   );
 }
 
-export function useRegisterPromptReuse(handlers: ReuseHandlers) {
+/** Registers the current writing input. Later registrations win while mounted. */
+export function useRegisterPromptReuse(reuse: ReusePrompt | null) {
   const registry = useContext(NovelPromptReuseContext);
-  const latest = useRef(handlers);
-  latest.current = handlers;
-  const kinds = Object.keys(handlers).sort().join(",");
+  const latest = useRef(reuse);
+  latest.current = reuse;
+  const active = reuse !== null;
   useEffect(() => {
-    if (!registry) return;
-    const installed: ReuseHandlers = {};
-    for (const kind of kinds
-      .split(",")
-      .filter(Boolean) as NovelPromptReuseKind[]) {
-      const run: ReusePrompt = (text) => latest.current[kind]?.(text) ?? false;
-      installed[kind] = run;
-      registry.current[kind] = run;
-    }
+    if (!registry || !active) return;
+    const run: ReusePrompt = (text) => latest.current?.(text) ?? false;
+    registry.current.push(run);
     return () => {
-      for (const kind of Object.keys(installed) as NovelPromptReuseKind[]) {
-        if (registry.current[kind] === installed[kind])
-          delete registry.current[kind];
-      }
+      const index = registry.current.lastIndexOf(run);
+      if (index >= 0) registry.current.splice(index, 1);
     };
-  }, [kinds, registry]);
-}
-
-export function useRegisterChapterPromptReuse(reuse: ReusePrompt) {
-  useRegisterPromptReuse({ chapter: reuse });
-}
-
-export function useReuseChapterPrompt() {
-  const reuse = useReusePrompt();
-  return (text: string) => reuse("chapter", text);
+  }, [active, registry]);
 }
 
 export function useReusePrompt() {
   const registry = useContext(NovelPromptReuseContext);
-  return (kind: NovelPromptReuseKind, text: string) =>
-    registry?.current[kind]?.(text) ?? false;
+  return (text: string) => {
+    const handlers = registry?.current;
+    if (!handlers?.length) return false;
+    return handlers[handlers.length - 1](text);
+  };
 }

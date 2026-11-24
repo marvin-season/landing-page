@@ -684,7 +684,7 @@ export function useNovel(
       afterChapterId,
       version: room.version,
     });
-    void recordNovelPrompt(key, "chapter", current.chapterGoal);
+    void recordNovelPrompt(key, current.chapterGoal);
     return true;
   }
 
@@ -829,11 +829,7 @@ export function useNovel(
         },
         prompt,
       );
-      void recordNovelPrompt(
-        key,
-        range ? "selection" : "rewrite",
-        requirements,
-      );
+      void recordNovelPrompt(key, requirements);
       return true;
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成重写草稿。");
@@ -958,7 +954,7 @@ export function useNovel(
         },
         plot.prompt,
       );
-      void recordNovelPrompt(key, mode, requirements);
+      void recordNovelPrompt(key, requirements);
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成剧情草稿。");
     }

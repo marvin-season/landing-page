@@ -266,19 +266,7 @@ export function NovelPanel({
     setComposerRequest((count) => count + 1);
     return true;
   }
-  function reuseRewritePrompt(text: string) {
-    if (!writer.ready || writer.busy || importing || ended || !chapter)
-      return false;
-    setRewriteRequirements(text);
-    setEditingChapter({ chapter, mode: "manual" });
-    setPolishComposerRequest((count) => count + 1);
-    return true;
-  }
-  useRegisterPromptReuse(
-    isEditing
-      ? { chapter: reuseChapterGoal }
-      : { chapter: reuseChapterGoal, rewrite: reuseRewritePrompt },
-  );
+  useRegisterPromptReuse(isEditing ? null : reuseChapterGoal);
   const generationOptions = {
     chapterGoal: novel.chapterGoal,
     words: novel.words,

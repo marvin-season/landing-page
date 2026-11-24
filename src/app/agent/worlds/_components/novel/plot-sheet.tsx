@@ -118,20 +118,15 @@ export function PlotSheet({
     setSelection(restored.ids.length === 1 ? "start" : [...restored.ids]);
   }, [restored]);
 
-  function fillRequirements(nextMode: PlotMode, text: string) {
-    if (writer.busy || applying || draft !== null) return false;
-    if ((nextMode === "stitch" || nextMode === "merge") && !hasPlotPair)
-      return false;
-    changeMode(nextMode);
-    setRequirements(text);
-    onOpenChange(true);
-    return true;
-  }
-  useRegisterPromptReuse({
-    stitch: (text) => fillRequirements("stitch", text),
-    merge: (text) => fillRequirements("merge", text),
-    insert: (text) => fillRequirements("insert", text),
-  });
+  useRegisterPromptReuse(
+    open
+      ? (text) => {
+          if (writer.busy || applying || draft !== null) return false;
+          setRequirements(text);
+          return true;
+        }
+      : null,
+  );
 
   function changeMode(nextMode: PlotMode) {
     setMode(nextMode);
