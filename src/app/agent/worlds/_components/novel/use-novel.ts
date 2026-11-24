@@ -841,9 +841,12 @@ export function useNovel(
     }
   }
 
-  function discardRewrite() {
+  function discardRewrite(options?: { selectionOnly?: boolean }) {
     if (generating.current) return;
     const captured = input.current;
+    const selectionRun =
+      captured?.task === "rewrite" && !("plot" in captured) && captured.range;
+    if (options?.selectionOnly && !selectionRun) return;
     if (captured && (captured.task === "rewrite" || "plot" in captured)) {
       input.current = null;
       setPreview("");

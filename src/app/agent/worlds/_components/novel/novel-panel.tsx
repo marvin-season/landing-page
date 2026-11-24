@@ -22,7 +22,6 @@ import {
   Scissors,
   Square,
   Trash2,
-  WandSparkles,
 } from "lucide-react";
 import {
   useCallback,
@@ -46,7 +45,6 @@ import { ChapterEditor } from "./chapter-editor";
 import {
   ChapterGenerationForm,
   type ChapterGenerationOptions,
-  ChapterRewriteForm,
 } from "./chapter-generation-form";
 import { ChapterIndex } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
@@ -128,6 +126,7 @@ export function NovelPanel({
   }, [editingChapter, thinkingChapter, onAtTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
   const [composerRequest, setComposerRequest] = useState(0);
+  const [polishComposerRequest, setPolishComposerRequest] = useState(0);
   const writer = useNovel(
     room,
     (busy) => {
@@ -198,32 +197,29 @@ export function NovelPanel({
       save: (next) => saveContext.current(next),
     });
   }, [novel.outline, novel.style, novel.title, writer.error, writer.ready]);
-  const [rewriting, setRewriting] = useState(false);
   const [appliedRewrite, setAppliedRewrite] = useState<{
     chapterId: string;
     length: number;
   }>();
   const streamingRewrite =
-    editingChapter?.mode !== "rewrite" &&
-    (plotOpen || writer.task === "rewrite") &&
-    writer.busy;
+    (plotOpen || writer.task === "rewrite") && writer.busy;
   const waitingForText = Boolean(thinkingChapter);
   useUnsavedNavigation(
-    waitingForText || streamingRewrite || writer.rewriteReady,
+    !isEditing && (waitingForText || streamingRewrite || writer.rewriteReady),
     waitingForText || streamingRewrite
       ? "草稿正在生成，离开会中断本次生成。确定离开吗？"
       : "草稿尚未应用，离开会丢失草稿。确定离开吗？",
   );
   const [splitting, setSplitting] = useState(false);
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
-  const actionFromMenu = useRef<"rewrite" | "split" | "plot" | null>(null);
+  const actionFromMenu = useRef<"split" | "plot" | null>(null);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
   const chapterIndex =
     selectedIndex < 0 ? novel.chapters.length - 1 : selectedIndex;
   const chapter = novel.chapters[chapterIndex];
-  const chapterSwitchLocked = waitingForText || rewriting || importing;
+  const chapterSwitchLocked = waitingForText || importing;
   const previousChapter =
     chapterIndex > 0 ? novel.chapters[chapterIndex - 1] : undefined;
   const nextChapter = novel.chapters[chapterIndex + 1];
@@ -262,32 +258,27 @@ export function NovelPanel({
   );
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
-  const chapterActionsLocked = disabled || rewriting;
+  const chapterActionsLocked = disabled;
   const summarizing = writer.task === "summary" && !writer.compressing;
   function reuseChapterGoal(text: string) {
-    if (!writer.ready || writer.busy || importing || rewriting || ended)
-      return false;
+    if (!writer.ready || writer.busy || importing || ended) return false;
     void writer.updateChapterGoal(text);
     setComposerRequest((count) => count + 1);
     return true;
   }
   function reuseRewritePrompt(text: string) {
-    if (!writer.ready || writer.busy || importing || ended) return false;
-    if (rewriting || editingChapter?.mode === "rewrite") {
-      setRewriteRequirements(text);
-      return true;
-    }
-    if (editingChapter) return false;
-    writer.discardRewrite();
-    window.getSelection()?.removeAllRanges();
+    if (!writer.ready || writer.busy || importing || ended || !chapter)
+      return false;
     setRewriteRequirements(text);
-    setRewriting(true);
+    setEditingChapter({ chapter, mode: "manual" });
+    setPolishComposerRequest((count) => count + 1);
     return true;
   }
-  useRegisterPromptReuse({
-    chapter: reuseChapterGoal,
-    rewrite: reuseRewritePrompt,
-  });
+  useRegisterPromptReuse(
+    isEditing
+      ? { chapter: reuseChapterGoal }
+      : { chapter: reuseChapterGoal, rewrite: reuseRewritePrompt },
+  );
   const generationOptions = {
     chapterGoal: novel.chapterGoal,
     words: novel.words,
@@ -329,27 +320,23 @@ export function NovelPanel({
       manualNext: true,
     });
   }
-  function generateRewrite() {
+  function beginChapterRewrite(draft: Chapter) {
     if (
-      !chapter ||
-      !writer.rewrite(chapter.id, rewriteRequirements, { compactContext })
+      !writer.rewrite(draft.id, rewriteRequirements, {
+        compactContext,
+        draft,
+      })
     )
-      return;
-    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
-    setRewriting(false);
-    setEditingChapter({ chapter, mode: "rewrite" });
+      return false;
+    setEditingChapter((current) =>
+      current ? { ...current, mode: "rewrite" } : current,
+    );
+    return true;
   }
-  function openRewrite() {
-    writer.discardRewrite();
-    window.getSelection()?.removeAllRanges();
-    setRewriteRequirements("");
-    setRewriting(true);
-  }
-  function closeRewrite() {
-    if (writer.busy) return;
-    writer.discardRewrite();
-    setRewriting(false);
-    requestAnimationFrame(() => chapterMenuTrigger.current?.focus());
+  function keepDraft() {
+    setEditingChapter((current) =>
+      current ? { ...current, mode: "manual" } : current,
+    );
   }
   function splitChapter(caret: number) {
     if (chapterActionsLocked || !chapter) return false;
@@ -441,30 +428,8 @@ export function NovelPanel({
             : mode === "rewrite"
               ? {
                   kind: mode,
-                  onGenerate: () => {
-                    const chapter = novel.chapters.find(
-                      ({ id }) => id === base.id,
-                    );
-                    if (
-                      !writer.rewrite(base.id, rewriteRequirements, {
-                        compactContext,
-                      })
-                    )
-                      return false;
-                    if (chapter && chapter !== base)
-                      setEditingChapter({ chapter, mode });
-                    return true;
-                  },
-                  renderForm: (props) => (
-                    <ChapterRewriteForm
-                      {...props}
-                      requirements={rewriteRequirements}
-                      onChange={setRewriteRequirements}
-                      compactContext={compactContext}
-                      onCompactContextChange={setCompactContext}
-                      submitLabel="重新生成"
-                    />
-                  ),
+                  onGenerate: () => beginChapterRewrite(base),
+                  renderForm: () => null,
                 }
               : undefined
         }
@@ -510,8 +475,15 @@ export function NovelPanel({
         onExit={() => {
           if (mode !== "manual") writer.clearDraftBackup();
           writer.discardRewrite();
+          setPolishComposerRequest(0);
           setEditingChapter(null);
         }}
+        rewriteRequirements={rewriteRequirements}
+        onRewriteRequirementsChange={setRewriteRequirements}
+        composerRequest={polishComposerRequest}
+        onRequestComposer={() => setPolishComposerRequest((count) => count + 1)}
+        onBeginChapterRewrite={beginChapterRewrite}
+        onKeepDraft={keepDraft}
       />
     );
   }
@@ -520,39 +492,24 @@ export function NovelPanel({
     <FloatingComposer
       label="继续创作下一章"
       draft={generationOptions.chapterGoal.trim()}
-      forceOpen={rewriting}
       requestOpen={composerRequest}
       onFocusInput={() =>
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
     >
-      {rewriting ? (
-        <ChapterRewriteForm
-          embedded
-          requirements={rewriteRequirements}
-          onChange={setRewriteRequirements}
-          compactContext={compactContext}
-          onCompactContextChange={setCompactContext}
-          disabled={disabled || ended}
-          submitLabel="开始润色"
-          onGenerate={generateRewrite}
-          onCancel={closeRewrite}
-        />
-      ) : (
-        <ChapterGenerationForm
-          embedded
-          inputRef={chapterGoalInput}
-          hint={continuationHint}
-          options={generationOptions}
-          disabled={continueLocked}
-          submitDisabled={!novel.title.trim()}
-          submitLabel="AI 续写"
-          onChange={updateGenerationOptions}
-          onGenerate={generateNextChapter}
-          manualDisabled={chapterActionsLocked}
-          onWriteManually={startNextChapterManually}
-        />
-      )}
+      <ChapterGenerationForm
+        embedded
+        inputRef={chapterGoalInput}
+        hint={continuationHint}
+        options={generationOptions}
+        disabled={continueLocked}
+        submitDisabled={!novel.title.trim()}
+        submitLabel="AI 续写"
+        onChange={updateGenerationOptions}
+        onGenerate={generateNextChapter}
+        manualDisabled={chapterActionsLocked}
+        onWriteManually={startNextChapterManually}
+      />
     </FloatingComposer>
   );
   return (
@@ -707,8 +664,7 @@ export function NovelPanel({
                             actionFromMenu.current = null;
                             if (!action) return;
                             event.preventDefault();
-                            if (action === "rewrite") openRewrite();
-                            else if (action === "split") setSplitting(true);
+                            if (action === "split") setSplitting(true);
                             else {
                               writer.discardRewrite();
                               setPlotOpen(true);
@@ -724,19 +680,6 @@ export function NovelPanel({
                             >
                               <Scissors />
                               拆分本章
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              disabled={
-                                chapterActionsLocked ||
-                                ended ||
-                                !chapter.text.trim()
-                              }
-                              onSelect={() => {
-                                actionFromMenu.current = "rewrite";
-                              }}
-                            >
-                              <WandSparkles />
-                              润色整章
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={chapterActionsLocked || ended}
@@ -813,7 +756,6 @@ export function NovelPanel({
                     title={chapter.title}
                     text={chapter.text}
                     brief={chapter.brief}
-                    rewriting={rewriting}
                     reuseDisabled={continueLocked}
                     renameDisabled={chapterActionsLocked}
                     onRename={(title) => {

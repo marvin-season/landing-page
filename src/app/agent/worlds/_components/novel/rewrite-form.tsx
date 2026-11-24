@@ -16,7 +16,6 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { WritingInstructions } from "./writing-instructions";
 
 type RewriteControls = {
@@ -50,24 +49,15 @@ export function RewritePanel({
   onDelete,
   onApply,
   onRewrite,
+  embedded = false,
 }: RewriteControls & {
   autoFocus?: boolean;
   isPassage: boolean;
+  embedded?: boolean;
 }) {
   const form = useRef<HTMLFormElement>(null);
   const instructions = useRef<HTMLTextAreaElement>(null);
   const showInstructions = !writer.busy && !draftReady;
-
-  useRegisterPromptReuse({
-    selection: (text) => {
-      if (!isPassage || !showInstructions || ended) return false;
-      const field = instructions.current;
-      if (!field) return false;
-      field.value = text;
-      field.focus({ preventScroll: true });
-      return true;
-    },
-  });
 
   useLayoutEffect(() => {
     if (!showInstructions) {
@@ -81,11 +71,14 @@ export function RewritePanel({
     <form
       ref={form}
       className={cn(
-        "flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground outline-none",
+        "flex min-w-0 shrink-0 flex-col overflow-hidden outline-none",
+        !embedded &&
+          "rounded-lg border border-border bg-popover text-popover-foreground",
         showInstructions ? "max-h-[min(16rem,55dvh)]" : "h-[min(26rem,48dvh)]",
-        isPassage
-          ? "@3xl:max-h-[60%]"
-          : "mx-auto mb-4 w-[calc(100%-2rem)] max-w-3xl",
+        !embedded &&
+          (isPassage
+            ? "@3xl:max-h-[60%]"
+            : "mx-auto mb-4 w-[calc(100%-2rem)] max-w-3xl"),
       )}
       tabIndex={-1}
       onSubmit={(event) => {

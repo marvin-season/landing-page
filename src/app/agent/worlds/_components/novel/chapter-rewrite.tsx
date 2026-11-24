@@ -11,7 +11,6 @@ export function ChapterReading({
   title,
   text,
   brief,
-  rewriting,
   appliedLength,
   reuseDisabled,
   renameDisabled,
@@ -21,7 +20,6 @@ export function ChapterReading({
   title: string;
   text: string;
   brief?: string;
-  rewriting: boolean;
   appliedLength?: number;
   reuseDisabled?: boolean;
   renameDisabled?: boolean;
@@ -33,7 +31,7 @@ export function ChapterReading({
   const cancelRename = useRef(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState(title);
-  const markEnd = rewriting ? text.length : appliedLength;
+  const markEnd = appliedLength;
   const content = useMemo(
     () =>
       renderChapterMarkdown(
@@ -42,9 +40,6 @@ export function ChapterReading({
       ),
     [markEnd, text],
   );
-  useLayoutEffect(() => {
-    if (rewriting) heading.current?.scrollIntoView({ block: "nearest" });
-  }, [rewriting]);
   useLayoutEffect(() => {
     if (!editingTitle) return;
     titleInput.current?.focus();
@@ -102,7 +97,7 @@ export function ChapterReading({
             </button>
           </h3>
         )}
-        {!rewriting && appliedLength !== undefined ? (
+        {appliedLength !== undefined ? (
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Check className="size-3.5 text-emerald-500" />
             已应用润色
@@ -131,13 +126,7 @@ export function ChapterReading({
         </div>
       ) : null}
       <div>
-        <MarkdownProse
-          className={
-            rewriting
-              ? "[&_[data-rewrite-mark]]:bg-primary/20 [&_[data-rewrite-mark]]:text-inherit"
-              : "[&_[data-rewrite-mark]]:bg-emerald-400/30 [&_[data-rewrite-mark]]:text-inherit"
-          }
-        >
+        <MarkdownProse className="[&_[data-rewrite-mark]]:bg-emerald-400/30 [&_[data-rewrite-mark]]:text-inherit">
           {content}
         </MarkdownProse>
       </div>

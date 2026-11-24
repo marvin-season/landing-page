@@ -22,8 +22,11 @@ import {
   confirmAgentNavigation,
   useUnsavedNavigation,
 } from "@/app/agent/_components/use-unsaved-navigation";
+import { ComposerDock, FloatingComposer } from "../floating-composer";
 import { WorldSelect } from "../world-select";
 import { ChapterDiffView } from "./chapter-diff-view";
+import { ChapterRewriteForm } from "./chapter-generation-form";
+import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import {
   type ChapterTextRange,
   type ChapterTextSelection,
@@ -46,6 +49,12 @@ export function ChapterEditor({
   onSave,
   onSelectChapter,
   onExit,
+  rewriteRequirements,
+  onRewriteRequirementsChange,
+  composerRequest,
+  onRequestComposer,
+  onBeginChapterRewrite,
+  onKeepDraft,
 }: {
   base: Chapter;
   chapters: readonly Chapter[];
@@ -81,6 +90,12 @@ export function ChapterEditor({
   onSave: (chapter: Chapter) => Promise<boolean>;
   onSelectChapter: (id: string) => void;
   onExit: () => void;
+  rewriteRequirements: string;
+  onRewriteRequirementsChange: (requirements: string) => void;
+  composerRequest: number;
+  onRequestComposer: () => void;
+  onBeginChapterRewrite: (draft: Chapter) => boolean;
+  onKeepDraft: () => void;
 }) {
   const [draft, setDraft] = useState(() =>
     initialText === undefined ? base : { ...base, text: initialText },
@@ -99,6 +114,7 @@ export function ChapterEditor({
     null,
   );
   const editor = useRef<HTMLTextAreaElement>(null);
+  const polishInput = useRef<HTMLTextAreaElement>(null);
   const focusedNewChapter = useRef(false);
   const generatedScrollTop = useRef<number | null>(null);
   const mirror = useRef<HTMLDivElement>(null);
@@ -138,14 +154,44 @@ export function ChapterEditor({
     editorBusy ||
     exceedsLimit ||
     (generatingDraft && !draftText.trim());
+  const selectionPending = Boolean(
+    target && (writer.busy || writer.rewriteReady),
+  );
+  const polishLabel = target ? "润色选段" : "润色本章";
+  const polishAvailable = !showDiff && generation?.kind !== "chapter";
   useUnsavedNavigation(
-    (generatingDraft && writer.busy) || (dirty && !editingLocked),
-    generatingDraft && writer.busy
+    (generatingDraft && writer.busy) ||
+      selectionPending ||
+      (dirty && !editingLocked),
+    (generatingDraft || target) && writer.busy
       ? "章节正在生成，离开会中断本次生成。确定离开吗？"
-      : generatingDraft
+      : generatingDraft || selectionPending
         ? "草稿尚未应用，确定离开吗？"
         : "章节有未保存的修改，确定放弃并离开吗？",
   );
+  useRegisterPromptReuse({
+    rewrite: (text) => {
+      if (
+        generation?.kind === "chapter" ||
+        target ||
+        writer.busy ||
+        writer.rewriteReady ||
+        ended ||
+        saving
+      )
+        return false;
+      onRewriteRequirementsChange(text);
+      onRequestComposer();
+      return true;
+    },
+    selection: (text) => {
+      if (!target || writer.busy || writer.rewriteReady || ended || saving)
+        return false;
+      onRewriteRequirementsChange(text);
+      onRequestComposer();
+      return true;
+    },
+  });
 
   const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);
   useLayoutEffect(() => {
@@ -166,6 +212,14 @@ export function ChapterEditor({
     // Updating the textarea value can move the viewport to the caret.
     input.scrollTop = generatedScrollTop.current ?? input.scrollHeight;
   }, [generatingDraft, useGeneratedText, visibleText]);
+
+  useLayoutEffect(() => {
+    if (generation?.kind !== "rewrite" || writer.busy || !useGeneratedText)
+      return;
+    if (!writer.preview.trim()) return;
+    setDraft({ ...base, text: writer.preview });
+    setUseGeneratedText(false);
+  }, [base, generation?.kind, useGeneratedText, writer.busy, writer.preview]);
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -198,7 +252,7 @@ export function ChapterEditor({
   function closeRewrite() {
     if (writer.busy) return;
     clearTimeout(pendingSelection.current);
-    writer.discardRewrite();
+    writer.discardRewrite({ selectionOnly: true });
     setTarget(null);
   }
 
@@ -232,333 +286,418 @@ export function ChapterEditor({
     closeRewrite();
   }
 
-  return (
-    <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
-      <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
-        <div className="flex min-w-0 max-w-full items-center gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="shrink-0"
-            disabled={editorBusy || editingLocked || saving}
-            onClick={() => {
-              if (generation) {
-                if (dirty && !window.confirm("确定丢弃草稿并返回阅读吗？"))
-                  return;
-              } else if (!confirmAgentNavigation()) {
-                return;
-              }
-              onExit();
-            }}
-          >
-            <ArrowLeft data-icon="inline-start" />
-            返回阅读
-          </Button>
-          <div className="flex min-w-0 items-center gap-2 text-sm">
-            <WorldSelect
-              label="章节目录"
-              size="sm"
-              className="max-w-md"
-              value={base.id}
-              disabled={
-                generatingDraft ||
-                dirty ||
-                saving ||
-                editingLocked ||
-                writer.busy
-              }
-              title={dirty ? "保存当前章节后可切换" : undefined}
-              onValueChange={(value) => {
-                closeRewrite();
-                setShowDiff(false);
-                onSelectChapter(value);
-              }}
-            >
-              {isNewChapter ? (
-                <SelectItem value={base.id}>{base.title}（新章）</SelectItem>
-              ) : null}
-              {chapters.map((chapter, index) => (
-                <SelectItem key={chapter.id} value={chapter.id}>
-                  {chapter.title || `第${index + 1}章`}
-                </SelectItem>
-              ))}
-            </WorldSelect>
-          </div>
-          <span
-            role="status"
-            className={cn(
-              "min-w-12 shrink-0 whitespace-nowrap text-xs text-muted-foreground",
-              dirty && saveFailed && "text-destructive",
-            )}
-          >
-            {generation && editorBusy
-              ? draftText
-                ? "正在生成…"
-                : "等待输出…"
-              : saving
-                ? "保存中…"
-                : generatingDraft || dirty
-                  ? saveFailed
-                    ? "保存失败"
-                    : generation && writer.draftIncomplete && useGeneratedText
-                      ? "未写完 · 未保存"
-                      : generation &&
-                          writer.generationStopped &&
-                          useGeneratedText
-                        ? "已停止 · 未保存"
-                        : "未保存"
-                  : "已保存"}
-          </span>
-        </div>
-        <div className="ml-auto flex flex-wrap items-center gap-2">
-          {generation && writer.busy ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={writer.stop}
-            >
-              <Square data-icon="inline-start" />
-              停止生成
-            </Button>
-          ) : null}
-          {showDiff ? (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={editorBusy || saving}
-              onClick={() => setShowDiff(false)}
-            >
-              <PencilLine data-icon="inline-start" />
-              返回编辑
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={!dirty || editingLocked || editorBusy || saving}
-              onClick={() => {
-                if (target) closeRewrite();
-                setShowDiff(true);
-              }}
-            >
-              <GitCompareArrows data-icon="inline-start" />
-              查看修改
-            </Button>
-          )}
-          <Button size="sm" disabled={cannotSave} onClick={() => void save()}>
-            <Save data-icon="inline-start" />
-            {generation ? "应用草稿" : "保存章节"}
-          </Button>
-        </div>
-      </div>
-      {showDiff ? (
-        <section className="flex min-h-0 flex-1 flex-col gap-3 p-4 pt-3">
-          {saveFailed && writer.error ? (
-            <p role="alert" className="text-xs text-destructive">
-              {writer.error}
-            </p>
-          ) : null}
-          <ChapterDiffView base={base} draft={currentDraft} />
-        </section>
+  function submitPolish() {
+    if (saving || ended || editorBusy) return;
+    if (target) {
+      if (!draft.text.slice(target.start, target.end).trim()) return;
+      if (
+        !writer.rewrite(draft.id, rewriteRequirements, {
+          range: { start: target.start, end: target.end },
+          compactContext,
+          draft,
+        })
+      )
+        return;
+      if (generation?.kind === "rewrite") onKeepDraft();
+      return;
+    }
+    if (!draftText.trim()) return;
+    if (
+      dirty &&
+      !window.confirm(
+        generation?.kind === "rewrite"
+          ? "重新生成会替换当前草稿，确定继续吗？"
+          : "润色会替换当前草稿，确定继续吗？",
+      )
+    )
+      return;
+    if (!onBeginChapterRewrite(currentDraft)) return;
+    generatedScrollTop.current = null;
+    setRevealedLength(0);
+    setUseGeneratedText(true);
+    setSaveFailed(false);
+  }
+
+  const polishComposer = (
+    <FloatingComposer
+      label={polishLabel}
+      draft={rewriteRequirements.trim()}
+      forceOpen={selectionPending}
+      requestOpen={composerRequest}
+      onFocusInput={() => polishInput.current?.focus({ preventScroll: true })}
+    >
+      {selectionPending && target ? (
+        <RewritePanel
+          embedded
+          key={`${target.start}:${target.end}`}
+          autoFocus={false}
+          isPassage
+          preview={writer.task === "rewrite" ? writer.preview : ""}
+          draftReady={writer.rewriteReady}
+          compactContext={compactContext}
+          onCompactContextChange={onCompactContextChange}
+          writer={writer}
+          ended={ended || !draft.text.slice(target.start, target.end).trim()}
+          onDelete={deleteSelection}
+          onClose={closeRewrite}
+          onApply={() => {
+            const next = writer.applyDraftRewrite(draft);
+            if (!next) return;
+            setDraft(next);
+            setAppliedRange({
+              start: target.start,
+              end: target.start + writer.preview.length,
+            });
+            setTarget(null);
+          }}
+          onRewrite={(requirements) => {
+            clearTimeout(pendingSelection.current);
+            writer.rewrite(draft.id, requirements, {
+              range: { start: target.start, end: target.end },
+              compactContext,
+              draft,
+            });
+          }}
+        />
       ) : (
-        <div
-          className={cn(
-            "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
-            (target || generation) && "@3xl:min-h-72",
-          )}
-        >
-          <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-4">
-            <div className="flex min-h-6 shrink-0 items-center">
-              <h2 className="flex items-center gap-1.5 text-sm font-medium">
-                {generation && editorBusy ? (
-                  <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
-                ) : null}
-                编辑草稿
-              </h2>
-              <span
-                className={cn(
-                  "ml-auto text-xs text-muted-foreground",
-                  exceedsLimit && "text-destructive",
-                )}
+        <ChapterRewriteForm
+          embedded
+          inputRef={polishInput}
+          title={polishLabel}
+          requirements={rewriteRequirements}
+          onChange={onRewriteRequirementsChange}
+          compactContext={compactContext}
+          onCompactContextChange={onCompactContextChange}
+          disabled={
+            ended ||
+            saving ||
+            editorBusy ||
+            (target
+              ? !draft.text.slice(target.start, target.end).trim()
+              : !draftText.trim())
+          }
+          submitLabel={
+            !target && generation?.kind === "rewrite" ? "重新生成" : "开始润色"
+          }
+          onGenerate={submitPolish}
+          onDelete={target ? deleteSelection : undefined}
+        />
+      )}
+    </FloatingComposer>
+  );
+
+  return (
+    <ComposerDock composer={polishAvailable ? polishComposer : null}>
+      <div
+        className={cn(
+          "@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95",
+          polishAvailable && "pb-(--composer-dock-height)",
+        )}
+      >
+        <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
+          <div className="flex min-w-0 max-w-full items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="shrink-0"
+              disabled={editorBusy || editingLocked || saving}
+              onClick={() => {
+                if (generation) {
+                  if (dirty && !window.confirm("确定丢弃草稿并返回阅读吗？"))
+                    return;
+                } else if (!confirmAgentNavigation()) {
+                  return;
+                }
+                onExit();
+              }}
+            >
+              <ArrowLeft data-icon="inline-start" />
+              返回阅读
+            </Button>
+            <div className="flex min-w-0 items-center gap-2 text-sm">
+              <WorldSelect
+                label="章节目录"
+                size="sm"
+                className="max-w-md"
+                value={base.id}
+                disabled={
+                  generatingDraft ||
+                  dirty ||
+                  saving ||
+                  editingLocked ||
+                  writer.busy
+                }
+                title={dirty ? "保存当前章节后可切换" : undefined}
+                onValueChange={(value) => {
+                  closeRewrite();
+                  setShowDiff(false);
+                  onSelectChapter(value);
+                }}
               >
-                {visibleLength} / {maxChapterLength} 字
-              </span>
+                {isNewChapter ? (
+                  <SelectItem value={base.id}>{base.title}（新章）</SelectItem>
+                ) : null}
+                {chapters.map((chapter, index) => (
+                  <SelectItem key={chapter.id} value={chapter.id}>
+                    {chapter.title || `第${index + 1}章`}
+                  </SelectItem>
+                ))}
+              </WorldSelect>
             </div>
-            <div
+            <span
+              role="status"
               className={cn(
-                "relative flex min-h-48 flex-1",
-                target && "@3xl:min-h-0",
+                "min-w-12 shrink-0 whitespace-nowrap text-xs text-muted-foreground",
+                dirty && saveFailed && "text-destructive",
               )}
             >
-              {highlight ? (
-                <div
-                  ref={mirror}
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7 text-transparent"
-                >
-                  {draft.text.slice(0, highlight.start)}
-                  <mark
-                    className={cn(
-                      "text-transparent",
-                      target ? "bg-primary/25" : "bg-emerald-500/25",
-                    )}
-                  >
-                    {draft.text.slice(highlight.start, highlight.end)}
-                  </mark>
-                  {draft.text.slice(highlight.end)}
-                  {"\u200b"}
-                </div>
-              ) : null}
-              <Textarea
-                ref={editor}
-                variant="plain"
-                aria-label="章节正文"
-                readOnly={editorBusy || editingLocked || saving}
-                placeholder={
-                  generation?.kind === "rewrite" && writer.busy
-                    ? "等待输出…"
-                    : undefined
-                }
-                value={visibleText}
-                maxLength={
-                  draftText.length > maxChapterLength
-                    ? undefined
-                    : maxChapterLength
-                }
-                onScroll={(event) => {
-                  if (generatingDraft && useGeneratedText) {
-                    const { scrollTop, scrollHeight, clientHeight } =
-                      event.currentTarget;
-                    generatedScrollTop.current =
-                      scrollHeight - clientHeight - scrollTop <= 2
-                        ? null
-                        : scrollTop;
-                  }
-                  syncMirror();
-                }}
-                onBlur={() => clearTimeout(pendingSelection.current)}
-                onPointerDown={() => clearTimeout(pendingSelection.current)}
-                onChange={(event) => {
-                  clearTimeout(pendingSelection.current);
+              {generation && editorBusy
+                ? draftText
+                  ? "正在生成…"
+                  : "等待输出…"
+                : saving
+                  ? "保存中…"
+                  : generatingDraft || dirty
+                    ? saveFailed
+                      ? "保存失败"
+                      : generation && writer.draftIncomplete && useGeneratedText
+                        ? "未写完 · 未保存"
+                        : generation &&
+                            writer.generationStopped &&
+                            useGeneratedText
+                          ? "已停止 · 未保存"
+                          : "未保存"
+                    : "已保存"}
+            </span>
+          </div>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            {generation && writer.busy ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={writer.stop}
+              >
+                <Square data-icon="inline-start" />
+                停止生成
+              </Button>
+            ) : null}
+            {showDiff ? (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={editorBusy || saving}
+                onClick={() => setShowDiff(false)}
+              >
+                <PencilLine data-icon="inline-start" />
+                返回编辑
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!dirty || editingLocked || editorBusy || saving}
+                onClick={() => {
                   if (target) closeRewrite();
-                  setAppliedRange(null);
-                  setUseGeneratedText(false);
-                  if (generation) writer.backupDraftText(event.target.value);
-                  setDraft({ ...draft, text: event.target.value });
+                  setShowDiff(true);
                 }}
-                onSelect={(event) => {
-                  if (generatingDraft || editingLocked || saving || writer.busy)
-                    return;
-                  const input = event.currentTarget;
-                  clearTimeout(pendingSelection.current);
-                  pendingSelection.current = setTimeout(() => {
-                    if (document.activeElement !== input) return;
-                    const { selectionStart, selectionEnd, selectionDirection } =
-                      input;
-                    const selection = textareaSelectionRange(
-                      draft.text,
-                      selectionStart,
-                      selectionEnd,
-                      selectionDirection,
-                    );
-                    if (!selection) {
-                      if (target) closeRewrite();
-                      return;
-                    }
-                    if (
-                      target?.start === selection.start &&
-                      target.end === selection.end
-                    )
-                      return;
-                    writer.discardRewrite();
-                    setAppliedRange(null);
-                    setTarget(selection);
-                  }, 100);
-                }}
+              >
+                <GitCompareArrows data-icon="inline-start" />
+                查看修改
+              </Button>
+            )}
+            <Button size="sm" disabled={cannotSave} onClick={() => void save()}>
+              <Save data-icon="inline-start" />
+              {generation ? "应用草稿" : "保存章节"}
+            </Button>
+          </div>
+        </div>
+        {showDiff ? (
+          <section className="flex min-h-0 flex-1 flex-col gap-3 p-4 pt-3">
+            {saveFailed && writer.error ? (
+              <p role="alert" className="text-xs text-destructive">
+                {writer.error}
+              </p>
+            ) : null}
+            <ChapterDiffView base={base} draft={currentDraft} />
+          </section>
+        ) : (
+          <div
+            className={cn(
+              "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
+              (target || generation) && "@3xl:min-h-72",
+            )}
+          >
+            <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-4">
+              <div className="flex min-h-6 shrink-0 items-center">
+                <h2 className="flex items-center gap-1.5 text-sm font-medium">
+                  {generation && editorBusy ? (
+                    <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
+                  ) : null}
+                  编辑草稿
+                </h2>
+                <span
+                  className={cn(
+                    "ml-auto text-xs text-muted-foreground",
+                    exceedsLimit && "text-destructive",
+                  )}
+                >
+                  {visibleLength} / {maxChapterLength} 字
+                </span>
+              </div>
+              <div
                 className={cn(
-                  "relative min-h-48 flex-1 resize-none leading-7",
-                  target && "selection:bg-transparent",
+                  "relative flex min-h-48 flex-1",
                   target && "@3xl:min-h-0",
                 )}
-              />
-            </div>
-            {generation ? (
-              <>
-                {writer.draftBackupFailed ? (
-                  <p role="alert" className="text-xs text-destructive">
-                    草稿备份失败，刷新前请先应用草稿或复制正文。
-                  </p>
-                ) : null}
-                {writer.error ? (
-                  <p
-                    role={writer.draftIncomplete ? "status" : "alert"}
-                    className={cn(
-                      "text-xs",
-                      writer.draftIncomplete
-                        ? "text-muted-foreground"
-                        : "text-destructive",
-                    )}
+              >
+                {highlight ? (
+                  <div
+                    ref={mirror}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7 text-transparent"
                   >
-                    {writer.error}
-                  </p>
+                    {draft.text.slice(0, highlight.start)}
+                    <mark
+                      className={cn(
+                        "text-transparent",
+                        target ? "bg-primary/25" : "bg-emerald-500/25",
+                      )}
+                    >
+                      {draft.text.slice(highlight.start, highlight.end)}
+                    </mark>
+                    {draft.text.slice(highlight.end)}
+                    {"\u200b"}
+                  </div>
                 ) : null}
-                {generation.renderForm({
-                  disabled: ended || saving || editorBusy,
-                  onGenerate: () => {
+                <Textarea
+                  ref={editor}
+                  variant="plain"
+                  aria-label="章节正文"
+                  readOnly={editorBusy || editingLocked || saving}
+                  placeholder={
+                    generation?.kind === "rewrite" && writer.busy
+                      ? "等待输出…"
+                      : undefined
+                  }
+                  value={visibleText}
+                  maxLength={
+                    draftText.length > maxChapterLength
+                      ? undefined
+                      : maxChapterLength
+                  }
+                  onScroll={(event) => {
+                    if (generatingDraft && useGeneratedText) {
+                      const { scrollTop, scrollHeight, clientHeight } =
+                        event.currentTarget;
+                      generatedScrollTop.current =
+                        scrollHeight - clientHeight - scrollTop <= 2
+                          ? null
+                          : scrollTop;
+                    }
+                    syncMirror();
+                  }}
+                  onBlur={() => clearTimeout(pendingSelection.current)}
+                  onPointerDown={() => clearTimeout(pendingSelection.current)}
+                  onChange={(event) => {
+                    clearTimeout(pendingSelection.current);
+                    if (target) closeRewrite();
+                    setAppliedRange(null);
+                    setUseGeneratedText(false);
+                    if (generation) writer.backupDraftText(event.target.value);
+                    setDraft({ ...draft, text: event.target.value });
+                  }}
+                  onSelect={(event) => {
                     if (
-                      dirty &&
-                      !window.confirm("重新生成会替换当前草稿，确定继续吗？")
+                      generatingDraft ||
+                      editingLocked ||
+                      saving ||
+                      writer.busy
                     )
                       return;
-                    if (generation.onGenerate()) {
-                      generatedScrollTop.current = null;
-                      setRevealedLength(0);
-                      setUseGeneratedText(true);
-                      setSaveFailed(false);
-                    }
-                  },
-                })}
-              </>
-            ) : null}
-            {target ? (
-              <RewritePanel
-                key={`${target.start}:${target.end}`}
-                autoFocus={false}
-                isPassage
-                preview={writer.task === "rewrite" ? writer.preview : ""}
-                draftReady={writer.rewriteReady}
-                compactContext={compactContext}
-                onCompactContextChange={onCompactContextChange}
-                writer={writer}
-                ended={
-                  ended || !draft.text.slice(target.start, target.end).trim()
-                }
-                onDelete={deleteSelection}
-                onClose={closeRewrite}
-                onApply={() => {
-                  const next = writer.applyDraftRewrite(draft);
-                  if (!next) return;
-                  setDraft(next);
-                  setAppliedRange({
-                    start: target.start,
-                    end: target.start + writer.preview.length,
-                  });
-                  setTarget(null);
-                }}
-                onRewrite={(requirements) => {
-                  clearTimeout(pendingSelection.current);
-                  writer.rewrite(draft.id, requirements, {
-                    range: { start: target.start, end: target.end },
-                    compactContext,
-                    draft,
-                  });
-                }}
-              />
-            ) : null}
-          </section>
-        </div>
-      )}
-    </div>
+                    const input = event.currentTarget;
+                    clearTimeout(pendingSelection.current);
+                    pendingSelection.current = setTimeout(() => {
+                      if (document.activeElement !== input) return;
+                      const {
+                        selectionStart,
+                        selectionEnd,
+                        selectionDirection,
+                      } = input;
+                      const selection = textareaSelectionRange(
+                        draft.text,
+                        selectionStart,
+                        selectionEnd,
+                        selectionDirection,
+                      );
+                      if (!selection) {
+                        if (target) closeRewrite();
+                        return;
+                      }
+                      if (
+                        target?.start === selection.start &&
+                        target.end === selection.end
+                      )
+                        return;
+                      writer.discardRewrite({ selectionOnly: true });
+                      setAppliedRange(null);
+                      setTarget(selection);
+                    }, 100);
+                  }}
+                  className={cn(
+                    "relative min-h-48 flex-1 resize-none leading-7",
+                    target && "selection:bg-transparent",
+                    target && "@3xl:min-h-0",
+                  )}
+                />
+              </div>
+              {generation ? (
+                <>
+                  {writer.draftBackupFailed ? (
+                    <p role="alert" className="text-xs text-destructive">
+                      草稿备份失败，刷新前请先应用草稿或复制正文。
+                    </p>
+                  ) : null}
+                  {writer.error &&
+                  (generation.kind === "chapter" || !selectionPending) ? (
+                    <p
+                      role={writer.draftIncomplete ? "status" : "alert"}
+                      className={cn(
+                        "text-xs",
+                        writer.draftIncomplete
+                          ? "text-muted-foreground"
+                          : "text-destructive",
+                      )}
+                    >
+                      {writer.error}
+                    </p>
+                  ) : null}
+                  {generation.kind === "chapter"
+                    ? generation.renderForm({
+                        disabled: ended || saving || editorBusy,
+                        onGenerate: () => {
+                          if (
+                            dirty &&
+                            !window.confirm(
+                              "重新生成会替换当前草稿，确定继续吗？",
+                            )
+                          )
+                            return;
+                          if (generation.onGenerate()) {
+                            generatedScrollTop.current = null;
+                            setRevealedLength(0);
+                            setUseGeneratedText(true);
+                            setSaveFailed(false);
+                          }
+                        },
+                      })
+                    : null}
+                </>
+              ) : null}
+            </section>
+          </div>
+        )}
+      </div>
+    </ComposerDock>
   );
 }

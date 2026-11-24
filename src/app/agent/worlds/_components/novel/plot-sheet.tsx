@@ -388,7 +388,7 @@ export function PlotSheet({
                 size="sm"
                 variant="ghost"
                 disabled={applying}
-                onClick={writer.discardRewrite}
+                onClick={() => writer.discardRewrite()}
               >
                 丢弃草稿
               </Button>

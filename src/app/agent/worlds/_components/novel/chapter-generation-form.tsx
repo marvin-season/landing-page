@@ -1,6 +1,6 @@
 import { Button, Input, Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { PenLine, WandSparkles } from "lucide-react";
+import { PenLine, Trash2, WandSparkles } from "lucide-react";
 import { type ReactNode, type Ref, useLayoutEffect, useRef } from "react";
 import {
   isChapterTargetValid,
@@ -136,25 +136,31 @@ export function ChapterGenerationForm({
 }
 
 export function ChapterRewriteForm({
+  title = "润色整章",
   requirements,
   onChange,
   compactContext,
   onCompactContextChange,
   disabled,
   embedded,
+  inputRef,
   submitLabel,
   onGenerate,
   onCancel,
+  onDelete,
 }: {
+  title?: string;
   requirements: string;
   onChange: (requirements: string) => void;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
   disabled: boolean;
   embedded?: boolean;
+  inputRef?: Ref<HTMLTextAreaElement>;
   submitLabel: string;
   onGenerate: () => void;
   onCancel?: () => void;
+  onDelete?: () => void;
 }) {
   const instructions = useRef<HTMLTextAreaElement>(null);
   const autoFocus = Boolean(onCancel);
@@ -168,9 +174,9 @@ export function ChapterRewriteForm({
       embedded={embedded}
       onSubmit={() => !disabled && onGenerate()}
     >
-      <h3 className="text-sm font-medium">润色整章</h3>
+      <h3 className="text-sm font-medium">{title}</h3>
       <WritingInstructions
-        ref={instructions}
+        ref={inputRef ?? instructions}
         plain={embedded}
         label="润色指令（选填）"
         value={requirements}
@@ -191,6 +197,20 @@ export function ChapterRewriteForm({
           精简上下文
         </label>
         <div className="ml-auto flex items-center gap-2">
+          {onDelete ? (
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="size-8"
+              aria-label="删除选区"
+              title="删除选区"
+              disabled={disabled}
+              onClick={onDelete}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          ) : null}
           {onCancel ? (
             <Button
               type="button"

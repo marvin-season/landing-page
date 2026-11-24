@@ -8,7 +8,13 @@ import {
 } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { ChevronDown, PenLine } from "lucide-react";
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 export function ComposerDock({
   composer,
@@ -18,34 +24,38 @@ export function ComposerDock({
   children: ReactNode;
 }) {
   const pane = useRef<HTMLDivElement>(null);
-  const dock = useRef<HTMLElement>(null);
+  const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
+  const setDock = useCallback((footer: HTMLElement | null) => {
+    setDockNode(footer);
+  }, []);
 
   useLayoutEffect(() => {
     const container = pane.current;
-    const footer = dock.current;
-    if (!container || !footer) return;
+    if (!container || !dockNode) return;
 
     const syncHeight = () => {
       container.style.setProperty(
         "--composer-dock-height",
-        `${footer.offsetHeight}px`,
+        `${dockNode.offsetHeight}px`,
       );
     };
     syncHeight();
     const observer = new ResizeObserver(syncHeight);
-    observer.observe(footer, { box: "border-box" });
+    observer.observe(dockNode, { box: "border-box" });
     return () => observer.disconnect();
-  }, []);
+  }, [dockNode]);
 
   return (
     <div ref={pane} className="relative flex min-h-0 min-w-0 flex-1 flex-col">
       {children}
-      <footer
-        ref={dock}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-4 pt-1 pb-4 sm:px-6 sm:pb-6"
-      >
-        {composer}
-      </footer>
+      {composer ? (
+        <footer
+          ref={setDock}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-4 pt-1 pb-4 sm:px-6 sm:pb-6"
+        >
+          {composer}
+        </footer>
+      ) : null}
     </div>
   );
 }
