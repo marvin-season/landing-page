@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@landing-page/design-system";
+import { BrandStatusPage } from "@/components/brand-status-page";
+import { SITE_NAME } from "@/lib/site";
 import "@/styles/globals.css";
 
 export default function GlobalError({
@@ -12,32 +15,38 @@ export default function GlobalError({
   return (
     <html lang="zh-CN">
       <head>
-        <title>出错了 · 蜡笔小新</title>
+        <title>{`闹脾气了 · ${SITE_NAME}`}</title>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="min-h-dvh bg-background text-foreground antialiased">
-        <div className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden px-6">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,color-mix(in_oklab,var(--destructive)_10%,transparent),transparent_58%)]"
-          />
-          <div className="relative flex max-w-md flex-col items-center gap-4 text-center">
-            <h1 className="text-6xl font-bold tracking-tight text-black">
-              出错了
-            </h1>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {error.message || "页面遇到了一些问题，请稍后再试。"}
-            </p>
-            <button
-              type="button"
-              onClick={reset}
-              className="mt-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              重试
-            </button>
-          </div>
-        </div>
+      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
+        <BrandStatusPage
+          eyebrow="哎呀"
+          title="闹脾气了"
+          description="页面有点不听话。再试一次，或者先回家看看小新在干嘛。"
+          detail={
+            <>
+              <p className="break-words">
+                {error.message || "页面遇到了一些问题，请稍后再试。"}
+              </p>
+              {error.digest ? (
+                <p className="mt-1 font-mono text-[11px] opacity-70">
+                  {error.digest}
+                </p>
+              ) : null}
+            </>
+          }
+          actions={
+            <>
+              <Button type="button" onClick={reset}>
+                再试一次
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="/">回首页</a>
+              </Button>
+            </>
+          }
+        />
       </body>
     </html>
   );

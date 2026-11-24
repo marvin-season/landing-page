@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { confirmAgentNavigation } from "@/app/agent/_components/use-unsaved-navigation";
+import { BrandStatusPage } from "@/components/brand-status-page";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
   WorldConfig,
@@ -99,16 +100,33 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       setActionPending(false);
     }
   }
-  if (!room)
+  if (!room) {
+    if (chat.error) {
+      return (
+        <BrandStatusPage
+          className="min-h-full"
+          eyebrow="404"
+          title="世界不见了"
+          description="这个世界不存在、被删了，或当前账号看不到。回列表看看别的吧。"
+          detail={<p className="wrap-break-word">{chat.error}</p>}
+          actions={
+            <Button asChild>
+              <Link href="/agent/worlds">返回世界列表</Link>
+            </Button>
+          }
+        />
+      );
+    }
     return (
       <div className="flex min-h-full flex-col items-center justify-center gap-5 p-8 text-foreground">
         <BookOpen className="size-8 text-muted-foreground" />
-        <p>{chat.error || "正在打开世界…"}</p>
+        <p>正在打开世界…</p>
         <Button asChild variant="outline">
           <Link href="/agent/worlds">返回世界列表</Link>
         </Button>
       </div>
     );
+  }
   const loaded = room;
   const { kind } = room;
   const novelMode = kind === "novel";

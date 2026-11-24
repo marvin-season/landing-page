@@ -1,29 +1,23 @@
+import { Button } from "@landing-page/design-system";
 import { MessageSquarePlus } from "lucide-react";
+import { BrandStatusPage } from "@/components/brand-status-page";
 import { Link } from "@/components/link/link";
 
 export default function AgentNotFound() {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-4 py-12 text-center">
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-sm font-medium text-muted-foreground">404</p>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            Conversation not found
-          </h1>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            This conversation does not exist, was deleted, or is not available
-            for the current account.
-          </p>
-        </div>
-
-        <Link
-          href="/agent"
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          <MessageSquarePlus className="size-4" />
-          Start a new conversation
-        </Link>
-      </div>
-    </div>
+    <BrandStatusPage
+      className="min-h-full"
+      eyebrow="404"
+      title="对话不见了"
+      description="这场对话不存在、被删了，或当前账号看不到。开一场新的吧。"
+      actions={
+        <Button asChild>
+          <Link href="/agent">
+            <MessageSquarePlus className="size-4" />
+            开一场新对话
+          </Link>
+        </Button>
+      }
+    />
   );
 }
