@@ -66,6 +66,7 @@ import {
 } from "./model";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
+import { useChapterNavigation } from "./use-chapter-navigation";
 import { useNovel } from "./use-novel";
 
 export type NovelContextBridge = {
@@ -114,8 +115,6 @@ export function NovelPanel({
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
-  const chapterAnchor = useRef<HTMLElement>(null);
-  const scrollChapterIntoView = useRef(false);
   const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
@@ -243,46 +242,18 @@ export function NovelPanel({
         ]
       : []),
   ];
-  const goToChapter = useCallback((id: string) => {
+  const selectChapter = useCallback((id: string) => {
     setAppliedRewrite(undefined);
     setSelected(id);
-    scrollChapterIntoView.current = true;
   }, []);
-  useLayoutEffect(() => {
-    if (!chapter?.id || !scrollChapterIntoView.current) return;
-    scrollChapterIntoView.current = false;
-    chapterAnchor.current?.scrollIntoView({ block: "start" });
-  }, [chapter?.id]);
-  useEffect(() => {
-    if (editingChapter || chapterSwitchLocked) return;
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-      if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey)
-        return;
-      const target = event.target;
-      if (
-        target instanceof HTMLElement &&
-        target.closest(
-          "input, textarea, select, [contenteditable='true'], [role='combobox'], [role='dialog'], [role='listbox'], [role='menu']",
-        )
-      )
-        return;
-      if (document.querySelector("[role='dialog']")) return;
-      const destination =
-        event.key === "ArrowLeft" ? previousChapter : nextChapter;
-      if (!destination) return;
-      event.preventDefault();
-      goToChapter(destination.id);
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [
-    chapterSwitchLocked,
-    editingChapter,
-    goToChapter,
-    nextChapter,
-    previousChapter,
-  ]);
+  const { chapterAnchor, goToChapter } = useChapterNavigation({
+    readingPanel,
+    chapterId: chapter?.id,
+    previousId: previousChapter?.id,
+    nextId: nextChapter?.id,
+    keyboardDisabled: isEditing || chapterSwitchLocked,
+    onSelect: selectChapter,
+  });
   const continuationHint = chapter
     ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。参考范围：当前章及之前。`
     : "续写位置：第1章。参考范围：世界和小说设定。";
@@ -588,10 +559,10 @@ export function NovelPanel({
     <ComposerDock composer={composer}>
       <div
         ref={readingPanel}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable [container-type:size]"
         onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
       >
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 pb-[calc(var(--composer-dock-height,0px)+1.5rem)]">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 [--reading-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)] pb-(--reading-bottom-padding)">
           {fileToolbar
             ? createPortal(
                 <ContextControls
@@ -664,7 +635,10 @@ export function NovelPanel({
             </article>
           ) : null}
           {chapter || thinkingChapter ? (
-            <section ref={chapterAnchor} className="flex flex-col gap-4">
+            <section
+              ref={chapterAnchor}
+              className="flex flex-col gap-4 min-h-[calc(100cqh-var(--reading-bottom-padding))]"
+            >
               <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
                 <ChapterIndex
                   chapters={chapterEntries}

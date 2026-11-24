@@ -62,7 +62,7 @@ export function ChapterReading({
   }
 
   return (
-    <article className="flex flex-col gap-4 pb-8">
+    <article className="flex flex-col gap-4 pb-8 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1 motion-safe:duration-200 motion-safe:ease-out">
       <div className="flex flex-wrap items-center justify-between gap-2">
         {editingTitle ? (
           <Input
