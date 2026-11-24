@@ -11,7 +11,7 @@
 
 **详情页共用部分**：
 
-- [`RoomHeader`](../../src/app/agent/worlds/_components/world-room/room-header.tsx)：标题、运行状态、类型标签、世界侧栏开关和「设定」按钮。剧本运行中或小说生成中时「设定」不可用。剧本对话区和小说阅读区滚到顶部时展开房间顶栏，离开顶部时平滑收起。编辑小说章节或打开世界设定时，房间顶栏立即隐藏。
+- [`RoomHeader`](../../src/app/agent/worlds/_components/world-room/room-header.tsx)：标题、运行状态、类型标签、世界侧栏开关和「设定」按钮。剧本运行中或小说生成中时「设定」不可用。剧本对话区和小说阅读区滚回顶部附近时展开房间顶栏，离开顶部一小段后再平滑收起（带滞回，避免贴顶抖动）。编辑小说章节或打开世界设定时，房间顶栏立即隐藏。
 - [`WorldNotes`](../../src/app/agent/worlds/_components/world-room/world-notes.tsx)：宽屏显示为右侧栏。窄屏时，小说以对话框打开，剧本以抽屉打开。展示角色公开资料、背景、前置剧情、场景、事实、规则；剧本另外显示系统操作者、旁白、剧情摘要、本批发言数与用量，并可点名角色。
 - [`SettingsSheet`](../../src/app/agent/worlds/_components/world-room/settings-sheet.tsx)：上方是 [`ArchiveActions`](../../src/app/agent/worlds/_components/world-room/archive-actions.tsx)（导出、备份、复制世界、结束故事），下方是 `WorldEditor`。小说房间以对话框打开，剧本房间以右侧抽屉打开。故事结束后只保留存档操作。小说房间的编辑器额外显示小说名称、文风、大纲和每章字数，见[小说模式 · 设定来源](./novel-mode.md#3-设定来源)。
 

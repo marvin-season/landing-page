@@ -64,6 +64,7 @@ import {
 } from "./model";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
+import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
 import { useChapterNavigation } from "./use-chapter-navigation";
 import { useNovel } from "./use-novel";
 
@@ -78,7 +79,7 @@ export function NovelPanel({
   fileToolbar,
   onBusyChange,
   onEditingChange,
-  onAtTopChange,
+  onScrollTopChange,
   onContext,
   onChapterStatus,
 }: {
@@ -86,11 +87,15 @@ export function NovelPanel({
   fileToolbar: HTMLElement | null;
   onBusyChange: (busy: boolean) => void;
   onEditingChange: (editing: boolean) => void;
-  onAtTopChange: (atTop: boolean) => void;
+  onScrollTopChange: (scrollTop: number) => void;
   onContext?: (value: NovelContextBridge | null) => void;
   onChapterStatus?: (status: { count: number; saving: boolean }) => void;
 }) {
+  const roomKey = `${room.ownerId}:${room.id}`;
   const [selected, setSelected] = useState<string | null>(null);
+  useLayoutEffect(() => {
+    setSelected(readReadingChapterId(roomKey));
+  }, [roomKey]);
   const [importing, setImporting] = useState(false);
   const [editingChapter, setEditingChapter] = useState<{
     chapter: Chapter;
@@ -122,8 +127,8 @@ export function NovelPanel({
       panel.scrollTop = readingScroll.current;
       readingScroll.current = null;
     }
-    onAtTopChange(panel.scrollTop <= 0);
-  }, [editingChapter, thinkingChapter, onAtTopChange]);
+    onScrollTopChange(panel.scrollTop);
+  }, [editingChapter, thinkingChapter, onScrollTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
   const [composerRequest, setComposerRequest] = useState(0);
   const [polishComposerRequest, setPolishComposerRequest] = useState(0);
@@ -242,6 +247,11 @@ export function NovelPanel({
     setAppliedRewrite(undefined);
     setSelected(id);
   }, []);
+  useEffect(() => {
+    if (!selected || !novel.chapters.some((item) => item.id === selected))
+      return;
+    writeReadingChapterId(roomKey, selected);
+  }, [novel.chapters, roomKey, selected]);
   const { chapterAnchor, goToChapter } = useChapterNavigation({
     readingPanel,
     chapterId: chapter?.id,
@@ -505,7 +515,7 @@ export function NovelPanel({
       <div
         ref={readingPanel}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable @container-size"
-        onScroll={(event) => onAtTopChange(event.currentTarget.scrollTop <= 0)}
+        onScroll={(event) => onScrollTopChange(event.currentTarget.scrollTop)}
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8 [--reading-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)] pb-(--reading-bottom-padding)">
           {fileToolbar

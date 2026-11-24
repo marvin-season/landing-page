@@ -54,6 +54,10 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
   const [novelFileToolbar, setNovelFileToolbar] =
     useState<HTMLDivElement | null>(null);
   const [atContentTop, setAtContentTop] = useState(true);
+  // Hysteresis so the room header does not snap at scrollTop === 0.
+  const onContentScrollTop = useCallback((scrollTop: number) => {
+    setAtContentTop((open) => (open ? scrollTop <= 28 : scrollTop <= 4));
+  }, []);
   const [novelContext, setNovelContext] = useState<NovelWritingContext | null>(
     null,
   );
@@ -223,7 +227,11 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
       <div className="flex h-full min-h-0 flex-col text-foreground">
         {!editing && !(novelMode && novelEditing) ? (
           <Collapsible open={atContentTop} className="shrink-0">
-            <CollapsibleContent variant="collapse" inert={!atContentTop}>
+            <CollapsibleContent
+              variant="collapse"
+              inert={!atContentTop}
+              className="duration-[340ms]! ease-[cubic-bezier(0.22,1,0.36,1)]"
+            >
               <RoomHeader
                 title={loaded.config.title}
                 running={running || novelBusy}
@@ -277,7 +285,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   fileToolbar={novelFileToolbar}
                   onBusyChange={setNovelBusy}
                   onEditingChange={setNovelEditing}
-                  onAtTopChange={setAtContentTop}
+                  onScrollTopChange={onContentScrollTop}
                   onChapterStatus={setNovelChapterStatus}
                   onContext={onNovelContext}
                 />
@@ -329,7 +337,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               >
                 <RoomTranscript
                   room={room}
-                  onAtTopChange={setAtContentTop}
+                  onScrollTopChange={onContentScrollTop}
                   onLoadEarlier={() => void chat.loadEarlier()}
                   onRetry={retryFor}
                 />

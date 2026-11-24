@@ -15,12 +15,12 @@ import { UnfinishedReplyStack } from "./unfinished-reply-stack";
 
 export function RoomTranscript({
   room,
-  onAtTopChange,
+  onScrollTopChange,
   onLoadEarlier,
   onRetry,
 }: {
   room: WorldRoom;
-  onAtTopChange: (atTop: boolean) => void;
+  onScrollTopChange: (scrollTop: number) => void;
   onLoadEarlier: () => void;
   onRetry: (message: WorldMessage) => (() => void) | undefined;
 }) {
@@ -32,7 +32,7 @@ export function RoomTranscript({
       onScrollCapture={(event) => {
         const scrollArea = conversation.current?.scrollRef.current;
         if (scrollArea && event.target === scrollArea) {
-          onAtTopChange(scrollArea.scrollTop <= 0);
+          onScrollTopChange(scrollArea.scrollTop);
         }
       }}
     >
