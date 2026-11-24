@@ -59,7 +59,6 @@ function syncPromptText(reason: NovelSyncDivergence) {
 export function NovelFileControls({
   toolbar,
   disabled,
-  canSummarize,
   hasChapters,
   importing,
   onImportingChange,
@@ -72,7 +71,6 @@ export function NovelFileControls({
   canRestoreLocal,
   syncPrompt,
   serverSynced,
-  onSummarize,
 }: {
   toolbar: HTMLElement | null;
   disabled: boolean;
@@ -176,26 +174,6 @@ export function NovelFileControls({
                   >
                     <FileText />
                     导出整本 TXT
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={!hasChapters}
-                    onSelect={() => onDownload("md")}
-                  >
-                    <FileText />
-                    导出整本 Markdown
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={
-                      disabled ||
-                      importing ||
-                      forking ||
-                      !canSummarize ||
-                      !hasChapters
-                    }
-                    onSelect={onSummarize}
-                  >
-                    <Download />
-                    总结并导出背景
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 {isDevelopment ? (
