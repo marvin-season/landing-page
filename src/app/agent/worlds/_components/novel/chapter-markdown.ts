@@ -8,11 +8,10 @@ import type { ChapterTextRange } from "./chapter-text";
 
 type MarkdownChild = MarkdownTree["children"][number];
 type Element = Extract<MarkdownChild, { type: "element" }>;
-const inlineFormatting = new Set(["a", "del", "em", "strong"]);
 const inlineParser = unified().use(remarkParse);
 
-// Convert rendered text boundaries back to source positions, including Markdown
-// escapes and entities. Only the edges of a transformed token are selectable.
+// Map rendered text offsets back to Markdown source positions so rewrite marks
+// stay aligned across escapes and entities.
 export function sourceOffsets(raw: string, visible: string) {
   const offsets = [0];
   const tokens =
@@ -57,14 +56,8 @@ function markText(
   if (start < 0 || end < 0) return [node];
 
   if (node.type === "element") {
-    if (inlineFormatting.has(node.tagName)) {
-      node.properties.dataFormatStart = start;
-      node.properties.dataFormatEnd = end;
-    }
     // Syntax-highlighted code and images may not have positioned text children.
     if (["pre", "code", "img"].includes(node.tagName)) {
-      node.properties.dataSourceStart = start;
-      node.properties.dataSourceEnd = end;
       if (range && start < range.end && end > range.start)
         node.properties.dataRewriteMark = "";
       return [node];
@@ -76,27 +69,30 @@ function markText(
   }
 
   if (node.type !== "text" || !node.value) return [node];
+  if (!range || start >= range.end || end <= range.start) return [node];
 
   const { value } = node;
   const raw = source.slice(start, end);
   const offsets = raw === value ? undefined : sourceOffsets(raw, value);
-  function span(from: number, to: number, marked = false): Element {
+  function slice(from: number, to: number, marked = false): MarkdownChild {
+    const text: MarkdownChild = {
+      type: "text",
+      value: value.slice(from, to),
+    };
+    if (!marked) return text;
     const left = offsets === null ? start : start + (offsets?.[from] ?? from);
     const right = offsets === null ? end : start + (offsets?.[to] ?? to);
     return {
       type: "element",
-      tagName: marked ? "mark" : "span",
+      tagName: "mark",
       properties: {
         dataSourceStart: left,
         dataSourceEnd: right,
-        ...(marked ? { dataRewriteMark: "" } : {}),
+        dataRewriteMark: "",
       },
-      children: [{ type: "text", value: value.slice(from, to) }],
+      children: [text],
     };
   }
-
-  if (!range || start >= range.end || end <= range.start)
-    return [span(0, node.value.length)];
 
   const from = offsets
     ? offsets.findLastIndex(
@@ -112,9 +108,9 @@ function markText(
       ? node.value.length
       : Math.min(to, node.value.length);
   return [
-    ...(left > 0 ? [span(0, left)] : []),
-    span(left, right, true),
-    ...(right < node.value.length ? [span(right, node.value.length)] : []),
+    ...(left > 0 ? [slice(0, left)] : []),
+    slice(left, right, true),
+    ...(right < node.value.length ? [slice(right, node.value.length)] : []),
   ];
 }
 

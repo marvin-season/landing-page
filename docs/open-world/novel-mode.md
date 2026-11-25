@@ -24,8 +24,8 @@
 | [`plot-edit.ts`](../../src/app/agent/worlds/_components/novel/plot-edit.ts) | 剧情粘合、合并、插入、拆分的上下文构造、草稿解析与应用 |
 | [`context-compression.ts`](../../src/app/agent/worlds/_components/novel/context-compression.ts) | 续写请求预算、摘要分批和覆盖范围 |
 | [`import-novel.ts`](../../src/app/agent/worlds/_components/novel/import-novel.ts) | TXT / Markdown 解析为章节 |
-| `chapter-editor.tsx`、`rewrite-form.tsx`、`chapter-diff(-view)`、`chapter-text.ts` | 居中编辑草稿、底部润色输入、行对齐与逐字差异、textarea 偏移与选段替换 |
-| `chapter-rewrite.tsx`、`chapter-markdown.ts` | 阅读模式渲染，将 Markdown 渲染结果映射回原文位置，用于高亮润色范围 |
+| `chapter-editor.tsx`、`chapter-generation-form.tsx`、`chapter-diff(-view)`、`chapter-text.ts` | 居中编辑草稿、底部润色输入、行对齐与逐字差异、textarea 偏移与选段替换 |
+| `chapter-rewrite.tsx`、`chapter-markdown.ts` | 阅读模式渲染与润色范围高亮 |
 | `plot-sheet.tsx`、`context-controls.tsx`、`background-controls.tsx` | 剧情整理、续写上下文与分支、导入导出与背景总结 |
 | [`novel.ts`](../../src/lib/group-chat/novel.ts) | `/api/novel` 服务端处理 |
 

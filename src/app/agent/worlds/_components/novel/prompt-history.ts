@@ -3,8 +3,6 @@ import Dexie, { type EntityTable } from "dexie";
 export type NovelPrompt = {
   id: number;
   roomKey: string;
-  /** @deprecated Kept for older IndexedDB rows; new records omit kind. */
-  kind?: string;
   text: string;
   createdAt: number;
 };

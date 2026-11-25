@@ -28,14 +28,3 @@ export async function writeChapterEditorDraft(
   if (text === undefined) await drafts.delete([roomKey, chapterId]);
   else await drafts.put({ roomKey, chapterId, text });
 }
-
-export async function migrateChapterEditorDraft(
-  roomKey: string,
-  chapterId: string,
-  text: string,
-) {
-  await db.transaction("rw", drafts, async () => {
-    if (!(await drafts.get([roomKey, chapterId])))
-      await drafts.add({ roomKey, chapterId, text });
-  });
-}

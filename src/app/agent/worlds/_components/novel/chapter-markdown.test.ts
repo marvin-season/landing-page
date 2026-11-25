@@ -11,7 +11,7 @@ test("rewrite marks only the requested occurrence without losing Markdown format
   const markup = renderToStaticMarkup(
     renderChapterMarkdown(chapter, { start, end }),
   );
-  assert.match(markup, /<strong[^>]*><span[^>]*>门开了<\/span><\/strong>/);
+  assert.match(markup, /<strong[^>]*>门开了<\/strong>/);
   assert.match(
     markup,
     new RegExp(
@@ -21,7 +21,7 @@ test("rewrite marks only the requested occurrence without losing Markdown format
   assert.equal(markup.match(/<mark/g)?.length, 1);
 });
 
-test("a rendered selection maps across entities, escapes, and Windows line endings", () => {
+test("sourceOffsets maps across entities, escapes, and Windows line endings", () => {
   const raw = "甲 &amp; \\*\r\n门开了 &lt;";
   const visible = "甲 & *\n门开了 <";
   const offsets = sourceOffsets(raw, visible);

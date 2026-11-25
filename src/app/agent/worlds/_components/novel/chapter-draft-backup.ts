@@ -2,7 +2,7 @@ import Dexie, { type Table } from "dexie";
 import { z } from "zod";
 
 const draftSchema = z.object({
-  mode: z.enum(["chapter", "rewrite"]),
+  mode: z.literal("chapter"),
   chapter: z.object({
     id: z.string().min(1),
     title: z.string(),
@@ -12,8 +12,6 @@ const draftSchema = z.object({
   text: z.string(),
   version: z.number().int(),
   afterChapterId: z.string().min(1).nullable().optional(),
-  requirements: z.string().optional(),
-  compactContext: z.boolean().optional(),
   manual: z.boolean().optional(),
 });
 
@@ -28,7 +26,6 @@ export function createChapterDraftBackup(
   roomKey: string,
   onError: (failed: boolean) => void,
 ) {
-  const legacyKey = `novel-draft:v1:${roomKey}`;
   let draft: ChapterDraftBackup | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let pending = false;
@@ -43,11 +40,6 @@ export function createChapterDraftBackup(
     const write = transaction.then(
       () => {
         if (latestWrite !== write) return;
-        try {
-          window.localStorage.removeItem(legacyKey);
-        } catch {
-          // The IndexedDB transaction already completed.
-        }
         onError(false);
       },
       () => {
@@ -70,18 +62,8 @@ export function createChapterDraftBackup(
     async read() {
       try {
         const stored = await continuations.get(roomKey);
-        const raw =
-          !stored && typeof window !== "undefined"
-            ? window.localStorage.getItem(legacyKey)
-            : null;
-        const value = draftSchema.safeParse(
-          stored ?? (raw ? JSON.parse(raw) : null),
-        );
-        draft = value?.success && value.data.text.trim() ? value.data : null;
-        if (draft?.mode === "chapter" && raw) {
-          pending = true;
-          await flush();
-        }
+        const value = draftSchema.safeParse(stored);
+        draft = value.success && value.data.text.trim() ? value.data : null;
         return draft;
       } catch {
         return null;

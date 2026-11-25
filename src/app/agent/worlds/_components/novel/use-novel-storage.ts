@@ -15,7 +15,6 @@ import {
   type ChapterDraftBackup,
   createChapterDraftBackup,
 } from "./chapter-draft-backup";
-import { migrateChapterEditorDraft } from "./chapter-editor-drafts";
 import {
   createNovel,
   exportNovel,
@@ -158,15 +157,7 @@ export function useNovelStorage(
           const current = latest.current.chapters.find(
             ({ id }) => id === restored.chapter.id,
           );
-          if (restored.mode === "rewrite") {
-            try {
-              if (current && current.text !== restored.text)
-                await migrateChapterEditorDraft(key, current.id, restored.text);
-              if (active) backup.clear();
-            } catch {
-              if (active) setDraftBackupFailed(true);
-            }
-          } else if (current) {
+          if (current) {
             backup.clear();
           } else {
             restoreEditor(restored);
