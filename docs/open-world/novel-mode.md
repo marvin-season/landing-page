@@ -55,7 +55,7 @@ type Novel = {
 
 ## 4. Writer 任务与上下文
 
-请求体为 `{ roomId, prompt, task }`，外层 `task` 取 `chapter`、`rewrite` 或 `summary`。`prompt` 是在浏览器中构造的 JSON 文本。写章和编辑共用固定的 Writer 通用指令；本次操作的范围、衔接要求和输出格式写入 `prompt` 内的 `task.instructions`，作者输入单独放在 `task.requirements`。粘合只要求输出 `{ ending, opening }` JSON，其他写章和编辑操作只要求输出正文。
+请求体为 `{ roomId, prompt, task }`，外层 `task` 取 `chapter`、`rewrite` 或 `summary`。浏览器按本次操作选取上下文并组装成 `prompt` 内的 JSON 字段。写章和编辑共用固定的 Writer 通用指令；`task.instructions` 只写本次操作的范围、衔接要求和输出格式，作者输入单独放在 `task.requirements`。粘合只要求输出 `{ ending, opening }` JSON，其他写章和编辑操作只要求输出正文。
 
 - **完整世界设定**：整个 `WorldConfig`。
 - **世界基本设定**：`title`、`background`、`scene`、`rules`、`facts`、`storyGoal`、`characters`，不含 `priorContext`。

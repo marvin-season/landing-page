@@ -161,7 +161,7 @@ export function chapterPrompt(
       chapter: through + 1,
       targetWords: Number(novel.words),
       maxCharacters: maxChapterLength,
-      instructions: `创作 task.chapter 对应的一章。若提供 archivedChapters，结合摘要与 completedChapters 确定续写起点的人物状态和剧情；若 archivedChapters.throughChapter 不小于 task.chapter，只把摘要中发生在目标章之前的情节当作前文，不从摘要末尾接写，也不提前写入或泄露后续情节。world.priorContext 和 importedBackground 只作前置背景，不复述。若有前文，对照大纲确定当前阶段，承接上一章末尾，只推进 task.requirements 对应的这一步。${newChapterOutput}`,
+      instructions: `创作 task.chapter 对应的一章。承接目标章之前的剧情，按大纲和本次要求推进，不提前写入或泄露后续情节。${newChapterOutput}`,
       requirements: novel.chapterGoal || "承接前文与大纲，推进下一阶段情节。",
     },
   });
@@ -302,8 +302,8 @@ export function insertChapterPrompt(
     maxCharacters: maxChapterLength,
     instructions: `${
       index === 0
-        ? "根据世界基本设定、novel 设定与 task.requirements 创作新的开篇。"
-        : "在 previousChapters 和 followingChapters 之间补写一章。开篇承接上一章末尾，收尾衔接下一章开篇。两侧正文固定，不复述或改写，不提前兑现下文的事件、转折或伏笔。"
+        ? "创作新的开篇。"
+        : "在所选两章之间补写一章。开篇承接上一章末尾，收尾衔接下一章开篇。两侧正文固定，不复述或改写，不提前兑现下文的事件、转折或伏笔。"
     }${newChapterOutput}`,
     requirements:
       requirements.trim() ||
@@ -421,23 +421,14 @@ export function rewritePrompt(
   const output =
     "严格不超过 task.maxCharacters 字符。不添加章名、说明、改动清单或代码围栏。";
   const scope = selection
-    ? "只输出 selection.text 的完整替换正文。接上 selection.before 的末尾和 selection.after 的开头；两侧正文固定，绝不重复。保持原选段的人称、时态、叙述视角和起止边界，确保可直接嵌回原位。"
-    : "只输出 targetChapter.text 的完整替换正文，保持原章的叙述视角和起止边界，保留关键事件和后文依赖的事实。";
-  const prior = [
-    history.archivedChapters
-      ? "归档摘要仅作参照；即使覆盖到本章或后续章节，也不得提前写入后文才发生的事件。"
-      : "",
-    history.completedChapters?.length &&
-    (!selection || !selection.before.trim())
-      ? "章首承接 completedChapters 中最后一章的结尾，前文保持不变。"
-      : "",
-  ].join("");
+    ? "只输出 selection.text 的完整替换正文。与两侧未选正文自然衔接，不改写或重复它们。保持原选段的人称、时态、叙述视角和起止边界，确保可直接嵌回原位。"
+    : "只输出 targetChapter.text 的完整替换正文。承接前文，保持原章的叙述视角和起止边界，保留关键事件和后文依赖的事实。";
   const prompt = JSON.stringify({
     ...history,
     ...writerPreset(config, novel),
     targetChapter,
     task: {
-      instructions: `${scope}${prior}${output}`,
+      instructions: `${scope}${output}`,
       maxCharacters: Math.max(
         0,
         maxChapterLength -

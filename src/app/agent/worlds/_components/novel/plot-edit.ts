@@ -109,7 +109,7 @@ export function preparePlotEdit(
         mode,
         maxCharacters: maxChapterLength,
         instructions:
-          "targetChapter.text 是按章序排列的 JSON 数组，每项含 title 和 text。把所选章节压缩重写为一章完整正文，保留关键事件的因果、伏笔与人物变化，删去重复铺垫、过渡套话、章名与分节符。若提供了前后章节片段，分别承接和衔接；它们是固定正文，不复述或改写。只输出合并后的纯正文，严格不超过 task.maxCharacters 字符，不输出章名、JSON、说明或代码围栏。",
+          "把所选章节压缩重写为一章完整正文，保留关键事件的因果、伏笔与人物变化，删去重复铺垫、过渡套话、章名与分节符。承接前文并衔接后文，不复述或改写两侧正文。只输出合并后的纯正文，严格不超过 task.maxCharacters 字符，不输出章名、JSON、说明或代码围栏。",
         requirements: request || undefined,
       },
     });
@@ -182,7 +182,7 @@ export function preparePlotEdit(
       endingMaxCharacters: endingLimit,
       openingMaxCharacters: openingLimit,
       instructions:
-        'targetChapter.text 含相邻两章的 ending 和 opening。只改写这两段以消除生硬跳切、重复叙述或时间断层，保留两章分界和关键事件。ending 接在 unchangedBefore 末尾，opening 接到 unchangedAfter 开头；固定原文不可改写或复述。只输出一个无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，两段分别不超过 task.endingMaxCharacters 和 task.openingMaxCharacters 字符。',
+        '只改写前章结尾 ending 和后章开头 opening，消除生硬跳切、重复叙述或时间断层，保留两章分界和关键事件。ending 接在 unchangedBefore 末尾，opening 接到 unchangedAfter 开头；固定原文不可改写或复述。只输出一个无代码围栏的合法 JSON 对象 {"ending":"...","opening":"..."}，两段分别不超过 task.endingMaxCharacters 和 task.openingMaxCharacters 字符。',
       requirements: request,
     },
   });
