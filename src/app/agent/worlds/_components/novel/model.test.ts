@@ -29,7 +29,7 @@ import {
   writerInstructions,
 } from "./model";
 
-test("continuation sends chapters only through the selected one and never sends an archive covering later chapters", () => {
+test("continuation sends only saved prose through the selected chapter when there is no archive", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [
@@ -37,7 +37,6 @@ test("continuation sends chapters only through the selected one and never sends 
     { id: "selected", title: "第2章", text: "从这里继续。" },
     { id: "later", title: "第3章", text: "已有后文。" },
   ];
-  novel.checkpoint = { throughChapterId: "later", summary: "包含后文的摘要。" };
   const through = continuationIndex(novel, "selected");
   assert.equal(through, 2);
   const prompt = JSON.parse(chapterPrompt(config, novel, through));
@@ -47,10 +46,36 @@ test("continuation sends chapters only through the selected one and never sends 
     { title: "第2章", text: "从这里继续。" },
   ]);
   assert.equal(prompt.archivedChapters, undefined);
-  novel.checkpoint = { throughChapterId: "first", summary: "开篇摘要。" };
-  const summarized = JSON.parse(chapterPrompt(config, novel, through));
-  assert.equal(summarized.archivedChapters.summary, "开篇摘要。");
-  assert.deepEqual(summarized.completedChapters, [prompt.completedChapters[1]]);
+});
+
+test("continuation always uses the archive and only adds uncovered prose through the selected chapter", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "first", title: "第1章", text: "归档的开篇。" },
+    { id: "archived", title: "第2章", text: "归档的结尾。" },
+    { id: "new", title: "第3章", text: "压缩后写的正文。" },
+    { id: "selected", title: "第4章", text: "从这里继续。" },
+    { id: "later", title: "第5章", text: "未选中的后文。" },
+  ];
+  novel.checkpoint = { throughChapterId: "archived", summary: "既有摘要。" };
+  for (const through of [0, 1, 2, 4]) {
+    const prompt = JSON.parse(chapterPrompt(config, novel, through));
+    assert.equal(prompt.task.chapter, through + 1);
+    assert.deepEqual(prompt.archivedChapters, {
+      throughChapter: 2,
+      summary: "既有摘要。",
+    });
+    assert.deepEqual(
+      prompt.completedChapters,
+      through === 4
+        ? [
+            { title: "第3章", text: "压缩后写的正文。" },
+            { title: "第4章", text: "从这里继续。" },
+          ]
+        : [],
+    );
+  }
 });
 
 test("saving a continuation inserts it after its anchor and preserves existing downstream prose", () => {
@@ -323,12 +348,10 @@ test("a passage rewrite sends the unselected text and replaces only the selected
     after: "\r\n\r\n灯亮了。",
   });
   assert.equal(prompt.targetChapter.text, undefined);
-  assert.deepEqual(Object.keys(prompt), [
-    "world",
-    "novel",
-    "targetChapter",
-    "task",
+  assert.deepEqual(prompt.completedChapters, [
+    { title: "上章", text: "门外很安静。" },
   ]);
+  assert.equal(prompt.followingChapters, undefined);
   assert.deepEqual(prompt.world.characters, config.characters);
   assert.equal(prompt.novel.style, novel.style);
   assert.match(prompt.task.instructions, /selection\.text 的完整替换正文/);
@@ -362,7 +385,7 @@ test("a passage rewrite sends the unselected text and replaces only the selected
   );
 });
 
-test("whole chapter rewrite sends all preceding chapters and only the immediate next chapter", () => {
+test("whole chapter rewrite sends the archive, uncovered preceding prose and the complete target", () => {
   const config = {
     ...loadWorldTemplates()[0].config,
     priorContext: "旧城来信",
@@ -379,43 +402,43 @@ test("whole chapter rewrite sends all preceding chapters and only the immediate 
   novel.background = createBackground(config, novel, "导入的背景摘要");
   novel.checkpoint = { throughChapterId: "start", summary: "归档剧情摘要" };
   const prompt = JSON.parse(rewritePrompt(config, novel, "b", "  缩短对白  "));
-  assert.deepEqual(prompt.previousChapters, [
-    { chapter: 1, title: "序章", text: "她来到旧城。" },
-    { chapter: 2, title: "初遇", text: "她在门前停下。" },
+  assert.deepEqual(prompt.completedChapters, [
+    { title: "初遇", text: "她在门前停下。" },
   ]);
   assert.deepEqual(prompt.targetChapter, {
     chapter: 3,
     title: "交锋",
     text: "她把钥匙交给他。",
   });
-  assert.deepEqual(prompt.followingChapters, [
-    { chapter: 4, title: "开门", text: "他掏出钥匙。" },
-  ]);
+  assert.equal(prompt.followingChapters, undefined);
   assert.equal(prompt.task.requirements, "缩短对白");
   assert.match(prompt.task.instructions, /targetChapter\.text 的完整替换正文/);
   assert.doesNotMatch(
     prompt.task.instructions,
     /selection\.|endingMaxCharacters|JSON/,
   );
-  assert.equal(prompt.world.priorContext, undefined);
-  assert.deepEqual(prompt.world.characters, config.characters);
-  assert.equal(prompt.archivedChapters, undefined);
+  assert.deepEqual(prompt.world, config);
+  assert.deepEqual(prompt.novel, {
+    title: novel.title,
+    style: novel.style,
+    outline: novel.outline,
+  });
+  assert.deepEqual(prompt.archivedChapters, {
+    throughChapter: 1,
+    summary: "归档剧情摘要",
+  });
   assert.equal(prompt.importedBackground, undefined);
   assert.equal(JSON.stringify(prompt).includes(novel.chapterGoal), false);
-  assert.deepEqual(
-    JSON.parse(rewritePrompt(config, novel, "start", "")).previousChapters,
-    [],
-  );
-  assert.deepEqual(
-    JSON.parse(rewritePrompt(config, novel, "end", "")).followingChapters,
-    [],
-  );
+  const earlier = JSON.parse(rewritePrompt(config, novel, "start", ""));
+  assert.deepEqual(earlier.completedChapters, []);
+  assert.deepEqual(earlier.archivedChapters, prompt.archivedChapters);
+  assert.match(earlier.task.instructions, /不得提前写入后文/);
 });
 
-test("compact rewrite sends world settings and requirements with only the selected text or target chapter prose", () => {
+test("compact passage rewrite skips the shared history but retains the target chapter and recent prose", () => {
   const config = {
     ...loadWorldTemplates()[0].config,
-    priorContext: "世界前情不发送",
+    priorContext: "世界预设前情",
   };
   const novel = createNovel(config);
   const selected = "她收起钥匙。";
@@ -430,61 +453,77 @@ test("compact rewrite sends world settings and requirements with only the select
   novel.checkpoint = { throughChapterId: "a", summary: "归档剧情摘要" };
   novel.outline = "单独编辑的小说大纲";
 
+  const range = { start: before.length, end: before.length + selected.length };
+  const normal = JSON.parse(
+    rewritePrompt(config, novel, "c", "收紧节奏", range),
+  );
   const prompt = JSON.parse(
+    rewritePrompt(config, novel, "c", "  收紧节奏  ", range, true),
+  );
+  assert.deepEqual(normal.archivedChapters, {
+    throughChapter: 1,
+    summary: "归档剧情摘要",
+  });
+  assert.equal(prompt.archivedChapters, undefined);
+  assert.equal(prompt.importedBackground, undefined);
+  assert.deepEqual(prompt.completedChapters, [
+    { title: "上一章", text: "她推开了门。" },
+  ]);
+  assert.deepEqual(normal.completedChapters, prompt.completedChapters);
+  assert.deepEqual(prompt.targetChapter, {
+    chapter: 3,
+    title: "本章",
+    selection: { before, text: selected, after: "未选中的结尾。" },
+  });
+  assert.deepEqual(prompt.targetChapter, normal.targetChapter);
+  assert.match(prompt.task.instructions, /人称、时态、叙述视角和起止边界/);
+  assert.equal(prompt.task.requirements, "收紧节奏");
+  assert.equal(
+    prompt.task.maxCharacters,
+    8000 - (novel.chapters[2].text.length - selected.length),
+  );
+  assert.deepEqual(prompt.world, config);
+  assert.deepEqual(prompt.novel, {
+    title: novel.title,
+    style: novel.style,
+    outline: novel.outline,
+  });
+
+  const uncompressed = JSON.parse(
     rewritePrompt(
       config,
-      novel,
+      { ...novel, checkpoint: undefined },
       "c",
-      "  收紧节奏  ",
-      { start: before.length, end: before.length + selected.length },
+      "",
+      range,
       true,
     ),
   );
-  const { instructions, ...task } = prompt.task;
-  assert.match(instructions, /人称、时态、叙述视角和起止边界/);
-  assert.doesNotMatch(
-    instructions,
-    /previousChapters|followingChapters|selection\.before|selection\.after/,
-  );
-  assert.deepEqual(
-    { ...prompt, task },
-    {
-      world: {
-        title: config.title,
-        background: config.background,
-        scene: config.scene,
-        rules: config.rules,
-        facts: config.facts,
-        storyGoal: config.storyGoal,
-        characters: config.characters,
-      },
-      novel: { style: novel.style },
-      targetChapter: { selection: { text: selected } },
-      task: {
-        maxCharacters: 8000 - (novel.chapters[2].text.length - selected.length),
-        requirements: "收紧节奏",
-      },
-    },
-  );
+  assert.equal(uncompressed.completedChapters, undefined);
+  assert.equal(uncompressed.importedBackground, undefined);
+  assert.deepEqual(uncompressed.targetChapter, prompt.targetChapter);
+});
 
-  novel.chapters[1].text = "长".repeat(maxNovelPromptLength);
+test("compact whole chapter rewrite keeps only the target and presets", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "a", title: "更早", text: "旧事。" },
+    { id: "b", title: "上一章", text: "长".repeat(maxNovelPromptLength) },
+    { id: "c", title: "本章", text: "她收起钥匙。" },
+  ];
+  novel.checkpoint = { throughChapterId: "a", summary: "归档剧情摘要" };
   const compactChapter = JSON.parse(
     rewritePrompt(config, novel, "c", "收紧节奏", undefined, true),
   );
-  const { instructions: wholeInstructions, ...wholeTask } = compactChapter.task;
-  assert.match(wholeInstructions, /targetChapter\.text/);
-  assert.doesNotMatch(
-    wholeInstructions,
-    /previousChapters|followingChapters|selection/,
-  );
-  assert.deepEqual(
-    { ...compactChapter, task: wholeTask },
-    {
-      ...prompt,
-      targetChapter: { text: novel.chapters[2].text },
-      task: { ...task, maxCharacters: 8000 },
-    },
-  );
+  assert.match(compactChapter.task.instructions, /targetChapter\.text/);
+  assert.equal(compactChapter.archivedChapters, undefined);
+  assert.equal(compactChapter.completedChapters, undefined);
+  assert.deepEqual(compactChapter.targetChapter, {
+    chapter: 3,
+    title: "本章",
+    text: "她收起钥匙。",
+  });
 
   novel.chapters[2].text = "长".repeat(maxNovelPromptLength);
   assert.throws(
@@ -493,7 +532,7 @@ test("compact rewrite sends world settings and requirements with only the select
   );
 });
 
-test("passage rewrites at chapter boundaries send only the corresponding neighboring excerpt", () => {
+test("passage rewrites at either chapter boundary use only preceding chapters as prose context", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   const target = "第一句。最后一句。";
@@ -510,21 +549,18 @@ test("passage rewrites at chapter boundaries send only the corresponding neighbo
   const ending = JSON.parse(
     rewritePrompt(config, novel, "target", "", fromEnd),
   );
-  assert.deepEqual(opening.previousChapters, [
-    { chapter: 1, title: "上章", text: novel.chapters[0].text.slice(-600) },
+  assert.deepEqual(opening.completedChapters, [
+    { title: "上章", text: novel.chapters[0].text },
   ]);
   assert.equal(opening.followingChapters, undefined);
-  assert.match(opening.task.instructions, /章首承接 previousChapters/);
-  assert.equal(ending.previousChapters, undefined);
-  assert.deepEqual(ending.followingChapters, [
-    { chapter: 3, title: "下章", text: novel.chapters[2].text.slice(0, 600) },
-  ]);
-  assert.match(ending.task.instructions, /章末衔接 followingChapters/);
+  assert.match(opening.task.instructions, /章首承接 completedChapters/);
+  assert.deepEqual(ending.completedChapters, opening.completedChapters);
+  assert.equal(ending.followingChapters, undefined);
   const compact = JSON.parse(
     rewritePrompt(config, novel, "target", "", fromStart, true),
   );
-  assert.equal(compact.previousChapters, undefined);
-  assert.doesNotMatch(compact.task.instructions, /previousChapters/);
+  assert.equal(compact.completedChapters, undefined);
+  assert.doesNotMatch(compact.task.instructions, /completedChapters/);
 });
 
 test("whole chapter rewrite asks for compact mode when preceding chapters exceed the request limit", () => {
@@ -543,10 +579,8 @@ test("whole chapter rewrite asks for compact mode when preceding chapters exceed
   );
   novel.chapters[0].text = "旧事。";
   const prompt = JSON.parse(rewritePrompt(config, novel, "c", ""));
-  assert.equal(prompt.previousChapters.length, 2);
-  assert.deepEqual(prompt.followingChapters, [
-    { chapter: 4, title: "后一章", text: "她回到家。" },
-  ]);
+  assert.equal(prompt.completedChapters.length, 2);
+  assert.equal(prompt.followingChapters, undefined);
 });
 
 test("a draft passage rewrite uses the edited snapshot and leaves the saved chapter intact", () => {

@@ -584,7 +584,7 @@ export function useNovel(
       novel,
       config: room.config,
       through,
-      cursor: initialCompressionCursor(novel, through),
+      cursor: initialCompressionCursor(novel),
       budget: novelRequestBudget,
       retries: 0,
     };

@@ -46,7 +46,7 @@ test("compression options set the target for the entire rolling summary and forw
   );
   assert.ok(batch);
   const { task, completedChapters } = JSON.parse(batch.prompt);
-  assert.equal(task.targetCharacters, 300);
+  assert.equal(task.targetCharacters, 450);
   assert.equal(task.requirements, "优先保留伏笔和人物约定。");
   assert.equal(completedChapters[0].text.length, 500);
   const automatic = planCompressionBatch(
@@ -59,6 +59,17 @@ test("compression options set the target for the entire rolling summary and forw
   );
   assert.ok(automatic);
   assert.equal(JSON.parse(automatic.prompt).task.targetCharacters, 750);
+  const leastCompressed = planCompressionBatch(
+    roomId,
+    config,
+    novel,
+    cursor,
+    2,
+    novelRequestBudget,
+    { rate: 10, instructions: "" },
+  );
+  assert.ok(leastCompressed);
+  assert.equal(JSON.parse(leastCompressed.prompt).task.targetCharacters, 1050);
 });
 
 test("budgets serialized request bytes separately from prompt characters", () => {
@@ -91,7 +102,7 @@ test("rolling compression covers a multi-request manuscript in order and retains
   }));
   novel.background = createBackground(config, novel, "之前有个约定。");
   const through = novel.chapters.length;
-  let cursor = initialCompressionCursor(novel, through);
+  let cursor = initialCompressionCursor(novel);
   let batches = 0;
   assert.equal(
     fitsNovelRequest(roomId, chapterPrompt(config, novel), "chapter"),
@@ -140,7 +151,24 @@ test("rolling compression covers a multi-request manuscript in order and retains
   assert.equal(compressed.chapters, novel.chapters);
   assert.equal(exportNovel(compressed, "md"), exportNovel(novel, "md"));
   assert.equal(novel.checkpoint, undefined);
-  assert.equal(initialCompressionCursor(compressed, 48).index, 0);
+  const resume = initialCompressionCursor(compressed);
+  const earlierPayload = JSON.parse(
+    compressedChapterPrompt(config, compressed, 48, resume),
+  );
+  assert.deepEqual(earlierPayload.archivedChapters, payload.archivedChapters);
+  assert.deepEqual(earlierPayload.completedChapters, []);
+  assert.equal(earlierPayload.task.chapter, 49);
+  assert.equal(
+    planCompressionBatch(
+      roomId,
+      config,
+      compressed,
+      resume,
+      48,
+      novelRequestBudget,
+    ),
+    null,
+  );
   assert.equal(
     invalidateEditedCheckpoint(
       compressed,
@@ -155,9 +183,9 @@ test("rolling compression covers a multi-request manuscript in order and retains
     ).checkpoint,
     compressed.checkpoint,
   );
-  assert.equal(
+  assert.deepEqual(
     JSON.parse(rewritePrompt(config, compressed, "0", "")).archivedChapters,
-    undefined,
+    payload.archivedChapters,
   );
 });
 
@@ -165,7 +193,7 @@ test("an oversized imported chapter is summarized without splitting a code point
   const novel = createNovel(config);
   const text = "🌊「正文」".repeat(40_000);
   novel.chapters = [{ id: "one", title: "第1章", text }];
-  let cursor = initialCompressionCursor(novel, 1);
+  let cursor = initialCompressionCursor(novel);
   const fragments: string[] = [];
   while (cursor.index < 1) {
     const batch = planCompressionBatch(

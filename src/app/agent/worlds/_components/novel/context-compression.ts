@@ -13,6 +13,8 @@ export const novelRequestBudget = {
   characters: maxNovelPromptLength,
   bytes: 384 * 1024,
 };
+export const minCompressionRate = 30;
+export const maxCompressionRate = 70;
 export const defaultCompressionRate = 50;
 export const maxCompressionTarget = 4000;
 export const maxCompressionPromptLength = 2000;
@@ -68,11 +70,8 @@ export type CompressionCursor = {
   summary: string;
 };
 
-export function initialCompressionCursor(
-  novel: Novel,
-  through: number,
-): CompressionCursor {
-  const index = novelCheckpointCount(novel, through);
+export function initialCompressionCursor(novel: Novel): CompressionCursor {
+  const index = novelCheckpointCount(novel);
   return {
     index,
     offset: 0,
@@ -116,6 +115,9 @@ export function planCompressionBatch(
   },
 ) {
   if (cursor.index >= through) return null;
+  const compressionRate = Number.isFinite(rate)
+    ? Math.min(maxCompressionRate, Math.max(minCompressionRate, rate))
+    : defaultCompressionRate;
   let coveredCharacters = cursor.offset;
   for (let index = 0; index < cursor.index; index++)
     coveredCharacters += novel.chapters[index].text.length;
@@ -143,7 +145,9 @@ export function planCompressionBatch(
           Math.max(
             1,
             Math.round(
-              ((coveredCharacters + batchCharacters) * (100 - rate)) / 100,
+              ((coveredCharacters + batchCharacters) *
+                (100 - compressionRate)) /
+                100,
             ),
           ),
         ),

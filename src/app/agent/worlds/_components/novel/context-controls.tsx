@@ -26,7 +26,9 @@ import { FieldGroup, TextField } from "../fields";
 import {
   defaultCompressionRate,
   maxCompressionPromptLength,
+  maxCompressionRate,
   maxCompressionTarget,
+  minCompressionRate,
   novelRequestBudget,
   novelRequestBytes,
 } from "./context-compression";
@@ -130,8 +132,8 @@ export function ContextControls({
                   <Input
                     id={rateId}
                     type="range"
-                    min={1}
-                    max={99}
+                    min={minCompressionRate}
+                    max={maxCompressionRate}
                     value={rate}
                     aria-valuetext={`${rate}%`}
                     onChange={(event) =>

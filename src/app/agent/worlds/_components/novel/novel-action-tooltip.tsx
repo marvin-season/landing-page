@@ -52,7 +52,7 @@ export function NovelActionButton({
 export const nextChapterActionHint: ActionHint = {
   action: "生成下一章草稿，确认后才加入正文。",
   context:
-    "完整世界设定、小说设定、续写要求和目标字数，以及续写起点及之前的正文。已有摘要可代替覆盖的前文；无有效摘要时可带入已导入的背景。不会发送后文或未保存草稿。",
+    "完整世界设定、小说设定、续写要求和目标字数。有摘要时，从任意章续写都会带摘要，只补上未被覆盖且截至所选章的正文。没有摘要时，发送截至所选章的正文和已导入的背景（如有）。不带草稿。",
 };
 
 export function localActionHint(action: string): ActionHint {
@@ -62,7 +62,7 @@ export function localActionHint(action: string): ActionHint {
 export function compactContextHint(selection: boolean): ActionHint {
   return localActionHint(
     selection
-      ? "开启后，下次润色的正文范围只包含选段。"
+      ? "开启后，省略摘要或用来替代摘要的前文，只保留本章和压缩后新增的前文章节。"
       : "开启后，下次润色的正文范围只包含本章。",
   );
 }
@@ -74,14 +74,14 @@ export function rewriteHint(selection: boolean, compact: boolean): ActionHint {
     action: selection
       ? "只生成所选文字的替换稿。"
       : "生成整章替换稿，确认后才更新正文。",
-    context: `世界基本设定、小说文风、润色要求和${
+    context: `完整世界设定、小说设定、润色要求和本章已保存正文。${
       selection
         ? compact
-          ? "已保存正文中的选段。不带两侧正文或相邻章节。"
-          : "已保存的选段及本章两侧正文。选到章首或章末时，带对应相邻章最多 600 字符。"
+          ? "标明选段位置，只附带压缩后新增的前文章节（如有），不带摘要。"
+          : "标明选段位置；有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
         : compact
-          ? "本章已保存正文。不带其他章节。"
-          : "本章已保存正文、全部前文章节及紧邻的下一章（如有）。"
+          ? "不带摘要或其他章节。"
+          : "有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
     }`,
   };
 }
