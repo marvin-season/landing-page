@@ -45,3 +45,19 @@ export function standaloneNovelConfig(
     ],
   };
 }
+
+/** 识别导入小说仍使用默认占位设定（非模板派生）。 */
+export function isStandaloneNovelPlaceholder(config: WorldConfig) {
+  if (config.characters.length !== 2) return false;
+  const [a, b] = config.characters;
+  if (a.id !== "protagonist" || b.id !== "supporting") return false;
+  if (a.identity !== "待补充" || b.identity !== "待补充") return false;
+  return (
+    config.background.includes("由导入正文创建") ||
+    config.scene.includes("可直接续写或先生成世界模板")
+  );
+}
+
+export function novelSettingsHintKey(roomId: string) {
+  return `world-novel-settings-hint:${roomId}`;
+}

@@ -11,7 +11,7 @@ import {
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { confirmAgentNavigation } from "@/app/agent/_components/use-unsaved-navigation";
 import { BrandStatusPage } from "@/components/brand-status-page";
 import { worldRequest } from "@/lib/group-chat/client";
@@ -21,6 +21,10 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
+import {
+  isStandaloneNovelPlaceholder,
+  novelSettingsHintKey,
+} from "@/lib/group-chat/standalone-novel-config";
 import { CharacterAvatar } from "../character-avatar";
 import { ComposerDock } from "../floating-composer";
 import { ChapterPromptReuseProvider } from "../novel/chapter-prompt-reuse";
@@ -62,6 +66,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     null,
   );
   const [novelSettled, setNovelSettled] = useState(false);
+  const [settingsHintDismissed, setSettingsHintDismissed] = useState(true);
   const saveNovelContext = useRef<
     ((context: NovelWritingContext) => Promise<boolean>) | null
   >(null);
@@ -93,6 +98,32 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     }
   });
   const { room } = chat;
+  useEffect(() => {
+    if (!room || room.kind !== "novel") {
+      setSettingsHintDismissed(true);
+      return;
+    }
+    if (room.sourceTemplateId || !isStandaloneNovelPlaceholder(room.config)) {
+      setSettingsHintDismissed(true);
+      return;
+    }
+    try {
+      setSettingsHintDismissed(
+        window.localStorage.getItem(novelSettingsHintKey(room.id)) === "1",
+      );
+    } catch {
+      setSettingsHintDismissed(false);
+    }
+  }, [room]);
+  function dismissSettingsHint() {
+    if (!room) return;
+    setSettingsHintDismissed(true);
+    try {
+      window.localStorage.setItem(novelSettingsHintKey(room.id), "1");
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }
   async function action(work: () => Promise<void>) {
     setActionPending(true);
     chat.setError("");
@@ -208,6 +239,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     });
   }
   async function edit(copy = false) {
+    if (novelMode) dismissSettingsHint();
     setCopying(copy);
     setEditing(structuredClone(loaded.config));
     try {
@@ -263,6 +295,32 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               />
             </CollapsibleContent>
           </Collapsible>
+        ) : null}
+        {novelMode &&
+        !editing &&
+        !settingsHintDismissed &&
+        !room.sourceTemplateId &&
+        isStandaloneNovelPlaceholder(loaded.config) ? (
+          <Alert className="rounded-none border-x-0 border-t-0">
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
+              <span>
+                当前仍是导入后的默认设定，建议先完善世界与角色，或从正文更新。
+              </span>
+              <span className="flex shrink-0 items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={running || actionPending}
+                  onClick={() => void edit()}
+                >
+                  去设定
+                </Button>
+                <Button size="sm" variant="ghost" onClick={dismissSettingsHint}>
+                  知道了
+                </Button>
+              </span>
+            </AlertDescription>
+          </Alert>
         ) : null}
         {novelMode && chat.error ? (
           <Alert>
