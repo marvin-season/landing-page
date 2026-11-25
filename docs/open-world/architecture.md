@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | 页面与表单 | `src/app/agent/worlds/` | 大厅、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
 | 房间读取与剧本运行 | [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts) | 读取与轮询房间、剧本自动开场、发起 / 暂停 / 重试运行、加载更早消息 |
-| 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts) | IndexedDB 读写、Writer 请求、流式草稿、完成判定、分支创建 |
+| 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)、[`novel/use-novel-storage.ts`](../../src/app/agent/worlds/_components/novel/use-novel-storage.ts) | 前者负责 Writer 请求、流式草稿、完成判定和分支创建；后者负责 IndexedDB 读写、草稿恢复和存档同步 |
 | 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、导入导出、章节文本与差异 |
 | 浏览器客户端 | [`client.ts`](../../src/lib/group-chat/client.ts) | `worldRequest`、`worldStream`（单批 SSE）、`worldStoryStream`（自动接续多批）、`downloadText` |
 | Route Handlers | [`api/group-chat/[[...path]]`](../../src/app/api/group-chat/[[...path]]/route.ts)、[`api/novel`](../../src/app/api/novel/route.ts) | 登录、同源校验、房间所有权、请求解析 |

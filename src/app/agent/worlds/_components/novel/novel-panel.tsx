@@ -51,7 +51,7 @@ import {
 import { ChapterIndex, type ChapterIndexEntry } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
-import type { ChapterTextSelection } from "./chapter-text";
+import { type ChapterTextRange, replaceTextRange } from "./chapter-text";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
@@ -111,7 +111,7 @@ export function NovelPanel({
     mode: "manual" | "chapter" | "rewrite";
     initialText?: string;
     afterChapterId?: string | null;
-    initialSelection?: ChapterTextSelection;
+    rewriteRange?: ChapterTextRange;
     manualNext?: boolean;
   } | null>(null);
   const [newChapterDraft, setNewChapterDraft] =
@@ -177,11 +177,13 @@ export function NovelPanel({
             title: pending.chapterTitle,
             text: pending.baseText,
           },
-          mode: "manual",
-          initialSelection: {
-            ...pending.range,
-            direction: "forward",
-          },
+          mode: "rewrite",
+          rewriteRange: pending.range,
+          initialText: replaceTextRange(
+            pending.baseText,
+            pending.preview,
+            pending.range,
+          ),
         });
         return;
       }
@@ -375,15 +377,16 @@ export function NovelPanel({
       setDiscardingDraft(false);
     }
   }
-  function beginChapterRewrite(chapterId: string) {
+  function beginChapterRewrite(chapterId: string, range?: ChapterTextRange) {
     if (
       !writer.rewrite(chapterId, rewriteRequirements, {
         compactContext,
+        range,
       })
     )
       return false;
     setEditingChapter((current) =>
-      current ? { ...current, mode: "rewrite" } : current,
+      current ? { ...current, mode: "rewrite", rewriteRange: range } : current,
     );
     return true;
   }
@@ -443,7 +446,7 @@ export function NovelPanel({
       mode,
       initialText,
       afterChapterId,
-      initialSelection,
+      rewriteRange,
       manualNext,
     } = editingChapter;
     return (
@@ -453,7 +456,6 @@ export function NovelPanel({
         base={base}
         chapters={novel.chapters}
         initialText={initialText}
-        initialSelection={initialSelection}
         generation={
           mode === "chapter" && !manualNext
             ? {
@@ -471,7 +473,8 @@ export function NovelPanel({
             : mode === "rewrite"
               ? {
                   kind: mode,
-                  onGenerate: () => beginChapterRewrite(base.id),
+                  range: rewriteRange,
+                  onGenerate: () => beginChapterRewrite(base.id, rewriteRange),
                   renderForm: () => null,
                 }
               : undefined
@@ -501,7 +504,7 @@ export function NovelPanel({
                 });
           if (saved) {
             setEditingChapter({ chapter: draft, mode: "manual" });
-            if (mode === "rewrite")
+            if (mode === "rewrite" && !rewriteRange)
               setAppliedRewrite({
                 chapterId: draft.id,
                 length: draft.text.length,
@@ -531,7 +534,7 @@ export function NovelPanel({
         onRewriteRequirementsChange={setRewriteRequirements}
         composerRequest={polishComposerRequest}
         onRequestComposer={() => setPolishComposerRequest((count) => count + 1)}
-        onBeginChapterRewrite={() => beginChapterRewrite(base.id)}
+        onBeginChapterRewrite={(range) => beginChapterRewrite(base.id, range)}
       />
     );
   }

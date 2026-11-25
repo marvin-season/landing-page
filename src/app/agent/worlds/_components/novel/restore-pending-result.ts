@@ -48,7 +48,8 @@ export function restorePendingResult(
       !chapter ||
       chapter.text !== pending.baseText ||
       pending.range.end > chapter.text.length ||
-      pending.range.start >= pending.range.end
+      pending.range.start >= pending.range.end ||
+      !chapter.text.slice(pending.range.start, pending.range.end).trim()
     )
       return null;
     return {
