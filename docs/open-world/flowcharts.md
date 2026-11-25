@@ -169,8 +169,8 @@ sequenceDiagram
       Hook->>DB: 保存（剧情整理先写库再更新页面）
     else 背景总结
       Hook-->>User: 下载背景总结 .md
-    else 分支摘要
-      Hook-->>UI: 填入摘要框
+    else 上下文压缩
+      Hook->>DB: 写入完整 checkpoint 摘要
     end
   else 停止、截断、报错或连接提前结束
     Hook-->>UI: 显示错误，不保存

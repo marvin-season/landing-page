@@ -21,8 +21,8 @@
 | --- | --- | --- |
 | 页面与表单 | `src/app/agent/worlds/` | 大厅、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
 | 房间读取与剧本运行 | [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts) | 读取与轮询房间、剧本自动开场、发起 / 暂停 / 重试运行、加载更早消息 |
-| 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)、[`novel/use-novel-storage.ts`](../../src/app/agent/worlds/_components/novel/use-novel-storage.ts) | 前者负责 Writer 请求、流式草稿、完成判定和分支创建；后者负责 IndexedDB 读写、草稿恢复和存档同步 |
-| 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、导入导出、章节文本与差异 |
+| 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)、[`novel/use-novel-storage.ts`](../../src/app/agent/worlds/_components/novel/use-novel-storage.ts) | 前者负责 Writer 请求、流式草稿、完成判定、上下文压缩归档和 Fork；后者负责 IndexedDB 读写、草稿恢复和存档同步 |
+| 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、续写摘要归档、导入导出、章节文本与差异 |
 | 浏览器客户端 | [`client.ts`](../../src/lib/group-chat/client.ts) | `worldRequest`、`worldStream`（单批 SSE）、`worldStoryStream`（自动接续多批）、`downloadText` |
 | Route Handlers | [`api/group-chat/[[...path]]`](../../src/app/api/group-chat/[[...path]]/route.ts)、[`api/novel`](../../src/app/api/novel/route.ts) | 登录、同源校验、房间所有权、请求解析 |
 | 领域与服务 | `src/lib/group-chat/` | `model.ts` 数据契约、`http.ts` 路由分发、`store.ts` 存档、`engine.ts` 运行、`schedule.ts` 选人、`context.ts` 上下文、`provider.ts` 模型调用、`session.ts` 会话标识、`novel.ts` Writer 接口、`world-templates.ts` 模板 |
@@ -63,7 +63,7 @@
 | 房间、世界配置、配置快照、剧本消息、剧情摘要、运行记录 | 服务端 libSQL `world_rooms`（每个房间一份 JSON 文档加列表摘要） | 默认 `file:./db/group-chat.db`，与 Mastra 单聊数据库分开 |
 | 运行请求幂等与暂停封锁 | `world_requests` | 以 `(room_id, clientRequestId)` 去重；暂停时写入 `cancelled` 封锁迟到的请求 |
 | 世界预设、角色预设 | `world_presets` | 与房间互不影响，创建房间时复制配置快照 |
-| 小说设定、章节、续写摘要 | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 不随房间跨设备同步；删除或复制房间都不处理这份数据 |
+| 小说设定、章节、续写摘要（`checkpoint`） | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 摘要归档只改 `checkpoint`，正文仍完整保留；不随房间跨设备同步；删除或复制房间都不处理这份数据，Fork 会整本复制含摘要 |
 | 生成中的小说草稿 | `useNovel` 内存；待应用结果另有本机备份 | 流式过程只在内存；续写 / 整章润色 / 选段润色 / 剧情整理的待应用结果刷新后可恢复 |
 
 ## 5. 接口
@@ -102,7 +102,7 @@
 - 请求体强制加上 `tool_choice: "none"`，不注册工具，不启用自动 Memory。剧本收到工具流时直接报错。
 - 每次调用的 system 指令由 `context.ts`（剧本）或小说 `model.ts`（小说）提供，Agent 自身只有一句通用指令。选人逻辑属于 `schedule.ts`，与 Agent 无关。
 
-**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界、导入备份或创建续写分支时会换新标识。请求头里只有哈希，不含明文配置。
+**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界、导入备份或 Fork 小说时会换新标识。请求头里只有哈希，不含明文配置。
 
 本机 Magpie 代理根据会话标识和首条 user 消息派生上游会话，用来争取提示词缓存命中。每次调用仍然发送完整的有效上下文；缓存是否命中、能省多少，由代理和模型决定。
 
@@ -118,7 +118,7 @@
 
 ```sh
 nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板、开发模式小说 TXT 落盘
-nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、续写分支、章节文本、Markdown 位置映射、差异
+nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、摘要归档、Fork、章节文本、Markdown 位置映射、差异
 nr check
 node_modules/.bin/tsc --noEmit --incremental false
 ```
