@@ -78,6 +78,7 @@ export function SettingsSheet({
               lockedMembers={!novel && !copying && room.status !== "draft"}
               presets={presets}
               plain={novel}
+              roomId={!copying && novel ? room.id : undefined}
               onCancel={() => onOpenChange(false)}
               onSave={onSave}
             />

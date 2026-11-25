@@ -32,7 +32,8 @@ import {
 } from "@/lib/group-chat/model";
 import { CharacterAvatar } from "./character-avatar";
 import { FieldGroup, TextField } from "./fields";
-import type { NovelWritingContext } from "./novel/model";
+import { exportNovel, type NovelWritingContext } from "./novel/model";
+import { getNovelCopyByRoomId } from "./novel/use-novel-storage";
 import { PriorContextField } from "./prior-context-field";
 import { WorldSelect } from "./world-select";
 
@@ -116,6 +117,7 @@ export function WorldEditor({
   kind,
   initialNovelContext,
   plain = false,
+  roomId,
 }: {
   initial: WorldConfig;
   onSave: (
@@ -130,12 +132,15 @@ export function WorldEditor({
   kind: WorldKind;
   initialNovelContext?: NovelWritingContext;
   plain?: boolean;
+  /** 已有小说作品时，可从本机正文 AI 回填设定表单 */
+  roomId?: string;
 }) {
   const [config, setConfig] = useState(() => structuredClone(initial));
   const [novelContext, setNovelContext] = useState(initialNovelContext);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [filling, setFilling] = useState(false);
   const novel = kind === "novel";
   const [models, setModels] = useState<string[]>([]);
   const [connection, setConnection] = useState("");
@@ -216,12 +221,50 @@ export function WorldEditor({
       onPresetSaved?.();
     });
   }
+  async function fillFromNovel() {
+    if (!roomId || !novel) return;
+    setFilling(true);
+    setError("");
+    try {
+      const saved = await getNovelCopyByRoomId(roomId);
+      if (!saved?.novel.chapters.some((chapter) => chapter.text.trim()))
+        throw new Error("本机还没有这部小说的正文，请先确认正文已保存");
+      const text = exportNovel(saved.novel, "txt");
+      const model =
+        config.characters.find((character) => character.enabled)?.model ??
+        config.characters[0]?.model ??
+        "cursor/auto";
+      const result = await worldRequest<{ template: { config: WorldConfig } }>(
+        "templates/extract",
+        "POST",
+        {
+          text,
+          kind: "novel",
+          model,
+          fileName: `${saved.novel.title || config.title}.txt`,
+        },
+      );
+      setConfig(structuredClone(result.template.config));
+      if (novelContext) {
+        setNovelContext({
+          ...novelContext,
+          title: result.template.config.title || novelContext.title,
+          outline: result.template.config.storyGoal || novelContext.outline,
+        });
+      }
+      setConnection("已从正文提取设定，请检查后保存。");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "从正文更新设定失败");
+    } finally {
+      setFilling(false);
+    }
+  }
   return (
     <form
       className="flex min-h-0 flex-1 flex-col"
       onSubmit={(e) => {
         e.preventDefault();
-        if (pending || importing) return;
+        if (pending || importing || filling) return;
         void action(async () => {
           const writingContext = novel ? novelContext : undefined;
           if (writingContext && !writingContext.title.trim())
@@ -246,7 +289,7 @@ export function WorldEditor({
         }
       >
         <fieldset
-          disabled={pending || importing}
+          disabled={pending || importing || filling}
           className="flex min-w-0 flex-col gap-3 disabled:opacity-60"
         >
           {!lockedMembers && presets.some((p) => p.kind === "world") ? (
@@ -761,15 +804,25 @@ export function WorldEditor({
             取消
           </Button>
           <div className="flex min-w-0 flex-wrap justify-end gap-2">
+            {novel && roomId ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={pending || importing || filling}
+                onClick={() => void fillFromNovel()}
+              >
+                {filling ? "正在从正文更新…" : "从正文更新设定"}
+              </Button>
+            ) : null}
             <Button
               type="button"
               variant="ghost"
-              disabled={pending || importing}
+              disabled={pending || importing || filling}
               onClick={() => void savePreset()}
             >
               {presetId ? "更新世界预设" : "保存为世界预设"}
             </Button>
-            <Button type="submit" disabled={pending || importing}>
+            <Button type="submit" disabled={pending || importing || filling}>
               {pending
                 ? "正在保存…"
                 : submitLabel || (lockedMembers ? "保存设定" : "创建世界")}

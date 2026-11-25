@@ -49,6 +49,19 @@ export function addNovelCopy(key: string, novel: Novel) {
   return novels.add({ key, novel });
 }
 
+export function getNovelCopy(key: string) {
+  return novels.get(key);
+}
+
+export async function getNovelCopyByRoomId(roomId: string) {
+  const exact = await novels.get(roomId);
+  if (exact) return exact;
+  const suffix = `:${roomId}`;
+  return (
+    (await novels.filter((row) => row.key.endsWith(suffix)).first()) ?? null
+  );
+}
+
 export function useNovelStorage(
   room: WorldRoom,
   {

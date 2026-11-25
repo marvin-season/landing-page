@@ -54,6 +54,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
     config: WorldConfig;
     kind: WorldKind;
     derived: boolean;
+    sourceTemplateId?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -76,11 +77,13 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
     config: WorldConfig,
     derived = false,
     kind: WorldKind = "script",
+    sourceTemplateId?: string,
   ) {
     setEditing({
       config: structuredClone(config),
       kind,
       derived,
+      sourceTemplateId,
     });
   }
   async function remove(id: string) {
@@ -104,10 +107,7 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             <h1 className="font-serif text-2xl font-normal">开放世界</h1>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
-            <ImportNovelTemplateDialog
-              disabled={pending}
-              onUseTemplate={(config, kind) => startEditing(config, true, kind)}
-            />
+            <ImportNovelTemplateDialog disabled={pending} />
             <Button
               variant="outline"
               disabled={pending}
@@ -189,33 +189,18 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                   <WorldCardFooter>
                     <span className="text-xs text-muted-foreground">
                       {world.config.characters.length} 位角色
-                      {world.sourceRoomId ? " · 已关联作品" : ""}
                     </span>
-                    <div className="flex items-center gap-2">
-                      {world.sourceRoomId ? (
-                        <Button
-                          size="sm"
-                          variant="text"
-                          className="gap-1.5 px-0 h-7"
-                          onClick={() =>
-                            router.push(`/agent/worlds/${world.sourceRoomId}`)
-                          }
-                        >
-                          打开作品
-                        </Button>
-                      ) : null}
-                      <Button
-                        size="sm"
-                        variant="text"
-                        className="gap-1.5 px-0 h-7"
-                        onClick={() =>
-                          startEditing(world.config, true, world.kind)
-                        }
-                      >
-                        使用模板
-                        <ArrowUpRight className="size-3.5" />
-                      </Button>
-                    </div>
+                    <Button
+                      size="sm"
+                      variant="text"
+                      className="gap-1.5 px-0 h-7"
+                      onClick={() =>
+                        startEditing(world.config, true, world.kind, world.id)
+                      }
+                    >
+                      使用模板
+                      <ArrowUpRight className="size-3.5" />
+                    </Button>
                   </WorldCardFooter>
                 </WorldCard>
               ))}
@@ -418,7 +403,13 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                   const result = await worldRequest<{ room: WorldRoom }>(
                     "rooms",
                     "POST",
-                    { ...config, kind: editing.kind },
+                    {
+                      ...config,
+                      kind: editing.kind,
+                      ...(editing.sourceTemplateId
+                        ? { sourceTemplateId: editing.sourceTemplateId }
+                        : {}),
+                    },
                   );
                   void queryClient.invalidateQueries({
                     queryKey: ["world-rooms"],

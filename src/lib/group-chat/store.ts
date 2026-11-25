@@ -5,6 +5,7 @@ import { type Client, createClient, type Transaction } from "@libsql/client";
 import {
   backupSchema,
   configSchema,
+  idSchema,
   presetInputSchema,
   type RoomListItem,
   type RunInput,
@@ -191,12 +192,20 @@ export function createWorldStore(getClient: () => Client) {
     });
   }
   function fresh(ownerId: string, input: unknown, kind: WorldKind): WorldRoom {
+    const sourceTemplateId =
+      typeof input === "object" &&
+      input &&
+      "sourceTemplateId" in input &&
+      typeof input.sourceTemplateId === "string"
+        ? idSchema.parse(input.sourceTemplateId)
+        : undefined;
     const config = configSchema.parse(input);
     return {
       id: randomUUID(),
       ownerId,
       kind,
       config,
+      ...(sourceTemplateId ? { sourceTemplateId } : {}),
       version: 1,
       snapshots: [{ version: 1, config: structuredClone(config) }],
       status: "draft",

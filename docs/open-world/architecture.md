@@ -109,7 +109,7 @@
 ## 7. 模板、预设、备份与复制
 
 - **模板**：`data/novels/template/*.json` 和不提交的 `data/novels/template/local/*.json`，文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
-- **从小说生成模板**：大厅可导入 ≤2MB 的 TXT / Markdown，经 `POST /api/group-chat/templates/extract` 调用 Writer 逆向提取世界设定。确认「保存模板并收录」后：创建小说作品并把正文写入本机 IndexedDB（进入「我的作品」），再 `POST /api/group-chat/templates` 写入 `data/novels/template/local/<id>.json`（可带 `sourceRoomId` 关联来源作品）。模板用法与内置模板相同。提取超时放宽到最多 180 秒（空闲等待最多 120 秒）。实现见 [`extract-world-template.ts`](../../src/lib/group-chat/extract-world-template.ts) 与 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)。
+- **导入小说 / 模板派生**：大厅「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；大厅列表不再提供「生成模板」。「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。本地模板仍可由 `POST /api/group-chat/templates` 写入 `data/novels/template/local/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
 - **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
 - **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
 - **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。

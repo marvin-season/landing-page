@@ -109,6 +109,8 @@ export type WorldRoom = {
   kind: WorldKind;
   status: "draft" | "active" | "ended";
   config: WorldConfig;
+  /** 从预设模板派生时记录来源模板 id */
+  sourceTemplateId?: string;
   version: number;
   snapshots: Array<{ version: number; config: WorldConfig }>;
   messages: WorldMessage[];
