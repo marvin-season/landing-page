@@ -505,7 +505,7 @@ export function ChapterEditor({
 
   return (
     <ComposerDock composer={polishAvailable ? polishComposer : null}>
-      <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
         <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
           <div className="flex min-w-0 max-w-full items-center gap-2">
             <NovelActionButton
@@ -591,6 +591,21 @@ export function ChapterEditor({
                                 ? "未保存"
                                 : "已保存"}
             </span>
+            <div className="flex min-w-0 items-center gap-2 text-sm">
+              <h2 className="flex items-center gap-1.5 font-medium">
+                {generation && editorBusy ? (
+                  <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
+                ) : null}
+              </h2>
+              <span
+                className={cn(
+                  "whitespace-nowrap text-xs text-muted-foreground",
+                  exceedsLimit && "text-destructive",
+                )}
+              >
+                {visibleText.length} / {maxChapterLength} 字
+              </span>
+            </div>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {generation && writer.busy ? (
@@ -656,44 +671,13 @@ export function ChapterEditor({
             <ChapterDiffView base={base} draft={currentDraft} />
           </section>
         ) : (
-          <div
-            className={cn(
-              "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
-              (target || generation) && "@3xl:min-h-72",
-              !isNewChapter && "@3xl:max-w-none @3xl:flex-row",
-            )}
-          >
-            {!isNewChapter ? (
-              <section className="hidden min-h-0 min-w-0 flex-1 flex-col gap-2 border-r border-border p-4 @3xl:flex">
-                <h2 className="flex min-h-6 shrink-0 items-center text-sm font-medium text-muted-foreground">
-                  已保存正文
-                </h2>
-                <div className="min-h-0 flex-1 overflow-y-auto wrap-break-word whitespace-pre-wrap px-3 py-2 pb-(--composer-dock-height) text-sm leading-7">
-                  {base.text}
-                </div>
-              </section>
-            ) : null}
-            <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-4">
-              <div className="flex min-h-6 shrink-0 items-center">
-                <h2 className="flex items-center gap-1.5 text-sm font-medium">
-                  {generation && editorBusy ? (
-                    <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
-                  ) : null}
-                  编辑草稿
-                </h2>
-                <span
-                  className={cn(
-                    "ml-auto text-xs text-muted-foreground",
-                    exceedsLimit && "text-destructive",
-                  )}
-                >
-                  {visibleText.length} / {maxChapterLength} 字
-                </span>
-              </div>
+          <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-5 py-4 sm:px-8">
+            <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
               <div
                 className={cn(
                   "relative flex min-h-48 flex-1 overflow-hidden",
-                  isPassage && "@3xl:min-h-0",
+                  polishAvailable &&
+                    "[--editor-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)]",
                 )}
               >
                 <div
@@ -705,7 +689,10 @@ export function ChapterEditor({
                 <div
                   ref={caretMirror}
                   aria-hidden
-                  className="pointer-events-none invisible absolute top-0 overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7"
+                  className={cn(
+                    "pointer-events-none invisible absolute top-0 overflow-hidden wrap-break-word whitespace-pre-wrap px-3 pt-2 text-sm leading-7",
+                    polishAvailable ? "pb-(--editor-bottom-padding)" : "pb-2",
+                  )}
                 >
                   {caretBefore}
                   {"\u200b"}
@@ -714,7 +701,10 @@ export function ChapterEditor({
                   <div
                     ref={mirror}
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7 text-transparent"
+                    className={cn(
+                      "pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 pt-2 text-sm leading-7 text-transparent",
+                      polishAvailable ? "pb-(--editor-bottom-padding)" : "pb-2",
+                    )}
                   >
                     {visibleText.slice(0, highlight.start)}
                     <mark className="text-transparent bg-primary/25">
@@ -796,9 +786,8 @@ export function ChapterEditor({
                   }}
                   className={cn(
                     "relative min-h-48 flex-1 resize-none leading-7 focus:border-transparent",
-                    polishAvailable && "scroll-pb-(--composer-dock-height)",
+                    polishAvailable && "pb-(--editor-bottom-padding)",
                     selectedRange && "selection:bg-transparent",
-                    isPassage && "@3xl:min-h-0",
                   )}
                 />
               </div>
