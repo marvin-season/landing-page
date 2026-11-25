@@ -4,10 +4,11 @@
 
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
-| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 模板、我的作品（全部 / 剧本 / 小说筛选）、我的预设、导入 JSON 存档、从小说生成模板、创建作品 |
+| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入 JSON 存档、导入小说、创建作品 |
+| `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板：我的（本地模板 + 世界 / 角色预设）、内置模板 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
-**创建作品**：大厅的「创建作品」以 `fog-harbor` 模板为初始值，「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。
+**创建作品**：作品页的「创建作品」以 `fog-harbor` 模板为初始值；预设模板页的「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。
 
 **详情页共用部分**：
 
@@ -19,7 +20,7 @@
 
 | 层 | 位置 | 内容 |
 | --- | --- | --- |
-| 页面与表单 | `src/app/agent/worlds/` | 大厅、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
+| 页面与表单 | `src/app/agent/worlds/` | 作品页、预设模板页、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
 | 房间读取与剧本运行 | [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts) | 读取与轮询房间、剧本自动开场、发起 / 暂停 / 重试运行、加载更早消息 |
 | 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)、[`novel/use-novel-storage.ts`](../../src/app/agent/worlds/_components/novel/use-novel-storage.ts) | 前者负责 Writer 请求、流式草稿、完成判定、上下文压缩归档和 Fork；后者负责 IndexedDB 读写、草稿恢复和存档同步 |
 | 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、续写摘要归档、导入导出、章节文本与差异 |
@@ -108,8 +109,8 @@
 
 ## 7. 模板、预设、备份与复制
 
-- **模板**：`data/novels/template/*.json` 和不提交的 `data/novels/template/local/*.json`，文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
-- **导入小说 / 模板派生**：大厅「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；大厅列表不再提供「生成模板」。「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。本地模板仍可由 `POST /api/group-chat/templates` 写入 `data/novels/template/local/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
+- **模板**：`data/novels/template/*.json`（内置，`source: "builtin"`）和不提交的 `data/novels/template/local/*.json`（我的，`source: "local"`），文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。预设模板页按来源分成「我的」与「内置」；「我的」还包含世界 / 角色预设。
+- **导入小说 / 模板派生**：作品页「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；列表不再提供「生成模板」。预设模板页「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。本地模板仍可由 `POST /api/group-chat/templates` 写入 `data/novels/template/local/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
 - **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
 - **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
 - **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。

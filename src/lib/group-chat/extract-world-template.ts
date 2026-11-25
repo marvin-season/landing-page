@@ -171,6 +171,7 @@ export function parseExtractedWorldTemplate(
     description: parsed.data.description,
     details: parsed.data.details,
     gradient,
+    source: "local",
     config,
   };
 }

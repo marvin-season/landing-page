@@ -12,12 +12,16 @@ export function templateNovelByteLength(text: string) {
   return new TextEncoder().encode(text).length;
 }
 
+export type WorldTemplateSource = "builtin" | "local";
+
 export type WorldTemplate = {
   id: string;
   description: string;
   details: string;
   gradient: WorldGradient;
   kind: WorldKind;
+  /** 内置模板来自 template/，本地模板来自 template/local/ */
+  source: WorldTemplateSource;
   config: WorldConfig;
   /** 从小说生成时关联的「我的作品」房间 */
   sourceRoomId?: string;

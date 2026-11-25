@@ -40,12 +40,18 @@ function jsonFiles(dir: string) {
 
 export function loadWorldTemplates(): WorldTemplate[] {
   const files = [
-    ...jsonFiles(templatesDir),
-    ...jsonFiles(localTemplatesDir),
-  ].sort((a, b) => a.localeCompare(b));
+    ...jsonFiles(templatesDir).map((file) => ({
+      file,
+      source: "builtin" as const,
+    })),
+    ...jsonFiles(localTemplatesDir).map((file) => ({
+      file,
+      source: "local" as const,
+    })),
+  ].sort((a, b) => a.file.localeCompare(b.file));
   if (files.length === 0) throw new Error(`未找到世界模板：${templatesDir}`);
   const seen = new Set<string>();
-  return files.map((file) => {
+  return files.map(({ file, source }) => {
     const name = basename(file);
     const id = idSchema.parse(name.slice(0, -".json".length));
     if (seen.has(id)) throw new Error(`世界模板 id 重复：${id}`);
@@ -57,8 +63,8 @@ export function loadWorldTemplates(): WorldTemplate[] {
       throw new Error(`世界模板无效：${name}`, { cause: error });
     }
     return isWorldChat(raw)
-      ? templateFromBackup(id, name, raw)
-      : templateFromConfig(id, name, raw);
+      ? templateFromBackup(id, name, raw, source)
+      : templateFromConfig(id, name, raw, source);
   });
 }
 
@@ -98,6 +104,7 @@ function templateFromConfig(
   id: string,
   name: string,
   raw: unknown,
+  source: WorldTemplate["source"],
 ): WorldTemplate {
   const meta = templateMetaSchema.safeParse(raw);
   const config = configSchema.safeParse(raw);
@@ -114,6 +121,7 @@ function templateFromConfig(
     description: meta.data.description,
     details: meta.data.details,
     gradient: meta.data.gradient,
+    source,
     config: config.data,
     sourceRoomId: meta.data.sourceRoomId,
   };
@@ -123,6 +131,7 @@ function templateFromBackup(
   id: string,
   name: string,
   raw: unknown,
+  source: WorldTemplate["source"],
 ): WorldTemplate {
   const backup = backupSchema.safeParse(raw);
   const meta = templateMetaSchema.partial().safeParse(raw);
@@ -147,6 +156,7 @@ function templateFromBackup(
         120,
       ),
     gradient: meta.data.gradient ?? worldGradientFromSeed(id),
+    source,
     config: backup.data.config,
     sourceRoomId: meta.data.sourceRoomId,
   };

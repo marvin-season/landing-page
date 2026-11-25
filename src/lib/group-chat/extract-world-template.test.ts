@@ -56,6 +56,7 @@ test("parses extracted world template json", () => {
     reservedIds: ["fog-harbor"],
   });
   assert.equal(template.kind, "novel");
+  assert.equal(template.source, "local");
   assert.equal(template.config.title, "爱与恨");
   assert.equal(template.config.characters.length, 2);
   assert.ok(template.config.characters.every((character) => character.avatar));

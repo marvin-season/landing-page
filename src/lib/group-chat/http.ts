@@ -134,6 +134,7 @@ export function createWorldHandlers({
             details: input.details,
             gradient: input.gradient,
             kind: input.kind,
+            source: "local",
             config: input.config,
             sourceRoomId: input.sourceRoomId,
           });
