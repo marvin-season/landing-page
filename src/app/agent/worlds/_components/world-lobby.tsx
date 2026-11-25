@@ -32,7 +32,8 @@ import {
   type WorldPreset,
   type WorldRoom,
 } from "@/lib/group-chat/model";
-import type { WorldTemplate } from "@/lib/group-chat/world-templates";
+import type { WorldTemplate } from "@/lib/group-chat/world-template-model";
+import { ImportNovelTemplateDialog } from "./import-novel-template-dialog";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldEditor } from "./world-editor";
 
@@ -102,7 +103,11 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
           <div className="min-w-0">
             <h1 className="font-serif text-2xl font-normal">开放世界</h1>
           </div>
-          <div className="flex shrink-0 gap-2">
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <ImportNovelTemplateDialog
+              disabled={pending}
+              onUseTemplate={(config, kind) => startEditing(config, true, kind)}
+            />
             <Button
               variant="outline"
               disabled={pending}
@@ -167,9 +172,14 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
             <WorldGrid>
               {templates.map((world) => (
                 <WorldCard key={world.id}>
-                  <h3 className="min-w-0 line-clamp-2 text-sm font-medium leading-5">
-                    {world.config.title}
-                  </h3>
+                  <div className="flex w-full items-start justify-between gap-2">
+                    <h3 className="min-w-0 line-clamp-2 text-sm font-medium leading-5">
+                      {world.config.title}
+                    </h3>
+                    <Tag size="compact" className="shrink-0">
+                      {world.kind === "novel" ? "小说" : "剧本"}
+                    </Tag>
+                  </div>
                   <p className="line-clamp-2 text-[11px] leading-4 text-muted-foreground">
                     {world.details}
                   </p>
@@ -179,18 +189,33 @@ export function WorldLobby({ templates }: { templates: WorldTemplate[] }) {
                   <WorldCardFooter>
                     <span className="text-xs text-muted-foreground">
                       {world.config.characters.length} 位角色
+                      {world.sourceRoomId ? " · 已关联作品" : ""}
                     </span>
-                    <Button
-                      size="sm"
-                      variant="text"
-                      className="gap-1.5 px-0 h-7"
-                      onClick={() =>
-                        startEditing(world.config, true, world.kind)
-                      }
-                    >
-                      使用模板
-                      <ArrowUpRight className="size-3.5" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {world.sourceRoomId ? (
+                        <Button
+                          size="sm"
+                          variant="text"
+                          className="gap-1.5 px-0 h-7"
+                          onClick={() =>
+                            router.push(`/agent/worlds/${world.sourceRoomId}`)
+                          }
+                        >
+                          打开作品
+                        </Button>
+                      ) : null}
+                      <Button
+                        size="sm"
+                        variant="text"
+                        className="gap-1.5 px-0 h-7"
+                        onClick={() =>
+                          startEditing(world.config, true, world.kind)
+                        }
+                      >
+                        使用模板
+                        <ArrowUpRight className="size-3.5" />
+                      </Button>
+                    </div>
                   </WorldCardFooter>
                 </WorldCard>
               ))}

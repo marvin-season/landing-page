@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { abortRun, createWorldEngine } from "./engine";
 import {
+  extractTemplateInputSchema,
+  extractWorldTemplateFromNovel,
+  saveTemplateInputSchema,
+  templateToFile,
+} from "./extract-world-template";
+import {
   exportBackup,
   exportMarkdown,
   exportNarrationMarkdown,
@@ -13,6 +19,8 @@ import {
 } from "./model";
 import type { Complete } from "./provider";
 import type { WorldStore } from "./store";
+import { allocateTemplateId } from "./world-template-model";
+import { loadWorldTemplates, saveLocalWorldTemplate } from "./world-templates";
 
 const json = (data: unknown, status = 200) =>
   Response.json(data, {
@@ -105,6 +113,41 @@ export function createWorldHandlers({
           await store.removePreset(ownerId, id);
           return json({ ok: true });
         }
+      }
+      if (area === "templates") {
+        if (request.method === "GET" && !id)
+          return json({ templates: loadWorldTemplates() });
+        if (id === "extract" && request.method === "POST") {
+          const input = extractTemplateInputSchema.parse(await body(request));
+          const template = await extractWorldTemplateFromNovel(
+            input,
+            complete,
+            request.signal,
+          );
+          return json({ template, file: templateToFile(template) });
+        }
+        if (!id && request.method === "POST") {
+          const input = saveTemplateInputSchema.parse(await body(request));
+          const saved = saveLocalWorldTemplate({
+            id: input.id ?? allocateTemplateId(input.config.title),
+            description: input.description,
+            details: input.details,
+            gradient: input.gradient,
+            kind: input.kind,
+            config: input.config,
+            sourceRoomId: input.sourceRoomId,
+          });
+          return json(
+            {
+              ...saved,
+              template: loadWorldTemplates().find(
+                (template) => template.id === saved.id,
+              ),
+            },
+            201,
+          );
+        }
+        throw new WorldError("method_not_allowed", "不支持此操作", 405);
       }
       if (area !== "rooms")
         throw new WorldError("not_found", "接口不存在", 404);

@@ -20,8 +20,11 @@ export type Complete = (input: {
   signal: AbortSignal;
   maxCharacters: number;
   timeoutMs?: number;
+  idleTimeoutMs?: number;
   onText?: (text: string) => void;
 }) => Promise<ModelResult>;
+
+const maxCompletionTimeoutMs = 180_000;
 
 function client() {
   return new OpenAI({
@@ -80,16 +83,18 @@ export function createTextCompletion(
     signal,
     maxCharacters,
     onText,
-    timeoutMs = 60000,
+    timeoutMs = 60_000,
+    idleTimeoutMs,
   }) => {
     const timeout = new AbortController();
     const combined = AbortSignal.any([signal, timeout.signal]);
-    const budgetMs = Math.min(60000, Math.max(1, timeoutMs));
-    const totalTimer = setTimeout(() => timeout.abort(), budgetMs);
-    let idleTimer = setTimeout(
-      () => timeout.abort(),
-      Math.min(30000, budgetMs),
+    const budgetMs = Math.min(maxCompletionTimeoutMs, Math.max(1, timeoutMs));
+    const idleBudgetMs = Math.min(
+      budgetMs,
+      Math.max(1, idleTimeoutMs ?? Math.min(30_000, budgetMs)),
     );
+    const totalTimer = setTimeout(() => timeout.abort(), budgetMs);
+    let idleTimer = setTimeout(() => timeout.abort(), idleBudgetMs);
     let text = "";
     try {
       combined.throwIfAborted();
@@ -119,10 +124,7 @@ export function createTextCompletion(
       for await (const chunk of stream.fullStream) {
         combined.throwIfAborted();
         clearTimeout(idleTimer);
-        idleTimer = setTimeout(
-          () => timeout.abort(),
-          Math.min(30000, budgetMs),
-        );
+        idleTimer = setTimeout(() => timeout.abort(), idleBudgetMs);
         if (chunk.type === "error") throw chunk.payload.error;
         if (chunk.type.startsWith("tool-"))
           throw new WorldError(
@@ -162,7 +164,13 @@ export function createTextCompletion(
     } catch (error) {
       if (signal.aborted) throw new WorldError("stopped", "对话已停止", 409);
       if (timeout.signal.aborted)
-        throw new WorldError("timeout", "模型响应超时，已暂停对话", 504);
+        throw new WorldError(
+          "timeout",
+          purpose === "writer"
+            ? "模型响应超时，请稍后重试或缩短正文"
+            : "模型响应超时，已暂停对话",
+          504,
+        );
       throw providerError(error);
     } finally {
       clearTimeout(totalTimer);

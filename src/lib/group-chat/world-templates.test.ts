@@ -14,11 +14,11 @@ test("scans json world templates", () => {
     assert.ok(template.description);
     assert.ok(template.details);
     assert.ok(template.config.characters.length >= 2);
+    assert.ok(template.kind === "script" || template.kind === "novel");
     for (const character of template.config.characters)
       assert.ok(character.avatar);
   }
-  const lover = templates.find((template) => template.id === "loverorhate");
-  assert.equal(lover?.kind, "novel");
-  assert.equal(lover?.config.title, "爱与恨");
-  assert.match(lover?.details ?? "", /何雨桐/);
+  const fog = templates.find((template) => template.id === "fog-harbor");
+  assert.equal(fog?.kind, "script");
+  assert.equal(fog?.config.title, "雾港停电之夜");
 });

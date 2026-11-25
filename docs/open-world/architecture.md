@@ -4,7 +4,7 @@
 
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
-| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 模板、我的作品（全部 / 剧本 / 小说筛选）、我的预设、导入 JSON 存档、创建作品 |
+| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 模板、我的作品（全部 / 剧本 / 小说筛选）、我的预设、导入 JSON 存档、从小说生成模板、创建作品 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
 **创建作品**：大厅的「创建作品」以 `fog-harbor` 模板为初始值，「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。
@@ -25,7 +25,7 @@
 | 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、续写摘要归档、导入导出、章节文本与差异 |
 | 浏览器客户端 | [`client.ts`](../../src/lib/group-chat/client.ts) | `worldRequest`、`worldStream`（单批 SSE）、`worldStoryStream`（自动接续多批）、`downloadText` |
 | Route Handlers | [`api/group-chat/[[...path]]`](../../src/app/api/group-chat/[[...path]]/route.ts)、[`api/novel`](../../src/app/api/novel/route.ts) | 登录、同源校验、房间所有权、请求解析 |
-| 领域与服务 | `src/lib/group-chat/` | `model.ts` 数据契约、`http.ts` 路由分发、`store.ts` 存档、`engine.ts` 运行、`schedule.ts` 选人、`context.ts` 上下文、`provider.ts` 模型调用、`session.ts` 会话标识、`novel.ts` Writer 接口、`world-templates.ts` 模板 |
+| 领域与服务 | `src/lib/group-chat/` | `model.ts` 数据契约、`http.ts` 路由分发、`store.ts` 存档、`engine.ts` 运行、`schedule.ts` 选人、`context.ts` 上下文、`provider.ts` 模型调用、`session.ts` 会话标识、`novel.ts` Writer 接口、`world-template-model.ts` 模板类型与纯函数、`world-templates.ts` 模板读写（Node fs）、`extract-world-template.ts` 从小说提取模板 |
 | Agent | [`mastra-server/agents/world-agents.ts`](../../mastra-server/agents/world-agents.ts) | `world-actor`、`world-narrator`、`world-summary`、`world-writer` |
 
 流式传输复用 `@landing-page/utils/stream` 的 `useChatStreamCore`：剧本用自定义适配器 `worldStoryStream`，小说用 `aiSdkChatStreamAdapter` 解析 AI SDK UI 消息流。两边都不另写 SSE 解析器。
@@ -108,7 +108,8 @@
 
 ## 7. 模板、预设、备份与复制
 
-- **模板**：`data/novels/template/*.json` 和不提交的 `data/novels/template/local/*.json`，文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
+- **模板**：`data/novels/template/*.json` 和不提交的 `data/novels/template/local/*.json`，文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。
+- **从小说生成模板**：大厅可导入 ≤2MB 的 TXT / Markdown，经 `POST /api/group-chat/templates/extract` 调用 Writer 逆向提取世界设定。确认「保存模板并收录」后：创建小说作品并把正文写入本机 IndexedDB（进入「我的作品」），再 `POST /api/group-chat/templates` 写入 `data/novels/template/local/<id>.json`（可带 `sourceRoomId` 关联来源作品）。模板用法与内置模板相同。提取超时放宽到最多 180 秒（空闲等待最多 120 秒）。实现见 [`extract-world-template.ts`](../../src/lib/group-chat/extract-world-template.ts) 与 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)。
 - **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
 - **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
 - **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。
@@ -117,7 +118,7 @@
 ## 8. 验证
 
 ```sh
-nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板、开发模式小说 TXT 落盘
+nr test:group-chat   # src/lib/group-chat/*.test.ts：存档、权限、上下文隔离、调度、接续、幂等、暂停竞态、摘要、provider、会话、Writer 接口、模板、从小说提取模板、开发模式小说 TXT 落盘
 nr test:novel        # novel/*.test.ts：上下文、导入导出、剧情整理、摘要归档、Fork、章节文本、Markdown 位置映射、差异
 nr check
 node_modules/.bin/tsc --noEmit --incremental false

@@ -1,4 +1,10 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { basename, join } from "node:path";
 import { z } from "zod";
 import {
@@ -6,30 +12,24 @@ import {
   configSchema,
   idSchema,
   type WorldConfig,
-  type WorldKind,
+  WorldError,
+  worldKindSchema,
 } from "./model";
-import {
-  type WorldGradient,
-  worldGradientFromSeed,
-  worldGradients,
-} from "./world-gradient";
+import { worldGradientFromSeed, worldGradients } from "./world-gradient";
+import type { WorldTemplate, WorldTemplateFile } from "./world-template-model";
+
+export type { WorldTemplate, WorldTemplateFile } from "./world-template-model";
 
 const templateMetaSchema = z.object({
   description: z.string().trim().min(1).max(800),
   details: z.string().trim().min(1).max(120),
   gradient: z.enum(worldGradients),
+  kind: worldKindSchema.optional(),
+  sourceRoomId: idSchema.optional(),
 });
 
-export type WorldTemplate = {
-  id: string;
-  description: string;
-  details: string;
-  gradient: WorldGradient;
-  kind: WorldKind;
-  config: WorldConfig;
-};
-
 const templatesDir = join(process.cwd(), "data", "novels", "template");
+const localTemplatesDir = join(templatesDir, "local");
 
 function jsonFiles(dir: string) {
   if (!existsSync(dir)) return [];
@@ -41,7 +41,7 @@ function jsonFiles(dir: string) {
 export function loadWorldTemplates(): WorldTemplate[] {
   const files = [
     ...jsonFiles(templatesDir),
-    ...jsonFiles(join(templatesDir, "local")),
+    ...jsonFiles(localTemplatesDir),
   ].sort((a, b) => a.localeCompare(b));
   if (files.length === 0) throw new Error(`未找到世界模板：${templatesDir}`);
   const seen = new Set<string>();
@@ -60,6 +60,10 @@ export function loadWorldTemplates(): WorldTemplate[] {
       ? templateFromBackup(id, name, raw)
       : templateFromConfig(id, name, raw);
   });
+}
+
+export function listWorldTemplateIds() {
+  return loadWorldTemplates().map((template) => template.id);
 }
 
 function isWorldChat(raw: unknown) {
@@ -106,11 +110,12 @@ function templateFromConfig(
   requireAvatars(name, config.data);
   return {
     id,
-    kind: "script",
+    kind: meta.data.kind ?? "script",
     description: meta.data.description,
     details: meta.data.details,
     gradient: meta.data.gradient,
     config: config.data,
+    sourceRoomId: meta.data.sourceRoomId,
   };
 }
 
@@ -143,7 +148,29 @@ function templateFromBackup(
       ),
     gradient: meta.data.gradient ?? worldGradientFromSeed(id),
     config: backup.data.config,
+    sourceRoomId: meta.data.sourceRoomId,
   };
+}
+
+export function saveLocalWorldTemplate(template: WorldTemplate) {
+  const id = idSchema.parse(template.id);
+  if (existsSync(join(templatesDir, `${id}.json`)))
+    throw new WorldError("conflict", `模板 id 与内置模板冲突：${id}`, 409);
+  mkdirSync(localTemplatesDir, { recursive: true });
+  const path = join(localTemplatesDir, `${id}.json`);
+  if (existsSync(path))
+    throw new WorldError("conflict", `本地模板已存在：${id}`, 409);
+  requireAvatars(id, template.config);
+  const file: WorldTemplateFile = {
+    description: template.description,
+    details: template.details,
+    gradient: template.gradient,
+    kind: template.kind,
+    ...(template.sourceRoomId ? { sourceRoomId: template.sourceRoomId } : {}),
+    ...template.config,
+  };
+  writeFileSync(path, `${JSON.stringify(file, null, 2)}\n`, "utf8");
+  return { id, path: `data/novels/template/local/${id}.json` };
 }
 
 const templates = loadWorldTemplates();
