@@ -13,6 +13,7 @@ import {
   insertChapterBefore,
   insertChapterPrompt,
   maxBackgroundFileBytes,
+  maxChapterLength,
   maxNovelPromptLength,
   novelRequest,
   parseBackgroundFile,
@@ -375,6 +376,7 @@ test("whole chapter rewrite sends the archive, uncovered preceding prose and the
   });
   assert.equal(prompt.followingChapters, undefined);
   assert.equal(prompt.task.requirements, "缩短对白");
+  assert.equal(prompt.task.maxCharacters, maxChapterLength);
   assert.match(prompt.task.instructions, /targetChapter\.text 的完整替换正文/);
   assert.doesNotMatch(
     prompt.task.instructions,
@@ -396,6 +398,12 @@ test("whole chapter rewrite sends the archive, uncovered preceding prose and the
   assert.deepEqual(earlier.completedChapters, []);
   assert.deepEqual(earlier.archivedChapters, prompt.archivedChapters);
   assert.equal(earlier.task.instructions, prompt.task.instructions);
+  const updated = replaceChapterText(novel, "b", "她递出钥匙。");
+  assert.deepEqual(updated.chapters, [
+    ...novel.chapters.slice(0, 2),
+    { ...novel.chapters[2], text: "她递出钥匙。" },
+    ...novel.chapters.slice(3),
+  ]);
 });
 
 test("compact passage rewrite skips the shared history but retains the target chapter and recent prose", () => {

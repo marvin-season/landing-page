@@ -14,6 +14,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useRef,
   useState,
@@ -67,15 +68,16 @@ export function ChapterEditor({
   base: Chapter;
   chapters: readonly Chapter[];
   initialText?: string;
-  generation?: {
-    kind: "chapter" | "rewrite";
-    range?: ChapterTextRange;
-    onGenerate: () => boolean;
-    renderForm: (props: {
-      disabled: boolean;
-      onGenerate: () => void;
-    }) => ReactNode;
-  };
+  generation?:
+    | {
+        kind: "chapter";
+        onGenerate: () => boolean;
+        renderForm: (props: {
+          disabled: boolean;
+          onGenerate: () => void;
+        }) => ReactNode;
+      }
+    | { kind: "rewrite"; range?: ChapterTextRange };
   writer: Pick<
     ReturnType<typeof useNovel>,
     | "busy"
@@ -126,21 +128,17 @@ export function ChapterEditor({
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const generatingDraft = Boolean(generation);
-  const rewriteRange = generation?.range;
+  const isRewrite = generation?.kind === "rewrite";
+  const rewriteRange = isRewrite ? generation.range : undefined;
   const isNewChapter = !chapters.some((chapter) => chapter.id === base.id);
   const waitingForRewrite =
-    generation?.kind === "rewrite" &&
-    useGeneratedText &&
-    !writer.preview.trim();
+    isRewrite && useGeneratedText && !writer.preview.trim();
+  const rewriteThinking = writer.busy && waitingForRewrite;
   const showingPreview =
-    generatingDraft &&
-    useGeneratedText &&
-    (!waitingForRewrite || (!rewriteRange && writer.busy));
-  const previewText =
-    showingPreview && rewriteRange
-      ? replaceTextRange(base.text, writer.preview, rewriteRange)
-      : writer.preview;
-  const draftText = showingPreview ? previewText : draft.text;
+    generatingDraft && useGeneratedText && !waitingForRewrite;
+  const draftText = showingPreview
+    ? replaceTextRange(base.text, writer.preview, rewriteRange)
+    : draft.text;
   const draftStatus = useChapterEditorDraft(
     roomKey,
     base.id,
@@ -156,33 +154,44 @@ export function ChapterEditor({
   const currentDraft = generation ? { ...base, text: draftText } : draft;
   const revealGeneratedText = showingPreview && !writer.generationStopped;
   const textToReveal = showingPreview ? writer.preview : draftText;
-  // Reveal a burst over a few frames without delaying ordinary text deltas.
   const newTextLength = textToReveal.length - revealedLength;
-  const frameLength = revealGeneratedText
-    ? Math.min(
-        textToReveal.length,
-        revealedLength + Math.max(24, Math.ceil(newTextLength / 8)),
-      )
-    : textToReveal.length;
+  const frameLength =
+    isRewrite && revealGeneratedText
+      ? Math.min(textToReveal.length, Math.max(1, revealedLength))
+      : revealGeneratedText
+        ? Math.min(
+            textToReveal.length,
+            revealedLength + Math.max(24, Math.ceil(newTextLength / 8)),
+          )
+        : textToReveal.length;
   const visibleLength =
     frameLength < textToReveal.length &&
     (textToReveal.codePointAt(frameLength - 1) ?? 0) > 0xffff
       ? frameLength + 1
       : frameLength;
-  const visiblePreview = textToReveal.slice(0, visibleLength);
-  const visibleText =
-    showingPreview && rewriteRange
-      ? replaceTextRange(base.text, visiblePreview, rewriteRange)
-      : visiblePreview;
-  const editorBusy = writer.busy || visibleLength < textToReveal.length;
+  const revealPending = visibleLength < textToReveal.length;
+  const visibleText = revealPending
+    ? replaceTextRange(
+        base.text,
+        textToReveal.slice(0, visibleLength),
+        rewriteRange,
+      )
+    : draftText;
+  const editorBusy = writer.busy || revealPending;
   const dirty =
     draftText !== base.text &&
     (!generatingDraft || !useGeneratedText || Boolean(draftText.trim()));
   const exceedsLimit = draftText.length > maxChapterLength;
-  const highlight =
-    showingPreview && rewriteRange
+  const selectedRange =
+    target ??
+    (!showingPreview && !appliedRange && draftText === base.text
+      ? rewriteRange
+      : undefined);
+  const highlight = draftLoading
+    ? null
+    : showingPreview && rewriteRange
       ? { start: rewriteRange.start, end: rewriteRange.start + visibleLength }
-      : (target ?? appliedRange);
+      : (selectedRange ?? appliedRange);
   const hasHighlight = Boolean(highlight);
   const cannotSave =
     !dirty ||
@@ -193,7 +202,8 @@ export function ChapterEditor({
     ((generatingDraft || isNewChapter) && !draftText.trim());
   const isPassage = Boolean(target || rewriteRange);
   const polishLabel = isPassage ? "润色选段" : "润色本章";
-  const polishAvailable = !showDiff && generation?.kind !== "chapter";
+  const polishAvailable =
+    !showDiff && (!generation || (isRewrite && editorBusy));
   const polishNeedsSave = !generatingDraft && (dirty || isNewChapter);
   useUnsavedNavigation(
     (generatingDraft && writer.busy) ||
@@ -208,7 +218,7 @@ export function ChapterEditor({
           : "草稿未能保存到本机，确定离开吗？",
   );
   useRegisterPromptReuse((text) => {
-    if (writer.busy || ended || saving || showDiff) return false;
+    if (editorBusy || ended || saving || showDiff || isRewrite) return false;
     onRewriteRequirementsChange(text);
     if (polishAvailable) onRequestComposer();
     return true;
@@ -221,23 +231,38 @@ export function ChapterEditor({
   }, [generation, isNewChapter]);
 
   useLayoutEffect(() => {
-    if (revealedLength === visibleLength || !revealGeneratedText) return;
+    if (isRewrite || revealedLength === visibleLength || !revealGeneratedText)
+      return;
     const frame = requestAnimationFrame(() => setRevealedLength(visibleLength));
     return () => cancelAnimationFrame(frame);
-  }, [revealGeneratedText, revealedLength, visibleLength]);
+  }, [isRewrite, revealGeneratedText, revealedLength, visibleLength]);
+
+  const rewriteHasMore = isRewrite && revealPending;
+  const advanceRewrite = useEffectEvent((from: number) => {
+    if (!rewriteHasMore || visibleLength !== from) return;
+    const remaining = textToReveal.length - from;
+    const step = Math.max(2, Math.ceil(remaining / 12));
+    setRevealedLength(Math.min(textToReveal.length, from + step));
+  });
+
+  // Incoming deltas extend the buffer without restarting the display timer.
+  useEffect(() => {
+    if (!rewriteHasMore) return;
+    const timer = setTimeout(() => advanceRewrite(visibleLength), 40);
+    return () => clearTimeout(timer);
+  }, [rewriteHasMore, visibleLength]);
 
   useLayoutEffect(() => {
     const input = editor.current;
-    if (!generatingDraft || !useGeneratedText || !visibleText || !input) return;
+    if (!showingPreview || !visibleText || !input) return;
     // Updating the textarea value can move the viewport to the caret.
     input.scrollTop = generatedScrollTop.current ?? input.scrollHeight;
-  }, [generatingDraft, useGeneratedText, visibleText]);
+  }, [showingPreview, visibleText]);
 
   useLayoutEffect(() => {
-    if (generation?.kind !== "rewrite" || writer.busy || !useGeneratedText)
-      return;
-    if (writer.preview.trim()) {
-      setDraft({ ...base, text: previewText });
+    if (!isRewrite || editorBusy || !useGeneratedText) return;
+    if (showingPreview) {
+      setDraft({ ...base, text: draftText });
       if (rewriteRange)
         setAppliedRange({
           start: rewriteRange.start,
@@ -247,11 +272,12 @@ export function ChapterEditor({
     setUseGeneratedText(false);
   }, [
     base,
-    generation?.kind,
-    previewText,
+    draftText,
+    editorBusy,
+    isRewrite,
     rewriteRange,
+    showingPreview,
     useGeneratedText,
-    writer.busy,
     writer.preview,
   ]);
 
@@ -308,12 +334,17 @@ export function ChapterEditor({
 
   useLayoutEffect(() => {
     const input = editor.current;
-    if (!hasHighlight || !input) return;
-    syncMirror();
+    if (!hasHighlight || showDiff || !input) return;
     const observer = new ResizeObserver(syncMirror);
     observer.observe(input);
     return () => observer.disconnect();
-  }, [hasHighlight, syncMirror]);
+  }, [hasHighlight, showDiff, syncMirror]);
+
+  // Keep the highlight aligned after a streamed update changes the textarea's scroll position.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: visibleText is the committed mirror and textarea text
+  useLayoutEffect(() => {
+    if (hasHighlight && !showDiff) syncMirror();
+  }, [hasHighlight, showDiff, syncMirror, visibleText]);
 
   // Remeasure after the caret prefix and the textarea value commit.
   // biome-ignore lint/correctness/useExhaustiveDependencies: those values are the committed mirror and textarea text
@@ -370,8 +401,7 @@ export function ChapterEditor({
   async function save() {
     if (cannotSave) return;
     clearTimeout(pendingSelection.current);
-    if (generation?.kind !== "rewrite") closeRewrite();
-    setAppliedRange(null);
+    if (!isRewrite) closeRewrite();
     setSaving(true);
     setSaveFailed(false);
     if (generation) {
@@ -381,7 +411,10 @@ export function ChapterEditor({
     try {
       const saved = await onSave(currentDraft);
       setSaveFailed(!saved);
-      if (saved) setShowDiff(false);
+      if (saved) {
+        setAppliedRange(null);
+        setShowDiff(false);
+      }
     } finally {
       setSaving(false);
     }
@@ -400,12 +433,17 @@ export function ChapterEditor({
   }
 
   function submitPolish() {
-    if (saving || ended || editorBusy || draftUnavailable || polishNeedsSave)
+    if (
+      generation ||
+      saving ||
+      ended ||
+      editorBusy ||
+      draftUnavailable ||
+      polishNeedsSave
+    )
       return;
-    const range = target ?? rewriteRange;
+    const range = target ?? undefined;
     if (!(range ? base.text.slice(range.start, range.end) : draftText).trim())
-      return;
-    if (dirty && !window.confirm("重新生成会替换当前草稿，确定继续吗？"))
       return;
     if (!onBeginChapterRewrite(range)) return;
     clearTimeout(pendingSelection.current);
@@ -413,7 +451,6 @@ export function ChapterEditor({
       ? (editor.current?.scrollTop ?? 0)
       : null;
     setTarget(null);
-    setAppliedRange(null);
     setRevealedLength(0);
     setUseGeneratedText(true);
     setSaveFailed(false);
@@ -452,11 +489,13 @@ export function ChapterEditor({
         }
         submitDisabled={polishNeedsSave}
         submitLabel={
-          polishNeedsSave
-            ? "保存章节后可润色"
-            : generation?.kind === "rewrite"
-              ? "重新生成"
-              : "开始润色"
+          rewriteThinking
+            ? "思考中…"
+            : isRewrite
+              ? "正在润色…"
+              : polishNeedsSave
+                ? "保存章节后可润色"
+                : "开始润色"
         }
         onGenerate={submitPolish}
         onDelete={target ? deleteSelection : undefined}
@@ -529,9 +568,11 @@ export function ChapterEditor({
               )}
             >
               {generation && editorBusy
-                ? draftText
-                  ? "正在生成…"
-                  : "等待输出…"
+                ? rewriteThinking
+                  ? "思考中…"
+                  : draftText
+                    ? "正在生成…"
+                    : "等待输出…"
                 : saving
                   ? "保存中…"
                   : draftLoading
@@ -652,7 +693,7 @@ export function ChapterEditor({
               <div
                 className={cn(
                   "relative flex min-h-48 flex-1 overflow-hidden",
-                  target && "@3xl:min-h-0",
+                  isPassage && "@3xl:min-h-0",
                 )}
               >
                 <div
@@ -676,12 +717,7 @@ export function ChapterEditor({
                     className="pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 py-2 text-sm leading-7 text-transparent"
                   >
                     {visibleText.slice(0, highlight.start)}
-                    <mark
-                      className={cn(
-                        "text-transparent",
-                        target ? "bg-primary/25" : "bg-emerald-500/25",
-                      )}
-                    >
+                    <mark className="text-transparent bg-primary/25">
                       {visibleText.slice(highlight.start, highlight.end)}
                     </mark>
                     {visibleText.slice(highlight.end)}
@@ -693,11 +729,6 @@ export function ChapterEditor({
                   variant="plain"
                   aria-label="章节正文"
                   readOnly={editorBusy || saving || draftUnavailable}
-                  placeholder={
-                    generation?.kind === "rewrite" && writer.busy
-                      ? "等待输出…"
-                      : undefined
-                  }
                   value={draftLoading ? "" : visibleText}
                   maxLength={
                     draftText.length > maxChapterLength
@@ -766,8 +797,8 @@ export function ChapterEditor({
                   className={cn(
                     "relative min-h-48 flex-1 resize-none leading-7 focus:border-transparent",
                     polishAvailable && "scroll-pb-(--composer-dock-height)",
-                    target && "selection:bg-transparent",
-                    target && "@3xl:min-h-0",
+                    selectedRange && "selection:bg-transparent",
+                    isPassage && "@3xl:min-h-0",
                   )}
                 />
               </div>

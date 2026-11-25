@@ -629,7 +629,7 @@ export function useNovel(
       "plot" in captured ||
       captured.chapterId !== chapter.id
     ) {
-      setError("无法应用这份润色草稿。草稿仍在，可复制正文或重新生成。");
+      setError("无法应用这份润色草稿。草稿仍在，可复制正文。");
       return false;
     }
     if (
@@ -637,7 +637,7 @@ export function useNovel(
       room.version !== captured.version ||
       room.status === "ended"
     ) {
-      setError("小说或世界设定已变更，请重新生成重写草稿。");
+      setError("小说或世界设定已变更，无法应用这份润色草稿。");
       return false;
     }
     const saved = await update(replaceChapter(captured.novel, chapter), {

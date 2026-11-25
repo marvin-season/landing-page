@@ -474,8 +474,6 @@ export function NovelPanel({
               ? {
                   kind: mode,
                   range: rewriteRange,
-                  onGenerate: () => beginChapterRewrite(base.id, rewriteRange),
-                  renderForm: () => null,
                 }
               : undefined
         }
