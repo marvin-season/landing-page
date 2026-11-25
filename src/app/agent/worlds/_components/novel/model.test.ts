@@ -21,10 +21,12 @@ import {
   renameChapter,
   replaceChapter,
   replaceChapterText,
+  rewriteInstructions,
   rewritePrompt,
   serializeBackground,
   splitChapterAt,
   summaryPrompt,
+  writerInstructions,
 } from "./model";
 
 test("continuation sends chapters only through the selected one and never sends an archive covering later chapters", () => {
@@ -192,7 +194,13 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   assert.equal(prompt.world.priorContext, "世界前置剧情。");
   assert.equal(prompt.importedBackground.summary, "导入的前情。");
   assert.equal(prompt.archivedChapters, undefined);
-  assert.deepEqual(prompt.task, {
+  const { instructions, ...task } = prompt.task;
+  assert.match(
+    instructions,
+    /在 previousChapters 和 followingChapters 之间补写一章/,
+  );
+  assert.doesNotMatch(instructions, /completedChapters/);
+  assert.deepEqual(task, {
     mode: "insert",
     chapter: 5,
     targetWords: 4000,
@@ -265,25 +273,34 @@ test("opening insertion sends only basic settings and the author's request, even
       "  从下雨的早晨写起  ",
     ),
   );
-  assert.deepEqual(opening, {
-    world: {
-      title: config.title,
-      background: config.background,
-      scene: config.scene,
-      rules: config.rules,
-      facts: config.facts,
-      storyGoal: config.storyGoal,
-      characters: config.characters,
+  const { instructions, ...task } = opening.task;
+  assert.match(instructions, /创作新的开篇/);
+  assert.doesNotMatch(
+    instructions,
+    /previousChapters|followingChapters|completedChapters/,
+  );
+  assert.deepEqual(
+    { ...opening, task },
+    {
+      world: {
+        title: config.title,
+        background: config.background,
+        scene: config.scene,
+        rules: config.rules,
+        facts: config.facts,
+        storyGoal: config.storyGoal,
+        characters: config.characters,
+      },
+      novel: { title: novel.title, style: novel.style, outline: novel.outline },
+      task: {
+        mode: "insert",
+        chapter: 1,
+        targetWords: 4000,
+        maxCharacters: 8000,
+        requirements: "从下雨的早晨写起",
+      },
     },
-    novel: { title: novel.title, style: novel.style, outline: novel.outline },
-    task: {
-      mode: "insert",
-      chapter: 1,
-      targetWords: 4000,
-      maxCharacters: 8000,
-      requirements: "从下雨的早晨写起",
-    },
-  });
+  );
 });
 
 test("a passage rewrite sends the unselected text and replaces only the selected occurrence", () => {
@@ -306,8 +323,20 @@ test("a passage rewrite sends the unselected text and replaces only the selected
     after: "\r\n\r\n灯亮了。",
   });
   assert.equal(prompt.targetChapter.text, undefined);
-  assert.deepEqual(Object.keys(prompt), ["world", "targetChapter", "task"]);
+  assert.deepEqual(Object.keys(prompt), [
+    "world",
+    "novel",
+    "targetChapter",
+    "task",
+  ]);
   assert.deepEqual(prompt.world.characters, config.characters);
+  assert.equal(prompt.novel.style, novel.style);
+  assert.match(prompt.task.instructions, /selection\.text 的完整替换正文/);
+  assert.match(prompt.task.instructions, /selection\.before.*selection\.after/);
+  assert.doesNotMatch(
+    prompt.task.instructions,
+    /followingChapters|targetChapter\.text|endingMaxCharacters|JSON/,
+  );
   assert.equal(prompt.task.requirements, "补足动作细节");
   const updated = replaceChapterText(
     novel,
@@ -363,6 +392,11 @@ test("whole chapter rewrite sends all preceding chapters and only the immediate 
     { chapter: 4, title: "开门", text: "他掏出钥匙。" },
   ]);
   assert.equal(prompt.task.requirements, "缩短对白");
+  assert.match(prompt.task.instructions, /targetChapter\.text 的完整替换正文/);
+  assert.doesNotMatch(
+    prompt.task.instructions,
+    /selection\.|endingMaxCharacters|JSON/,
+  );
   assert.equal(prompt.world.priorContext, undefined);
   assert.deepEqual(prompt.world.characters, config.characters);
   assert.equal(prompt.archivedChapters, undefined);
@@ -406,38 +440,91 @@ test("compact rewrite sends world settings and requirements with only the select
       true,
     ),
   );
-  assert.deepEqual(prompt, {
-    world: {
-      title: config.title,
-      background: config.background,
-      scene: config.scene,
-      rules: config.rules,
-      facts: config.facts,
-      storyGoal: config.storyGoal,
-      characters: config.characters,
+  const { instructions, ...task } = prompt.task;
+  assert.match(instructions, /人称、时态、叙述视角和起止边界/);
+  assert.doesNotMatch(
+    instructions,
+    /previousChapters|followingChapters|selection\.before|selection\.after/,
+  );
+  assert.deepEqual(
+    { ...prompt, task },
+    {
+      world: {
+        title: config.title,
+        background: config.background,
+        scene: config.scene,
+        rules: config.rules,
+        facts: config.facts,
+        storyGoal: config.storyGoal,
+        characters: config.characters,
+      },
+      novel: { style: novel.style },
+      targetChapter: { selection: { text: selected } },
+      task: {
+        maxCharacters: 8000 - (novel.chapters[2].text.length - selected.length),
+        requirements: "收紧节奏",
+      },
     },
-    targetChapter: { selection: { text: selected } },
-    task: {
-      maxCharacters: 8000 - (novel.chapters[2].text.length - selected.length),
-      requirements: "收紧节奏",
-    },
-  });
+  );
 
   novel.chapters[1].text = "长".repeat(maxNovelPromptLength);
   const compactChapter = JSON.parse(
     rewritePrompt(config, novel, "c", "收紧节奏", undefined, true),
   );
-  assert.deepEqual(compactChapter, {
-    ...prompt,
-    targetChapter: { text: novel.chapters[2].text },
-    task: { ...prompt.task, maxCharacters: 8000 },
-  });
+  const { instructions: wholeInstructions, ...wholeTask } = compactChapter.task;
+  assert.match(wholeInstructions, /targetChapter\.text/);
+  assert.doesNotMatch(
+    wholeInstructions,
+    /previousChapters|followingChapters|selection/,
+  );
+  assert.deepEqual(
+    { ...compactChapter, task: wholeTask },
+    {
+      ...prompt,
+      targetChapter: { text: novel.chapters[2].text },
+      task: { ...task, maxCharacters: 8000 },
+    },
+  );
 
   novel.chapters[2].text = "长".repeat(maxNovelPromptLength);
   assert.throws(
     () => rewritePrompt(config, novel, "c", "", undefined, true),
     /精简上下文仍然过长/,
   );
+});
+
+test("passage rewrites at chapter boundaries send only the corresponding neighboring excerpt", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  const target = "第一句。最后一句。";
+  novel.chapters = [
+    { id: "prev", title: "上章", text: `${"旧".repeat(1000)}上一章结尾。` },
+    { id: "target", title: "本章", text: target },
+    { id: "next", title: "下章", text: `下一章开头。${"后".repeat(1000)}` },
+  ];
+  const fromStart = { start: 0, end: "第一句。".length };
+  const fromEnd = { start: fromStart.end, end: target.length };
+  const opening = JSON.parse(
+    rewritePrompt(config, novel, "target", "", fromStart),
+  );
+  const ending = JSON.parse(
+    rewritePrompt(config, novel, "target", "", fromEnd),
+  );
+  assert.deepEqual(opening.previousChapters, [
+    { chapter: 1, title: "上章", text: novel.chapters[0].text.slice(-600) },
+  ]);
+  assert.equal(opening.followingChapters, undefined);
+  assert.match(opening.task.instructions, /章首承接 previousChapters/);
+  assert.equal(ending.previousChapters, undefined);
+  assert.deepEqual(ending.followingChapters, [
+    { chapter: 3, title: "下章", text: novel.chapters[2].text.slice(0, 600) },
+  ]);
+  assert.match(ending.task.instructions, /章末衔接 followingChapters/);
+  const compact = JSON.parse(
+    rewritePrompt(config, novel, "target", "", fromStart, true),
+  );
+  assert.equal(compact.previousChapters, undefined);
+  assert.doesNotMatch(compact.task.instructions, /previousChapters/);
 });
 
 test("whole chapter rewrite asks for compact mode when preceding chapters exceed the request limit", () => {
@@ -547,6 +634,16 @@ test("writer receives world secrets and edited chapters in order, with the next 
   assert.equal(prompt.task.requirements, novel.chapterGoal);
   assert.equal(prompt.task.targetWords, 1000);
   assert.equal(prompt.task.maxCharacters, 8000);
+  assert.match(prompt.task.instructions, /completedChapters/);
+  assert.doesNotMatch(
+    prompt.task.instructions,
+    /previousChapters|followingChapters|selection|JSON/,
+  );
+  assert.match(writerInstructions, /task\.instructions/);
+  assert.doesNotMatch(
+    rewriteInstructions,
+    /selection|ending|opening|stitch|merge|只输出/,
+  );
 });
 
 test("summary export imports into a different novel as background without replacing its chapters or settings", () => {

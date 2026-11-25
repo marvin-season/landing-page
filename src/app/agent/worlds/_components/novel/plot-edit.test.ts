@@ -86,6 +86,16 @@ test("stitch changes only the transition and keeps both chapter IDs and titles",
   assert.equal(stitchTask.mode, "stitch");
   assert.ok(stitchTask.endingMaxCharacters > 0);
   assert.ok(stitchTask.openingMaxCharacters > 0);
+  assert.equal(stitchTask.requirements, "加一句道别");
+  assert.match(
+    stitchTask.instructions,
+    /合法 JSON 对象 \{"ending":"\.\.\.","opening":"\.\.\."\}/,
+  );
+  assert.match(
+    stitchTask.instructions,
+    /task\.endingMaxCharacters 和 task\.openingMaxCharacters/,
+  );
+  assert.doesNotMatch(stitchTask.instructions, /selection|合并后的纯正文/);
   const draft = readPlotDraft(
     edit,
     '```json\n{"ending":"她挥手道别。","opening":"走到车站时，天已黑了。"}\n```',
@@ -140,7 +150,12 @@ test("merge rewrites a consecutive range into one chapter and renumbers only def
   assert.equal(prompt.followingChapters[0].text, novel.chapters[4].text);
   assert.equal(mergeTask.mode, "merge");
   assert.equal(mergeTask.maxCharacters, 8000);
-  assert.match(mergeTask.requirements, /作者要求：保留争执的具体原因。/);
+  assert.equal(mergeTask.requirements, "保留争执的具体原因");
+  assert.match(mergeTask.instructions, /只输出合并后的纯正文/);
+  assert.doesNotMatch(
+    mergeTask.instructions,
+    /selection|unchangedBefore|endingMaxCharacters/,
+  );
   assert.throws(() => readPlotDraft(edit, "长".repeat(8001)), /8000/);
   const draft = readPlotDraft(edit, "争执过后，她独自去了车站，找到了失物。");
   const saved = applyPlotDraft(withCheckpoint, edit, draft);

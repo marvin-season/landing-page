@@ -22,6 +22,7 @@ import {
   History,
   LoaderCircle,
   Minimize2,
+  Square,
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,7 @@ import {
   parseNovelFile,
 } from "./import-novel";
 import { type NovelBackground, serializeBackground } from "./model";
+import { localActionHint, NovelActionButton } from "./novel-action-tooltip";
 import type { NovelSyncDivergence } from "./novel-sync";
 
 export function downloadBackground(background: NovelBackground) {
@@ -307,6 +309,30 @@ export function NovelFileControls({
         <p className="text-sm text-muted-foreground">{notice}</p>
       ) : null}
     </>
+  );
+}
+
+export function NovelBackgroundSummaryStatus({
+  onStop,
+}: {
+  onStop: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <NovelActionButton
+        hint={localActionHint("停止当前背景总结。")}
+        size="sm"
+        variant="outline"
+        onClick={onStop}
+      >
+        <Square data-icon="inline-start" />
+        停止总结
+      </NovelActionButton>
+      <span className="flex items-center gap-2 text-sm text-muted-foreground">
+        <LoaderCircle className="size-4 animate-spin" />
+        正在总结剧情背景…
+      </span>
+    </div>
   );
 }
 

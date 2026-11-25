@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Switch } from "@landing-page/design-system";
+import { Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import {
   Check,
@@ -16,6 +16,14 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
+import {
+  compactContextHint,
+  localActionHint,
+  NovelActionButton,
+  NovelActionTooltip,
+  rewriteHint,
+  stopGenerationHint,
+} from "./novel-action-tooltip";
 import { WritingInstructions } from "./writing-instructions";
 
 type RewriteControls = {
@@ -118,17 +126,17 @@ export function RewritePanel({
             待应用
           </span>
         ) : (
-          <Button
+          <NovelActionButton
+            hint={localActionHint("关闭当前润色面板。")}
             type="button"
             size="icon"
             variant="ghost"
             className="size-7"
             aria-label="关闭润色"
-            title="关闭润色"
             onClick={onClose}
           >
             <X className="size-4" />
-          </Button>
+          </NovelActionButton>
         )}
       </div>
       <div
@@ -193,39 +201,56 @@ export function RewritePanel({
       </div>
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 px-3 py-2">
         {showInstructions ? (
-          <label className="mr-auto flex items-center gap-2 text-xs text-muted-foreground">
-            <Switch
-              checked={compactContext}
-              onCheckedChange={onCompactContextChange}
-            />
-            精简上下文
-          </label>
+          <NovelActionTooltip hint={compactContextHint(isPassage)}>
+            <label className="mr-auto flex items-center gap-2 text-xs text-muted-foreground">
+              <Switch
+                checked={compactContext}
+                onCheckedChange={onCompactContextChange}
+              />
+              精简上下文
+            </label>
+          </NovelActionTooltip>
         ) : null}
         {showInstructions && onDelete ? (
-          <Button
+          <NovelActionButton
+            hint={localActionHint("从本机草稿中删除选中的文字。")}
             type="button"
             size="icon"
             variant="ghost"
             className="size-8"
             aria-label="删除选区"
-            title="删除选区"
             onClick={onDelete}
           >
             <Trash2 className="size-4" />
-          </Button>
+          </NovelActionButton>
         ) : null}
         {draftReady ? (
           <>
-            <Button type="button" size="sm" variant="ghost" onClick={onClose}>
+            <NovelActionButton
+              hint={localActionHint("丢弃这次润色结果。")}
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={onClose}
+            >
               丢弃
-            </Button>
-            <Button type="button" size="sm" disabled={ended} onClick={onApply}>
+            </NovelActionButton>
+            <NovelActionButton
+              hint={localActionHint(
+                "把润色结果写入本机草稿，保存后才更新正文。",
+              )}
+              type="button"
+              size="sm"
+              disabled={ended}
+              onClick={onApply}
+            >
               <Check data-icon="inline-start" />
               应用替换
-            </Button>
+            </NovelActionButton>
           </>
         ) : writer.busy ? (
-          <Button
+          <NovelActionButton
+            hint={stopGenerationHint}
             type="button"
             size="sm"
             variant="ghost"
@@ -237,12 +262,17 @@ export function RewritePanel({
           >
             <Square data-icon="inline-start" />
             停止生成
-          </Button>
+          </NovelActionButton>
         ) : (
-          <Button type="submit" size="sm" disabled={ended}>
+          <NovelActionButton
+            hint={rewriteHint(isPassage, compactContext)}
+            type="submit"
+            size="sm"
+            disabled={ended}
+          >
             <WandSparkles data-icon="inline-start" />
             开始润色
-          </Button>
+          </NovelActionButton>
         )}
       </div>
     </form>

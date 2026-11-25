@@ -3,7 +3,6 @@
 import {
   Alert,
   AlertDescription,
-  Button,
   Collapsible,
   CollapsibleChevron,
   CollapsibleContent,
@@ -32,6 +31,7 @@ import {
   novelRequestBytes,
 } from "./context-compression";
 import { chapterPrompt, novelCheckpointCount } from "./model";
+import { localActionHint, NovelActionButton } from "./novel-action-tooltip";
 import type { useNovel } from "./use-novel";
 
 const number = new Intl.NumberFormat("zh-CN");
@@ -167,12 +167,21 @@ export function ContextControls({
         </div>
         <DialogFooter className="shrink-0 border-t border-border sm:flex-row sm:justify-end">
           {writer.compressing ? (
-            <Button variant="outline" onClick={writer.stop}>
+            <NovelActionButton
+              hint={localActionHint("停止当前压缩，不保存未完成的摘要。")}
+              variant="outline"
+              onClick={writer.stop}
+            >
               <Square data-icon="inline-start" />
               停止压缩
-            </Button>
+            </NovelActionButton>
           ) : (
-            <Button
+            <NovelActionButton
+              hint={{
+                action: "分批生成供续写使用的剧情摘要，保留章节原文。",
+                context:
+                  "完整世界设定、书名、已有摘要或导入背景、本批正文、摘要目标字数和压缩提示词。",
+              }}
               variant="outline"
               disabled={!canCompress || pending}
               onClick={() => {
@@ -184,7 +193,7 @@ export function ContextControls({
             >
               <Minimize2 data-icon="inline-start" />
               压缩上下文
-            </Button>
+            </NovelActionButton>
           )}
         </DialogFooter>
       </DialogContent>

@@ -38,6 +38,7 @@ import { ComposerDock, FloatingComposer } from "../floating-composer";
 import {
   downloadBackground,
   NovelBackgroundPreview,
+  NovelBackgroundSummaryStatus,
   NovelFileControls,
 } from "./background-controls";
 import type { ChapterDraftBackup } from "./chapter-draft-backup";
@@ -46,6 +47,7 @@ import { observeChapterEditorDrafts } from "./chapter-editor-drafts";
 import {
   ChapterGenerationForm,
   type ChapterGenerationOptions,
+  EmptyNovelContinuation,
 } from "./chapter-generation-form";
 import { ChapterIndex, type ChapterIndexEntry } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
@@ -64,6 +66,14 @@ import {
   replaceChapter,
   splitChapterAt,
 } from "./model";
+import { NewChapterDraftActions } from "./new-chapter-draft-actions";
+import {
+  localActionHint,
+  NovelActionButton,
+  NovelActionTooltip,
+  nextChapterActionHint,
+  stopGenerationHint,
+} from "./novel-action-tooltip";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
@@ -542,6 +552,11 @@ export function NovelPanel({
   const composer = newChapterDraft ? null : (
     <FloatingComposer
       label="继续创作下一章"
+      wrapTrigger={(trigger) => (
+        <NovelActionTooltip hint={nextChapterActionHint}>
+          {trigger}
+        </NovelActionTooltip>
+      )}
       draft={generationOptions.chapterGoal.trim()}
       requestOpen={composerRequest}
       onFocusInput={() =>
@@ -615,16 +630,7 @@ export function NovelPanel({
             onSummarize={writer.generateBackground}
           />
           {summarizing && writer.busy ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <Button size="sm" variant="outline" onClick={writer.stop}>
-                <Square data-icon="inline-start" />
-                停止总结
-              </Button>
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                <LoaderCircle className="size-4 animate-spin" />
-                正在总结剧情背景…
-              </span>
-            </div>
+            <NovelBackgroundSummaryStatus onStop={writer.stop} />
           ) : null}
           {writer.backgroundExport ? (
             <NovelBackgroundPreview exported={writer.backgroundExport} />
@@ -676,7 +682,8 @@ export function NovelPanel({
                 ) : null}
                 <div className="ml-auto flex shrink-0 items-center gap-2">
                   {thinkingChapter ? (
-                    <Button
+                    <NovelActionButton
+                      hint={stopGenerationHint}
                       size="sm"
                       variant="outline"
                       className="h-9"
@@ -684,10 +691,13 @@ export function NovelPanel({
                     >
                       <Square data-icon="inline-start" />
                       停止生成
-                    </Button>
+                    </NovelActionButton>
                   ) : chapter && !showingNewDraft ? (
                     <>
-                      <Button
+                      <NovelActionButton
+                        hint={localActionHint(
+                          "打开本章编辑器，并恢复已有的本机草稿。",
+                        )}
                         size="sm"
                         variant="outline"
                         className="h-9"
@@ -701,7 +711,7 @@ export function NovelPanel({
                       >
                         <PenLine data-icon="inline-start" />
                         编辑本章
-                      </Button>
+                      </NovelActionButton>
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -785,38 +795,13 @@ export function NovelPanel({
                     : `${thinkingChapter.title}正在构思…`}
                 </p>
               ) : showingNewDraft && newChapterDraft ? (
-                <div className="flex flex-col items-start gap-3 py-5">
-                  <h3 className="font-serif text-xl">
-                    {newChapterDraft.chapter.title}
-                  </h3>
-                  <p className="text-sm font-medium text-destructive">
-                    请先保存草稿
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      size="sm"
-                      disabled={chapterActionsLocked || discardingDraft}
-                      onClick={resumeNewChapterDraft}
-                    >
-                      <PenLine data-icon="inline-start" />
-                      编辑草稿
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      disabled={chapterActionsLocked || discardingDraft}
-                      onClick={() => void discardNewChapterDraft()}
-                    >
-                      <Trash2 data-icon="inline-start" />
-                      丢弃草稿
-                    </Button>
-                  </div>
-                  {writer.draftBackupFailed ? (
-                    <p role="alert" className="text-xs text-destructive">
-                      未能更新本机草稿，请重试。
-                    </p>
-                  ) : null}
-                </div>
+                <NewChapterDraftActions
+                  title={newChapterDraft.chapter.title}
+                  disabled={chapterActionsLocked || discardingDraft}
+                  backupFailed={writer.draftBackupFailed}
+                  onEdit={resumeNewChapterDraft}
+                  onDiscard={() => void discardNewChapterDraft()}
+                />
               ) : chapter ? (
                 <>
                   <PlotSheet
@@ -900,20 +885,10 @@ export function NovelPanel({
               ) : null}
             </section>
           ) : (
-            <div className="flex flex-col items-center gap-4 py-10 text-center">
-              <p className="max-w-sm text-sm text-muted-foreground">
-                还没有章节。写下下一章要求开始续写，或从文件菜单导入已有小说。
-              </p>
-              <Button
-                type="button"
-                size="sm"
-                disabled={continueLocked}
-                onClick={() => setComposerRequest((count) => count + 1)}
-              >
-                <PenLine data-icon="inline-start" />
-                填写下一章要求
-              </Button>
-            </div>
+            <EmptyNovelContinuation
+              disabled={continueLocked}
+              onOpen={() => setComposerRequest((count) => count + 1)}
+            />
           )}
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 ## 1. 核心决策
 
-一个 Writer 统一负责情节、人物言行、叙事视角、文风和章节衔接。角色是作者掌握的创作资料，不是轮流调用的 Agent。写章、润色、剧情整理和背景总结都是同一个 `world-writer` 的不同任务，靠不同的 system 指令区分。
+一个 Writer 统一负责情节、人物言行、叙事视角、文风和章节衔接。角色是作者掌握的创作资料，不是轮流调用的 Agent。写章、润色和剧情整理由同一个 `world-writer` 执行，每次仅发送当前操作的指令和上下文；总结使用独立的档案指令。
 
 | 项目 | 剧本 | 小说 |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ type Novel = {
 
 ## 4. Writer 任务与上下文
 
-请求体为 `{ roomId, prompt, task }`，`task` 取 `chapter`、`rewrite` 或 `summary`。`prompt` 是在浏览器中构造的 JSON 文本，服务端按 `task` 选择对应的固定指令。
+请求体为 `{ roomId, prompt, task }`，外层 `task` 取 `chapter`、`rewrite` 或 `summary`。`prompt` 是在浏览器中构造的 JSON 文本。写章和编辑共用固定的 Writer 通用指令；本次操作的范围、衔接要求和输出格式写入 `prompt` 内的 `task.instructions`，作者输入单独放在 `task.requirements`。粘合只要求输出 `{ ending, opening }` JSON，其他写章和编辑操作只要求输出正文。
 
 - **完整世界设定**：整个 `WorldConfig`。
 - **世界基本设定**：`title`、`background`、`scene`、`rules`、`facts`、`storyGoal`、`characters`，不含 `priorContext`。
@@ -66,14 +66,16 @@ type Novel = {
 | --- | --- | --- |
 | 续写下一章 | `chapter` | 完整世界设定；书名、文风、大纲；只发送当前章及之前章节的标题和正文；`task` 含新章章号、目标字数、8000 字上限和下一章要求（留空时为“承接前文与大纲，推进下一阶段情节。”）。续写摘要仅在覆盖范围不超过当前章时使用。 |
 | 剧情插入 | `chapter`，`task.mode: "insert"` | **第一章之前**：只发送世界基本设定、书名、文风、大纲及本次写作要求和字数限制，不发送已有章节或剧情摘要。**章间**：发送完整世界设定、书名、文风、大纲、插入要求、字数限制及所选两章的完整正文（`previousChapters` / `followingChapters` 各一章）。章号和默认标题按插入后的位置编号。超过 150,000 字符则报错。 |
-| 润色整章 | `rewrite` | 世界基本设定；目标章（章号、标题、正文）；全部前文章节和紧邻的下一章；润色要求（留空时为“改善语言、节奏和过渡，保留关键剧情。”）。开启「精简上下文」后，章节部分只发本章正文。 |
-| 润色选段 | `rewrite` | 世界基本设定；目标章的章号和标题，以及已保存正文中的 `selection: { before, text, after }`；替换长度上限为 8000 减去选区外文字的长度。不发送其他章节。开启「精简上下文」后只发选段正文。 |
+| 润色整章 | `rewrite` | 世界基本设定、小说文风；目标章（章号、标题、正文）；全部前文章节和紧邻的下一章；润色要求（留空时为“改善语言、节奏和过渡，保留关键剧情。”）。开启「精简上下文」后，章节部分只发本章正文。 |
+| 润色选段 | `rewrite` | 世界基本设定、小说文风；目标章的章号和标题，以及已保存正文中的 `selection: { before, text, after }`；替换长度上限为 8000 减去选区外文字的长度。选段触及章首或章末时，再发送对应一侧相邻章的边界片段（最多 600 字符）。开启「精简上下文」后，章节部分只发选段正文。 |
 | 剧情粘合 | `rewrite`，`task.mode: "stitch"` | 完整世界设定；书名、文风、大纲；所选前一章的结尾和后一章的开头（各约 1,200 字符，边界对齐到段落或句末，短章取全文），以 JSON `{ ending, opening }` 放入 `targetChapter.text`；所选两章中紧邻改写区的保留原文（各 ≤600 字符）；过渡要求和两段各自的长度上限。要求模型输出 JSON。 |
 | 剧情合并 | `rewrite`，`task.mode: "merge"` | 完整世界设定；书名、文风、大纲；所选连续章节的章名和完整正文，按章序以 JSON 数组放入 `targetChapter.text`；选中范围外前一章的结尾、后一章的开头（各 ≤600 字符）；固定的单章压缩要求（去重、抹除接缝，保留关键事件、伏笔和人物变化），以及选填的本次写作要求。超过 150,000 字符则报错。 |
 | 总结并导出背景 | `summary` | 完整世界设定；书名；已完成章节的标题和正文（有效摘要会代替它覆盖的章节）。不发送文风、大纲和下一章要求。 |
 | 续写上下文压缩 | `summary` | 完整世界设定、书名、已有摘要或导入背景、本批待压缩的正文，以及按压缩率计算的累计摘要目标字符数和选填的压缩提示词。多批次依次更新同一份剧情摘要。 |
 
 润色和剧情整理都不发送续写摘要。续写和总结在没有有效续写摘要时会发送导入背景；章间插入有导入背景时也会发送。导入背景以 `importedBackground` 字段传递。
+
+悬停在续写、润色、剧情整理或上下文压缩按钮上，可查看操作作用和发送给 AI 的内容。润色提示随整章、选段和「精简上下文」切换；剧情插入提示随书首或章间切换。手动写章、保存及应用草稿等操作会提示不向 AI 发送内容。
 
 **不调用模型的操作**：编辑与保存正文、查看修改、删除选区、切换章节、拆章、删章、导入导出小说、应用或丢弃草稿，以及复制小说（只创建房间并写入本机）。
 
@@ -84,8 +86,8 @@ type Novel = {
 1. 校验登录和同源 `Origin`，以及 `roomId`、`task`，`prompt` 不超过 150,000 字符。
 2. 读取房间并校验所有者。只接受 `kind === "novel"` 且未结束的房间，否则返回 409。
 3. 选定写作模型，会话标识为 `worldSessionId(room, "writer", model)`。
-4. 调用 `handleChatStream`：`agentId: "world-writer"`，按 task 选用 `writerInstructions` / `rewriteInstructions` / `summaryInstructions`，`activeTools: []`，`toolChoice: "none"`，`maxSteps: 1`，`maxOutputTokens: 8192`，`maxRetries: 0`，并透传 `request.signal`。
-5. 以 AI SDK UI 消息流返回。客户端不能覆盖模型、指令或工具配置。
+4. 调用 `handleChatStream`：`agentId: "world-writer"`，按外层 `task` 选用通用写作指令或 `summaryInstructions`，`activeTools: []`，`toolChoice: "none"`，`maxSteps: 1`，`maxOutputTokens: 8192`，`maxRetries: 0`，并透传 `request.signal`。
+5. 以 AI SDK UI 消息流返回。客户端不能覆盖模型、系统指令或工具配置。本次操作的指令和素材通过用户消息 `prompt` 传入。
 
 ## 6. 任务生命周期
 

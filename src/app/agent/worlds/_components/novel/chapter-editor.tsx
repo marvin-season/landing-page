@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, SelectItem, Textarea } from "@landing-page/design-system";
+import { SelectItem, Textarea } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import {
   ArrowLeft,
@@ -33,6 +33,13 @@ import {
   textareaSelectionRange,
 } from "./chapter-text";
 import { type Chapter, maxChapterLength } from "./model";
+import {
+  localActionHint,
+  NovelActionButton,
+  NovelActionTooltip,
+  rewriteHint,
+  stopGenerationHint,
+} from "./novel-action-tooltip";
 import { RewritePanel } from "./rewrite-form";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
@@ -413,6 +420,11 @@ export function ChapterEditor({
   const polishComposer = (
     <FloatingComposer
       label={polishLabel}
+      wrapTrigger={(trigger) => (
+        <NovelActionTooltip hint={rewriteHint(Boolean(target), compactContext)}>
+          {trigger}
+        </NovelActionTooltip>
+      )}
       draft={rewriteRequirements.trim()}
       forceOpen={selectionPending}
       requestOpen={composerRequest}
@@ -455,6 +467,7 @@ export function ChapterEditor({
       ) : (
         <ChapterRewriteForm
           embedded
+          isPassage={Boolean(target)}
           inputRef={polishInput}
           title={polishLabel}
           requirements={rewriteRequirements}
@@ -490,7 +503,8 @@ export function ChapterEditor({
       <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto bg-background/95">
         <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
           <div className="flex min-w-0 max-w-full items-center gap-2">
-            <Button
+            <NovelActionButton
+              hint={localActionHint("返回阅读页，保留本机草稿。")}
               size="sm"
               variant="ghost"
               className="shrink-0"
@@ -507,7 +521,7 @@ export function ChapterEditor({
             >
               <ArrowLeft data-icon="inline-start" />
               返回阅读
-            </Button>
+            </NovelActionButton>
             <div className="flex min-w-0 items-center gap-2 text-sm">
               <WorldSelect
                 label="章节目录"
@@ -574,7 +588,8 @@ export function ChapterEditor({
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {generation && writer.busy ? (
-              <Button
+              <NovelActionButton
+                hint={stopGenerationHint}
                 type="button"
                 size="sm"
                 variant="outline"
@@ -582,10 +597,11 @@ export function ChapterEditor({
               >
                 <Square data-icon="inline-start" />
                 停止生成
-              </Button>
+              </NovelActionButton>
             ) : null}
             {showDiff ? (
-              <Button
+              <NovelActionButton
+                hint={localActionHint("关闭对比，继续编辑草稿。")}
                 size="sm"
                 variant="outline"
                 disabled={editorBusy || saving}
@@ -593,9 +609,10 @@ export function ChapterEditor({
               >
                 <PencilLine data-icon="inline-start" />
                 返回编辑
-              </Button>
+              </NovelActionButton>
             ) : (
-              <Button
+              <NovelActionButton
+                hint={localActionHint("对比已保存正文和当前草稿。")}
                 size="sm"
                 variant="outline"
                 disabled={!dirty || editingLocked || editorBusy || saving}
@@ -606,12 +623,21 @@ export function ChapterEditor({
               >
                 <GitCompareArrows data-icon="inline-start" />
                 查看修改
-              </Button>
+              </NovelActionButton>
             )}
-            <Button size="sm" disabled={cannotSave} onClick={() => void save()}>
+            <NovelActionButton
+              hint={localActionHint(
+                isNewChapter
+                  ? "保存草稿并加入章节目录。"
+                  : "将草稿保存为章节正文。",
+              )}
+              size="sm"
+              disabled={cannotSave}
+              onClick={() => void save()}
+            >
               <Save data-icon="inline-start" />
               {generation ? "应用草稿" : "保存章节"}
-            </Button>
+            </NovelActionButton>
           </div>
         </div>
         {showDiff ? (

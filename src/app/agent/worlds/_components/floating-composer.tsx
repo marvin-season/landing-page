@@ -9,6 +9,7 @@ import {
 import { cn } from "@landing-page/utils";
 import { ChevronDown, PenLine } from "lucide-react";
 import {
+  type ReactElement,
   type ReactNode,
   useCallback,
   useLayoutEffect,
@@ -67,6 +68,7 @@ export function FloatingComposer({
   requestOpen = 0,
   expandRequest = 0,
   onFocusInput,
+  wrapTrigger,
   children,
 }: {
   label: string;
@@ -76,6 +78,7 @@ export function FloatingComposer({
   /** Opens the composer without moving focus, so a text selection can stay put. */
   expandRequest?: number;
   onFocusInput: () => void;
+  wrapTrigger?: (trigger: ReactElement) => ReactElement;
   children: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -95,6 +98,26 @@ export function FloatingComposer({
     setExpanded(true);
   }, [expandRequest]);
 
+  const openButton = (
+    <CollapsibleTrigger asChild>
+      <Button
+        ref={trigger}
+        type="button"
+        variant="ghost"
+        aria-label={label}
+        className={cn(
+          "absolute inset-x-0 top-0 h-11 w-full min-w-0 justify-start gap-2.5 rounded-xl px-3.5 font-normal transition-opacity duration-150 motion-reduce:transition-none",
+          open && "invisible pointer-events-none opacity-0",
+        )}
+      >
+        <PenLine data-icon="inline-start" className="text-muted-foreground" />
+        <span className={cn("truncate", !draft && "text-muted-foreground")}>
+          {draft || label}
+        </span>
+      </Button>
+    </CollapsibleTrigger>
+  );
+
   return (
     <Collapsible
       open={open}
@@ -107,23 +130,7 @@ export function FloatingComposer({
         open ? "max-w-3xl" : "max-w-sm",
       )}
     >
-      <CollapsibleTrigger asChild>
-        <Button
-          ref={trigger}
-          type="button"
-          variant="ghost"
-          aria-label={label}
-          className={cn(
-            "absolute inset-x-0 top-0 h-11 w-full min-w-0 justify-start gap-2.5 rounded-xl px-3.5 font-normal transition-opacity duration-150 motion-reduce:transition-none",
-            open && "invisible pointer-events-none opacity-0",
-          )}
-        >
-          <PenLine data-icon="inline-start" className="text-muted-foreground" />
-          <span className={cn("truncate", !draft && "text-muted-foreground")}>
-            {draft || label}
-          </span>
-        </Button>
-      </CollapsibleTrigger>
+      {wrapTrigger ? wrapTrigger(openButton) : openButton}
       <CollapsibleContent
         variant="collapse"
         inert={!open}

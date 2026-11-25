@@ -26,6 +26,14 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { type Chapter, maxChapterLength } from "./model";
 import {
+  insertionModeHint,
+  localActionHint,
+  NovelActionButton,
+  NovelActionTooltip,
+  plotHint,
+  stopGenerationHint,
+} from "./novel-action-tooltip";
+import {
   type PlotMode,
   type PlotSelection,
   resolveChapterRange,
@@ -178,23 +186,30 @@ export function PlotSheet({
                 <legend className="sr-only">整理方式</legend>
                 <div className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-muted/40 p-1">
                   {options.map(({ value, label, icon: Icon }) => (
-                    <label key={value} className="group relative min-w-0">
-                      <input
-                        type="radio"
-                        name={fieldName}
-                        checked={mode === value}
-                        disabled={!hasPlotPair && value !== "insert"}
-                        className="peer sr-only"
-                        onChange={() => {
-                          changeMode(value);
-                          writer.discardRewrite();
-                        }}
-                      />
-                      <span className="flex min-h-7 flex-wrap items-center justify-center gap-1 rounded-md px-1 py-1 text-xs text-muted-foreground peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring group-has-disabled:opacity-60">
-                        <Icon className="size-3.5 shrink-0" />
-                        {label}
-                      </span>
-                    </label>
+                    <NovelActionTooltip
+                      key={value}
+                      hint={
+                        value === "insert" ? insertionModeHint : plotHint(value)
+                      }
+                    >
+                      <label className="group relative min-w-0">
+                        <input
+                          type="radio"
+                          name={fieldName}
+                          checked={mode === value}
+                          disabled={!hasPlotPair && value !== "insert"}
+                          className="peer sr-only"
+                          onChange={() => {
+                            changeMode(value);
+                            writer.discardRewrite();
+                          }}
+                        />
+                        <span className="flex min-h-7 flex-wrap items-center justify-center gap-1 rounded-md px-1 py-1 text-xs text-muted-foreground peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring group-has-disabled:opacity-60">
+                          <Icon className="size-3.5 shrink-0" />
+                          {label}
+                        </span>
+                      </label>
+                    </NovelActionTooltip>
                   ))}
                 </div>
               </fieldset>
@@ -367,7 +382,8 @@ export function PlotSheet({
         </form>
         <DialogFooter className="shrink-0 border-t border-border flex-row flex-wrap justify-end px-3 py-2">
           {writer.busy ? (
-            <Button
+            <NovelActionButton
+              hint={stopGenerationHint}
               type="button"
               size="sm"
               variant="outline"
@@ -375,10 +391,11 @@ export function PlotSheet({
             >
               <Square data-icon="inline-start" />
               停止生成
-            </Button>
+            </NovelActionButton>
           ) : draft ? (
             <>
-              <Button
+              <NovelActionButton
+                hint={localActionHint("丢弃本次整理生成的草稿，保留原章节。")}
                 type="button"
                 size="sm"
                 variant="ghost"
@@ -386,8 +403,15 @@ export function PlotSheet({
                 onClick={() => writer.discardRewrite()}
               >
                 丢弃草稿
-              </Button>
-              <Button
+              </NovelActionButton>
+              <NovelActionButton
+                hint={localActionHint(
+                  draft.mode === "merge"
+                    ? "用合并稿替换所选章节。"
+                    : draft.mode === "insert"
+                      ? "保存草稿并插入所选位置。"
+                      : "保存两章改写后的结尾与开头。",
+                )}
                 type="button"
                 size="sm"
                 disabled={applying}
@@ -412,13 +436,19 @@ export function PlotSheet({
                     : draft.mode === "insert"
                       ? "插入新章"
                       : "应用粘合"}
-              </Button>
+              </NovelActionButton>
             </>
           ) : (
-            <Button type="submit" size="sm" form={form} disabled={!canStart}>
+            <NovelActionButton
+              hint={plotHint(mode, atStart)}
+              type="submit"
+              size="sm"
+              form={form}
+              disabled={!canStart}
+            >
               <WandSparkles data-icon="inline-start" />
               生成草稿
-            </Button>
+            </NovelActionButton>
           )}
         </DialogFooter>
       </DialogContent>

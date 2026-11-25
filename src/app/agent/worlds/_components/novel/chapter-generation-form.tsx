@@ -1,4 +1,4 @@
-import { Button, Input, Switch } from "@landing-page/design-system";
+import { Input, Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
 import { PenLine, Trash2, WandSparkles } from "lucide-react";
 import { type ReactNode, type Ref, useLayoutEffect, useRef } from "react";
@@ -7,12 +7,48 @@ import {
   maxChapterLength,
   minChapterTarget,
 } from "./model";
+import {
+  compactContextHint,
+  localActionHint,
+  NovelActionButton,
+  NovelActionTooltip,
+  nextChapterActionHint,
+  rewriteHint,
+} from "./novel-action-tooltip";
 import { WritingInstructions } from "./writing-instructions";
 
 export type ChapterGenerationOptions = {
   chapterGoal: string;
   words: string;
 };
+
+export function EmptyNovelContinuation({
+  disabled,
+  onOpen,
+}: {
+  disabled: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-4 py-10 text-center">
+      <p className="max-w-sm text-sm text-muted-foreground">
+        还没有章节。写下下一章要求开始续写，或从文件菜单导入已有小说。
+      </p>
+      <NovelActionButton
+        hint={localActionHint(
+          "展开下一章要求，填写后可手动写作或发起 AI 续写。",
+        )}
+        type="button"
+        size="sm"
+        disabled={disabled}
+        onClick={onOpen}
+      >
+        <PenLine data-icon="inline-start" />
+        填写下一章要求
+      </NovelActionButton>
+    </div>
+  );
+}
 
 function WritingGenerationForm({
   children,
@@ -105,7 +141,8 @@ export function ChapterGenerationForm({
         </label>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           {onWriteManually ? (
-            <Button
+            <NovelActionButton
+              hint={localActionHint("打开空白新章，保存前仅保留为本机草稿。")}
               type="button"
               size="sm"
               variant="outline"
@@ -115,9 +152,17 @@ export function ChapterGenerationForm({
             >
               <PenLine data-icon="inline-start" />
               手动写下一章
-            </Button>
+            </NovelActionButton>
           ) : null}
-          <Button
+          <NovelActionButton
+            hint={
+              onWriteManually
+                ? nextChapterActionHint
+                : {
+                    ...nextChapterActionHint,
+                    action: "在同一位置重新生成新章草稿。",
+                  }
+            }
             type="submit"
             size="sm"
             className="min-w-28 whitespace-nowrap"
@@ -125,7 +170,7 @@ export function ChapterGenerationForm({
           >
             <WandSparkles data-icon="inline-start" />
             {submitLabel}
-          </Button>
+          </NovelActionButton>
         </div>
       </div>
       {hint ? (
@@ -145,6 +190,7 @@ export function ChapterRewriteForm({
   submitDisabled,
   embedded,
   inputRef,
+  isPassage = false,
   submitLabel,
   onGenerate,
   onCancel,
@@ -159,6 +205,7 @@ export function ChapterRewriteForm({
   submitDisabled?: boolean;
   embedded?: boolean;
   inputRef?: Ref<HTMLTextAreaElement>;
+  isPassage?: boolean;
   submitLabel: string;
   onGenerate: () => void;
   onCancel?: () => void;
@@ -191,31 +238,34 @@ export function ChapterRewriteForm({
         }}
       />
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Switch
-            checked={compactContext}
-            disabled={disabled}
-            onCheckedChange={onCompactContextChange}
-          />
-          精简上下文
-        </label>
+        <NovelActionTooltip hint={compactContextHint(isPassage)}>
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Switch
+              checked={compactContext}
+              disabled={disabled}
+              onCheckedChange={onCompactContextChange}
+            />
+            精简上下文
+          </label>
+        </NovelActionTooltip>
         <div className="ml-auto flex items-center gap-2">
           {onDelete ? (
-            <Button
+            <NovelActionButton
+              hint={localActionHint("从本机草稿中删除选中的文字。")}
               type="button"
               size="icon"
               variant="ghost"
               className="size-8"
               aria-label="删除选区"
-              title="删除选区"
               disabled={disabled}
               onClick={onDelete}
             >
               <Trash2 className="size-4" />
-            </Button>
+            </NovelActionButton>
           ) : null}
           {onCancel ? (
-            <Button
+            <NovelActionButton
+              hint={localActionHint("关闭当前润色表单。")}
               type="button"
               size="sm"
               variant="ghost"
@@ -223,9 +273,10 @@ export function ChapterRewriteForm({
               onClick={onCancel}
             >
               取消
-            </Button>
+            </NovelActionButton>
           ) : null}
-          <Button
+          <NovelActionButton
+            hint={rewriteHint(isPassage, compactContext)}
             type="submit"
             size="sm"
             className="min-w-28 whitespace-nowrap"
@@ -233,7 +284,7 @@ export function ChapterRewriteForm({
           >
             <WandSparkles data-icon="inline-start" />
             {submitLabel}
-          </Button>
+          </NovelActionButton>
         </div>
       </div>
     </WritingGenerationForm>
