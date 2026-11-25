@@ -19,7 +19,6 @@ import {
   Ellipsis,
   LoaderCircle,
   PenLine,
-  Scissors,
   Square,
   Trash2,
 } from "lucide-react";
@@ -52,7 +51,6 @@ import {
 import { ChapterIndex, type ChapterIndexEntry } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import { ChapterReading } from "./chapter-rewrite";
-import { ChapterSplit } from "./chapter-split";
 import type { ChapterTextSelection } from "./chapter-text";
 import { ContextControls } from "./context-controls";
 import {
@@ -64,7 +62,6 @@ import {
   formatChapterLength,
   type NovelWritingContext,
   replaceChapter,
-  splitChapterAt,
 } from "./model";
 import { NewChapterDraftActions } from "./new-chapter-draft-actions";
 import {
@@ -234,9 +231,8 @@ export function NovelPanel({
       ? "草稿正在生成，离开会中断本次生成。确定离开吗？"
       : "草稿尚未应用，离开会丢失草稿。确定离开吗？",
   );
-  const [splitting, setSplitting] = useState(false);
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
-  const actionFromMenu = useRef<"split" | "plot" | null>(null);
+  const openPlotAfterMenuClose = useRef(false);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
@@ -389,15 +385,6 @@ export function NovelPanel({
     setEditingChapter((current) =>
       current ? { ...current, mode: "rewrite" } : current,
     );
-    return true;
-  }
-  function splitChapter(caret: number) {
-    if (chapterActionsLocked || !chapter) return false;
-    const newChapterId = crypto.randomUUID();
-    const next = splitChapterAt(novel, chapter.id, caret, newChapterId);
-    if (!next) return false;
-    writer.update(next);
-    setSelected(newChapterId);
     return true;
   }
   function deleteChapter() {
@@ -729,27 +716,14 @@ export function NovelPanel({
                           align="end"
                           className="min-w-44"
                           onCloseAutoFocus={(event) => {
-                            const action = actionFromMenu.current;
-                            actionFromMenu.current = null;
-                            if (!action) return;
+                            if (!openPlotAfterMenuClose.current) return;
+                            openPlotAfterMenuClose.current = false;
                             event.preventDefault();
-                            if (action === "split") setSplitting(true);
-                            else {
-                              writer.discardRewrite();
-                              setPlotOpen(true);
-                            }
+                            writer.discardRewrite();
+                            setPlotOpen(true);
                           }}
                         >
                           <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              disabled={!/\S\s*\S/u.test(chapter.text)}
-                              onSelect={() => {
-                                actionFromMenu.current = "split";
-                              }}
-                            >
-                              <Scissors />
-                              拆分本章
-                            </DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={
                                 chapterActionsLocked ||
@@ -757,7 +731,7 @@ export function NovelPanel({
                                 Boolean(newChapterDraft)
                               }
                               onSelect={() => {
-                                actionFromMenu.current = "plot";
+                                openPlotAfterMenuClose.current = true;
                               }}
                             >
                               <Combine />
@@ -806,6 +780,7 @@ export function NovelPanel({
                 <>
                   <PlotSheet
                     chapters={novel.chapters}
+                    currentChapterId={chapter.id}
                     hasPlotPair={hasPlotPair}
                     open={plotOpen}
                     onOpenChange={(open) => {
@@ -823,17 +798,6 @@ export function NovelPanel({
                       setSelected(id);
                       setPlotRestore(null);
                     }}
-                  />
-                  <ChapterSplit
-                    chapter={chapter}
-                    disabled={chapterActionsLocked}
-                    open={splitting}
-                    onOpenChange={setSplitting}
-                    onCloseAutoFocus={(event) => {
-                      event.preventDefault();
-                      chapterMenuTrigger.current?.focus();
-                    }}
-                    onSplit={splitChapter}
                   />
                   <ChapterReading
                     key={chapter.id}

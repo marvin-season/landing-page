@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { WorldConfig } from "@/lib/group-chat/model";
 import { createNovel } from "./model";
+import { createPendingResultBackup } from "./pending-result-backup";
 import { restorePendingResult } from "./restore-pending-result";
 
 const config = {
@@ -63,4 +64,43 @@ test("selection pending restores only when the chapter text still matches", () =
     restorePendingResult({ ...pending, baseText: "changed" }, novel, config),
     null,
   );
+});
+
+test("a pending AI split restores only if both parts still match the original chapter", () => {
+  const novel = createNovel(config);
+  novel.chapters = [{ id: "c1", title: "原章", text: "上半章。\n\n下半章。" }];
+  const pending = {
+    kind: "plot" as const,
+    mode: "split" as const,
+    ids: ["c1"],
+    requirements: "",
+    version: 1,
+    draft: {
+      mode: "split" as const,
+      chapters: [
+        { id: "c1", title: "原章", text: "上半章。\n\n" },
+        { id: "new", title: "第2章", text: "下半章。" },
+      ],
+    },
+  };
+  const storage = new Map<string, string>();
+  const backup = createPendingResultBackup(
+    "split-room",
+    () => ({
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+      removeItem: (key) => storage.delete(key),
+    }),
+    () => {},
+  );
+  backup.write(pending);
+  const recovered = backup.read();
+  assert.deepEqual(recovered, pending);
+  assert.ok(recovered);
+  assert.deepEqual(
+    restorePendingResult(recovered, novel, config)?.plotDraft,
+    pending.draft,
+  );
+  novel.chapters[0].text = "已修改的原章。";
+  assert.equal(restorePendingResult(recovered, novel, config), null);
 });

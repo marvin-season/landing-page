@@ -961,7 +961,7 @@ export function useNovel(
       generating.current = false;
     }
     discardRewrite();
-    return plotDraft.chapters[0].id;
+    return plotDraft.chapters[captured.plot.mode === "split" ? 1 : 0].id;
   }
 
   const syncHost = {

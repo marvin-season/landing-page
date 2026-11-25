@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { plotModes } from "./plot-edit";
 
 const chapterSchema = z.object({
   id: z.string().min(1),
@@ -23,11 +24,11 @@ const pendingSchema = z.discriminatedUnion("kind", [
   }),
   z.object({
     kind: z.literal("plot"),
-    mode: z.enum(["stitch", "merge", "insert"]),
+    mode: z.enum(plotModes),
     ids: z.array(z.string().min(1)).min(1),
     requirements: z.string(),
     draft: z.object({
-      mode: z.enum(["stitch", "merge", "insert"]),
+      mode: z.enum(plotModes),
       chapters: z.array(chapterSchema).min(1).max(2),
     }),
     version: z.number().int(),

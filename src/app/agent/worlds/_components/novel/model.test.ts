@@ -12,7 +12,6 @@ import {
   formatChapterLength,
   insertChapterBefore,
   insertChapterPrompt,
-  invalidateEditedCheckpoint,
   maxBackgroundFileBytes,
   maxNovelPromptLength,
   novelRequest,
@@ -24,7 +23,6 @@ import {
   rewriteInstructions,
   rewritePrompt,
   serializeBackground,
-  splitChapterAt,
   summaryPrompt,
   writerInstructions,
 } from "./model";
@@ -154,38 +152,6 @@ test("renaming a chapter from the reading page keeps custom titles and restores 
     renameChapter(novel, "b", "名".repeat(90))?.chapters[1].title.length,
     80,
   );
-});
-
-test("splitting preserves source text and puts the new chapter before the renumbered following chapters", () => {
-  const novel = createNovel(loadWorldTemplates()[0].config);
-  const before = "**上半段**\r\n\r\n";
-  const after = "下半段。\r\n";
-  novel.chapters = [
-    { id: "target", title: "旅途", text: before + after },
-    { id: "next", title: "第2章", text: "后来。" },
-    { id: "custom", title: "尾声", text: "再后来。" },
-  ];
-  novel.checkpoint = { throughChapterId: "next", summary: "旧摘要" };
-
-  const caret = before.replaceAll("\r\n", "\n").length;
-  const updated = splitChapterAt(novel, "target", caret, "new");
-  assert.ok(updated);
-  assert.deepEqual(updated.chapters, [
-    { id: "target", title: "旅途", text: before },
-    { id: "new", title: "第2章", text: after },
-    { id: "next", title: "第3章", text: "后来。" },
-    novel.chapters[2],
-  ]);
-  assert.equal(novel.chapters[0].text, before + after);
-  assert.equal(
-    invalidateEditedCheckpoint(novel, updated).checkpoint,
-    undefined,
-  );
-  assert.match(exportNovel(updated, "md"), /## 第2章\n\n下半段。/);
-
-  assert.equal(splitChapterAt(novel, "target", 0, "new"), null);
-  assert.equal(splitChapterAt(novel, "target", caret + 5, "new"), null);
-  assert.equal(splitChapterAt(novel, "missing", caret, "new"), null);
 });
 
 test("inserting before chapter five preserves the original sequence, IDs, prose, and custom titles", () => {

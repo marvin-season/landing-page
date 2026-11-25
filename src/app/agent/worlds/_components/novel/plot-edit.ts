@@ -12,7 +12,8 @@ import {
   numberedTitle,
 } from "./model";
 
-export type PlotMode = "stitch" | "merge" | "insert";
+export const plotModes = ["stitch", "merge", "insert", "split"] as const;
+export type PlotMode = (typeof plotModes)[number];
 export type PlotSelection = readonly string[];
 
 const transitionLength = 1200;
@@ -21,6 +22,16 @@ const stitchResult = z.object({
   ending: z.string().trim().min(1),
   opening: z.string().trim().min(1),
 });
+const splitResult = z.object({ secondOpening: z.string().regex(/^\S/u) });
+
+export function canSplitChapter(text: string) {
+  return /\S\s*\S/u.test(text);
+}
+
+function parsePlotJson(text: string): unknown {
+  const json = text.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)?.[1] ?? text;
+  return JSON.parse(json);
+}
 
 export function resolveChapterRange(
   chapters: readonly Chapter[],
@@ -74,6 +85,35 @@ export function preparePlotEdit(
 ) {
   const request = requirements.trim();
   const range = resolveChapterRange(novel.chapters, ids);
+  if (mode === "split") {
+    if (!range || range.chapters.length !== 1)
+      throw new Error("请选择一章需要拆分的正文。");
+    const {
+      index,
+      chapters: [chapter],
+    } = range;
+    if (!canSplitChapter(chapter.text))
+      throw new Error("所选章节没有足够正文可供拆分。");
+
+    const prompt = JSON.stringify({
+      world: config,
+      novel: { title: novel.title, style: novel.style, outline: novel.outline },
+      targetChapter: {
+        chapter: index + 1,
+        title: chapter.title,
+        text: chapter.text,
+      },
+      task: {
+        mode,
+        instructions:
+          '将本章分为前后两章，优先选在完整段落或场景转换处，并保证拆分后两章都有正文。不要改写正文。只输出 JSON 对象 {"secondOpening":"..."}，逐字摘录拆分后第二章开头一小段原文，不含开头空白，确保这段文字在原章中只出现一次。不要输出代码围栏或说明。',
+        requirements: request || undefined,
+      },
+    });
+    if (prompt.length > maxNovelPromptLength)
+      throw new Error("本次章节拆分的上下文过长，请缩短正文或精简设定。");
+    return { mode, range, prompt };
+  }
   if (mode === "merge") {
     if (!range || ids.length < 2) throw new Error("请选择至少两个相邻的章节。");
     if (range.chapters.some(({ text }) => !text.trim()))
@@ -207,6 +247,37 @@ export type PlotDraft = { mode: PlotMode; chapters: Chapter[] };
 export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
   const text = output.trim();
   if (!text) throw new Error("没有生成正文，请重试。");
+  if (edit.mode === "split") {
+    const chapter = edit.range.chapters[0];
+    let opening: string;
+    try {
+      opening = splitResult.parse(parsePlotJson(text)).secondOpening;
+    } catch {
+      throw new Error("未能识别拆分位置，请重新生成。");
+    }
+    const offset = chapter.text.indexOf(opening);
+    const first = chapter.text.slice(0, offset);
+    const second = chapter.text.slice(offset);
+    if (
+      offset <= 0 ||
+      chapter.text.lastIndexOf(opening) !== offset ||
+      !first.trim() ||
+      !second.trim() ||
+      /^[\uDC00-\uDFFF]/.test(second)
+    )
+      throw new Error("拆分位置无法在原文中唯一定位，请重新生成。");
+    return {
+      mode: edit.mode,
+      chapters: [
+        { ...chapter, text: first },
+        {
+          id: crypto.randomUUID(),
+          title: chapterTitle(edit.range.index + 1),
+          text: second,
+        },
+      ],
+    };
+  }
   if (edit.mode !== "stitch") {
     if (text.length > maxChapterLength)
       throw new Error(`草稿超过 ${maxChapterLength} 字，请重新生成。`);
@@ -227,8 +298,7 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
   const { first, second } = edit.pair;
   let result: z.infer<typeof stitchResult>;
   try {
-    const json = text.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)?.[1] ?? text;
-    result = stitchResult.parse(JSON.parse(json));
+    result = stitchResult.parse(parsePlotJson(text));
   } catch {
     throw new Error("未能识别两个过渡片段，请重新生成。");
   }
@@ -259,18 +329,23 @@ export function applyPlotDraft(
 ): Novel {
   if (edit.mode === "insert")
     return insertChapterBefore(novel, edit.beforeId, draft.chapters[0]);
-  const { index } = edit.mode === "merge" ? edit.range : edit.pair;
+  const { index } = edit.mode === "stitch" ? edit.pair : edit.range;
+  const replacement =
+    edit.mode === "merge" ? [draft.chapters[0]] : draft.chapters;
   const following = novel.chapters.slice(
-    edit.mode === "merge" ? edit.range.end : index + 2,
+    edit.mode === "stitch" ? index + 2 : edit.range.end,
   );
   return {
     ...novel,
     chapters: [
       ...novel.chapters.slice(0, index),
-      ...(edit.mode === "merge" ? [draft.chapters[0]] : draft.chapters),
-      ...(edit.mode === "merge"
+      ...replacement,
+      ...(edit.mode !== "stitch"
         ? following.map((chapter, offset) => {
-            const title = numberedTitle(chapter.title, index + 1 + offset);
+            const title = numberedTitle(
+              chapter.title,
+              index + replacement.length + offset,
+            );
             return title === chapter.title ? chapter : { ...chapter, title };
           })
         : following),

@@ -4,7 +4,6 @@ import {
   type ChapterTextRange,
   replaceTextRange,
   splitChapterText,
-  textareaSourceOffset,
 } from "./chapter-text";
 
 export type Chapter = {
@@ -356,35 +355,6 @@ export function insertChapterBefore(
       const title = numberedTitle(existing.title, position);
       return title === existing.title ? existing : { ...existing, title };
     }),
-  };
-}
-
-export function splitChapterAt(
-  novel: Novel,
-  chapterId: string,
-  caret: number,
-  newChapterId: string,
-): Novel | null {
-  const index = novel.chapters.findIndex(({ id }) => id === chapterId);
-  if (index < 0 || !Number.isInteger(caret) || caret <= 0) return null;
-
-  const chapter = novel.chapters[index];
-  const offset = textareaSourceOffset(chapter.text, caret);
-  const before = chapter.text.slice(0, offset);
-  const after = chapter.text.slice(offset);
-  if (!before.trim() || !after.trim()) return null;
-
-  return {
-    ...novel,
-    chapters: [
-      ...novel.chapters.slice(0, index),
-      { ...chapter, text: before },
-      { id: newChapterId, title: chapterTitle(index + 1), text: after },
-      ...novel.chapters.slice(index + 1).map((existing, offset) => {
-        const title = numberedTitle(existing.title, index + 2 + offset);
-        return title === existing.title ? existing : { ...existing, title };
-      }),
-    ],
   };
 }
 

@@ -74,6 +74,18 @@ export function restorePendingResult(
       pending.mode,
       pending.requirements,
     );
+    if (plot.mode === "split") {
+      const original = plot.range.chapters[0];
+      const [first, second] = pending.draft.chapters;
+      if (
+        pending.draft.mode !== "split" ||
+        first?.id !== original.id ||
+        !first.text.trim() ||
+        !second?.text.trim() ||
+        first.text + second.text !== original.text
+      )
+        return null;
+    }
     return {
       run: {
         task: pending.mode === "insert" ? "chapter" : "rewrite",

@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "@landing-page/design-system";
 import type { ReactElement } from "react";
+import type { PlotMode } from "./plot-edit";
 
 type ActionHint = {
   action: string;
@@ -86,10 +87,13 @@ export function rewriteHint(selection: boolean, compact: boolean): ActionHint {
   };
 }
 
-export function plotHint(
-  mode: "stitch" | "merge" | "insert",
-  atStart = false,
-): ActionHint {
+export function plotHint(mode: PlotMode, atStart = false): ActionHint {
+  if (mode === "split") {
+    return {
+      action: "让 AI 选择拆分位置，预览后将一章拆成两章，保留全部原文。",
+      context: "完整世界设定、小说设定、所选章的正文和选填的拆分要求。",
+    };
+  }
   if (mode === "stitch") {
     return {
       action: "只改写前一章结尾和后一章开头，保留两章分界。",

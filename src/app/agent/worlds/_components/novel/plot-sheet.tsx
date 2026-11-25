@@ -18,6 +18,7 @@ import {
   Link2,
   ListPlus,
   LoaderCircle,
+  Scissors,
   Square,
   WandSparkles,
 } from "lucide-react";
@@ -34,6 +35,7 @@ import {
   stopGenerationHint,
 } from "./novel-action-tooltip";
 import {
+  canSplitChapter,
   type PlotMode,
   type PlotSelection,
   resolveChapterRange,
@@ -44,10 +46,12 @@ const options = [
   { value: "stitch", label: "剧情粘合", icon: Link2 },
   { value: "merge", label: "剧情合并", icon: Combine },
   { value: "insert", label: "剧情插入", icon: ListPlus },
+  { value: "split", label: "拆分章节", icon: Scissors },
 ] as const;
 
 export function PlotSheet({
   chapters,
+  currentChapterId,
   hasPlotPair,
   open,
   onOpenChange,
@@ -57,6 +61,7 @@ export function PlotSheet({
   restored,
 }: {
   chapters: readonly Chapter[];
+  currentChapterId: string;
   hasPlotPair: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -82,7 +87,7 @@ export function PlotSheet({
   const form = useId();
   const requirementsId = useId();
   const [selection, setSelection] = useState<string[] | "start">(() =>
-    restored ? (restored.ids.length === 1 ? "start" : [...restored.ids]) : [],
+    restored ? restoredSelection(restored) : [],
   );
   const [preferredMode, setMode] = useState<PlotMode>(
     () => restored?.mode ?? "stitch",
@@ -93,24 +98,44 @@ export function PlotSheet({
   const [applying, setApplying] = useState(false);
   const draft = writer.plotDraft;
   const locked = writer.busy || applying || draft !== null;
-  const mode = hasPlotPair ? preferredMode : "insert";
+  const hasSplitTarget = chapters.some(({ text }) => canSplitChapter(text));
+  function modeAvailable(value: PlotMode) {
+    return value === "split"
+      ? hasSplitTarget
+      : value === "insert" || hasPlotPair;
+  }
+  const mode = modeAvailable(preferredMode)
+    ? preferredMode
+    : hasSplitTarget
+      ? "split"
+      : "insert";
+  const splitting = mode === "split";
   const firstChapter = chapters[0];
   const canInsertAtStart = mode === "insert" && Boolean(firstChapter);
   const atStart = canInsertAtStart && selection === "start";
-  const selected = selection === "start" ? [] : selection;
+  const explicitSelection = selection === "start" ? [] : selection;
+  const selected =
+    splitting && explicitSelection.length !== 1
+      ? [currentChapterId]
+      : explicitSelection;
   const range = resolveChapterRange(chapters, selected);
   const selectedCount = range?.chapters.length ?? 0;
   const hasValidRange =
     range &&
-    (mode === "merge" ? selectedCount >= 2 : selectedCount === 2) &&
-    range.chapters.every(({ text }) => text.trim());
+    (splitting
+      ? selectedCount === 1 && canSplitChapter(range.chapters[0].text)
+      : (mode === "merge" ? selectedCount >= 2 : selectedCount === 2) &&
+        range.chapters.every(({ text }) => text.trim()));
   const target: PlotSelection | null =
     atStart && firstChapter
       ? [firstChapter.id]
       : hasValidRange
         ? range.chapters.map(({ id }) => id)
         : null;
-  const canStart = Boolean(target && (mode === "merge" || requirements.trim()));
+  const requiresInstructions = mode === "stitch" || mode === "insert";
+  const canStart = Boolean(
+    target && (!requiresInstructions || requirements.trim()),
+  );
   const sourceLength =
     mode === "merge"
       ? (range?.chapters.reduce(
@@ -123,7 +148,7 @@ export function PlotSheet({
     if (!restored) return;
     setMode(restored.mode);
     setRequirements(restored.requirements);
-    setSelection(restored.ids.length === 1 ? "start" : [...restored.ids]);
+    setSelection(restoredSelection(restored));
   }, [restored]);
 
   useRegisterPromptReuse(
@@ -139,6 +164,8 @@ export function PlotSheet({
   function changeMode(nextMode: PlotMode) {
     setMode(nextMode);
     if (
+      splitting ||
+      nextMode === "split" ||
       (selection === "start" && nextMode !== "insert") ||
       (nextMode !== "merge" && selected.length > 2)
     )
@@ -184,7 +211,7 @@ export function PlotSheet({
             <>
               <fieldset disabled={locked}>
                 <legend className="sr-only">整理方式</legend>
-                <div className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-muted/40 p-1">
+                <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-muted/40 p-1 sm:grid-cols-4">
                   {options.map(({ value, label, icon: Icon }) => (
                     <NovelActionTooltip
                       key={value}
@@ -197,7 +224,7 @@ export function PlotSheet({
                           type="radio"
                           name={fieldName}
                           checked={mode === value}
-                          disabled={!hasPlotPair && value !== "insert"}
+                          disabled={!modeAvailable(value)}
                           className="peer sr-only"
                           onChange={() => {
                             changeMode(value);
@@ -221,7 +248,9 @@ export function PlotSheet({
                       ? "插入位置"
                       : mode === "merge"
                         ? "连续章节（至少两章）"
-                        : "相邻两章"}
+                        : splitting
+                          ? "选择一章"
+                          : "相邻两章"}
                   </p>
                   {mode === "merge" && range ? (
                     <div className="flex items-center gap-1">
@@ -265,23 +294,27 @@ export function PlotSheet({
                 ) : null}
                 <div
                   className="grid max-h-[min(26dvh,10rem)] grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-1 overflow-y-auto p-1"
-                  hidden={!hasPlotPair}
+                  hidden={!splitting && !hasPlotPair}
                 >
                   {chapters.map((chapter, index) => {
                     const active =
-                      !!range && index >= range.index && index < range.end;
+                      !!range &&
+                      index >= range.index &&
+                      index < range.end &&
+                      (!splitting || canSplitChapter(chapter.text));
                     const insideRange =
                       !!range && index > range.index && index < range.end - 1;
                     const adjacentText =
                       chapters[index - 1]?.text.trim() ||
                       chapters[index + 1]?.text.trim();
-                    const available =
-                      chapter.text.trim() &&
-                      (active ||
-                        (range
-                          ? (mode === "merge" || selectedCount === 1) &&
-                            (index === range.index - 1 || index === range.end)
-                          : adjacentText));
+                    const available = splitting
+                      ? canSplitChapter(chapter.text)
+                      : chapter.text.trim() &&
+                        (active ||
+                          (range
+                            ? (mode === "merge" || selectedCount === 1) &&
+                              (index === range.index - 1 || index === range.end)
+                            : adjacentText));
                     return (
                       <Button
                         key={chapter.id}
@@ -297,6 +330,10 @@ export function PlotSheet({
                         onClick={() => {
                           if (insideRange) return;
                           writer.discardRewrite();
+                          if (splitting) {
+                            setSelection([chapter.id]);
+                            return;
+                          }
                           const ids = range?.chapters.map(({ id }) => id) ?? [];
                           setSelection(
                             active
@@ -312,13 +349,15 @@ export function PlotSheet({
                 </div>
                 {hasValidRange && mode !== "merge" ? (
                   <p className="break-words text-xs text-muted-foreground">
-                    {range.chapters[0].title} → {range.chapters[1].title}
+                    {range.chapters[0].title}
+                    {!splitting ? ` → ${range.chapters[1].title}` : null}
                   </p>
                 ) : null}
               </fieldset>
               <fieldset disabled={locked} className="flex flex-col gap-1">
                 <label htmlFor={requirementsId} className="text-xs font-medium">
-                  本次写作要求{mode === "merge" ? "（选填）" : " *"}
+                  {splitting ? "本次拆分要求" : "本次写作要求"}
+                  {requiresInstructions ? " *" : "（选填）"}
                 </label>
                 <Textarea
                   id={requirementsId}
@@ -326,7 +365,7 @@ export function PlotSheet({
                   onChange={(event) => setRequirements(event.target.value)}
                   maxLength={4000}
                   rows={2}
-                  required={mode !== "merge"}
+                  required={requiresInstructions}
                 />
               </fieldset>
               {mode === "merge" ? (
@@ -410,7 +449,9 @@ export function PlotSheet({
                     ? "用合并稿替换所选章节。"
                     : draft.mode === "insert"
                       ? "保存草稿并插入所选位置。"
-                      : "保存两章改写后的结尾与开头。",
+                      : draft.mode === "split"
+                        ? "保存拆分后的两章，保留全部原文。"
+                        : "保存两章改写后的结尾与开头。",
                 )}
                 type="button"
                 size="sm"
@@ -435,7 +476,9 @@ export function PlotSheet({
                     ? "合并为一章"
                     : draft.mode === "insert"
                       ? "插入新章"
-                      : "应用粘合"}
+                      : draft.mode === "split"
+                        ? "应用拆分"
+                        : "应用粘合"}
               </NovelActionButton>
             </>
           ) : (
@@ -454,4 +497,14 @@ export function PlotSheet({
       </DialogContent>
     </Dialog>
   );
+}
+
+function restoredSelection({
+  mode,
+  ids,
+}: {
+  mode: PlotMode;
+  ids: PlotSelection;
+}) {
+  return mode === "insert" && ids.length === 1 ? "start" : [...ids];
 }
