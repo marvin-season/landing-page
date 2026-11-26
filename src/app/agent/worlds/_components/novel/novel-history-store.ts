@@ -7,11 +7,13 @@ import type { ThinkingHistoryEntry } from "./thinking-history";
 export type HistoryOperation =
   | { kind: "continuation"; chapter: Chapter; afterId?: string | null }
   | { kind: "rewrite"; range?: ChapterTextRange }
+  | { kind: "chapter-save"; afterId: string | null }
   | { kind: PlotMode; beforeId?: string }
   | { kind: "summary" };
 
 type HistorySummary = Omit<ThinkingHistoryEntry, "task" | "status"> & {
   key: string;
+  kind?: "chapter-save";
   status: ThinkingHistoryEntry["status"] | "running";
   hasResult: boolean;
   incomplete?: boolean;
@@ -99,6 +101,7 @@ export async function startNovelHistory(
   entry: HistorySummary,
   operation: HistoryOperation,
   chapters: Chapter[],
+  result?: Pick<HistoryContent, "raw" | "results">,
 ) {
   const hashes = await Promise.all(chapters.map(({ text }) => textHash(text)));
   const { key, id } = entry;
@@ -120,6 +123,7 @@ export async function startNovelHistory(
         hash: hashes[i],
       })),
       raw: "",
+      ...result,
     });
     await entries.put(entry);
   });

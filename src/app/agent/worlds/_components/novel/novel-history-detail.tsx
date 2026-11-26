@@ -73,6 +73,7 @@ export function NovelHistoryDetail({
   const [view, setView] = useState<"current" | "original" | "raw">(() =>
     historicalChapters(content).length ? "current" : "raw",
   );
+  const [savedVersion, setSavedVersion] = useState<"before" | "after">("after");
   const [part, setPart] = useState(0);
   const [resultPart, setResultPart] = useState(0);
   const [manual, setManual] = useState<"whole" | "passage" | "insert">();
@@ -85,24 +86,32 @@ export function NovelHistoryDetail({
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const automatic = useMemo(
-    () => prepareHistoryPlan(book, content, lineage),
-    [book, content, lineage],
+    () => prepareHistoryPlan(book, content, lineage, savedVersion),
+    [book, content, lineage, savedVersion],
   );
   const originalResults = useMemo(() => historicalChapters(content), [content]);
+  const isChapterSave = content.operation.kind === "chapter-save";
   const hasProse = originalResults.length > 0;
   const targetIndex = book.chapters.findIndex(({ id }) => id === targetId);
   const target = book.chapters[targetIndex];
   const range = selection?.chapter === target ? selection?.range : undefined;
-  const selectedResult = originalResults[resultPart];
+  const selectedResult =
+    savedVersion === "before"
+      ? content.sources[0]
+      : originalResults[resultPart];
   const passageResult =
     content.operation.kind === "rewrite" && content.operation.range
       ? content.raw.trim()
       : selectedResult?.text;
   const manualText = manual === "whole" ? selectedResult?.text : passageResult;
   const manualPlan = useMemo(() => {
-    if (!manual || !manualText) return undefined;
+    if (!manual || manualText === undefined) return undefined;
     if (manual === "insert") {
-      if (!targetId || (targetId !== startPosition && !target))
+      if (
+        !manualText.trim() ||
+        !targetId ||
+        (targetId !== startPosition && !target)
+      )
         return undefined;
       const index = targetIndex + 1;
       return historyInsertPlan(
@@ -213,7 +222,7 @@ export function NovelHistoryDetail({
                 aria-pressed={view === value}
                 onClick={() => changeView(value)}
               >
-                {label}
+                {isChapterSave && value === "raw" ? "保存结果" : label}
               </Button>
             ))}
           </div>
@@ -241,10 +250,41 @@ export function NovelHistoryDetail({
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-4">
         {view === "raw" ? (
           <pre className="whitespace-pre-wrap wrap-anywhere rounded-lg border border-border bg-background/55 p-4 font-serif text-sm leading-7 sm:p-6 sm:text-base">
-            {content.raw || "这轮尚未收到结果。"}
+            {isChapterSave
+              ? originalResults[0]?.text || "该版本正文为空。"
+              : content.raw || "这轮尚未收到结果。"}
           </pre>
         ) : (
           <>
+            {view === "current" && isChapterSave && content.sources.length ? (
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">应用版本</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={savedVersion === "before" ? "soft" : "ghost"}
+                  aria-pressed={savedVersion === "before"}
+                  onClick={() => {
+                    setSavedVersion("before");
+                    setError("");
+                  }}
+                >
+                  保存前
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={savedVersion === "after" ? "soft" : "ghost"}
+                  aria-pressed={savedVersion === "after"}
+                  onClick={() => {
+                    setSavedVersion("after");
+                    setError("");
+                  }}
+                >
+                  保存后
+                </Button>
+              </div>
+            ) : null}
             {view === "current" && !automatic ? (
               <Alert className="shrink-0 px-3 py-2">
                 <AlertDescription>
@@ -397,9 +437,21 @@ export function NovelHistoryDetail({
                 base={base}
                 draft={draft}
                 layout="reading"
-                baseLabel={view === "current" ? "当前正文" : "当时原文"}
+                baseLabel={
+                  view === "current"
+                    ? "当前正文"
+                    : isChapterSave
+                      ? "保存前"
+                      : "当时原文"
+                }
                 draftLabel={
-                  view === "current" && plan ? "应用预览" : "当时结果"
+                  view === "current" && plan
+                    ? "应用预览"
+                    : isChapterSave
+                      ? view === "original" || savedVersion === "after"
+                        ? "保存后"
+                        : "保存前"
+                      : "当时结果"
                 }
               />
             ) : null}

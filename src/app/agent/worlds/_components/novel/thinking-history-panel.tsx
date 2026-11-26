@@ -81,6 +81,40 @@ function HistoryRow({
     entry.phase === "writing" ||
     Boolean(entry.answer?.includes("撰写"));
 
+  const resultButton =
+    saved?.hasResult && saved.status !== "running" ? (
+      <Button
+        type="button"
+        size="sm"
+        variant="soft"
+        className="mr-2 shrink-0"
+        disabled={disabled}
+        onClick={() => onOpen(saved)}
+      >
+        {pending ? (
+          <LoaderCircle
+            data-icon="inline-start"
+            className="animate-spin motion-reduce:animate-none"
+          />
+        ) : null}
+        查看结果
+      </Button>
+    ) : null;
+
+  if (saved?.kind === "chapter-save") {
+    return (
+      <div className="flex items-center justify-between gap-1 rounded-lg hover:bg-muted/40">
+        <div className="flex min-w-0 flex-1 flex-col gap-1 px-2.5 py-3">
+          <p className="wrap-anywhere text-sm font-medium">{entry.label}</p>
+          <time className="text-xs text-muted-foreground tabular-nums">
+            {timeFormat.format(entry.createdAt)}
+          </time>
+        </div>
+        {resultButton}
+      </div>
+    );
+  }
+
   return (
     <Collapsible>
       <div className="flex items-center gap-1 rounded-lg hover:bg-muted/40">
@@ -113,24 +147,7 @@ function HistoryRow({
           </div>
           <CollapsibleChevron />
         </CollapsibleTrigger>
-        {saved?.hasResult && saved.status !== "running" ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="soft"
-            className="mr-2 shrink-0"
-            disabled={disabled}
-            onClick={() => onOpen(saved)}
-          >
-            {pending ? (
-              <LoaderCircle
-                data-icon="inline-start"
-                className="animate-spin motion-reduce:animate-none"
-              />
-            ) : null}
-            查看结果
-          </Button>
-        ) : null}
+        {resultButton}
       </div>
       <CollapsibleContent>
         <div className="mx-2 mb-3 flex flex-col gap-3 rounded-lg bg-muted/35 p-3">

@@ -102,6 +102,7 @@ export function useNovel(
   const {
     key,
     lineage,
+    chapterHistoryError,
     storageVersion,
     missingLocal,
     syncReadFailed,
@@ -765,7 +766,7 @@ export function useNovel(
     loadFailed,
     error: reconnecting
       ? "连接已断开，正在重连原生成任务…"
-      : error || historyError,
+      : error || historyError || chapterHistoryError,
     syncPrompt,
     serverSynced,
     hasLocalBackup,
@@ -786,7 +787,7 @@ export function useNovel(
     toolCalls,
     runPhase,
     thinkingHistory,
-    historyError,
+    historyError: historyError || chapterHistoryError,
     clearThinkingHistory,
     task,
     generationStopped,

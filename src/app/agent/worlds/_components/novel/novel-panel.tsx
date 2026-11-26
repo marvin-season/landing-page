@@ -674,6 +674,7 @@ export function NovelPanel({
                         ?.history,
                     ),
                   expectedNovel: novel,
+                  archiveChapterId: draft.id,
                 });
           if (saved) {
             setEditingChapter({

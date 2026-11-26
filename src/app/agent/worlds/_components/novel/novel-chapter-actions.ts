@@ -145,7 +145,12 @@ export function createNovelChapterActions({
         brief && brief === current.chapterGoal.trim()
           ? { ...next, chapterGoal: "" }
           : next,
-        { persistFirst: true, backupPrevious: Boolean(cached?.history) },
+        {
+          persistFirst: true,
+          backupPrevious: Boolean(cached?.history),
+          expectedNovel: current,
+          archiveChapterId: chapter.id,
+        },
       ))
     )
       return null;
@@ -235,6 +240,8 @@ export function createNovelChapterActions({
     const saved = await update(replaceChapter(captured.novel, chapter), {
       persistFirst: true,
       backupPrevious: Boolean(captured.novel.checkpoint),
+      expectedNovel: captured.novel,
+      archiveChapterId: chapter.id,
     });
     if (saved) discardRewrite();
     return saved;

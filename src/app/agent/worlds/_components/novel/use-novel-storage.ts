@@ -1,7 +1,7 @@
 "use client";
 
 import { isDevelopment } from "@landing-page/utils";
-import Dexie, { liveQuery, type Table } from "dexie";
+import { liveQuery } from "dexie";
 import {
   type RefObject,
   useEffect,
@@ -27,6 +27,12 @@ import {
 } from "./model";
 import type { ChapterLineage } from "./novel-history-apply";
 import {
+  changedInAnotherTab,
+  flushSavedChapterHistory,
+  novels,
+  persistNovelRecord,
+} from "./novel-local-store";
+import {
   loadServerNovel,
   restoreNovelBackup,
   type ServerNovel,
@@ -43,18 +49,8 @@ import {
   restorePendingResult,
 } from "./restore-pending-result";
 
-const db = new Dexie("world-novels");
-db.version(1).stores({ novels: "key" });
-type NovelRecord = {
-  key: string;
-  novel: Novel;
-  previous?: Novel;
-  lineage?: ChapterLineage[];
-  version?: string;
-};
-const novels: Table<NovelRecord, string> = db.table("novels");
-const changedInAnotherTab =
-  "另一个标签页已保存此作品。请保留手头修改，刷新后核对最新正文。";
+const chapterHistoryWriteError =
+  "正文已保存。历史记录暂未写入，下次打开作品会重试。";
 
 export function addNovelCopy(key: string, novel: Novel) {
   return novels.add({ key, novel, version: crypto.randomUUID() });
@@ -114,6 +110,7 @@ export function useNovelStorage(
   );
   const ready = loadStatus === "ready";
   const [draftBackupFailed, setDraftBackupFailed] = useState(false);
+  const [chapterHistoryError, setChapterHistoryError] = useState("");
   const [saving, setSaving] = useState(false);
   const [syncPrompt, setSyncPrompt] = useState<NovelSyncDivergence | null>(
     null,
@@ -240,6 +237,14 @@ export function useNovelStorage(
           }
         }
         setLoadStatus("ready");
+        void flushSavedChapterHistory(key).then(
+          () => {
+            if (active) setChapterHistoryError("");
+          },
+          () => {
+            if (active) setChapterHistoryError(chapterHistoryWriteError);
+          },
+        );
       })
       .catch(() => {
         if (!active) return;
@@ -279,6 +284,7 @@ export function useNovelStorage(
       restoreCheckpoint = false,
       chapterLineage,
       expectedNovel,
+      archiveChapterId,
     }: {
       persistFirst?: boolean;
       touch?: boolean;
@@ -286,6 +292,7 @@ export function useNovelStorage(
       restoreCheckpoint?: boolean;
       chapterLineage?: ChapterLineage[];
       expectedNovel?: Novel;
+      archiveChapterId?: string;
     } = {},
   ) {
     if (expectedNovel && expectedNovel !== latest.current)
@@ -306,18 +313,15 @@ export function useNovelStorage(
     const write = writes.current.then(async () => {
       const previous = backupPrevious ? committed.current : previousRef.current;
       const version = crypto.randomUUID();
-      const nextLineage = await db.transaction("rw", novels, async () => {
-        const stored = await novels.get(key);
-        if (expectedNovel && expectedNovel !== latest.current)
-          throw new Error("正文已修改，请重新打开历史预览。");
-        if (stored?.version !== storageVersion.current)
-          throw new Error(changedInAnotherTab);
-        const lineage = chapterLineage?.length
-          ? [...(stored?.lineage ?? []), ...chapterLineage]
-          : stored?.lineage;
-        await novels.put({ key, novel: next, previous, version, lineage });
-        return lineage;
-      });
+      const nextLineage = await persistNovelRecord(
+        { key, novel: next, previous, version },
+        {
+          expectedVersion: storageVersion.current,
+          chapterLineage,
+          archiveChapterId,
+          isCurrent: () => !expectedNovel || expectedNovel === latest.current,
+        },
+      );
       if (chapterLineage?.length && nextLineage) setLineage(nextLineage);
       committed.current = next;
       storageVersion.current = version;
@@ -326,6 +330,12 @@ export function useNovelStorage(
       setMissingLocal(false);
       if (persistFirst) publish();
       if (latest.current === next) setSaving(false);
+      if (archiveChapterId) {
+        await flushSavedChapterHistory(key).then(
+          () => setChapterHistoryError(""),
+          () => setChapterHistoryError(chapterHistoryWriteError),
+        );
+      }
     });
     writes.current = write.catch((error: unknown) => {
       setSaving(false);
@@ -380,6 +390,7 @@ export function useNovelStorage(
   return {
     key,
     lineage,
+    chapterHistoryError,
     storageVersion,
     missingLocal,
     syncReadFailed,

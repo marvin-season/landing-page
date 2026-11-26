@@ -154,13 +154,51 @@ export function historyInsertPlan(
   return { before: [], after: [chapter], index };
 }
 
+function prepareChapterRevision(
+  chapters: Chapter[],
+  lineage: readonly ChapterLineage[],
+  source: Chapter,
+  result: string,
+) {
+  const index = chapters.findIndex(({ id }) => id === source.id);
+  const target = chapters[index];
+  if (
+    !target ||
+    (descendants(source.id, lineage).size > 1 && target.text !== source.text)
+  )
+    return undefined;
+  const text = mergeHistoryText(source.text, target.text, result);
+  return text === undefined ? undefined : historyDraftPlan(target, index, text);
+}
+
 export function prepareHistoryPlan(
   book: Novel,
   content: HistoryContent,
   lineage: readonly ChapterLineage[],
+  savedVersion: "before" | "after" = "after",
 ): HistoryPlan | undefined {
   const { operation, sources, raw, results } = content;
   const { chapters } = book;
+  if (operation.kind === "chapter-save") {
+    const before = sources[0];
+    const after = results?.[0];
+    if (!after) return undefined;
+    if (before) {
+      return savedVersion === "before"
+        ? prepareChapterRevision(chapters, lineage, after, before.text)
+        : prepareChapterRevision(chapters, lineage, before, after.text);
+    }
+    if (savedVersion === "before") return undefined;
+    const existing = chapters.findIndex(({ id }) => id === after.id);
+    if (existing >= 0) {
+      return chapters[existing].text === after.text
+        ? historyDraftPlan(chapters[existing], existing, after.text)
+        : undefined;
+    }
+    if (lineage.some(({ from }) => from.includes(after.id))) return undefined;
+    const index = continuationIndex(book, operation.afterId);
+    return index === null ? undefined : historyInsertPlan(after, index);
+  }
   if (operation.kind === "summary" || !raw.trim()) return undefined;
   if (operation.kind === "continuation" || operation.kind === "insert") {
     const result =
@@ -203,17 +241,7 @@ export function prepareHistoryPlan(
         match.range,
       );
     }
-    const index = chapters.findIndex(({ id }) => id === source.id);
-    if (index < 0 || (related.size > 1 && chapters[index].text !== source.text))
-      return undefined;
-    const text = mergeHistoryText(
-      source.text,
-      chapters[index].text,
-      raw.trim(),
-    );
-    return text === undefined
-      ? undefined
-      : historyDraftPlan(chapters[index], index, text);
+    return prepareChapterRevision(chapters, lineage, source, raw.trim());
   }
   if (!results?.length) return undefined;
   const range = resolveChapterRange(
@@ -261,7 +289,7 @@ export function canStageHistoryPlan(book: Novel, plan: HistoryPlan) {
     !after.length ||
     after.some(
       ({ text }) =>
-        !text.trim() ||
+        ((!before.length || plan.plotMode) && !text.trim()) ||
         (text.length > maxChapterLength && plan.plotMode !== "split"),
     )
   )
