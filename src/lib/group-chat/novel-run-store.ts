@@ -1,5 +1,9 @@
 import type { Client } from "@libsql/client";
-import type { NovelRunStatus, NovelRunToolCall } from "./novel-run-contract";
+import type {
+  NovelRunPhase,
+  NovelRunStatus,
+  NovelRunToolCall,
+} from "./novel-run-contract";
 
 export const novelRunTimeoutMs = 280_000;
 const retentionMs = 24 * 60 * 60 * 1000;
@@ -17,6 +21,16 @@ function parseTools(value: unknown): NovelRunToolCall[] | undefined {
   }
 }
 
+function parsePhase(value: unknown): NovelRunPhase | undefined {
+  if (
+    value === "preparing" ||
+    value === "applying_skills" ||
+    value === "writing"
+  )
+    return value;
+  return undefined;
+}
+
 export function createNovelRunStore(getClient: () => Client, now = Date.now) {
   let ready: Promise<Client> | undefined;
   function database() {
@@ -28,7 +42,7 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
             owner_id TEXT NOT NULL, room_id TEXT NOT NULL, id TEXT NOT NULL,
             status TEXT NOT NULL, text TEXT NOT NULL DEFAULT '',
             incomplete INTEGER NOT NULL DEFAULT 0, error TEXT,
-            tools TEXT,
+            tools TEXT, phase TEXT,
             deadline INTEGER NOT NULL, expires_at INTEGER NOT NULL,
             PRIMARY KEY (owner_id, room_id, id)
           )`,
@@ -36,10 +50,12 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
         ],
         "write",
       );
-      try {
-        await db.execute("ALTER TABLE novel_runs ADD COLUMN tools TEXT");
-      } catch {
-        // Column already exists on upgraded databases.
+      for (const column of ["tools TEXT", "phase TEXT"]) {
+        try {
+          await db.execute(`ALTER TABLE novel_runs ADD COLUMN ${column}`);
+        } catch {
+          // Column already exists on upgraded databases.
+        }
       }
       return db;
     })().catch((error) => {
@@ -59,8 +75,8 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
         args: [time],
       });
       const result = await db.execute({
-        sql: `INSERT INTO novel_runs (owner_id, room_id, id, status, deadline, expires_at)
-              VALUES (?, ?, ?, 'running', ?, ?) ON CONFLICT DO NOTHING`,
+        sql: `INSERT INTO novel_runs (owner_id, room_id, id, status, phase, deadline, expires_at)
+              VALUES (?, ?, ?, 'running', 'preparing', ?, ?) ON CONFLICT DO NOTHING`,
         args: [...key, time + novelRunTimeoutMs + 10_000, time + retentionMs],
       });
       return result.rowsAffected !== 0;
@@ -69,7 +85,7 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
       const db = await database();
       const time = now();
       const { rows } = await db.execute({
-        sql: `SELECT status, text, incomplete, error, tools, deadline
+        sql: `SELECT status, text, incomplete, error, tools, phase, deadline
               FROM novel_runs WHERE ${keyFilter} AND expires_at > ?`,
         args: [...key, time],
       });
@@ -77,6 +93,7 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
       if (!row) return null;
       const text = String(row.text);
       const tools = parseTools(row.tools);
+      const phase = parsePhase(row.phase);
       if (row.status === "running" && Number(row.deadline) <= time)
         return {
           status: "failed",
@@ -91,14 +108,15 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
         incomplete: Boolean(row.incomplete),
         error: row.error == null ? null : String(row.error),
         ...(tools?.length ? { tools } : {}),
+        ...(row.status === "running" && phase ? { phase } : {}),
       };
     },
     async write(
       key: RunKey,
-      { status, text, incomplete, error, tools }: NovelRunStatus,
+      { status, text, incomplete, error, tools, phase }: NovelRunStatus,
     ) {
       const result = await (await database()).execute({
-        sql: `UPDATE novel_runs SET status = ?, text = ?, incomplete = ?, error = ?, tools = ?
+        sql: `UPDATE novel_runs SET status = ?, text = ?, incomplete = ?, error = ?, tools = ?, phase = ?
               WHERE ${keyFilter} AND status = 'running' AND deadline > ?`,
         args: [
           status,
@@ -106,6 +124,7 @@ export function createNovelRunStore(getClient: () => Client, now = Date.now) {
           Number(incomplete),
           error,
           tools?.length ? JSON.stringify(tools) : null,
+          status === "running" ? (phase ?? null) : null,
           ...key,
           now(),
         ],

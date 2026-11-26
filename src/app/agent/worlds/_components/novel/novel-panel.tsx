@@ -632,6 +632,7 @@ export function NovelPanel({
                 : "正在构思…"
           }
           tools={writer.toolCalls}
+          phase={writer.runPhase}
           compact={Boolean(writer.preview.trim())}
         />
       ) : null}

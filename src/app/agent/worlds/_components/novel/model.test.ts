@@ -825,6 +825,7 @@ test("selected writing skills appear as skillCatalog for chapter and rewrite but
   );
   assert.equal(chapter.skills, undefined);
   assert.match(writerInstructions, /apply_writing_skill/);
+  assert.match(writerInstructions, /禁止任何元叙述/);
   const rewrite = JSON.parse(rewritePrompt(config, novel, "one", "收紧节奏"));
   assert.deepEqual(
     rewrite.skillCatalog.map(({ id }: { id: string }) => id),

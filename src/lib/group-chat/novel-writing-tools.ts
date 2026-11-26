@@ -34,7 +34,7 @@ export function createNovelWritingTools(
     apply_writing_skill: createTool({
       id: "apply_writing_skill",
       description:
-        "挂载一条写作技法。需要强化场景、对白或章末收束时调用；不需要可不调用。同一技法重复调用会返回已挂载结果。",
+        "静默挂载一条写作技法。需要强化场景、对白或章末收束时调用；不需要可不调用。同一技法重复调用会返回已挂载结果。调用后直接写正文，不要在正文里提及本工具或技法名。",
       inputSchema: z.object({
         skillId: z
           .string()

@@ -163,6 +163,7 @@ test("novel writing, summaries and rewrites stream through the world proxy with 
       text: "",
       incomplete: false,
       error: null,
+      phase: "preparing",
     });
     assert.equal((await handle(request(run))).status, 202);
     assert.equal(ctx.jobs.length, 1);

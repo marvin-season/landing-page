@@ -28,6 +28,7 @@ export function useNovelTask<T>({
   onRestore,
   onText,
   onTools,
+  onPhase,
   onResult,
   onError,
 }: {
@@ -36,6 +37,7 @@ export function useNovelTask<T>({
   onRestore: (entry: NovelRunRecord<T>) => boolean;
   onText: (text: string) => void;
   onTools?: (tools: NonNullable<NovelRunStatus["tools"]>) => void;
+  onPhase?: (phase: NovelRunStatus["phase"]) => void;
   onResult: (
     version: number,
     snapshot?: NovelRunStatus,
@@ -117,6 +119,7 @@ export function useNovelTask<T>({
         if (snapshot.status === "running") {
           onText(snapshot.text);
           onTools?.(snapshot.tools ?? []);
+          onPhase?.(snapshot.phase);
         } else void deliver(operation, snapshot);
       },
     })

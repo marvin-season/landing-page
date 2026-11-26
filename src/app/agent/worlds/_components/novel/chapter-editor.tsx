@@ -95,6 +95,7 @@ export function ChapterEditor({
     | "stop"
     | "preview"
     | "toolCalls"
+    | "runPhase"
   >;
   ended: boolean;
   compactContext: boolean;
@@ -526,6 +527,7 @@ export function ChapterEditor({
               : "正在润色…"
           }
           tools={writer.toolCalls}
+          phase={writer.runPhase}
           compact={Boolean(writer.preview.trim())}
         />
       ) : null}
@@ -779,6 +781,7 @@ export function ChapterEditor({
                       : "思考中…"
                 }
                 tools={writer.toolCalls}
+                phase={writer.runPhase}
                 compact={Boolean(writer.preview.trim())}
               />
             ) : null}

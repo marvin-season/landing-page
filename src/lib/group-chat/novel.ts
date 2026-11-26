@@ -12,7 +12,11 @@ import {
 import { idSchema, WorldError, type WorldRoom } from "@/lib/group-chat/model";
 import { providerError } from "@/lib/group-chat/provider";
 import { worldSessionId } from "@/lib/group-chat/session";
-import type { NovelRunStatus, NovelRunToolCall } from "./novel-run-contract";
+import type {
+  NovelRunPhase,
+  NovelRunStatus,
+  NovelRunToolCall,
+} from "./novel-run-contract";
 import { type NovelRunStore, novelRunTimeoutMs } from "./novel-run-store";
 import {
   createNovelWritingTools,
@@ -52,10 +56,13 @@ async function generateNovel(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), novelRunTimeoutMs);
   const { signal } = controller;
+  let stepText = "";
+  let committedText = "";
   let text = "";
   let tools: NovelRunToolCall[] = [];
+  let phase: NovelRunPhase = "preparing";
   let publishedText = "";
-  let publishedTools = "";
+  let publishedMeta = "";
   let pending: Promise<void> | undefined;
   let result: NovelRunStatus = {
     status: "failed",
@@ -64,11 +71,24 @@ async function generateNovel(
     error: connectionEnded,
   };
 
+  function visibleText() {
+    return stepText.trim() ? stepText : committedText;
+  }
+
+  function currentPhase(): NovelRunPhase {
+    if (visibleText().trim()) return "writing";
+    if (tools.length) return "applying_skills";
+    return "preparing";
+  }
+
   function publish(force = false) {
     if (pending || signal.aborted) return;
-    const toolsKey = JSON.stringify(tools);
-    if (!force && text === publishedText && toolsKey === publishedTools) return;
+    text = visibleText();
+    phase = currentPhase();
+    const metaKey = JSON.stringify({ tools, phase });
+    if (!force && text === publishedText && metaKey === publishedMeta) return;
     const snapshotText = text;
+    const snapshotPhase = phase;
     const toolsSnapshot = tools.map((item) => ({ ...item }));
     pending = (async () => {
       const active = await runs.write(key, {
@@ -77,10 +97,11 @@ async function generateNovel(
         incomplete: false,
         error: null,
         tools: snapshotTools(toolsSnapshot),
+        phase: snapshotPhase,
       });
       if (active) {
         publishedText = snapshotText;
-        publishedTools = toolsKey;
+        publishedMeta = metaKey;
       } else controller.abort();
     })()
       .catch((error) => console.error("Novel progress write failed", error))
@@ -93,6 +114,11 @@ async function generateNovel(
     const index = tools.findIndex((item) => item.id === next.id);
     if (index >= 0) tools[index] = { ...tools[index], ...next };
     else tools = [...tools, next];
+    // 工具前的旁白不算正文：丢弃当前 step 已流出的说明文字。
+    if (stepText.trim()) {
+      stepText = "";
+      text = visibleText();
+    }
     publish(true);
   }
 
@@ -143,12 +169,25 @@ async function generateNovel(
     try {
       signal.throwIfAborted();
       let finish: { incomplete: boolean } | undefined;
+      let sawStep = false;
+      publish(true);
       while (!signal.aborted) {
         const { value: event, done } = await reader.read();
         if (done) break;
-        if (event.type === "text-delta") {
-          const first = text === "";
-          text += event.delta;
+        if (event.type === "start-step") {
+          if (sawStep && stepText.trim()) committedText = stepText;
+          stepText = "";
+          sawStep = true;
+          text = visibleText();
+          publish(true);
+        } else if (event.type === "finish-step") {
+          if (stepText.trim()) committedText = stepText;
+          text = visibleText();
+          publish(true);
+        } else if (event.type === "text-delta") {
+          const first = !visibleText().trim();
+          stepText += event.delta;
+          text = visibleText();
           if (first) publish(true);
         } else if (event.type === "tool-input-start") {
           upsertTool({
@@ -203,6 +242,7 @@ async function generateNovel(
           break;
         }
       }
+      text = visibleText();
       if (
         finish &&
         !signal.aborted &&
