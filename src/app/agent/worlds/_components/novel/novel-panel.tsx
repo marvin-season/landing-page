@@ -446,9 +446,8 @@ export function NovelPanel({
         "用本地正文覆盖服务器文件。服务器上现在的正文会保留为唯一备份，更早的备份会被删除。",
       )
     )
-      return null;
-    const path = await writer.saveToServer();
-    return `已写入 ${path}`;
+      return;
+    await writer.saveToServer();
   }
   async function syncFromServer() {
     if (newChapterDraft) throw new Error("请先保存草稿。");
@@ -457,9 +456,8 @@ export function NovelPanel({
         "用服务器正文覆盖本地书名和章节。现在的本地正文会保留为唯一备份，更早的本地备份会被替换。文风和大纲会保留。",
       )
     )
-      return null;
+      return;
     await writer.syncFromServer();
-    return "已从服务器同步到本地。上一份本地正文留在备份里。";
   }
   async function restoreLocalBackup() {
     if (newChapterDraft) throw new Error("请先保存草稿。");
@@ -622,6 +620,7 @@ export function NovelPanel({
             }}
           />
           <NovelFileControls
+            roomKey={roomKey}
             toolbar={fileToolbar}
             triggerRef={fileMenuTrigger}
             disabled={chapterActionsLocked}

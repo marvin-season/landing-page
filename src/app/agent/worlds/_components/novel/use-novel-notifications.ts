@@ -22,8 +22,10 @@ export function useNovelNotifications({
   const generationDismissed = useRef(false);
 
   useEffect(() => {
-    if (generationTitle === null) {
+    if (generating || generationTitle === null) {
       generationDismissed.current = false;
+    }
+    if (generationTitle === null) {
       toast.dismiss(generationId);
       return;
     }
@@ -31,7 +33,8 @@ export function useNovelNotifications({
     toast(generating ? "正在生成" : "查看生成结果", {
       id: generationId,
       duration: Infinity,
-      closeButton: true,
+      closeButton: !generating,
+      dismissible: !generating,
       description: generationTitle,
       icon: generating
         ? createElement(LoaderCircle, {
@@ -40,7 +43,10 @@ export function useNovelNotifications({
         : null,
       action: {
         label: generating ? "查看进度" : "打开草稿",
-        onClick: onOpenGeneration,
+        onClick: (event) => {
+          event.preventDefault();
+          onOpenGeneration();
+        },
       },
       onDismiss: () => {
         generationDismissed.current = true;
@@ -52,7 +58,7 @@ export function useNovelNotifications({
     if (serverSynced) {
       toast.success("数据已同步", {
         id: syncId,
-        duration: Infinity,
+        duration: 3000,
         closeButton: true,
       });
     } else {

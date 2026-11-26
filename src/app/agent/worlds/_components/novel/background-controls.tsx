@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  toast,
 } from "@landing-page/design-system";
 import { isDevelopment } from "@landing-page/utils";
 import {
@@ -26,7 +27,13 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type RefObject, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
@@ -59,6 +66,7 @@ function syncPromptText(reason: NovelSyncDivergence) {
 }
 
 export function NovelFileControls({
+  roomKey,
   toolbar,
   triggerRef,
   disabled,
@@ -80,6 +88,7 @@ export function NovelFileControls({
   serverSynced,
   generationAction,
 }: {
+  roomKey: string;
   toolbar: HTMLElement | null;
   triggerRef: RefObject<HTMLButtonElement | null>;
   disabled: boolean;
@@ -92,8 +101,8 @@ export function NovelFileControls({
   onDownloadDrafts?: () => void;
   onFork: () => Promise<string>;
   onOpenContext: () => void;
-  onSaveToServer: () => Promise<string | null>;
-  onSyncFromServer: () => Promise<string | null>;
+  onSaveToServer: () => Promise<void>;
+  onSyncFromServer: () => Promise<void>;
   onRestoreLocal: () => Promise<string | null>;
   canRestoreLocal: boolean;
   syncPrompt: NovelSyncDivergence | null;
@@ -105,9 +114,14 @@ export function NovelFileControls({
   const fileRef = useRef<HTMLInputElement>(null);
   const openContextAfterMenuClose = useRef(false);
   const [error, setError] = useState("");
+  const [syncError, setSyncError] = useState("");
   const [notice, setNotice] = useState("");
   const [pending, setPending] = useState<"" | "save" | "load" | "restore">("");
   const [forking, setForking] = useState(false);
+  const syncActions = useRef({ onSaveToServer, onSyncFromServer });
+  useEffect(() => {
+    syncActions.current = { onSaveToServer, onSyncFromServer };
+  }, [onSaveToServer, onSyncFromServer]);
   async function fork() {
     setError("");
     setForking(true);
@@ -119,24 +133,102 @@ export function NovelFileControls({
       setForking(false);
     }
   }
-  function run(
-    kind: "save" | "load" | "restore",
-    action: () => Promise<string | null>,
-  ) {
-    setError("");
-    setNotice("");
-    setPending(kind);
-    void action()
-      .then((next) => {
-        if (next) setNotice(next);
-      })
-      .catch((syncError) => {
-        setError(
-          syncError instanceof Error ? syncError.message : "同步小说失败。",
-        );
-      })
-      .finally(() => setPending(""));
-  }
+  const run = useCallback(
+    (
+      kind: "save" | "load" | "restore",
+      action: () => Promise<string | null> | Promise<void>,
+    ) => {
+      setError("");
+      setSyncError("");
+      setNotice("");
+      setPending(kind);
+      void action()
+        .then((next) => {
+          if (kind === "restore" && next) setNotice(next);
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error ? error.message : "同步小说失败。";
+          if (kind === "restore") setError(message);
+          else setSyncError(message);
+        })
+        .finally(() => setPending(""));
+    },
+    [],
+  );
+  const syncPromptId = `novel-sync-prompt:${roomKey}`;
+  const syncActionsDisabled = disabled || forking || Boolean(pending);
+  const syncProgress =
+    pending === "save"
+      ? "正在保存到服务器…"
+      : pending === "load"
+        ? "正在从服务器同步…"
+        : null;
+  useEffect(() => {
+    if (!isDevelopment || (!syncProgress && !syncPrompt && !syncError)) {
+      toast.dismiss(syncPromptId);
+      return;
+    }
+    const canDismiss = !syncProgress && !syncPrompt;
+    const options = {
+      id: syncPromptId,
+      duration: Infinity,
+      closeButton: canDismiss,
+      dismissible: canDismiss,
+    };
+    if (syncProgress) {
+      toast.loading(syncProgress, { ...options, description: null });
+      return;
+    }
+    const description = (
+      <>
+        {syncError ? <span className="block">{syncError}</span> : null}
+        {syncPrompt ? (
+          <>
+            <span className="block">{syncPromptText(syncPrompt)}</span>
+            <span className="mt-3 flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={syncActionsDisabled}
+                onClick={() => run("save", syncActions.current.onSaveToServer)}
+              >
+                保存到服务器
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={syncActionsDisabled}
+                onClick={() =>
+                  run("load", syncActions.current.onSyncFromServer)
+                }
+              >
+                从服务器同步
+              </Button>
+            </span>
+          </>
+        ) : null}
+      </>
+    );
+    if (syncError) {
+      toast.error("同步小说失败", { ...options, description });
+    } else {
+      toast.warning("小说正文待同步", { ...options, description });
+    }
+  }, [
+    run,
+    syncActionsDisabled,
+    syncError,
+    syncProgress,
+    syncPrompt,
+    syncPromptId,
+  ]);
+  useEffect(
+    () => () => {
+      toast.dismiss(syncPromptId);
+    },
+    [syncPromptId],
+  );
   return (
     <>
       {toolbar
@@ -289,31 +381,6 @@ export function NovelFileControls({
           }
         }}
       />
-      {isDevelopment && syncPrompt ? (
-        <Alert>
-          <AlertDescription>
-            <span className="block">{syncPromptText(syncPrompt)}</span>
-            <span className="mt-3 flex flex-wrap gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={disabled || forking || Boolean(pending)}
-                onClick={() => run("save", onSaveToServer)}
-              >
-                保存到服务器
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={disabled || forking || Boolean(pending)}
-                onClick={() => run("load", onSyncFromServer)}
-              >
-                从服务器同步
-              </Button>
-            </span>
-          </AlertDescription>
-        </Alert>
-      ) : null}
       {error ? (
         <Alert>
           <AlertDescription>{error}</AlertDescription>
