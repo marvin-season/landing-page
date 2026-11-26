@@ -190,7 +190,28 @@ function TimelineStep({
   );
 }
 
-function phaseSummary(phase: NovelRunPhase, tools: NovelRunToolCall[]) {
+function phaseSummary({
+  phase,
+  tools,
+  active,
+}: {
+  phase: NovelRunPhase;
+  tools: NovelRunToolCall[];
+  active: boolean;
+}) {
+  if (!active) {
+    if (tools.length) {
+      const names = tools
+        .filter((tool) => tool.state === "done")
+        .map((tool) => skillNameFromTool(tool))
+        .filter((name): name is string => Boolean(name));
+      const unique = names.filter(
+        (name, index, list) => list.indexOf(name) === index,
+      );
+      return unique.length ? `已完成 · ${unique.join("、")}` : "已完成";
+    }
+    return "已完成";
+  }
   if (phase === "preparing") return "准备中";
   if (phase === "applying_skills") {
     const names = tools
@@ -209,7 +230,7 @@ function phaseSummary(phase: NovelRunPhase, tools: NovelRunToolCall[]) {
     const unique = names.filter(
       (name, index, list) => list.indexOf(name) === index,
     );
-    return unique.length ? `已挂 · ${unique.join("、")}` : "撰写中";
+    return unique.length ? `撰写 · ${unique.join("、")}` : "撰写中";
   }
   return "撰写中";
 }
@@ -240,22 +261,29 @@ export function NovelComposerThinking({
       setOpen(true);
   }, [active, current]);
 
-  const preparingState = current === "preparing" ? "active" : "done";
-  const skillsState =
-    current === "preparing"
+  const preparingState = !active || current !== "preparing" ? "done" : "active";
+  const skillsState = !active
+    ? "done"
+    : current === "preparing"
       ? "pending"
       : current === "applying_skills"
         ? "active"
         : "done";
-  const writingState = current === "writing" ? "active" : "pending";
+  const writingState = !active
+    ? current === "writing" || hasText
+      ? "done"
+      : "pending"
+    : current === "writing"
+      ? "active"
+      : "pending";
   const skillDetail = tools.length
     ? tools
         .map((tool) => skillNameFromTool(tool) || friendlyToolName(tool))
         .filter((name, index, list) => list.indexOf(name) === index)
         .join("、")
-    : current === "applying_skills"
+    : current === "applying_skills" && active
       ? "正在选择技法…"
-      : current === "writing"
+      : current === "writing" || !active
         ? "本次未挂载技法"
         : "需要时自动挂载";
 
@@ -279,7 +307,7 @@ export function NovelComposerThinking({
         )}
         <span className="min-w-0 flex-1 truncate">{label}</span>
         <span className="hidden max-w-[40%] truncate text-xs font-normal text-muted-foreground sm:inline">
-          {phaseSummary(current, tools)}
+          {phaseSummary({ phase: current, tools, active })}
         </span>
         <ChevronDown
           className={cn(
@@ -307,11 +335,11 @@ export function NovelComposerThinking({
               title="撰写正文"
               state={writingState}
               detail={
-                writingState === "active"
-                  ? "正文开始流出"
-                  : writingState === "pending"
-                    ? "技法就绪后开始"
-                    : undefined
+                writingState === "done"
+                  ? "正文已生成"
+                  : writingState === "active"
+                    ? "正文开始流出"
+                    : "技法就绪后开始"
               }
             />
           </div>
