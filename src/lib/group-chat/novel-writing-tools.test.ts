@@ -12,6 +12,7 @@ test("allowedWritingSkillIds opens the scoped catalog when the pool is empty", (
     "scene-driven",
     "dialogue-first",
     "chapter-hook",
+    "prose-imagery",
   ]);
   assert.deepEqual(
     allowedWritingSkillIds(["dialogue-first", "missing"], "rewrite"),

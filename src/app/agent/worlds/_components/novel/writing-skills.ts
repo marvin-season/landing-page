@@ -49,6 +49,14 @@ export const writingSkills: WritingSkill[] = [
     instructions:
       "章末停在具体未决的动作、对白或发现上，留出下一步压力；禁止章末总结、主题升华、预告下一章或空泛收束句。",
   },
+  {
+    id: "prose-imagery",
+    name: "意象与余韵",
+    description: "偏散文：以感官意象与氛围收束，少硬推情节。",
+    appliesTo: ["chapter", "rewrite"],
+    instructions:
+      "以可感的物象、光影、气味与声音承载情绪，让氛围自然流转；少用情节硬推和结论式旁白。段末留一点未说尽的余味，避免主题升华、口号收束或抒情套话堆砌。",
+  },
 ];
 
 const skillById = new Map(writingSkills.map((skill) => [skill.id, skill]));

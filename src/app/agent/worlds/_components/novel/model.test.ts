@@ -295,6 +295,11 @@ test("opening insertion sends prior context and only the original opening excerp
           name: "章末钩子",
           description: "章末停在未决情境，不作总结或预告下一章。",
         },
+        {
+          id: "prose-imagery",
+          name: "意象与余韵",
+          description: "偏散文：以感官意象与氛围收束，少硬推情节。",
+        },
       ],
       task: {
         mode: "insert",
