@@ -9,7 +9,6 @@ import {
 import { cn } from "@landing-page/utils";
 import { PenLine } from "lucide-react";
 import {
-  type FocusEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -82,72 +81,56 @@ export function FloatingComposer({
 }) {
   const [expanded, setExpanded] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  /** 正在展开并迁移焦点时忽略短暂 blur，避免点开后立刻被收起。 */
-  const opening = useRef(false);
   const focusInput = useRef(onFocusInput);
   focusInput.current = onFocusInput;
   const open = expanded || forceOpen;
 
-  const expand = useCallback((andFocus: boolean) => {
-    opening.current = true;
-    setExpanded(true);
-    requestAnimationFrame(() => {
-      if (andFocus) focusInput.current();
-      // 再等一帧，等触发器失焦、输入框获得焦点都落定后再允许失焦收起。
-      requestAnimationFrame(() => {
-        opening.current = false;
-      });
-    });
-  }, []);
-
   useLayoutEffect(() => {
     if (!requestOpen) return;
-    expand(true);
-  }, [expand, requestOpen]);
+    setExpanded(true);
+    requestAnimationFrame(() => focusInput.current());
+  }, [requestOpen]);
 
   useLayoutEffect(() => {
     if (!expandRequest) return;
-    expand(false);
-  }, [expand, expandRequest]);
+    setExpanded(true);
+  }, [expandRequest]);
 
   useEffect(() => {
     if (!open || forceOpen) return;
 
-    function onPointerDown(event: PointerEvent) {
-      const target = event.target;
+    function collapseIfOutside(target: EventTarget | null) {
       if (!(target instanceof Node)) return;
       if (root.current?.contains(target)) return;
       setExpanded(false);
     }
 
+    // 点到浮窗外：收起。用 pointerdown 覆盖「失焦到不可聚焦区域」。
+    function onPointerDown(event: PointerEvent) {
+      collapseIfOutside(event.target);
+    }
+
+    // Tab 等焦点挪出浮窗：收起。不在展开瞬间误伤，因为焦点仍在内部或刚移入。
+    function onFocusIn(event: Event) {
+      collapseIfOutside(event.target);
+    }
+
     document.addEventListener("pointerdown", onPointerDown, true);
-    return () =>
+    document.addEventListener("focusin", onFocusIn, true);
+    return () => {
       document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("focusin", onFocusIn, true);
+    };
   }, [forceOpen, open]);
 
-  function collapseOnBlur(event: FocusEvent<HTMLDivElement>) {
-    if (forceOpen || opening.current) return;
-    const next = event.relatedTarget;
-    if (next instanceof Node && event.currentTarget.contains(next)) return;
-    requestAnimationFrame(() => {
-      if (forceOpen || opening.current) return;
-      const active = document.activeElement;
-      if (active instanceof Node && root.current?.contains(active)) return;
-      setExpanded(false);
-    });
-  }
-
   return (
-    <div ref={root} onBlur={collapseOnBlur}>
+    <div ref={root}>
       <Collapsible
         open={open}
         onOpenChange={(next) => {
-          if (next) {
-            expand(true);
-            return;
-          }
-          if (forceOpen) return;
-          setExpanded(false);
+          if (!next && forceOpen) return;
+          setExpanded(next);
+          if (next) requestAnimationFrame(() => focusInput.current());
         }}
         className={cn(
           "relative mx-auto min-h-11 w-full rounded-xl border border-border/60 bg-background/65 shadow-md transition-[max-width] duration-200 ease-out motion-reduce:transition-none pointer-events-auto backdrop-blur-md backdrop-saturate-150",

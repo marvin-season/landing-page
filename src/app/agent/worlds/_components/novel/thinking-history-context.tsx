@@ -26,6 +26,7 @@ export function NovelThinkingHistoryProvider({
   children: ReactNode;
 }) {
   const [api, setApi] = useState<ThinkingHistoryApi | null>(null);
+  // setApi 稳定；不要把整个 {api,setApi} 放进订阅方的 effect 依赖。
   const value = useMemo(() => ({ api, setApi }), [api]);
   return (
     <ThinkingHistoryContext.Provider value={value}>
@@ -39,12 +40,12 @@ export function usePublishThinkingHistory(
   entries: ThinkingHistoryEntry[],
   clear: () => void,
 ) {
-  const context = useContext(ThinkingHistoryContext);
+  const setApi = useContext(ThinkingHistoryContext)?.setApi;
   useEffect(() => {
-    if (!context) return;
-    context.setApi({ entries, clear });
-    return () => context.setApi(null);
-  }, [clear, context, entries]);
+    if (!setApi) return;
+    setApi({ entries, clear });
+    return () => setApi(null);
+  }, [clear, entries, setApi]);
 }
 
 export function useThinkingHistory() {
