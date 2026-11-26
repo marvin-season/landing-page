@@ -275,14 +275,13 @@ export function NovelComposerThinking({
   const skillsState =
     current === "applying_skills" && active ? "active" : "done";
   const writingState = current === "writing" && active ? "active" : "done";
+  // 仅展示真实挂载到的技法名，不做过程说明。
   const skillDetail = tools.length
     ? tools
         .map((tool) => skillNameFromTool(tool) || friendlyToolName(tool))
         .filter((name, index, list) => list.indexOf(name) === index)
         .join("、")
-    : current === "applying_skills" && active
-      ? "正在选择技法…"
-      : undefined;
+    : undefined;
 
   return (
     <Collapsible
@@ -316,13 +315,7 @@ export function NovelComposerThinking({
       <CollapsibleContent variant="collapse">
         <div className="flex flex-col gap-3 border-t border-border/60 px-3 py-2.5">
           <div className="flex flex-col gap-2.5">
-            <TimelineStep
-              title="准备 Writer"
-              state={preparingState}
-              detail={
-                preparingState === "active" ? "连接模型并装载上下文" : undefined
-              }
-            />
+            <TimelineStep title="准备 Writer" state={preparingState} />
             {reachedSkills ? (
               <TimelineStep
                 title="挂载写作技法"
@@ -331,27 +324,13 @@ export function NovelComposerThinking({
               />
             ) : null}
             {reachedWriting ? (
-              <TimelineStep
-                title="撰写正文"
-                state={writingState}
-                detail={
-                  writingState === "done"
-                    ? "正文已生成"
-                    : writingState === "active"
-                      ? "正文开始流出"
-                      : undefined
-                }
-              />
+              <TimelineStep title="撰写正文" state={writingState} />
             ) : null}
           </div>
           {compact ? (
             <AppliedSkillChips tools={tools} />
           ) : tools.length ? (
             <NovelToolTrace tools={tools} />
-          ) : current === "preparing" && active ? (
-            <p className="text-xs text-muted-foreground">
-              正在准备；若需要技法，下一步会在此出现。
-            </p>
           ) : null}
         </div>
       </CollapsibleContent>
