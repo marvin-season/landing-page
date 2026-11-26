@@ -409,7 +409,11 @@ export function ChapterEditor({
 
   async function save() {
     if (cannotSave) return;
-    if (draftConflict && !window.confirm("这份草稿基于旧正文。确定用它替换现在的章节正文？")) return;
+    if (
+      draftConflict &&
+      !window.confirm("这份草稿基于旧正文。确定用它替换现在的章节正文？")
+    )
+      return;
     clearTimeout(pendingSelection.current);
     if (!isRewrite) closeRewrite();
     setSaving(true);
@@ -639,7 +643,9 @@ export function ChapterEditor({
             </div>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
-            {!generation && !ended ? <PromptHistoryDialog roomKey={roomKey} /> : null}
+            {!generation && !ended ? (
+              <PromptHistoryDialog roomKey={roomKey} />
+            ) : null}
             {!isNewChapter && (dirty || isRewrite) ? (
               <NovelActionButton
                 hint={localActionHint("恢复已保存的正文。")}
@@ -844,7 +850,7 @@ export function ChapterEditor({
                   草稿未能保存到本机，请重试或先保存章节。
                 </p>
               ) : null}
-              {generation || target || saveFailed ? (
+              {generation || target || saveFailed || writer.error ? (
                 <>
                   {writer.error ? (
                     <p

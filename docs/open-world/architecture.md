@@ -64,7 +64,7 @@
 | 房间、世界配置、配置快照、剧本消息、剧情摘要、运行记录 | 服务端 libSQL `world_rooms`（每个房间一份 JSON 文档加列表摘要） | 默认 `file:./db/group-chat.db`，与 Mastra 单聊数据库分开 |
 | 运行请求幂等与暂停封锁 | `world_requests` | 以 `(room_id, clientRequestId)` 去重；暂停时写入 `cancelled` 封锁迟到的请求 |
 | 世界预设、角色预设 | `world_presets` | 与房间互不影响，创建房间时复制配置快照 |
-| 小说设定、章节、续写摘要（`checkpoint`） | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 摘要归档只改 `checkpoint`，正文仍完整保留；不随房间跨设备同步；删除或复制房间都不处理这份数据，Fork 会整本复制含摘要 |
+| 小说设定、章节、续写摘要（`checkpoint`） | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 摘要归档只改 `checkpoint`，正文仍完整保留；不随房间跨设备同步。删除或仅复制世界设定不处理这份数据，「复制整本小说」会复制正文和摘要 |
 | 生成中的小说草稿 | `useNovel` 内存；待应用结果另有本机备份 | 流式过程只在内存；续写 / 整章润色 / 选段润色 / 剧情整理的待应用结果刷新后可恢复 |
 
 ## 5. 接口

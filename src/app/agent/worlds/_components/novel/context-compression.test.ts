@@ -151,14 +151,15 @@ test("rolling compression covers a multi-request manuscript in order and retains
   assert.equal(compressed.chapters, novel.chapters);
   assert.equal(exportNovel(compressed, "md"), exportNovel(novel, "md"));
   assert.equal(novel.checkpoint, undefined);
-  const resume = initialCompressionCursor(compressed);
+  const resume = initialCompressionCursor(compressed, 48);
+  assert.equal(resume.index, 0);
   const earlierPayload = JSON.parse(
     compressedChapterPrompt(config, compressed, 48, resume),
   );
-  assert.deepEqual(earlierPayload.archivedChapters, payload.archivedChapters);
-  assert.deepEqual(earlierPayload.completedChapters, []);
+  assert.equal(earlierPayload.archivedChapters, undefined);
+  assert.equal(earlierPayload.completedChapters.length, 48);
   assert.equal(earlierPayload.task.chapter, 49);
-  assert.equal(
+  assert.ok(
     planCompressionBatch(
       roomId,
       config,
@@ -167,7 +168,6 @@ test("rolling compression covers a multi-request manuscript in order and retains
       48,
       novelRequestBudget,
     ),
-    null,
   );
   assert.equal(
     invalidateEditedCheckpoint(
@@ -183,9 +183,9 @@ test("rolling compression covers a multi-request manuscript in order and retains
     ).checkpoint,
     compressed.checkpoint,
   );
-  assert.deepEqual(
+  assert.equal(
     JSON.parse(rewritePrompt(config, compressed, "0", "")).archivedChapters,
-    payload.archivedChapters,
+    undefined,
   );
 });
 

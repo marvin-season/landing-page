@@ -8,6 +8,7 @@ import {
   invalidateEditedCheckpoint,
   isTxtChapterHeading,
   markdownChapterMarker,
+  markdownChapterMarkerLine,
   markdownNovelMarker,
   maxChapterLength,
   type Novel,
@@ -42,9 +43,29 @@ export function parseNovelFile(
   const fileTitle = fileName.replace(/\.[^.]+$/, "").trim();
   let title = fileTitle;
   let bodyStart = 0;
-  const markedMarkdown = extension === "md" && text.startsWith(`${markdownNovelMarker}\n\n`);
+  const markedMarkdown =
+    extension === "md" && text.startsWith(`${markdownNovelMarker}\n\n`);
   const headings: { start: number; end: number; title: string }[] = [];
-  if (extension === "md") {
+  if (markedMarkdown) {
+    const titleStart = markdownNovelMarker.length + 2;
+    const titleEnd = text.indexOf("\n", titleStart);
+    if (titleEnd < 0 || !text.startsWith("# ", titleStart))
+      throw new Error("无法识别 Markdown 小说的书名。");
+    title = text.slice(titleStart + 2, titleEnd).trim();
+    bodyStart = titleEnd;
+    const marker = `\n\n${markdownChapterMarker}`;
+    for (const match of text.matchAll(/^## (.*)$/gm)) {
+      const end = match.index + match[0].length;
+      if (!text.startsWith(marker, end)) continue;
+      const boundary = end + marker.length;
+      if (boundary !== text.length && text[boundary] !== "\n") continue;
+      headings.push({
+        start: match.index,
+        end: boundary,
+        title: match[1].trim(),
+      });
+    }
+  } else if (extension === "md") {
     for (const node of markdown.parse(text).children) {
       if (node.type !== "heading") continue;
       const { start, end } = node.position ?? {};
@@ -58,20 +79,11 @@ export function parseNovelFile(
       if (!name) continue;
       if (
         node.depth === 1 &&
-        (markedMarkdown
-          ? start.offset === markdownNovelMarker.length + 2
-          : start.offset === 0 && !chapterHeading.test(name))
+        start.offset === 0 &&
+        !chapterHeading.test(name)
       ) {
         title = name;
         bodyStart = end.offset;
-      } else if (markedMarkdown) {
-        const marker = `\n\n${markdownChapterMarker}\n`;
-        if (node.depth === 2 && text.startsWith(marker, end.offset))
-          headings.push({
-            start: start.offset,
-            end: end.offset + marker.length,
-            title: name,
-          });
       } else if (node.depth === 2 || chapterHeading.test(name)) {
         headings.push({ start: start.offset, end: end.offset, title: name });
       }
@@ -121,7 +133,16 @@ export function parseNovelFile(
     const prose =
       extension === "txt"
         ? body.split("\n").map(unescapeTxtChapterLine).join("\n")
-        : body;
+        : markedMarkdown
+          ? body
+              .split("\n")
+              .map((line) =>
+                line.startsWith("\\") && markdownChapterMarkerLine.test(line)
+                  ? line.slice(1)
+                  : line,
+              )
+              .join("\n")
+          : body;
     if ((extension === "txt" || markedMarkdown) && chapterName) {
       chapters.push({ title: chapterName, text: prose });
     } else {
@@ -181,12 +202,18 @@ export function applyServerExport(
     const samePosition = current.chapters[index];
     const matches = byContent.get(signature);
     const existing =
-      samePosition && key(samePosition.title, samePosition.text) === signature && !consumed.has(samePosition.id)
+      samePosition &&
+      key(samePosition.title, samePosition.text) === signature &&
+      !consumed.has(samePosition.id)
         ? samePosition
-        : matches?.length === 1 && !consumed.has(matches[0].id) ? matches[0] : undefined;
+        : matches?.length === 1 && !consumed.has(matches[0].id)
+          ? matches[0]
+          : undefined;
     if (existing) {
       consumed.add(existing.id);
-      const existingName = /^第[1-9]\d*章$/.test(existing.title) ? name : existing.title;
+      const existingName = /^第[1-9]\d*章$/.test(existing.title)
+        ? name
+        : existing.title;
       return existing.title === existingName && existing.text === text
         ? existing
         : { ...existing, title: existingName, text };

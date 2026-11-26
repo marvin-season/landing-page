@@ -257,12 +257,17 @@ export function splitPlotAtOffset(
     !first.trim() ||
     !second.trim() ||
     /^[\uDC00-\uDFFF]/.test(second)
-  ) throw new Error("拆分位置两侧都需要有正文。");
+  )
+    throw new Error("拆分位置两侧都需要有正文。");
   return {
     mode: edit.mode,
     chapters: [
       { ...chapter, text: first },
-      { id: crypto.randomUUID(), title: chapterTitle(edit.range.index + 1), text: second },
+      {
+        id: crypto.randomUUID(),
+        title: chapterTitle(edit.range.index + 1),
+        text: second,
+      },
     ],
   };
 }
@@ -277,23 +282,33 @@ export function plotDraftEditableText(edit: PlotEdit, draft: PlotDraft) {
     ),
     draft.chapters[1].text.slice(
       edit.openingGap.length,
-      draft.chapters[1].text.length - edit.openingSuffix.length - edit.after.length,
+      draft.chapters[1].text.length -
+        edit.openingSuffix.length -
+        edit.after.length,
     ),
   ];
 }
 
-export function replacePlotDraftText(edit: PlotEdit, draft: PlotDraft, index: number, text: string): PlotDraft {
+export function replacePlotDraftText(
+  edit: PlotEdit,
+  draft: PlotDraft,
+  index: number,
+  text: string,
+): PlotDraft {
   if (edit.mode === "split") return draft;
   const chapter = draft.chapters[index];
   if (!chapter) return draft;
-  const next = edit.mode !== "stitch"
-    ? text
-    : index === 0
-      ? edit.before + edit.endingPrefix + text + edit.endingGap
-      : edit.openingGap + text + edit.openingSuffix + edit.after;
+  const next =
+    edit.mode !== "stitch"
+      ? text
+      : index === 0
+        ? edit.before + edit.endingPrefix + text + edit.endingGap
+        : edit.openingGap + text + edit.openingSuffix + edit.after;
   return {
     ...draft,
-    chapters: draft.chapters.map((chapter, i) => i === index ? { ...chapter, text: next } : chapter),
+    chapters: draft.chapters.map((chapter, i) =>
+      i === index ? { ...chapter, text: next } : chapter,
+    ),
   };
 }
 

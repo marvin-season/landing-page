@@ -284,14 +284,17 @@ export function numberedTitle(title: string, index: number) {
 
 export const markdownNovelMarker = "<!-- novel-manuscript -->";
 export const markdownChapterMarker = "<!-- novel-chapter -->";
+export const markdownChapterMarkerLine = /^\\*<!-- novel-chapter -->$/;
 
 export function removeChapter(novel: Novel, chapterId: string): Novel {
   return {
     ...novel,
-    chapters: novel.chapters.filter(({ id }) => id !== chapterId).map((chapter, index) => {
-      const title = numberedTitle(chapter.title, index);
-      return title === chapter.title ? chapter : { ...chapter, title };
-    }),
+    chapters: novel.chapters
+      .filter(({ id }) => id !== chapterId)
+      .map((chapter, index) => {
+        const title = numberedTitle(chapter.title, index);
+        return title === chapter.title ? chapter : { ...chapter, title };
+      }),
   };
 }
 
@@ -326,7 +329,13 @@ export function insertChapterPrompt(
   if (index === 0) {
     const prompt = JSON.stringify({
       world: config,
-      followingChapters: [{ title: novel.chapters[0].title, text: novel.chapters[0].text.slice(0, 1200) }],
+      importedBackground: novel.background,
+      followingChapters: [
+        {
+          title: novel.chapters[0].title,
+          text: novel.chapters[0].text.slice(0, 1200),
+        },
+      ],
       novel: settings,
       task,
     });
@@ -543,7 +552,12 @@ export function exportNovel(novel: Novel, format: "txt" | "md") {
             .split(/\r\n?|\n/)
             .map(escapeTxtChapterLine)
             .join("\n")
-        : text;
+        : text
+            .split(/\r\n?|\n/)
+            .map((line) =>
+              markdownChapterMarkerLine.test(line) ? `\\${line}` : line,
+            )
+            .join("\n");
     return `${title}\n\n${body}`;
   });
   const title =

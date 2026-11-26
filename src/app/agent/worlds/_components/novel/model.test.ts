@@ -47,7 +47,7 @@ test("continuation sends only saved prose through the selected chapter when ther
   assert.equal(prompt.archivedChapters, undefined);
 });
 
-test("continuation always uses the archive and only adds uncovered prose through the selected chapter", () => {
+test("continuation uses only an archive that ends at or before the selected chapter", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [
@@ -61,19 +61,20 @@ test("continuation always uses the archive and only adds uncovered prose through
   for (const through of [0, 1, 2, 4]) {
     const prompt = JSON.parse(chapterPrompt(config, novel, through));
     assert.equal(prompt.task.chapter, through + 1);
-    assert.deepEqual(prompt.archivedChapters, {
-      throughChapter: 2,
-      summary: "既有摘要。",
-    });
+    assert.deepEqual(
+      prompt.archivedChapters,
+      through < 2 ? undefined : { throughChapter: 2, summary: "既有摘要。" },
+    );
     assert.deepEqual(
       prompt.completedChapters,
-      through === 4
-        ? [
-            { title: "第3章", text: "压缩后写的正文。" },
-            { title: "第4章", text: "从这里继续。" },
-          ]
-        : [],
+      novel.chapters
+        .slice(through < 2 ? 0 : 2, through)
+        .map(({ title, text }) => ({ title, text })),
     );
+    assert.deepEqual(prompt.followingChapter, {
+      title: novel.chapters[through].title,
+      opening: novel.chapters[through].text,
+    });
   }
 });
 
@@ -207,7 +208,7 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   assert.equal(updated.chapterGoal, novel.chapterGoal);
   assert.match(
     exportNovel(updated, "md"),
-    /## 第5章\n\n旅途\n\n## 第6章\n\n原文 5/,
+    /## 第5章\n\n<!-- novel-chapter -->\n\n旅途\n\n## 第6章\n\n<!-- novel-chapter -->\n\n原文 5/,
   );
   assert.deepEqual(
     JSON.parse(chapterPrompt(config, updated))
@@ -245,7 +246,7 @@ test("interchapter insertion counts only the selected chapters toward the contex
   );
 });
 
-test("opening insertion sends only basic settings and the author's request, even with long existing prose", () => {
+test("opening insertion sends prior context and only the original opening excerpt", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.chapters = [
@@ -271,15 +272,9 @@ test("opening insertion sends only basic settings and the author's request, even
   assert.deepEqual(
     { ...opening, task },
     {
-      world: {
-        title: config.title,
-        background: config.background,
-        scene: config.scene,
-        rules: config.rules,
-        facts: config.facts,
-        storyGoal: config.storyGoal,
-        characters: config.characters,
-      },
+      world: { ...config, priorContext: "世界前置剧情" },
+      importedBackground: novel.background,
+      followingChapters: [{ title: "旧开篇", text: "早".repeat(1200) }],
       novel: { title: novel.title, style: novel.style, outline: novel.outline },
       task: {
         mode: "insert",
@@ -396,7 +391,7 @@ test("whole chapter rewrite sends the archive, uncovered preceding prose and the
   assert.equal(JSON.stringify(prompt).includes(novel.chapterGoal), false);
   const earlier = JSON.parse(rewritePrompt(config, novel, "start", ""));
   assert.deepEqual(earlier.completedChapters, []);
-  assert.deepEqual(earlier.archivedChapters, prompt.archivedChapters);
+  assert.equal(earlier.archivedChapters, undefined);
   assert.equal(earlier.task.instructions, prompt.task.instructions);
   const updated = replaceChapterText(novel, "b", "她递出钥匙。");
   assert.deepEqual(updated.chapters, [
@@ -406,7 +401,7 @@ test("whole chapter rewrite sends the archive, uncovered preceding prose and the
   ]);
 });
 
-test("compact passage rewrite skips the shared history but retains the target chapter and recent prose", () => {
+test("compact passage rewrite skips all other chapters and retains the target chapter", () => {
   const config = {
     ...loadWorldTemplates()[0].config,
     priorContext: "世界预设前情",
@@ -437,10 +432,10 @@ test("compact passage rewrite skips the shared history but retains the target ch
   });
   assert.equal(prompt.archivedChapters, undefined);
   assert.equal(prompt.importedBackground, undefined);
-  assert.deepEqual(prompt.completedChapters, [
+  assert.equal(prompt.completedChapters, undefined);
+  assert.deepEqual(normal.completedChapters, [
     { title: "上一章", text: "她推开了门。" },
   ]);
-  assert.deepEqual(normal.completedChapters, prompt.completedChapters);
   assert.deepEqual(prompt.targetChapter, {
     chapter: 3,
     title: "本章",
@@ -788,7 +783,7 @@ test("whole novel exports preserve chapter order and exclude author settings and
   );
   assert.equal(
     exportNovel(novel, "md"),
-    "# 书名\n\n## 第1章\n\n正文一\n\n## 第2章\n\n正文二\n",
+    "<!-- novel-manuscript -->\n\n# 书名\n\n## 第1章\n\n<!-- novel-chapter -->\n\n正文一\n\n## 第2章\n\n<!-- novel-chapter -->\n\n正文二\n",
   );
 });
 

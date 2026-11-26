@@ -64,7 +64,13 @@ export function useChapterEditorDraft(
     )
       return;
     requested.current = text;
-    const write = writeChapterEditorDraft(roomKey, chapterId, text, original.current);
+    if (text === undefined) original.current = baseText;
+    const write = writeChapterEditorDraft(
+      roomKey,
+      chapterId,
+      text,
+      original.current,
+    );
     pending.current = write;
     setStatus("saving");
     void write.then(
@@ -75,7 +81,7 @@ export function useChapterEditorDraft(
         if (pending.current === write) setStatus("write-error");
       },
     );
-  }, [chapterId, enabled, roomKey, status, text]);
+  }, [baseText, chapterId, enabled, roomKey, status, text]);
 
   return status;
 }

@@ -9,7 +9,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquare, Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
@@ -23,6 +23,7 @@ import {
   startCreateWork,
 } from "./create-work-sheet";
 import { ImportNovelTemplateDialog } from "./import-novel-template-dialog";
+import { observeNovelList } from "./novel/use-novel-storage";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldLobbyNav } from "./world-lobby-nav";
 
@@ -47,17 +48,35 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
     queryKey: ["world-presets"],
     queryFn: () => worldRequest<{ presets: WorldPreset[] }>("presets"),
   });
+  const [localNovels, setLocalNovels] = useState<
+    ReadonlyMap<string, { title: string; updatedAt?: number }>
+  >(() => new Map());
+  useEffect(() => {
+    const ids = rooms.data?.rooms
+      .filter(({ kind }) => kind === "novel")
+      .map(({ id }) => id);
+    if (!ids?.length) return;
+    const subscription = observeNovelList(ids).subscribe({
+      next: setLocalNovels,
+      error: () => setLocalNovels(new Map()),
+    });
+    return () => subscription.unsubscribe();
+  }, [rooms.data]);
   const savedRooms =
     workFilter === "all"
       ? rooms.data?.rooms
       : rooms.data?.rooms.filter((room) => room.kind === workFilter);
 
-  async function remove(id: string) {
-    if (!window.confirm("删除这个世界及其全部存档？此操作不能撤销。")) return;
+  async function remove(room: RoomListItem) {
+    const message =
+      room.kind === "novel"
+        ? "删除这部作品的世界记录后将无法再从作品列表打开小说。请先导出需要保留的正文和草稿。确定删除？"
+        : "删除这个世界及其全部存档？此操作不能撤销。";
+    if (!window.confirm(message)) return;
     setPending(true);
     setError("");
     try {
-      await worldRequest(`rooms/${id}`, "DELETE");
+      await worldRequest(`rooms/${room.id}`, "DELETE");
       await rooms.refetch();
     } catch (e) {
       setError(e instanceof Error ? e.message : "删除失败");
@@ -140,7 +159,7 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                 <div className="flex w-full items-start justify-between gap-2">
                   <div className="flex min-w-0 items-start gap-2">
                     <h3 className="min-w-0 line-clamp-2 text-sm font-medium leading-5 cursor-pointer">
-                      {room.title}
+                      {localNovels.get(room.id)?.title || room.title}
                     </h3>
                     <Tag size="compact" className="shrink-0">
                       {room.kind === "novel" ? "小说" : "剧本"}
@@ -153,7 +172,7 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                     disabled={pending}
                     onClick={(event) => {
                       event.stopPropagation();
-                      void remove(room.id);
+                      void remove(room);
                     }}
                     aria-label={`删除${room.title}`}
                   >
@@ -172,7 +191,12 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                     </span>
                   ) : null}
                   <span className="ml-auto text-xs tabular-nums text-muted-foreground">
-                    {new Date(room.updatedAt).toLocaleDateString("zh-CN")}
+                    {new Date(
+                      Math.max(
+                        Date.parse(room.updatedAt),
+                        localNovels.get(room.id)?.updatedAt ?? 0,
+                      ),
+                    ).toLocaleDateString("zh-CN")}
                   </span>
                 </WorldCardFooter>
               </WorldCard>

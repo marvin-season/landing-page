@@ -25,6 +25,7 @@ import {
 import { useEffect, useId, useState } from "react";
 import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
+import { textareaSourceOffset } from "./chapter-text";
 import { type Chapter, maxChapterLength } from "./model";
 import {
   insertionModeHint,
@@ -102,7 +103,10 @@ export function PlotSheet({
   );
   const [applying, setApplying] = useState(false);
   const [manualSplit, setManualSplit] = useState(false);
-  const [splitPoint, setSplitPoint] = useState<{ chapterId: string; offset: number } | null>(null);
+  const [splitPoint, setSplitPoint] = useState<{
+    chapterId: string;
+    offset: number;
+  } | null>(null);
   const draft = writer.plotDraft;
   const locked = writer.busy || applying || draft !== null;
   const hasSplitTarget = chapters.some(({ text }) => canSplitChapter(text));
@@ -140,13 +144,21 @@ export function PlotSheet({
         ? range.chapters.map(({ id }) => id)
         : null;
   const requiresInstructions = mode === "stitch" || mode === "insert";
-  const splitChapter = splitting && range?.chapters.length === 1 ? range.chapters[0] : undefined;
-  const splitOffset = splitChapter && splitPoint?.chapterId === splitChapter.id ? splitPoint.offset : 0;
+  const splitChapter =
+    splitting && range?.chapters.length === 1 ? range.chapters[0] : undefined;
+  const splitOffset =
+    splitChapter && splitPoint?.chapterId === splitChapter.id
+      ? splitPoint.offset
+      : 0;
   const validSplitPoint = Boolean(
-    splitChapter?.text.slice(0, splitOffset).trim() && splitChapter.text.slice(splitOffset).trim(),
+    splitChapter?.text.slice(0, splitOffset).trim() &&
+      splitChapter.text.slice(splitOffset).trim(),
   );
   const canStart = Boolean(
-    target && (splitting && manualSplit ? validSplitPoint : !requiresInstructions || requirements.trim()),
+    target &&
+      (splitting && manualSplit
+        ? validSplitPoint
+        : !requiresInstructions || requirements.trim()),
   );
   const sourceLength =
     mode === "merge"
@@ -218,7 +230,12 @@ export function PlotSheet({
           onSubmit={(event) => {
             event.preventDefault();
             if (!locked && canStart && target)
-              writer.editPlot(target, mode, requirements, splitting && manualSplit ? splitOffset : undefined);
+              writer.editPlot(
+                target,
+                mode,
+                requirements,
+                splitting && manualSplit ? splitOffset : undefined,
+              );
           }}
         >
           {!draft ? (
@@ -254,29 +271,6 @@ export function PlotSheet({
                   ))}
                 </div>
               </fieldset>
-              {splitting ? (
-                <div className="flex flex-col gap-2">
-                  <Button type="button" variant="outline" size="sm" className="self-start" disabled={locked} onClick={() => setManualSplit(!manualSplit)}>
-                    {manualSplit ? "改用 AI 选拆分位置" : "手动选拆分位置"}
-                  </Button>
-                  {manualSplit && splitChapter ? (
-                    <>
-                      <p className="text-xs text-muted-foreground">把光标放在第二章的开头。</p>
-                      <Textarea
-                        aria-label="第二章开头"
-                        readOnly
-                        rows={6}
-                        value={splitChapter.text}
-                        onSelect={(event) => setSplitPoint({
-                          chapterId: splitChapter.id,
-                          offset: event.currentTarget.selectionStart,
-                        })}
-                      />
-                    </>
-                  ) : null}
-                </div>
-              ) : null}
-              {splitting && manualSplit ? null : (
               <fieldset disabled={locked} className="flex flex-col gap-1">
                 <legend className="sr-only">章节选择</legend>
                 <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
@@ -391,23 +385,63 @@ export function PlotSheet({
                   </p>
                 ) : null}
               </fieldset>
-              <fieldset disabled={locked} className="flex flex-col gap-1">
-                <label htmlFor={requirementsId} className="text-xs font-medium">
-                  {splitting ? "本次拆分要求" : "本次写作要求"}
-                  {requiresInstructions ? " *" : "（选填）"}
-                </label>
-                <Textarea
-                  id={requirementsId}
-                  value={requirements}
-                  onChange={(event) => setRequirements(event.target.value)}
-                  maxLength={4000}
-                  rows={2}
-                  required={requiresInstructions}
-                />
-                <div className="self-start">
-                  <PromptHistoryDialog roomKey={roomKey} />
+              {splitting ? (
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="self-start"
+                    disabled={locked}
+                    onClick={() => setManualSplit(!manualSplit)}
+                  >
+                    {manualSplit ? "改用 AI 选拆分位置" : "手动选拆分位置"}
+                  </Button>
+                  {manualSplit && splitChapter ? (
+                    <>
+                      <p className="text-xs text-muted-foreground">
+                        把光标放在第二章的开头。
+                      </p>
+                      <Textarea
+                        aria-label="第二章开头"
+                        readOnly
+                        rows={6}
+                        value={splitChapter.text}
+                        onSelect={(event) =>
+                          setSplitPoint({
+                            chapterId: splitChapter.id,
+                            offset: textareaSourceOffset(
+                              splitChapter.text,
+                              event.currentTarget.selectionStart,
+                            ),
+                          })
+                        }
+                      />
+                    </>
+                  ) : null}
                 </div>
-              </fieldset>
+              ) : null}
+              {splitting && manualSplit ? null : (
+                <fieldset disabled={locked} className="flex flex-col gap-1">
+                  <label
+                    htmlFor={requirementsId}
+                    className="text-xs font-medium"
+                  >
+                    {splitting ? "本次拆分要求" : "本次写作要求"}
+                    {requiresInstructions ? " *" : "（选填）"}
+                  </label>
+                  <Textarea
+                    id={requirementsId}
+                    value={requirements}
+                    onChange={(event) => setRequirements(event.target.value)}
+                    maxLength={4000}
+                    rows={2}
+                    required={requiresInstructions}
+                  />
+                  <div className="self-start">
+                    <PromptHistoryDialog roomKey={roomKey} />
+                  </div>
+                </fieldset>
               )}
               {mode === "merge" ? (
                 <Alert className="px-2 py-1.5">
@@ -451,9 +485,17 @@ export function PlotSheet({
                   </h4>
                   {writer.editablePlotText[index] !== undefined ? (
                     <Textarea
-                      aria-label={draft.mode === "stitch" ? (index === 0 ? "前章结尾" : "后章开头") : "草稿正文"}
+                      aria-label={
+                        draft.mode === "stitch"
+                          ? index === 0
+                            ? "前章结尾"
+                            : "后章开头"
+                          : "草稿正文"
+                      }
                       value={writer.editablePlotText[index]}
-                      onChange={(event) => writer.editPlotDraftText(index, event.target.value)}
+                      onChange={(event) =>
+                        writer.editPlotDraftText(index, event.target.value)
+                      }
                       rows={5}
                       disabled={applying}
                     />
@@ -533,7 +575,11 @@ export function PlotSheet({
             </>
           ) : (
             <NovelActionButton
-              hint={splitting && manualSplit ? localActionHint("按光标位置拆成两章，保留全部原文。") : plotHint(mode, atStart)}
+              hint={
+                splitting && manualSplit
+                  ? localActionHint("按光标位置拆成两章，保留全部原文。")
+                  : plotHint(mode, atStart)
+              }
               type="submit"
               size="sm"
               form={form}

@@ -8,6 +8,39 @@ import {
 } from "./import-novel";
 import { chapterPrompt, createNovel, exportNovel } from "./model";
 
+test("the novel's Markdown export keeps headings inside the same chapter on import", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.chapters = [
+    {
+      id: "a",
+      title: "序",
+      text:
+        `开头。\n\n## 章内小节\n\n<!-- novel-chapter -->\n\n${"中".repeat(8100)}\n\n` +
+        "```",
+    },
+    { id: "b", title: "后记", text: "结尾。" },
+  ];
+  const imported = parseNovelFile(exportNovel(novel, "md"), "小说.md");
+  assert.deepEqual(
+    imported.chapters,
+    novel.chapters.map(({ text, title }) => ({ text, title })),
+  );
+});
+
+test("server sync retains local chapter identity and brief after an inserted chapter", () => {
+  const novel = createNovel(loadWorldTemplates()[0].config);
+  novel.title = "旧港";
+  novel.chapters = [
+    { id: "existing", title: "港口", text: "原有正文。", brief: "原要求" },
+  ];
+  const next = applyServerExport(
+    novel,
+    "旧港\n\n第1章\n\n新开篇。\n\n第2章 港口\n\n原有正文。",
+    "旧港.txt",
+  );
+  assert.deepEqual(next.chapters[1], novel.chapters[0]);
+});
+
 test("novel exports import as editable chapters in both formats", () => {
   const novel = createNovel(loadWorldTemplates()[0].config);
   novel.title = "旧港";

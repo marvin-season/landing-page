@@ -264,7 +264,11 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               className="duration-[340ms]! ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               <RoomHeader
-                title={novelMode ? (novelContext?.title ?? loaded.config.title) : loaded.config.title}
+                title={
+                  novelMode
+                    ? (novelContext?.title ?? loaded.config.title)
+                    : loaded.config.title
+                }
                 running={running || novelBusy}
                 ended={ended}
                 phase={
@@ -470,9 +474,12 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 if (novelMode) dismissSettingsHint();
               } catch (error) {
                 if (writingContext && previousContext) {
-                  const restored = await saveNovelContext.current?.(previousContext);
+                  const restored =
+                    await saveNovelContext.current?.(previousContext);
                   if (!restored)
-                    throw new Error("世界设定未保存，本机小说设定也未能恢复。请刷新后核对两处设定。");
+                    throw new Error(
+                      "世界设定未保存，本机小说设定也未能恢复。请刷新后核对两处设定。",
+                    );
                 }
                 throw error;
               }

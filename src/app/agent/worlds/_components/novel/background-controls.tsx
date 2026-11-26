@@ -35,16 +35,15 @@ import {
   maxNovelFileBytes,
   parseNovelFile,
 } from "./import-novel";
-import { type NovelBackground, serializeBackground } from "./model";
+import type { NovelBackground } from "./model";
 import { localActionHint, NovelActionButton } from "./novel-action-tooltip";
 import type { NovelSyncDivergence } from "./novel-sync";
 
 export function downloadBackground(background: NovelBackground) {
   const name = background.source.title.replace(/[\\/:*?"<>|]/g, "_") || "小说";
-  // Keep the versioned envelope intact so another novel can validate the file.
   downloadText(
     `${name}-背景总结.md`,
-    serializeBackground(background),
+    background.summary,
     "text/markdown;charset=utf-8",
   );
 }
@@ -206,7 +205,10 @@ export function NovelFileControls({
                     <FileText />
                     导出整本 TXT
                   </DropdownMenuItem>
-                  <DropdownMenuItem disabled={!hasChapters} onSelect={() => onDownload("md")}>
+                  <DropdownMenuItem
+                    disabled={!hasChapters}
+                    onSelect={() => onDownload("md")}
+                  >
                     <FileText />
                     导出整本 Markdown
                   </DropdownMenuItem>
@@ -217,7 +219,9 @@ export function NovelFileControls({
                     </DropdownMenuItem>
                   ) : null}
                   <DropdownMenuItem
-                    disabled={disabled || !canSummarize || !hasChapters || forking}
+                    disabled={
+                      disabled || !canSummarize || !hasChapters || forking
+                    }
                     onSelect={onSummarize}
                   >
                     <Download />

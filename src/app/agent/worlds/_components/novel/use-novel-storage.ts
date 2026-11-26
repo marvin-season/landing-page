@@ -1,7 +1,7 @@
 "use client";
 
 import { isDevelopment } from "@landing-page/utils";
-import Dexie, { type Table } from "dexie";
+import Dexie, { liveQuery, type Table } from "dexie";
 import {
   type RefObject,
   useEffect,
@@ -16,8 +16,8 @@ import {
   createChapterDraftBackup,
 } from "./chapter-draft-backup";
 import {
-  createNovel,
   type Chapter,
+  createNovel,
   exportNovel,
   invalidateEditedCheckpoint,
   type Novel,
@@ -43,9 +43,15 @@ import {
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
-type NovelRecord = { key: string; novel: Novel; previous?: Novel; version?: string };
+type NovelRecord = {
+  key: string;
+  novel: Novel;
+  previous?: Novel;
+  version?: string;
+};
 const novels: Table<NovelRecord, string> = db.table("novels");
-const changedInAnotherTab = "另一个标签页已保存此作品。请保留手头修改，刷新后核对最新正文。";
+const changedInAnotherTab =
+  "另一个标签页已保存此作品。请保留手头修改，刷新后核对最新正文。";
 
 export function addNovelCopy(key: string, novel: Novel) {
   return novels.add({ key, novel, version: crypto.randomUUID() });
@@ -62,6 +68,21 @@ export async function getNovelCopyByRoomId(roomId: string) {
   return (
     (await novels.filter((row) => row.key.endsWith(suffix)).first()) ?? null
   );
+}
+
+export function observeNovelList(roomIds: readonly string[]) {
+  const requested = new Set(roomIds);
+  return liveQuery(async () => {
+    const rows = await novels
+      .filter(({ key }) => requested.has(key.slice(key.lastIndexOf(":") + 1)))
+      .toArray();
+    return new Map(
+      rows.map(({ key, novel }) => [
+        key.slice(key.lastIndexOf(":") + 1),
+        { title: novel.title, updatedAt: novel.updatedAt },
+      ]),
+    );
+  });
 }
 
 export function useNovelStorage(
@@ -194,13 +215,18 @@ export function useNovelStorage(
           const pending = pendingBackup.read();
           const restoredPending = pending
             ? restorePendingResult(
-                pending, latest.current, configRef.current,
-                storageVersion.current ?? "legacy", roomVersionRef.current,
+                pending,
+                latest.current,
+                configRef.current,
+                storageVersion.current ?? "legacy",
+                roomVersionRef.current,
               )
             : null;
           if (pending && !restoredPending) {
             if (pending.kind === "plot") {
-              setError("正文或设定已变，旧剧情草稿无法直接应用。可从文件菜单导出待整理草稿。");
+              setError(
+                "正文或设定已变，旧剧情草稿无法直接应用。可从文件菜单导出待整理草稿。",
+              );
               setConflictedPlot(pending.draft.chapters);
             }
             if (pending.kind !== "plot") pendingBackup.clear();
@@ -238,8 +264,17 @@ export function useNovelStorage(
     };
   }, [backup, pendingBackup]);
 
-  function update(next: Novel, { persistFirst = false, touch = true, backupPrevious = false, restoreCheckpoint = false } = {}) {
-    if (!restoreCheckpoint) next = invalidateEditedCheckpoint(latest.current, next);
+  function update(
+    next: Novel,
+    {
+      persistFirst = false,
+      touch = true,
+      backupPrevious = false,
+      restoreCheckpoint = false,
+    } = {},
+  ) {
+    if (!restoreCheckpoint)
+      next = invalidateEditedCheckpoint(latest.current, next);
     if (
       touch &&
       exportNovel(latest.current, "txt") !== exportNovel(next, "txt")
@@ -296,12 +331,15 @@ export function useNovelStorage(
   }
   function updateContext(context: NovelWritingContext) {
     const current = latest.current;
-    return update({
-      ...current,
-      title: context.title,
-      style: context.style,
-      outline: context.outline,
-    }, { persistFirst: true });
+    return update(
+      {
+        ...current,
+        title: context.title,
+        style: context.style,
+        outline: context.outline,
+      },
+      { persistFirst: true },
+    );
   }
 
   const syncHost = {

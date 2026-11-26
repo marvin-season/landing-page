@@ -53,7 +53,7 @@ export function NovelActionButton({
 export const nextChapterActionHint: ActionHint = {
   action: "生成下一章草稿，确认后才加入正文。",
   context:
-    "完整世界设定、小说设定、续写要求和目标字数。有摘要时，从任意章续写都会带摘要，只补上未被覆盖且截至所选章的正文。没有摘要时，发送截至所选章的正文和已导入的背景（如有）。不带草稿。",
+    "完整世界设定、小说设定、续写要求和目标字数。摘要没有超过续写点时，用摘要替换所覆盖的前文。章间续写也会参考紧接着一章的开头。不带草稿。",
 };
 
 export function localActionHint(action: string): ActionHint {
@@ -63,7 +63,7 @@ export function localActionHint(action: string): ActionHint {
 export function compactContextHint(selection: boolean): ActionHint {
   return localActionHint(
     selection
-      ? "开启后，省略摘要或用来替代摘要的前文，只保留本章和压缩后新增的前文章节。"
+      ? "开启后，润色只参考本章和创作设定。"
       : "开启后，下次润色的正文范围只包含本章。",
   );
 }
@@ -78,7 +78,7 @@ export function rewriteHint(selection: boolean, compact: boolean): ActionHint {
     context: `完整世界设定、小说设定、润色要求和本章已保存正文。${
       selection
         ? compact
-          ? "标明选段位置，只附带压缩后新增的前文章节（如有），不带摘要。"
+          ? "标明选段位置，不带摘要或其他章节。"
           : "标明选段位置；有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
         : compact
           ? "不带摘要或其他章节。"
@@ -111,7 +111,7 @@ export function plotHint(mode: PlotMode, atStart = false): ActionHint {
   return {
     action: atStart ? "在第一章前补写新开篇。" : "在选定的两章之间补写一章。",
     context: atStart
-      ? "世界基本设定、小说设定、插入要求和目标字数。不带已有章节或摘要。"
+      ? "完整世界设定（含前置剧情）、小说设定、插入要求、目标字数和原第一章的开头。"
       : "完整世界设定、小说设定、插入要求、目标字数及前后两章的完整正文。若已导入背景，也会一起发送。",
   };
 }
@@ -119,5 +119,5 @@ export function plotHint(mode: PlotMode, atStart = false): ActionHint {
 export const insertionModeHint: ActionHint = {
   action: "在书首或相邻两章之间补写一章。",
   context:
-    "两种位置都带小说设定和写作要求。书首用世界基本设定；章间用完整世界设定，并带相邻两章全文和已导入的背景（如有）。",
+    "两种位置都带完整世界设定、小说设定和写作要求。书首还带原第一章的开头，章间还带相邻两章全文。",
 };

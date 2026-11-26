@@ -95,7 +95,9 @@ export function ImportNovelTemplateDialog({
           await worldRequest(`rooms/${created.room.id}`, "DELETE");
         } catch {
           void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
-          throw new Error("正文未能保存，空作品也未能清理。请在作品列表删除空作品后重试。");
+          throw new Error(
+            "正文未能保存，空作品也未能清理。请在作品列表删除空作品后重试。",
+          );
         }
         throw new Error("正文未能保存到本机。请检查浏览器存储空间后重试。");
       }

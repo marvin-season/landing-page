@@ -303,7 +303,7 @@ export function NovelPanel({
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || writer.saving;
   const newChapterLocked = chapterActionsLocked || Boolean(newChapterDraft);
-  const summarizing = writer.task === "summary" && !writer.compressing;
+  const summarizing = writer.summarizingBackground;
   function reuseChapterGoal(text: string) {
     if (newChapterLocked || ended) return false;
     void writer.updateChapterGoal(text);
@@ -415,14 +415,16 @@ export function NovelPanel({
   }
   function downloadDrafts() {
     const drafts = Array.from(draftTexts, ([id, text]) => ({
-      title: novel.chapters.find((item) => item.id === id)?.title ?? `原章节 ${id}`,
+      title:
+        novel.chapters.find((item) => item.id === id)?.title ?? `原章节 ${id}`,
       text,
     }));
     drafts.push(...(writer.conflictedPlot ?? []));
-    if (newChapterDraft) drafts.push({
-      title: newChapterDraft.chapter.title,
-      text: newChapterDraft.text,
-    });
+    if (newChapterDraft)
+      drafts.push({
+        title: newChapterDraft.chapter.title,
+        text: newChapterDraft.text,
+      });
     downloadText(
       `${novel.title.replace(/[\\/:*?"<>|]/g, "_")}-待确认草稿.txt`,
       drafts.map(({ title, text }) => `${title}\n\n${text}`).join("\n\n"),
@@ -516,6 +518,7 @@ export function NovelPanel({
               ? await writer.saveChapterRewrite(draft)
               : await writer.update(replaceChapter(novel, draft), {
                   persistFirst: true,
+                  backupPrevious: Boolean(novel.checkpoint),
                 });
           if (saved) {
             setEditingChapter({ chapter: draft, mode: "manual" });
@@ -557,7 +560,7 @@ export function NovelPanel({
       />
     );
   }
-  const continueLocked = chapterActionsLocked || ended;
+  const continueLocked = disabled || ended;
   const composer = newChapterDraft ? null : (
     <FloatingComposer
       label="继续创作下一章"
@@ -629,7 +632,9 @@ export function NovelPanel({
             }}
             onDownload={download}
             onDownloadDrafts={
-              draftTexts.size || newChapterDraft || writer.conflictedPlot ? downloadDrafts : undefined
+              draftTexts.size || newChapterDraft || writer.conflictedPlot
+                ? downloadDrafts
+                : undefined
             }
             onFork={writer.createFork}
             onOpenContext={() => setContextOpen(true)}
@@ -643,12 +648,16 @@ export function NovelPanel({
           />
           {writer.missingLocal && writer.ready ? (
             <Alert>
-              <AlertDescription>当前浏览器没有这部作品的正文存档。若曾在其他设备写作，可从「文件」导入正文。</AlertDescription>
+              <AlertDescription>
+                当前浏览器没有这部作品的正文存档。若曾在其他设备写作，可从「文件」导入正文。
+              </AlertDescription>
             </Alert>
           ) : null}
           {writer.syncReadFailed ? (
             <Alert>
-              <AlertDescription>未能读取服务器 TXT。本机存档可正常使用。</AlertDescription>
+              <AlertDescription>
+                未能读取服务器 TXT。本机存档可正常使用。
+              </AlertDescription>
             </Alert>
           ) : null}
           {summarizing && writer.busy ? (
@@ -689,12 +698,18 @@ export function NovelPanel({
                   <p
                     className={cn(
                       "shrink-0 whitespace-nowrap text-xs tabular-nums",
-                      chapterLengthShortfall(chapter.text.length, chapter.targetWords ?? "")
+                      chapterLengthShortfall(
+                        chapter.text.length,
+                        chapter.targetWords ?? "",
+                      )
                         ? "text-amber-700 dark:text-amber-400"
                         : "text-muted-foreground",
                     )}
                   >
-                    {formatChapterLength(chapter.text.length, chapter.targetWords ?? "")}
+                    {formatChapterLength(
+                      chapter.text.length,
+                      chapter.targetWords ?? "",
+                    )}
                     {hasDraft(chapter) ? (
                       <span className="ml-2 font-medium text-destructive">
                         草稿未同步，点击「编辑本章」进入
@@ -886,7 +901,7 @@ export function NovelPanel({
             </section>
           ) : (
             <EmptyNovelContinuation
-              disabled={continueLocked}
+              disabled={disabled}
               onOpen={() => setComposerRequest((count) => count + 1)}
             />
           )}

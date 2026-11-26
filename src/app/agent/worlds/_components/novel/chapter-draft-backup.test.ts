@@ -39,6 +39,29 @@ test("clearing an applied continuation cancels pending writes", async () => {
   assert.equal(await open("author:second-room").read(), null);
 });
 
+test("starting a regeneration preserves the current draft until it produces text", async () => {
+  const key = "author:regenerate";
+  const draft = open(key);
+  draft.start(source);
+  draft.write("原来写好的草稿");
+  await draft.flush();
+
+  const replacement = {
+    ...source,
+    chapter: { ...source.chapter, brief: "换一种写法" },
+  };
+  draft.start(replacement);
+  draft.write(" ");
+  assert.equal((await open(key).read())?.text, "原来写好的草稿");
+  assert.equal(draft.cancelEmptyReplacement()?.chapter.brief, "Next step");
+
+  draft.start(replacement);
+  draft.write("新正文");
+  await draft.flush();
+  assert.equal((await open(key).read())?.chapter.brief, "换一种写法");
+  assert.equal((await open(key).read())?.text, "新正文");
+});
+
 test("manual new chapters survive returning to reading and can be resumed after reload", async () => {
   const key = "author:manual-draft";
   const draft = open(key);

@@ -104,3 +104,32 @@ test("a pending AI split restores only if both parts still match the original ch
   novel.chapters[0].text = "已修改的原章。";
   assert.equal(restorePendingResult(recovered, novel, config), null);
 });
+
+test("a pending merge cannot restore after another tab saves the manuscript", () => {
+  const novel = createNovel(config);
+  novel.chapters = [
+    { id: "a", title: "第1章", text: "第一章正文" },
+    { id: "b", title: "第2章", text: "第二章正文" },
+  ];
+  const pending = {
+    kind: "plot" as const,
+    mode: "merge" as const,
+    ids: ["a", "b"],
+    requirements: "",
+    version: 1,
+    storageVersion: "before-edit",
+    draft: {
+      mode: "merge" as const,
+      chapters: [{ id: "merged", title: "第1章", text: "合并草稿" }],
+    },
+  };
+  assert.ok(restorePendingResult(pending, novel, config, "before-edit", 1));
+  assert.equal(
+    restorePendingResult(pending, novel, config, "after-edit", 1),
+    null,
+  );
+  assert.equal(
+    restorePendingResult(pending, novel, config, "before-edit", 2),
+    null,
+  );
+});

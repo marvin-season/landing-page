@@ -18,7 +18,11 @@ export type NovelServerSyncHost = {
   publish: (novel: Novel) => void;
   update: (
     novel: Novel,
-    options?: { persistFirst?: boolean; touch?: boolean; restoreCheckpoint?: boolean },
+    options?: {
+      persistFirst?: boolean;
+      touch?: boolean;
+      restoreCheckpoint?: boolean;
+    },
   ) => Promise<boolean>;
   clearDraft: () => void;
 };
@@ -104,9 +108,15 @@ export function saveNovelToServer(host: NovelServerSyncHost) {
 
 export function syncNovelFromServer(host: NovelServerSyncHost) {
   return locked(host, async () => {
+    const submitted = host.novel();
     const server = await loadServerNovel(host.roomId());
     if (!server) throw new Error("服务器上还没有这本小说。");
     const current = host.novel();
+    if (submitted !== current || host.busy()) {
+      host.server.current = server;
+      host.publish(current);
+      throw new Error("读取服务器期间本机有变动，请核对正文后重新同步。");
+    }
     const prior = host.previous.current;
     if (exportNovel(current, "txt") !== server.text) {
       host.rememberBackup(structuredClone(current));
@@ -141,7 +151,13 @@ export function restoreNovelBackup(host: NovelServerSyncHost) {
       restored.updatedAt = Date.now();
       restored.syncedAt = current.syncedAt;
     }
-    if (!(await host.update(restored, { touch: false, persistFirst: true, restoreCheckpoint: true }))) {
+    if (
+      !(await host.update(restored, {
+        touch: false,
+        persistFirst: true,
+        restoreCheckpoint: true,
+      }))
+    ) {
       host.rememberBackup(previous);
       throw new Error("本地备份未能恢复。");
     }

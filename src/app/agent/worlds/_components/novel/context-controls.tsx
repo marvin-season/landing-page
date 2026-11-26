@@ -48,7 +48,16 @@ export function ContextControls({
   room: WorldRoom;
   writer: Pick<
     ReturnType<typeof useNovel>,
-    "novel" | "busy" | "error" | "compressing" | "compressContext" | "stop"
+    | "novel"
+    | "busy"
+    | "error"
+    | "compressing"
+    | "compressContext"
+    | "stop"
+    | "checkpointCandidate"
+    | "applyCheckpoint"
+    | "discardCheckpoint"
+    | "saving"
   >;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -119,6 +128,12 @@ export function ContextControls({
               </CollapsibleContent>
             </Collapsible>
           ) : null}
+          {writer.checkpointCandidate ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium">待应用摘要</p>
+              <UnifiedMarkdown content={writer.checkpointCandidate.summary} />
+            </div>
+          ) : null}
           {canCompress ? (
             <fieldset disabled={pending}>
               <FieldGroup>
@@ -177,6 +192,24 @@ export function ContextControls({
               <Square data-icon="inline-start" />
               停止压缩
             </NovelActionButton>
+          ) : writer.checkpointCandidate ? (
+            <>
+              <NovelActionButton
+                hint={localActionHint("放弃新摘要。")}
+                variant="ghost"
+                disabled={writer.saving}
+                onClick={writer.discardCheckpoint}
+              >
+                放弃摘要
+              </NovelActionButton>
+              <NovelActionButton
+                hint={localActionHint("采用新摘要供后续续写使用。")}
+                disabled={writer.saving}
+                onClick={() => void writer.applyCheckpoint()}
+              >
+                应用摘要
+              </NovelActionButton>
+            </>
           ) : (
             <NovelActionButton
               hint={{
