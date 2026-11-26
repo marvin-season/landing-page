@@ -282,10 +282,6 @@ export function numberedTitle(title: string, index: number) {
   return /^第[1-9]\d*章$/.test(title) ? chapterTitle(index) : title;
 }
 
-export const markdownNovelMarker = "<!-- novel-manuscript -->";
-export const markdownChapterMarker = "<!-- novel-chapter -->";
-export const markdownChapterMarkerLine = /^\\*<!-- novel-chapter -->$/;
-
 export function removeChapter(novel: Novel, chapterId: string): Novel {
   return {
     ...novel,
@@ -502,67 +498,39 @@ function parseExportedBackground(normalized: string): NovelBackground {
   const position = normalized.lastIndexOf(backgroundMarker);
   const header = normalized.match(/^# [^\n]+\n\n/);
   if (position < 0 || !header || !normalized.endsWith("\n-->"))
-    throw new Error("请选择“总结并导出背景”生成的 Markdown 文件（.md）。");
+    throw new Error("无法识别旧版 Markdown 背景总结文件。");
   let metadata: unknown;
   try {
     metadata = JSON.parse(
       normalized.slice(position + backgroundMarker.length, -4),
     );
   } catch {
-    throw new Error("背景文件的来源信息损坏，请重新导出 Markdown 背景文件。");
+    throw new Error("旧版背景文件的来源信息损坏，请换一份文件。");
   }
   const result = backgroundSchema.safeParse({
     ...(metadata && typeof metadata === "object" ? metadata : {}),
     summary: normalized.slice(header[0].length, position).trim(),
   });
-  if (!result.success)
-    throw new Error(
-      "背景文件格式或版本不支持，请选择“总结并导出背景”生成的文件。",
-    );
+  if (!result.success) throw new Error("旧版背景文件的格式或版本不支持。");
   return result.data;
 }
 
-export function serializeBackground(background: NovelBackground): string {
-  const { summary, ...metadata } = background;
-  // Preserve source settings for re-import without adding them to readable prose.
-  const source = JSON.stringify(metadata, null, 2)
-    .replaceAll("<", "\\u003c")
-    .replaceAll(">", "\\u003e");
-  const title = background.source.title.replace(/\s+/g, " ");
-  return `# ${title} · 背景总结（截至第 ${background.source.chapterCount} 章）\n\n${summary.trim()}\n\n<!-- novel-background\n${source}\n-->\n`;
-}
-
-export function exportNovel(novel: Novel, format: "txt" | "md") {
-  const heading = format === "md" ? `${markdownNovelMarker}\n\n# ` : "";
+export function exportNovel(novel: Novel) {
   const chapters = novel.chapters.map((chapter, index) => {
-    let title = chapter.title;
-    if (format === "md") {
-      title = `## ${title.replace(/[\r\n]+/g, " ")}\n\n${markdownChapterMarker}`;
-    } else {
-      title = title.replace(/[\r\n]+/g, " ").trim();
-      if (!isTxtChapterHeading(title)) {
-        const number = chapterTitle(index);
-        title = title ? `${number} ${title}` : number;
-      }
+    let title = chapter.title.replace(/[\r\n]+/g, " ").trim();
+    if (!isTxtChapterHeading(title)) {
+      const number = chapterTitle(index);
+      title = title ? `${number} ${title}` : number;
     }
-    const text = chapter.text.trim();
-    const body =
-      format === "txt"
-        ? text
-            .split(/\r\n?|\n/)
-            .map(escapeTxtChapterLine)
-            .join("\n")
-        : text
-            .split(/\r\n?|\n/)
-            .map((line) =>
-              markdownChapterMarkerLine.test(line) ? `\\${line}` : line,
-            )
-            .join("\n");
+    const body = chapter.text
+      .trim()
+      .split(/\r\n?|\n/)
+      .map(escapeTxtChapterLine)
+      .join("\n");
     return `${title}\n\n${body}`;
   });
-  const title =
-    format === "txt" ? escapeTxtChapterLine(novel.title) : novel.title;
-  return `${heading}${title}\n\n${chapters.join("\n\n")}\n`;
+  const title = escapeTxtChapterLine(novel.title);
+  return `${title}\n\n${chapters.join("\n\n")}\n`;
 }
 
 export function novelRequest(

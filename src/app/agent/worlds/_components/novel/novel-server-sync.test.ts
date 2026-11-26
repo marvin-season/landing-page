@@ -65,7 +65,7 @@ test("pulling the server keeps only the previous local manuscript", async () => 
     const novel = copies.shift();
     if (!novel) throw new Error("没有更多服务器版本。");
     return Response.json({
-      text: exportNovel(novel, "txt"),
+      text: exportNovel(novel),
       fileName: "旧港.txt",
       updatedAt: novel.chapters[0]?.text === "第二版" ? 2 : 3,
     });

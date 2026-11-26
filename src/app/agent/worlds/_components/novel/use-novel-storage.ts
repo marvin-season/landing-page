@@ -149,7 +149,7 @@ export function useNovelStorage(
     const status = novelSyncStatus(
       novel,
       serverCopy.current,
-      exportNovel(novel, "txt"),
+      exportNovel(novel),
     );
     setSyncPrompt(status.kind === "diverged" ? status.reason : null);
     setServerSynced(status.kind === "match");
@@ -174,11 +174,7 @@ export function useNovelStorage(
         previousRef.current = saved?.previous;
         setHasLocalBackup(Boolean(saved?.previous));
         serverCopy.current = server;
-        const status = novelSyncStatus(
-          novel,
-          server,
-          exportNovel(novel, "txt"),
-        );
+        const status = novelSyncStatus(novel, server, exportNovel(novel));
         if (
           status.kind === "match" &&
           (novel.updatedAt !== status.updatedAt ||
@@ -275,10 +271,7 @@ export function useNovelStorage(
   ) {
     if (!restoreCheckpoint)
       next = invalidateEditedCheckpoint(latest.current, next);
-    if (
-      touch &&
-      exportNovel(latest.current, "txt") !== exportNovel(next, "txt")
-    ) {
+    if (touch && exportNovel(latest.current) !== exportNovel(next)) {
       next = { ...next, updatedAt: Date.now() };
     }
     function publish() {

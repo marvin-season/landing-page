@@ -42,9 +42,9 @@ import type { NovelSyncDivergence } from "./novel-sync";
 export function downloadBackground(background: NovelBackground) {
   const name = background.source.title.replace(/[\\/:*?"<>|]/g, "_") || "小说";
   downloadText(
-    `${name}-背景总结.md`,
-    background.summary,
-    "text/markdown;charset=utf-8",
+    `${name}-背景总结.txt`,
+    background.summary.replace(/^##[ \t]+/gm, ""),
+    "text/plain;charset=utf-8",
   );
 }
 
@@ -87,7 +87,7 @@ export function NovelFileControls({
   importing: boolean;
   onImportingChange: (importing: boolean) => void;
   onImport: (novel: ImportedNovel) => Promise<void>;
-  onDownload: (format: "txt" | "md") => void;
+  onDownload: () => void;
   onDownloadDrafts?: () => void;
   onFork: () => Promise<string>;
   onOpenContext: () => void;
@@ -200,17 +200,10 @@ export function NovelFileControls({
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     disabled={!hasChapters}
-                    onSelect={() => onDownload("txt")}
+                    onSelect={onDownload}
                   >
                     <FileText />
                     导出整本 TXT
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={!hasChapters}
-                    onSelect={() => onDownload("md")}
-                  >
-                    <FileText />
-                    导出整本 Markdown
                   </DropdownMenuItem>
                   {onDownloadDrafts ? (
                     <DropdownMenuItem onSelect={onDownloadDrafts}>

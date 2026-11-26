@@ -23,10 +23,19 @@ import {
   replaceChapterText,
   rewriteInstructions,
   rewritePrompt,
-  serializeBackground,
   summaryPrompt,
   writerInstructions,
 } from "./model";
+
+function legacyBackgroundFixture({
+  summary,
+  ...metadata
+}: ReturnType<typeof createBackground>) {
+  const source = JSON.stringify(metadata, null, 2)
+    .replaceAll("<", "\\u003c")
+    .replaceAll(">", "\\u003e");
+  return `# ${metadata.source.title} · 背景总结\n\n${summary}\n\n<!-- novel-background\n${source}\n-->\n`;
+}
 
 test("continuation sends only saved prose through the selected chapter when there is no archive", () => {
   const config = loadWorldTemplates()[0].config;
@@ -118,10 +127,7 @@ test("a saved continuation keeps the requirement sent for that draft, and later 
     undefined,
   );
   assert.equal(rememberChapterBrief(draft, "  ").brief, undefined);
-  assert.equal(
-    exportNovel(saved ?? novel, "txt").includes("推进感情线"),
-    false,
-  );
+  assert.equal(exportNovel(saved ?? novel).includes("推进感情线"), false);
 });
 
 test("renaming a chapter from the reading page keeps custom titles and restores the default number", () => {
@@ -206,10 +212,7 @@ test("inserting before chapter five preserves the original sequence, IDs, prose,
   ]);
   assert.equal(novel.chapters[4].title, "第5章");
   assert.equal(updated.chapterGoal, novel.chapterGoal);
-  assert.match(
-    exportNovel(updated, "md"),
-    /## 第5章\n\n<!-- novel-chapter -->\n\n旅途\n\n## 第6章\n\n<!-- novel-chapter -->\n\n原文 5/,
-  );
+  assert.match(exportNovel(updated), /第5章\n\n旅途\n\n第6章\n\n原文 5/);
   assert.deepEqual(
     JSON.parse(chapterPrompt(config, updated))
       .completedChapters.slice(4)
@@ -609,7 +612,7 @@ test("adopting a rewrite changes only its chapter body and future context and ex
     JSON.parse(chapterPrompt(config, updated)).completedChapters[0].text,
     "新稿",
   );
-  assert.equal(exportNovel(updated, "md").includes("旧稿"), false);
+  assert.equal(exportNovel(updated).includes("旧稿"), false);
 });
 
 test("writer receives world secrets and edited chapters in order, with the next chapter requirements", () => {
@@ -662,7 +665,7 @@ test("summary export imports into a different novel as background without replac
     source,
     "## 人物状态\n林舟在旧港，已答应帮助苏晚。\n## 未解伏笔\n灯塔的来信尚未拆开。",
   );
-  const markdown = serializeBackground(background);
+  const markdown = legacyBackgroundFixture(background);
   assert.ok(markdown.startsWith("# 原小说 · 背景总结"));
   assert.ok(markdown.includes(background.summary));
   const imported = parseBackgroundFile(markdown);
@@ -680,7 +683,7 @@ test("summary export imports into a different novel as background without replac
   assert.equal(prompt.novel.outline, "调查灯塔");
   assert.equal(imported.source.throughChapterId, "chapter-one");
   assert.equal(imported.source.chapterCount, 1);
-  assert.equal(exportNovel(next, "txt").includes(background.summary), false);
+  assert.equal(exportNovel(next).includes(background.summary), false);
 });
 
 test("summary requests merge inherited background with completed chapters, without including future chapter requirements as events", () => {
@@ -728,18 +731,20 @@ test("background import rejects malformed, oversized and incompatible files", ()
   ])
     assert.throws(
       () =>
-        parseBackgroundFile(serializeBackground(invalid as typeof background)),
+        parseBackgroundFile(
+          legacyBackgroundFixture(invalid as typeof background),
+        ),
       /格式或版本/,
     );
 });
 
-test("edited Markdown body imports with Windows line endings while metadata and source secrets round-trip intact", () => {
+test("edited legacy Markdown imports with Windows line endings and preserves metadata", () => {
   const config = structuredClone(loadWorldTemplates()[0].config);
   config.characters[0].privateInfo = "秘密包含 --> 和 <tag>";
   const novel = createNovel(config);
   novel.chapters = [{ id: "one", title: "第一章", text: "正文" }];
   const background = createBackground(config, novel, "## 人物状态\n原总结");
-  const text = serializeBackground(background).replace(
+  const text = legacyBackgroundFixture(background).replace(
     "原总结",
     "手工修订后的总结",
   );
@@ -778,12 +783,8 @@ test("whole novel exports preserve chapter order and exclude author settings and
     { id: "two", title: "第2章", text: "正文二" },
   ];
   assert.equal(
-    exportNovel(novel, "txt"),
+    exportNovel(novel),
     "书名\n\n第1章\n\n正文一\n\n第2章\n\n正文二\n",
-  );
-  assert.equal(
-    exportNovel(novel, "md"),
-    "<!-- novel-manuscript -->\n\n# 书名\n\n## 第1章\n\n<!-- novel-chapter -->\n\n正文一\n\n## 第2章\n\n<!-- novel-chapter -->\n\n正文二\n",
   );
 });
 

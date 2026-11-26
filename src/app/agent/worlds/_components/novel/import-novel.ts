@@ -7,9 +7,6 @@ import {
   createNovel,
   invalidateEditedCheckpoint,
   isTxtChapterHeading,
-  markdownChapterMarker,
-  markdownChapterMarkerLine,
-  markdownNovelMarker,
   maxChapterLength,
   type Novel,
   unescapeTxtChapterLine,
@@ -19,6 +16,9 @@ export const maxNovelFileBytes = 16 * 1024 * 1024;
 const chapterHeading =
   /^(?:第[〇零一二三四五六七八九十百千两\d]+[章节回集]|chapter[ \t]+\d+\b).{0,100}$/i;
 const markdown = unified().use(remarkParse);
+const markdownNovelMarker = "<!-- novel-manuscript -->";
+const markdownChapterMarker = "<!-- novel-chapter -->";
+const markdownChapterMarkerLine = /^\\*<!-- novel-chapter -->$/;
 
 export type ImportedNovel = {
   title: string;

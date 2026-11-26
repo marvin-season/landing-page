@@ -67,7 +67,7 @@ async function locked<T>(host: NovelServerSyncHost, work: () => Promise<T>) {
 export function saveNovelToServer(host: NovelServerSyncHost) {
   return locked(host, async () => {
     const submitted = host.novel();
-    const text = exportNovel(submitted, "txt");
+    const text = exportNovel(submitted);
     const response = await fetch("/api/novel/save-txt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ export function saveNovelToServer(host: NovelServerSyncHost) {
       typeof data.fileName === "string" ? data.fileName : "小说.txt";
     const current = host.novel();
     host.server.current = { text, fileName, updatedAt: data.updatedAt };
-    if (exportNovel(current, "txt") !== text) {
+    if (exportNovel(current) !== text) {
       host.publish(current);
       throw new Error("保存期间本地正文又有修改，服务器上是刚才提交的那一版。");
     }
@@ -118,7 +118,7 @@ export function syncNovelFromServer(host: NovelServerSyncHost) {
       throw new Error("读取服务器期间本机有变动，请核对正文后重新同步。");
     }
     const prior = host.previous.current;
-    if (exportNovel(current, "txt") !== server.text) {
+    if (exportNovel(current) !== server.text) {
       host.rememberBackup(structuredClone(current));
     }
     host.server.current = server;
@@ -144,7 +144,7 @@ export function restoreNovelBackup(host: NovelServerSyncHost) {
     host.rememberBackup(structuredClone(current));
     const restored = structuredClone(previous);
     const server = host.server.current;
-    if (server && exportNovel(restored, "txt") === server.text) {
+    if (server && exportNovel(restored) === server.text) {
       restored.updatedAt = server.updatedAt;
       restored.syncedAt = server.updatedAt;
     } else {

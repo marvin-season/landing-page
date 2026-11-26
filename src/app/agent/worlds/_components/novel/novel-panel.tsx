@@ -404,13 +404,11 @@ export function NovelPanel({
     if (await writer.update(next, { persistFirst: true, backupPrevious: true }))
       setSelected(next.chapters[Math.max(0, index - 1)]?.id ?? null);
   }
-  function download(format: "txt" | "md") {
+  function download() {
     downloadText(
-      `${novel.title.replace(/[\\/:*?"<>|]/g, "_") || "小说"}.${format}`,
-      exportNovel(novel, format),
-      format === "md"
-        ? "text/markdown;charset=utf-8"
-        : "text/plain;charset=utf-8",
+      `${novel.title.replace(/[\\/:*?"<>|]/g, "_") || "小说"}.txt`,
+      exportNovel(novel),
+      "text/plain;charset=utf-8",
     );
   }
   function downloadDrafts() {

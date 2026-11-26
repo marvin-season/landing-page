@@ -8,23 +8,35 @@ import {
 } from "./import-novel";
 import { chapterPrompt, createNovel, exportNovel } from "./model";
 
-test("the novel's Markdown export keeps headings inside the same chapter on import", () => {
-  const novel = createNovel(loadWorldTemplates()[0].config);
-  novel.chapters = [
+test("legacy Markdown exports keep headings inside the same chapter on import", () => {
+  const longSection = "中".repeat(8100);
+  const chapters = [
     {
-      id: "a",
       title: "序",
-      text:
-        `开头。\n\n## 章内小节\n\n<!-- novel-chapter -->\n\n${"中".repeat(8100)}\n\n` +
+      text: [
+        "开头。",
+        "## 章内小节",
+        "<!-- novel-chapter -->",
+        longSection,
         "```",
+      ].join("\n\n"),
     },
-    { id: "b", title: "后记", text: "结尾。" },
+    { title: "后记", text: "结尾。" },
   ];
-  const imported = parseNovelFile(exportNovel(novel, "md"), "小说.md");
-  assert.deepEqual(
-    imported.chapters,
-    novel.chapters.map(({ text, title }) => ({ text, title })),
-  );
+  const legacyFile = [
+    "<!-- novel-manuscript -->",
+    "# 旧港",
+    "## 序",
+    "<!-- novel-chapter -->",
+    chapters[0].text.replace(
+      "<!-- novel-chapter -->",
+      "\\<!-- novel-chapter -->",
+    ),
+    "## 后记",
+    "<!-- novel-chapter -->",
+    "结尾。",
+  ].join("\n\n");
+  assert.deepEqual(parseNovelFile(legacyFile, "小说.md").chapters, chapters);
 });
 
 test("server sync retains local chapter identity and brief after an inserted chapter", () => {
@@ -41,22 +53,20 @@ test("server sync retains local chapter identity and brief after an inserted cha
   assert.deepEqual(next.chapters[1], novel.chapters[0]);
 });
 
-test("novel exports import as editable chapters in both formats", () => {
+test("TXT exports import as editable chapters", () => {
   const novel = createNovel(loadWorldTemplates()[0].config);
   novel.title = "旧港";
   novel.chapters = [
     { id: "a", title: "第一章 港口", text: "她来到旧港。\n\n灯塔熄灭了。" },
     { id: "b", title: "第二章 提灯", text: "晚归的人提着灯。" },
   ];
-  for (const format of ["txt", "md"] as const) {
-    const source = `\uFEFF${exportNovel(novel, format).replaceAll("\n", "\r\n")}`;
-    const imported = parseNovelFile(source, `旧港.${format}`);
-    assert.equal(imported.title, novel.title);
-    assert.deepEqual(
-      imported.chapters,
-      novel.chapters.map(({ title, text }) => ({ title, text })),
-    );
-  }
+  const source = `\uFEFF${exportNovel(novel).replaceAll("\n", "\r\n")}`;
+  const imported = parseNovelFile(source, "旧港.txt");
+  assert.equal(imported.title, novel.title);
+  assert.deepEqual(
+    imported.chapters,
+    novel.chapters.map(({ title, text }) => ({ title, text })),
+  );
 });
 
 test("Markdown headings in code blocks do not start new chapters", () => {
@@ -91,16 +101,13 @@ test("TXT export numbers custom titles so the same chapter boundaries survive re
     { id: "a", title: "序章", text: "灯塔熄灭了。" },
     { id: "b", title: "第二章：夜雨", text: "雨下了一夜。" },
   ];
-  const source = exportNovel(novel, "txt");
+  const source = exportNovel(novel);
   const imported = parseNovelFile(source, "旧港.txt");
   assert.deepEqual(imported.chapters, [
     { title: "第1章 序章", text: "灯塔熄灭了。" },
     { title: "第二章：夜雨", text: "雨下了一夜。" },
   ]);
-  assert.equal(
-    exportNovel(createImportedNovel(config, imported), "txt"),
-    source,
-  );
+  assert.equal(exportNovel(createImportedNovel(config, imported)), source);
 });
 
 test("TXT keeps the book title out of the chapters when the filename differs", () => {
@@ -128,7 +135,7 @@ test("TXT round-trips long numbered chapters and heading-shaped prose even after
     },
     { id: "b", title: "第2章", text: "第二段。" },
   ];
-  assert.deepEqual(parseNovelFile(exportNovel(novel, "txt"), "副本.txt"), {
+  assert.deepEqual(parseNovelFile(exportNovel(novel), "副本.txt"), {
     title: novel.title,
     chapters: novel.chapters.map(({ title, text }) => ({ title, text })),
   });
@@ -166,7 +173,7 @@ test("server export replaces chapters and keeps writing settings", () => {
   novel.title = "旧港";
   novel.style = "第一人称";
   novel.chapters = [{ id: "a", title: "第1章", text: "灯。" }];
-  const same = applyServerExport(novel, exportNovel(novel, "txt"), "旧港.txt");
+  const same = applyServerExport(novel, exportNovel(novel), "旧港.txt");
   assert.equal(same.chapters[0], novel.chapters[0]);
   assert.equal(same.style, "第一人称");
   const changed = applyServerExport(

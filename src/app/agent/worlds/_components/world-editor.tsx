@@ -229,7 +229,7 @@ export function WorldEditor({
       const saved = await getNovelCopyByRoomId(roomId);
       if (!saved?.novel.chapters.some((chapter) => chapter.text.trim()))
         throw new Error("本机还没有这部小说的正文，请先确认正文已保存");
-      const text = exportNovel(saved.novel, "txt");
+      const text = exportNovel(saved.novel);
       const model =
         config.characters.find((character) => character.enabled)?.model ??
         config.characters[0]?.model ??

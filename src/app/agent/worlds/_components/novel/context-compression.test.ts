@@ -149,7 +149,7 @@ test("rolling compression covers a multi-request manuscript in order and retains
   assert.ok(checkpoint);
   assert.deepEqual(manuscript, novel);
   assert.equal(compressed.chapters, novel.chapters);
-  assert.equal(exportNovel(compressed, "md"), exportNovel(novel, "md"));
+  assert.equal(exportNovel(compressed), exportNovel(novel));
   assert.equal(novel.checkpoint, undefined);
   const resume = initialCompressionCursor(compressed, 48);
   assert.equal(resume.index, 0);
