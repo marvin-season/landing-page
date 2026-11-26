@@ -2,12 +2,12 @@
 
 import {
   Button,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@landing-page/design-system";
 import { History } from "lucide-react";
 import { useState } from "react";
@@ -46,8 +46,8 @@ export function NovelThinkingHistoryButton({
   const [open, setOpen] = useState(false);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button
           type="button"
           variant="ghost"
@@ -62,18 +62,15 @@ export function NovelThinkingHistoryButton({
             </span>
           ) : null}
         </Button>
-      </SheetTrigger>
-      <SheetContent
-        side="bottom"
-        className="max-h-[80vh] gap-0 p-0 sm:max-w-none"
-      >
-        <SheetHeader className="border-b border-border px-4 py-3 text-left">
-          <SheetTitle>构思历史</SheetTitle>
-          <SheetDescription>
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[min(80dvh,40rem)] max-w-lg flex-col gap-0 overflow-hidden p-0">
+        <DialogHeader className="shrink-0 space-y-1 border-b border-border pr-12 text-left">
+          <DialogTitle>构思历史</DialogTitle>
+          <DialogDescription>
             仅保存技法挂载与步骤时间线，不含章节正文。刷新后仍可查看。
-          </SheetDescription>
-        </SheetHeader>
-        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2">
           <p className="text-xs text-muted-foreground">
             {entries.length ? `共 ${entries.length} 条` : "暂无记录"}
           </p>
@@ -129,7 +126,7 @@ export function NovelThinkingHistoryButton({
             </p>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
