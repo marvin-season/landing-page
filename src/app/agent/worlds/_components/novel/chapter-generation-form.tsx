@@ -113,7 +113,6 @@ export function ChapterGenerationForm({
         if (!disabled && !submitDisabled && validTarget) onGenerate();
       }}
     >
-      <h3 className="text-sm font-medium">下一章要求</h3>
       <WritingInstructions
         ref={inputRef}
         plain={embedded}

@@ -657,7 +657,7 @@ export function NovelPanel({
         skills={novel.skills}
         disabled={continueLocked || composerThinking}
         submitDisabled={!novel.title.trim() || composerThinking}
-        submitLabel={composerThinking ? "构思中…" : "AI 续写"}
+        submitLabel={composerThinking ? "构思中…" : "下一章要求"}
         onChange={updateGenerationOptions}
         onSkillsChange={updateWritingSkills}
         onGenerate={generateNextChapter}
