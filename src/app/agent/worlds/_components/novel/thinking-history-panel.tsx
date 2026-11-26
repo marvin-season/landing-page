@@ -15,6 +15,7 @@ import { NovelComposerThinking } from "./novel-tool-trace";
 import {
   type ThinkingHistoryEntry,
   thinkingHistoryPhase,
+  thinkingHistoryQuestion,
 } from "./thinking-history";
 
 function formatTime(value: number) {
@@ -67,7 +68,7 @@ export function NovelThinkingHistoryButton({
         <DialogHeader className="shrink-0 space-y-1 border-b border-border pr-12 text-left">
           <DialogTitle>构思历史</DialogTitle>
           <DialogDescription>
-            仅保存技法挂载与步骤时间线，不含章节正文。刷新后仍可查看。
+            记录每次问答的写作要求与技法摘要，不含章节正文。刷新后仍可查看。
           </DialogDescription>
         </DialogHeader>
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2">
@@ -91,38 +92,65 @@ export function NovelThinkingHistoryButton({
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
           {entries.length ? (
             <ul className="flex flex-col gap-3">
-              {entries.map((entry) => (
-                <li key={entry.id} className="flex flex-col gap-2">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="text-sm font-medium text-foreground">
-                      {entry.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatTime(entry.createdAt)} ·{" "}
-                      {statusLabel(entry.status)}
-                    </p>
-                  </div>
-                  {entry.requirements?.trim() ? (
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      要求：{entry.requirements.trim()}
-                    </p>
-                  ) : null}
-                  {entry.error ? (
-                    <p className="text-xs text-destructive">{entry.error}</p>
-                  ) : null}
-                  <NovelComposerThinking
-                    active={false}
-                    label="构思过程"
-                    tools={entry.tools}
-                    phase={thinkingHistoryPhase(entry)}
-                    compact
-                  />
-                </li>
-              ))}
+              {entries.map((entry) => {
+                const question = thinkingHistoryQuestion(entry);
+                const hasProse =
+                  entry.status === "completed" ||
+                  entry.phase === "writing" ||
+                  Boolean(entry.answer?.includes("撰写"));
+                return (
+                  <li
+                    key={entry.id}
+                    className="flex flex-col gap-2 rounded-lg border border-border/70 p-3"
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {entry.label}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatTime(entry.createdAt)} ·{" "}
+                        {statusLabel(entry.status)}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-1.5 text-sm">
+                      <p>
+                        <span className="mr-2 text-xs font-medium text-muted-foreground">
+                          问
+                        </span>
+                        <span className="text-foreground">
+                          {question || "（未填写写作要求）"}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="mr-2 text-xs font-medium text-muted-foreground">
+                          答
+                        </span>
+                        <span className="text-foreground">
+                          {entry.answer?.trim() ||
+                            (entry.tools.length
+                              ? "已记录技法挂载"
+                              : "无技法摘要")}
+                        </span>
+                      </p>
+                    </div>
+                    {entry.error ? (
+                      <p className="text-xs text-destructive">{entry.error}</p>
+                    ) : null}
+                    <NovelComposerThinking
+                      active={false}
+                      label="步骤"
+                      tools={entry.tools}
+                      phase={thinkingHistoryPhase(entry)}
+                      hasProse={hasProse}
+                      compact
+                    />
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              续写或润色后，技法与步骤会留在这里。
+              续写或润色后，问答与技法步骤会留在这里。
             </p>
           )}
         </div>

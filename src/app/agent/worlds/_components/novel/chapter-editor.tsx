@@ -548,6 +548,7 @@ export function ChapterEditor({
           }
           tools={writer.toolCalls}
           phase={writer.runPhase}
+          hasProse={Boolean(writer.preview.trim())}
           compact={Boolean(writer.preview.trim()) || !polishThinking}
         />
       ) : null}
@@ -949,6 +950,7 @@ export function ChapterEditor({
                           }
                           tools={writer.toolCalls}
                           phase={writer.runPhase}
+                          hasProse={Boolean(writer.preview.trim())}
                           compact={
                             Boolean(writer.preview.trim()) || !writer.busy
                           }

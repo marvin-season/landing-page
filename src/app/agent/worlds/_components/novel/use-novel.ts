@@ -59,6 +59,7 @@ import {
   createThinkingHistoryStore,
   sanitizeThinkingTools,
   type ThinkingHistoryEntry,
+  thinkingHistoryAnswer,
   thinkingHistoryLabel,
 } from "./thinking-history";
 import { addNovelCopy, useNovelStorage } from "./use-novel-storage";
@@ -161,10 +162,14 @@ export function useNovel(
           ? run.novel.chapters.find((chapter) => chapter.id === run.chapterId)
               ?.title
           : undefined;
-    const requirements =
+    const question =
       run.task === "chapter" && "draft" in run
-        ? latest.current.chapterGoal
-        : undefined;
+        ? run.draft.chapter.brief?.trim() ||
+          latest.current.chapterGoal.trim() ||
+          ""
+        : run.task === "rewrite"
+          ? run.requirements?.trim() || ""
+          : "";
     setThinkingHistory(
       thinkingHistoryStore.append({
         id: crypto.randomUUID(),
@@ -180,7 +185,8 @@ export function useNovel(
           snapshot?.phase ??
           (tools.length || output.current.trim() ? "writing" : "preparing"),
         tools,
-        requirements: requirements?.trim() || undefined,
+        question: question || undefined,
+        answer: thinkingHistoryAnswer({ tools, status }),
         error: snapshot?.error ?? null,
       }),
     );

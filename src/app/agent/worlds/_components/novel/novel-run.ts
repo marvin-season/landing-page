@@ -51,6 +51,8 @@ export type NovelRun =
       novel: Novel;
       version: number;
       range?: ChapterTextRange;
+      /** 本次润色要求，供构思历史「问」侧回显。 */
+      requirements?: string;
     };
 
 export type RestoredNovelRun =

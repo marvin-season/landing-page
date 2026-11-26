@@ -235,25 +235,32 @@ function phaseSummary({
   return "撰写中";
 }
 
-/** 输入框顶部：可折叠的准备 → 挂载技法 → 撰写正文。 */
+/** 输入框顶部：按实际到达步骤动态展开的构思时间线。 */
 export function NovelComposerThinking({
   label,
   tools,
   phase,
   compact,
+  hasProse = false,
   active = true,
   className,
 }: {
   label: string;
   tools: NovelRunToolCall[];
   phase?: NovelRunPhase;
+  /** 工具区收成技法摘要条 */
   compact?: boolean;
+  /** 是否已开始/完成正文输出；用于决定是否出现「撰写正文」步 */
+  hasProse?: boolean;
   /** 仍在生成时顶栏显示旋转状态 */
   active?: boolean;
   className?: string;
 }) {
-  const hasText = Boolean(compact);
-  const current = resolvePhase({ phase, tools, hasText });
+  const current = resolvePhase({
+    phase,
+    tools,
+    hasText: hasProse,
+  });
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -261,21 +268,13 @@ export function NovelComposerThinking({
       setOpen(true);
   }, [active, current]);
 
-  const preparingState = !active || current !== "preparing" ? "done" : "active";
-  const skillsState = !active
-    ? "done"
-    : current === "preparing"
-      ? "pending"
-      : current === "applying_skills"
-        ? "active"
-        : "done";
-  const writingState = !active
-    ? current === "writing" || hasText
-      ? "done"
-      : "pending"
-    : current === "writing"
-      ? "active"
-      : "pending";
+  // 只渲染已经到达的步骤，不预置未发生的挂载/撰写。
+  const reachedSkills = tools.length > 0 || current === "applying_skills";
+  const reachedWriting = current === "writing" || hasProse;
+  const preparingState = current === "preparing" && active ? "active" : "done";
+  const skillsState =
+    current === "applying_skills" && active ? "active" : "done";
+  const writingState = current === "writing" && active ? "active" : "done";
   const skillDetail = tools.length
     ? tools
         .map((tool) => skillNameFromTool(tool) || friendlyToolName(tool))
@@ -283,9 +282,7 @@ export function NovelComposerThinking({
         .join("、")
     : current === "applying_skills" && active
       ? "正在选择技法…"
-      : current === "writing" || !active
-        ? "本次未挂载技法"
-        : "需要时自动挂载";
+      : undefined;
 
   return (
     <Collapsible
@@ -326,22 +323,26 @@ export function NovelComposerThinking({
                 preparingState === "active" ? "连接模型并装载上下文" : undefined
               }
             />
-            <TimelineStep
-              title="挂载写作技法"
-              state={skillsState}
-              detail={skillDetail}
-            />
-            <TimelineStep
-              title="撰写正文"
-              state={writingState}
-              detail={
-                writingState === "done"
-                  ? "正文已生成"
-                  : writingState === "active"
-                    ? "正文开始流出"
-                    : "技法就绪后开始"
-              }
-            />
+            {reachedSkills ? (
+              <TimelineStep
+                title="挂载写作技法"
+                state={skillsState}
+                detail={skillDetail}
+              />
+            ) : null}
+            {reachedWriting ? (
+              <TimelineStep
+                title="撰写正文"
+                state={writingState}
+                detail={
+                  writingState === "done"
+                    ? "正文已生成"
+                    : writingState === "active"
+                      ? "正文开始流出"
+                      : undefined
+                }
+              />
+            ) : null}
           </div>
           {compact ? (
             <AppliedSkillChips tools={tools} />
@@ -349,7 +350,7 @@ export function NovelComposerThinking({
             <NovelToolTrace tools={tools} />
           ) : current === "preparing" && active ? (
             <p className="text-xs text-muted-foreground">
-              正在准备；若需要技法，下一步会在此显示工具调用。
+              正在准备；若需要技法，下一步会在此出现。
             </p>
           ) : null}
         </div>

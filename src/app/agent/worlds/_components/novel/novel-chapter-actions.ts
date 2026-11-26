@@ -185,6 +185,7 @@ export function createNovelChapterActions({
           novel: current,
           version: room.version,
           range,
+          requirements,
         },
         prompt,
       );

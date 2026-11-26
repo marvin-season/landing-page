@@ -19,6 +19,11 @@ export const thinkingHistoryEntrySchema = z.object({
   status: z.enum(["completed", "failed", "cancelled"]),
   phase: novelRunPhase.optional(),
   tools: z.array(historyToolCall),
+  /** 问：作者本次写作要求。 */
+  question: z.string().optional(),
+  /** 答：技法挂载与结果摘要（不含正文）。 */
+  answer: z.string().optional(),
+  /** @deprecated 兼容旧本地缓存，读取时并入 question。 */
   requirements: z.string().optional(),
   error: z.string().nullable().optional(),
 });
@@ -44,6 +49,49 @@ export function sanitizeThinkingTools(tools: NovelRunToolCall[]) {
     ...tool,
     output: trimToolOutput(tool.output),
   }));
+}
+
+function skillNamesFromTools(tools: NovelRunToolCall[]) {
+  return tools
+    .map((tool) => {
+      const output = tool.output;
+      if (output && typeof output === "object" && "name" in output) {
+        const name = (output as { name?: unknown }).name;
+        if (typeof name === "string" && name.trim()) return name;
+      }
+      const input = tool.input;
+      if (input && typeof input === "object" && "skillId" in input) {
+        const id = (input as { skillId?: unknown }).skillId;
+        if (typeof id === "string" && id.trim()) return id;
+      }
+      return null;
+    })
+    .filter((name): name is string => Boolean(name))
+    .filter((name, index, list) => list.indexOf(name) === index);
+}
+
+export function thinkingHistoryAnswer({
+  tools,
+  status,
+}: {
+  tools: NovelRunToolCall[];
+  status: ThinkingHistoryEntry["status"];
+}) {
+  const skills = skillNamesFromTools(tools);
+  const skillPart = skills.length
+    ? `已挂载技法：${skills.join("、")}`
+    : "未挂载技法";
+  const statusPart =
+    status === "completed"
+      ? "撰写完成"
+      : status === "cancelled"
+        ? "已停止"
+        : "生成失败";
+  return `${skillPart}；${statusPart}`;
+}
+
+export function thinkingHistoryQuestion(entry: ThinkingHistoryEntry) {
+  return entry.question?.trim() || entry.requirements?.trim() || "";
 }
 
 export function createThinkingHistoryStore(

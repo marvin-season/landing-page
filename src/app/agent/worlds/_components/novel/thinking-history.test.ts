@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createThinkingHistoryStore,
   sanitizeThinkingTools,
+  thinkingHistoryAnswer,
   thinkingHistoryLabel,
 } from "./thinking-history";
 
@@ -77,5 +78,26 @@ test("thinking history store keeps newest entries per novel key", () => {
       isPassage: true,
     }),
     "夜雨 · 段落润色",
+  );
+});
+
+test("thinkingHistoryAnswer summarizes skills without prose", () => {
+  assert.equal(
+    thinkingHistoryAnswer({ tools: [], status: "completed" }),
+    "未挂载技法；撰写完成",
+  );
+  assert.equal(
+    thinkingHistoryAnswer({
+      tools: [
+        {
+          id: "1",
+          name: "apply_writing_skill",
+          state: "done",
+          output: { id: "chapter-hook", name: "章末钩子" },
+        },
+      ],
+      status: "completed",
+    }),
+    "已挂载技法：章末钩子；撰写完成",
   );
 });
