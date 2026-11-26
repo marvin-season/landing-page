@@ -19,7 +19,7 @@ import {
 import type { Complete } from "./provider";
 import type { WorldStore } from "./store";
 import { allocateTemplateId } from "./world-template-model";
-import { loadWorldTemplates, saveLocalWorldTemplate } from "./world-templates";
+import { loadWorldTemplates, saveWorldTemplate } from "./world-templates";
 
 const json = (data: unknown, status = 200) =>
   Response.json(data, {
@@ -127,13 +127,12 @@ export function createWorldHandlers({
         }
         if (!id && request.method === "POST") {
           const input = saveTemplateInputSchema.parse(await body(request));
-          const saved = saveLocalWorldTemplate({
+          const saved = saveWorldTemplate({
             id: input.id ?? allocateTemplateId(input.config.title),
             description: input.description,
             details: input.details,
             gradient: input.gradient,
             kind: input.kind,
-            source: "local",
             config: input.config,
             sourceRoomId: input.sourceRoomId,
           });

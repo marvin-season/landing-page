@@ -5,7 +5,7 @@
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
 | `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入小说、创建作品 |
-| `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板：我的（本地模板 + 世界 / 角色预设）、内置模板 |
+| `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板（`data/novels/template/*.json`）与世界 / 角色预设 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
 **创建作品**：作品页的「创建作品」以 `fog-harbor` 模板为初始值；预设模板页的「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。
@@ -108,8 +108,8 @@
 
 ## 7. 模板、预设与复制
 
-- **模板**：`data/novels/template/*.json`（内置，`source: "builtin"`）和不提交的 `data/novels/template/local/*.json`（我的，`source: "local"`），文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。预设模板页按来源分成「我的」与「内置」；「我的」还包含世界 / 角色预设。
-- **导入小说 / 模板派生**：作品页「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；列表不再提供「生成模板」。预设模板页「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。本地模板仍可由 `POST /api/group-chat/templates` 写入 `data/novels/template/local/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
+- **预设模板**：`data/novels/template/*.json`，文件名就是模板 ID，不再区分内置 / 本地子目录。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。预设模板页上方平铺全部文件模板，下方是世界 / 角色预设。
+- **导入小说 / 模板派生**：作品页「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；列表不再提供「生成模板」。预设模板页「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。新模板可由 `POST /api/group-chat/templates` 写入 `data/novels/template/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
 - **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。复用设定优先用预设，不再提供 `world-chat` JSON 备份的导入 / 导出入口。
 - **复制世界**：用当前配置和类型新建房间。剧本消息、小说章节都不复制。
 

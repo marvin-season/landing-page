@@ -56,7 +56,6 @@ test("parses extracted world template json", () => {
     reservedIds: ["fog-harbor"],
   });
   assert.equal(template.kind, "novel");
-  assert.equal(template.source, "local");
   assert.equal(template.config.title, "爱与恨");
   assert.equal(template.config.characters.length, 2);
   assert.ok(template.config.characters.every((character) => character.avatar));
@@ -89,7 +88,7 @@ afterEach(() => {
   }
 });
 
-test("saves local template file shape", () => {
+test("saves template file shape", () => {
   const root = mkdtempSync(join(tmpdir(), "world-template-"));
   tempRoots.push(root);
   const template = parseExtractedWorldTemplate(sampleJson, {

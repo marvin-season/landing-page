@@ -8,8 +8,7 @@ import {
 } from "@landing-page/design-system";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, Trash2 } from "lucide-react";
-import { type ReactNode, useMemo, useState } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
+import { type ReactNode, useState } from "react";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { WorldPreset } from "@/lib/group-chat/model";
 import type { WorldTemplate } from "@/lib/group-chat/world-template-model";
@@ -21,12 +20,6 @@ import {
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldLobbyNav } from "./world-lobby-nav";
 
-const templateFilters = [
-  { value: "mine", label: "我的" },
-  { value: "builtin", label: "内置" },
-] as const;
-type TemplateFilter = (typeof templateFilters)[number]["value"];
-
 export function WorldTemplatesLobby({
   templates,
 }: {
@@ -35,20 +28,10 @@ export function WorldTemplatesLobby({
   const [editing, setEditing] = useState<CreateWorkDraft | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const [filter, setFilter] = useState<TemplateFilter>("mine");
   const presets = useQuery({
     queryKey: ["world-presets"],
     queryFn: () => worldRequest<{ presets: WorldPreset[] }>("presets"),
   });
-
-  const builtinTemplates = useMemo(
-    () => templates.filter((template) => template.source === "builtin"),
-    [templates],
-  );
-  const localTemplates = useMemo(
-    () => templates.filter((template) => template.source === "local"),
-    [templates],
-  );
   const myPresets = presets.data?.presets ?? [];
 
   async function removePreset(id: string) {
@@ -63,6 +46,16 @@ export function WorldTemplatesLobby({
     } finally {
       setPending(false);
     }
+  }
+
+  function openFromTemplate(template: WorldTemplate) {
+    setEditing(
+      startCreateWork(template.config, {
+        derived: true,
+        kind: template.kind,
+        sourceTemplateId: template.id,
+      }),
+    );
   }
 
   return (
@@ -86,54 +79,96 @@ export function WorldTemplatesLobby({
             <h2 className="text-xs font-medium tracking-wide text-muted-foreground">
               预设模板
             </h2>
+            <span className="text-xs text-muted-foreground">
+              {templates.length} 个模板
+            </span>
           </div>
-          <Tabs value={filter} onValueChange={setFilter} className="mb-3">
-            <TabsList aria-label="模板来源">
-              {templateFilters.map(({ value, label }) => (
-                <TabsTrigger
-                  key={value}
-                  value={value}
-                  aria-selected={filter === value}
-                >
-                  {label}
-                </TabsTrigger>
+          {templates.length ? (
+            <WorldGrid>
+              {templates.map((world) => (
+                <TemplateCard
+                  key={world.id}
+                  title={world.config.title}
+                  kind={world.kind}
+                  details={world.details}
+                  description={world.description}
+                  characterCount={world.config.characters.length}
+                  onUse={() => openFromTemplate(world)}
+                />
               ))}
-            </TabsList>
-          </Tabs>
-          {filter === "mine" ? (
-            <MineTemplates
-              templates={localTemplates}
-              presets={myPresets}
-              presetsPending={presets.isPending}
-              pending={pending}
-              onUseTemplate={(template) =>
-                setEditing(
-                  startCreateWork(template.config, {
-                    derived: true,
-                    kind: template.kind,
-                    sourceTemplateId: template.id,
-                  }),
-                )
-              }
-              onUsePreset={(preset) =>
-                setEditing(startCreateWork(preset.content))
-              }
-              onRemovePreset={removePreset}
-            />
+            </WorldGrid>
           ) : (
-            <BuiltinTemplates
-              templates={builtinTemplates}
-              onUseTemplate={(template) =>
-                setEditing(
-                  startCreateWork(template.config, {
-                    derived: true,
-                    kind: template.kind,
-                    sourceTemplateId: template.id,
-                  }),
-                )
-              }
-            />
+            <p className="py-4 text-sm leading-5 text-muted-foreground">
+              还没有预设模板。
+            </p>
           )}
+        </section>
+        <section>
+          <div className="mb-2 flex items-baseline justify-between gap-3">
+            <h2 className="text-xs font-medium tracking-wide text-muted-foreground">
+              我的预设
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {myPresets.length} 个预设
+            </span>
+          </div>
+          {presets.isPending ? (
+            <p className="py-2 text-sm text-muted-foreground">正在读取预设…</p>
+          ) : null}
+          {!presets.isPending && !myPresets.length ? (
+            <p className="py-4 text-sm leading-5 text-muted-foreground">
+              还没有世界 / 角色预设。可在创建或编辑作品时保存。
+            </p>
+          ) : null}
+          {myPresets.length ? (
+            <WorldGrid>
+              {myPresets.map((preset) =>
+                preset.kind === "world" ? (
+                  <TemplateCard
+                    key={preset.id}
+                    title={preset.name}
+                    tag="世界"
+                    details={preset.content.title}
+                    description={preset.content.scene}
+                    characterCount={preset.content.characters.length}
+                    onUse={() => setEditing(startCreateWork(preset.content))}
+                    useLabel="使用预设"
+                    actions={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        disabled={pending}
+                        onClick={() => void removePreset(preset.id)}
+                        aria-label="删除预设"
+                      >
+                        <Trash2 />
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <TemplateCard
+                    key={preset.id}
+                    title={preset.name}
+                    tag="角色"
+                    details={preset.content.identity}
+                    description={preset.content.personality}
+                    meta="角色预设 · 可在角色配置中使用"
+                    actions={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        disabled={pending}
+                        onClick={() => void removePreset(preset.id)}
+                        aria-label="删除预设"
+                      >
+                        <Trash2 />
+                      </Button>
+                    }
+                  />
+                ),
+              )}
+            </WorldGrid>
+          ) : null}
         </section>
       </div>
       <CreateWorkSheet
@@ -141,145 +176,6 @@ export function WorldTemplatesLobby({
         setEditing={setEditing}
         presets={presets.data?.presets}
       />
-    </div>
-  );
-}
-
-function BuiltinTemplates({
-  templates,
-  onUseTemplate,
-}: {
-  templates: WorldTemplate[];
-  onUseTemplate: (template: WorldTemplate) => void;
-}) {
-  if (!templates.length) {
-    return (
-      <p className="py-4 text-sm leading-5 text-muted-foreground">
-        还没有内置模板。
-      </p>
-    );
-  }
-  return (
-    <WorldGrid>
-      {templates.map((world) => (
-        <TemplateCard
-          key={world.id}
-          title={world.config.title}
-          kind={world.kind}
-          details={world.details}
-          description={world.description}
-          characterCount={world.config.characters.length}
-          onUse={() => onUseTemplate(world)}
-        />
-      ))}
-    </WorldGrid>
-  );
-}
-
-function MineTemplates({
-  templates,
-  presets,
-  presetsPending,
-  pending,
-  onUseTemplate,
-  onUsePreset,
-  onRemovePreset,
-}: {
-  templates: WorldTemplate[];
-  presets: WorldPreset[];
-  presetsPending: boolean;
-  pending: boolean;
-  onUseTemplate: (template: WorldTemplate) => void;
-  onUsePreset: (preset: Extract<WorldPreset, { kind: "world" }>) => void;
-  onRemovePreset: (id: string) => void;
-}) {
-  const empty = !templates.length && !presets.length && !presetsPending;
-  if (empty) {
-    return (
-      <p className="py-4 text-sm leading-5 text-muted-foreground">
-        还没有我的模板或预设。可在创建或编辑作品时保存为世界 / 角色预设。
-      </p>
-    );
-  }
-  return (
-    <div className="flex flex-col gap-6">
-      {templates.length ? (
-        <div>
-          <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-            本地模板
-          </h3>
-          <WorldGrid>
-            {templates.map((world) => (
-              <TemplateCard
-                key={world.id}
-                title={world.config.title}
-                kind={world.kind}
-                details={world.details}
-                description={world.description}
-                characterCount={world.config.characters.length}
-                onUse={() => onUseTemplate(world)}
-              />
-            ))}
-          </WorldGrid>
-        </div>
-      ) : null}
-      {presetsPending ? (
-        <p className="py-2 text-sm text-muted-foreground">正在读取预设…</p>
-      ) : null}
-      {presets.length ? (
-        <div>
-          <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-            我的预设
-          </h3>
-          <WorldGrid>
-            {presets.map((preset) =>
-              preset.kind === "world" ? (
-                <TemplateCard
-                  key={preset.id}
-                  title={preset.name}
-                  tag="世界"
-                  details={preset.content.title}
-                  description={preset.content.scene}
-                  characterCount={preset.content.characters.length}
-                  onUse={() => onUsePreset(preset)}
-                  useLabel="使用预设"
-                  actions={
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      disabled={pending}
-                      onClick={() => void onRemovePreset(preset.id)}
-                      aria-label="删除预设"
-                    >
-                      <Trash2 />
-                    </Button>
-                  }
-                />
-              ) : (
-                <TemplateCard
-                  key={preset.id}
-                  title={preset.name}
-                  tag="角色"
-                  details={preset.content.identity}
-                  description={preset.content.personality}
-                  meta="角色预设 · 可在角色配置中使用"
-                  actions={
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      disabled={pending}
-                      onClick={() => void onRemovePreset(preset.id)}
-                      aria-label="删除预设"
-                    >
-                      <Trash2 />
-                    </Button>
-                  }
-                />
-              ),
-            )}
-          </WorldGrid>
-        </div>
-      ) : null}
     </div>
   );
 }

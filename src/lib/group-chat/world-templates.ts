@@ -29,7 +29,6 @@ const templateMetaSchema = z.object({
 });
 
 const templatesDir = join(process.cwd(), "data", "novels", "template");
-const localTemplatesDir = join(templatesDir, "local");
 
 function jsonFiles(dir: string) {
   if (!existsSync(dir)) return [];
@@ -39,19 +38,10 @@ function jsonFiles(dir: string) {
 }
 
 export function loadWorldTemplates(): WorldTemplate[] {
-  const files = [
-    ...jsonFiles(templatesDir).map((file) => ({
-      file,
-      source: "builtin" as const,
-    })),
-    ...jsonFiles(localTemplatesDir).map((file) => ({
-      file,
-      source: "local" as const,
-    })),
-  ].sort((a, b) => a.file.localeCompare(b.file));
+  const files = jsonFiles(templatesDir).sort((a, b) => a.localeCompare(b));
   if (files.length === 0) throw new Error(`未找到世界模板：${templatesDir}`);
   const seen = new Set<string>();
-  return files.map(({ file, source }) => {
+  return files.map((file) => {
     const name = basename(file);
     const id = idSchema.parse(name.slice(0, -".json".length));
     if (seen.has(id)) throw new Error(`世界模板 id 重复：${id}`);
@@ -63,8 +53,8 @@ export function loadWorldTemplates(): WorldTemplate[] {
       throw new Error(`世界模板无效：${name}`, { cause: error });
     }
     return isWorldChat(raw)
-      ? templateFromBackup(id, name, raw, source)
-      : templateFromConfig(id, name, raw, source);
+      ? templateFromBackup(id, name, raw)
+      : templateFromConfig(id, name, raw);
   });
 }
 
@@ -104,7 +94,6 @@ function templateFromConfig(
   id: string,
   name: string,
   raw: unknown,
-  source: WorldTemplate["source"],
 ): WorldTemplate {
   const meta = templateMetaSchema.safeParse(raw);
   const config = configSchema.safeParse(raw);
@@ -121,7 +110,6 @@ function templateFromConfig(
     description: meta.data.description,
     details: meta.data.details,
     gradient: meta.data.gradient,
-    source,
     config: config.data,
     sourceRoomId: meta.data.sourceRoomId,
   };
@@ -131,7 +119,6 @@ function templateFromBackup(
   id: string,
   name: string,
   raw: unknown,
-  source: WorldTemplate["source"],
 ): WorldTemplate {
   const backup = backupSchema.safeParse(raw);
   const meta = templateMetaSchema.partial().safeParse(raw);
@@ -156,20 +143,17 @@ function templateFromBackup(
         120,
       ),
     gradient: meta.data.gradient ?? worldGradientFromSeed(id),
-    source,
     config: backup.data.config,
     sourceRoomId: meta.data.sourceRoomId,
   };
 }
 
-export function saveLocalWorldTemplate(template: WorldTemplate) {
+export function saveWorldTemplate(template: WorldTemplate) {
   const id = idSchema.parse(template.id);
-  if (existsSync(join(templatesDir, `${id}.json`)))
-    throw new WorldError("conflict", `模板 id 与内置模板冲突：${id}`, 409);
-  mkdirSync(localTemplatesDir, { recursive: true });
-  const path = join(localTemplatesDir, `${id}.json`);
+  mkdirSync(templatesDir, { recursive: true });
+  const path = join(templatesDir, `${id}.json`);
   if (existsSync(path))
-    throw new WorldError("conflict", `本地模板已存在：${id}`, 409);
+    throw new WorldError("conflict", `预设模板已存在：${id}`, 409);
   requireAvatars(id, template.config);
   const file: WorldTemplateFile = {
     description: template.description,
@@ -180,7 +164,7 @@ export function saveLocalWorldTemplate(template: WorldTemplate) {
     ...template.config,
   };
   writeFileSync(path, `${JSON.stringify(file, null, 2)}\n`, "utf8");
-  return { id, path: `data/novels/template/local/${id}.json` };
+  return { id, path: `data/novels/template/${id}.json` };
 }
 
 const templates = loadWorldTemplates();
