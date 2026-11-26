@@ -78,6 +78,7 @@ export function NovelFileControls({
   canRestoreLocal,
   syncPrompt,
   serverSynced,
+  generationAction,
 }: {
   toolbar: HTMLElement | null;
   triggerRef: RefObject<HTMLButtonElement | null>;
@@ -97,6 +98,7 @@ export function NovelFileControls({
   canRestoreLocal: boolean;
   syncPrompt: NovelSyncDivergence | null;
   serverSynced: boolean;
+  generationAction?: { label: string; onSelect: () => void };
   onSummarize: () => void;
 }) {
   const router = useRouter();
@@ -170,6 +172,12 @@ export function NovelFileControls({
                 }}
               >
                 <DropdownMenuGroup>
+                  {generationAction ? (
+                    <DropdownMenuItem onSelect={generationAction.onSelect}>
+                      <FileText />
+                      {generationAction.label}
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuItem
                     disabled={disabled || importing || forking}
                     onSelect={() => fileRef.current?.click()}
@@ -221,35 +229,24 @@ export function NovelFileControls({
                     总结并导出背景
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                {isDevelopment ? (
+                {isDevelopment && !serverSynced ? (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      {serverSynced ? (
-                        <DropdownMenuItem disabled>
-                          <HardDrive />
-                          数据已同步
-                        </DropdownMenuItem>
-                      ) : (
-                        <>
-                          <DropdownMenuItem
-                            disabled={
-                              !hasChapters || forking || Boolean(pending)
-                            }
-                            onSelect={() => run("save", onSaveToServer)}
-                          >
-                            <HardDrive />
-                            {pending === "save" ? "正在保存…" : "保存到服务器"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={forking || Boolean(pending)}
-                            onSelect={() => run("load", onSyncFromServer)}
-                          >
-                            <HardDriveDownload />
-                            {pending === "load" ? "正在同步…" : "从服务器同步"}
-                          </DropdownMenuItem>
-                        </>
-                      )}
+                      <DropdownMenuItem
+                        disabled={!hasChapters || forking || Boolean(pending)}
+                        onSelect={() => run("save", onSaveToServer)}
+                      >
+                        <HardDrive />
+                        {pending === "save" ? "正在保存…" : "保存到服务器"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={forking || Boolean(pending)}
+                        onSelect={() => run("load", onSyncFromServer)}
+                      >
+                        <HardDriveDownload />
+                        {pending === "load" ? "正在同步…" : "从服务器同步"}
+                      </DropdownMenuItem>
                     </DropdownMenuGroup>
                   </>
                 ) : null}
@@ -292,9 +289,6 @@ export function NovelFileControls({
           }
         }}
       />
-      {isDevelopment && serverSynced ? (
-        <p className="text-sm text-muted-foreground">数据已同步</p>
-      ) : null}
       {isDevelopment && syncPrompt ? (
         <Alert>
           <AlertDescription>

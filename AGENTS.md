@@ -74,6 +74,8 @@ Read `docs/architecture.md` before changing routing, API, tRPC, Mastra, or strea
 
 个人项目，可以修改所有代码，除非特别说明，无需考虑存量数据的迁移和兼容。
 
+修改完一次代码后，必须执行 `nr check` 和 `nr lint` 检查代码是否符合规范。
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

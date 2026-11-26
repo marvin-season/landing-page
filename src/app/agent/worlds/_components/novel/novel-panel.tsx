@@ -77,6 +77,7 @@ import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
 import { useChapterNavigation } from "./use-chapter-navigation";
 import { useNovel } from "./use-novel";
+import { useNovelNotifications } from "./use-novel-notifications";
 
 export type NovelContextBridge = {
   settled: boolean;
@@ -217,6 +218,24 @@ export function NovelPanel({
     },
   );
   const { novel } = writer;
+  const openGeneration = useCallback(() => {
+    readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+    setEditingChapter((current) =>
+      current ? { ...current, initialText: undefined } : current,
+    );
+    setReadingDuringGeneration(false);
+  }, []);
+  const generationTitle =
+    readingDuringGeneration && editingChapter
+      ? editingChapter.chapter.title
+      : null;
+  useNovelNotifications({
+    roomKey,
+    generationTitle,
+    generating: writer.busy,
+    onOpenGeneration: openGeneration,
+    serverSynced: writer.serverSynced,
+  });
   useEffect(() => {
     onChapterStatus?.({
       count: novel.chapters.length,
@@ -611,28 +630,6 @@ export function NovelPanel({
   );
   return (
     <ComposerDock composer={composer}>
-      {readingDuringGeneration && editingChapter ? (
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="mt-2 mr-4 shrink-0 self-end sm:mr-6"
-          title={editingChapter.chapter.title}
-          onClick={() => {
-            readingScroll.current = readingPanel.current?.scrollTop ?? 0;
-            setEditingChapter({ ...editingChapter, initialText: undefined });
-            setReadingDuringGeneration(false);
-          }}
-        >
-          {writer.busy ? (
-            <LoaderCircle
-              data-icon="inline-start"
-              className="size-3.5 animate-spin motion-reduce:animate-none"
-            />
-          ) : null}
-          {writer.busy ? "查看进度" : "打开草稿"}
-        </Button>
-      ) : null}
       <div
         ref={readingPanel}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable @container-size"
@@ -685,6 +682,14 @@ export function NovelPanel({
             canRestoreLocal={writer.hasLocalBackup}
             syncPrompt={writer.syncPrompt}
             serverSynced={writer.serverSynced}
+            generationAction={
+              generationTitle === null
+                ? undefined
+                : {
+                    label: writer.busy ? "查看进度" : "打开草稿",
+                    onSelect: openGeneration,
+                  }
+            }
             onSummarize={writer.generateBackground}
           />
           {writer.missingLocal && writer.ready ? (

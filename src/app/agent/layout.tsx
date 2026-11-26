@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { Toaster } from "@landing-page/design-system";
 import { AgentSidebar } from "@/app/agent/_components/AgentSidebar";
 import { auth } from "@/auth";
 import { LocatorRuntime } from "@/components/locator-runtime";
@@ -31,6 +32,11 @@ export default async function AgentLayout({
                 {children}
               </main>
             </div>
+            <Toaster
+              position="top-right"
+              expand
+              toastOptions={{ closeButtonAriaLabel: "关闭通知" }}
+            />
           </TankQueryClientProvider>
         </ThemeProvider>
       </body>
