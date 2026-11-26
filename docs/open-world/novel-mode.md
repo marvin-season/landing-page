@@ -34,7 +34,7 @@
 | [`novel.ts`](../../src/lib/group-chat/novel.ts) | `/api/novel` 服务端处理 |
 | [`layout.tsx`](../../src/app/agent/worlds/layout.tsx) | `/agent/worlds` 下统一使用本机「刘建毛草」字体 |
 
-`/agent/worlds`（含大厅、模板、小说与剧本房间）始终使用本机托管的刘建毛草（`src/fonts/LiuJianMaoCao-Regular.ttf`，仅 Regular 400）。布局同时覆盖默认 `sans` / `serif`，避免子组件的 `font-sans`、`font-serif` 切回系统字体；等宽字（如 diff 行号）仍用 `font-mono`。Dialog / Sheet / Dropdown 等 Portal 挂在 `body` 下，因此同一套字体类和变量也会在停留本路由时写到 `body`，离开后还原。本路由关闭 Agent 根布局的 `antialiased`（灰度抗锯齿会让毛笔字偏细），改用亚像素渲染。
+`/agent/worlds`（含大厅、模板、小说与剧本房间）始终使用本机托管的刘建毛草（`src/fonts/LiuJianMaoCao-Regular.ttf`）。布局同时覆盖默认 `sans` / `serif`，避免子组件的 `font-sans`、`font-serif` 切回系统字体；等宽字（如 diff 行号）仍用 `font-mono`。Dialog / Sheet / Dropdown 等 Portal 挂在 `body` 下，因此同一套字体类和变量也会在停留本路由时写到 `body`，离开后还原。
 
 ## 3. 设定来源
 

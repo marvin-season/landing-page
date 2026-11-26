@@ -10,9 +10,6 @@ const FONT_VARS = [
 /**
  * Radix Dialog / Sheet / Dropdown 等 Portal 挂在 body 下，不会继承
  * worlds layout 内层 div 的字体。挂载期间把同一套字体类和 CSS 变量写到 body。
- *
- * Agent 根布局默认 `antialiased`（灰度抗锯齿）会让毛笔字显得更细；
- * 在本路由改为 `subpixel-antialiased`，离开后还原。
  */
 export function WorldsFontScope({
   className,
@@ -21,13 +18,9 @@ export function WorldsFontScope({
   className: string;
   children: ReactNode;
 }) {
-  const scopeClassName = `${className} subpixel-antialiased`;
-
   useEffect(() => {
     const { body } = document;
-    const classes = scopeClassName.split(/\s+/).filter(Boolean);
-    const hadAntialiased = body.classList.contains("antialiased");
-    if (hadAntialiased) body.classList.remove("antialiased");
+    const classes = className.split(/\s+/).filter(Boolean);
     body.classList.add(...classes);
 
     const previous = FONT_VARS.map(
@@ -39,13 +32,12 @@ export function WorldsFontScope({
 
     return () => {
       body.classList.remove(...classes);
-      if (hadAntialiased) body.classList.add("antialiased");
       for (const [prop, value] of previous) {
         if (value) body.style.setProperty(prop, value);
         else body.style.removeProperty(prop);
       }
     };
-  }, [scopeClassName]);
+  }, [className]);
 
-  return <div className={`${scopeClassName} h-full min-h-0`}>{children}</div>;
+  return <div className={`${className} h-full min-h-0`}>{children}</div>;
 }
