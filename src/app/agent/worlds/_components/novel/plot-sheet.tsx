@@ -41,7 +41,7 @@ import {
   type PlotSelection,
   resolveChapterRange,
 } from "./plot-edit";
-import { PromptHistoryDialog } from "./prompt-history-dialog";
+import { NovelThinkingHistoryButton } from "./thinking-history-panel";
 import type { useNovel } from "./use-novel";
 
 const options = [
@@ -53,7 +53,6 @@ const options = [
 
 export function PlotSheet({
   chapters,
-  roomKey,
   currentChapterId,
   hasPlotPair,
   open,
@@ -64,7 +63,6 @@ export function PlotSheet({
   restored,
 }: {
   chapters: readonly Chapter[];
-  roomKey: string;
   currentChapterId: string;
   hasPlotPair: boolean;
   open: boolean;
@@ -439,7 +437,7 @@ export function PlotSheet({
                     required={requiresInstructions}
                   />
                   <div className="self-start">
-                    <PromptHistoryDialog roomKey={roomKey} />
+                    <NovelThinkingHistoryButton />
                   </div>
                 </fieldset>
               )}

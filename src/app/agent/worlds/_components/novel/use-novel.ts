@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { worldRequest } from "@/lib/group-chat/client";
 import {
@@ -145,6 +145,9 @@ export function useNovel(
   );
   useEffect(() => {
     setThinkingHistory(thinkingHistoryStore.list());
+  }, [thinkingHistoryStore]);
+  const clearThinkingHistory = useCallback(() => {
+    setThinkingHistory(thinkingHistoryStore.clear());
   }, [thinkingHistoryStore]);
 
   function rememberThinking(
@@ -790,9 +793,7 @@ export function useNovel(
     toolCalls,
     runPhase,
     thinkingHistory,
-    clearThinkingHistory() {
-      setThinkingHistory(thinkingHistoryStore.clear());
-    },
+    clearThinkingHistory,
     task,
     generationStopped,
     draftIncomplete,

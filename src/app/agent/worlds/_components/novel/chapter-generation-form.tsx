@@ -156,7 +156,7 @@ export function ChapterGenerationForm({
               onClick={onWriteManually}
             >
               <PenLine data-icon="inline-start" />
-              手动写下一章
+              手动续写
             </NovelActionButton>
           ) : null}
           <NovelActionButton

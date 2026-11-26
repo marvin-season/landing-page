@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import type { Ref } from "react";
 import { worldsWorksPath } from "@/lib/worlds-paths";
-import { PromptHistoryDialog } from "../novel/prompt-history-dialog";
+import { NovelThinkingHistoryButton } from "../novel/thinking-history-panel";
 
 export function RoomHeader({
   title,
@@ -27,7 +27,7 @@ export function RoomHeader({
   onToggleNotesSidebar,
   onEdit,
   fileToolbarRef,
-  promptHistoryKey,
+  showThinkingHistory = false,
 }: {
   title: string;
   running: boolean;
@@ -41,7 +41,7 @@ export function RoomHeader({
   onToggleNotesSidebar: () => void;
   onEdit: () => void;
   fileToolbarRef?: Ref<HTMLDivElement>;
-  promptHistoryKey?: string;
+  showThinkingHistory?: boolean;
 }) {
   const notesSidebarLabel = notesSidebarOpen ? "收起世界侧栏" : "展开世界侧栏";
   return (
@@ -70,9 +70,7 @@ export function RoomHeader({
         {fileToolbarRef ? (
           <div ref={fileToolbarRef} className="flex items-center gap-2" />
         ) : null}
-        {promptHistoryKey ? (
-          <PromptHistoryDialog roomKey={promptHistoryKey} />
-        ) : null}
+        {showThinkingHistory ? <NovelThinkingHistoryButton /> : null}
         <Button
           variant="outline"
           size="sm"

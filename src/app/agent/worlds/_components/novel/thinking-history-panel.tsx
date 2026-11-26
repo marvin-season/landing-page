@@ -12,12 +12,14 @@ import {
 import { cn } from "@landing-page/utils";
 import { History } from "lucide-react";
 import { useState } from "react";
+import { useReusePrompt } from "./chapter-prompt-reuse";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import {
   type ThinkingHistoryEntry,
   thinkingHistoryPhase,
   thinkingHistoryQuestion,
 } from "./thinking-history";
+import { useThinkingHistory } from "./thinking-history-context";
 
 function formatTime(value: number) {
   try {
@@ -39,27 +41,40 @@ function statusLabel(status: ThinkingHistoryEntry["status"]) {
 }
 
 export function NovelThinkingHistoryButton({
-  entries,
-  onClear,
+  entries: entriesProp,
+  onClear: onClearProp,
   className,
 }: {
-  entries: ThinkingHistoryEntry[];
+  entries?: ThinkingHistoryEntry[];
   onClear?: () => void;
   className?: string;
-}) {
+} = {}) {
+  const shared = useThinkingHistory();
+  const entries = entriesProp ?? shared?.entries ?? [];
+  const onClear = onClearProp ?? shared?.clear;
   const [open, setOpen] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const reusePrompt = useReusePrompt();
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setBlocked(false);
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className={cn("h-8 gap-1.5 px-2 text-muted-foreground", className)}
+          aria-label="构思历史"
+          title="构思历史"
+          className={cn(className)}
         >
-          <History className="size-3.5" />
-          历史
+          <History data-icon="inline-start" />
+          <span className="hidden sm:inline">构思历史</span>
           {entries.length ? (
             <span className="rounded-full bg-muted px-1.5 text-[10px] tabular-nums text-foreground">
               {entries.length}
@@ -71,7 +86,7 @@ export function NovelThinkingHistoryButton({
         <DialogHeader className="shrink-0 space-y-1 border-b border-border pr-12 text-left">
           <DialogTitle>构思历史</DialogTitle>
           <DialogDescription>
-            记录每次问答的写作要求与技法摘要，不含章节正文。刷新后仍可查看。
+            记录每次问答的写作要求与技法摘要，不含章节正文。点「填入」写入当前输入框。
           </DialogDescription>
         </DialogHeader>
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2">
@@ -93,6 +108,11 @@ export function NovelThinkingHistoryButton({
           ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          {blocked ? (
+            <p role="status" className="mb-2 text-xs text-muted-foreground">
+              当前无法填入。正在生成、导入，或故事已结束时请稍后再试。
+            </p>
+          ) : null}
           {entries.length ? (
             <ul className="flex flex-col gap-3">
               {entries.map((entry) => {
@@ -116,14 +136,33 @@ export function NovelThinkingHistoryButton({
                       </p>
                     </div>
                     <div className="flex flex-col gap-1.5 text-sm">
-                      <p>
-                        <span className="mr-2 text-xs font-medium text-muted-foreground">
-                          问
-                        </span>
-                        <span className="text-foreground">
-                          {question || "（未填写写作要求）"}
-                        </span>
-                      </p>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 flex-1">
+                          <span className="mr-2 text-xs font-medium text-muted-foreground">
+                            问
+                          </span>
+                          <span className="text-foreground">
+                            {question || "（未填写写作要求）"}
+                          </span>
+                        </p>
+                        {question ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="h-7 shrink-0 px-2 text-xs"
+                            onClick={() => {
+                              if (!reusePrompt(question)) {
+                                setBlocked(true);
+                                return;
+                              }
+                              setOpen(false);
+                            }}
+                          >
+                            填入
+                          </Button>
+                        ) : null}
+                      </div>
                       <p>
                         <span className="mr-2 text-xs font-medium text-muted-foreground">
                           答

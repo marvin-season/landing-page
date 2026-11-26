@@ -49,11 +49,11 @@ import {
   NovelActionTooltip,
   nextChapterActionHint,
 } from "./novel-action-tooltip";
-import { NovelComposerStatusBar } from "./novel-composer-status";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
+import { usePublishThinkingHistory } from "./thinking-history-context";
 import { useChapterNavigation } from "./use-chapter-navigation";
 import { useNovel } from "./use-novel";
 import { useNovelNotifications } from "./use-novel-notifications";
@@ -208,6 +208,11 @@ export function NovelPanel({
     readingDuringGeneration && editingChapter
       ? editingChapter.chapter.title
       : null;
+  usePublishThinkingHistory(
+    writer.thinkingHistory,
+    writer.clearThinkingHistory,
+  );
+
   useNovelNotifications({
     roomKey,
     generationTitle,
@@ -625,30 +630,25 @@ export function NovelPanel({
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
     >
-      <NovelComposerStatusBar
-        reserveCollapse={!composerThinking}
-        history={writer.thinkingHistory}
-        onClearHistory={writer.clearThinkingHistory}
-      >
-        {showComposerTrace ? (
-          <NovelComposerThinking
-            active={composerThinking}
-            label={
-              writer.compressing
-                ? "正在压缩模型上下文…"
-                : composerThinking
-                  ? thinkingChapter
-                    ? `${thinkingChapter.title}正在构思…`
-                    : "正在构思…"
-                  : "本次构思过程"
-            }
-            tools={writer.toolCalls}
-            phase={writer.runPhase}
-            hasProse={Boolean(writer.preview.trim())}
-            compact={Boolean(writer.preview.trim()) || !composerThinking}
-          />
-        ) : null}
-      </NovelComposerStatusBar>
+      {showComposerTrace ? (
+        <NovelComposerThinking
+          className={!composerThinking ? "pr-9" : undefined}
+          active={composerThinking}
+          label={
+            writer.compressing
+              ? "正在压缩模型上下文…"
+              : composerThinking
+                ? thinkingChapter
+                  ? `${thinkingChapter.title}正在构思…`
+                  : "正在构思…"
+                : "本次构思过程"
+          }
+          tools={writer.toolCalls}
+          phase={writer.runPhase}
+          hasProse={Boolean(writer.preview.trim())}
+          compact={Boolean(writer.preview.trim()) || !composerThinking}
+        />
+      ) : null}
       <ChapterGenerationForm
         embedded
         inputRef={chapterGoalInput}
@@ -657,7 +657,7 @@ export function NovelPanel({
         skills={novel.skills}
         disabled={continueLocked || composerThinking}
         submitDisabled={!novel.title.trim() || composerThinking}
-        submitLabel={composerThinking ? "构思中…" : "下一章要求"}
+        submitLabel={composerThinking ? "构思中…" : "AI 续写"}
         onChange={updateGenerationOptions}
         onSkillsChange={updateWritingSkills}
         onGenerate={generateNextChapter}
@@ -824,7 +824,6 @@ export function NovelPanel({
                 <>
                   <PlotSheet
                     chapters={novel.chapters}
-                    roomKey={roomKey}
                     currentChapterId={chapter.id}
                     hasPlotPair={hasPlotPair}
                     open={plotOpen}

@@ -23,7 +23,6 @@ import {
   replacePlotDraftText,
   splitPlotAtOffset,
 } from "./plot-edit";
-import { recordNovelPrompt } from "./prompt-history";
 import type { useNovelStorage } from "./use-novel-storage";
 
 export function createNovelChapterActions({
@@ -47,7 +46,7 @@ export function createNovelChapterActions({
   room: WorldRoom;
   storage: Pick<
     ReturnType<typeof useNovelStorage>,
-    "key" | "latest" | "storageVersion" | "backup" | "pendingBackup" | "update"
+    "latest" | "storageVersion" | "backup" | "pendingBackup" | "update"
   >;
   ready: boolean;
   generating: RefObject<boolean>;
@@ -68,8 +67,7 @@ export function createNovelChapterActions({
   setPreview: (value: string) => void;
   setRewriteReady: (value: boolean) => void;
 }) {
-  const { key, latest, storageVersion, backup, pendingBackup, update } =
-    storage;
+  const { latest, storageVersion, backup, pendingBackup, update } = storage;
 
   function generateChapter(
     chapter: Chapter,
@@ -105,7 +103,6 @@ export function createNovelChapterActions({
     )
       return false;
     backup.start(draft);
-    void recordNovelPrompt(key, current.chapterGoal);
     return true;
   }
 
@@ -189,7 +186,6 @@ export function createNovelChapterActions({
         },
         prompt,
       );
-      void recordNovelPrompt(key, requirements);
       return true;
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成重写草稿。");
@@ -277,7 +273,6 @@ export function createNovelChapterActions({
         return;
       }
       start(run, plot.prompt);
-      void recordNovelPrompt(key, requirements);
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成剧情草稿。");
     }
