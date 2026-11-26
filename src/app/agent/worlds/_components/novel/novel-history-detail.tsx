@@ -1,14 +1,22 @@
 "use client";
 
 import {
+  Alert,
+  AlertDescription,
   Button,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Textarea,
 } from "@landing-page/design-system";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ChapterDiffView } from "./chapter-diff-view";
 import { type ChapterTextRange, replaceTextRange } from "./chapter-text";
@@ -23,6 +31,11 @@ import type { NovelHistoryWorkspace } from "./thinking-history-context";
 
 const blankChapter: Chapter = { id: "", title: "", text: "" };
 const startPosition = "history-first";
+const historyViews = [
+  { value: "current", label: "当前正文对比" },
+  { value: "original", label: "当时改动" },
+  { value: "raw", label: "生成结果" },
+] as const;
 
 function historicalChapters({
   operation,
@@ -57,7 +70,7 @@ export function NovelHistoryDetail({
   onStaged: () => void;
 }) {
   const { book, lineage } = workspace;
-  const [view, setView] = useState<"current" | "original" | "raw">(
+  const [view, setView] = useState<"current" | "original" | "raw">(() =>
     historicalChapters(content).length ? "current" : "raw",
   );
   const [part, setPart] = useState(0);
@@ -68,6 +81,7 @@ export function NovelHistoryDetail({
     chapter: Chapter;
     range: ChapterTextRange;
   }>();
+  const [showPositions, setShowPositions] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const automatic = useMemo(
@@ -136,6 +150,7 @@ export function NovelHistoryDetail({
       (chapter, i) =>
         chapter.id === plan.after[i].id && chapter.text === plan.after[i].text,
     );
+  const adjustingPosition = !automatic || showPositions;
   const tooLong =
     plan?.after.some(({ text }) => text.length > maxChapterLength) &&
     plan.plotMode !== "split";
@@ -161,80 +176,91 @@ export function NovelHistoryDetail({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border px-4 py-2">
+    <>
+      <DialogHeader className="shrink-0 flex-row items-center gap-2 border-b border-border px-3 pr-12 text-left sm:gap-3 sm:px-6 sm:pr-14">
         <Button
           type="button"
-          size="sm"
+          size="icon"
           variant="ghost"
+          className="size-8 shrink-0"
           onClick={onBack}
           disabled={working}
+          aria-label="返回创作历史"
+          title="返回创作历史"
         >
-          返回列表
+          <ArrowLeft />
         </Button>
-        <span className="mr-auto text-sm font-medium">{entry.label}</span>
-        {hasProse ? (
-          <>
+        <div className="min-w-0">
+          <DialogTitle className="truncate" title={entry.label}>
+            {entry.label}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            创作历史结果
+          </DialogDescription>
+        </div>
+      </DialogHeader>
+
+      {hasProse ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-border px-4 py-2 sm:px-6">
+          <div className="inline-flex flex-wrap items-center gap-0.5 rounded-xl bg-muted/60 p-0.5">
+            {historyViews.map(({ value, label }) => (
+              <Button
+                type="button"
+                size="sm"
+                key={value}
+                variant={view === value ? "soft" : "ghost"}
+                className="px-2.5 sm:px-3"
+                aria-pressed={view === value}
+                onClick={() => changeView(value)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+          {view === "current" && automatic ? (
             <Button
               type="button"
               size="sm"
-              variant={view === "current" ? "soft" : "ghost"}
-              onClick={() => changeView("current")}
+              variant="ghost"
+              className="ml-auto shrink-0"
+              aria-expanded={adjustingPosition}
+              onClick={() => {
+                if (showPositions) {
+                  setManual(undefined);
+                  setPart(0);
+                }
+                setShowPositions(!showPositions);
+              }}
             >
-              当前正文对比
+              {showPositions ? "恢复原位置" : "更换应用位置"}
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={view === "original" ? "soft" : "ghost"}
-              onClick={() => changeView("original")}
-            >
-              查看当时改动
-            </Button>
-          </>
-        ) : null}
-        <Button
-          type="button"
-          size="sm"
-          variant={view === "raw" ? "soft" : "ghost"}
-          onClick={() => changeView("raw")}
-        >
-          生成结果
-        </Button>
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 px-4 py-3">
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-4">
         {view === "raw" ? (
-          <pre className="min-h-48 overflow-auto whitespace-pre-wrap break-words text-sm">
+          <pre className="whitespace-pre-wrap wrap-anywhere rounded-lg border border-border bg-background/55 p-4 font-serif text-sm leading-7 sm:p-6 sm:text-base">
             {content.raw || "这轮尚未收到结果。"}
           </pre>
         ) : (
           <>
             {view === "current" && !automatic ? (
-              <p className="text-sm text-muted-foreground">
-                原位置无法安全匹配，或当前正文与历史修改冲突。可查看当时改动，或指定应用位置。
-              </p>
+              <Alert className="shrink-0 px-3 py-2">
+                <AlertDescription>
+                  无法安全应用到原位置。请手动选择目标，或另存为新章。
+                </AlertDescription>
+              </Alert>
             ) : null}
-            {view === "current" && hasProse ? (
+            {view === "current" && adjustingPosition ? (
               <div className="flex shrink-0 flex-wrap items-center gap-2">
-                {automatic ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={manual ? "outline" : "soft"}
-                    onClick={() => {
-                      setManual(undefined);
-                      setPart(0);
-                    }}
-                  >
-                    原位置
-                  </Button>
-                ) : null}
                 {book.chapters.length ? (
                   <>
                     <Button
                       type="button"
                       size="sm"
                       variant={manual === "passage" ? "soft" : "outline"}
+                      aria-pressed={manual === "passage"}
                       onClick={() => {
                         setManual("passage");
                         setPart(0);
@@ -246,6 +272,7 @@ export function NovelHistoryDetail({
                       type="button"
                       size="sm"
                       variant={manual === "whole" ? "soft" : "outline"}
+                      aria-pressed={manual === "whole"}
                       onClick={() => {
                         setManual("whole");
                         setPart(0);
@@ -259,6 +286,7 @@ export function NovelHistoryDetail({
                   type="button"
                   size="sm"
                   variant={manual === "insert" ? "soft" : "outline"}
+                  aria-pressed={manual === "insert"}
                   onClick={() => {
                     setManual("insert");
                     setPart(0);
@@ -269,7 +297,7 @@ export function NovelHistoryDetail({
               </div>
             ) : null}
             {view === "current" && manual ? (
-              <div className="shrink-0 space-y-2">
+              <div className="flex shrink-0 flex-col gap-2 rounded-lg border border-border bg-muted/25 p-3">
                 <div className="flex flex-wrap gap-2">
                   <Select
                     value={targetId}
@@ -286,17 +314,19 @@ export function NovelHistoryDetail({
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {manual === "insert" ? (
-                        <SelectItem value={startPosition}>
-                          第一章之前
-                        </SelectItem>
-                      ) : null}
-                      {book.chapters.map((chapter, i) => (
-                        <SelectItem value={chapter.id} key={chapter.id}>
-                          {i + 1}. {chapter.title}
-                          {manual === "insert" ? " 之后" : ""}
-                        </SelectItem>
-                      ))}
+                      <SelectGroup>
+                        {manual === "insert" ? (
+                          <SelectItem value={startPosition}>
+                            第一章之前
+                          </SelectItem>
+                        ) : null}
+                        {book.chapters.map((chapter, i) => (
+                          <SelectItem value={chapter.id} key={chapter.id}>
+                            {i + 1}. {chapter.title}
+                            {manual === "insert" ? " 之后" : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                   {originalResults.length > 1 ? (
@@ -308,11 +338,13 @@ export function NovelHistoryDetail({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {originalResults.map((chapter, i) => (
-                          <SelectItem key={chapter.id} value={String(i)}>
-                            {chapter.title}
-                          </SelectItem>
-                        ))}
+                        <SelectGroup>
+                          {originalResults.map((chapter, i) => (
+                            <SelectItem key={chapter.id} value={String(i)}>
+                              {chapter.title}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                   ) : null}
@@ -320,7 +352,7 @@ export function NovelHistoryDetail({
                 {target && manual === "passage" ? (
                   <Textarea
                     aria-label="在当前正文中选中要替换的文字"
-                    className="h-28 resize-none"
+                    className="h-28 resize-none font-serif leading-6"
                     value={target.text}
                     readOnly
                     onSelect={(event) => {
@@ -344,6 +376,7 @@ export function NovelHistoryDetail({
                     size="sm"
                     key={`${before[i]?.id ?? ""}:${after[i]?.id ?? ""}`}
                     variant={i === index ? "soft" : "ghost"}
+                    aria-pressed={i === index}
                     onClick={() => setPart(i)}
                   >
                     {before[i]?.title || after[i]?.title}
@@ -360,8 +393,10 @@ export function NovelHistoryDetail({
             ) : null}
             {parts ? (
               <ChapterDiffView
+                key={`${view}:${index}`}
                 base={base}
                 draft={draft}
+                layout="reading"
                 baseLabel={view === "current" ? "当前正文" : "当时原文"}
                 draftLabel={
                   view === "current" && plan ? "应用预览" : "当时结果"
@@ -370,31 +405,48 @@ export function NovelHistoryDetail({
             ) : null}
           </>
         )}
-        {error ? (
-          <p role="alert" className="shrink-0 text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
-        {view === "current" && plan ? (
-          <div className="flex shrink-0 items-center justify-end gap-3 pb-1">
-            {noChange || tooLong ? (
-              <span className="text-xs text-muted-foreground">
-                {noChange ? "当前正文已是这个结果" : "草稿超过章节字数限制"}
-              </span>
-            ) : null}
-            <Button
-              type="button"
-              size="sm"
-              disabled={
-                working || noChange || tooLong || entry.status === "running"
-              }
-              onClick={() => void stage()}
-            >
-              {working ? "正在打开…" : "应用为草稿"}
-            </Button>
-          </div>
-        ) : null}
       </div>
-    </div>
+
+      {view === "current" && (plan || error) ? (
+        <DialogFooter className="shrink-0 flex-row items-center justify-between gap-3 border-t border-border px-4 py-3 sm:px-6">
+          <p
+            role={error ? "alert" : undefined}
+            className={
+              error
+                ? "text-xs text-destructive"
+                : "text-xs text-muted-foreground"
+            }
+          >
+            {error ||
+              (noChange
+                ? "当前正文已是这个结果"
+                : tooLong
+                  ? "草稿超过章节字数限制"
+                  : "草稿保存后才会更新正文")}
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            className="shrink-0"
+            disabled={
+              !plan ||
+              working ||
+              noChange ||
+              tooLong ||
+              entry.status === "running"
+            }
+            onClick={() => void stage()}
+          >
+            {working ? (
+              <LoaderCircle
+                data-icon="inline-start"
+                className="animate-spin motion-reduce:animate-none"
+              />
+            ) : null}
+            {working ? "正在打开…" : "应用为草稿"}
+          </Button>
+        </DialogFooter>
+      ) : null}
+    </>
   );
 }

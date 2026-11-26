@@ -1,11 +1,12 @@
 "use client";
 
 import {
+  Alert,
+  AlertDescription,
   Button,
   Collapsible,
   CollapsibleChevron,
   CollapsibleContent,
-  CollapsibleDescription,
   CollapsibleTitle,
   CollapsibleTrigger,
   Dialog,
@@ -16,8 +17,14 @@ import {
   DialogTrigger,
 } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { History } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  History,
+  LoaderCircle,
+} from "lucide-react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { downloadText } from "@/lib/group-chat/client";
 import { useReusePrompt } from "./chapter-prompt-reuse";
 import { NovelHistoryDetail } from "./novel-history-detail";
@@ -37,24 +44,140 @@ import {
 } from "./thinking-history";
 import { useThinkingHistory } from "./thinking-history-context";
 
-function formatTime(value: number) {
-  try {
-    return new Intl.DateTimeFormat("zh-CN", {
-      month: "numeric",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(value);
-  } catch {
-    return new Date(value).toLocaleString();
-  }
-}
+const dayFormat = new Intl.DateTimeFormat("zh-CN", { dateStyle: "long" });
+const timeFormat = new Intl.DateTimeFormat("zh-CN", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
 
-function statusLabel(status: HistorySummary["status"]) {
+function statusLabel(status: HistorySummary["status"], incomplete?: boolean) {
   if (status === "running") return "进行中";
-  if (status === "completed") return "完成";
+  if (status === "completed") return incomplete ? "未写完" : "完成";
   if (status === "cancelled") return "已停止";
   return "失败";
+}
+
+function HistoryRow({
+  entry,
+  pending,
+  disabled,
+  onOpen,
+  onReuse,
+}: {
+  entry: HistorySummary | ThinkingHistoryEntry;
+  pending: boolean;
+  disabled: boolean;
+  onOpen: (entry: HistorySummary) => void;
+  onReuse: (text: string) => void;
+}) {
+  const saved = "hasResult" in entry ? entry : undefined;
+  const question =
+    "hasResult" in entry
+      ? (entry.question?.trim() ?? "")
+      : thinkingHistoryQuestion(entry);
+  const hasProse =
+    entry.status === "completed" ||
+    entry.phase === "writing" ||
+    Boolean(entry.answer?.includes("撰写"));
+
+  return (
+    <Collapsible>
+      <div className="flex items-center gap-1 rounded-lg hover:bg-muted/40">
+        <CollapsibleTrigger
+          type="button"
+          variant="flush"
+          className="min-w-0 flex-1 gap-3 rounded-lg px-2.5 py-3"
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
+              <CollapsibleTitle className="max-w-full flex-none wrap-anywhere">
+                {entry.label}
+              </CollapsibleTitle>
+              <span
+                className={cn(
+                  "shrink-0 text-xs font-normal text-muted-foreground",
+                  entry.status === "failed" && "text-destructive",
+                  entry.status === "running" && "text-primary",
+                )}
+              >
+                {statusLabel(entry.status, saved?.incomplete)}
+              </span>
+            </div>
+            <div className="flex min-w-0 items-baseline gap-2 text-xs font-normal text-muted-foreground">
+              <time className="shrink-0 tabular-nums">
+                {timeFormat.format(entry.createdAt)}
+              </time>
+              <span className="truncate">{question || "未填写写作要求"}</span>
+            </div>
+          </div>
+          <CollapsibleChevron />
+        </CollapsibleTrigger>
+        {saved?.hasResult && saved.status !== "running" ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="soft"
+            className="mr-2 shrink-0"
+            disabled={disabled}
+            onClick={() => onOpen(saved)}
+          >
+            {pending ? (
+              <LoaderCircle
+                data-icon="inline-start"
+                className="animate-spin motion-reduce:animate-none"
+              />
+            ) : null}
+            查看结果
+          </Button>
+        ) : null}
+      </div>
+      <CollapsibleContent>
+        <div className="mx-2 mb-3 flex flex-col gap-3 rounded-lg bg-muted/35 p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-xs text-muted-foreground">写作要求</p>
+              <p className="whitespace-pre-wrap wrap-anywhere text-sm leading-relaxed">
+                {question || "未填写写作要求"}
+              </p>
+            </div>
+            {question ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                onClick={() => onReuse(question)}
+              >
+                填入
+              </Button>
+            ) : null}
+          </div>
+          {entry.answer?.trim() ? (
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {entry.answer}
+            </p>
+          ) : null}
+          {entry.error ? (
+            <p className="text-xs text-destructive">{entry.error}</p>
+          ) : null}
+          <NovelComposerThinking
+            active={false}
+            defaultOpen={false}
+            label="构思步骤"
+            tools={entry.tools}
+            phase={
+              entry.status === "running"
+                ? (entry.phase ?? "preparing")
+                : thinkingHistoryPhase({ ...entry, status: entry.status })
+            }
+            hasProse={hasProse}
+            compact
+          />
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
 }
 
 export function NovelThinkingHistoryButton({
@@ -80,7 +203,10 @@ export function NovelThinkingHistoryButton({
     entry: HistorySummary;
     content: HistoryContent;
   }>();
-  const [requesting, setRequesting] = useState(false);
+  const [request, setRequest] = useState<
+    { kind: "result"; id: string } | { kind: "export" }
+  >();
+  const requesting = Boolean(request);
   const [error, setError] = useState("");
   const entries = page?.next
     ? page.entries
@@ -88,6 +214,8 @@ export function NovelThinkingHistoryButton({
   const onClear = onClearProp ?? shared?.clear;
   const [open, setOpen] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const viewport = useRef<HTMLDivElement>(null);
+  const previousScroll = useRef(0);
   const reusePrompt = useReusePrompt();
   useEffect(() => {
     if (!open || !roomKey) return;
@@ -98,9 +226,15 @@ export function NovelThinkingHistoryButton({
     return () => subscription.unsubscribe();
   }, [cursor, open, roomKey]);
 
+  useLayoutEffect(() => {
+    if (open && !detail && viewport.current)
+      viewport.current.scrollTop = previousScroll.current;
+  }, [detail, open]);
+
   function changeOpen(next: boolean) {
     setOpen(next);
     if (!next) {
+      previousScroll.current = 0;
       setBlocked(false);
       setPages([]);
       setPage(undefined);
@@ -111,22 +245,23 @@ export function NovelThinkingHistoryButton({
 
   async function openDetail(entry: HistorySummary) {
     if (!roomKey || requesting) return;
-    setRequesting(true);
+    setRequest({ kind: "result", id: entry.id });
     setError("");
     try {
       const content = await readNovelHistory(roomKey, entry.id);
       if (!content) throw new Error();
+      previousScroll.current = viewport.current?.scrollTop ?? 0;
       setDetail({ entry, content });
     } catch {
       setError("无法读取本轮结果。");
     } finally {
-      setRequesting(false);
+      setRequest(undefined);
     }
   }
 
   async function downloadHistory() {
     if (!roomKey || requesting) return;
-    setRequesting(true);
+    setRequest({ kind: "export" });
     setError("");
     try {
       const archive = await exportNovelHistory(roomKey, legacy);
@@ -134,7 +269,7 @@ export function NovelThinkingHistoryButton({
     } catch {
       setError("历史导出失败，请重试。");
     } finally {
-      setRequesting(false);
+      setRequest(undefined);
     }
   }
 
@@ -165,18 +300,10 @@ export function NovelThinkingHistoryButton({
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "flex max-h-[min(80dvh,40rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0",
-          detail && "h-[min(85dvh,48rem)] max-h-[min(85dvh,48rem)] max-w-5xl",
+          "flex max-h-[min(85dvh,44rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0",
+          detail && "h-[min(90dvh,52rem)] max-h-[min(90dvh,52rem)] max-w-6xl",
         )}
       >
-        <DialogHeader className="shrink-0 space-y-1 border-b border-border pr-12 text-left">
-          <DialogTitle>创作历史</DialogTitle>
-          <DialogDescription>
-            {detail
-              ? "核对正文差异后，可以把这份结果打开为草稿。"
-              : "回看写作要求、生成结果和技法步骤。"}
-          </DialogDescription>
-        </DialogHeader>
         {workspace && detail ? (
           <NovelHistoryDetail
             key={detail.entry.id}
@@ -188,211 +315,169 @@ export function NovelThinkingHistoryButton({
           />
         ) : (
           <>
-            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2">
-              <p className="text-xs text-muted-foreground">
-                {roomKey && !page && !error
-                  ? "正在读取…"
-                  : entries.length
-                    ? `第 ${pages.length + 1} 页`
-                    : "暂无记录"}
-              </p>
-              <div className="flex items-center gap-2">
-                {roomKey && entries.length ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={requesting}
-                    onClick={() => void downloadHistory()}
-                  >
-                    导出历史
-                  </Button>
-                ) : null}
-                {legacy.length && onClear && !page?.next ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-muted-foreground"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "清空旧版技法摘要？新记录的问答和结果会保留。",
-                        )
-                      )
-                        onClear();
-                    }}
-                  >
-                    清空旧摘要
-                  </Button>
-                ) : null}
+            <DialogHeader className="shrink-0 flex-row items-center justify-between gap-3 border-b border-border px-4 pr-12 text-left sm:px-6 sm:pr-14">
+              <div className="flex min-w-0 flex-col gap-1">
+                <DialogTitle>创作历史</DialogTitle>
+                <DialogDescription className="sr-only">
+                  回看写作要求与生成结果
+                </DialogDescription>
               </div>
-            </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+              {roomKey && entries.length ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="shrink-0"
+                  disabled={requesting}
+                  onClick={() => void downloadHistory()}
+                >
+                  {request?.kind === "export" ? (
+                    <LoaderCircle
+                      data-icon="inline-start"
+                      className="animate-spin motion-reduce:animate-none"
+                    />
+                  ) : (
+                    <Download data-icon="inline-start" />
+                  )}
+                  导出历史
+                </Button>
+              ) : null}
+            </DialogHeader>
+
+            <div
+              ref={viewport}
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2 sm:px-5"
+            >
               {error || workspace?.error ? (
-                <p role="alert" className="mb-2 text-sm text-destructive">
-                  {error || workspace?.error}
-                </p>
+                <Alert className="my-2 px-3 py-2">
+                  <AlertDescription className="text-destructive">
+                    {error || workspace?.error}
+                  </AlertDescription>
+                </Alert>
               ) : null}
               {blocked ? (
-                <p role="status" className="mb-2 text-xs text-muted-foreground">
+                <p
+                  role="status"
+                  className="px-2 py-2 text-xs text-muted-foreground"
+                >
                   当前无法填入。正在生成、导入，或故事已结束时请稍后再试。
                 </p>
               ) : null}
-              {entries.length ? (
-                <ul className="flex flex-col gap-2">
-                  {entries.map((entry) => {
-                    const saved = "hasResult" in entry ? entry : undefined;
-                    const question = saved
-                      ? (saved.question?.trim() ?? "")
-                      : thinkingHistoryQuestion(entry as ThinkingHistoryEntry);
-                    const hasProse =
-                      entry.status === "completed" ||
-                      entry.phase === "writing" ||
-                      Boolean(entry.answer?.includes("撰写"));
-                    const questionPreview =
-                      question.trim() || "（未填写写作要求）";
+              {roomKey && !page && !error ? (
+                <p
+                  role="status"
+                  className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground"
+                >
+                  <LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" />
+                  正在读取历史…
+                </p>
+              ) : entries.length ? (
+                <ul className="flex flex-col">
+                  {entries.map((entry, index) => {
+                    const day = dayFormat.format(entry.createdAt);
+                    const previous = entries[index - 1];
                     return (
-                      <li key={entry.id}>
-                        <Collapsible defaultOpen={false}>
-                          <CollapsibleTrigger
-                            type="button"
-                            variant="default"
-                            className="min-h-0 flex-col items-stretch gap-1 rounded-lg border border-border/70 bg-transparent px-3 py-2.5 hover:bg-muted/40 data-[state=open]:rounded-b-none data-[state=open]:border-b-transparent data-[state=open]:bg-muted/30"
-                          >
-                            <div className="flex w-full items-center gap-2">
-                              <CollapsibleTitle>{entry.label}</CollapsibleTitle>
-                              <CollapsibleDescription className="shrink-0">
-                                {formatTime(entry.createdAt)} ·{" "}
-                                {statusLabel(entry.status)}
-                                {saved?.incomplete && saved.status !== "running"
-                                  ? " · 未写完"
-                                  : ""}
-                              </CollapsibleDescription>
-                              <CollapsibleChevron />
-                            </div>
-                            <p className="truncate pr-6 text-left text-xs font-normal text-muted-foreground">
-                              {questionPreview}
-                            </p>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent variant="collapse">
-                            <div className="flex flex-col gap-2 rounded-b-lg border border-t-0 border-border/70 px-3 py-2.5">
-                              <div className="flex flex-col gap-1.5 text-sm">
-                                <div className="flex items-start justify-between gap-2">
-                                  <p className="min-w-0 flex-1">
-                                    <span className="mr-2 text-xs font-medium text-muted-foreground">
-                                      问
-                                    </span>
-                                    <span className="text-foreground">
-                                      {question || "（未填写写作要求）"}
-                                    </span>
-                                  </p>
-                                  {question ? (
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-7 shrink-0 px-2 text-xs"
-                                      onClick={() => {
-                                        if (!reusePrompt(question)) {
-                                          setBlocked(true);
-                                          return;
-                                        }
-                                        changeOpen(false);
-                                      }}
-                                    >
-                                      填入
-                                    </Button>
-                                  ) : null}
-                                </div>
-                                <p>
-                                  <span className="mr-2 text-xs font-medium text-muted-foreground">
-                                    答
-                                  </span>
-                                  <span className="text-foreground">
-                                    {entry.answer?.trim() ||
-                                      (entry.tools.length
-                                        ? "已记录技法挂载"
-                                        : "无技法摘要")}
-                                  </span>
-                                </p>
-                              </div>
-                              {entry.error ? (
-                                <p className="text-xs text-destructive">
-                                  {entry.error}
-                                </p>
-                              ) : null}
-                              {saved?.hasResult &&
-                              saved.status !== "running" ? (
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className="self-start"
-                                  disabled={requesting}
-                                  onClick={() => void openDetail(saved)}
-                                >
-                                  查看结果
-                                </Button>
-                              ) : null}
-                              <NovelComposerThinking
-                                active={false}
-                                defaultOpen={false}
-                                label="步骤"
-                                tools={entry.tools}
-                                phase={
-                                  entry.status === "running"
-                                    ? (entry.phase ?? "preparing")
-                                    : thinkingHistoryPhase({
-                                        ...entry,
-                                        status: entry.status,
-                                      })
-                                }
-                                hasProse={hasProse}
-                                compact
-                              />
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      </li>
+                      <Fragment key={entry.id}>
+                        {!previous ||
+                        dayFormat.format(previous.createdAt) !== day ? (
+                          <li className="border-b border-border/70 px-2.5 pt-3 pb-1.5 text-xs font-medium text-muted-foreground">
+                            {day}
+                          </li>
+                        ) : null}
+                        <li>
+                          <HistoryRow
+                            entry={entry}
+                            disabled={requesting}
+                            pending={
+                              request?.kind === "result" &&
+                              request.id === entry.id
+                            }
+                            onOpen={(saved) => void openDetail(saved)}
+                            onReuse={(text) => {
+                              if (reusePrompt(text)) changeOpen(false);
+                              else setBlocked(true);
+                            }}
+                          />
+                        </li>
+                      </Fragment>
                     );
                   })}
                 </ul>
-              ) : (
-                <p className="py-8 text-center text-sm text-muted-foreground">
-                  续写、润色或剧情整理后，问答和结果会留在这里。
-                </p>
-              )}
+              ) : !error ? (
+                <div className="flex flex-col items-center gap-2 py-12 text-center">
+                  <History className="size-5 text-muted-foreground" />
+                  <p className="text-sm font-medium">还没有创作记录</p>
+                  <p className="text-xs text-muted-foreground">
+                    续写、润色或剧情整理后，结果会保存在这里。
+                  </p>
+                </div>
+              ) : null}
             </div>
-            {pages.length || page?.next ? (
-              <div className="flex shrink-0 justify-end gap-2 border-t border-border px-4 py-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={!pages.length}
-                  onClick={() => {
-                    setPage(undefined);
-                    setPages((value) => value.slice(0, -1));
-                  }}
-                >
-                  上一页
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={!page?.next}
-                  onClick={() => {
-                    if (page?.next) {
-                      const next = page.next;
-                      setPage(undefined);
-                      setPages((value) => [...value, next]);
-                    }
-                  }}
-                >
-                  下一页
-                </Button>
+
+            {pages.length || page?.next || (legacy.length && onClear) ? (
+              <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-2 sm:px-6">
+                <div>
+                  {legacy.length && onClear && !page?.next ? (
+                    <Button
+                      type="button"
+                      variant="text"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "清空旧版技法摘要？新记录的问答和结果会保留。",
+                          )
+                        )
+                          onClear();
+                      }}
+                    >
+                      清空旧摘要
+                    </Button>
+                  ) : null}
+                </div>
+                {pages.length || page?.next ? (
+                  <nav
+                    aria-label="创作历史分页"
+                    className="flex items-center gap-1"
+                  >
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      aria-label="上一页"
+                      title="上一页"
+                      disabled={!pages.length || requesting}
+                      onClick={() => {
+                        setPage(undefined);
+                        setPages((value) => value.slice(0, -1));
+                      }}
+                    >
+                      <ChevronLeft />
+                    </Button>
+                    <span className="px-1 text-xs text-muted-foreground tabular-nums">
+                      第 {pages.length + 1} 页
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      aria-label="下一页"
+                      title="下一页"
+                      disabled={!page?.next || requesting}
+                      onClick={() => {
+                        if (!page?.next) return;
+                        const next = page.next;
+                        setPage(undefined);
+                        setPages((value) => [...value, next]);
+                      }}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  </nav>
+                ) : null}
               </div>
             ) : null}
           </>
