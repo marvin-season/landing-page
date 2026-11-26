@@ -87,7 +87,7 @@ export function RoomComposer({
           draft={draft.trim()}
           onFocusInput={() => input.current?.focus({ preventScroll: true })}
         >
-          <div className="mb-2 flex flex-wrap items-center gap-2 pr-8">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
             {running ? (
               <Button
                 size="sm"

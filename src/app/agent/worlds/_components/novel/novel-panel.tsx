@@ -45,10 +45,6 @@ import {
   replaceChapter,
 } from "./model";
 import { NewChapterDraftActions } from "./new-chapter-draft-actions";
-import {
-  NovelActionTooltip,
-  nextChapterActionHint,
-} from "./novel-action-tooltip";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
@@ -619,11 +615,6 @@ export function NovelPanel({
     <FloatingComposer
       label="继续创作下一章"
       forceOpen={composerThinking}
-      wrapTrigger={(trigger) => (
-        <NovelActionTooltip hint={nextChapterActionHint}>
-          {trigger}
-        </NovelActionTooltip>
-      )}
       draft={generationOptions.chapterGoal.trim()}
       requestOpen={composerRequest}
       onFocusInput={() =>
@@ -632,7 +623,6 @@ export function NovelPanel({
     >
       {showComposerTrace ? (
         <NovelComposerThinking
-          className={!composerThinking ? "pr-9" : undefined}
           active={composerThinking}
           label={
             writer.compressing

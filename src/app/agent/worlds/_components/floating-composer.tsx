@@ -7,11 +7,12 @@ import {
   CollapsibleTrigger,
 } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { ChevronDown, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
 import {
-  type ReactElement,
+  type FocusEvent,
   type ReactNode,
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -68,7 +69,6 @@ export function FloatingComposer({
   requestOpen = 0,
   expandRequest = 0,
   onFocusInput,
-  wrapTrigger,
   children,
 }: {
   label: string;
@@ -78,11 +78,10 @@ export function FloatingComposer({
   /** Opens the composer without moving focus, so a text selection can stay put. */
   expandRequest?: number;
   onFocusInput: () => void;
-  wrapTrigger?: (trigger: ReactElement) => ReactElement;
   children: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
+  const root = useRef<HTMLDivElement>(null);
   const focusInput = useRef(onFocusInput);
   focusInput.current = onFocusInput;
   const open = expanded || forceOpen;
@@ -98,66 +97,87 @@ export function FloatingComposer({
     setExpanded(true);
   }, [expandRequest]);
 
-  const openButton = (
-    <CollapsibleTrigger asChild>
-      <Button
-        ref={trigger}
-        type="button"
-        variant="ghost"
-        aria-label={label}
-        className={cn(
-          "absolute inset-x-0 top-0 h-11 w-full min-w-0 justify-start gap-2.5 rounded-xl px-3.5 font-normal transition-opacity duration-150 motion-reduce:transition-none",
-          open && "invisible pointer-events-none opacity-0",
-        )}
-      >
-        <PenLine data-icon="inline-start" className="text-muted-foreground" />
-        <span className={cn("truncate", !draft && "text-muted-foreground")}>
-          {draft || label}
-        </span>
-      </Button>
-    </CollapsibleTrigger>
-  );
+  useEffect(() => {
+    if (!open || forceOpen) return;
+
+    function collapseIfOutside(target: EventTarget | null) {
+      if (!(target instanceof Node)) {
+        setExpanded(false);
+        return;
+      }
+      if (root.current?.contains(target)) return;
+      setExpanded(false);
+    }
+
+    function onPointerDown(event: PointerEvent) {
+      collapseIfOutside(event.target);
+    }
+
+    function onFocusIn(event: Event) {
+      collapseIfOutside(event.target);
+    }
+
+    // 捕获阶段：点页面其它区域或焦点挪出时收起；点内部控件不收。
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("focusin", onFocusIn, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("focusin", onFocusIn, true);
+    };
+  }, [forceOpen, open]);
+
+  function collapseOnBlur(event: FocusEvent<HTMLDivElement>) {
+    if (forceOpen) return;
+    const next = event.relatedTarget;
+    if (next instanceof Node && event.currentTarget.contains(next)) return;
+    // relatedTarget 常为 null（点到不可聚焦区域）；延后确认，避免点内部按钮时误收。
+    requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active instanceof Node && root.current?.contains(active)) return;
+      setExpanded(false);
+    });
+  }
 
   return (
-    <Collapsible
-      open={open}
-      onOpenChange={(next) => {
-        setExpanded(next);
-        if (next) requestAnimationFrame(onFocusInput);
-      }}
-      className={cn(
-        "relative mx-auto min-h-11 w-full rounded-xl border border-border/60 bg-background/65 shadow-md transition-[max-width] duration-200 ease-out motion-reduce:transition-none pointer-events-auto backdrop-blur-md backdrop-saturate-150",
-        open ? "max-w-3xl" : "max-w-sm",
-      )}
-    >
-      {wrapTrigger ? wrapTrigger(openButton) : openButton}
-      <CollapsibleContent
-        variant="collapse"
-        inert={!open}
-        className="data-[state=open]:[&>[data-slot=collapsible-body]]:overflow-visible"
+    <div ref={root} onBlur={collapseOnBlur}>
+      <Collapsible
+        open={open}
+        onOpenChange={(next) => {
+          setExpanded(next);
+          if (next) requestAnimationFrame(onFocusInput);
+        }}
+        className={cn(
+          "relative mx-auto min-h-11 w-full rounded-xl border border-border/60 bg-background/65 shadow-md transition-[max-width] duration-200 ease-out motion-reduce:transition-none pointer-events-auto backdrop-blur-md backdrop-saturate-150",
+          open ? "max-w-3xl" : "max-w-sm",
+        )}
       >
-        <div className="relative flex flex-col gap-2 p-3">
-          {!forceOpen ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="收起输入框"
-              title="收起输入框"
-              className="absolute top-2 right-2 z-10 size-8 text-muted-foreground"
-              onClick={() => {
-                setExpanded(false);
-                requestAnimationFrame(() =>
-                  trigger.current?.focus({ preventScroll: true }),
-                );
-              }}
-            >
-              <ChevronDown />
-            </Button>
-          ) : null}
-          {children}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+        <CollapsibleTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            aria-label={label}
+            className={cn(
+              "absolute inset-x-0 top-0 h-11 w-full min-w-0 justify-start gap-2.5 rounded-xl px-3.5 font-normal transition-opacity duration-150 motion-reduce:transition-none",
+              open && "invisible pointer-events-none opacity-0",
+            )}
+          >
+            <PenLine
+              data-icon="inline-start"
+              className="text-muted-foreground"
+            />
+            <span className={cn("truncate", !draft && "text-muted-foreground")}>
+              {draft || label}
+            </span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent
+          variant="collapse"
+          inert={!open}
+          className="data-[state=open]:[&>[data-slot=collapsible-body]]:overflow-visible"
+        >
+          <div className="relative flex flex-col gap-2 p-3">{children}</div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 }

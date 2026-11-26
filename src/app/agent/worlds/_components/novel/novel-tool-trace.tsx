@@ -243,6 +243,7 @@ export function NovelComposerThinking({
   compact,
   hasProse = false,
   active = true,
+  defaultOpen = true,
   className,
 }: {
   label: string;
@@ -254,6 +255,8 @@ export function NovelComposerThinking({
   hasProse?: boolean;
   /** 仍在生成时顶栏显示旋转状态 */
   active?: boolean;
+  /** 初始是否展开详情；生成中默认展开，历史回看可默认收起 */
+  defaultOpen?: boolean;
   className?: string;
 }) {
   const current = resolvePhase({
@@ -261,7 +264,7 @@ export function NovelComposerThinking({
     tools,
     hasText: hasProse,
   });
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
     if (active && (current === "preparing" || current === "applying_skills"))
@@ -294,7 +297,7 @@ export function NovelComposerThinking({
     >
       <CollapsibleTrigger
         type="button"
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-foreground outline-none hover:bg-muted/50"
+        className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm font-medium text-foreground outline-none hover:bg-muted/50"
       >
         {active ? (
           <LoaderCircle className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />

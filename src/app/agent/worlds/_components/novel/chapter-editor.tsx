@@ -39,8 +39,6 @@ import { type Chapter, maxChapterLength } from "./model";
 import {
   localActionHint,
   NovelActionButton,
-  NovelActionTooltip,
-  rewriteHint,
   stopGenerationHint,
 } from "./novel-action-tooltip";
 import { NovelComposerThinking } from "./novel-tool-trace";
@@ -127,7 +125,6 @@ export function ChapterEditor({
   const [appliedRange, setAppliedRange] = useState<ChapterTextRange | null>(
     null,
   );
-  const [caretBefore, setCaretBefore] = useState<string | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
   const polishInput = useRef<HTMLTextAreaElement>(null);
   const seenSelection = useRef("");
@@ -137,6 +134,7 @@ export function ChapterEditor({
   const mirror = useRef<HTMLDivElement>(null);
   const caretMirror = useRef<HTMLDivElement>(null);
   const caretBar = useRef<HTMLDivElement>(null);
+  const caretLineTop = useRef(0);
   const pendingSelection = useRef<ReturnType<typeof setTimeout>>(undefined);
   const pendingCaret = useRef<number | null>(null);
   const generatingDraft = Boolean(generation);
@@ -193,6 +191,7 @@ export function ChapterEditor({
         rewriteRange,
       )
     : draftText;
+  const editorText = draftLoading ? "" : visibleText;
   const editorBusy = writer.busy || revealPending;
   const canReturnWhileGenerating = generatingDraft && writer.busy;
   const dirty =
@@ -312,39 +311,53 @@ export function ChapterEditor({
     layer.scrollTop = input.scrollTop;
   }, []);
 
-  const placeCaretBar = useCallback(() => {
-    const input = editor.current;
-    const mirrorLayer = caretMirror.current;
+  const placeCaretBar = useCallback((scrollTop: number) => {
     const bar = caretBar.current;
-    if (!input || !mirrorLayer || !bar) return;
-    if (document.activeElement !== input) {
-      bar.style.visibility = "hidden";
-      return;
-    }
-    mirrorLayer.style.width = `${input.clientWidth}px`;
-    const style = getComputedStyle(input);
-    const lineHeight = Number.parseFloat(style.lineHeight) || 28;
-    const padBottom = Number.parseFloat(style.paddingBottom) || 0;
-    const lineTop =
-      mirrorLayer.scrollHeight - padBottom - lineHeight - input.scrollTop;
-    bar.style.visibility = "visible";
-    bar.style.top = `${input.clientTop + lineTop}px`;
-    bar.style.height = `${lineHeight}px`;
+    if (bar?.style.visibility === "visible")
+      bar.style.transform = `translateY(${caretLineTop.current - scrollTop}px)`;
   }, []);
 
   const syncCaret = useCallback(() => {
     const input = editor.current;
-    if (!input || document.activeElement !== input) {
-      setCaretBefore(null);
+    const layer = caretMirror.current;
+    const bar = caretBar.current;
+    if (!input || !layer || !bar) return;
+    if (document.activeElement !== input) {
+      bar.style.visibility = "hidden";
       return;
     }
+
     const caret =
       input.selectionDirection === "backward"
         ? input.selectionStart
         : input.selectionEnd;
-    const before = input.value.slice(0, caret);
-    setCaretBefore((current) => (current === before ? current : before));
-  }, []);
+    const value = input.value;
+    // Keep the full line wrapping and give a trailing empty line a text box.
+    const text = !value || value.endsWith("\n") ? `${value}\u200b` : value;
+    if (layer.textContent !== text) layer.textContent = text;
+    const node = layer.firstChild;
+    if (!node) return;
+    layer.style.width = `${input.clientWidth}px`;
+
+    const range = document.createRange();
+    range.setStart(node, caret);
+    range.setEnd(node, value[caret - 1] === "\n" ? caret + 1 : caret);
+    const caretRect = range.getClientRects()[0];
+    if (!caretRect) {
+      bar.style.visibility = "hidden";
+      return;
+    }
+    const style = getComputedStyle(input);
+    const lineHeight = Number.parseFloat(style.lineHeight);
+    const paddingTop = Number.parseFloat(style.paddingTop);
+    const textTop = layer.getBoundingClientRect().top + paddingTop;
+    const caretCenter = caretRect.top + caretRect.height / 2;
+    const line = Math.floor((caretCenter - textTop) / lineHeight);
+    caretLineTop.current = paddingTop + line * lineHeight;
+    bar.style.height = `${lineHeight}px`;
+    bar.style.visibility = "visible";
+    placeCaretBar(input.scrollTop);
+  }, [placeCaretBar]);
 
   useLayoutEffect(() => {
     const input = editor.current;
@@ -360,26 +373,16 @@ export function ChapterEditor({
     if (hasHighlight && !showDiff) syncMirror();
   }, [hasHighlight, showDiff, syncMirror, visibleText]);
 
-  // Remeasure after the caret prefix and the textarea value commit.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: those values are the committed mirror and textarea text
+  // Remeasure after React commits the textarea value or remounts the editor.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: these control the committed textarea value and presence
   useLayoutEffect(() => {
     syncCaret();
-    placeCaretBar();
-  }, [caretBefore, placeCaretBar, syncCaret, visibleText]);
+  }, [editorText, showDiff, syncCaret]);
 
   useEffect(() => {
     const input = editor.current;
-    if (!input) return;
-    const onScroll = () => {
-      syncMirror();
-      placeCaretBar();
-    };
-    const observer = new ResizeObserver(() => {
-      const mirrorLayer = caretMirror.current;
-      if (mirrorLayer) mirrorLayer.style.width = `${input.clientWidth}px`;
-      placeCaretBar();
-    });
-    input.addEventListener("scroll", onScroll);
+    if (showDiff || !input) return;
+    const observer = new ResizeObserver(syncCaret);
     input.addEventListener("focus", syncCaret);
     input.addEventListener("blur", syncCaret);
     input.addEventListener("keyup", syncCaret);
@@ -387,7 +390,6 @@ export function ChapterEditor({
     document.addEventListener("selectionchange", syncCaret);
     observer.observe(input);
     return () => {
-      input.removeEventListener("scroll", onScroll);
       input.removeEventListener("focus", syncCaret);
       input.removeEventListener("blur", syncCaret);
       input.removeEventListener("keyup", syncCaret);
@@ -395,7 +397,7 @@ export function ChapterEditor({
       document.removeEventListener("selectionchange", syncCaret);
       observer.disconnect();
     };
-  }, [placeCaretBar, syncCaret, syncMirror]);
+  }, [showDiff, syncCaret]);
 
   useEffect(() => () => clearTimeout(pendingSelection.current), []);
 
@@ -514,11 +516,6 @@ export function ChapterEditor({
     <FloatingComposer
       label={polishLabel}
       forceOpen={polishThinking}
-      wrapTrigger={(trigger) => (
-        <NovelActionTooltip hint={rewriteHint(isPassage, compactContext)}>
-          {trigger}
-        </NovelActionTooltip>
-      )}
       draft={rewriteRequirements.trim()}
       requestOpen={composerRequest}
       expandRequest={selectionExpand}
@@ -526,7 +523,6 @@ export function ChapterEditor({
     >
       {showPolishTrace ? (
         <NovelComposerThinking
-          className={!polishThinking ? "pr-9" : undefined}
           active={polishThinking}
           label={
             polishThinking
@@ -780,7 +776,7 @@ export function ChapterEditor({
             <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
               <div
                 className={cn(
-                  "relative flex min-h-48 flex-1 overflow-hidden",
+                  "relative flex min-h-48 flex-1 overflow-clip",
                   polishAvailable &&
                     "[--editor-bottom-padding:calc(var(--composer-dock-height,0px)+1.5rem)]",
                 )}
@@ -788,26 +784,20 @@ export function ChapterEditor({
                 <div
                   ref={caretBar}
                   aria-hidden
-                  className="pointer-events-none absolute right-px left-px bg-foreground/5"
+                  className="pointer-events-none absolute top-px right-px left-px bg-foreground/5"
                   style={{ visibility: "hidden" }}
                 />
                 <div
                   ref={caretMirror}
                   aria-hidden
-                  className={cn(
-                    "pointer-events-none invisible absolute top-0 overflow-hidden wrap-break-word whitespace-pre-wrap px-3 pt-2 text-sm leading-7",
-                    polishAvailable ? "pb-(--editor-bottom-padding)" : "pb-2",
-                  )}
-                >
-                  {caretBefore}
-                  {"\u200b"}
-                </div>
+                  className="pointer-events-none invisible absolute inset-px overflow-clip wrap-break-word whitespace-pre-wrap px-3 pt-2 text-base leading-7"
+                />
                 {highlight ? (
                   <div
                     ref={mirror}
                     aria-hidden="true"
                     className={cn(
-                      "pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 pt-2 text-sm leading-7 text-transparent",
+                      "pointer-events-none absolute inset-px overflow-hidden wrap-break-word whitespace-pre-wrap px-3 pt-2 text-base leading-7 text-transparent",
                       polishAvailable ? "pb-(--editor-bottom-padding)" : "pb-2",
                     )}
                   >
@@ -824,15 +814,16 @@ export function ChapterEditor({
                   variant="plain"
                   aria-label="章节正文"
                   readOnly={editorBusy || saving || draftUnavailable}
-                  value={draftLoading ? "" : visibleText}
+                  value={editorText}
                   maxLength={
                     draftText.length > maxChapterLength
                       ? undefined
                       : maxChapterLength
                   }
                   onScroll={(event) => {
+                    const { scrollTop } = event.currentTarget;
                     if (generatingDraft && useGeneratedText) {
-                      const { scrollTop, scrollHeight, clientHeight } =
+                      const { scrollHeight, clientHeight } =
                         event.currentTarget;
                       generatedScrollTop.current =
                         !rewriteRange &&
@@ -841,6 +832,7 @@ export function ChapterEditor({
                           : scrollTop;
                     }
                     syncMirror();
+                    placeCaretBar(scrollTop);
                   }}
                   onBlur={() => clearTimeout(pendingSelection.current)}
                   onPointerDown={() => clearTimeout(pendingSelection.current)}

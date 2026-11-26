@@ -2,6 +2,12 @@
 
 import {
   Button,
+  Collapsible,
+  CollapsibleChevron,
+  CollapsibleContent,
+  CollapsibleDescription,
+  CollapsibleTitle,
+  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -82,7 +88,7 @@ export function NovelThinkingHistoryButton({
           ) : null}
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[min(80dvh,40rem)] max-w-lg flex-col gap-0 overflow-hidden p-0">
+      <DialogContent className="flex max-h-[min(80dvh,40rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="shrink-0 space-y-1 border-b border-border pr-12 text-left">
           <DialogTitle>构思历史</DialogTitle>
           <DialogDescription>
@@ -114,78 +120,93 @@ export function NovelThinkingHistoryButton({
             </p>
           ) : null}
           {entries.length ? (
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-2">
               {entries.map((entry) => {
                 const question = thinkingHistoryQuestion(entry);
                 const hasProse =
                   entry.status === "completed" ||
                   entry.phase === "writing" ||
                   Boolean(entry.answer?.includes("撰写"));
+                const questionPreview = question.trim() || "（未填写写作要求）";
                 return (
-                  <li
-                    key={entry.id}
-                    className="flex flex-col gap-2 rounded-lg border border-border/70 p-3"
-                  >
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-sm font-medium text-foreground">
-                        {entry.label}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTime(entry.createdAt)} ·{" "}
-                        {statusLabel(entry.status)}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-1.5 text-sm">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="min-w-0 flex-1">
-                          <span className="mr-2 text-xs font-medium text-muted-foreground">
-                            问
-                          </span>
-                          <span className="text-foreground">
-                            {question || "（未填写写作要求）"}
-                          </span>
+                  <li key={entry.id}>
+                    <Collapsible defaultOpen={false}>
+                      <CollapsibleTrigger
+                        type="button"
+                        variant="default"
+                        className="min-h-0 flex-col items-stretch gap-1 rounded-lg border border-border/70 bg-transparent px-3 py-2.5 hover:bg-muted/40 data-[state=open]:rounded-b-none data-[state=open]:border-b-transparent data-[state=open]:bg-muted/30"
+                      >
+                        <div className="flex w-full items-center gap-2">
+                          <CollapsibleTitle>{entry.label}</CollapsibleTitle>
+                          <CollapsibleDescription className="shrink-0">
+                            {formatTime(entry.createdAt)} ·{" "}
+                            {statusLabel(entry.status)}
+                          </CollapsibleDescription>
+                          <CollapsibleChevron />
+                        </div>
+                        <p className="truncate pr-6 text-left text-xs font-normal text-muted-foreground">
+                          {questionPreview}
                         </p>
-                        {question ? (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            className="h-7 shrink-0 px-2 text-xs"
-                            onClick={() => {
-                              if (!reusePrompt(question)) {
-                                setBlocked(true);
-                                return;
-                              }
-                              setOpen(false);
-                            }}
-                          >
-                            填入
-                          </Button>
-                        ) : null}
-                      </div>
-                      <p>
-                        <span className="mr-2 text-xs font-medium text-muted-foreground">
-                          答
-                        </span>
-                        <span className="text-foreground">
-                          {entry.answer?.trim() ||
-                            (entry.tools.length
-                              ? "已记录技法挂载"
-                              : "无技法摘要")}
-                        </span>
-                      </p>
-                    </div>
-                    {entry.error ? (
-                      <p className="text-xs text-destructive">{entry.error}</p>
-                    ) : null}
-                    <NovelComposerThinking
-                      active={false}
-                      label="步骤"
-                      tools={entry.tools}
-                      phase={thinkingHistoryPhase(entry)}
-                      hasProse={hasProse}
-                      compact
-                    />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent variant="collapse">
+                        <div className="flex flex-col gap-2 rounded-b-lg border border-t-0 border-border/70 px-3 py-2.5">
+                          <div className="flex flex-col gap-1.5 text-sm">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="min-w-0 flex-1">
+                                <span className="mr-2 text-xs font-medium text-muted-foreground">
+                                  问
+                                </span>
+                                <span className="text-foreground">
+                                  {question || "（未填写写作要求）"}
+                                </span>
+                              </p>
+                              {question ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 shrink-0 px-2 text-xs"
+                                  onClick={() => {
+                                    if (!reusePrompt(question)) {
+                                      setBlocked(true);
+                                      return;
+                                    }
+                                    setOpen(false);
+                                  }}
+                                >
+                                  填入
+                                </Button>
+                              ) : null}
+                            </div>
+                            <p>
+                              <span className="mr-2 text-xs font-medium text-muted-foreground">
+                                答
+                              </span>
+                              <span className="text-foreground">
+                                {entry.answer?.trim() ||
+                                  (entry.tools.length
+                                    ? "已记录技法挂载"
+                                    : "无技法摘要")}
+                              </span>
+                            </p>
+                          </div>
+                          {entry.error ? (
+                            <p className="text-xs text-destructive">
+                              {entry.error}
+                            </p>
+                          ) : null}
+                          <NovelComposerThinking
+                            active={false}
+                            defaultOpen={false}
+                            label="步骤"
+                            tools={entry.tools}
+                            phase={thinkingHistoryPhase(entry)}
+                            hasProse={hasProse}
+                            compact
+                          />
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </li>
                 );
               })}
