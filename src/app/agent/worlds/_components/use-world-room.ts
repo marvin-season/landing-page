@@ -26,6 +26,7 @@ function mergeRoom(previous: WorldRoom | null, next: WorldRoom) {
 }
 export function useWorldRoom(roomId: string, onAccepted: () => void) {
   const [room, setRoom] = useState<WorldRoom | null>(null);
+  const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState(false);
@@ -41,8 +42,10 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
   const lastCommand = useRef<RunInput | null>(null);
   const requestId = useRef<string | undefined>(undefined);
   const autoStarted = useRef<string | null>(null);
+  const hasLoadedRoom = useRef(false);
   const refresh = useCallback(async () => {
     const requestEpoch = epoch.current;
+    const initialLoad = !hasLoadedRoom.current;
     try {
       const data = await worldRequest<{ room: WorldRoom }>(`rooms/${roomId}`);
       if (
@@ -50,11 +53,16 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
         !busyRef.current &&
         !pendingRef.current &&
         requestEpoch === epoch.current
-      )
+      ) {
+        hasLoadedRoom.current = true;
         setRoom((old) => mergeRoom(old, data.room));
+        if (initialLoad) setLoadError("");
+      }
     } catch (e) {
-      if (mounted.current)
-        setError(e instanceof Error ? e.message : "读取失败");
+      if (!mounted.current) return;
+      const message = (e instanceof Error && e.message) || "读取失败";
+      if (!initialLoad) setError(message);
+      else if (!hasLoadedRoom.current) setLoadError(message);
     }
   }, [roomId]);
   useEffect(() => {
@@ -246,6 +254,7 @@ export function useWorldRoom(roomId: string, onAccepted: () => void) {
   return {
     room,
     setRoom,
+    loadError,
     error,
     setError,
     busy,

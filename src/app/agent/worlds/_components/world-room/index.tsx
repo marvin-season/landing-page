@@ -8,7 +8,6 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@landing-page/design-system";
-import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -31,6 +30,7 @@ import { ChapterPromptReuseProvider } from "../novel/chapter-prompt-reuse";
 import type { NovelWritingContext } from "../novel/model";
 import { type NovelContextBridge, NovelPanel } from "../novel/novel-panel";
 import { useWorldRoom } from "../use-world-room";
+import { WorldRoomSkeleton } from "../world-room-skeleton";
 import { ArchiveActions } from "./archive-actions";
 import { RoomComposer } from "./room-composer";
 import { RoomHeader } from "./room-header";
@@ -136,14 +136,14 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     }
   }
   if (!room) {
-    if (chat.error) {
+    if (chat.loadError) {
       return (
         <BrandStatusPage
           className="min-h-full"
           eyebrow="404"
           title="世界不见了"
           description="这个世界不存在、被删了，或当前账号看不到。回列表看看别的吧。"
-          detail={<p className="wrap-break-word">{chat.error}</p>}
+          detail={<p className="wrap-break-word">{chat.loadError}</p>}
           actions={
             <Button asChild>
               <Link href="/agent/worlds">返回世界列表</Link>
@@ -152,15 +152,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         />
       );
     }
-    return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-5 p-8 text-foreground">
-        <BookOpen className="size-8 text-muted-foreground" />
-        <p>正在打开世界…</p>
-        <Button asChild variant="outline">
-          <Link href="/agent/worlds">返回世界列表</Link>
-        </Button>
-      </div>
-    );
+    return <WorldRoomSkeleton showHeader />;
   }
   const loaded = room;
   const { kind } = room;

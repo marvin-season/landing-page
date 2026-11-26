@@ -14,6 +14,7 @@ import { UnifiedMarkdown } from "@/components/ui/unified-markdown";
 import { downloadText } from "@/lib/group-chat/client";
 import type { WorldRoom } from "@/lib/group-chat/model";
 import { ComposerDock, FloatingComposer } from "../floating-composer";
+import { WorldRoomSkeleton } from "../world-room-skeleton";
 import {
   downloadBackground,
   NovelBackgroundPreview,
@@ -113,24 +114,12 @@ export function NovelPanel({
     });
     return () => subscription.unsubscribe();
   }, [isEditing, roomKey]);
-  useLayoutEffect(() => {
-    onEditingChange(isEditing);
-  }, [isEditing, onEditingChange]);
   const [thinkingChapter, setThinkingChapter] = useState<Chapter | null>(null);
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
   const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
-  useLayoutEffect(() => {
-    const panel = readingPanel.current;
-    if (isEditing || thinkingChapter || !panel) return;
-    if (readingScroll.current !== null) {
-      panel.scrollTop = readingScroll.current;
-      readingScroll.current = null;
-    }
-    onScrollTopChange(panel.scrollTop);
-  }, [isEditing, thinkingChapter, onScrollTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
   const fileMenuTrigger = useRef<HTMLButtonElement>(null);
@@ -193,7 +182,19 @@ export function NovelPanel({
       setEditingChapter({ chapter, mode: "chapter", afterChapterId });
     },
   );
-  const { novel } = writer;
+  const { novel, ready, loadFailed } = writer;
+  useLayoutEffect(() => {
+    onEditingChange(ready && isEditing);
+  }, [isEditing, onEditingChange, ready]);
+  useLayoutEffect(() => {
+    const panel = readingPanel.current;
+    if (!ready || isEditing || thinkingChapter || !panel) return;
+    if (readingScroll.current !== null) {
+      panel.scrollTop = readingScroll.current;
+      readingScroll.current = null;
+    }
+    onScrollTopChange(panel.scrollTop);
+  }, [isEditing, thinkingChapter, onScrollTopChange, ready]);
   const openGeneration = useCallback(() => {
     readingScroll.current = readingPanel.current?.scrollTop ?? 0;
     setEditingChapter((current) =>
@@ -213,20 +214,21 @@ export function NovelPanel({
     serverSynced: writer.serverSynced,
   });
   useEffect(() => {
+    if (!ready) return;
     onChapterStatus?.({
       count: novel.chapters.length,
       saving: writer.saving,
     });
-  }, [novel.chapters.length, onChapterStatus, writer.saving]);
+  }, [novel.chapters.length, onChapterStatus, ready, writer.saving]);
   const publishContext = useRef(onContext);
   const saveContext = useRef(writer.updateContext);
   publishContext.current = onContext;
   saveContext.current = writer.updateContext;
   useEffect(() => {
-    if (!writer.ready && !writer.error) return;
+    if (!ready && !loadFailed) return;
     publishContext.current?.({
       settled: true,
-      context: writer.ready
+      context: ready
         ? {
             title: novel.title,
             style: novel.style,
@@ -235,7 +237,7 @@ export function NovelPanel({
         : null,
       save: (next) => saveContext.current(next),
     });
-  }, [novel.outline, novel.style, novel.title, writer.error, writer.ready]);
+  }, [loadFailed, novel.outline, novel.style, novel.title, ready]);
   const [appliedRewrite, setAppliedRewrite] = useState<{
     chapterId: string;
     length: number;
@@ -466,6 +468,19 @@ export function NovelPanel({
     await writer.restoreLocalBackup();
     return "已恢复本地备份。";
   }
+  if (!ready) {
+    return loadFailed ? (
+      <div className="min-h-0 flex-1 overflow-y-auto scrollbar-gutter-stable">
+        <div className="mx-auto w-full max-w-5xl px-5 py-6 sm:px-8">
+          <Alert>
+            <AlertDescription>{writer.error}</AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    ) : (
+      <WorldRoomSkeleton />
+    );
+  }
   if (editingChapter && isEditing) {
     const {
       chapter: base,
@@ -666,7 +681,7 @@ export function NovelPanel({
             }
             onSummarize={writer.generateBackground}
           />
-          {writer.missingLocal && writer.ready ? (
+          {writer.missingLocal ? (
             <Alert>
               <AlertDescription>
                 当前浏览器没有这部作品的正文存档。若曾在其他设备写作，可从「文件」导入正文。

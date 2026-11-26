@@ -106,7 +106,10 @@ export function useNovelStorage(
 ) {
   const key = `${room.ownerId}:${room.id}`;
   const [novel, setNovel] = useState(() => createNovel(room.config));
-  const [ready, setReady] = useState(false);
+  const [loadStatus, setLoadStatus] = useState<"loading" | "ready" | "failed">(
+    "loading",
+  );
+  const ready = loadStatus === "ready";
   const [draftBackupFailed, setDraftBackupFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [syncPrompt, setSyncPrompt] = useState<NovelSyncDivergence | null>(
@@ -231,10 +234,12 @@ export function useNovelStorage(
             restorePending(pending, restoredPending);
           }
         }
-        setReady(true);
+        setLoadStatus("ready");
       })
       .catch(() => {
-        if (active) setError("无法读取小说存档，请刷新后重试。");
+        if (!active) return;
+        setError("无法读取小说存档，请刷新后重试。");
+        setLoadStatus("failed");
       });
     return () => {
       active = false;
@@ -365,6 +370,7 @@ export function useNovelStorage(
     renameChapter,
     updateContext,
     ready,
+    loadFailed: loadStatus === "failed",
     saving,
     syncPrompt,
     serverSynced,
