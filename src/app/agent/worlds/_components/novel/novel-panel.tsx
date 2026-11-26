@@ -115,6 +115,7 @@ export function NovelPanel({
     rewriteRange?: ChapterTextRange;
     manualNext?: boolean;
   } | null>(null);
+  const [readingDuringGeneration, setReadingDuringGeneration] = useState(false);
   const [newChapterDraft, setNewChapterDraft] =
     useState<ChapterDraftBackup | null>(null);
   const [discardingDraft, setDiscardingDraft] = useState(false);
@@ -123,7 +124,7 @@ export function NovelPanel({
     ids: PlotSelection;
     requirements: string;
   } | null>(null);
-  const isEditing = editingChapter !== null;
+  const isEditing = editingChapter !== null && !readingDuringGeneration;
   const [draftTexts, setDraftTexts] = useState<ReadonlyMap<string, string>>(
     () => new Map(),
   );
@@ -146,13 +147,13 @@ export function NovelPanel({
   const readingScroll = useRef<number | null>(null);
   useLayoutEffect(() => {
     const panel = readingPanel.current;
-    if (editingChapter || thinkingChapter || !panel) return;
+    if (isEditing || thinkingChapter || !panel) return;
     if (readingScroll.current !== null) {
       panel.scrollTop = readingScroll.current;
       readingScroll.current = null;
     }
     onScrollTopChange(panel.scrollTop);
-  }, [editingChapter, thinkingChapter, onScrollTopChange]);
+  }, [isEditing, thinkingChapter, onScrollTopChange]);
   const [plotOpen, setPlotOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
   const fileMenuTrigger = useRef<HTMLButtonElement>(null);
@@ -314,7 +315,8 @@ export function NovelPanel({
   const hasPlotPair = novel.chapters.some(({ text }, index) =>
     Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
   );
-  const disabled = !writer.ready || writer.busy || importing;
+  const disabled =
+    !writer.ready || writer.busy || importing || readingDuringGeneration;
   const ended = room.status === "ended";
   const chapterActionsLocked = disabled || writer.saving;
   const newChapterLocked = chapterActionsLocked || Boolean(newChapterDraft);
@@ -472,7 +474,7 @@ export function NovelPanel({
     await writer.restoreLocalBackup();
     return "已恢复本地备份。";
   }
-  if (editingChapter) {
+  if (editingChapter && isEditing) {
     const {
       chapter: base,
       mode,
@@ -551,6 +553,10 @@ export function NovelPanel({
           setEditingChapter({ chapter: next, mode: "manual" });
         }}
         onExit={async () => {
+          if (writer.busy) {
+            setReadingDuringGeneration(true);
+            return;
+          }
           if (mode === "chapter") {
             const pending = await writer.checkpointDraftBackup();
             if (pending === undefined) return;
@@ -605,6 +611,28 @@ export function NovelPanel({
   );
   return (
     <ComposerDock composer={composer}>
+      {readingDuringGeneration && editingChapter ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="mt-2 mr-4 shrink-0 self-end sm:mr-6"
+          title={editingChapter.chapter.title}
+          onClick={() => {
+            readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+            setEditingChapter({ ...editingChapter, initialText: undefined });
+            setReadingDuringGeneration(false);
+          }}
+        >
+          {writer.busy ? (
+            <LoaderCircle
+              data-icon="inline-start"
+              className="size-3.5 animate-spin motion-reduce:animate-none"
+            />
+          ) : null}
+          {writer.busy ? "查看进度" : "打开草稿"}
+        </Button>
+      ) : null}
       <div
         ref={readingPanel}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable @container-size"

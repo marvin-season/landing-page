@@ -187,6 +187,7 @@ export function ChapterEditor({
       )
     : draftText;
   const editorBusy = writer.busy || revealPending;
+  const canReturnWhileGenerating = generatingDraft && writer.busy;
   const dirty =
     draftText !== base.text &&
     (!generatingDraft || !useGeneratedText || Boolean(draftText.trim()));
@@ -215,7 +216,7 @@ export function ChapterEditor({
     !showDiff && (!generation || (isRewrite && editorBusy));
   const polishNeedsSave = !generatingDraft && (dirty || isNewChapter);
   useUnsavedNavigation(
-    !(generatingDraft && writer.busy) &&
+    !canReturnWhileGenerating &&
       (draftWriting || (dirty && (isNewChapter || draftWriteFailed))),
     isNewChapter
       ? "新章尚未保存为正文，确定离开吗？"
@@ -541,12 +542,23 @@ export function ChapterEditor({
         <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3">
           <div className="flex min-w-0 max-w-full items-center gap-2">
             <NovelActionButton
-              hint={localActionHint("返回阅读页，保留本机草稿。")}
+              hint={localActionHint(
+                canReturnWhileGenerating
+                  ? "返回阅读页，继续生成。"
+                  : "返回阅读页，保留本机草稿。",
+              )}
               size="sm"
               variant="ghost"
               className="shrink-0"
-              disabled={editorBusy || saving || draftWriting}
+              disabled={
+                saving ||
+                (!canReturnWhileGenerating && (editorBusy || draftWriting))
+              }
               onClick={async () => {
+                if (canReturnWhileGenerating) {
+                  await onExit();
+                  return;
+                }
                 if (!isNewChapter && !confirmAgentNavigation()) return;
                 if (isNewChapter) setSaving(true);
                 try {
