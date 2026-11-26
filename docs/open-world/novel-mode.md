@@ -24,7 +24,7 @@
 | [`writing-skills.ts`](../../src/app/agent/worlds/_components/novel/writing-skills.ts) | 内置写作技法包、id 白名单与按任务范围解析 |
 | [`writing-skill-slash.ts`](../../src/app/agent/worlds/_components/novel/writing-skill-slash.ts) | 续写/润色输入框 `/` 唤起技法选择 |
 | [`novel-writing-tools.ts`](../../src/lib/group-chat/novel-writing-tools.ts) | Writer `apply_writing_skill` 工具与可选池 |
-| [`novel-tool-trace.tsx`](../../src/app/agent/worlds/_components/novel/novel-tool-trace.tsx) | 构思区工具调用卡片 |
+| [`novel-tool-trace.tsx`](../../src/app/agent/worlds/_components/novel/novel-tool-trace.tsx) | 输入框顶部的构思状态与工具调用卡片 |
 | [`plot-edit.ts`](../../src/app/agent/worlds/_components/novel/plot-edit.ts) | 剧情粘合、合并、插入、拆分的上下文构造、草稿解析与应用 |
 | [`context-compression.ts`](../../src/app/agent/worlds/_components/novel/context-compression.ts) | 续写请求预算、摘要分批和覆盖范围 |
 | [`import-novel.ts`](../../src/app/agent/worlds/_components/novel/import-novel.ts) | TXT / Markdown 解析为章节 |
@@ -52,7 +52,7 @@ type Novel = {
 ```
 
 - **打开作品**时，从读取房间开始显示骨架屏。房间读取失败时显示错误页，成功后阅读区继续用骨架屏等待本机存档、草稿和生成任务记录。读取完成后显示正文或恢复的草稿，确实没有章节和可恢复的新章草稿时才显示空状态。小说存档读取失败时提示刷新重试。本机没有记录时，用 `createNovel(config)` 初始化，书名取世界名称，大纲取 `storyGoal`，文风为默认的第三人称，写作技法为空，每章 4000 字，并显示本机无存档提示。开发模式的服务器 TXT 只参与对账，确认同步后才覆盖正文。
-- **修改设定**：在顶栏「设定」中修改。小说房间的编辑器把「故事推进要求」换成「创作设定」，包括小说名称（≤100）、文风与叙述视角、大纲与创作要求（≤12000）。`style` 管人称与整体腔调。写作技法不在设定里勾选：在续写或润色输入框输入 `/` 唤起内置技法包（如场景驱动、对白优先、章末钩子），选中后以可移除标签写入本机 `skills`，作为本次 Writer 可选池；未选则开放当前任务范围内全部内置技法。构思阶段可由模型调用 `apply_writing_skill` 挂载，工具卡片可见；技法正文不进入导出 TXT。保存设定时先写入本机小说，再把大纲截取前 4000 字写入 `config.storyGoal`，然后 `configure` 世界配置。配置保存失败时尝试恢复本机设定。详情顶栏和作品列表优先显示本机书名。大厅导入、仍为默认占位设定的小说首次进入时，顶栏下显示可关闭的弱提示，引导「去设定」或「从正文更新设定」；关闭后本机记住，同一作品不再显示。
+- **修改设定**：在顶栏「设定」中修改。小说房间的编辑器把「故事推进要求」换成「创作设定」，包括小说名称（≤100）、文风与叙述视角、大纲与创作要求（≤12000）。`style` 管人称与整体腔调。写作技法不在设定里勾选：在续写或润色输入框输入 `/` 唤起内置技法包（如场景驱动、对白优先、章末钩子），选中后以可移除标签写入本机 `skills`，作为本次 Writer 可选池；未选则开放当前任务范围内全部内置技法。构思阶段可由模型调用 `apply_writing_skill` 挂载；输入框顶部展示构思状态与工具卡片（构思时输入框保持展开）；技法正文不进入导出 TXT。保存设定时先写入本机小说，再把大纲截取前 4000 字写入 `config.storyGoal`，然后 `configure` 世界配置。配置保存失败时尝试恢复本机设定。详情顶栏和作品列表优先显示本机书名。大厅导入、仍为默认占位设定的小说首次进入时，顶栏下显示可关闭的弱提示，引导「去设定」或「从正文更新设定」；关闭后本机记住，同一作品不再显示。
 - **在大厅创建小说时**：本机还没有小说记录，编辑器只显示「大纲与创作要求」，内容写入 `storyGoal`，首次打开时再据此初始化。
 - **下一章要求与每章目标字数**：在阅读页底部填写，目标字数范围为 1000～8000，随每次输入保存到本机。输入 `/` 可限定 Writer 可选用的技法；标签会保留到下次打开。
 - **本章要求**：续写开始时，若「下一章要求」去掉空白后还有内容，就记下这段文字。应用该次草稿时写入新章的 `brief`。同一章草稿重新生成后，以最后一次实际送出的要求为准；要求留空则不保留 `brief`。润色、剧情整理、导入、手动保存和从服务器同步都不会新写 `brief`。它只留在本机小说里，不进入 Writer 上下文，也不写入导出的 TXT。草稿保存后，如果当前输入仍与该章实际使用的要求相同，就清空输入框。

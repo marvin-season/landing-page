@@ -49,7 +49,7 @@ import {
   NovelActionTooltip,
   nextChapterActionHint,
 } from "./novel-action-tooltip";
-import { NovelToolTrace } from "./novel-tool-trace";
+import { NovelComposerThinking } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
@@ -603,9 +603,13 @@ export function NovelPanel({
     );
   }
   const continueLocked = disabled || ended;
+  const composerThinking =
+    waitingForText ||
+    (writer.busy && writer.task === "chapter" && !writer.compressing);
   const composer = newChapterDraft ? null : (
     <FloatingComposer
       label="继续创作下一章"
+      forceOpen={composerThinking}
       wrapTrigger={(trigger) => (
         <NovelActionTooltip hint={nextChapterActionHint}>
           {trigger}
@@ -617,19 +621,33 @@ export function NovelPanel({
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
     >
+      {composerThinking ? (
+        <NovelComposerThinking
+          className="pr-8"
+          label={
+            writer.compressing
+              ? "正在压缩模型上下文…"
+              : thinkingChapter
+                ? `${thinkingChapter.title}正在构思…`
+                : "正在构思…"
+          }
+          tools={writer.toolCalls}
+          compact={Boolean(writer.preview.trim())}
+        />
+      ) : null}
       <ChapterGenerationForm
         embedded
         inputRef={chapterGoalInput}
         hint={continuationHint}
         options={generationOptions}
         skills={novel.skills}
-        disabled={continueLocked}
-        submitDisabled={!novel.title.trim()}
-        submitLabel="AI 续写"
+        disabled={continueLocked || composerThinking}
+        submitDisabled={!novel.title.trim() || composerThinking}
+        submitLabel={composerThinking ? "构思中…" : "AI 续写"}
         onChange={updateGenerationOptions}
         onSkillsChange={updateWritingSkills}
         onGenerate={generateNextChapter}
-        manualDisabled={newChapterLocked}
+        manualDisabled={newChapterLocked || composerThinking}
         onWriteManually={startNextChapterManually}
       />
     </FloatingComposer>
@@ -771,18 +789,15 @@ export function NovelPanel({
                 onDeleteChapter={() => void deleteChapter()}
               />
               {thinkingChapter ? (
-                <div className="flex flex-col gap-3 py-5">
-                  <p
-                    role="status"
-                    className="flex items-center gap-2 text-sm text-muted-foreground"
-                  >
-                    <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
-                    {writer.compressing
-                      ? "正在压缩模型上下文…"
-                      : `${thinkingChapter.title}正在构思…`}
-                  </p>
-                  <NovelToolTrace tools={writer.toolCalls} />
-                </div>
+                <p
+                  role="status"
+                  className="flex items-center gap-2 py-5 text-sm text-muted-foreground"
+                >
+                  <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
+                  {writer.compressing
+                    ? "正在压缩模型上下文…"
+                    : `${thinkingChapter.title}正在构思…详见下方输入框`}
+                </p>
               ) : showingNewDraft && newChapterDraft ? (
                 <NewChapterDraftActions
                   title={newChapterDraft.chapter.title}

@@ -43,7 +43,7 @@ import {
   rewriteHint,
   stopGenerationHint,
 } from "./novel-action-tooltip";
-import { NovelToolTrace } from "./novel-tool-trace";
+import { NovelComposerThinking } from "./novel-tool-trace";
 import { PromptHistoryDialog } from "./prompt-history-dialog";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
@@ -495,9 +495,16 @@ export function ChapterEditor({
     setSaveFailed(false);
   }
 
+  const polishThinking =
+    polishAvailable &&
+    writer.busy &&
+    (rewriteThinking ||
+      writer.task === "rewrite" ||
+      Boolean(writer.toolCalls.length));
   const polishComposer = (
     <FloatingComposer
       label={polishLabel}
+      forceOpen={polishThinking}
       wrapTrigger={(trigger) => (
         <NovelActionTooltip hint={rewriteHint(isPassage, compactContext)}>
           {trigger}
@@ -508,6 +515,20 @@ export function ChapterEditor({
       expandRequest={selectionExpand}
       onFocusInput={() => polishInput.current?.focus({ preventScroll: true })}
     >
+      {polishThinking ? (
+        <NovelComposerThinking
+          className="pr-8"
+          label={
+            rewriteThinking
+              ? writer.toolCalls.length
+                ? "挂载技法中…"
+                : "思考中…"
+              : "正在润色…"
+          }
+          tools={writer.toolCalls}
+          compact={Boolean(writer.preview.trim())}
+        />
+      ) : null}
       <ChapterRewriteForm
         embedded
         isPassage={isPassage}
@@ -528,7 +549,7 @@ export function ChapterEditor({
             ? !draft.text.slice(target.start, target.end).trim()
             : !draftText.trim())
         }
-        submitDisabled={polishNeedsSave}
+        submitDisabled={polishNeedsSave || polishThinking}
         submitLabel={
           rewriteThinking
             ? "思考中…"
@@ -745,10 +766,18 @@ export function ChapterEditor({
           </section>
         ) : (
           <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-5 py-4 sm:px-8">
-            {rewriteThinking ||
-            (generation && writer.busy && writer.toolCalls.length) ? (
-              <NovelToolTrace
+            {generation?.kind === "chapter" &&
+            writer.busy &&
+            (writer.toolCalls.length || !writer.preview.trim()) ? (
+              <NovelComposerThinking
                 className="mb-3"
+                label={
+                  writer.preview.trim()
+                    ? "正在生成…"
+                    : writer.toolCalls.length
+                      ? "挂载技法中…"
+                      : "思考中…"
+                }
                 tools={writer.toolCalls}
                 compact={Boolean(writer.preview.trim())}
               />

@@ -136,7 +136,7 @@ export function FloatingComposer({
         inert={!open}
         className="data-[state=open]:[&>[data-slot=collapsible-body]]:overflow-visible"
       >
-        <div className="relative p-3">
+        <div className="relative flex flex-col gap-2 p-3">
           {!forceOpen ? (
             <Button
               type="button"
