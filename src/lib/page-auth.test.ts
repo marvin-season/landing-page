@@ -20,6 +20,17 @@ describe("isProtectedPath", () => {
     assert.equal(isProtectedPath("/agent/thread-1"), true);
   });
 
+  it("allows the worlds home while protecting the workspace below it", () => {
+    assert.equal(isProtectedPath("/agent/worlds"), false);
+    assert.equal(isProtectedPath("/agent/worlds/"), false);
+    assert.equal(getSafeReturnTo("/agent/worlds"), "/");
+    for (const path of ["works", "templates", "room-1"]) {
+      const pathname = `/agent/worlds/${path}`;
+      assert.equal(isProtectedPath(pathname), true);
+      assert.equal(getSafeReturnTo(pathname), pathname);
+    }
+  });
+
   it("matches admin with and without locale prefix", () => {
     assert.equal(isProtectedPath("/admin"), true);
     assert.equal(isProtectedPath("/admin/users"), true);

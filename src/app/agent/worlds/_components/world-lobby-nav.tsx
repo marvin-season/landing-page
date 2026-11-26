@@ -3,17 +3,24 @@
 import { cn } from "@landing-page/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  worldsHomePath,
+  worldsTemplatesPath,
+  worldsWorksPath,
+} from "@/lib/worlds-paths";
 
 const items = [
   {
-    href: "/agent/worlds",
-    label: "作品",
-    match: (path: string) => path === "/agent/worlds",
+    href: worldsHomePath,
+    label: "首页",
   },
   {
-    href: "/agent/worlds/templates",
+    href: worldsWorksPath,
+    label: "我的作品",
+  },
+  {
+    href: worldsTemplatesPath,
     label: "预设模板",
-    match: (path: string) => path === "/agent/worlds/templates",
   },
 ] as const;
 
@@ -25,7 +32,7 @@ export function WorldLobbyNav() {
       aria-label="开放世界分区"
     >
       {items.map((item) => {
-        const active = item.match(pathname);
+        const active = item.href === pathname;
         return (
           <Link
             key={item.href}

@@ -92,7 +92,7 @@ flowchart TB
 
 #### 开放世界与小说模式
 
-`/agent/worlds`（作品）、`/agent/worlds/templates`（预设模板）与 `/agent/worlds/[roomId]` 承载世界设定及两种创作模式。群聊通过 `/api/group-chat` 调度角色与旁白并维护服务端房间存档；小说模式通过 `/api/novel` 由单个 Writer 统一创作整章，复用世界 Agent 的代理配置，采用当前世界第一个启用角色的模型（全部禁用时取第一个角色），不启用工具和自动 Memory。
+`/agent/worlds` 是可公开访问和索引的产品首页。`/agent/worlds/works`（我的作品）、`/agent/worlds/templates`（预设模板）与 `/agent/worlds/[roomId]`（作品详情）要求登录。群聊通过 `/api/group-chat` 调度角色与旁白并维护服务端房间存档；小说模式通过 `/api/novel` 由单个 Writer 统一创作整章，复用世界 Agent 的代理配置，采用当前世界第一个启用角色的模型（全部禁用时取第一个角色），不启用工具和自动 Memory。
 
 作品页展示作品列表；预设模板页平铺 `data/novels/template/*.json`，下方是世界 / 角色预设。选择模板后再决定创建剧本还是小说，作品卡片显示类型。房间类型在创建时写入服务端，详情中不能更改。两类房间均可编辑或导入前置剧情作为生成上下文。小说设定（书名、文风、大纲、字数）在详情页的「设定」中与世界设定一起编辑，和章节一起保存在浏览器 IndexedDB。完整模块关系、生命周期和当前限制见[开放世界文档](./open-world/README.md)。
 

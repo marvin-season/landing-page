@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { Ref } from "react";
+import { worldsWorksPath } from "@/lib/worlds-paths";
 import { PromptHistoryDialog } from "../novel/prompt-history-dialog";
 
 export function RoomHeader({
@@ -47,7 +48,7 @@ export function RoomHeader({
     <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon">
-          <Link href="/agent/worlds" aria-label="返回世界列表">
+          <Link href={worldsWorksPath} aria-label="返回我的作品">
             <ArrowLeft />
           </Link>
         </Button>

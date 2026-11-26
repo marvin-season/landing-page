@@ -1,4 +1,5 @@
 import { isLocale, locales, sourceLocale } from "@/lib/i18n/locales";
+import { worldsHomePath } from "./worlds-paths";
 
 export type ProtectedPage = {
   path: string;
@@ -44,7 +45,12 @@ function matchesPage(pathname: string, page: ProtectedPage) {
   );
 }
 
+export function isPublicWorldsHome(pathname: string) {
+  return normalizePathname(pathname) === worldsHomePath;
+}
+
 export function getProtectedPage(pathname: string) {
+  if (isPublicWorldsHome(pathname)) return undefined;
   return protectedPages.find((page) => matchesPage(pathname, page));
 }
 

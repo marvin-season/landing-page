@@ -38,6 +38,7 @@ import { useCallback, useState } from "react";
 import { Link } from "@/components/link/link";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { useTRPC } from "@/lib/trpc";
+import { worldsWorksPath } from "@/lib/worlds-paths";
 import { isWorldsPath } from "./agent-paths";
 import { SidebarListLink } from "./sidebar-list-link";
 import { WorkspaceNav } from "./workspace-nav";
@@ -512,7 +513,7 @@ function DesktopCollapsedContent({
           <Globe className="size-4" />
         </DesktopRailLink>
         {worlds ? (
-          <DesktopRailLink href="/agent/worlds" label="创建世界">
+          <DesktopRailLink href={worldsWorksPath} label="创建世界">
             <Plus className="size-4" />
           </DesktopRailLink>
         ) : (

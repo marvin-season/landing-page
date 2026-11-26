@@ -6,12 +6,17 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isBookkeepingPath, locales, sourceLocale } from "@/lib/i18n/locales";
-import { getAuthorizationUrl, getProtectedPage } from "@/lib/page-auth";
+import {
+  getAuthorizationUrl,
+  getProtectedPage,
+  isPublicWorldsHome,
+} from "@/lib/page-auth";
 
 const defaultPrefix = `/${sourceLocale}`;
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (isPublicWorldsHome(pathname)) return NextResponse.next();
   const protectedPage = getProtectedPage(pathname);
 
   if (protectedPage) {

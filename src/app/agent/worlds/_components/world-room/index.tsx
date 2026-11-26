@@ -24,6 +24,7 @@ import {
   isStandaloneNovelPlaceholder,
   novelSettingsHintKey,
 } from "@/lib/group-chat/standalone-novel-config";
+import { worldsWorksPath } from "@/lib/worlds-paths";
 import { CharacterAvatar } from "../character-avatar";
 import { ComposerDock } from "../floating-composer";
 import { ChapterPromptReuseProvider } from "../novel/chapter-prompt-reuse";
@@ -146,7 +147,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
           detail={<p className="wrap-break-word">{chat.loadError}</p>}
           actions={
             <Button asChild>
-              <Link href="/agent/worlds">返回世界列表</Link>
+              <Link href={worldsWorksPath}>返回我的作品</Link>
             </Button>
           }
         />

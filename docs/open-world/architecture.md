@@ -4,7 +4,8 @@
 
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
-| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入小说、创建作品 |
+| `/agent/worlds` | [`WorldsPage`](../../src/app/agent/worlds/page.tsx) | 公开首页，介绍创作模式并链接到我的作品与预设模板 |
+| `/agent/worlds/works` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入小说、创建作品 |
 | `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板（`data/novels/template/*.json`）与世界 / 角色预设 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 

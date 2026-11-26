@@ -1,6 +1,6 @@
 # 开放世界文档
 
-入口：`/agent/worlds`（作品）、`/agent/worlds/templates`（预设模板）与 `/agent/worlds/[roomId]`（作品详情），沿用 `/agent` 的登录保护。
+`/agent/worlds` 是开放世界的公开首页，介绍创作模式并收录在站点地图中。`/agent/worlds/works`（我的作品）、`/agent/worlds/templates`（预设模板）与 `/agent/worlds/[roomId]`（作品详情）沿用 `/agent` 的登录保护。
 
 剧本和小说共用世界模板、世界设定编辑器与角色资料。创建作品时选择类型，类型写入服务端，创建后不能切换：
 

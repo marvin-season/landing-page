@@ -35,7 +35,7 @@ flowchart LR
 |---|---|---|---|
 | `/resume` | `true` | `/resume`，其他语言 `/{lang}/resume` | 简历；未登录不可看 |
 | `/admin` | `true` | `/admin`，其他语言 `/{lang}/admin` | 管理入口与子页，旧记账跳转地址除外 |
-| `/agent` | `false` | 只有 `/agent`，无语言前缀 | Agent 对话与线程页 |
+| `/agent` | `false` | 只有 `/agent`，无语言前缀 | Agent 对话和工作区，开放世界首页 `/agent/worlds` 除外 |
 
 `locale: true` 会同时匹配无前缀和所有 `/{lang}` 前缀（含 `/en/...`）。`locale: false` 只匹配该 path 本身及其子路径。
 
@@ -53,7 +53,7 @@ Next.js 16 用 `src/proxy.ts` 拦截页面请求（不再需要根目录 `middle
 
 顺序：
 
-1. `getProtectedPage(pathname)`。
+1. 公开的 `/agent/worlds` 首页直接放行，其余路径通过 `getProtectedPage(pathname)` 检查。
 2. 命中受保护页则 `await auth()`。
    - 没有 `session.user.id` → `302` 到 `getAuthorizationUrl(pathname)`。
    - 已登录且 `locale: false`（`/agent`）→ `next()`，不再做语言重写。
