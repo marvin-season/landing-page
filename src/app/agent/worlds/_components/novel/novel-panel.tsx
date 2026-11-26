@@ -606,6 +606,9 @@ export function NovelPanel({
   const composerThinking =
     waitingForText ||
     (writer.busy && writer.task === "chapter" && !writer.compressing);
+  const showComposerTrace =
+    composerThinking ||
+    (writer.task === "chapter" && writer.toolCalls.length > 0);
   const composer = newChapterDraft ? null : (
     <FloatingComposer
       label="继续创作下一章"
@@ -621,19 +624,22 @@ export function NovelPanel({
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
     >
-      {composerThinking ? (
+      {showComposerTrace ? (
         <NovelComposerThinking
           className="pr-8"
+          active={composerThinking}
           label={
             writer.compressing
               ? "正在压缩模型上下文…"
-              : thinkingChapter
-                ? `${thinkingChapter.title}正在构思…`
-                : "正在构思…"
+              : composerThinking
+                ? thinkingChapter
+                  ? `${thinkingChapter.title}正在构思…`
+                  : "正在构思…"
+                : "本次构思过程"
           }
           tools={writer.toolCalls}
           phase={writer.runPhase}
-          compact={Boolean(writer.preview.trim())}
+          compact={Boolean(writer.preview.trim()) || !composerThinking}
         />
       ) : null}
       <ChapterGenerationForm

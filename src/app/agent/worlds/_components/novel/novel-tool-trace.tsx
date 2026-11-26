@@ -1,5 +1,13 @@
+"use client";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { Check, LoaderCircle } from "lucide-react";
+import { Check, ChevronDown, LoaderCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ToolBlock } from "@/app/agent/_components/ToolBlock";
 import type {
   NovelRunPhase,
@@ -182,22 +190,56 @@ function TimelineStep({
   );
 }
 
-/** 输入框顶部：准备 → 挂载技法 → 撰写正文。 */
+function phaseSummary(phase: NovelRunPhase, tools: NovelRunToolCall[]) {
+  if (phase === "preparing") return "准备中";
+  if (phase === "applying_skills") {
+    const names = tools
+      .map((tool) => skillNameFromTool(tool))
+      .filter((name): name is string => Boolean(name));
+    const unique = names.filter(
+      (name, index, list) => list.indexOf(name) === index,
+    );
+    return unique.length ? `挂载 · ${unique.join("、")}` : "挂载技法中";
+  }
+  if (tools.length) {
+    const names = tools
+      .filter((tool) => tool.state === "done")
+      .map((tool) => skillNameFromTool(tool))
+      .filter((name): name is string => Boolean(name));
+    const unique = names.filter(
+      (name, index, list) => list.indexOf(name) === index,
+    );
+    return unique.length ? `已挂 · ${unique.join("、")}` : "撰写中";
+  }
+  return "撰写中";
+}
+
+/** 输入框顶部：可折叠的准备 → 挂载技法 → 撰写正文。 */
 export function NovelComposerThinking({
   label,
   tools,
   phase,
   compact,
+  active = true,
   className,
 }: {
   label: string;
   tools: NovelRunToolCall[];
   phase?: NovelRunPhase;
   compact?: boolean;
+  /** 仍在生成时顶栏显示旋转状态 */
+  active?: boolean;
   className?: string;
 }) {
   const hasText = Boolean(compact);
   const current = resolvePhase({ phase, tools, hasText });
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (active && (current === "preparing" || current === "applying_skills"))
+      setOpen(true);
+  }, [active, current]);
+
   const preparingState = current === "preparing" ? "active" : "done";
   const skillsState =
     current === "preparing"
@@ -218,53 +260,72 @@ export function NovelComposerThinking({
         : "需要时自动挂载";
 
   return (
-    <div
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border border-border/70 bg-muted/40 px-3 py-2.5",
+        "rounded-lg border border-border/70 bg-muted/40",
         className,
       )}
     >
-      <p
-        role="status"
-        className="flex items-center gap-2 text-sm font-medium text-foreground"
+      <CollapsibleTrigger
+        type="button"
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-foreground outline-none hover:bg-muted/50"
       >
-        <LoaderCircle className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
-        {label}
-      </p>
-      <div className="flex flex-col gap-2.5 border-t border-border/60 pt-2.5">
-        <TimelineStep
-          title="准备 Writer"
-          state={preparingState}
-          detail={
-            preparingState === "active" ? "连接模型并装载上下文" : undefined
-          }
+        {active ? (
+          <LoaderCircle className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />
+        ) : (
+          <Check className="size-3.5 shrink-0 text-primary" />
+        )}
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        <span className="hidden max-w-[40%] truncate text-xs font-normal text-muted-foreground sm:inline">
+          {phaseSummary(current, tools)}
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+            open && "rotate-180",
+          )}
         />
-        <TimelineStep
-          title="挂载写作技法"
-          state={skillsState}
-          detail={skillDetail}
-        />
-        <TimelineStep
-          title="撰写正文"
-          state={writingState}
-          detail={
-            writingState === "active"
-              ? "正文开始流出"
-              : writingState === "pending"
-                ? "技法就绪后开始"
-                : undefined
-          }
-        />
-      </div>
-      {compact ? (
-        <AppliedSkillChips tools={tools} />
-      ) : tools.length ? (
-        <NovelToolTrace tools={tools} />
-      ) : current === "preparing" ? (
-        <p className="text-xs text-muted-foreground">
-          正在准备；若需要技法，下一步会在此显示工具调用。
-        </p>
-      ) : null}
-    </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent variant="collapse">
+        <div className="flex flex-col gap-3 border-t border-border/60 px-3 py-2.5">
+          <div className="flex flex-col gap-2.5">
+            <TimelineStep
+              title="准备 Writer"
+              state={preparingState}
+              detail={
+                preparingState === "active" ? "连接模型并装载上下文" : undefined
+              }
+            />
+            <TimelineStep
+              title="挂载写作技法"
+              state={skillsState}
+              detail={skillDetail}
+            />
+            <TimelineStep
+              title="撰写正文"
+              state={writingState}
+              detail={
+                writingState === "active"
+                  ? "正文开始流出"
+                  : writingState === "pending"
+                    ? "技法就绪后开始"
+                    : undefined
+              }
+            />
+          </div>
+          {compact ? (
+            <AppliedSkillChips tools={tools} />
+          ) : tools.length ? (
+            <NovelToolTrace tools={tools} />
+          ) : current === "preparing" && active ? (
+            <p className="text-xs text-muted-foreground">
+              正在准备；若需要技法，下一步会在此显示工具调用。
+            </p>
+          ) : null}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
