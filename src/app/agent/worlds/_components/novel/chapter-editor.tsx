@@ -555,7 +555,6 @@ export function ChapterEditor({
         embedded
         isPassage={isPassage}
         inputRef={polishInput}
-        title={polishLabel}
         requirements={rewriteRequirements}
         onChange={onRewriteRequirementsChange}
         skills={skills}
@@ -579,7 +578,7 @@ export function ChapterEditor({
               ? "正在润色…"
               : polishNeedsSave
                 ? "保存章节后可润色"
-                : "开始润色"
+                : polishLabel
         }
         onGenerate={submitPolish}
         onDelete={target ? deleteSelection : undefined}

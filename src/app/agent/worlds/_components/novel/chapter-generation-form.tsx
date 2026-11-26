@@ -187,7 +187,7 @@ export function ChapterGenerationForm({
 }
 
 export function ChapterRewriteForm({
-  title = "润色整章",
+  title,
   requirements,
   onChange,
   skills,
@@ -233,7 +233,7 @@ export function ChapterRewriteForm({
       embedded={embedded}
       onSubmit={() => !disabled && !submitDisabled && onGenerate()}
     >
-      <h3 className="text-sm font-medium">{title}</h3>
+      {title ? <h3 className="text-sm font-medium">{title}</h3> : null}
       <WritingInstructions
         ref={inputRef ?? instructions}
         plain={embedded}
