@@ -63,11 +63,14 @@ export function NovelFileControls({
   toolbar,
   triggerRef,
   disabled,
+  canSummarize,
   hasChapters,
   importing,
   onImportingChange,
   onImport,
   onDownload,
+  onDownloadDrafts,
+  onSummarize,
   onFork,
   onOpenContext,
   onSaveToServer,
@@ -86,6 +89,7 @@ export function NovelFileControls({
   onImportingChange: (importing: boolean) => void;
   onImport: (novel: ImportedNovel) => Promise<void>;
   onDownload: (format: "txt" | "md") => void;
+  onDownloadDrafts?: () => void;
   onFork: () => Promise<string>;
   onOpenContext: () => void;
   onSaveToServer: () => Promise<string | null>;
@@ -181,7 +185,7 @@ export function NovelFileControls({
                     onSelect={() => void fork()}
                   >
                     <GitFork />
-                    {forking ? "正在复制…" : "Fork"}
+                    {forking ? "正在复制…" : "复制整本小说"}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={disabled}
@@ -201,6 +205,23 @@ export function NovelFileControls({
                   >
                     <FileText />
                     导出整本 TXT
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled={!hasChapters} onSelect={() => onDownload("md")}>
+                    <FileText />
+                    导出整本 Markdown
+                  </DropdownMenuItem>
+                  {onDownloadDrafts ? (
+                    <DropdownMenuItem onSelect={onDownloadDrafts}>
+                      <FileText />
+                      导出待确认草稿
+                    </DropdownMenuItem>
+                  ) : null}
+                  <DropdownMenuItem
+                    disabled={disabled || !canSummarize || !hasChapters || forking}
+                    onSelect={onSummarize}
+                  >
+                    <Download />
+                    总结并导出背景
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 {isDevelopment ? (
@@ -232,17 +253,19 @@ export function NovelFileControls({
                           </DropdownMenuItem>
                         </>
                       )}
-                      {canRestoreLocal ? (
-                        <DropdownMenuItem
-                          disabled={forking || Boolean(pending)}
-                          onSelect={() => run("restore", onRestoreLocal)}
-                        >
-                          <History />
-                          {pending === "restore" ? "正在恢复…" : "恢复本地备份"}
-                        </DropdownMenuItem>
-                      ) : null}
                     </DropdownMenuGroup>
                   </>
+                ) : null}
+                {canRestoreLocal ? (
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      disabled={disabled || forking || Boolean(pending)}
+                      onSelect={() => run("restore", onRestoreLocal)}
+                    >
+                      <History />
+                      {pending === "restore" ? "正在恢复…" : "恢复本地备份"}
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 ) : null}
               </DropdownMenuContent>
             </DropdownMenu>,

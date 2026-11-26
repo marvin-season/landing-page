@@ -51,8 +51,11 @@ import {
   type PlotDraft,
   type PlotMode,
   type PlotSelection,
+  plotDraftEditableText,
   preparePlotEdit,
   readPlotDraft,
+  replacePlotDraftText,
+  splitPlotAtOffset,
 } from "./plot-edit";
 import { recordNovelPrompt } from "./prompt-history";
 import { incompleteNovelDraftNotice } from "./restore-pending-result";
@@ -89,6 +92,7 @@ type NovelRun =
       plotRequirements: string;
       novel: Novel;
       version: number;
+      storageVersion?: string;
     }
   | {
       task: "rewrite";
@@ -121,9 +125,12 @@ export function useNovel(
   const finished = useRef(false);
   const incomplete = useRef(false);
   const generating = useRef(false);
-  const continuationBrief = useRef<string | undefined>(undefined);
   const {
     key,
+    storageVersion,
+    missingLocal,
+    syncReadFailed,
+    conflictedPlot,
     novel,
     latest,
     update,
@@ -163,6 +170,30 @@ export function useNovel(
     setBusy(false);
     setCompressing(false);
     onBusyChange(false);
+  }
+
+  function recoverEmptyContinuation() {
+    const previous = backup.cancelEmptyReplacement();
+    if (!previous) return false;
+    setPreview(previous.text);
+    setGenerationStopped(true);
+    return true;
+  }
+
+  function keepPlotDraft(run: Extract<NovelRun, { plot: unknown }>, draft: PlotDraft, cutShort = false) {
+    setPlotDraft(draft);
+    setDraftIncomplete(cutShort);
+    setRewriteReady(true);
+    pendingBackup.write({
+      kind: "plot",
+      mode: run.plot.mode,
+      ids: [...run.plotIds],
+      requirements: run.plotRequirements,
+      draft,
+      version: run.version,
+      storageVersion: run.storageVersion,
+      incomplete: cutShort || undefined,
+    });
   }
   const stream = useChatStreamCore({
     adapter: aiSdkChatStreamAdapter,
@@ -225,10 +256,13 @@ export function useNovel(
       }
       end();
       if (!finished.current || !text) {
+        const recovered = !text && recoverEmptyContinuation();
         backup.flush();
-        setDraftIncomplete(false);
+        setDraftIncomplete(Boolean(text) && !recovered);
         setError(
-          "连接提前结束或没有生成内容，请重试。草稿未计入正文或导出文件。",
+          recovered
+            ? "没有收到新正文，已恢复重新生成前的草稿。"
+            : "连接提前结束或没有生成内容。已收到的正文仍可编辑。",
         );
         return;
       }
@@ -237,17 +271,7 @@ export function useNovel(
       const cutShortNotice = incompleteNovelDraftNotice;
       if ("plot" in captured) {
         try {
-          const draft = readPlotDraft(captured.plot, text);
-          setPlotDraft(draft);
-          pendingBackup.write({
-            kind: "plot",
-            mode: captured.plot.mode,
-            ids: [...captured.plotIds],
-            requirements: captured.plotRequirements,
-            draft,
-            version: captured.version,
-            incomplete: cutShort || undefined,
-          });
+          keepPlotDraft(captured, readPlotDraft(captured.plot, text), cutShort);
         } catch (error) {
           setDraftIncomplete(false);
           setError(
@@ -255,9 +279,7 @@ export function useNovel(
           );
           return;
         }
-        setDraftIncomplete(cutShort);
         setError(cutShort ? cutShortNotice : "");
-        setRewriteReady(true);
         return;
       }
       if (captured.task === "summary") {
@@ -332,8 +354,9 @@ export function useNovel(
       }
       backup.flush();
       end();
-      setDraftIncomplete(false);
-      setError(message);
+      const recovered = recoverEmptyContinuation();
+      setDraftIncomplete(!recovered && Boolean(getChatStreamText(state.current).trim()));
+      setError(recovered ? `${message} 已恢复重新生成前的草稿。` : message);
     },
   });
 
@@ -367,7 +390,7 @@ export function useNovel(
       novel,
       config: room.config,
       through,
-      cursor: initialCompressionCursor(novel),
+      cursor: initialCompressionCursor(novel, through),
       budget: novelRequestBudget,
       retries: 0,
     };
@@ -452,10 +475,12 @@ export function useNovel(
     )
       return false;
     const brief = current.chapterGoal.trim();
-    continuationBrief.current = brief;
     pendingBackup.clear();
     backup.start({
-      chapter: rememberChapterBrief(chapter, brief),
+      chapter: {
+        ...rememberChapterBrief(chapter, brief),
+        targetWords: current.words,
+      },
       afterChapterId,
       version: room.version,
     });
@@ -464,7 +489,6 @@ export function useNovel(
   }
 
   function startManualChapter(chapter: Chapter, afterChapterId: string | null) {
-    continuationBrief.current = undefined;
     backup.start({
       chapter,
       afterChapterId,
@@ -477,13 +501,18 @@ export function useNovel(
     chapter: Chapter,
     afterChapterId: string | null | undefined,
   ) {
-    const brief =
-      continuationBrief.current !== undefined
-        ? continuationBrief.current
-        : chapter.brief;
-    const stored = rememberChapterBrief(chapter, brief);
+    const current = latest.current;
+    const cached = backup.current();
+    const generated = cached?.chapter.id === chapter.id && !cached.manual
+      ? cached.chapter
+      : null;
+    const brief = generated ? generated.brief : chapter.brief;
+    const stored = {
+      ...rememberChapterBrief(chapter, brief),
+      targetWords: generated?.targetWords ?? chapter.targetWords,
+    };
     const next = applyChapterContinuation(
-      latest.current,
+      current,
       stored,
       afterChapterId,
     );
@@ -491,8 +520,14 @@ export function useNovel(
       setError("找不到续写起点，无法保存到原位置。");
       return null;
     }
-    if (!(await update(next, { persistFirst: true }))) return null;
-    continuationBrief.current = undefined;
+    if (
+      !(await update(
+        brief && brief === current.chapterGoal.trim()
+          ? { ...next, chapterGoal: "" }
+          : next,
+        { persistFirst: true },
+      ))
+    ) return null;
     setDraftIncomplete(false);
     setError("");
     return next.chapters.find(({ id }) => id === chapter.id) ?? null;
@@ -647,8 +682,8 @@ export function useNovel(
     return saved;
   }
 
-  function editPlot(ids: PlotSelection, mode: PlotMode, requirements: string) {
-    if (!ready || generating.current || room.status === "ended") return;
+  function editPlot(ids: PlotSelection, mode: PlotMode, requirements: string, splitOffset?: number) {
+    if (!ready || generating.current || (room.status === "ended" && splitOffset === undefined)) return;
     const current = latest.current;
     try {
       const plot = preparePlotEdit(
@@ -657,22 +692,35 @@ export function useNovel(
         ids,
         mode,
         requirements,
+        splitOffset !== undefined,
       );
-      start(
-        {
+      const run = {
           task: mode === "insert" ? "chapter" : "rewrite",
           plot,
           plotIds: ids,
           plotRequirements: requirements,
           novel: current,
           version: room.version,
-        },
-        plot.prompt,
-      );
+          storageVersion: storageVersion.current ?? "legacy",
+      } as const;
+      if (splitOffset !== undefined && plot.mode === "split") {
+        const draft = splitPlotAtOffset(plot, splitOffset);
+        input.current = run;
+        setError("");
+        keepPlotDraft(run, draft);
+        return;
+      }
+      start(run, plot.prompt);
       void recordNovelPrompt(key, requirements);
     } catch (error) {
       setError(error instanceof Error ? error.message : "无法生成剧情草稿。");
     }
+  }
+
+  function editPlotDraftText(index: number, text: string) {
+    const run = input.current;
+    if (!run || !("plot" in run) || !plotDraft || generating.current) return;
+    keepPlotDraft(run, replacePlotDraftText(run.plot, plotDraft, index, text), draftIncomplete);
   }
 
   async function applyPlot() {
@@ -682,16 +730,23 @@ export function useNovel(
     if (
       latest.current !== captured.novel ||
       captured.version !== room.version ||
-      room.status === "ended"
+      (room.status === "ended" && captured.plot.mode !== "split")
     ) {
       setError("小说或世界设定已变更，请重新生成剧情草稿。");
+      return null;
+    }
+    if (
+      captured.plot.mode !== "split" &&
+      (plotDraft.chapters.some(({ text }) => text.length > maxChapterLength) ||
+        plotDraftEditableText(captured.plot, plotDraft).some((text) => !text.trim()))
+    ) {
+      setError(`请填写有效的草稿正文，保存后每章不能超过 ${maxChapterLength} 字。`);
       return null;
     }
     generating.current = true;
     try {
       const next = applyPlotDraft(captured.novel, captured.plot, plotDraft);
-      if (!(await update(next, { persistFirst: true }))) {
-        setError("保存失败，原章节仍保留。请重试。");
+      if (!(await update(next, { persistFirst: true, backupPrevious: true }))) {
         return null;
       }
     } finally {
@@ -703,6 +758,9 @@ export function useNovel(
 
   return {
     novel,
+    missingLocal,
+    syncReadFailed,
+    conflictedPlot,
     update,
     updateChapterGoal,
     renameChapter,
@@ -728,6 +786,11 @@ export function useNovel(
     draftIncomplete,
     rewriteReady,
     plotDraft,
+    editablePlotText:
+      plotDraft && input.current && "plot" in input.current
+        ? plotDraftEditableText(input.current.plot, plotDraft)
+        : [],
+    editPlotDraftText,
     editPlot,
     applyPlot,
     backgroundExport,
@@ -736,8 +799,7 @@ export function useNovel(
         throw new Error("正在生成或读取小说，请稍后再导入。");
       setError("");
       const next = createImportedNovel(room.config, imported);
-      if (!(await update(next, { persistFirst: true }))) {
-        setError("导入未能保存，原小说已保留。请检查浏览器存储空间后重试。");
+      if (!(await update(next, { persistFirst: true, backupPrevious: true }))) {
         return null;
       }
       input.current = null;
@@ -761,6 +823,11 @@ export function useNovel(
       backup.flush();
       end();
       const run = input.current;
+      const recovered = recoverEmptyContinuation();
+      if (recovered) {
+        setError("未收到新正文，已恢复上一份草稿。");
+        return;
+      }
       if (run?.task === "summary" && "batch" in run) {
         setError("已停止压缩上下文，原正文和摘要已保留。");
         return;

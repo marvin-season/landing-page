@@ -61,6 +61,7 @@ import {
   exportNovel,
   formatChapterLength,
   type NovelWritingContext,
+  removeChapter,
   replaceChapter,
 } from "./model";
 import { NewChapterDraftActions } from "./new-chapter-draft-actions";
@@ -293,14 +294,14 @@ export function NovelPanel({
     onSelect: selectChapter,
   });
   const continuationHint = chapter
-    ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。参考范围：当前章及之前。`
+    ? `续写位置：「${chapter.title || chapterTitle(chapterIndex)}」之后，生成${chapterTitle(chapterIndex + 1)}。${chapterIndex < novel.chapters.length - 1 ? "会插入新章，参考前文及紧接着一章的开头。" : "参考范围：当前章及之前。"}`
     : "续写位置：第1章。参考范围：世界和小说设定。";
   const hasPlotPair = novel.chapters.some(({ text }, index) =>
     Boolean(text.trim() && novel.chapters[index + 1]?.text.trim()),
   );
   const disabled = !writer.ready || writer.busy || importing;
   const ended = room.status === "ended";
-  const chapterActionsLocked = disabled;
+  const chapterActionsLocked = disabled || writer.saving;
   const newChapterLocked = chapterActionsLocked || Boolean(newChapterDraft);
   const summarizing = writer.task === "summary" && !writer.compressing;
   function reuseChapterGoal(text: string) {
@@ -390,18 +391,18 @@ export function NovelPanel({
     );
     return true;
   }
-  function deleteChapter() {
-    if (disabled || !chapter) return;
+  async function deleteChapter() {
+    if (chapterActionsLocked || !chapter) return;
     if (
       !window.confirm(
-        `删除“${chapter.title}”及其全部正文？此操作不能撤销，其他章节将保留。`,
+        `删除“${chapter.title}”？删除前的正文可从「文件 → 恢复本地备份」找回。`,
       )
     )
       return;
     const index = novel.chapters.findIndex((item) => item.id === chapter.id);
-    const chapters = novel.chapters.filter((item) => item.id !== chapter.id);
-    writer.update({ ...novel, chapters });
-    setSelected(chapters[Math.max(0, index - 1)]?.id ?? null);
+    const next = removeChapter(novel, chapter.id);
+    if (await writer.update(next, { persistFirst: true, backupPrevious: true }))
+      setSelected(next.chapters[Math.max(0, index - 1)]?.id ?? null);
   }
   function download(format: "txt" | "md") {
     downloadText(
@@ -410,6 +411,22 @@ export function NovelPanel({
       format === "md"
         ? "text/markdown;charset=utf-8"
         : "text/plain;charset=utf-8",
+    );
+  }
+  function downloadDrafts() {
+    const drafts = Array.from(draftTexts, ([id, text]) => ({
+      title: novel.chapters.find((item) => item.id === id)?.title ?? `原章节 ${id}`,
+      text,
+    }));
+    drafts.push(...(writer.conflictedPlot ?? []));
+    if (newChapterDraft) drafts.push({
+      title: newChapterDraft.chapter.title,
+      text: newChapterDraft.text,
+    });
+    downloadText(
+      `${novel.title.replace(/[\\/:*?"<>|]/g, "_")}-待确认草稿.txt`,
+      drafts.map(({ title, text }) => `${title}\n\n${text}`).join("\n\n"),
+      "text/plain;charset=utf-8",
     );
   }
   async function saveToServer() {
@@ -533,6 +550,10 @@ export function NovelPanel({
         composerRequest={polishComposerRequest}
         onRequestComposer={() => setPolishComposerRequest((count) => count + 1)}
         onBeginChapterRewrite={(range) => beginChapterRewrite(base.id, range)}
+        onDiscardRewrite={() => {
+          writer.discardRewrite();
+          setEditingChapter({ chapter: base, mode: "manual" });
+        }}
       />
     );
   }
@@ -596,7 +617,7 @@ export function NovelPanel({
               if (newChapterDraft) throw new Error("请先保存草稿。");
               if (
                 !window.confirm(
-                  `即将导入 ${imported.chapters.length} 章，覆盖当前小说的全部 ${novel.chapters.length} 章、创作设置和剧情摘要。此操作无法撤销，建议先导出旧稿。`,
+                  `即将用 ${imported.chapters.length} 章覆盖当前 ${novel.chapters.length} 章、创作设置和剧情摘要。覆盖前的版本会保留为本地备份。`,
                 )
               )
                 return;
@@ -607,6 +628,9 @@ export function NovelPanel({
               setSelected(id);
             }}
             onDownload={download}
+            onDownloadDrafts={
+              draftTexts.size || newChapterDraft || writer.conflictedPlot ? downloadDrafts : undefined
+            }
             onFork={writer.createFork}
             onOpenContext={() => setContextOpen(true)}
             onSaveToServer={saveToServer}
@@ -617,6 +641,16 @@ export function NovelPanel({
             serverSynced={writer.serverSynced}
             onSummarize={writer.generateBackground}
           />
+          {writer.missingLocal && writer.ready ? (
+            <Alert>
+              <AlertDescription>当前浏览器没有这部作品的正文存档。若曾在其他设备写作，可从「文件」导入正文。</AlertDescription>
+            </Alert>
+          ) : null}
+          {writer.syncReadFailed ? (
+            <Alert>
+              <AlertDescription>未能读取服务器 TXT。本机存档可正常使用。</AlertDescription>
+            </Alert>
+          ) : null}
           {summarizing && writer.busy ? (
             <NovelBackgroundSummaryStatus onStop={writer.stop} />
           ) : null}
@@ -655,12 +689,12 @@ export function NovelPanel({
                   <p
                     className={cn(
                       "shrink-0 whitespace-nowrap text-xs tabular-nums",
-                      chapterLengthShortfall(chapter.text.length, novel.words)
+                      chapterLengthShortfall(chapter.text.length, chapter.targetWords ?? "")
                         ? "text-amber-700 dark:text-amber-400"
                         : "text-muted-foreground",
                     )}
                   >
-                    {formatChapterLength(chapter.text.length, novel.words)}
+                    {formatChapterLength(chapter.text.length, chapter.targetWords ?? "")}
                     {hasDraft(chapter) ? (
                       <span className="ml-2 font-medium text-destructive">
                         草稿未同步，点击「编辑本章」进入
@@ -747,7 +781,7 @@ export function NovelPanel({
                                 chapterActionsLocked ||
                                 newChapterDraft?.afterChapterId === chapter.id
                               }
-                              onSelect={deleteChapter}
+                              onSelect={() => void deleteChapter()}
                             >
                               <Trash2 />
                               删除本章
@@ -781,6 +815,7 @@ export function NovelPanel({
                 <>
                   <PlotSheet
                     chapters={novel.chapters}
+                    roomKey={roomKey}
                     currentChapterId={chapter.id}
                     hasPlotPair={hasPlotPair}
                     open={plotOpen}

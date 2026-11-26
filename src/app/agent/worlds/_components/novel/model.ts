@@ -11,6 +11,7 @@ export type Chapter = {
   title: string;
   text: string;
   brief?: string;
+  targetWords?: string;
 };
 export const novelTaskSchema = z.enum(["chapter", "summary", "rewrite"]);
 export type NovelTask = z.infer<typeof novelTaskSchema>;
@@ -111,8 +112,9 @@ function novelHistory(
   through = novel.chapters.length,
   includeChapterContext = true,
 ): NovelHistory {
-  const count = novelCheckpointCount(novel);
-  if (!includeChapterContext && !count) return {};
+  if (!includeChapterContext) return {};
+  const checkpointCount = novelCheckpointCount(novel);
+  const count = checkpointCount <= through ? checkpointCount : 0;
   const archive =
     novel.checkpoint && count
       ? {
@@ -123,7 +125,7 @@ function novelHistory(
         }
       : { importedBackground: novel.background };
   return {
-    ...(includeChapterContext ? archive : {}),
+    ...archive,
     completedChapters: novel.chapters
       .slice(count, through)
       .map(({ title, text }) => ({ title, text })),
@@ -153,14 +155,18 @@ export function chapterPrompt(
   novel: Novel,
   through = novel.chapters.length,
 ) {
+  const following = novel.chapters[through];
   return JSON.stringify({
     ...novelHistory(novel, through),
     ...writerPreset(config, novel),
+    followingChapter: following
+      ? { title: following.title, opening: following.text.slice(0, 1200) }
+      : undefined,
     task: {
       chapter: through + 1,
       targetWords: Number(novel.words),
       maxCharacters: maxChapterLength,
-      instructions: `创作 task.chapter 对应的一章。承接目标章之前的剧情，按大纲和本次要求推进，不提前写入或泄露后续情节。${newChapterOutput}`,
+      instructions: `创作 task.chapter 对应的一章。承接目标章之前的剧情，按大纲和本次要求推进；有 followingChapter 时，让结尾接得上其开头，不复述或提前写入后续事件。${newChapterOutput}`,
       requirements: novel.chapterGoal || "承接前文与大纲，推进下一阶段情节。",
     },
   });
@@ -276,10 +282,17 @@ export function numberedTitle(title: string, index: number) {
   return /^第[1-9]\d*章$/.test(title) ? chapterTitle(index) : title;
 }
 
-function basicWorldContext(config: WorldConfig) {
-  const { title, background, scene, rules, facts, storyGoal, characters } =
-    config;
-  return { title, background, scene, rules, facts, storyGoal, characters };
+export const markdownNovelMarker = "<!-- novel-manuscript -->";
+export const markdownChapterMarker = "<!-- novel-chapter -->";
+
+export function removeChapter(novel: Novel, chapterId: string): Novel {
+  return {
+    ...novel,
+    chapters: novel.chapters.filter(({ id }) => id !== chapterId).map((chapter, index) => {
+      const title = numberedTitle(chapter.title, index);
+      return title === chapter.title ? chapter : { ...chapter, title };
+    }),
+  };
 }
 
 export function insertChapterPrompt(
@@ -301,7 +314,7 @@ export function insertChapterPrompt(
     maxCharacters: maxChapterLength,
     instructions: `${
       index === 0
-        ? "创作新的开篇。"
+        ? "创作新的开篇。结合已有前置剧情，让收尾接得上原第一章的开头。"
         : "在所选两章之间补写一章。开篇承接上一章末尾，收尾衔接下一章开篇。两侧正文固定，不复述或改写，不提前兑现下文的事件、转折或伏笔。"
     }${newChapterOutput}`,
     requirements:
@@ -312,7 +325,8 @@ export function insertChapterPrompt(
   };
   if (index === 0) {
     const prompt = JSON.stringify({
-      world: basicWorldContext(config),
+      world: config,
+      followingChapters: [{ title: novel.chapters[0].title, text: novel.chapters[0].text.slice(0, 1200) }],
       novel: settings,
       task,
     });
@@ -384,10 +398,7 @@ export function rewritePrompt(
   const targetChapter = selection
     ? { ...position, selection }
     : { ...position, text };
-  const history =
-    compactContext && !selection
-      ? {}
-      : novelHistory(novel, index, !compactContext);
+  const history = novelHistory(novel, index, !compactContext);
   const output =
     "严格不超过 task.maxCharacters 字符。不添加章名、说明、改动清单或代码围栏。";
   const scope = selection
@@ -513,11 +524,11 @@ export function serializeBackground(background: NovelBackground): string {
 }
 
 export function exportNovel(novel: Novel, format: "txt" | "md") {
-  const heading = format === "md" ? "# " : "";
+  const heading = format === "md" ? `${markdownNovelMarker}\n\n# ` : "";
   const chapters = novel.chapters.map((chapter, index) => {
     let title = chapter.title;
     if (format === "md") {
-      title = `## ${title}`;
+      title = `## ${title.replace(/[\r\n]+/g, " ")}\n\n${markdownChapterMarker}`;
     } else {
       title = title.replace(/[\r\n]+/g, " ").trim();
       if (!isTxtChapterHeading(title)) {

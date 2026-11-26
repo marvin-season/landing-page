@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import {
-  readChapterEditorDraft,
+  readChapterEditorDraftRecord,
   writeChapterEditorDraft,
 } from "./chapter-editor-drafts";
 
@@ -22,23 +22,28 @@ export function useChapterEditorDraft(
   chapterId: string,
   enabled: boolean,
   text: string | undefined,
-  onRestore: (text: string) => void,
+  baseText: string,
+  onRestore: (text: string, conflict: boolean) => void,
 ) {
   const [status, setStatus] = useState<DraftStatus>(
     enabled ? "loading" : "ready",
   );
   const requested = useRef<string | undefined>(undefined);
+  const original = useRef(baseText);
   const pending = useRef<Promise<void> | undefined>(undefined);
   const restore = useEffectEvent(onRestore);
 
   useEffect(() => {
     if (status !== "loading") return;
     let active = true;
-    void readChapterEditorDraft(roomKey, chapterId).then(
+    void readChapterEditorDraftRecord(roomKey, chapterId).then(
       (saved) => {
         if (!active) return;
-        requested.current = saved;
-        if (saved !== undefined) restore(saved);
+        requested.current = saved?.text;
+        if (saved) {
+          original.current = saved.baseText ?? baseText;
+          restore(saved.text, original.current !== baseText);
+        }
         setStatus("ready");
       },
       () => {
@@ -48,7 +53,7 @@ export function useChapterEditorDraft(
     return () => {
       active = false;
     };
-  }, [chapterId, roomKey, status]);
+  }, [baseText, chapterId, roomKey, status]);
 
   useLayoutEffect(() => {
     if (
@@ -59,7 +64,7 @@ export function useChapterEditorDraft(
     )
       return;
     requested.current = text;
-    const write = writeChapterEditorDraft(roomKey, chapterId, text);
+    const write = writeChapterEditorDraft(roomKey, chapterId, text, original.current);
     pending.current = write;
     setStatus("saving");
     void write.then(

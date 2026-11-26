@@ -27,6 +27,7 @@ const pendingSchema = z.discriminatedUnion("kind", [
     mode: z.enum(plotModes),
     ids: z.array(z.string().min(1)).min(1),
     requirements: z.string(),
+    storageVersion: z.string().optional(),
     draft: z.object({
       mode: z.enum(plotModes),
       chapters: z.array(chapterSchema).min(1).max(2),

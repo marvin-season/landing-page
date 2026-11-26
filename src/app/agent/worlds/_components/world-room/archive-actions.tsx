@@ -71,7 +71,7 @@ export function ArchiveActions({
       ) : null}
       <Button size="sm" variant="outline" onClick={onCopy}>
         <Copy data-icon="inline-start" />
-        复制世界
+        {room.kind === "novel" ? "仅复制世界设定" : "复制世界"}
       </Button>
       {!ended ? (
         <Button
@@ -82,7 +82,9 @@ export function ArchiveActions({
             void onPending(async () => {
               if (
                 !window.confirm(
-                  "结束这个故事？结束后只能查看与导出 Markdown，也可以复制配置创建新世界。",
+                  room.kind === "novel"
+                    ? "结束此作品的 AI 创作？仍可手动编辑和导出。想继续使用 AI，可从文件菜单复制整本小说。"
+                    : "结束这个故事？结束后只能查看与导出 Markdown，也可以复制配置创建新世界。",
                 )
               )
                 return;
@@ -96,7 +98,7 @@ export function ArchiveActions({
           }
         >
           <Flag data-icon="inline-start" />
-          结束故事
+          {room.kind === "novel" ? "结束 AI 创作" : "结束故事"}
         </Button>
       ) : null}
     </div>

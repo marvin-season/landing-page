@@ -26,6 +26,7 @@ export type RestoredPendingRun =
       plotRequirements: string;
       novel: Novel;
       version: number;
+      storageVersion?: string;
     };
 
 export type RestoredPendingState = {
@@ -41,7 +42,10 @@ export function restorePendingResult(
   pending: PendingResultBackup,
   novel: Novel,
   config: WorldConfig,
+  storageVersion?: string,
+  roomVersion?: number,
 ): RestoredPendingState | null {
+  if (roomVersion !== undefined && roomVersion !== pending.version) return null;
   if (pending.kind === "selection") {
     const chapter = novel.chapters.find(({ id }) => id === pending.chapterId);
     if (
@@ -67,6 +71,11 @@ export function restorePendingResult(
       notice: pending.incomplete ? incompleteNovelDraftNotice : "",
     };
   }
+  if (
+    pending.mode !== "split" &&
+    (!pending.storageVersion || pending.storageVersion !== storageVersion)
+  )
+    return null;
   try {
     const plot = preparePlotEdit(
       config,
@@ -74,6 +83,7 @@ export function restorePendingResult(
       pending.ids,
       pending.mode,
       pending.requirements,
+      pending.mode === "split",
     );
     if (plot.mode === "split") {
       const original = plot.range.chapters[0];
@@ -95,6 +105,7 @@ export function restorePendingResult(
         plotRequirements: pending.requirements,
         novel,
         version: pending.version,
+        storageVersion: pending.storageVersion,
       },
       task: pending.mode === "insert" ? "chapter" : "rewrite",
       preview: "",

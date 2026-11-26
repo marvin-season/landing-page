@@ -8,6 +8,7 @@ const draftSchema = z.object({
     title: z.string(),
     text: z.string(),
     brief: z.string().optional(),
+    targetWords: z.string().optional(),
   }),
   text: z.string(),
   version: z.number().int(),
@@ -27,6 +28,7 @@ export function createChapterDraftBackup(
   onError: (failed: boolean) => void,
 ) {
   let draft: ChapterDraftBackup | null = null;
+  let replacement: ChapterDraftBackup | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let pending = false;
   let latestWrite: Promise<void> | undefined;
@@ -70,11 +72,22 @@ export function createChapterDraftBackup(
       }
     },
     start(next: Omit<ChapterDraftBackup, "text" | "mode">) {
-      draft = { ...next, mode: "chapter", text: "" };
-      pending = true;
-      flush();
+      replacement = { ...next, mode: "chapter", text: "" };
+    },
+    current() {
+      return draft;
+    },
+    cancelEmptyReplacement() {
+      if (!replacement) return null;
+      replacement = null;
+      return draft;
     },
     write(text: string) {
+      if (replacement) {
+        if (!text.trim()) return;
+        draft = replacement;
+        replacement = null;
+      }
       if (!draft || draft.text === text) return;
       draft = { ...draft, text };
       pending = true;
@@ -94,6 +107,7 @@ export function createChapterDraftBackup(
     },
     async clear() {
       const previous = draft;
+      replacement = null;
       draft = null;
       pending = true;
       await flush();

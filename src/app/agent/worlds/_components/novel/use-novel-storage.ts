@@ -17,6 +17,7 @@ import {
 } from "./chapter-draft-backup";
 import {
   createNovel,
+  type Chapter,
   exportNovel,
   invalidateEditedCheckpoint,
   type Novel,
@@ -42,11 +43,12 @@ import {
 
 const db = new Dexie("world-novels");
 db.version(1).stores({ novels: "key" });
-const novels: Table<{ key: string; novel: Novel; previous?: Novel }, string> =
-  db.table("novels");
+type NovelRecord = { key: string; novel: Novel; previous?: Novel; version?: string };
+const novels: Table<NovelRecord, string> = db.table("novels");
+const changedInAnotherTab = "另一个标签页已保存此作品。请保留手头修改，刷新后核对最新正文。";
 
 export function addNovelCopy(key: string, novel: Novel) {
-  return novels.add({ key, novel });
+  return novels.add({ key, novel, version: crypto.randomUUID() });
 }
 
 export function getNovelCopy(key: string) {
@@ -91,7 +93,12 @@ export function useNovelStorage(
   );
   const [serverSynced, setServerSynced] = useState(false);
   const [hasLocalBackup, setHasLocalBackup] = useState(false);
+  const [missingLocal, setMissingLocal] = useState(false);
+  const [syncReadFailed, setSyncReadFailed] = useState(false);
+  const [conflictedPlot, setConflictedPlot] = useState<Chapter[] | null>(null);
   const latest = useRef(novel);
+  const committed = useRef(novel);
+  const storageVersion = useRef<string | undefined>(undefined);
   const writes = useRef(Promise.resolve());
   const previousRef = useRef<Novel | undefined>(undefined);
   const serverCopy = useRef<ServerNovel | null>(null);
@@ -111,8 +118,10 @@ export function useNovelStorage(
   );
   const configRef = useRef(room.config);
   const roomIdRef = useRef(room.id);
+  const roomVersionRef = useRef(room.version);
   configRef.current = room.config;
   roomIdRef.current = room.id;
+  roomVersionRef.current = room.version;
   const restoreEditor = useEffectEvent(onDraftRestored);
   const restorePending = useEffectEvent(onPendingRestored);
   function publishSync(novel: Novel) {
@@ -129,11 +138,18 @@ export function useNovelStorage(
     let active = true;
     Promise.all([
       novels.get(key),
-      isDevelopment ? loadServerNovel(roomIdRef.current) : null,
+      isDevelopment
+        ? loadServerNovel(roomIdRef.current).catch(() => {
+            if (active) setSyncReadFailed(true);
+            return null;
+          })
+        : null,
     ])
       .then(async ([saved, server]) => {
         if (!active) return;
         let novel = saved?.novel ?? createNovel(configRef.current);
+        setMissingLocal(!saved);
+        storageVersion.current = saved?.version;
         previousRef.current = saved?.previous;
         setHasLocalBackup(Boolean(saved?.previous));
         serverCopy.current = server;
@@ -152,14 +168,10 @@ export function useNovelStorage(
             updatedAt: status.updatedAt,
             syncedAt: status.updatedAt,
           };
-          await novels.put({
-            key,
-            novel,
-            previous: previousRef.current,
-          });
         }
         if (!active) return;
         latest.current = novel;
+        committed.current = novel;
         setNovel(novel);
         setSyncPrompt(status.kind === "diverged" ? status.reason : null);
         setServerSynced(status.kind === "match");
@@ -181,9 +193,18 @@ export function useNovelStorage(
         if (!restoredEditor) {
           const pending = pendingBackup.read();
           const restoredPending = pending
-            ? restorePendingResult(pending, latest.current, configRef.current)
+            ? restorePendingResult(
+                pending, latest.current, configRef.current,
+                storageVersion.current ?? "legacy", roomVersionRef.current,
+              )
             : null;
-          if (pending && !restoredPending) pendingBackup.clear();
+          if (pending && !restoredPending) {
+            if (pending.kind === "plot") {
+              setError("正文或设定已变，旧剧情草稿无法直接应用。可从文件菜单导出待整理草稿。");
+              setConflictedPlot(pending.draft.chapters);
+            }
+            if (pending.kind !== "plot") pendingBackup.clear();
+          }
           if (pending && restoredPending) {
             restorePending(pending, restoredPending);
           }
@@ -217,15 +238,14 @@ export function useNovelStorage(
     };
   }, [backup, pendingBackup]);
 
-  function update(next: Novel, { persistFirst = false, touch = true } = {}) {
-    next = invalidateEditedCheckpoint(latest.current, next);
+  function update(next: Novel, { persistFirst = false, touch = true, backupPrevious = false, restoreCheckpoint = false } = {}) {
+    if (!restoreCheckpoint) next = invalidateEditedCheckpoint(latest.current, next);
     if (
       touch &&
       exportNovel(latest.current, "txt") !== exportNovel(next, "txt")
     ) {
       next = { ...next, updatedAt: Date.now() };
     }
-    const previous = previousRef.current;
     function publish() {
       onUpdate();
       latest.current = next;
@@ -235,13 +255,29 @@ export function useNovelStorage(
     if (!persistFirst) publish();
     setSaving(true);
     const write = writes.current.then(async () => {
-      await novels.put({ key, novel: next, previous });
+      const previous = backupPrevious ? committed.current : previousRef.current;
+      const version = crypto.randomUUID();
+      await db.transaction("rw", novels, async () => {
+        const stored = await novels.get(key);
+        if (stored?.version !== storageVersion.current)
+          throw new Error(changedInAnotherTab);
+        await novels.put({ key, novel: next, previous, version });
+      });
+      committed.current = next;
+      storageVersion.current = version;
+      previousRef.current = previous;
+      setHasLocalBackup(Boolean(previous));
+      setMissingLocal(false);
       if (persistFirst) publish();
       if (latest.current === next) setSaving(false);
     });
-    writes.current = write.catch(() => {
+    writes.current = write.catch((error: unknown) => {
       setSaving(false);
-      setError("小说未能保存到本机，请先导出章节，避免刷新后丢失。");
+      setError(
+        error instanceof Error && error.message === changedInAnotherTab
+          ? changedInAnotherTab
+          : "小说未能保存到本机，请先导出章节，避免刷新后丢失。",
+      );
     });
     return write.then(
       () => true,
@@ -265,7 +301,7 @@ export function useNovelStorage(
       title: context.title,
       style: context.style,
       outline: context.outline,
-    });
+    }, { persistFirst: true });
   }
 
   const syncHost = {
@@ -286,6 +322,11 @@ export function useNovelStorage(
 
   return {
     key,
+    storageVersion,
+    missingLocal,
+    syncReadFailed,
+    conflictedPlot,
+    setConflictedPlot,
     novel,
     latest,
     update,

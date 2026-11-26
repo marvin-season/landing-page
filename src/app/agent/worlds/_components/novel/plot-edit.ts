@@ -82,6 +82,7 @@ export function preparePlotEdit(
   ids: PlotSelection,
   mode: PlotMode,
   requirements: string,
+  localSplit = false,
 ) {
   const request = requirements.trim();
   const range = resolveChapterRange(novel.chapters, ids);
@@ -110,7 +111,7 @@ export function preparePlotEdit(
         requirements: request || undefined,
       },
     });
-    if (prompt.length > maxNovelPromptLength)
+    if (!localSplit && prompt.length > maxNovelPromptLength)
       throw new Error("本次章节拆分的上下文过长，请缩短正文或精简设定。");
     return { mode, range, prompt };
   }
@@ -244,6 +245,58 @@ export function preparePlotEdit(
 type PlotEdit = ReturnType<typeof preparePlotEdit>;
 export type PlotDraft = { mode: PlotMode; chapters: Chapter[] };
 
+export function splitPlotAtOffset(
+  edit: Extract<PlotEdit, { mode: "split" }>,
+  offset: number,
+): PlotDraft {
+  const chapter = edit.range.chapters[0];
+  const first = chapter.text.slice(0, offset);
+  const second = chapter.text.slice(offset);
+  if (
+    !Number.isInteger(offset) ||
+    !first.trim() ||
+    !second.trim() ||
+    /^[\uDC00-\uDFFF]/.test(second)
+  ) throw new Error("拆分位置两侧都需要有正文。");
+  return {
+    mode: edit.mode,
+    chapters: [
+      { ...chapter, text: first },
+      { id: crypto.randomUUID(), title: chapterTitle(edit.range.index + 1), text: second },
+    ],
+  };
+}
+
+export function plotDraftEditableText(edit: PlotEdit, draft: PlotDraft) {
+  if (edit.mode === "split") return [];
+  if (edit.mode !== "stitch") return [draft.chapters[0].text];
+  return [
+    draft.chapters[0].text.slice(
+      edit.before.length + edit.endingPrefix.length,
+      draft.chapters[0].text.length - edit.endingGap.length,
+    ),
+    draft.chapters[1].text.slice(
+      edit.openingGap.length,
+      draft.chapters[1].text.length - edit.openingSuffix.length - edit.after.length,
+    ),
+  ];
+}
+
+export function replacePlotDraftText(edit: PlotEdit, draft: PlotDraft, index: number, text: string): PlotDraft {
+  if (edit.mode === "split") return draft;
+  const chapter = draft.chapters[index];
+  if (!chapter) return draft;
+  const next = edit.mode !== "stitch"
+    ? text
+    : index === 0
+      ? edit.before + edit.endingPrefix + text + edit.endingGap
+      : edit.openingGap + text + edit.openingSuffix + edit.after;
+  return {
+    ...draft,
+    chapters: draft.chapters.map((chapter, i) => i === index ? { ...chapter, text: next } : chapter),
+  };
+}
+
 export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
   const text = output.trim();
   if (!text) throw new Error("没有生成正文，请重试。");
@@ -256,27 +309,9 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
       throw new Error("未能识别拆分位置，请重新生成。");
     }
     const offset = chapter.text.indexOf(opening);
-    const first = chapter.text.slice(0, offset);
-    const second = chapter.text.slice(offset);
-    if (
-      offset <= 0 ||
-      chapter.text.lastIndexOf(opening) !== offset ||
-      !first.trim() ||
-      !second.trim() ||
-      /^[\uDC00-\uDFFF]/.test(second)
-    )
+    if (offset <= 0 || chapter.text.lastIndexOf(opening) !== offset)
       throw new Error("拆分位置无法在原文中唯一定位，请重新生成。");
-    return {
-      mode: edit.mode,
-      chapters: [
-        { ...chapter, text: first },
-        {
-          id: crypto.randomUUID(),
-          title: chapterTitle(edit.range.index + 1),
-          text: second,
-        },
-      ],
-    };
+    return splitPlotAtOffset(edit, offset);
   }
   if (edit.mode !== "stitch") {
     if (text.length > maxChapterLength)

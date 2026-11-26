@@ -7,12 +7,14 @@ import {
   createNovel,
   invalidateEditedCheckpoint,
   isTxtChapterHeading,
+  markdownChapterMarker,
+  markdownNovelMarker,
   maxChapterLength,
   type Novel,
   unescapeTxtChapterLine,
 } from "./model";
 
-export const maxNovelFileBytes = 2 * 1024 * 1024;
+export const maxNovelFileBytes = 16 * 1024 * 1024;
 const chapterHeading =
   /^(?:第[〇零一二三四五六七八九十百千两\d]+[章节回集]|chapter[ \t]+\d+\b).{0,100}$/i;
 const markdown = unified().use(remarkParse);
@@ -40,6 +42,7 @@ export function parseNovelFile(
   const fileTitle = fileName.replace(/\.[^.]+$/, "").trim();
   let title = fileTitle;
   let bodyStart = 0;
+  const markedMarkdown = extension === "md" && text.startsWith(`${markdownNovelMarker}\n\n`);
   const headings: { start: number; end: number; title: string }[] = [];
   if (extension === "md") {
     for (const node of markdown.parse(text).children) {
@@ -55,11 +58,20 @@ export function parseNovelFile(
       if (!name) continue;
       if (
         node.depth === 1 &&
-        start.offset === 0 &&
-        !chapterHeading.test(name)
+        (markedMarkdown
+          ? start.offset === markdownNovelMarker.length + 2
+          : start.offset === 0 && !chapterHeading.test(name))
       ) {
         title = name;
         bodyStart = end.offset;
+      } else if (markedMarkdown) {
+        const marker = `\n\n${markdownChapterMarker}\n`;
+        if (node.depth === 2 && text.startsWith(marker, end.offset))
+          headings.push({
+            start: start.offset,
+            end: end.offset + marker.length,
+            title: name,
+          });
       } else if (node.depth === 2 || chapterHeading.test(name)) {
         headings.push({ start: start.offset, end: end.offset, title: name });
       }
@@ -110,7 +122,7 @@ export function parseNovelFile(
       extension === "txt"
         ? body.split("\n").map(unescapeTxtChapterLine).join("\n")
         : body;
-    if (extension === "txt" && chapterName) {
+    if ((extension === "txt" || markedMarkdown) && chapterName) {
       chapters.push({ title: chapterName, text: prose });
     } else {
       addChapter(chapters, chapterName, prose);
@@ -151,10 +163,34 @@ export function applyServerExport(
   fileName: string,
 ): Novel {
   const imported = parseNovelFile(source, fileName);
+  const consumed = new Set<string>();
+  const byContent = new Map<string, Chapter[]>();
+  function key(title: string, text: string) {
+    const label = title.trim().replace(/^第[1-9]\d*章(?:[ \t]+|$)/, "");
+    return JSON.stringify([label, text.trim().replace(/\r\n?/g, "\n")]);
+  }
+  for (const chapter of current.chapters) {
+    const signature = key(chapter.title, chapter.text);
+    const matches = byContent.get(signature);
+    if (matches) matches.push(chapter);
+    else byContent.set(signature, [chapter]);
+  }
   const chapters = imported.chapters.map(({ title, text }, index) => {
     const name = title || chapterTitle(index);
-    const existing = current.chapters[index];
-    if (existing?.title === name && existing.text === text) return existing;
+    const signature = key(name, text);
+    const samePosition = current.chapters[index];
+    const matches = byContent.get(signature);
+    const existing =
+      samePosition && key(samePosition.title, samePosition.text) === signature && !consumed.has(samePosition.id)
+        ? samePosition
+        : matches?.length === 1 && !consumed.has(matches[0].id) ? matches[0] : undefined;
+    if (existing) {
+      consumed.add(existing.id);
+      const existingName = /^第[1-9]\d*章$/.test(existing.title) ? name : existing.title;
+      return existing.title === existingName && existing.text === text
+        ? existing
+        : { ...existing, title: existingName, text };
+    }
     return {
       id: crypto.randomUUID(),
       title: name,

@@ -26,6 +26,7 @@ import {
 import { ComposerDock, FloatingComposer } from "../floating-composer";
 import { WorldSelect } from "../world-select";
 import { ChapterDiffView } from "./chapter-diff-view";
+import { writeChapterEditorDraft } from "./chapter-editor-drafts";
 import { ChapterRewriteForm } from "./chapter-generation-form";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
 import {
@@ -42,6 +43,7 @@ import {
   rewriteHint,
   stopGenerationHint,
 } from "./novel-action-tooltip";
+import { PromptHistoryDialog } from "./prompt-history-dialog";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
 
@@ -63,6 +65,7 @@ export function ChapterEditor({
   composerRequest,
   onRequestComposer,
   onBeginChapterRewrite,
+  onDiscardRewrite,
 }: {
   roomKey: string;
   base: Chapter;
@@ -98,6 +101,7 @@ export function ChapterEditor({
   rewriteRequirements: string;
   onRewriteRequirementsChange: (requirements: string) => void;
   composerRequest: number;
+  onDiscardRewrite: () => void;
   onRequestComposer: () => void;
   onBeginChapterRewrite: (range?: ChapterTextRange) => boolean;
 }) {
@@ -110,6 +114,7 @@ export function ChapterEditor({
   const [revealedLength, setRevealedLength] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
+  const [draftConflict, setDraftConflict] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
   const [target, setTarget] = useState<ChapterTextSelection | null>(null);
   const [appliedRange, setAppliedRange] = useState<ChapterTextRange | null>(
@@ -144,7 +149,11 @@ export function ChapterEditor({
     base.id,
     !isNewChapter && !waitingForRewrite,
     draftText === base.text ? undefined : draftText,
-    (text) => setDraft((current) => ({ ...current, text })),
+    base.text,
+    (text, conflict) => {
+      setDraft((current) => ({ ...current, text }));
+      setDraftConflict(conflict);
+    },
   );
   const draftLoading = draftStatus === "loading";
   const draftReadFailed = draftStatus === "read-error";
@@ -400,6 +409,7 @@ export function ChapterEditor({
 
   async function save() {
     if (cannotSave) return;
+    if (draftConflict && !window.confirm("这份草稿基于旧正文。确定用它替换现在的章节正文？")) return;
     clearTimeout(pendingSelection.current);
     if (!isRewrite) closeRewrite();
     setSaving(true);
@@ -412,9 +422,30 @@ export function ChapterEditor({
       const saved = await onSave(currentDraft);
       setSaveFailed(!saved);
       if (saved) {
+        setDraftConflict(false);
         setAppliedRange(null);
         setShowDiff(false);
       }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function discardDraft() {
+    if (dirty && !window.confirm("放弃草稿，恢复已保存的正文？")) return;
+    setSaving(true);
+    try {
+      await writeChapterEditorDraft(roomKey, base.id, undefined);
+      onDiscardRewrite();
+      setDraft(base);
+      setDraftConflict(false);
+      setUseGeneratedText(false);
+      setShowDiff(false);
+      setSaveFailed(false);
+      setAppliedRange(null);
+      closeRewrite();
+    } catch {
+      setSaveFailed(true);
     } finally {
       setSaving(false);
     }
@@ -608,6 +639,18 @@ export function ChapterEditor({
             </div>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
+            {!generation && !ended ? <PromptHistoryDialog roomKey={roomKey} /> : null}
+            {!isNewChapter && (dirty || isRewrite) ? (
+              <NovelActionButton
+                hint={localActionHint("恢复已保存的正文。")}
+                size="sm"
+                variant="ghost"
+                disabled={editorBusy || saving || draftWriting}
+                onClick={() => void discardDraft()}
+              >
+                {dirty ? "放弃草稿" : "返回编辑"}
+              </NovelActionButton>
+            ) : null}
             {generation && writer.busy ? (
               <NovelActionButton
                 hint={stopGenerationHint}
@@ -661,6 +704,11 @@ export function ChapterEditor({
             </NovelActionButton>
           </div>
         </div>
+        {draftConflict ? (
+          <p role="alert" className="px-5 py-2 text-sm text-muted-foreground">
+            正文已更新，这份草稿基于旧版本。保存前请查看修改。
+          </p>
+        ) : null}
         {showDiff ? (
           <section className="flex min-h-0 flex-1 flex-col gap-3 p-4 pt-3">
             {saveFailed && writer.error ? (

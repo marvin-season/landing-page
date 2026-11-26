@@ -47,6 +47,8 @@ export function ImportNovelTemplateDialog({
   async function onPickFile(file: File | undefined) {
     setError("");
     if (!file) return;
+    setFileName("");
+    setText("");
     if (file.size > maxTemplateNovelFileBytes) {
       setError("小说文件不能超过 2MB");
       return;
@@ -83,10 +85,20 @@ export function ImportNovelTemplateDialog({
         ...config,
         kind: "novel",
       });
-      await addNovelCopy(`${created.room.ownerId}:${created.room.id}`, {
-        ...novel,
-        updatedAt: Date.now(),
-      });
+      try {
+        await addNovelCopy(`${created.room.ownerId}:${created.room.id}`, {
+          ...novel,
+          updatedAt: Date.now(),
+        });
+      } catch {
+        try {
+          await worldRequest(`rooms/${created.room.id}`, "DELETE");
+        } catch {
+          void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
+          throw new Error("正文未能保存，空作品也未能清理。请在作品列表删除空作品后重试。");
+        }
+        throw new Error("正文未能保存到本机。请检查浏览器存储空间后重试。");
+      }
       void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
       setOpen(false);
       reset();

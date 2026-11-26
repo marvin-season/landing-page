@@ -1,6 +1,6 @@
 import Dexie, { liveQuery, type Table } from "dexie";
 
-type EditorDraft = { roomKey: string; chapterId: string; text: string };
+type EditorDraft = { roomKey: string; chapterId: string; text: string; baseText?: string };
 
 const db = new Dexie("world-novel-editor-drafts");
 db.version(1).stores({ drafts: "[roomKey+chapterId]" });
@@ -20,11 +20,16 @@ export async function readChapterEditorDraft(
   return (await drafts.get([roomKey, chapterId]))?.text;
 }
 
+export function readChapterEditorDraftRecord(roomKey: string, chapterId: string) {
+  return drafts.get([roomKey, chapterId]);
+}
+
 export async function writeChapterEditorDraft(
   roomKey: string,
   chapterId: string,
   text: string | undefined,
+  baseText?: string,
 ) {
   if (text === undefined) await drafts.delete([roomKey, chapterId]);
-  else await drafts.put({ roomKey, chapterId, text });
+  else await drafts.put({ roomKey, chapterId, text, baseText });
 }

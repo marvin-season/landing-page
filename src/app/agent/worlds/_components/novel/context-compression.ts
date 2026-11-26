@@ -70,8 +70,12 @@ export type CompressionCursor = {
   summary: string;
 };
 
-export function initialCompressionCursor(novel: Novel): CompressionCursor {
-  const index = novelCheckpointCount(novel);
+export function initialCompressionCursor(
+  novel: Novel,
+  through = novel.chapters.length,
+): CompressionCursor {
+  const count = novelCheckpointCount(novel);
+  const index = count <= through ? count : 0;
   return {
     index,
     offset: 0,

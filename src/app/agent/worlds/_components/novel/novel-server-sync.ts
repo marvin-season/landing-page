@@ -18,7 +18,7 @@ export type NovelServerSyncHost = {
   publish: (novel: Novel) => void;
   update: (
     novel: Novel,
-    options?: { persistFirst?: boolean; touch?: boolean },
+    options?: { persistFirst?: boolean; touch?: boolean; restoreCheckpoint?: boolean },
   ) => Promise<boolean>;
   clearDraft: () => void;
 };
@@ -141,7 +141,7 @@ export function restoreNovelBackup(host: NovelServerSyncHost) {
       restored.updatedAt = Date.now();
       restored.syncedAt = current.syncedAt;
     }
-    if (!(await host.update(restored, { touch: false, persistFirst: true }))) {
+    if (!(await host.update(restored, { touch: false, persistFirst: true, restoreCheckpoint: true }))) {
       host.rememberBackup(previous);
       throw new Error("本地备份未能恢复。");
     }

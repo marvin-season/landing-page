@@ -239,7 +239,6 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
     });
   }
   async function edit(copy = false) {
-    if (novelMode) dismissSettingsHint();
     setCopying(copy);
     setEditing(structuredClone(loaded.config));
     try {
@@ -265,7 +264,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               className="duration-[340ms]! ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               <RoomHeader
-                title={loaded.config.title}
+                title={novelMode ? (novelContext?.title ?? loaded.config.title) : loaded.config.title}
                 running={running || novelBusy}
                 ended={ended}
                 phase={
@@ -310,7 +309,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={running || actionPending}
+                  disabled={running || novelBusy || actionPending}
                   onClick={() => void edit()}
                 >
                   去设定
@@ -452,20 +451,31 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
               );
               router.push(`/agent/worlds/${data.room.id}`);
             } else {
+              const previousContext = novelContext;
               if (writingContext) {
                 const saved = await saveNovelContext.current?.(writingContext);
                 if (!saved) throw new Error("小说设定未能保存到本机。");
               }
-              const data = await worldRequest<{ room: WorldRoom }>(
-                `rooms/${loaded.id}`,
-                "PATCH",
-                {
-                  action: "configure",
-                  expectedVersion: loaded.version,
-                  config,
-                },
-              );
-              chat.setRoom(data.room);
+              try {
+                const data = await worldRequest<{ room: WorldRoom }>(
+                  `rooms/${loaded.id}`,
+                  "PATCH",
+                  {
+                    action: "configure",
+                    expectedVersion: loaded.version,
+                    config,
+                  },
+                );
+                chat.setRoom(data.room);
+                if (novelMode) dismissSettingsHint();
+              } catch (error) {
+                if (writingContext && previousContext) {
+                  const restored = await saveNovelContext.current?.(previousContext);
+                  if (!restored)
+                    throw new Error("世界设定未保存，本机小说设定也未能恢复。请刷新后核对两处设定。");
+                }
+                throw error;
+              }
             }
             setEditing(null);
           }}
