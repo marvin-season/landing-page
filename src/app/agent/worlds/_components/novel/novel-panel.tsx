@@ -233,11 +233,19 @@ export function NovelPanel({
             title: novel.title,
             style: novel.style,
             outline: novel.outline,
+            skills: novel.skills ?? [],
           }
         : null,
       save: (next) => saveContext.current(next),
     });
-  }, [loadFailed, novel.outline, novel.style, novel.title, ready]);
+  }, [
+    loadFailed,
+    novel.outline,
+    novel.skills,
+    novel.style,
+    novel.title,
+    ready,
+  ]);
   const [appliedRewrite, setAppliedRewrite] = useState<{
     chapterId: string;
     length: number;
@@ -330,6 +338,9 @@ export function NovelPanel({
   };
   function updateGenerationOptions(options: ChapterGenerationOptions) {
     writer.update({ ...novel, ...options });
+  }
+  function updateWritingSkills(skills: string[]) {
+    writer.update({ ...novel, skills });
   }
   function generateNextChapter() {
     if (newChapterLocked) return;
@@ -506,8 +517,10 @@ export function NovelPanel({
                   <ChapterGenerationForm
                     {...props}
                     options={generationOptions}
+                    skills={novel.skills}
                     submitLabel="重新生成"
                     onChange={updateGenerationOptions}
+                    onSkillsChange={updateWritingSkills}
                   />
                 ),
               }
@@ -576,6 +589,8 @@ export function NovelPanel({
         }}
         rewriteRequirements={rewriteRequirements}
         onRewriteRequirementsChange={setRewriteRequirements}
+        skills={novel.skills}
+        onSkillsChange={updateWritingSkills}
         composerRequest={polishComposerRequest}
         onRequestComposer={() => setPolishComposerRequest((count) => count + 1)}
         onBeginChapterRewrite={(range) => beginChapterRewrite(base.id, range)}
@@ -606,10 +621,12 @@ export function NovelPanel({
         inputRef={chapterGoalInput}
         hint={continuationHint}
         options={generationOptions}
+        skills={novel.skills}
         disabled={continueLocked}
         submitDisabled={!novel.title.trim()}
         submitLabel="AI 续写"
         onChange={updateGenerationOptions}
+        onSkillsChange={updateWritingSkills}
         onGenerate={generateNextChapter}
         manualDisabled={newChapterLocked}
         onWriteManually={startNextChapterManually}

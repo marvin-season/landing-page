@@ -10,6 +10,7 @@ import {
   maxNovelPromptLength,
   type Novel,
   numberedTitle,
+  writerPreset,
 } from "./model";
 
 export const plotModes = ["stitch", "merge", "insert", "split"] as const;
@@ -97,8 +98,7 @@ export function preparePlotEdit(
       throw new Error("所选章节没有足够正文可供拆分。");
 
     const prompt = JSON.stringify({
-      world: config,
-      novel: { title: novel.title, style: novel.style, outline: novel.outline },
+      ...writerPreset(config, novel, "plot"),
       targetChapter: {
         chapter: index + 1,
         title: chapter.title,
@@ -124,12 +124,7 @@ export function preparePlotEdit(
     const previous = novel.chapters[index - 1];
     const following = novel.chapters[end];
     const prompt = JSON.stringify({
-      world: config,
-      novel: {
-        title: novel.title,
-        style: novel.style,
-        outline: novel.outline,
-      },
+      ...writerPreset(config, novel, "plot"),
       previousChapters: previous
         ? [{ title: previous.title, text: previous.text.slice(-contextLength) }]
         : [],
@@ -206,12 +201,7 @@ export function preparePlotEdit(
     throw new Error("章节原文过长，请先缩短正文再粘合。");
 
   const prompt = JSON.stringify({
-    world: config,
-    novel: {
-      title: novel.title,
-      style: novel.style,
-      outline: novel.outline,
-    },
+    ...writerPreset(config, novel, "plot"),
     targetChapter: {
       title: `${first.title} / ${second.title}`,
       text: JSON.stringify({ ending, opening }),

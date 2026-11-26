@@ -62,6 +62,8 @@ export function ChapterEditor({
   onExit,
   rewriteRequirements,
   onRewriteRequirementsChange,
+  skills,
+  onSkillsChange,
   composerRequest,
   onRequestComposer,
   onBeginChapterRewrite,
@@ -98,6 +100,8 @@ export function ChapterEditor({
   onSave: (chapter: Chapter) => Promise<boolean>;
   onSelectChapter: (id: string) => void;
   onExit: () => void | Promise<void>;
+  skills?: string[];
+  onSkillsChange?: (skills: string[]) => void;
   rewriteRequirements: string;
   onRewriteRequirementsChange: (requirements: string) => void;
   composerRequest: number;
@@ -509,6 +513,8 @@ export function ChapterEditor({
         title={polishLabel}
         requirements={rewriteRequirements}
         onChange={onRewriteRequirementsChange}
+        skills={skills}
+        onSkillsChange={onSkillsChange}
         compactContext={compactContext}
         onCompactContextChange={onCompactContextChange}
         disabled={

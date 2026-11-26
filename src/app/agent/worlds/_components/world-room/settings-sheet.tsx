@@ -53,7 +53,7 @@ export function SettingsSheet({
         <SheetTitle>{copying ? "复制为新世界" : "世界设定与存档"}</SheetTitle>
         <SheetDescription>
           {novel
-            ? "修改设定只影响后续章节。名称、文风和大纲也在这里。"
+            ? "修改设定只影响后续章节。名称、文风和大纲也在这里；写作技法在续写输入框用 / 选择。"
             : "修改设定只影响后续对话。秘密仅提供给对应角色。"}
         </SheetDescription>
       </SheetHeader>

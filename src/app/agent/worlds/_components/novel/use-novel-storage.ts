@@ -22,6 +22,7 @@ import {
   invalidateEditedCheckpoint,
   type Novel,
   type NovelWritingContext,
+  novelWritingContext,
   renameChapter as renameStoredChapter,
 } from "./model";
 import {
@@ -332,9 +333,7 @@ export function useNovelStorage(
     return update(
       {
         ...current,
-        title: context.title,
-        style: context.style,
-        outline: context.outline,
+        ...novelWritingContext(context),
       },
       { persistFirst: true },
     );

@@ -81,7 +81,8 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
         next &&
         current.title === next.title &&
         current.style === next.style &&
-        current.outline === next.outline
+        current.outline === next.outline &&
+        (current.skills ?? []).join("\0") === (next.skills ?? []).join("\0")
       )
         return current;
       return next;

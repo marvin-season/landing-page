@@ -78,6 +78,7 @@ function WritingGenerationForm({
 
 export function ChapterGenerationForm({
   options,
+  skills,
   disabled,
   embedded,
   inputRef,
@@ -85,11 +86,13 @@ export function ChapterGenerationForm({
   submitDisabled = false,
   submitLabel,
   onChange,
+  onSkillsChange,
   onGenerate,
   onWriteManually,
   manualDisabled,
 }: {
   options: ChapterGenerationOptions;
+  skills?: string[];
   disabled: boolean;
   embedded?: boolean;
   inputRef?: Ref<HTMLTextAreaElement>;
@@ -97,6 +100,7 @@ export function ChapterGenerationForm({
   submitDisabled?: boolean;
   submitLabel: string;
   onChange: (next: ChapterGenerationOptions) => void;
+  onSkillsChange?: (skills: string[]) => void;
   onGenerate: () => void;
   onWriteManually?: () => void;
   manualDisabled?: boolean;
@@ -116,7 +120,9 @@ export function ChapterGenerationForm({
         label="下一章要求"
         value={options.chapterGoal}
         disabled={disabled}
-        placeholder="可指定本章事件、伏笔、结尾或情绪；留空则按大纲继续。"
+        skills={skills}
+        onSkillsChange={onSkillsChange}
+        placeholder="可指定本章事件、伏笔、结尾或情绪；输入 / 选择写作技法。"
         onChange={(event) =>
           onChange({ ...options, chapterGoal: event.target.value })
         }
@@ -184,6 +190,8 @@ export function ChapterRewriteForm({
   title = "润色整章",
   requirements,
   onChange,
+  skills,
+  onSkillsChange,
   compactContext,
   onCompactContextChange,
   disabled,
@@ -199,6 +207,8 @@ export function ChapterRewriteForm({
   title?: string;
   requirements: string;
   onChange: (requirements: string) => void;
+  skills?: string[];
+  onSkillsChange?: (skills: string[]) => void;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
   disabled: boolean;
@@ -231,7 +241,9 @@ export function ChapterRewriteForm({
         label="润色指令（选填）"
         value={requirements}
         disabled={disabled}
-        placeholder="润色指令（选填），例如：收紧对话节奏"
+        skills={skills}
+        onSkillsChange={onSkillsChange}
+        placeholder="润色指令（选填）；输入 / 选择写作技法"
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
           if (!disabled && event.key === "Escape") onCancel?.();

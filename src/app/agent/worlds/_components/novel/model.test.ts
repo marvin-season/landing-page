@@ -795,3 +795,31 @@ test("chapter requests identify the room and task without sending model credenti
     task: "chapter",
   });
 });
+
+test("selected writing skills inject into chapter and rewrite prompts but not summaries", () => {
+  const config = loadWorldTemplates()[0].config;
+  const novel = createNovel(config);
+  novel.skills = ["scene-driven", "chapter-hook", "missing", "dialogue-first"];
+  novel.chapters = [{ id: "one", title: "第1章", text: "正文。" }];
+  const chapter = JSON.parse(chapterPrompt(config, novel));
+  assert.deepEqual(
+    chapter.skills.map(({ id }: { id: string }) => id),
+    ["scene-driven", "chapter-hook", "dialogue-first"],
+  );
+  assert.match(writerInstructions, /若提供 skills/);
+  const rewrite = JSON.parse(rewritePrompt(config, novel, "one", "收紧节奏"));
+  assert.deepEqual(
+    rewrite.skills.map(({ id }: { id: string }) => id),
+    ["scene-driven", "dialogue-first"],
+  );
+  const insert = JSON.parse(
+    insertChapterPrompt(config, novel, "one", "补一段雨夜开场"),
+  );
+  assert.deepEqual(
+    insert.skills.map(({ id }: { id: string }) => id),
+    ["scene-driven", "chapter-hook", "dialogue-first"],
+  );
+  const summary = JSON.parse(summaryPrompt(config, novel));
+  assert.equal(summary.skills, undefined);
+  assert.equal(JSON.stringify(summary).includes("scene-driven"), false);
+});

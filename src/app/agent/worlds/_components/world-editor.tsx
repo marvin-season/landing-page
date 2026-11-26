@@ -405,6 +405,7 @@ export function WorldEditor({
                     value={novelContext.style}
                     onChange={(style) => updateNovelContext("style", style)}
                     multiline
+                    hint="写作技法请在续写或润色输入框输入 / 选择，选中后以标签显示，可随时移除。"
                   />
                   <TextField
                     label="小说大纲与创作要求"
