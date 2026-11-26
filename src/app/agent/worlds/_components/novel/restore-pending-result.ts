@@ -17,7 +17,7 @@ export type RestoredPendingRun =
       chapterId: string;
       novel: Novel;
       version: number;
-      range: ChapterTextRange;
+      range?: ChapterTextRange;
     }
   | {
       task: "rewrite" | "chapter";
@@ -48,12 +48,14 @@ export function restorePendingResult(
   if (roomVersion !== undefined && roomVersion !== pending.version) return null;
   if (pending.kind === "selection") {
     const chapter = novel.chapters.find(({ id }) => id === pending.chapterId);
+    const { range } = pending;
     if (
       !chapter ||
       chapter.text !== pending.baseText ||
-      pending.range.end > chapter.text.length ||
-      pending.range.start >= pending.range.end ||
-      !chapter.text.slice(pending.range.start, pending.range.end).trim()
+      (range &&
+        (range.end > chapter.text.length ||
+          range.start >= range.end ||
+          !chapter.text.slice(range.start, range.end).trim()))
     )
       return null;
     return {

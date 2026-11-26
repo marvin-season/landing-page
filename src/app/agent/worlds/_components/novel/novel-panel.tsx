@@ -195,6 +195,25 @@ export function NovelPanel({
       });
       setPlotOpen(true);
     },
+    (restored) => {
+      if (restored.kind === "plot") {
+        setPlotRestore(restored);
+        setPlotOpen(true);
+        return;
+      }
+      if (restored.kind === "rewrite") {
+        setSelected(restored.chapter.id);
+        setEditingChapter({
+          chapter: restored.chapter,
+          mode: "rewrite",
+          rewriteRange: restored.range,
+        });
+        return;
+      }
+      const { chapter, afterChapterId } = restored.draft;
+      setSelected(chapter.id);
+      setEditingChapter({ chapter, mode: "chapter", afterChapterId });
+    },
   );
   const { novel } = writer;
   useEffect(() => {
@@ -225,14 +244,10 @@ export function NovelPanel({
     chapterId: string;
     length: number;
   }>();
-  const streamingRewrite =
-    (plotOpen || writer.task === "rewrite") && writer.busy;
   const waitingForText = Boolean(thinkingChapter);
   useUnsavedNavigation(
-    !isEditing && (waitingForText || streamingRewrite || writer.rewriteReady),
-    waitingForText || streamingRewrite
-      ? "草稿正在生成，离开会中断本次生成。确定离开吗？"
-      : "草稿尚未应用，离开会丢失草稿。确定离开吗？",
+    !isEditing && !writer.busy && writer.rewriteReady,
+    "草稿尚未应用，确定离开吗？",
   );
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
   const openPlotAfterMenuClose = useRef(false);

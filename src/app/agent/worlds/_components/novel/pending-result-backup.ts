@@ -13,10 +13,12 @@ const pendingSchema = z.discriminatedUnion("kind", [
     kind: z.literal("selection"),
     chapterId: z.string().min(1),
     chapterTitle: z.string(),
-    range: z.object({
-      start: z.number().int().nonnegative(),
-      end: z.number().int().nonnegative(),
-    }),
+    range: z
+      .object({
+        start: z.number().int().nonnegative(),
+        end: z.number().int().nonnegative(),
+      })
+      .optional(),
     baseText: z.string(),
     preview: z.string().min(1),
     version: z.number().int(),
@@ -75,6 +77,7 @@ export function createPendingResultBackup(
       pending = next;
       dirty = true;
       persist();
+      return !dirty;
     },
     flush: persist,
     clear() {

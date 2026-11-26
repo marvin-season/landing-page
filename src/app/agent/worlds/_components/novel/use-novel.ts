@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  aiSdkChatStreamAdapter,
-  getChatStreamText,
-  initialChatStreamState,
-  reduceChatStreamState,
-  useChatStreamCore,
-} from "@landing-page/utils/stream";
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { worldRequest } from "@/lib/group-chat/client";
@@ -63,6 +56,7 @@ import {
 import { recordNovelPrompt } from "./prompt-history";
 import { incompleteNovelDraftNotice } from "./restore-pending-result";
 import { addNovelCopy, useNovelStorage } from "./use-novel-storage";
+import { useNovelTask } from "./use-novel-task";
 
 type Compression = {
   novel: Novel;
@@ -76,6 +70,7 @@ type Compression = {
 type ChapterRun = {
   task: "chapter";
   compression: Compression;
+  draft: Omit<ChapterDraftBackup, "text" | "mode">;
   onFirstText?: () => void;
 };
 type CompressionRun = {
@@ -106,12 +101,54 @@ type NovelRun =
       range?: ChapterTextRange;
     };
 
+type RestoredNovelRun =
+  | { kind: "chapter"; draft: ChapterRun["draft"] }
+  | { kind: "rewrite"; chapter: Chapter; range?: ChapterTextRange }
+  | { kind: "plot"; mode: PlotMode; ids: PlotSelection; requirements: string };
+
+function storedChapterRun({ onFirstText: _onFirstText, ...run }: ChapterRun) {
+  return run;
+}
+
+function storedNovelRun(run: NovelRun): NovelRun {
+  if ("plot" in run || !("compression" in run)) return run;
+  if (run.task === "chapter") return storedChapterRun(run);
+  return {
+    ...run,
+    continuation: run.continuation && storedChapterRun(run.continuation),
+  };
+}
+
+function sourceNovel(run: NovelRun) {
+  return "compression" in run ? run.compression.novel : run.novel;
+}
+
+function rebindNovelRun(run: NovelRun, novel: Novel): NovelRun {
+  if (!("compression" in run)) return { ...run, novel };
+  const compression = { ...run.compression, novel };
+  if (run.task === "chapter") return { ...run, compression };
+  return {
+    ...run,
+    compression,
+    continuation: run.continuation && { ...run.continuation, compression },
+  };
+}
+
+function editableNovelState({
+  updatedAt: _updatedAt,
+  syncedAt: _syncedAt,
+  ...novel
+}: Novel) {
+  return JSON.stringify(novel);
+}
+
 export function useNovel(
   room: WorldRoom,
   onBusyChange: (busy: boolean) => void,
   onBackgroundReady: (background: NovelBackground) => void,
   onDraftRestored: (draft: ChapterDraftBackup) => void,
   onPendingRestored: (pending: PendingResultBackup) => void = () => {},
+  onRunRestored: (run: RestoredNovelRun) => void = () => {},
 ) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -129,10 +166,10 @@ export function useNovel(
   const [backgroundExport, setBackgroundExport] =
     useState<NovelBackground | null>(null);
   const input = useRef<NovelRun | null>(null);
-  const state = useRef(initialChatStreamState);
-  const finished = useRef(false);
-  const incomplete = useRef(false);
+  const output = useRef("");
   const generating = useRef(false);
+  const currentRoom = useRef(room);
+  currentRoom.current = room;
   const {
     key,
     storageVersion,
@@ -145,7 +182,7 @@ export function useNovel(
     updateChapterGoal,
     renameChapter,
     updateContext,
-    ready,
+    ready: storageReady,
     saving,
     syncPrompt,
     serverSynced,
@@ -207,200 +244,194 @@ export function useNovel(
       incomplete: cutShort || undefined,
     });
   }
-  const stream = useChatStreamCore({
-    adapter: aiSdkChatStreamAdapter,
-    onEvent(event) {
-      if (event.type === "finish") {
-        incomplete.current = Boolean(
-          event.finishReason && event.finishReason !== "stop",
-        );
-        finished.current = true;
-      }
-      state.current = reduceChatStreamState(state.current, event);
-      const run = input.current;
-      if (run && "plot" in run) return;
-      if (run?.task === "summary" && "batch" in run) return;
-      const text = getChatStreamText(state.current);
-      if (run?.task === "chapter") backup.write(text);
-      if (run?.task === "chapter" && run.onFirstText && text.trim()) {
-        const onFirstText = run.onFirstText;
-        run.onFirstText = undefined;
-        flushSync(() => {
-          setPreview(text);
-          onFirstText();
-        });
+  function receiveText(text: string) {
+    if (output.current === text) return;
+    output.current = text;
+    const run = input.current;
+    if (run && "plot" in run) return;
+    if (run?.task === "summary" && "batch" in run) return;
+    if (run?.task === "chapter") backup.write(text);
+    if (run?.task === "chapter" && run.onFirstText && text.trim()) {
+      const onFirstText = run.onFirstText;
+      run.onFirstText = undefined;
+      flushSync(() => {
+        setPreview(text);
+        onFirstText();
+      });
+      return;
+    }
+    setPreview(text);
+  }
+  function complete(cutShort: boolean, version: number) {
+    const text = output.current.trim();
+    const captured = input.current;
+    if (captured?.task === "summary" && "batch" in captured) {
+      if (cutShort || !text || text.length > maxNovelSummaryLength) {
+        end();
+        setError("剧情摘要未生成完整或过长，请重试压缩。");
         return;
       }
-      setPreview(text);
-    },
-    onComplete() {
-      const text = getChatStreamText(state.current).trim();
-      const captured = input.current;
-      if (captured?.task === "summary" && "batch" in captured) {
-        if (
-          !finished.current ||
-          incomplete.current ||
-          !text ||
-          text.length > maxNovelSummaryLength
-        ) {
-          end();
-          setError("剧情摘要未生成完整或过长，请重试压缩。");
-          return;
-        }
-        const compression = {
-          ...captured.compression,
-          cursor: {
-            index: captured.batch.index,
-            offset: captured.batch.offset,
-            summary: text,
-          },
-        };
-        const continuation = captured.continuation;
-        if (continuation) {
-          if (!continueChapter({ ...continuation, compression })) end();
-        } else if (compression.cursor.index < compression.through) {
-          if (!compress(compression, undefined, captured.exportBackground))
-            end();
-        } else {
-          if (captured.exportBackground)
-            publishBackground(
-              captured.compression.config,
-              compression.novel,
-              text,
-            );
-          else {
-            const { checkpoint } = novelWithCompression(
-              compression.novel,
-              compression.cursor,
-            );
-            if (checkpoint)
-              setCheckpointCandidate({ source: compression.novel, checkpoint });
-          }
-          end();
-        }
-        return;
-      }
-      end();
-      if (!finished.current || !text) {
-        const recovered = !text && recoverEmptyContinuation();
-        backup.flush();
-        setDraftIncomplete(Boolean(text) && !recovered);
-        setError(
-          recovered
-            ? "没有收到新正文，已恢复重新生成前的草稿。"
-            : "连接提前结束或没有生成内容。已收到的正文仍可编辑。",
-        );
-        return;
-      }
-      if (!captured) return;
-      const cutShort = incomplete.current;
-      const cutShortNotice = incompleteNovelDraftNotice;
-      if ("plot" in captured) {
-        try {
-          keepPlotDraft(captured, readPlotDraft(captured.plot, text), cutShort);
-        } catch (error) {
-          setDraftIncomplete(false);
-          setError(
-            error instanceof Error ? error.message : "无法读取剧情草稿。",
-          );
-          return;
-        }
-        setError(cutShort ? cutShortNotice : "");
-        return;
-      }
-      if (captured.task === "summary") {
-        setDraftIncomplete(false);
-        if (cutShort) {
-          setError(
-            "输出未写完，请缩减范围后重新生成，或改用手动输入。摘要未采用。",
-          );
-          setPreview("");
-          return;
-        }
-        publishBackground(captured.config, captured.novel, text);
-        return;
-      }
-      if (captured.task === "chapter") saveCheckpoint(captured.compression);
-      if (text.length > maxChapterLength) {
-        setError(`草稿超过 ${maxChapterLength} 字，请缩短后保存。`);
-        setDraftIncomplete(cutShort);
-      } else {
-        setDraftIncomplete(cutShort);
-        setError(cutShort ? cutShortNotice : "");
-      }
-      if (captured.task === "chapter") {
-        backup.write(text);
-        backup.flush();
-      }
-      setPreview(text);
-    },
-    onError(message) {
-      const run = input.current;
+      const compression = {
+        ...captured.compression,
+        cursor: {
+          index: captured.batch.index,
+          offset: captured.batch.offset,
+          summary: text,
+        },
+      };
+      const continuation = captured.continuation;
+      const needsNext =
+        Boolean(continuation) || compression.cursor.index < compression.through;
       if (
-        run?.task === "summary" &&
-        !("batch" in run) &&
-        isNovelRequestTooLarge(message)
+        needsNext &&
+        (latest.current !== compression.novel ||
+          currentRoom.current.status === "ended" ||
+          currentRoom.current.version !== version)
       ) {
-        const compression = createCompression(
-          run.novel,
-          run.novel.chapters.length,
+        end();
+        setError("小说或世界设定已变更，无法继续压缩，请重新发起。");
+        return;
+      }
+      if (continuation) {
+        if (!continueChapter({ ...continuation, compression })) end();
+      } else if (compression.cursor.index < compression.through) {
+        if (!compress(compression, undefined, captured.exportBackground)) end();
+      } else {
+        if (captured.exportBackground)
+          publishBackground(
+            captured.compression.config,
+            compression.novel,
+            text,
+          );
+        else {
+          const { checkpoint } = novelWithCompression(
+            compression.novel,
+            compression.cursor,
+          );
+          if (checkpoint)
+            setCheckpointCandidate({ source: compression.novel, checkpoint });
+        }
+        end();
+      }
+      return;
+    }
+    end();
+    if (!text) {
+      const recovered = !text && recoverEmptyContinuation();
+      backup.flush();
+      setDraftIncomplete(Boolean(text) && !recovered);
+      setError(
+        recovered
+          ? "没有收到新正文，已恢复重新生成前的草稿。"
+          : "连接提前结束或没有生成内容。已收到的正文仍可编辑。",
+      );
+      return;
+    }
+    if (!captured) return;
+    const cutShortNotice = incompleteNovelDraftNotice;
+    if ("plot" in captured) {
+      try {
+        keepPlotDraft(captured, readPlotDraft(captured.plot, text), cutShort);
+      } catch (error) {
+        setDraftIncomplete(false);
+        setError(error instanceof Error ? error.message : "无法读取剧情草稿。");
+        return;
+      }
+      setError(cutShort ? cutShortNotice : "");
+      return;
+    }
+    if (captured.task === "summary") {
+      setDraftIncomplete(false);
+      if (cutShort) {
+        setError(
+          "输出未写完，请缩减范围后重新生成，或改用手动输入。摘要未采用。",
         );
-        compression.budget = smallerNovelBudget(
-          room.id,
-          summaryPrompt(run.config, run.novel),
-          "summary",
-          compression.budget,
-        );
-        if (compress(compression, undefined, true)) return;
+        setPreview("");
+        return;
+      }
+      publishBackground(captured.config, captured.novel, text);
+      return;
+    }
+    if (captured.task === "chapter") saveCheckpoint(captured.compression);
+    if (text.length > maxChapterLength) {
+      setError(`草稿超过 ${maxChapterLength} 字，请缩短后保存。`);
+      setDraftIncomplete(cutShort);
+    } else {
+      setDraftIncomplete(cutShort);
+      setError(cutShort ? cutShortNotice : "");
+    }
+    if (captured.task === "chapter") {
+      backup.write(text);
+      backup.flush();
+    }
+    setPreview(text);
+  }
+
+  function fail(message: string, version: number) {
+    const run = input.current;
+    const canRetry =
+      run &&
+      sourceNovel(run) === latest.current &&
+      currentRoom.current.version === version &&
+      currentRoom.current.status !== "ended";
+    if (
+      canRetry &&
+      run.task === "summary" &&
+      !("batch" in run) &&
+      isNovelRequestTooLarge(message)
+    ) {
+      const compression = createCompression(
+        run.novel,
+        run.novel.chapters.length,
+      );
+      compression.budget = smallerNovelBudget(
+        room.id,
+        summaryPrompt(run.config, run.novel),
+        "summary",
+        compression.budget,
+      );
+      if (compress(compression, undefined, true)) return;
+      end();
+      return;
+    }
+    if (
+      canRetry &&
+      !("plot" in run) &&
+      "compression" in run &&
+      isNovelRequestTooLarge(message)
+    ) {
+      const current = run.compression;
+      const noChapterText = !output.current.trim();
+      if (current.retries < 4 && (run.task === "summary" || noChapterText)) {
+        const prompt =
+          run.task === "summary"
+            ? run.batch.prompt
+            : continuationPrompt(current);
+        const next = {
+          ...current,
+          retries: current.retries + 1,
+          budget: smallerNovelBudget(room.id, prompt, run.task, current.budget),
+        };
+        if (
+          compress(
+            next,
+            run.task === "chapter" ? run : run.continuation,
+            run.task === "summary" && run.exportBackground,
+          )
+        )
+          return;
         end();
         return;
       }
-      if (
-        run &&
-        !("plot" in run) &&
-        "compression" in run &&
-        isNovelRequestTooLarge(message)
-      ) {
-        const current = run.compression;
-        const noChapterText = !getChatStreamText(state.current).trim();
-        if (current.retries < 4 && (run.task === "summary" || noChapterText)) {
-          const prompt =
-            run.task === "summary"
-              ? run.batch.prompt
-              : continuationPrompt(current);
-          const next = {
-            ...current,
-            retries: current.retries + 1,
-            budget: smallerNovelBudget(
-              room.id,
-              prompt,
-              run.task,
-              current.budget,
-            ),
-          };
-          if (
-            compress(
-              next,
-              run.task === "chapter" ? run : run.continuation,
-              run.task === "summary" && run.exportBackground,
-            )
-          )
-            return;
-          end();
-          return;
-        }
-      }
-      backup.flush();
-      end();
-      const recovered = recoverEmptyContinuation();
-      setDraftIncomplete(
-        !recovered && Boolean(getChatStreamText(state.current).trim()),
-      );
-      setError(recovered ? `${message} 已恢复重新生成前的草稿。` : message);
-    },
-  });
+    }
+    backup.flush();
+    end();
+    const recovered = recoverEmptyContinuation();
+    setDraftIncomplete(!recovered && Boolean(output.current.trim()));
+    setError(recovered ? `${message} 已恢复重新生成前的草稿。` : message);
+  }
 
-  function start(run: NovelRun, prompt: string): void {
+  function prepare(run: NovelRun) {
     input.current = run;
     setError("");
     const archiving = run.task === "summary" && "batch" in run;
@@ -412,17 +443,107 @@ export function useNovel(
     setRewriteReady(false);
     setPlotDraft(null);
     pendingBackup.clear();
-    finished.current = false;
-    incomplete.current = false;
-    state.current = initialChatStreamState;
+    output.current = "";
     setPreview("");
     generating.current = true;
     setBusy(true);
     onBusyChange(true);
-    stream.send({
-      url: "/api/novel",
-      body: novelRequest(room.id, prompt, run.task),
+  }
+
+  function persistRewrite(incomplete: boolean) {
+    const run = input.current;
+    if (run?.task !== "rewrite" || "plot" in run || !output.current.trim())
+      return true;
+    const chapter = run.novel.chapters.find(({ id }) => id === run.chapterId);
+    if (!chapter) return false;
+    return pendingBackup.write({
+      kind: "selection",
+      chapterId: chapter.id,
+      chapterTitle: chapter.title,
+      baseText: chapter.text,
+      range: run.range,
+      preview: output.current.trim(),
+      version: run.version,
+      incomplete: incomplete || undefined,
     });
+  }
+
+  const taskConnection = useNovelTask<NovelRun>({
+    key,
+    storageReady,
+    onError: setError,
+    onText: receiveText,
+    async onResult(version, snapshot, message) {
+      const run = input.current;
+      if (snapshot) receiveText(snapshot.text);
+      if (snapshot?.status === "completed")
+        complete(snapshot.incomplete, version);
+      else if (snapshot?.status === "cancelled") stopLocally();
+      else fail(message ?? snapshot?.error ?? "小说生成未完成。", version);
+
+      if (run !== input.current) return false;
+      const isContinuation = run?.task === "chapter" && !("plot" in run);
+      const draftSaved = persistRewrite(
+        snapshot?.status !== "completed" || snapshot.incomplete,
+      );
+      const chapterSaved =
+        !isContinuation ||
+        !output.current.trim() ||
+        (await backup.checkpoint()) !== undefined;
+      return draftSaved && chapterSaved;
+    },
+    onRestore(entry) {
+      const current = latest.current;
+      let run = entry.run;
+      if (editableNovelState(sourceNovel(run)) === editableNovelState(current))
+        run = rebindNovelRun(run, current);
+      if ("plot" in run) {
+        onRunRestored({
+          kind: "plot",
+          mode: run.plot.mode,
+          ids: run.plotIds,
+          requirements: run.plotRequirements,
+        });
+      } else if (run.task === "rewrite") {
+        const chapter = run.novel.chapters.find(
+          ({ id }) => id === run.chapterId,
+        );
+        if (chapter)
+          onRunRestored({ kind: "rewrite", chapter, range: run.range });
+      } else {
+        const chapterRun =
+          run.task === "chapter"
+            ? run
+            : "batch" in run
+              ? run.continuation
+              : undefined;
+        if (chapterRun) {
+          if (
+            current.chapters.some(
+              ({ id }) => id === chapterRun.draft.chapter.id,
+            )
+          ) {
+            return false;
+          }
+          backup.start(chapterRun.draft);
+          onRunRestored({ kind: "chapter", draft: chapterRun.draft });
+        }
+      }
+      prepare(run);
+      return true;
+    },
+  });
+  const { ready, reconnecting, stop } = taskConnection;
+
+  function start(run: NovelRun, prompt: string): void {
+    prepare(run);
+    taskConnection.start(
+      {
+        ...novelRequest(room.id, prompt, run.task),
+        version: currentRoom.current.version,
+      },
+      storedNovelRun(run),
+    );
   }
 
   function createCompression(novel: Novel, through: number): Compression {
@@ -510,24 +631,25 @@ export function useNovel(
       setError("找不到续写起点，请返回阅读页重新选择章节。");
       return false;
     }
-    if (
-      !continueChapter({
-        task: "chapter",
-        compression: createCompression(current, index),
-        onFirstText,
-      })
-    )
-      return false;
     const brief = current.chapterGoal.trim();
-    pendingBackup.clear();
-    backup.start({
+    const draft = {
       chapter: {
         ...rememberChapterBrief(chapter, brief),
         targetWords: current.words,
       },
       afterChapterId,
       version: room.version,
-    });
+    };
+    if (
+      !continueChapter({
+        task: "chapter",
+        compression: createCompression(current, index),
+        draft,
+        onFirstText,
+      })
+    )
+      return false;
+    backup.start(draft);
     void recordNovelPrompt(key, current.chapterGoal);
     return true;
   }
@@ -854,6 +976,30 @@ export function useNovel(
     return plotDraft.chapters[captured.plot.mode === "split" ? 1 : 0].id;
   }
 
+  function stopLocally() {
+    backup.flush();
+    end();
+    const run = input.current;
+    const recovered = recoverEmptyContinuation();
+    if (recovered) {
+      setError("未收到新正文，已恢复上一份草稿。");
+      return;
+    }
+    if (run?.task === "summary" && "batch" in run) {
+      setError("已停止压缩上下文，原正文和摘要已保留。");
+      return;
+    }
+    if (
+      run &&
+      !("plot" in run) &&
+      (run.task === "chapter" || run.task === "rewrite")
+    ) {
+      setGenerationStopped(true);
+    } else {
+      setError("已停止，本次草稿未计入正文或导出文件，可以重新生成。");
+    }
+  }
+
   return {
     novel,
     missingLocal,
@@ -864,7 +1010,7 @@ export function useNovel(
     renameChapter,
     updateContext,
     ready,
-    error,
+    error: reconnecting ? "连接已断开，正在重连原生成任务…" : error,
     syncPrompt,
     serverSynced,
     hasLocalBackup,
@@ -922,29 +1068,6 @@ export function useNovel(
     rewrite,
     discardRewrite,
     saveChapterRewrite,
-    stop() {
-      stream.stop();
-      backup.flush();
-      end();
-      const run = input.current;
-      const recovered = recoverEmptyContinuation();
-      if (recovered) {
-        setError("未收到新正文，已恢复上一份草稿。");
-        return;
-      }
-      if (run?.task === "summary" && "batch" in run) {
-        setError("已停止压缩上下文，原正文和摘要已保留。");
-        return;
-      }
-      if (
-        run &&
-        !("plot" in run) &&
-        (run.task === "chapter" || run.task === "rewrite")
-      ) {
-        setGenerationStopped(true);
-      } else {
-        setError("已停止，本次草稿未计入正文或导出文件，可以重新生成。");
-      }
-    },
+    stop,
   };
 }

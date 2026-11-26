@@ -29,7 +29,7 @@
 | 领域与服务 | `src/lib/group-chat/` | `model.ts` 数据契约、`http.ts` 路由分发、`store.ts` 存档、`engine.ts` 运行、`schedule.ts` 选人、`context.ts` 上下文、`provider.ts` 模型调用、`session.ts` 会话标识、`novel.ts` Writer 接口、`world-template-model.ts` 模板类型与纯函数、`world-templates.ts` 模板读写（Node fs）、`extract-world-template.ts` 从小说提取模板 |
 | Agent | [`mastra-server/agents/world-agents.ts`](../../mastra-server/agents/world-agents.ts) | `world-actor`、`world-narrator`、`world-summary`、`world-writer` |
 
-流式传输复用 `@landing-page/utils/stream` 的 `useChatStreamCore`：剧本用自定义适配器 `worldStoryStream`，小说用 `aiSdkChatStreamAdapter` 解析 AI SDK UI 消息流。两边都不另写 SSE 解析器。
+剧本的 SSE 用 `useChatStreamCore` 和 `worldStoryStream`。小说的 AI SDK 流由服务端消费，浏览器读取可重连任务的正文快照。
 
 ## 3. 房间与世界配置
 
@@ -65,7 +65,7 @@
 | 运行请求幂等与暂停封锁 | `world_requests` | 以 `(room_id, clientRequestId)` 去重；暂停时写入 `cancelled` 封锁迟到的请求 |
 | 世界预设、角色预设 | `world_presets` | 与房间互不影响，创建房间时复制配置快照 |
 | 小说设定、章节、续写摘要（`checkpoint`） | 浏览器 IndexedDB `world-novels.novels`，键为 `${ownerId}:${roomId}` | 摘要归档只改 `checkpoint`，正文仍完整保留；不随房间跨设备同步。删除或仅复制世界设定不处理这份数据，「复制整本小说」会复制正文和摘要 |
-| 生成中的小说草稿 | `useNovel` 内存；待应用结果另有本机备份 | 流式过程只在内存；续写 / 整章润色 / 选段润色 / 剧情整理的待应用结果刷新后可恢复 |
+| 小说生成任务 | 服务端 libSQL `novel_runs`，本机 IndexedDB `world-novel-runs` | 服务端保存短期输出快照，浏览器保存任务 ID 和草稿上下文。多实例部署需让各实例连接同一 `GROUP_CHAT_DATABASE_URL` |
 
 ## 5. 接口
 
@@ -85,7 +85,7 @@
 | `POST rooms/:id/runs` | 剧本运行：写入输入，返回 SSE 事件流；仅保存不运行时返回 JSON |
 | `POST rooms/:id/stop` | 暂停运行并封锁对应请求 |
 
-`POST /api/novel` 由 [`createNovelHandler`](../../src/lib/group-chat/novel.ts) 处理，见[小说模式 · Writer 接口](./novel-mode.md#5-writer-接口)。
+`/api/novel` 由 [`createNovelHandlers`](../../src/lib/group-chat/novel.ts) 处理。Next.js 在返回受理响应后运行 Writer，浏览器可继续读取快照或主动取消。参见[小说模式 · Writer 接口](./novel-mode.md#5-writer-接口)。
 
 ## 6. Agent 与模型代理
 

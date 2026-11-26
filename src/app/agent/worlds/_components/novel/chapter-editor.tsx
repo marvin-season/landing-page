@@ -215,16 +215,13 @@ export function ChapterEditor({
     !showDiff && (!generation || (isRewrite && editorBusy));
   const polishNeedsSave = !generatingDraft && (dirty || isNewChapter);
   useUnsavedNavigation(
-    (generatingDraft && writer.busy) ||
-      draftWriting ||
-      (dirty && (isNewChapter || draftWriteFailed)),
-    generatingDraft && writer.busy
-      ? "章节正在生成，离开会中断本次生成。确定离开吗？"
-      : isNewChapter
-        ? "新章尚未保存为正文，确定离开吗？"
-        : draftWriting
-          ? "正在将草稿保存到本机，确定离开吗？"
-          : "草稿未能保存到本机，确定离开吗？",
+    !(generatingDraft && writer.busy) &&
+      (draftWriting || (dirty && (isNewChapter || draftWriteFailed))),
+    isNewChapter
+      ? "新章尚未保存为正文，确定离开吗？"
+      : draftWriting
+        ? "正在将草稿保存到本机，确定离开吗？"
+        : "草稿未能保存到本机，确定离开吗？",
   );
   useRegisterPromptReuse((text) => {
     if (editorBusy || ended || saving || showDiff || isRewrite) return false;

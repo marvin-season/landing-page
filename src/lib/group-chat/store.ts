@@ -529,7 +529,7 @@ export function createWorldStore(getClient: () => Client) {
 }
 export type WorldStore = ReturnType<typeof createWorldStore>;
 let client: Client | undefined;
-export const worldStore = createWorldStore(() => {
+export function getWorldDatabase() {
   if (!client) {
     const url =
       process.env.GROUP_CHAT_DATABASE_URL || "file:./db/group-chat.db";
@@ -541,4 +541,6 @@ export const worldStore = createWorldStore(() => {
     });
   }
   return client;
-});
+}
+
+export const worldStore = createWorldStore(getWorldDatabase);
