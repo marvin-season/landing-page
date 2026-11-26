@@ -11,24 +11,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@landing-page/design-system";
-import { useQueryClient } from "@tanstack/react-query";
 import { BookUp } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { worldRequest } from "@/lib/group-chat/client";
-import type { WorldRoom } from "@/lib/group-chat/model";
-import { standaloneNovelConfig } from "@/lib/group-chat/standalone-novel-config";
 import { maxTemplateNovelFileBytes } from "@/lib/group-chat/world-template-model";
-import { createImportedNovel, parseNovelFile } from "./novel/import-novel";
-import { addNovelCopy } from "./novel/use-novel-storage";
+import { type ImportedNovel, parseNovelFile } from "./novel/import-novel";
 
 export function ImportNovelTemplateDialog({
   disabled,
+  onImport,
 }: {
   disabled?: boolean;
+  onImport: (novel: ImportedNovel) => Promise<void>;
 }) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -78,33 +72,9 @@ export function ImportNovelTemplateDialog({
     setPending(true);
     setError("");
     try {
-      const parsed = parseNovelFile(text, fileName || "novel.txt");
-      const config = standaloneNovelConfig(parsed.title);
-      const novel = createImportedNovel(config, parsed);
-      const created = await worldRequest<{ room: WorldRoom }>("rooms", "POST", {
-        ...config,
-        kind: "novel",
-      });
-      try {
-        await addNovelCopy(`${created.room.ownerId}:${created.room.id}`, {
-          ...novel,
-          updatedAt: Date.now(),
-        });
-      } catch {
-        try {
-          await worldRequest(`rooms/${created.room.id}`, "DELETE");
-        } catch {
-          void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
-          throw new Error(
-            "正文未能保存，空作品也未能清理。请在作品列表删除空作品后重试。",
-          );
-        }
-        throw new Error("正文未能保存到本机。请检查浏览器存储空间后重试。");
-      }
-      void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
+      await onImport(parseNovelFile(text, fileName || "novel.txt"));
       setOpen(false);
       reset();
-      router.push(`/agent/worlds/${created.room.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "导入失败");
     } finally {
@@ -129,6 +99,7 @@ export function ImportNovelTemplateDialog({
       <Dialog
         open={open}
         onOpenChange={(next) => {
+          if (!next && pending) return;
           setOpen(next);
           if (!next) reset();
         }}

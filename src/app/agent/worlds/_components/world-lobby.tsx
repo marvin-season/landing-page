@@ -6,8 +6,8 @@ import {
   Button,
   Tag,
 } from "@landing-page/design-system";
-import { useQuery } from "@tanstack/react-query";
-import { MessageSquare, Plus, Trash2, Users } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { LoaderCircle, MessageSquare, Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
@@ -16,14 +16,18 @@ import type {
   RoomListItem,
   WorldConfig,
   WorldPreset,
+  WorldRoom,
 } from "@/lib/group-chat/model";
+import { standaloneNovelConfig } from "@/lib/group-chat/standalone-novel-config";
 import {
   type CreateWorkDraft,
   CreateWorkSheet,
   startCreateWork,
 } from "./create-work-sheet";
 import { ImportNovelTemplateDialog } from "./import-novel-template-dialog";
-import { observeNovelList } from "./novel/use-novel-storage";
+import { createImportedNovel, type ImportedNovel } from "./novel/import-novel";
+import { createNovel } from "./novel/model";
+import { addNovelCopy, observeNovelList } from "./novel/use-novel-storage";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldLobbyNav } from "./world-lobby-nav";
 
@@ -36,9 +40,12 @@ type WorkFilter = (typeof workFilters)[number]["value"];
 
 export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [editing, setEditing] = useState<CreateWorkDraft | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [creatingBlank, setCreatingBlank] = useState(false);
+  const actionsDisabled = pending || creatingBlank;
   const [workFilter, setWorkFilter] = useState<WorkFilter>("all");
   const rooms = useQuery({
     queryKey: ["world-rooms"],
@@ -67,6 +74,50 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
       ? rooms.data?.rooms
       : rooms.data?.rooms.filter((room) => room.kind === workFilter);
 
+  async function createStandaloneNovel(imported?: ImportedNovel) {
+    const config = standaloneNovelConfig(imported?.title ?? "", {
+      source: imported ? "import" : "blank",
+    });
+    const novel = imported
+      ? createImportedNovel(config, imported)
+      : createNovel(config);
+    const { room } = await worldRequest<{ room: WorldRoom }>("rooms", "POST", {
+      ...config,
+      kind: "novel",
+    });
+    try {
+      await addNovelCopy(`${room.ownerId}:${room.id}`, {
+        ...novel,
+        updatedAt: Date.now(),
+      });
+    } catch {
+      try {
+        await worldRequest(`rooms/${room.id}`, "DELETE");
+      } catch {
+        void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
+        throw new Error(
+          "小说未能保存到本机，空作品也未能清理。请在作品列表删除空作品后重试。",
+        );
+      }
+      throw new Error("小说未能保存到本机。请检查浏览器存储空间后重试。");
+    }
+    void queryClient.invalidateQueries({ queryKey: ["world-rooms"] });
+    router.push(`/agent/worlds/${room.id}`);
+  }
+
+  async function createBlankNovel() {
+    if (actionsDisabled) return;
+    setError("");
+    setCreatingBlank(true);
+    try {
+      await createStandaloneNovel();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "创建小说失败");
+    } finally {
+      setCreatingBlank(false);
+    }
+  }
+
   async function remove(room: RoomListItem) {
     const message =
       room.kind === "novel"
@@ -94,9 +145,13 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
             <WorldLobbyNav />
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
-            <ImportNovelTemplateDialog disabled={pending} />
+            <ImportNovelTemplateDialog
+              disabled={actionsDisabled}
+              onImport={createStandaloneNovel}
+            />
             {defaultConfig ? (
               <Button
+                disabled={creatingBlank}
                 onClick={() => setEditing(startCreateWork(defaultConfig))}
               >
                 <Plus data-icon="inline-start" />
@@ -151,6 +206,27 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
             </p>
           ) : null}
           <WorldGrid>
+            {workFilter !== "script" ? (
+              <WorldCard className="relative min-h-28">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="absolute inset-0 size-full flex-col gap-2 rounded-lg"
+                  disabled={actionsDisabled}
+                  onClick={() => void createBlankNovel()}
+                >
+                  {creatingBlank ? (
+                    <LoaderCircle
+                      data-icon="inline-start"
+                      className="animate-spin motion-reduce:animate-none"
+                    />
+                  ) : (
+                    <Plus data-icon="inline-start" />
+                  )}
+                  {creatingBlank ? "正在创建…" : "新建空白小说"}
+                </Button>
+              </WorldCard>
+            ) : null}
             {savedRooms?.map((room) => (
               <WorldCard
                 key={room.id}
@@ -169,7 +245,7 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                     size="icon"
                     variant="ghost"
                     className="size-7 shrink-0 rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    disabled={pending}
+                    disabled={actionsDisabled}
                     onClick={(event) => {
                       event.stopPropagation();
                       void remove(room);

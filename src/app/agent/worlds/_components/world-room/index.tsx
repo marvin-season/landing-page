@@ -301,7 +301,9 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             <Alert className="rounded-none border-x-0 border-t-0">
               <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
                 <span>
-                  当前仍是导入后的默认设定，建议先完善世界与角色，或从正文更新。
+                  {novelChapterStatus?.count
+                    ? "当前使用默认设定，可以完善世界与角色，或从正文更新。"
+                    : "当前使用默认设定，可以直接写第一章，也可以先完善世界与角色。"}
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
                   <Button

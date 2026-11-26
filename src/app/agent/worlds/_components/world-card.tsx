@@ -1,3 +1,4 @@
+import { cn } from "@landing-page/utils";
 import type { ReactNode } from "react";
 
 export function WorldGrid({ children }: { children: ReactNode }) {
@@ -11,13 +12,18 @@ export function WorldGrid({ children }: { children: ReactNode }) {
 export function WorldCard({
   children,
   onClick,
+  className,
 }: {
   children: ReactNode;
   onClick?: () => void;
+  className?: string;
 }) {
   return (
     <article
-      className="group flex items-start gap-2 min-w-0 border rounded-lg p-4 transition-all duration-300 hover:shadow-xl cursor-pointer flex-col data-[interactive=true]:cursor-pointer"
+      className={cn(
+        "group flex items-start gap-2 min-w-0 border rounded-lg p-4 transition-all duration-300 hover:shadow-xl cursor-pointer flex-col data-[interactive=true]:cursor-pointer",
+        className,
+      )}
       data-interactive={Boolean(onClick)}
       onClick={onClick}
     >
