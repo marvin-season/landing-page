@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@landing-page/design-system";
+import { cn } from "@landing-page/utils";
 import { History } from "lucide-react";
 import { useState } from "react";
 import { NovelComposerThinking } from "./novel-tool-trace";
@@ -40,9 +41,11 @@ function statusLabel(status: ThinkingHistoryEntry["status"]) {
 export function NovelThinkingHistoryButton({
   entries,
   onClear,
+  className,
 }: {
   entries: ThinkingHistoryEntry[];
   onClear?: () => void;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -53,7 +56,7 @@ export function NovelThinkingHistoryButton({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 gap-1.5 px-2 text-muted-foreground"
+          className={cn("h-8 gap-1.5 px-2 text-muted-foreground", className)}
         >
           <History className="size-3.5" />
           历史

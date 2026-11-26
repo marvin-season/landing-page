@@ -43,9 +43,9 @@ import {
   rewriteHint,
   stopGenerationHint,
 } from "./novel-action-tooltip";
+import { NovelComposerStatusBar } from "./novel-composer-status";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import { PromptHistoryDialog } from "./prompt-history-dialog";
-import { NovelThinkingHistoryButton } from "./thinking-history-panel";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
 
@@ -527,31 +527,30 @@ export function ChapterEditor({
       expandRequest={selectionExpand}
       onFocusInput={() => polishInput.current?.focus({ preventScroll: true })}
     >
-      <div className="mb-2 flex items-center justify-end pr-8">
-        <NovelThinkingHistoryButton
-          entries={writer.thinkingHistory}
-          onClear={writer.clearThinkingHistory}
-        />
-      </div>
-      {showPolishTrace ? (
-        <NovelComposerThinking
-          className="pr-8"
-          active={polishThinking}
-          label={
-            polishThinking
-              ? rewriteThinking
-                ? writer.toolCalls.length
-                  ? "挂载技法中…"
-                  : "思考中…"
-                : "正在润色…"
-              : "本次构思过程"
-          }
-          tools={writer.toolCalls}
-          phase={writer.runPhase}
-          hasProse={Boolean(writer.preview.trim())}
-          compact={Boolean(writer.preview.trim()) || !polishThinking}
-        />
-      ) : null}
+      <NovelComposerStatusBar
+        reserveCollapse={!polishThinking}
+        history={writer.thinkingHistory}
+        onClearHistory={writer.clearThinkingHistory}
+      >
+        {showPolishTrace ? (
+          <NovelComposerThinking
+            active={polishThinking}
+            label={
+              polishThinking
+                ? rewriteThinking
+                  ? writer.toolCalls.length
+                    ? "挂载技法中…"
+                    : "思考中…"
+                  : "正在润色…"
+                : "本次构思过程"
+            }
+            tools={writer.toolCalls}
+            phase={writer.runPhase}
+            hasProse={Boolean(writer.preview.trim())}
+            compact={Boolean(writer.preview.trim()) || !polishThinking}
+          />
+        ) : null}
+      </NovelComposerStatusBar>
       <ChapterRewriteForm
         embedded
         isPassage={isPassage}
@@ -930,32 +929,31 @@ export function ChapterEditor({
                   ) : null}
                   {generation?.kind === "chapter" ? (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-end">
-                        <NovelThinkingHistoryButton
-                          entries={writer.thinkingHistory}
-                          onClear={writer.clearThinkingHistory}
-                        />
-                      </div>
-                      {showChapterTrace ? (
-                        <NovelComposerThinking
-                          active={writer.busy}
-                          label={
-                            writer.busy
-                              ? writer.preview.trim()
-                                ? "正在生成…"
-                                : writer.toolCalls.length
-                                  ? "挂载技法中…"
-                                  : "思考中…"
-                              : "本次构思过程"
-                          }
-                          tools={writer.toolCalls}
-                          phase={writer.runPhase}
-                          hasProse={Boolean(writer.preview.trim())}
-                          compact={
-                            Boolean(writer.preview.trim()) || !writer.busy
-                          }
-                        />
-                      ) : null}
+                      <NovelComposerStatusBar
+                        history={writer.thinkingHistory}
+                        onClearHistory={writer.clearThinkingHistory}
+                      >
+                        {showChapterTrace ? (
+                          <NovelComposerThinking
+                            active={writer.busy}
+                            label={
+                              writer.busy
+                                ? writer.preview.trim()
+                                  ? "正在生成…"
+                                  : writer.toolCalls.length
+                                    ? "挂载技法中…"
+                                    : "思考中…"
+                                : "本次构思过程"
+                            }
+                            tools={writer.toolCalls}
+                            phase={writer.runPhase}
+                            hasProse={Boolean(writer.preview.trim())}
+                            compact={
+                              Boolean(writer.preview.trim()) || !writer.busy
+                            }
+                          />
+                        ) : null}
+                      </NovelComposerStatusBar>
                       {generation.renderForm({
                         disabled: ended || saving || editorBusy,
                         onGenerate: () => {
