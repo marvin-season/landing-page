@@ -261,7 +261,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
             <CollapsibleContent
               variant="collapse"
               inert={!atContentTop}
-              className="duration-[340ms]! ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="duration-340! ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               <RoomHeader
                 title={
@@ -338,7 +338,7 @@ export function WorldRoomView({ roomId }: { roomId: string }) {
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
                 >
-                  <div className="absolute inset-0 scale-90 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-10 blur-xs" />
+                  <div className="absolute inset-0 scale-80 bg-[url('/images/18/nekocosplay/01-go-play-yeri.webp')] bg-cover bg-center opacity-20 blur-xs" />
                 </div>
                 <NovelPanel
                   key={room.id}
