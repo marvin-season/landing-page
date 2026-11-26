@@ -53,6 +53,7 @@ import { NovelComposerThinking } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
+import { NovelThinkingHistoryButton } from "./thinking-history-panel";
 import { useChapterNavigation } from "./use-chapter-navigation";
 import { useNovel } from "./use-novel";
 import { useNovelNotifications } from "./use-novel-notifications";
@@ -624,6 +625,12 @@ export function NovelPanel({
         chapterGoalInput.current?.focus({ preventScroll: true })
       }
     >
+      <div className="mb-2 flex items-center justify-end pr-8">
+        <NovelThinkingHistoryButton
+          entries={writer.thinkingHistory}
+          onClear={writer.clearThinkingHistory}
+        />
+      </div>
       {showComposerTrace ? (
         <NovelComposerThinking
           className="pr-8"

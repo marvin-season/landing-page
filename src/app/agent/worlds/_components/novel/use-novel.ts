@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { worldRequest } from "@/lib/group-chat/client";
 import {
@@ -10,6 +10,7 @@ import {
 } from "@/lib/group-chat/model";
 import type {
   NovelRunPhase,
+  NovelRunStatus,
   NovelRunToolCall,
 } from "@/lib/group-chat/novel-run-contract";
 import type { ChapterDraftBackup } from "./chapter-draft-backup";
@@ -54,6 +55,12 @@ import {
   readPlotDraft,
 } from "./plot-edit";
 import { incompleteNovelDraftNotice } from "./restore-pending-result";
+import {
+  createThinkingHistoryStore,
+  sanitizeThinkingTools,
+  type ThinkingHistoryEntry,
+  thinkingHistoryLabel,
+} from "./thinking-history";
 import { addNovelCopy, useNovelStorage } from "./use-novel-storage";
 import { useNovelTask } from "./use-novel-task";
 
@@ -70,6 +77,9 @@ export function useNovel(
   const [preview, setPreview] = useState("");
   const [toolCalls, setToolCalls] = useState<NovelRunToolCall[]>([]);
   const [runPhase, setRunPhase] = useState<NovelRunPhase | undefined>();
+  const [thinkingHistory, setThinkingHistory] = useState<
+    ThinkingHistoryEntry[]
+  >([]);
   const [task, setTask] = useState<NovelTask>("chapter");
   const [generationStopped, setGenerationStopped] = useState(false);
   const [draftIncomplete, setDraftIncomplete] = useState(false);
@@ -127,6 +137,54 @@ export function useNovel(
       onPendingRestored(pending);
     },
   });
+
+  const thinkingHistoryStore = useMemo(
+    () => createThinkingHistoryStore(key),
+    [key],
+  );
+  useEffect(() => {
+    setThinkingHistory(thinkingHistoryStore.list());
+  }, [thinkingHistoryStore]);
+
+  function rememberThinking(
+    status: ThinkingHistoryEntry["status"],
+    snapshot?: NovelRunStatus,
+  ) {
+    const run = input.current;
+    if (!run || "plot" in run) return;
+    if (run.task !== "chapter" && run.task !== "rewrite") return;
+    const tools = sanitizeThinkingTools(snapshot?.tools ?? toolCalls);
+    const chapterTitle =
+      run.task === "chapter" && "draft" in run
+        ? run.draft.chapter.title
+        : run.task === "rewrite"
+          ? run.novel.chapters.find((chapter) => chapter.id === run.chapterId)
+              ?.title
+          : undefined;
+    const requirements =
+      run.task === "chapter" && "draft" in run
+        ? latest.current.chapterGoal
+        : undefined;
+    setThinkingHistory(
+      thinkingHistoryStore.append({
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        task: run.task,
+        label: thinkingHistoryLabel({
+          task: run.task,
+          chapterTitle,
+          isPassage: run.task === "rewrite" ? Boolean(run.range) : undefined,
+        }),
+        status,
+        phase:
+          snapshot?.phase ??
+          (tools.length || output.current.trim() ? "writing" : "preparing"),
+        tools,
+        requirements: requirements?.trim() || undefined,
+        error: snapshot?.error ?? null,
+      }),
+    );
+  }
 
   function end() {
     generating.current = false;
@@ -402,10 +460,16 @@ export function useNovel(
         setToolCalls(snapshot.tools ?? []);
         setRunPhase(snapshot.phase);
       }
-      if (snapshot?.status === "completed")
+      if (snapshot?.status === "completed") {
+        rememberThinking("completed", snapshot);
         complete(snapshot.incomplete, version);
-      else if (snapshot?.status === "cancelled") stopLocally();
-      else fail(message ?? snapshot?.error ?? "小说生成未完成。", version);
+      } else if (snapshot?.status === "cancelled") {
+        rememberThinking("cancelled", snapshot);
+        stopLocally();
+      } else {
+        rememberThinking("failed", snapshot);
+        fail(message ?? snapshot?.error ?? "小说生成未完成。", version);
+      }
 
       if (run !== input.current) return false;
       const isContinuation = run?.task === "chapter" && !("plot" in run);
@@ -719,6 +783,10 @@ export function useNovel(
     preview,
     toolCalls,
     runPhase,
+    thinkingHistory,
+    clearThinkingHistory() {
+      setThinkingHistory(thinkingHistoryStore.clear());
+    },
     task,
     generationStopped,
     draftIncomplete,

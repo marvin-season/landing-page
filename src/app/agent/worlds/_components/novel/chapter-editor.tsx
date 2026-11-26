@@ -45,6 +45,7 @@ import {
 } from "./novel-action-tooltip";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import { PromptHistoryDialog } from "./prompt-history-dialog";
+import { NovelThinkingHistoryButton } from "./thinking-history-panel";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
 
@@ -96,6 +97,8 @@ export function ChapterEditor({
     | "preview"
     | "toolCalls"
     | "runPhase"
+    | "thinkingHistory"
+    | "clearThinkingHistory"
   >;
   ended: boolean;
   compactContext: boolean;
@@ -524,6 +527,12 @@ export function ChapterEditor({
       expandRequest={selectionExpand}
       onFocusInput={() => polishInput.current?.focus({ preventScroll: true })}
     >
+      <div className="mb-2 flex items-center justify-end pr-8">
+        <NovelThinkingHistoryButton
+          entries={writer.thinkingHistory}
+          onClear={writer.clearThinkingHistory}
+        />
+      </div>
       {showPolishTrace ? (
         <NovelComposerThinking
           className="pr-8"
@@ -920,6 +929,12 @@ export function ChapterEditor({
                   ) : null}
                   {generation?.kind === "chapter" ? (
                     <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-end">
+                        <NovelThinkingHistoryButton
+                          entries={writer.thinkingHistory}
+                          onClear={writer.clearThinkingHistory}
+                        />
+                      </div>
                       {showChapterTrace ? (
                         <NovelComposerThinking
                           active={writer.busy}
