@@ -238,6 +238,7 @@ export type PlotDraft = { mode: PlotMode; chapters: Chapter[] };
 export function splitPlotAtOffset(
   edit: Extract<PlotEdit, { mode: "split" }>,
   offset: number,
+  newChapterId = crypto.randomUUID(),
 ): PlotDraft {
   const chapter = edit.range.chapters[0];
   const first = chapter.text.slice(0, offset);
@@ -254,7 +255,7 @@ export function splitPlotAtOffset(
     chapters: [
       { ...chapter, text: first },
       {
-        id: crypto.randomUUID(),
+        id: newChapterId,
         title: chapterTitle(edit.range.index + 1),
         text: second,
       },
@@ -302,7 +303,11 @@ export function replacePlotDraftText(
   };
 }
 
-export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
+export function readPlotDraft(
+  edit: PlotEdit,
+  output: string,
+  generatedChapterId?: string,
+): PlotDraft {
   const text = output.trim();
   if (!text) throw new Error("没有生成正文，请重试。");
   if (edit.mode === "split") {
@@ -316,7 +321,7 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
     const offset = chapter.text.indexOf(opening);
     if (offset <= 0 || chapter.text.lastIndexOf(opening) !== offset)
       throw new Error("拆分位置无法在原文中唯一定位，请重新生成。");
-    return splitPlotAtOffset(edit, offset);
+    return splitPlotAtOffset(edit, offset, generatedChapterId);
   }
   if (edit.mode !== "stitch") {
     if (text.length > maxChapterLength)
@@ -325,7 +330,7 @@ export function readPlotDraft(edit: PlotEdit, output: string): PlotDraft {
       mode: edit.mode,
       chapters: [
         {
-          id: crypto.randomUUID(),
+          id: generatedChapterId ?? crypto.randomUUID(),
           title:
             edit.mode === "insert"
               ? chapterTitle(edit.index)

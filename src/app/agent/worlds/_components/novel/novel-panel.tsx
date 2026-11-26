@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -23,7 +24,11 @@ import {
 } from "./background-controls";
 import type { ChapterDraftBackup } from "./chapter-draft-backup";
 import { ChapterEditor } from "./chapter-editor";
-import { observeChapterEditorDrafts } from "./chapter-editor-drafts";
+import {
+  observeChapterEditorDrafts,
+  readChapterEditorDraftRecord,
+  stageChapterHistoryDraft,
+} from "./chapter-editor-drafts";
 import {
   ChapterGenerationForm,
   type ChapterGenerationOptions,
@@ -40,11 +45,13 @@ import {
   chapterTitle,
   continuationIndex,
   exportNovel,
+  type Novel,
   type NovelWritingContext,
   removeChapter,
   replaceChapter,
 } from "./model";
 import { NewChapterDraftActions } from "./new-chapter-draft-actions";
+import { canStageHistoryPlan, type HistoryPlan } from "./novel-history-apply";
 import { NovelComposerThinking } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
@@ -90,6 +97,7 @@ export function NovelPanel({
     afterChapterId?: string | null;
     rewriteRange?: ChapterTextRange;
     manualNext?: boolean;
+    historySession?: string;
   } | null>(null);
   const [readingDuringGeneration, setReadingDuringGeneration] = useState(false);
   const [newChapterDraft, setNewChapterDraft] =
@@ -204,9 +212,27 @@ export function NovelPanel({
     readingDuringGeneration && editingChapter
       ? editingChapter.chapter.title
       : null;
+  const editorHasDraft = useRef(false);
+  const setEditorHasDraft = useCallback((blocked: boolean) => {
+    editorHasDraft.current = blocked;
+  }, []);
+  const stageHistory = useRef(stageHistoryDraft);
+  stageHistory.current = stageHistoryDraft;
+  const historyWorkspace = useMemo(
+    () => ({
+      roomKey,
+      book: novel,
+      lineage: writer.lineage,
+      error: writer.historyError,
+      stage: (source: Novel, plan: HistoryPlan, question: string) =>
+        stageHistory.current(source, plan, question),
+    }),
+    [novel, roomKey, writer.historyError, writer.lineage],
+  );
   usePublishThinkingHistory(
     writer.thinkingHistory,
     writer.clearThinkingHistory,
+    historyWorkspace,
   );
 
   useNovelNotifications({
@@ -328,6 +354,90 @@ export function NovelPanel({
   const chapterActionsLocked = disabled || writer.saving;
   const newChapterLocked = chapterActionsLocked || Boolean(newChapterDraft);
   const summarizing = writer.summarizingBackground;
+  async function stageHistoryDraft(
+    source: Novel,
+    plan: HistoryPlan,
+    question: string,
+  ) {
+    if (chapterActionsLocked || ended || !writer.isCurrentNovel(source))
+      throw new Error("当前无法打开这份草稿。请等当前操作结束或更新预览。");
+    if (editorHasDraft.current || writer.rewriteReady)
+      throw new Error("请先处理当前编辑器或剧情整理里的草稿。");
+    if (!canStageHistoryPlan(source, plan))
+      throw new Error("这份草稿超出章节字数限制，或插入位置已变化。");
+    const { before, after, index } = plan;
+    if (readingPanel.current)
+      readingScroll.current = readingPanel.current.scrollTop;
+    const result = after[0];
+    if (plan.plotMode) {
+      const existing = await Promise.all(
+        before.map(({ id }) => readChapterEditorDraftRecord(roomKey, id)),
+      );
+      if (existing.some((draft, i) => draft && draft.text !== before[i].text))
+        throw new Error("涉及的章节中有本机草稿，请先处理。");
+      const mode = plan.plotMode;
+      const ids = before.map(({ id }) => id);
+      const requirements =
+        question.trim() || (mode === "stitch" ? "使用历史粘合结果。" : "");
+      if (
+        !writer.stageHistoryPlot(
+          source,
+          ids,
+          { mode, chapters: after },
+          requirements,
+        )
+      )
+        throw new Error("正文已改动，或已有待应用的剧情草稿。");
+      setEditingChapter(null);
+      setPlotRestore({ mode, ids, requirements });
+      setPlotOpen(true);
+      return;
+    }
+    if (!before.length) {
+      if (newChapterDraft) throw new Error("请先处理已有的新章草稿。");
+      const afterChapterId = source.chapters[index - 1]?.id ?? null;
+      const draft = await writer.stageHistoryContinuation({
+        chapter: { ...result, text: "" },
+        afterChapterId,
+        text: result.text,
+        version: room.version,
+      });
+      if (!draft) throw new Error("请先处理已有的新章草稿。");
+      setNewChapterDraft(draft);
+      setEditingChapter({
+        chapter: draft.chapter,
+        mode: "chapter",
+        afterChapterId,
+        initialText: draft.text,
+        manualNext: true,
+      });
+    } else {
+      const base = before[0];
+      if (base.text === result.text)
+        throw new Error("当前正文已经是这个结果。");
+      if (
+        !(await stageChapterHistoryDraft(
+          roomKey,
+          base.id,
+          base.text,
+          result.text,
+        ))
+      )
+        throw new Error("目标章节已有本机草稿，请先处理。");
+      setEditingChapter({
+        chapter: base,
+        mode: "manual",
+        initialText: result.text,
+        historySession: crypto.randomUUID(),
+      });
+    }
+    setSelected(result.id);
+    setAppliedRewrite(undefined);
+    setPlotOpen(false);
+    setPlotRestore(null);
+    setReadingDuringGeneration(false);
+  }
+
   function reuseChapterGoal(text: string) {
     if (newChapterLocked || ended) return false;
     void writer.updateChapterGoal(text);
@@ -506,7 +616,7 @@ export function NovelPanel({
     } = editingChapter;
     return (
       <ChapterEditor
-        key={JSON.stringify([roomKey, base.id])}
+        key={JSON.stringify([roomKey, base.id, editingChapter.historySession])}
         roomKey={roomKey}
         base={base}
         chapters={novel.chapters}
@@ -538,6 +648,7 @@ export function NovelPanel({
         ended={ended}
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
+        onHistoryBlockedChange={setEditorHasDraft}
         onSave={async (draft) => {
           if (mode === "chapter") {
             const saved = await writer.saveChapterContinuation(
@@ -556,10 +667,20 @@ export function NovelPanel({
               ? await writer.saveChapterRewrite(draft)
               : await writer.update(replaceChapter(novel, draft), {
                   persistFirst: true,
-                  backupPrevious: Boolean(novel.checkpoint),
+                  backupPrevious:
+                    Boolean(novel.checkpoint) ||
+                    Boolean(
+                      (await readChapterEditorDraftRecord(roomKey, draft.id))
+                        ?.history,
+                    ),
+                  expectedNovel: novel,
                 });
           if (saved) {
-            setEditingChapter({ chapter: draft, mode: "manual" });
+            setEditingChapter({
+              chapter: draft,
+              mode: "manual",
+              historySession: editingChapter.historySession,
+            });
             if (mode === "rewrite" && !rewriteRange)
               setAppliedRewrite({
                 chapterId: draft.id,

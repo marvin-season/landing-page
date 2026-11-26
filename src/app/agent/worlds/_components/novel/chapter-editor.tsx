@@ -67,6 +67,7 @@ export function ChapterEditor({
   onRequestComposer,
   onBeginChapterRewrite,
   onDiscardRewrite,
+  onHistoryBlockedChange,
 }: {
   roomKey: string;
   base: Chapter;
@@ -94,6 +95,7 @@ export function ChapterEditor({
     | "preview"
     | "toolCalls"
     | "runPhase"
+    | "task"
   >;
   ended: boolean;
   compactContext: boolean;
@@ -107,6 +109,7 @@ export function ChapterEditor({
   onRewriteRequirementsChange: (requirements: string) => void;
   composerRequest: number;
   onDiscardRewrite: () => void;
+  onHistoryBlockedChange: (blocked: boolean) => void;
   onRequestComposer: () => void;
   onBeginChapterRewrite: (range?: ChapterTextRange) => boolean;
 }) {
@@ -197,6 +200,10 @@ export function ChapterEditor({
   const dirty =
     draftText !== base.text &&
     (!generatingDraft || !useGeneratedText || Boolean(draftText.trim()));
+  useLayoutEffect(() => {
+    onHistoryBlockedChange(dirty || draftUnavailable || draftWriting || saving);
+    return () => onHistoryBlockedChange(false);
+  }, [dirty, draftUnavailable, draftWriting, onHistoryBlockedChange, saving]);
   const exceedsLimit = draftText.length > maxChapterLength;
   const selectedRange =
     target ??

@@ -25,6 +25,7 @@ import {
   novelWritingContext,
   renameChapter as renameStoredChapter,
 } from "./model";
+import type { ChapterLineage } from "./novel-history-apply";
 import {
   loadServerNovel,
   restoreNovelBackup,
@@ -48,6 +49,7 @@ type NovelRecord = {
   key: string;
   novel: Novel;
   previous?: Novel;
+  lineage?: ChapterLineage[];
   version?: string;
 };
 const novels: Table<NovelRecord, string> = db.table("novels");
@@ -121,6 +123,7 @@ export function useNovelStorage(
   const [missingLocal, setMissingLocal] = useState(false);
   const [syncReadFailed, setSyncReadFailed] = useState(false);
   const [conflictedPlot, setConflictedPlot] = useState<Chapter[] | null>(null);
+  const [lineage, setLineage] = useState<ChapterLineage[]>([]);
   const latest = useRef(novel);
   const committed = useRef(novel);
   const storageVersion = useRef<string | undefined>(undefined);
@@ -174,6 +177,7 @@ export function useNovelStorage(
         if (!active) return;
         let novel = saved?.novel ?? createNovel(configRef.current);
         setMissingLocal(!saved);
+        setLineage(saved?.lineage ?? []);
         storageVersion.current = saved?.version;
         previousRef.current = saved?.previous;
         setHasLocalBackup(Boolean(saved?.previous));
@@ -273,8 +277,19 @@ export function useNovelStorage(
       touch = true,
       backupPrevious = false,
       restoreCheckpoint = false,
+      chapterLineage,
+      expectedNovel,
+    }: {
+      persistFirst?: boolean;
+      touch?: boolean;
+      backupPrevious?: boolean;
+      restoreCheckpoint?: boolean;
+      chapterLineage?: ChapterLineage[];
+      expectedNovel?: Novel;
     } = {},
   ) {
+    if (expectedNovel && expectedNovel !== latest.current)
+      return Promise.resolve(false);
     if (!restoreCheckpoint)
       next = invalidateEditedCheckpoint(latest.current, next);
     if (touch && exportNovel(latest.current) !== exportNovel(next)) {
@@ -291,12 +306,19 @@ export function useNovelStorage(
     const write = writes.current.then(async () => {
       const previous = backupPrevious ? committed.current : previousRef.current;
       const version = crypto.randomUUID();
-      await db.transaction("rw", novels, async () => {
+      const nextLineage = await db.transaction("rw", novels, async () => {
         const stored = await novels.get(key);
+        if (expectedNovel && expectedNovel !== latest.current)
+          throw new Error("正文已修改，请重新打开历史预览。");
         if (stored?.version !== storageVersion.current)
           throw new Error(changedInAnotherTab);
-        await novels.put({ key, novel: next, previous, version });
+        const lineage = chapterLineage?.length
+          ? [...(stored?.lineage ?? []), ...chapterLineage]
+          : stored?.lineage;
+        await novels.put({ key, novel: next, previous, version, lineage });
+        return lineage;
       });
+      if (chapterLineage?.length && nextLineage) setLineage(nextLineage);
       committed.current = next;
       storageVersion.current = version;
       previousRef.current = previous;
@@ -357,6 +379,7 @@ export function useNovelStorage(
 
   return {
     key,
+    lineage,
     storageVersion,
     missingLocal,
     syncReadFailed,

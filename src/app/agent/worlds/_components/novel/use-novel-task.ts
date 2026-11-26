@@ -20,6 +20,7 @@ type ActiveRun<T> = {
   stopping?: boolean;
   following?: boolean;
   terminal?: boolean;
+  lastCheckpoint?: number;
 };
 
 export function useNovelTask<T>({
@@ -30,6 +31,8 @@ export function useNovelTask<T>({
   onTools,
   onPhase,
   onResult,
+  onStart,
+  onProgress,
   onError,
 }: {
   key: string;
@@ -39,10 +42,15 @@ export function useNovelTask<T>({
   onTools?: (tools: NonNullable<NovelRunStatus["tools"]>) => void;
   onPhase?: (phase: NovelRunStatus["phase"]) => void;
   onResult: (
-    version: number,
+    entry: NovelRunRecord<T>,
     snapshot?: NovelRunStatus,
     error?: string,
   ) => Promise<boolean>;
+  onStart: (entry: NovelRunRecord<T>) => Promise<void>;
+  onProgress: (
+    entry: NovelRunRecord<T>,
+    snapshot: NovelRunStatus,
+  ) => Promise<void>;
   onError: (message: string) => void;
 }) {
   const [checkedKey, setCheckedKey] = useState<string>();
@@ -80,13 +88,12 @@ export function useNovelTask<T>({
     operation.terminal = true;
     setReconnecting(false);
     try {
-      const saved = onResult(
-        operation.entry.request.version,
-        snapshot,
-        message,
-      );
+      const saved = onResult(operation.entry, snapshot, message);
       // The result can synchronously start another compression batch.
-      if (session.active !== operation) return;
+      if (session.active !== operation) {
+        await saved;
+        return;
+      }
       await queueJournal(async () => {
         if (
           !(await saved) ||
@@ -120,6 +127,11 @@ export function useNovelTask<T>({
           onText(snapshot.text);
           onTools?.(snapshot.tools ?? []);
           onPhase?.(snapshot.phase);
+          const now = Date.now();
+          if (snapshot.text && now - (operation.lastCheckpoint ?? 0) >= 3000) {
+            operation.lastCheckpoint = now;
+            void onProgress(entry, snapshot).catch(() => {});
+          }
         } else void deliver(operation, snapshot);
       },
     })
@@ -157,6 +169,7 @@ export function useNovelTask<T>({
         throw new Error("另一页面正在处理此作品的生成，请刷新后查看。");
       session.journalId = entry.request.runId;
       operation.persisted = true;
+      await onStart(entry);
       if (
         !operation.controller.signal.aborted &&
         !operation.terminal &&

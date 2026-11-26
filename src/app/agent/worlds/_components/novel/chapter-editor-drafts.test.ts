@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   readChapterEditorDraft,
+  readChapterEditorDraftRecord,
+  stageChapterHistoryDraft,
   writeChapterEditorDraft,
 } from "./chapter-editor-drafts";
 
@@ -28,4 +30,28 @@ test("successive autosaves keep the latest text", async () => {
     writeChapterEditorDraft(room, "one", "Latest edit"),
   ]);
   assert.equal(await readChapterEditorDraft(room, "one"), "Latest edit");
+});
+
+test("staging historical changes respects existing drafts and records the source for later confirmation", async () => {
+  const key = "author:history";
+  await writeChapterEditorDraft(key, "one", "Writer's draft", "Current prose");
+  assert.equal(
+    await stageChapterHistoryDraft(key, "one", "Current prose", "Old result"),
+    false,
+  );
+  assert.equal(await readChapterEditorDraft(key, "one"), "Writer's draft");
+  await writeChapterEditorDraft(key, "one", undefined);
+  assert.equal(
+    await stageChapterHistoryDraft(key, "one", "Current prose", "Old result"),
+    true,
+  );
+  await writeChapterEditorDraft(
+    key,
+    "one",
+    "Edited old result",
+    "Current prose",
+  );
+  const draft = await readChapterEditorDraftRecord(key, "one");
+  assert.equal(draft?.history, true);
+  assert.equal(draft?.baseText, "Current prose");
 });

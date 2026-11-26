@@ -48,9 +48,13 @@ function DiffCell({
 export function ChapterDiffView({
   base,
   draft,
+  baseLabel = "原稿",
+  draftLabel = "草稿",
 }: {
   base: Chapter;
   draft: Chapter;
+  baseLabel?: string;
+  draftLabel?: string;
 }) {
   const rows = useMemo(
     () => buildChapterDiff(base.text, draft.text),
@@ -61,9 +65,9 @@ export function ChapterDiffView({
     <div className="flex min-h-48 min-w-0 flex-1 flex-col overflow-hidden bg-background">
       <div className="grid shrink-0 grid-cols-2 border-b border-border bg-muted/40 text-sm font-medium">
         <div className="border-r border-border px-3 py-1 text-muted-foreground">
-          原稿
+          {baseLabel}
         </div>
-        <div className="px-3 py-1">草稿</div>
+        <div className="px-3 py-1">{draftLabel}</div>
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         <div className="grid min-w-2xl grid-cols-2">

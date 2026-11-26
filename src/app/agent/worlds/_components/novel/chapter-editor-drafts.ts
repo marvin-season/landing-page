@@ -5,6 +5,7 @@ type EditorDraft = {
   chapterId: string;
   text: string;
   baseText?: string;
+  history?: boolean;
 };
 
 const db = new Dexie("world-novel-editor-drafts");
@@ -38,6 +39,32 @@ export async function writeChapterEditorDraft(
   text: string | undefined,
   baseText?: string,
 ) {
-  if (text === undefined) await drafts.delete([roomKey, chapterId]);
-  else await drafts.put({ roomKey, chapterId, text, baseText });
+  if (text === undefined) {
+    await drafts.delete([roomKey, chapterId]);
+    return;
+  }
+  await db.transaction("rw", drafts, async () => {
+    const current = await drafts.get([roomKey, chapterId]);
+    await drafts.put({
+      roomKey,
+      chapterId,
+      text,
+      baseText,
+      history: current?.history,
+    });
+  });
+}
+
+export async function stageChapterHistoryDraft(
+  roomKey: string,
+  chapterId: string,
+  baseText: string,
+  text: string,
+) {
+  return db.transaction("rw", drafts, async () => {
+    const current = await drafts.get([roomKey, chapterId]);
+    if (current && current.text !== baseText) return false;
+    await drafts.put({ roomKey, chapterId, baseText, text, history: true });
+    return true;
+  });
 }

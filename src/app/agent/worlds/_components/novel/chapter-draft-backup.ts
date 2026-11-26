@@ -14,6 +14,7 @@ const draftSchema = z.object({
   version: z.number().int(),
   afterChapterId: z.string().min(1).nullable().optional(),
   manual: z.boolean().optional(),
+  history: z.boolean().optional(),
 });
 
 export type ChapterDraftBackup = z.infer<typeof draftSchema>;
@@ -73,6 +74,26 @@ export function createChapterDraftBackup(
     },
     start(next: Omit<ChapterDraftBackup, "text" | "mode">) {
       replacement = { ...next, mode: "chapter", text: "" };
+    },
+    async stageHistory(
+      next: Omit<ChapterDraftBackup, "mode" | "manual" | "history">,
+    ) {
+      if (draft?.text.trim() || replacement) return null;
+      const staged: ChapterDraftBackup = {
+        ...next,
+        mode: "chapter",
+        manual: true,
+        history: true,
+      };
+      const saved = await db.transaction("rw", continuations, async () => {
+        const stored = await continuations.get(roomKey);
+        if (stored?.text.trim()) return false;
+        await continuations.put({ ...staged, roomKey });
+        return true;
+      });
+      if (!saved) return null;
+      draft = staged;
+      return staged;
     },
     current() {
       return draft;

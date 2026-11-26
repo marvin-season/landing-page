@@ -12,6 +12,7 @@ import {
   replaceChapter,
   rewritePrompt,
 } from "./model";
+import { plotLineage } from "./novel-history-apply";
 import type { ChapterRun, Compression, NovelRun } from "./novel-run";
 import {
   applyPlotDraft,
@@ -144,7 +145,7 @@ export function createNovelChapterActions({
         brief && brief === current.chapterGoal.trim()
           ? { ...next, chapterGoal: "" }
           : next,
-        { persistFirst: true },
+        { persistFirst: true, backupPrevious: Boolean(cached?.history) },
       ))
     )
       return null;
@@ -278,6 +279,36 @@ export function createNovelChapterActions({
     }
   }
 
+  function stageHistoryPlot(
+    source: Novel,
+    ids: PlotSelection,
+    draft: PlotDraft,
+    requirements: string,
+  ) {
+    if (generating.current || source !== latest.current || pendingBackup.read())
+      return false;
+    const plot = preparePlotEdit(
+      room.config,
+      source,
+      ids,
+      draft.mode,
+      requirements,
+      draft.mode === "split",
+    );
+    const run = {
+      task: "rewrite",
+      plot,
+      plotIds: ids,
+      plotRequirements: requirements,
+      novel: source,
+      version: room.version,
+      storageVersion: storageVersion.current ?? "legacy",
+    } as const;
+    input.current = run;
+    keepPlotDraft(run, draft);
+    return true;
+  }
+
   function editPlotDraftText(index: number, text: string) {
     const run = input.current;
     if (!run || !("plot" in run) || !plotDraft || generating.current) return;
@@ -315,7 +346,18 @@ export function createNovelChapterActions({
     generating.current = true;
     try {
       const next = applyPlotDraft(captured.novel, captured.plot, plotDraft);
-      if (!(await update(next, { persistFirst: true, backupPrevious: true }))) {
+      const sources =
+        captured.plot.mode === "merge" || captured.plot.mode === "split"
+          ? captured.plot.range.chapters
+          : [];
+      if (
+        !(await update(next, {
+          persistFirst: true,
+          backupPrevious: true,
+          chapterLineage: plotLineage(sources, plotDraft),
+          expectedNovel: captured.novel,
+        }))
+      ) {
         return null;
       }
     } finally {
@@ -334,6 +376,7 @@ export function createNovelChapterActions({
     saveChapterRewrite,
     editPlot,
     editPlotDraftText,
+    stageHistoryPlot,
     applyPlot,
   };
 }

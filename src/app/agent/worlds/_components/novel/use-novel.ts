@@ -10,7 +10,6 @@ import {
 } from "@/lib/group-chat/model";
 import type {
   NovelRunPhase,
-  NovelRunStatus,
   NovelRunToolCall,
 } from "@/lib/group-chat/novel-run-contract";
 import type { ChapterDraftBackup } from "./chapter-draft-backup";
@@ -39,6 +38,10 @@ import {
 } from "./model";
 import { createNovelChapterActions } from "./novel-chapter-actions";
 import {
+  archiveNovelRunOutput,
+  archiveNovelRunStart,
+} from "./novel-history-run";
+import {
   type ChapterRun,
   type Compression,
   editableNovelState,
@@ -57,10 +60,7 @@ import {
 import { incompleteNovelDraftNotice } from "./restore-pending-result";
 import {
   createThinkingHistoryStore,
-  sanitizeThinkingTools,
   type ThinkingHistoryEntry,
-  thinkingHistoryAnswer,
-  thinkingHistoryLabel,
 } from "./thinking-history";
 import { addNovelCopy, useNovelStorage } from "./use-novel-storage";
 import { useNovelTask } from "./use-novel-task";
@@ -74,6 +74,7 @@ export function useNovel(
   onRunRestored: (run: RestoredNovelRun) => void = () => {},
 ) {
   const [error, setError] = useState("");
+  const [historyError, setHistoryError] = useState("");
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
   const [toolCalls, setToolCalls] = useState<NovelRunToolCall[]>([]);
@@ -100,6 +101,7 @@ export function useNovel(
   currentRoom.current = room;
   const {
     key,
+    lineage,
     storageVersion,
     missingLocal,
     syncReadFailed,
@@ -149,51 +151,6 @@ export function useNovel(
   const clearThinkingHistory = useCallback(() => {
     setThinkingHistory(thinkingHistoryStore.clear());
   }, [thinkingHistoryStore]);
-
-  function rememberThinking(
-    status: ThinkingHistoryEntry["status"],
-    snapshot?: NovelRunStatus,
-  ) {
-    const run = input.current;
-    if (!run || "plot" in run) return;
-    if (run.task !== "chapter" && run.task !== "rewrite") return;
-    const tools = sanitizeThinkingTools(snapshot?.tools ?? toolCalls);
-    const chapterTitle =
-      run.task === "chapter" && "draft" in run
-        ? run.draft.chapter.title
-        : run.task === "rewrite"
-          ? run.novel.chapters.find((chapter) => chapter.id === run.chapterId)
-              ?.title
-          : undefined;
-    const question =
-      run.task === "chapter" && "draft" in run
-        ? run.draft.chapter.brief?.trim() ||
-          latest.current.chapterGoal.trim() ||
-          ""
-        : run.task === "rewrite"
-          ? run.requirements?.trim() || ""
-          : "";
-    setThinkingHistory(
-      thinkingHistoryStore.append({
-        id: crypto.randomUUID(),
-        createdAt: Date.now(),
-        task: run.task,
-        label: thinkingHistoryLabel({
-          task: run.task,
-          chapterTitle,
-          isPassage: run.task === "rewrite" ? Boolean(run.range) : undefined,
-        }),
-        status,
-        phase:
-          snapshot?.phase ??
-          (tools.length || output.current.trim() ? "writing" : "preparing"),
-        tools,
-        question: question || undefined,
-        answer: thinkingHistoryAnswer({ tools, status }),
-        error: snapshot?.error ?? null,
-      }),
-    );
-  }
 
   function end() {
     generating.current = false;
@@ -247,7 +204,7 @@ export function useNovel(
     }
     setPreview(text);
   }
-  function complete(cutShort: boolean, version: number) {
+  function complete(cutShort: boolean, version: number, runId: string) {
     const text = output.current.trim();
     const captured = input.current;
     if (captured?.task === "summary" && "batch" in captured) {
@@ -316,7 +273,11 @@ export function useNovel(
     const cutShortNotice = incompleteNovelDraftNotice;
     if ("plot" in captured) {
       try {
-        keepPlotDraft(captured, readPlotDraft(captured.plot, text), cutShort);
+        keepPlotDraft(
+          captured,
+          readPlotDraft(captured.plot, text, runId),
+          cutShort,
+        );
       } catch (error) {
         setDraftIncomplete(false);
         setError(error instanceof Error ? error.message : "无法读取剧情草稿。");
@@ -462,7 +423,37 @@ export function useNovel(
     onText: receiveText,
     onTools: setToolCalls,
     onPhase: setRunPhase,
-    async onResult(version, snapshot, message) {
+    async onStart(entry) {
+      try {
+        await archiveNovelRunStart(entry);
+      } catch {
+        setHistoryError("本机历史写入失败，请检查浏览器存储空间。");
+      }
+    },
+    onProgress: archiveNovelRunOutput,
+    async onResult(entry, snapshot, message) {
+      const { version, runId } = entry.request;
+      const archive = archiveNovelRunOutput(
+        entry,
+        snapshot ?? {
+          status: "failed",
+          text: output.current,
+          incomplete: Boolean(output.current.trim()),
+          tools: toolCalls,
+          error: message ?? null,
+        },
+      ).then(
+        () => {
+          setHistoryError("");
+          return true;
+        },
+        () => {
+          setHistoryError(
+            "本次结果未能存入历史，请保留草稿并检查浏览器存储空间。",
+          );
+          return false;
+        },
+      );
       const run = input.current;
       if (snapshot) {
         receiveText(snapshot.text);
@@ -470,17 +461,14 @@ export function useNovel(
         setRunPhase(snapshot.phase);
       }
       if (snapshot?.status === "completed") {
-        rememberThinking("completed", snapshot);
-        complete(snapshot.incomplete, version);
+        complete(snapshot.incomplete, version, runId);
       } else if (snapshot?.status === "cancelled") {
-        rememberThinking("cancelled", snapshot);
         stopLocally();
       } else {
-        rememberThinking("failed", snapshot);
         fail(message ?? snapshot?.error ?? "小说生成未完成。", version);
       }
 
-      if (run !== input.current) return false;
+      if (run !== input.current) return archive;
       const isContinuation = run?.task === "chapter" && !("plot" in run);
       const draftSaved = persistRewrite(
         snapshot?.status !== "completed" || snapshot.incomplete,
@@ -489,7 +477,7 @@ export function useNovel(
         !isContinuation ||
         !output.current.trim() ||
         (await backup.checkpoint()) !== undefined;
-      return draftSaved && chapterSaved;
+      return (await archive) && draftSaved && chapterSaved;
     },
     onRestore(entry) {
       const current = latest.current;
@@ -743,7 +731,7 @@ export function useNovel(
 
   const chapterActions = createNovelChapterActions({
     room,
-    storage: { key, latest, storageVersion, backup, pendingBackup, update },
+    storage: { latest, storageVersion, backup, pendingBackup, update },
     ready,
     generating,
     input,
@@ -763,6 +751,9 @@ export function useNovel(
   return {
     ...chapterActions,
     novel,
+    lineage,
+    stageHistoryContinuation: backup.stageHistory,
+    isCurrentNovel: (source: Novel) => latest.current === source,
     missingLocal,
     syncReadFailed,
     conflictedPlot,
@@ -772,7 +763,9 @@ export function useNovel(
     updateContext,
     ready,
     loadFailed,
-    error: reconnecting ? "连接已断开，正在重连原生成任务…" : error,
+    error: reconnecting
+      ? "连接已断开，正在重连原生成任务…"
+      : error || historyError,
     syncPrompt,
     serverSynced,
     hasLocalBackup,
@@ -793,6 +786,7 @@ export function useNovel(
     toolCalls,
     runPhase,
     thinkingHistory,
+    historyError,
     clearThinkingHistory,
     task,
     generationStopped,

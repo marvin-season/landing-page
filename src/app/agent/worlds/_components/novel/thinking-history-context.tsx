@@ -8,9 +8,20 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { Novel } from "./model";
+import type { ChapterLineage, HistoryPlan } from "./novel-history-apply";
 import type { ThinkingHistoryEntry } from "./thinking-history";
 
+export type NovelHistoryWorkspace = {
+  roomKey: string;
+  book: Novel;
+  lineage: ChapterLineage[];
+  error: string;
+  stage: (source: Novel, plan: HistoryPlan, question: string) => Promise<void>;
+};
+
 type ThinkingHistoryApi = {
+  workspace?: NovelHistoryWorkspace;
   entries: ThinkingHistoryEntry[];
   clear: () => void;
 };
@@ -39,13 +50,14 @@ export function NovelThinkingHistoryProvider({
 export function usePublishThinkingHistory(
   entries: ThinkingHistoryEntry[],
   clear: () => void,
+  workspace: NovelHistoryWorkspace,
 ) {
   const setApi = useContext(ThinkingHistoryContext)?.setApi;
   useEffect(() => {
     if (!setApi) return;
-    setApi({ entries, clear });
+    setApi({ entries, clear, workspace });
     return () => setApi(null);
-  }, [clear, entries, setApi]);
+  }, [clear, entries, setApi, workspace]);
 }
 
 export function useThinkingHistory() {
