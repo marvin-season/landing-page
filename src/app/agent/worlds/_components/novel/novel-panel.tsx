@@ -1,27 +1,7 @@
 "use client";
 
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@landing-page/design-system";
-import { cn } from "@landing-page/utils";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Combine,
-  Ellipsis,
-  LoaderCircle,
-  PenLine,
-  Square,
-  Trash2,
-} from "lucide-react";
+import { Alert, AlertDescription, Button } from "@landing-page/design-system";
+import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -48,29 +28,25 @@ import {
   type ChapterGenerationOptions,
   EmptyNovelContinuation,
 } from "./chapter-generation-form";
-import { ChapterIndex, type ChapterIndexEntry } from "./chapter-index";
+import type { ChapterIndexEntry } from "./chapter-index";
 import { useRegisterPromptReuse } from "./chapter-prompt-reuse";
+import { ChapterReadingToolbar } from "./chapter-reading-toolbar";
 import { ChapterReading } from "./chapter-rewrite";
 import { type ChapterTextRange, replaceTextRange } from "./chapter-text";
 import { ContextControls } from "./context-controls";
 import {
   type Chapter,
-  chapterLengthShortfall,
   chapterTitle,
   continuationIndex,
   exportNovel,
-  formatChapterLength,
   type NovelWritingContext,
   removeChapter,
   replaceChapter,
 } from "./model";
 import { NewChapterDraftActions } from "./new-chapter-draft-actions";
 import {
-  localActionHint,
-  NovelActionButton,
   NovelActionTooltip,
   nextChapterActionHint,
-  stopGenerationHint,
 } from "./novel-action-tooltip";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
@@ -270,7 +246,6 @@ export function NovelPanel({
     "草稿尚未应用，确定离开吗？",
   );
   const chapterMenuTrigger = useRef<HTMLButtonElement>(null);
-  const openPlotAfterMenuClose = useRef(false);
   const selectedIndex = novel.chapters.findIndex(
     (item) => item.id === selected,
   );
@@ -733,127 +708,36 @@ export function NovelPanel({
               ref={chapterAnchor}
               className="flex flex-col gap-4 min-h-[calc(100cqh-var(--reading-bottom-padding))]"
             >
-              <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 p-2 -mx-2 backdrop-blur-xs">
-                <ChapterIndex
-                  chapters={chapterEntries}
-                  value={thinkingChapter?.id ?? readingChapterId ?? ""}
-                  disabled={chapterSwitchLocked}
-                  onSelect={goToChapter}
-                />
-                {chapter && !thinkingChapter && !showingNewDraft ? (
-                  <p
-                    className={cn(
-                      "shrink-0 whitespace-nowrap text-xs tabular-nums",
-                      chapterLengthShortfall(
-                        chapter.text.length,
-                        chapter.targetWords ?? "",
-                      )
-                        ? "text-amber-700 dark:text-amber-400"
-                        : "text-muted-foreground",
-                    )}
-                  >
-                    {formatChapterLength(
-                      chapter.text.length,
-                      chapter.targetWords ?? "",
-                    )}
-                    {hasDraft(chapter) ? (
-                      <span className="ml-2 font-medium text-destructive">
-                        草稿未同步，点击「编辑本章」进入
-                      </span>
-                    ) : null}
-                  </p>
-                ) : null}
-                <div className="ml-auto flex shrink-0 items-center gap-2">
-                  {thinkingChapter ? (
-                    <NovelActionButton
-                      hint={stopGenerationHint}
-                      size="sm"
-                      variant="outline"
-                      className="h-9"
-                      onClick={writer.stop}
-                    >
-                      <Square data-icon="inline-start" />
-                      停止生成
-                    </NovelActionButton>
-                  ) : chapter && !showingNewDraft ? (
-                    <>
-                      <NovelActionButton
-                        hint={localActionHint(
-                          "打开本章编辑器，并恢复已有的本机草稿。",
-                        )}
-                        size="sm"
-                        variant="outline"
-                        className="h-9"
-                        disabled={chapterActionsLocked}
-                        onClick={() => {
-                          readingScroll.current =
-                            readingPanel.current?.scrollTop ?? 0;
-                          writer.discardRewrite();
-                          setEditingChapter({ chapter, mode: "manual" });
-                        }}
-                      >
-                        <PenLine data-icon="inline-start" />
-                        编辑本章
-                      </NovelActionButton>
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            ref={chapterMenuTrigger}
-                            size="sm"
-                            variant="outline"
-                            className="h-9"
-                            disabled={chapterActionsLocked}
-                          >
-                            <Ellipsis data-icon="inline-start" />
-                            章节操作
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="min-w-44"
-                          onCloseAutoFocus={(event) => {
-                            if (!openPlotAfterMenuClose.current) return;
-                            openPlotAfterMenuClose.current = false;
-                            event.preventDefault();
-                            writer.discardRewrite();
-                            setPlotOpen(true);
-                          }}
-                        >
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              disabled={
-                                chapterActionsLocked ||
-                                ended ||
-                                Boolean(newChapterDraft)
-                              }
-                              onSelect={() => {
-                                openPlotAfterMenuClose.current = true;
-                              }}
-                            >
-                              <Combine />
-                              剧情整理
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              disabled={
-                                chapterActionsLocked ||
-                                newChapterDraft?.afterChapterId === chapter.id
-                              }
-                              onSelect={() => void deleteChapter()}
-                            >
-                              <Trash2 />
-                              删除本章
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </>
-                  ) : null}
-                </div>
-              </div>
+              <ChapterReadingToolbar
+                chapter={chapter}
+                chapterEntries={chapterEntries}
+                chapterId={thinkingChapter?.id ?? readingChapterId ?? ""}
+                thinking={waitingForText}
+                showingNewDraft={showingNewDraft}
+                hasDraft={Boolean(chapter && hasDraft(chapter))}
+                switchLocked={chapterSwitchLocked}
+                actionsLocked={chapterActionsLocked}
+                plotLocked={
+                  chapterActionsLocked || ended || Boolean(newChapterDraft)
+                }
+                deleteLocked={
+                  chapterActionsLocked ||
+                  newChapterDraft?.afterChapterId === chapter?.id
+                }
+                menuTrigger={chapterMenuTrigger}
+                onSelectChapter={goToChapter}
+                onStop={writer.stop}
+                onEditChapter={(chapter) => {
+                  readingScroll.current = readingPanel.current?.scrollTop ?? 0;
+                  writer.discardRewrite();
+                  setEditingChapter({ chapter, mode: "manual" });
+                }}
+                onOpenPlot={() => {
+                  writer.discardRewrite();
+                  setPlotOpen(true);
+                }}
+                onDeleteChapter={() => void deleteChapter()}
+              />
               {thinkingChapter ? (
                 <p
                   role="status"
