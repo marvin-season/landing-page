@@ -3,7 +3,9 @@ import { test } from "node:test";
 import {
   maxWritingSkillsCharacters,
   normalizeSkillIds,
+  resolveWritingSkillCatalog,
   resolveWritingSkills,
+  writingSkillCatalogField,
   writingSkills,
   writingSkillsField,
 } from "./writing-skills";
@@ -44,6 +46,16 @@ test("resolveWritingSkills filters by scope and stays within the shared budget",
   assert.equal(
     writingSkillsField(["scene-driven"], "plot").skills?.[0]?.id,
     "scene-driven",
+  );
+  assert.deepEqual(
+    resolveWritingSkillCatalog([], "chapter").map(({ id }) => id),
+    ["scene-driven", "dialogue-first", "chapter-hook"],
+  );
+  assert.deepEqual(
+    writingSkillCatalogField(["dialogue-first"], "rewrite").skillCatalog?.map(
+      ({ id }) => id,
+    ),
+    ["dialogue-first"],
   );
   const total = writingSkills.reduce(
     (sum, skill) => sum + skill.instructions.length,

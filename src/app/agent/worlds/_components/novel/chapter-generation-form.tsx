@@ -122,7 +122,7 @@ export function ChapterGenerationForm({
         disabled={disabled}
         skills={skills}
         onSkillsChange={onSkillsChange}
-        placeholder="可指定本章事件、伏笔、结尾或情绪；输入 / 选择写作技法。"
+        placeholder="可指定本章事件、伏笔、结尾或情绪；输入 / 限定 Writer 可选用的技法。"
         onChange={(event) =>
           onChange({ ...options, chapterGoal: event.target.value })
         }
@@ -243,7 +243,7 @@ export function ChapterRewriteForm({
         disabled={disabled}
         skills={skills}
         onSkillsChange={onSkillsChange}
-        placeholder="润色指令（选填）；输入 / 选择写作技法"
+        placeholder="润色指令（选填）；输入 / 限定 Writer 可选用的技法"
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
           if (!disabled && event.key === "Escape") onCancel?.();

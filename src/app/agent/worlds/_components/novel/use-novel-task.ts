@@ -27,6 +27,7 @@ export function useNovelTask<T>({
   storageReady,
   onRestore,
   onText,
+  onTools,
   onResult,
   onError,
 }: {
@@ -34,6 +35,7 @@ export function useNovelTask<T>({
   storageReady: boolean;
   onRestore: (entry: NovelRunRecord<T>) => boolean;
   onText: (text: string) => void;
+  onTools?: (tools: NonNullable<NovelRunStatus["tools"]>) => void;
   onResult: (
     version: number,
     snapshot?: NovelRunStatus,
@@ -112,8 +114,10 @@ export function useNovelTask<T>({
       onConnection: setReconnecting,
       onUpdate(snapshot) {
         if (session.active !== operation || operation.terminal) return;
-        if (snapshot.status === "running") onText(snapshot.text);
-        else void deliver(operation, snapshot);
+        if (snapshot.status === "running") {
+          onText(snapshot.text);
+          onTools?.(snapshot.tools ?? []);
+        } else void deliver(operation, snapshot);
       },
     })
       .catch((error: unknown) => {

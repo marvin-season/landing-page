@@ -20,14 +20,18 @@ function worldAgent(purpose: WorldAgentPurpose, name: string): Agent {
           : undefined,
         // The provider omits tool_choice when no tools are registered. The
         // local agent proxy still needs an explicit opt-out of upstream tools.
-        fetch: (url, init) =>
-          fetch(url, {
+        // When the request already carries tools (novel Writer skills), keep
+        // the SDK/Mastra tool_choice so the model can call them.
+        fetch: (url, init) => {
+          const body = JSON.parse(String(init?.body));
+          const hasTools = Array.isArray(body.tools) && body.tools.length > 0;
+          return fetch(url, {
             ...init,
-            body: JSON.stringify({
-              ...JSON.parse(String(init?.body)),
-              tool_choice: "none",
-            }),
-          }),
+            body: JSON.stringify(
+              hasTools ? body : { ...body, tool_choice: "none" },
+            ),
+          });
+        },
       }).chatModel(requestContext.get("model") as string),
     maxRetries: 0,
     // group-chat owns history and summaries. Automatic memory must not mix roles.

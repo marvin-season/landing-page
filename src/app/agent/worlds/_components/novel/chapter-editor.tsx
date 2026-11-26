@@ -43,6 +43,7 @@ import {
   rewriteHint,
   stopGenerationHint,
 } from "./novel-action-tooltip";
+import { NovelToolTrace } from "./novel-tool-trace";
 import { PromptHistoryDialog } from "./prompt-history-dialog";
 import { useChapterEditorDraft } from "./use-chapter-editor-draft";
 import type { useNovel } from "./use-novel";
@@ -93,6 +94,7 @@ export function ChapterEditor({
     | "error"
     | "stop"
     | "preview"
+    | "toolCalls"
   >;
   ended: boolean;
   compactContext: boolean;
@@ -619,7 +621,9 @@ export function ChapterEditor({
             >
               {generation && editorBusy
                 ? rewriteThinking
-                  ? "思考中…"
+                  ? writer.toolCalls.length
+                    ? "挂载技法中…"
+                    : "思考中…"
                   : draftText
                     ? "正在生成…"
                     : "等待输出…"
@@ -741,6 +745,14 @@ export function ChapterEditor({
           </section>
         ) : (
           <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-5 py-4 sm:px-8">
+            {rewriteThinking ||
+            (generation && writer.busy && writer.toolCalls.length) ? (
+              <NovelToolTrace
+                className="mb-3"
+                tools={writer.toolCalls}
+                compact={Boolean(writer.preview.trim())}
+              />
+            ) : null}
             <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
               <div
                 className={cn(

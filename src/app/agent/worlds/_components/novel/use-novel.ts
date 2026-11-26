@@ -8,6 +8,7 @@ import {
   type WorldConfig,
   type WorldRoom,
 } from "@/lib/group-chat/model";
+import type { NovelRunToolCall } from "@/lib/group-chat/novel-run-contract";
 import type { ChapterDraftBackup } from "./chapter-draft-backup";
 import {
   type CompressionOptions,
@@ -64,6 +65,7 @@ export function useNovel(
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
+  const [toolCalls, setToolCalls] = useState<NovelRunToolCall[]>([]);
   const [task, setTask] = useState<NovelTask>("chapter");
   const [generationStopped, setGenerationStopped] = useState(false);
   const [draftIncomplete, setDraftIncomplete] = useState(false);
@@ -357,6 +359,7 @@ export function useNovel(
     pendingBackup.clear();
     output.current = "";
     setPreview("");
+    setToolCalls([]);
     generating.current = true;
     setBusy(true);
     onBusyChange(true);
@@ -385,9 +388,13 @@ export function useNovel(
     storageReady,
     onError: setError,
     onText: receiveText,
+    onTools: setToolCalls,
     async onResult(version, snapshot, message) {
       const run = input.current;
-      if (snapshot) receiveText(snapshot.text);
+      if (snapshot) {
+        receiveText(snapshot.text);
+        setToolCalls(snapshot.tools ?? []);
+      }
       if (snapshot?.status === "completed")
         complete(snapshot.incomplete, version);
       else if (snapshot?.status === "cancelled") stopLocally();
@@ -703,6 +710,7 @@ export function useNovel(
       input.current?.task === "summary" &&
       (!("batch" in input.current) || Boolean(input.current.exportBackground)),
     preview,
+    toolCalls,
     task,
     generationStopped,
     draftIncomplete,

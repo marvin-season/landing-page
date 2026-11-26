@@ -113,8 +113,6 @@ test("novel writing, summaries and rewrites stream through the world proxy with 
       );
       const body = JSON.parse(String(init?.body));
       assert.equal(body.model, "kiro/auto");
-      assert.equal(body.tool_choice, "none");
-      assert.equal(body.tools, undefined);
       bodies.push(body);
       const chunk = (delta: unknown, finish_reason: string | null = null) =>
         `data: ${JSON.stringify({ id: "test", created: 1, model: body.model, choices: [{ index: 0, delta, finish_reason }] })}\n\n`;
@@ -177,11 +175,19 @@ test("novel writing, summaries and rewrites stream through the world proxy with 
       incomplete: false,
       error: null,
     });
-    const messages = bodies.at(-1)?.messages;
+    const body = bodies.at(-1);
+    const messages = body?.messages;
     assert.deepEqual(
       messages?.map((message) => message.content),
       [instructions, "完整小说上下文"],
     );
+    if (task === "summary") {
+      assert.equal(body?.tool_choice, "none");
+      assert.equal(body?.tools, undefined);
+    } else {
+      assert.notEqual(body?.tool_choice, "none");
+      assert.ok(Array.isArray(body?.tools) && body.tools.length > 0);
+    }
   }
 });
 

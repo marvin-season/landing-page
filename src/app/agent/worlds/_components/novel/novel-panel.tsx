@@ -49,6 +49,7 @@ import {
   NovelActionTooltip,
   nextChapterActionHint,
 } from "./novel-action-tooltip";
+import { NovelToolTrace } from "./novel-tool-trace";
 import type { PlotMode, PlotSelection } from "./plot-edit";
 import { PlotSheet } from "./plot-sheet";
 import { readReadingChapterId, writeReadingChapterId } from "./reading-chapter";
@@ -770,15 +771,18 @@ export function NovelPanel({
                 onDeleteChapter={() => void deleteChapter()}
               />
               {thinkingChapter ? (
-                <p
-                  role="status"
-                  className="flex items-center gap-2 py-5 text-sm text-muted-foreground"
-                >
-                  <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
-                  {writer.compressing
-                    ? "正在压缩模型上下文…"
-                    : `${thinkingChapter.title}正在构思…`}
-                </p>
+                <div className="flex flex-col gap-3 py-5">
+                  <p
+                    role="status"
+                    className="flex items-center gap-2 text-sm text-muted-foreground"
+                  >
+                    <LoaderCircle className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
+                    {writer.compressing
+                      ? "正在压缩模型上下文…"
+                      : `${thinkingChapter.title}正在构思…`}
+                  </p>
+                  <NovelToolTrace tools={writer.toolCalls} />
+                </div>
               ) : showingNewDraft && newChapterDraft ? (
                 <NewChapterDraftActions
                   title={newChapterDraft.chapter.title}

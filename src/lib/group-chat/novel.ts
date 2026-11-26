@@ -12,8 +12,13 @@ import {
 import { idSchema, WorldError, type WorldRoom } from "@/lib/group-chat/model";
 import { providerError } from "@/lib/group-chat/provider";
 import { worldSessionId } from "@/lib/group-chat/session";
-import type { NovelRunStatus } from "./novel-run-contract";
+import type { NovelRunStatus, NovelRunToolCall } from "./novel-run-contract";
 import { type NovelRunStore, novelRunTimeoutMs } from "./novel-run-store";
+import {
+  createNovelWritingTools,
+  skillPoolFromPrompt,
+  writingToolScopeForTask,
+} from "./novel-writing-tools";
 import type { WorldStore } from "./store";
 
 const keySchema = z.object({ roomId: idSchema, runId: z.uuid() });
@@ -32,6 +37,10 @@ const instructionsByTask = {
 const snapshotIntervalMs = 900;
 const connectionEnded = "连接提前结束或没有生成内容。已收到的正文仍可编辑。";
 
+function snapshotTools(tools: NovelRunToolCall[]) {
+  return tools.length ? tools : undefined;
+}
+
 async function generateNovel(
   mastra: Mastra,
   room: WorldRoom,
@@ -44,7 +53,9 @@ async function generateNovel(
   const timer = setTimeout(() => controller.abort(), novelRunTimeoutMs);
   const { signal } = controller;
   let text = "";
-  let published = "";
+  let tools: NovelRunToolCall[] = [];
+  let publishedText = "";
+  let publishedTools = "";
   let pending: Promise<void> | undefined;
   let result: NovelRunStatus = {
     status: "failed",
@@ -53,21 +64,24 @@ async function generateNovel(
     error: connectionEnded,
   };
 
-  function publish() {
+  function publish(force = false) {
     if (pending || signal.aborted) return;
-    const snapshot = text;
+    const toolsKey = JSON.stringify(tools);
+    if (!force && text === publishedText && toolsKey === publishedTools) return;
+    const snapshotText = text;
+    const toolsSnapshot = tools.map((item) => ({ ...item }));
     pending = (async () => {
-      const active =
-        snapshot === published
-          ? (await runs.read(key))?.status === "running"
-          : await runs.write(key, {
-              status: "running",
-              text: snapshot,
-              incomplete: false,
-              error: null,
-            });
-      if (active) published = snapshot;
-      else controller.abort();
+      const active = await runs.write(key, {
+        status: "running",
+        text: snapshotText,
+        incomplete: false,
+        error: null,
+        tools: snapshotTools(toolsSnapshot),
+      });
+      if (active) {
+        publishedText = snapshotText;
+        publishedTools = toolsKey;
+      } else controller.abort();
     })()
       .catch((error) => console.error("Novel progress write failed", error))
       .finally(() => {
@@ -75,7 +89,14 @@ async function generateNovel(
       });
   }
 
-  const interval = setInterval(publish, snapshotIntervalMs);
+  function upsertTool(next: NovelRunToolCall) {
+    const index = tools.findIndex((item) => item.id === next.id);
+    if (index >= 0) tools[index] = { ...tools[index], ...next };
+    else tools = [...tools, next];
+    publish(true);
+  }
+
+  const interval = setInterval(() => publish(), snapshotIntervalMs);
   try {
     const model =
       room.config.characters.find((character) => character.enabled)?.model ||
@@ -83,6 +104,11 @@ async function generateNovel(
     const requestContext = new RequestContext();
     requestContext.set("model", model);
     requestContext.set("sessionId", worldSessionId(room, "writer", model));
+    const toolScope = writingToolScopeForTask(task);
+    const writingTools =
+      toolScope == null
+        ? undefined
+        : createNovelWritingTools(skillPoolFromPrompt(prompt), toolScope);
     const stream = await handleChatStream({
       mastra,
       agentId: "world-writer",
@@ -97,9 +123,17 @@ async function generateNovel(
         instructions: instructionsByTask[task],
         requestContext,
         abortSignal: signal,
-        activeTools: [],
-        toolChoice: "none",
-        maxSteps: 1,
+        ...(writingTools
+          ? {
+              toolsets: { writing: writingTools },
+              toolChoice: "auto" as const,
+              maxSteps: 4,
+            }
+          : {
+              activeTools: [],
+              toolChoice: "none" as const,
+              maxSteps: 1,
+            }),
         modelSettings: { maxOutputTokens: 8192, maxRetries: 0 },
       },
     });
@@ -115,7 +149,47 @@ async function generateNovel(
         if (event.type === "text-delta") {
           const first = text === "";
           text += event.delta;
-          if (first) publish();
+          if (first) publish(true);
+        } else if (event.type === "tool-input-start") {
+          upsertTool({
+            id: event.toolCallId,
+            name: event.toolName,
+            state: "calling",
+          });
+        } else if (event.type === "tool-input-available") {
+          upsertTool({
+            id: event.toolCallId,
+            name: event.toolName,
+            state: "calling",
+            input: event.input,
+          });
+        } else if (event.type === "tool-input-error") {
+          upsertTool({
+            id: event.toolCallId,
+            name: event.toolName,
+            state: "error",
+            input: event.input,
+            errorText: event.errorText,
+          });
+        } else if (event.type === "tool-output-available") {
+          upsertTool({
+            id: event.toolCallId,
+            name:
+              tools.find((item) => item.id === event.toolCallId)?.name ||
+              "tool",
+            state: "done",
+            output: event.output,
+            errorText: null,
+          });
+        } else if (event.type === "tool-output-error") {
+          upsertTool({
+            id: event.toolCallId,
+            name:
+              tools.find((item) => item.id === event.toolCallId)?.name ||
+              "tool",
+            state: "error",
+            errorText: event.errorText,
+          });
         } else if (event.type === "finish") {
           finish = {
             incomplete: Boolean(
@@ -135,7 +209,13 @@ async function generateNovel(
         text.trim() &&
         result.error === connectionEnded
       )
-        result = { status: "completed", text, ...finish, error: null };
+        result = {
+          status: "completed",
+          text,
+          ...finish,
+          error: null,
+          tools: snapshotTools(tools),
+        };
     } finally {
       signal.removeEventListener("abort", cancelReader);
       await reader.cancel().catch(() => {});
@@ -155,7 +235,11 @@ async function generateNovel(
     clearTimeout(timer);
     clearInterval(interval);
     await pending;
-    await runs.write(key, { ...result, text });
+    await runs.write(key, {
+      ...result,
+      text,
+      tools: snapshotTools(tools),
+    });
   }
 }
 

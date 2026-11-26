@@ -279,6 +279,23 @@ test("opening insertion sends prior context and only the original opening excerp
       importedBackground: novel.background,
       followingChapters: [{ title: "旧开篇", text: "早".repeat(1200) }],
       novel: { title: novel.title, style: novel.style, outline: novel.outline },
+      skillCatalog: [
+        {
+          id: "scene-driven",
+          name: "场景驱动",
+          description: "用具体场景、动作和感官推进，少写总结式旁白。",
+        },
+        {
+          id: "dialogue-first",
+          name: "对白优先",
+          description: "信息差与潜台词走对白，避免作者替角色点破。",
+        },
+        {
+          id: "chapter-hook",
+          name: "章末钩子",
+          description: "章末停在未决情境，不作总结或预告下一章。",
+        },
+      ],
       task: {
         mode: "insert",
         chapter: 1,
@@ -796,30 +813,32 @@ test("chapter requests identify the room and task without sending model credenti
   });
 });
 
-test("selected writing skills inject into chapter and rewrite prompts but not summaries", () => {
+test("selected writing skills appear as skillCatalog for chapter and rewrite but not summaries", () => {
   const config = loadWorldTemplates()[0].config;
   const novel = createNovel(config);
   novel.skills = ["scene-driven", "chapter-hook", "missing", "dialogue-first"];
   novel.chapters = [{ id: "one", title: "第1章", text: "正文。" }];
   const chapter = JSON.parse(chapterPrompt(config, novel));
   assert.deepEqual(
-    chapter.skills.map(({ id }: { id: string }) => id),
+    chapter.skillCatalog.map(({ id }: { id: string }) => id),
     ["scene-driven", "chapter-hook", "dialogue-first"],
   );
-  assert.match(writerInstructions, /若提供 skills/);
+  assert.equal(chapter.skills, undefined);
+  assert.match(writerInstructions, /apply_writing_skill/);
   const rewrite = JSON.parse(rewritePrompt(config, novel, "one", "收紧节奏"));
   assert.deepEqual(
-    rewrite.skills.map(({ id }: { id: string }) => id),
+    rewrite.skillCatalog.map(({ id }: { id: string }) => id),
     ["scene-driven", "dialogue-first"],
   );
   const insert = JSON.parse(
     insertChapterPrompt(config, novel, "one", "补一段雨夜开场"),
   );
   assert.deepEqual(
-    insert.skills.map(({ id }: { id: string }) => id),
+    insert.skillCatalog.map(({ id }: { id: string }) => id),
     ["scene-driven", "chapter-hook", "dialogue-first"],
   );
   const summary = JSON.parse(summaryPrompt(config, novel));
+  assert.equal(summary.skillCatalog, undefined);
   assert.equal(summary.skills, undefined);
   assert.equal(JSON.stringify(summary).includes("scene-driven"), false);
 });

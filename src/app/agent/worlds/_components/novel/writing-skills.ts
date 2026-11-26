@@ -14,6 +14,13 @@ export type WritingSkillPayload = {
   instructions: string;
 };
 
+/** 供 Writer 自选挂载的技法目录（不含 instructions）。 */
+export type WritingSkillCatalogItem = {
+  id: string;
+  name: string;
+  description: string;
+};
+
 /** 全部启用技法的 instructions 合计上限（字符）。 */
 export const maxWritingSkillsCharacters = 800;
 
@@ -58,16 +65,33 @@ export function normalizeSkillIds(ids: string[] | undefined) {
   return next;
 }
 
+function skillIdsForScope(
+  ids: string[] | undefined,
+  scope: WritingSkillScope | WritingSkillScope[],
+) {
+  const scopes = new Set(Array.isArray(scope) ? scope : [scope]);
+  const selected = normalizeSkillIds(ids);
+  const source = selected.length
+    ? selected
+    : writingSkills.map((skill) => skill.id);
+  return source.filter((id) => {
+    const skill = skillById.get(id);
+    return skill?.appliesTo.some((item) => scopes.has(item));
+  });
+}
+
 export function resolveWritingSkills(
   ids: string[] | undefined,
   scope: WritingSkillScope | WritingSkillScope[],
 ): WritingSkillPayload[] {
-  const scopes = new Set(Array.isArray(scope) ? scope : [scope]);
   const selected: WritingSkillPayload[] = [];
   let used = 0;
+  // 静默注入仍只使用作者点选的 id；空池不注入。
   for (const id of normalizeSkillIds(ids)) {
     const skill = skillById.get(id);
-    if (!skill || !skill.appliesTo.some((item) => scopes.has(item))) continue;
+    if (!skill) continue;
+    const scopes = new Set(Array.isArray(scope) ? scope : [scope]);
+    if (!skill.appliesTo.some((item) => scopes.has(item))) continue;
     const next = used + skill.instructions.length;
     if (next > maxWritingSkillsCharacters) break;
     selected.push({ id: skill.id, instructions: skill.instructions });
@@ -76,10 +100,36 @@ export function resolveWritingSkills(
   return selected;
 }
 
+export function resolveWritingSkillCatalog(
+  ids: string[] | undefined,
+  scope: WritingSkillScope | WritingSkillScope[],
+): WritingSkillCatalogItem[] {
+  return skillIdsForScope(ids, scope).flatMap((id) => {
+    const skill = skillById.get(id);
+    if (!skill) return [];
+    return [
+      {
+        id: skill.id,
+        name: skill.name,
+        description: skill.description,
+      },
+    ];
+  });
+}
+
 export function writingSkillsField(
   ids: string[] | undefined,
   scope: WritingSkillScope | WritingSkillScope[],
 ) {
   const skills = resolveWritingSkills(ids, scope);
   return skills.length ? { skills } : {};
+}
+
+/** 写入 prompt 的可选技法目录；空选择时开放当前任务范围内全部内置技法。 */
+export function writingSkillCatalogField(
+  ids: string[] | undefined,
+  scope: WritingSkillScope | WritingSkillScope[],
+) {
+  const skillCatalog = resolveWritingSkillCatalog(ids, scope);
+  return skillCatalog.length ? { skillCatalog } : {};
 }
