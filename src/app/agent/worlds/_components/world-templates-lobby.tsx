@@ -8,7 +8,7 @@ import {
 } from "@landing-page/design-system";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
 import { worldRequest } from "@/lib/group-chat/client";
 import type { WorldPreset } from "@/lib/group-chat/model";
@@ -232,38 +232,51 @@ function MineTemplates({
             我的预设
           </h3>
           <WorldGrid>
-            {presets.map((preset) => (
-              <WorldCard key={preset.id}>
-                <div className="min-w-0 flex-1 w-full">
-                  <p className="text-sm font-medium truncate">{preset.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {preset.kind === "world"
-                      ? "世界预设 · 可在创建面板中选择并编辑"
-                      : "角色预设 · 可在角色配置中使用"}
-                  </p>
-                </div>
-                <WorldCardFooter>
-                  {preset.kind === "world" ? (
+            {presets.map((preset) =>
+              preset.kind === "world" ? (
+                <TemplateCard
+                  key={preset.id}
+                  title={preset.name}
+                  tag="世界"
+                  details={preset.content.title}
+                  description={preset.content.scene}
+                  characterCount={preset.content.characters.length}
+                  onUse={() => onUsePreset(preset)}
+                  useLabel="使用预设"
+                  actions={
                     <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onUsePreset(preset)}
+                      size="icon"
+                      variant="ghost"
+                      disabled={pending}
+                      onClick={() => void onRemovePreset(preset.id)}
+                      aria-label="删除预设"
                     >
-                      使用
+                      <Trash2 />
                     </Button>
-                  ) : null}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    disabled={pending}
-                    onClick={() => void onRemovePreset(preset.id)}
-                    aria-label="删除预设"
-                  >
-                    <Trash2 />
-                  </Button>
-                </WorldCardFooter>
-              </WorldCard>
-            ))}
+                  }
+                />
+              ) : (
+                <TemplateCard
+                  key={preset.id}
+                  title={preset.name}
+                  tag="角色"
+                  details={preset.content.identity}
+                  description={preset.content.personality}
+                  meta="角色预设 · 可在角色配置中使用"
+                  actions={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      disabled={pending}
+                      onClick={() => void onRemovePreset(preset.id)}
+                      aria-label="删除预设"
+                    >
+                      <Trash2 />
+                    </Button>
+                  }
+                />
+              ),
+            )}
           </WorldGrid>
         </div>
       ) : null}
@@ -274,27 +287,39 @@ function MineTemplates({
 function TemplateCard({
   title,
   kind,
+  tag,
   details,
   description,
   characterCount,
+  meta,
   onUse,
+  useLabel = "使用模板",
+  actions,
 }: {
   title: string;
-  kind: WorldTemplate["kind"];
+  kind?: WorldTemplate["kind"];
+  tag?: string;
   details: string;
   description: string;
-  characterCount: number;
-  onUse: () => void;
+  characterCount?: number;
+  meta?: string;
+  onUse?: () => void;
+  useLabel?: string;
+  actions?: ReactNode;
 }) {
+  const label =
+    tag ?? (kind === "novel" ? "小说" : kind === "script" ? "剧本" : undefined);
   return (
     <WorldCard>
       <div className="flex w-full items-start justify-between gap-2">
         <h3 className="min-w-0 line-clamp-2 text-sm font-medium leading-5">
           {title}
         </h3>
-        <Tag size="compact" className="shrink-0">
-          {kind === "novel" ? "小说" : "剧本"}
-        </Tag>
+        {label ? (
+          <Tag size="compact" className="shrink-0">
+            {label}
+          </Tag>
+        ) : null}
       </div>
       <p className="line-clamp-2 text-[11px] leading-4 text-muted-foreground">
         {details}
@@ -304,17 +329,22 @@ function TemplateCard({
       </p>
       <WorldCardFooter>
         <span className="text-xs text-muted-foreground">
-          {characterCount} 位角色
+          {meta ?? (characterCount != null ? `${characterCount} 位角色` : null)}
         </span>
-        <Button
-          size="sm"
-          variant="text"
-          className="gap-1.5 px-0 h-7"
-          onClick={onUse}
-        >
-          使用模板
-          <ArrowUpRight className="size-3.5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {onUse ? (
+            <Button
+              size="sm"
+              variant="text"
+              className="gap-1.5 px-0 h-7"
+              onClick={onUse}
+            >
+              {useLabel}
+              <ArrowUpRight className="size-3.5" />
+            </Button>
+          ) : null}
+          {actions}
+        </div>
       </WorldCardFooter>
     </WorldCard>
   );

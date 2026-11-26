@@ -69,28 +69,6 @@ export function ArchiveActions({
           </Button>
         </>
       ) : null}
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={pending}
-        onClick={() =>
-          void onPending(async () => {
-            if (
-              !window.confirm(
-                "完整备份包含所有角色的秘密和私有设定，请妥善保管。是否导出？",
-              )
-            )
-              return;
-            const data = await worldRequest(`rooms/${room.id}/export`);
-            downloadText(
-              `${room.config.title}.json`,
-              JSON.stringify(data, null, 2),
-            );
-          })
-        }
-      >
-        {novel ? "备份世界设定" : "完整备份"}
-      </Button>
       <Button size="sm" variant="outline" onClick={onCopy}>
         <Copy data-icon="inline-start" />
         复制世界
@@ -104,7 +82,7 @@ export function ArchiveActions({
             void onPending(async () => {
               if (
                 !window.confirm(
-                  "结束这个故事？结束后只能查看与导出，也可以复制配置创建新世界。",
+                  "结束这个故事？结束后只能查看与导出 Markdown，也可以复制配置创建新世界。",
                 )
               )
                 return;

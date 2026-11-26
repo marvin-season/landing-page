@@ -12,7 +12,6 @@ import { abortRun, createWorldEngine } from "./engine";
 import { createWorldHandlers } from "./http";
 import {
   configSchema,
-  exportBackup,
   exportNarrationMarkdown,
   runInputSchema,
   WorldError,
@@ -118,7 +117,7 @@ async function conversationWithQuestion() {
   return { store, room };
 }
 
-test("world type is fixed at creation and preserved in listings and backups", async () => {
+test("world type is fixed at creation and preserved in listings", async () => {
   const store = setup();
   const handle = createWorldHandlers({
     store,
@@ -150,17 +149,13 @@ test("world type is fixed at creation and preserved in listings and backups", as
     1,
   );
   assert.equal(updated.kind, "novel");
+  assert.equal(
+    updated.config.priorContext,
+    "旧港停电时，众人已经把客人转移至仓库。",
+  );
   assert.equal((await store.list("alice"))[0].kind, "novel");
-  const backup = exportBackup(updated);
-  const restored = await store.import("alice", backup);
-  assert.equal(restored.kind, "novel");
-  assert.equal(restored.config.priorContext, updated.config.priorContext);
-  await assert.rejects(store.begin("alice", restored.id, command()), {
+  await assert.rejects(store.begin("alice", room.id, command()), {
     code: "wrong_world_kind",
-  });
-  const { kind: _kind, ...untypedBackup } = backup;
-  await assert.rejects(store.import("alice", untypedBackup), {
-    name: "ZodError",
   });
 });
 
@@ -1008,32 +1003,6 @@ test("director invalid output falls back and unknown/private candidates cannot b
   assert.equal(saved.messages.at(-1)?.kind, "agent");
 });
 
-test("backup import allocates fresh identities and rejects inconsistent references", async () => {
-  const store = setup();
-  const room = await store.create("alice", exampleWorld);
-  const saved = (
-    await store.begin(
-      "alice",
-      room.id,
-      command({ text: "hello", mode: "save" }),
-    )
-  ).room;
-  const backup = exportBackup(saved);
-  const imported = await store.import("bob", backup);
-  assert.notEqual(imported.id, room.id);
-  assert.equal(imported.ownerId, "bob");
-  assert.notEqual(imported.messages[0].id, saved.messages[0].id);
-  assert.equal(imported.run, null);
-  assert.equal(imported.messages[0].runId, null);
-  await assert.rejects(
-    store.import("bob", {
-      ...backup,
-      messages: [{ ...backup.messages[0], configVersion: 999 }],
-    }),
-    /引用/,
-  );
-});
-
 test("narration export keeps every narrator message and excludes dialogue", async () => {
   const store = setup();
   const room = await store.create("alice", exampleWorld);
@@ -1145,14 +1114,13 @@ test("system narration can be interrupted, retried and exported without becoming
   const saved = await store.get("alice", room.id);
   assert.equal(saved.messages.at(-1)?.speakerId, "system");
   assert.equal(saved.messages.at(-1)?.status, "complete");
-  const imported = await store.import("alice", exportBackup(saved));
-  assert.equal(imported.messages.at(-1)?.kind, "narrator");
+  assert.equal(saved.messages.at(-1)?.kind, "narrator");
   assert.match(
-    JSON.stringify(actorContext(imported, imported.config.characters[0])),
+    JSON.stringify(actorContext(saved, saved.config.characters[0])),
     /备用灯闪烁/,
   );
   assert.doesNotMatch(
-    JSON.stringify(actorContext(imported, imported.config.characters[0])),
+    JSON.stringify(actorContext(saved, saved.config.characters[0])),
     /灯光开始闪烁/,
   );
 });

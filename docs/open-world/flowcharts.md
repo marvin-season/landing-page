@@ -84,7 +84,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  ui[useWorldRoom] -->|读取、轮询、配置、导入导出、暂停| request[worldRequest]
+  ui[useWorldRoom] -->|读取、轮询、配置、导出 Markdown、暂停| request[worldRequest]
   ui -->|运行| story[worldStoryStream]
   story --> stream[worldStream]
   stream --> runs["POST rooms/:id/runs"]
@@ -93,7 +93,7 @@ flowchart TD
   handlers --> engine["createWorldEngine(worldStore, completeText) → execute"]
   runs --> handle[handle：登录、同源、所有权]
   other --> handle
-  handle -->|列表、配置、预设、导入导出| store[worldStore]
+  handle -->|列表、配置、预设、导出 Markdown| store[worldStore]
   handle -->|模型列表 / 连接测试| proxy[代理]
   handle -->|stop / end / delete| abort[store 更新并 abortRun]
   handle -->|runs| begin[store.begin：幂等、版本、写入输入、新建 WorldRun]

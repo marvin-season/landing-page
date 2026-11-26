@@ -4,7 +4,7 @@
 
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
-| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入 JSON 存档、导入小说、创建作品 |
+| `/agent/worlds` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选）、导入小说、创建作品 |
 | `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板：我的（本地模板 + 世界 / 角色预设）、内置模板 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
@@ -14,7 +14,7 @@
 
 - [`RoomHeader`](../../src/app/agent/worlds/_components/world-room/room-header.tsx)：标题、运行状态、类型标签、世界侧栏开关和「设定」按钮。剧本运行中或小说生成中时「设定」不可用。剧本对话区和小说阅读区滚回顶部附近时展开房间顶栏，离开顶部一小段后再平滑收起（带滞回，避免贴顶抖动）。编辑小说章节或打开世界设定时，房间顶栏立即隐藏。
 - [`WorldNotes`](../../src/app/agent/worlds/_components/world-room/world-notes.tsx)：宽屏显示为右侧栏。窄屏时，小说以对话框打开，剧本以抽屉打开。展示角色公开资料、背景、前置剧情、场景、事实、规则；剧本另外显示系统操作者、旁白、剧情摘要、本批发言数与用量，并可点名角色。
-- [`SettingsSheet`](../../src/app/agent/worlds/_components/world-room/settings-sheet.tsx)：上方是 [`ArchiveActions`](../../src/app/agent/worlds/_components/world-room/archive-actions.tsx)（导出、备份、复制世界、结束故事），下方是 `WorldEditor`。小说房间以对话框打开，剧本房间以右侧抽屉打开。故事结束后只保留存档操作。小说房间的编辑器额外显示小说名称、文风、大纲和每章字数，见[小说模式 · 设定来源](./novel-mode.md#3-设定来源)。
+- [`SettingsSheet`](../../src/app/agent/worlds/_components/world-room/settings-sheet.tsx)：上方是 [`ArchiveActions`](../../src/app/agent/worlds/_components/world-room/archive-actions.tsx)（导出对话 / 旁白 Markdown、复制世界、结束故事），下方是 `WorldEditor`。小说房间以对话框打开，剧本房间以右侧抽屉打开。故事结束后只保留存档操作。小说房间的编辑器额外显示小说名称、文风、大纲和每章字数，见[小说模式 · 设定来源](./novel-mode.md#3-设定来源)。
 
 ## 2. 模块分层
 
@@ -35,7 +35,7 @@
 
 `WorldRoom`（[`model.ts`](../../src/lib/group-chat/model.ts)）包含 `kind`、`status`（`draft` / `active` / `ended`）、`config`、`version`、`snapshots`、`messages`、`summary`、`run`、`runs`、`paused`。
 
-- `kind` 为 `script` 或 `novel`，创建和导入时必填。配置更新接口不接受 `kind`；列表只返回这两类房间。
+- `kind` 为 `script` 或 `novel`，创建时必填。配置更新接口不接受 `kind`；列表只返回这两类房间。
 - 每次 `configure` 使 `version + 1` 并追加配置快照。剧本消息记录生成时的 `configVersion`。
 - 小说房间不会发起运行，`status` 保持 `draft`，直到结束故事变为 `ended`。
 
@@ -77,10 +77,9 @@
 | `POST connection` | 用指定模型做一次纯文本连接测试 |
 | `GET/POST presets`，`PATCH/DELETE presets/:id` | 预设列表、新建、更新、删除 |
 | `GET rooms` / `POST rooms` | 作品列表（最多 200 个）/ 创建房间（必须带 `kind`） |
-| `POST rooms/import` | 导入 `world-chat` JSON 备份（≤6 MB），生成新房间 |
 | `GET rooms/:id` | 房间视图，消息只返回最近 100 条 |
 | `GET rooms/:id/messages?before=seq` | 向前分页加载消息 |
-| `GET rooms/:id/export[?format=markdown\|narration]` | JSON 备份 / 对话 Markdown / 旁白 Markdown |
+| `GET rooms/:id/export?format=markdown\|narration` | 对话 Markdown / 旁白 Markdown |
 | `PATCH rooms/:id` | `configure`（带 `expectedVersion`）、`rename`、`end` |
 | `DELETE rooms/:id` | 删除房间及幂等记录，并中止进行中的运行 |
 | `POST rooms/:id/runs` | 剧本运行：写入输入，返回 SSE 事件流；仅保存不运行时返回 JSON |
@@ -103,17 +102,15 @@
 - 请求体强制加上 `tool_choice: "none"`，不注册工具，不启用自动 Memory。剧本收到工具流时直接报错。
 - 每次调用的 system 指令由 `context.ts`（剧本）或小说 `model.ts`（小说）提供，Agent 自身只有一句通用指令。选人逻辑属于 `schedule.ts`，与 Agent 无关。
 
-**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界、导入备份或 Fork 小说时会换新标识。请求头里只有哈希，不含明文配置。
+**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界或 Fork 小说时会换新标识。请求头里只有哈希，不含明文配置。
 
 本机 Magpie 代理根据会话标识和首条 user 消息派生上游会话，用来争取提示词缓存命中。每次调用仍然发送完整的有效上下文；缓存是否命中、能省多少，由代理和模型决定。
 
-## 7. 模板、预设、备份与复制
+## 7. 模板、预设与复制
 
 - **模板**：`data/novels/template/*.json`（内置，`source: "builtin"`）和不提交的 `data/novels/template/local/*.json`（我的，`source: "local"`），文件名就是模板 ID。同目录里的 TXT 是模板附带的正文。角色头像仍在 `public/worlds/avatars`。扁平模板需同时通过 `configSchema` 和元数据（`description`、`details`、`gradient`）校验；可选 `kind`（`script` / `novel`，缺省为剧本）。`format` 为 `world-chat` 的备份也可以直接作为模板：世界设定取 `config`，作品类型取 `kind`；缺少卡片元数据时，说明用初始场景，细节用角色名，渐变按文件名生成。每个角色都要有 `avatar`；任一模板无效时页面加载失败。预设模板页按来源分成「我的」与「内置」；「我的」还包含世界 / 角色预设。
 - **导入小说 / 模板派生**：作品页「导入小说」把 ≤2MB 的 TXT / Markdown 收录为独立小说作品（默认占位设定 + 本机 IndexedDB 正文），导入后直接打开作品；列表不再提供「生成模板」。预设模板页「使用模板」派生小说时写入 `sourceTemplateId`。作品右上角「设定」可手工改字段，或点「从正文更新设定」调用 `POST /api/group-chat/templates/extract` 回填表单（需再点保存）。本地模板仍可由 `POST /api/group-chat/templates` 写入 `data/novels/template/local/`。提取超时最多 180 秒。实现见 [`ImportNovelTemplateDialog`](../../src/app/agent/worlds/_components/import-novel-template-dialog.tsx)、[`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx)。
-- **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。
-- **JSON 备份**：`format: "world-chat"`、`schemaVersion: 1`，包含 `kind`、配置、全部快照、版本、消息、摘要，也包含角色私有资料（导出前会提示确认），不含 API 密钥。小说备份只有世界设定，没有章节；如果小说备份里带有消息，导入时会被拒绝。
-- **导入**：校验快照版本、消息顺序、发言者与点名引用，然后生成新房间和新消息 ID。摘要清空后重新整理，运行不恢复，房间处于暂停状态。
+- **预设**：编辑器可把当前世界存为世界预设，或把单个角色存为角色预设，已选中的预设可以原地更新。套用世界预设时保留当前已填写的前置剧情。复用设定优先用预设，不再提供 `world-chat` JSON 备份的导入 / 导出入口。
 - **复制世界**：用当前配置和类型新建房间。剧本消息、小说章节都不复制。
 
 ## 8. 验证

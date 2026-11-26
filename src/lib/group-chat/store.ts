@@ -3,7 +3,6 @@ import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { type Client, createClient, type Transaction } from "@libsql/client";
 import {
-  backupSchema,
   configSchema,
   idSchema,
   presetInputSchema,
@@ -486,60 +485,6 @@ export function createWorldStore(getClient: () => Client) {
           work(room);
         })
       ).room;
-    },
-    async import(ownerId: string, input: unknown) {
-      const backup = backupSchema.parse(input);
-      const versions = new Map(
-        backup.snapshots.map((snapshot) => [snapshot.version, snapshot.config]),
-      );
-      if (
-        versions.size !== backup.snapshots.length ||
-        !versions.has(backup.version)
-      )
-        throw new WorldError("invalid_backup", "备份配置版本不完整");
-      const room = fresh(ownerId, backup.config, backup.kind);
-      if (room.kind === "novel" && backup.messages.length)
-        throw new WorldError("invalid_backup", "小说设定备份不能包含剧本对话");
-      room.version = backup.version;
-      room.snapshots = backup.snapshots;
-      const ids = new Map<string, string>();
-      let seq = 0;
-      for (const message of backup.messages) {
-        const config = versions.get(message.configVersion);
-        if (
-          !config ||
-          message.seq <= seq ||
-          ids.has(message.id) ||
-          (message.followUpTo &&
-            (message.kind !== "agent" || !ids.has(message.followUpTo))) ||
-          (message.kind === "agent" &&
-            !config.characters.some((c) => c.id === message.speakerId)) ||
-          (message.kind === "intervention" && message.speakerId !== "user") ||
-          (["system", "narrator"].includes(message.kind) &&
-            message.speakerId !== "system") ||
-          message.mentions.some(
-            (id) => !config.characters.some((c) => c.id === id),
-          )
-        )
-          throw new WorldError("invalid_backup", "备份消息引用或顺序不完整");
-        ids.set(message.id, randomUUID());
-        seq = message.seq;
-        room.messages.push({
-          ...message,
-          id: ids.get(message.id)!,
-          followUpTo: message.followUpTo
-            ? ids.get(message.followUpTo)
-            : undefined,
-          runId: null,
-          status:
-            message.status === "streaming" ? "interrupted" : message.status,
-        });
-      }
-      // Rebuild summaries from validated public history; imported summaries are not trusted facts.
-      room.summary = null;
-      room.status = room.messages.length ? "active" : "draft";
-      room.paused = true;
-      return insert(room);
     },
     async presets(ownerId: string) {
       const rows = await (await database()).execute({

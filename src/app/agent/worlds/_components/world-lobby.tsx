@@ -6,18 +6,16 @@ import {
   Button,
   Tag,
 } from "@landing-page/design-system";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Plus, Trash2, Upload, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { MessageSquare, Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
 import { worldRequest } from "@/lib/group-chat/client";
-import {
-  backupSchema,
-  type RoomListItem,
-  type WorldConfig,
-  type WorldPreset,
-  type WorldRoom,
+import type {
+  RoomListItem,
+  WorldConfig,
+  WorldPreset,
 } from "@/lib/group-chat/model";
 import {
   type CreateWorkDraft,
@@ -37,12 +35,10 @@ type WorkFilter = (typeof workFilters)[number]["value"];
 
 export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [editing, setEditing] = useState<CreateWorkDraft | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [workFilter, setWorkFilter] = useState<WorkFilter>("all");
-  const fileRef = useRef<HTMLInputElement>(null);
   const rooms = useQuery({
     queryKey: ["world-rooms"],
     queryFn: () => worldRequest<{ rooms: RoomListItem[] }>("rooms"),
@@ -80,14 +76,6 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
             <ImportNovelTemplateDialog disabled={pending} />
-            <Button
-              variant="outline"
-              disabled={pending}
-              onClick={() => fileRef.current?.click()}
-            >
-              <Upload data-icon="inline-start" />
-              导入存档
-            </Button>
             {defaultConfig ? (
               <Button
                 onClick={() => setEditing(startCreateWork(defaultConfig))}
@@ -97,39 +85,6 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
               </Button>
             ) : null}
           </div>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (!file) return;
-              setPending(true);
-              setError("");
-              try {
-                if (file.size > 6 * 1024 * 1024)
-                  throw new Error("存档不能超过 6MB");
-                const backup = backupSchema.parse(
-                  JSON.parse(await file.text()),
-                );
-                const result = await worldRequest<{ room: WorldRoom }>(
-                  "rooms/import",
-                  "POST",
-                  backup,
-                );
-                void queryClient.invalidateQueries({
-                  queryKey: ["world-rooms"],
-                });
-                router.push(`/agent/worlds/${result.room.id}`);
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "导入失败");
-              } finally {
-                setPending(false);
-              }
-            }}
-          />
         </header>
         {error || rooms.error || presets.error ? (
           <Alert className="text-destructive">

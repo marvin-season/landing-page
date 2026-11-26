@@ -7,7 +7,6 @@ import {
   templateToFile,
 } from "./extract-world-template";
 import {
-  exportBackup,
   exportMarkdown,
   exportNarrationMarkdown,
   idSchema,
@@ -164,11 +163,6 @@ export function createWorldHandlers({
           201,
         );
       }
-      if (id === "import" && request.method === "POST")
-        return json(
-          { room: view(await store.import(ownerId, await body(request))) },
-          201,
-        );
       idSchema.parse(id);
       if (request.method === "GET") {
         const room = await store.get(ownerId, id);
@@ -187,7 +181,7 @@ export function createWorldHandlers({
                 },
               },
             );
-          return json(exportBackup(room));
+          throw new WorldError("not_found", "接口不存在", 404);
         }
         if (action === "messages") {
           const before = z.coerce

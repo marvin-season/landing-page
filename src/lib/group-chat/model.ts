@@ -175,18 +175,6 @@ export const backupSchema = z.object({
     })
     .nullable(),
 });
-export function exportBackup(room: WorldRoom) {
-  return {
-    format: "world-chat" as const,
-    schemaVersion: 1 as const,
-    kind: room.kind,
-    config: room.config,
-    snapshots: room.snapshots,
-    version: room.version,
-    messages: room.messages,
-    summary: room.summary,
-  };
-}
 export function exportMarkdown(room: WorldRoom) {
   return `# ${room.config.title}\n\n${room.messages
     .map(
