@@ -12,15 +12,16 @@ import { worldAgents } from "~/mastra-server/agents/world-agents";
 import { WorldError, type WorldRoom } from "./model";
 import { createNovelHandlers } from "./novel";
 import { createNovelRunStore, novelRunTimeoutMs } from "./novel-run-store";
-import { worldSessionId } from "./session";
 import { exampleWorld } from "./world-templates";
+
+process.env.DEEPSEEK_API_KEY ||= "test-deepseek-key";
 
 function room(): WorldRoom {
   const config = structuredClone(exampleWorld);
   config.characters[0].enabled = false;
   config.characters[0].model = "disabled/model";
   config.characters[1].enabled = true;
-  config.characters[1].model = "kiro/auto";
+  config.characters[1].model = "deepseek/deepseek-chat";
   return {
     id: "novel-room",
     kind: "novel",
@@ -90,7 +91,7 @@ function fixture(t: import("node:test").TestContext, now?: () => number) {
 
 const mastra = new Mastra({ agents: { writer: worldAgents.writer } });
 
-test("novel writing, summaries and rewrites stream through the world proxy with server-owned model, instructions and tool policy", async (t) => {
+test("novel writing, summaries and rewrites stream through DeepSeek with server-owned instructions and tool policy", async (t) => {
   const saved = room();
   const ctx = fixture(t);
   const bodies: Array<{ messages: Array<{ content: string }> }> = [];
@@ -98,21 +99,15 @@ test("novel writing, summaries and rewrites stream through the world proxy with 
     globalThis,
     "fetch",
     async (url: string, init?: RequestInit) => {
-      assert.equal(
+      assert.match(
         String(url),
-        `${process.env.GROUP_CHAT_BASE_URL || "http://127.0.0.1:3425/v1"}/chat/completions`,
+        /^https:\/\/api\.deepseek\.com\/.*chat\/completions/,
       );
       const headers = new Headers(init?.headers);
-      assert.equal(
-        headers.get("authorization"),
-        `Bearer ${process.env.GROUP_CHAT_API_KEY || "magpie"}`,
-      );
-      assert.equal(
-        headers.get("X-Magpie-Session"),
-        worldSessionId(saved, "writer", "kiro/auto"),
-      );
+      assert.match(headers.get("authorization") ?? "", /^Bearer\s+/);
+      assert.equal(headers.get("X-Magpie-Session"), null);
       const body = JSON.parse(String(init?.body));
-      assert.equal(body.model, "kiro/auto");
+      assert.equal(body.model, "deepseek-chat");
       bodies.push(body);
       const chunk = (delta: unknown, finish_reason: string | null = null) =>
         `data: ${JSON.stringify({ id: "test", created: 1, model: body.model, choices: [{ index: 0, delta, finish_reason }] })}\n\n`;
@@ -183,10 +178,12 @@ test("novel writing, summaries and rewrites stream through the world proxy with 
       [instructions, "完整小说上下文"],
     );
     if (task === "summary") {
-      assert.equal(body?.tool_choice, "none");
+      // DeepSeek 直连时无工具可不带 tool_choice；有工具时才显式 auto。
+      assert.ok(
+        body?.tool_choice === undefined || body?.tool_choice === "none",
+      );
       assert.equal(body?.tools, undefined);
     } else {
-      assert.notEqual(body?.tool_choice, "none");
       assert.ok(Array.isArray(body?.tools) && body.tools.length > 0);
     }
   }

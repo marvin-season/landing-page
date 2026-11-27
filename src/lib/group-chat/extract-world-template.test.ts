@@ -8,6 +8,7 @@ import {
   parseExtractedWorldTemplate,
   templateToFile,
 } from "./extract-world-template";
+import { defaultWorldCharacterModel } from "./model";
 import {
   allocateTemplateId,
   maxTemplateNovelFileBytes,
@@ -52,14 +53,18 @@ const sampleJson = JSON.stringify({
 test("parses extracted world template json", () => {
   const template = parseExtractedWorldTemplate(sampleJson, {
     kind: "novel",
-    model: "cursor/auto",
+    model: defaultWorldCharacterModel,
     reservedIds: ["fog-harbor"],
   });
   assert.equal(template.kind, "novel");
   assert.equal(template.config.title, "爱与恨");
   assert.equal(template.config.characters.length, 2);
   assert.ok(template.config.characters.every((character) => character.avatar));
-  assert.ok(template.config.characters.every((c) => c.model === "cursor/auto"));
+  assert.ok(
+    template.config.characters.every(
+      (c) => c.model === defaultWorldCharacterModel,
+    ),
+  );
   assert.match(template.id, /^[\w-]+$/);
   assert.equal(templateToFile(template).kind, "novel");
 });
@@ -93,7 +98,7 @@ test("saves template file shape", () => {
   tempRoots.push(root);
   const template = parseExtractedWorldTemplate(sampleJson, {
     kind: "novel",
-    model: "cursor/auto",
+    model: defaultWorldCharacterModel,
     reservedIds: [],
   });
   // Exercise serializer without touching repo local dir.

@@ -1,4 +1,4 @@
-import type { WorldConfig } from "./model";
+import { defaultWorldCharacterModel, type WorldConfig } from "./model";
 
 const blankNovelScene = "可根据创作要求开始第一章，故事背景和角色设定待补充。";
 
@@ -6,7 +6,7 @@ const blankNovelScene = "可根据创作要求开始第一章，故事背景和�
 export function standaloneNovelConfig(
   title: string,
   {
-    model = "cursor/auto",
+    model = defaultWorldCharacterModel,
     source = "import",
   }: { model?: string; source?: "blank" | "import" } = {},
 ): WorldConfig {

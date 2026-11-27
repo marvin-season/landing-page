@@ -22,7 +22,7 @@
       "publicInfo": "喊过两次假警报；今晚又在喊",
       "privateInfo": "第二次假喊是因为怕被说胆小，不是为了好玩",
       "style": "孩子气，句子碎；急了会重复关键词",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -35,7 +35,7 @@
       "publicInfo": "主张「再喊也不上山」",
       "privateInfo": "想借这次事件推动牧场重新划分",
       "style": "冷静、带讽刺；爱用「上次」压人",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -48,7 +48,7 @@
       "publicInfo": "出没于山坡另一侧",
       "privateInfo": "已学会把「狼来了」当作人类内乱的信号",
       "style": "简短、压迫感强；少用人类道德词",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     }
   ]

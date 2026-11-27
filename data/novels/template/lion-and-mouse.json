@@ -22,7 +22,7 @@
       "publicInfo": "森林最强；近日睡眠不安，前腿有旧伤",
       "privateInfo": "怀疑某个臣属把路线卖给了猎人，但还没有证据",
       "style": "短句、命令口吻；偶尔流露疲惫",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -35,7 +35,7 @@
       "publicInfo": "被狮王放过；熟悉地道与夜间小路",
       "privateInfo": "曾在猎人营地偷到半页账本，上面写着「狮牙」",
       "style": "语速快，爱用比喻；紧张时声音发细",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -48,7 +48,7 @@
       "publicInfo": "在林边布网；声称只为自卫",
       "privateInfo": "真正雇主要的是「可转让的王权证明」，不是肉",
       "style": "少废话，谈条件像谈价格",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     }
   ]

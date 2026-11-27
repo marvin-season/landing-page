@@ -10,6 +10,8 @@ export const idSchema = z
 export const worldKindSchema = z.enum(["script", "novel"]);
 export type WorldKind = z.infer<typeof worldKindSchema>;
 export const maxPriorContextLength = 8000;
+/** 世界角色默认展示用模型 ID；实际生成由 world agents 固定为 deepseek/deepseek-chat。 */
+export const defaultWorldCharacterModel = "deepseek/deepseek-chat";
 export const characterSchema = z.object({
   id: idSchema,
   name: text(30).min(1, "请填写角色名称"),

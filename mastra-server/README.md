@@ -17,8 +17,8 @@
 ## 使用方式
 
 - **Chat API**：`src/app/api/chat/route.ts` 使用 `handleChatStream` 与 `mastra` 处理流式对话
-- **开放世界**：`src/lib/group-chat/provider.ts` 通过三类世界 Agent 处理 NPC 对白（`actor`）、旁白（`narrator`）和公开剧情摘要（`summary`）。选人及旁白触发由 `schedule.ts` 的 `nextTurn` 决定，不再使用 director Agent。每次调用的角色指令和上下文由 `context.ts` 组装；世界状态和消息由 group-chat 存档管理，Agent 不启用自动 Memory 或工具，避免角色私有上下文混用。用户可按系统、旁白或已启用角色身份输入，具体流程见[开放世界运行架构](../docs/open-world/architecture.md)。
-- **小说**：`/api/novel` 使用同一工厂创建的 `writer` Agent，复用 `GROUP_CHAT_BASE_URL` / `GROUP_CHAT_API_KEY`，从已验证所有权的房间选择第一个启用角色的模型；全部禁用时取第一个角色。写章与背景总结均由该 Writer 完成，不启用工具或自动 Memory。
+- **开放世界**：`src/lib/group-chat/provider.ts` 通过四类世界 Agent 处理 NPC 对白（`actor`）、旁白（`narrator`）、公开剧情摘要（`summary`）与小说写作（`writer`）。选人及旁白触发由 `schedule.ts` 的 `nextTurn` 决定。每次调用的角色指令和上下文由 `context.ts` / 小说 `model.ts` 组装；世界状态和消息由 group-chat 存档管理，Agent 不启用自动 Memory。World Agent 固定 `model: "deepseek/deepseek-chat"`，与 `general-agent` 一样直连 DeepSeek。用户可按系统、旁白或已启用角色身份输入，具体流程见[开放世界运行架构](../docs/open-world/architecture.md)。
+- **小说**：`/api/novel` 使用同一工厂创建的 `writer` Agent（DeepSeek Chat）。写章、润色、剧情整理与背景总结均由该 Writer 完成；写章 / 润色可挂载写作技法 toolset。
 - **Thread**：`server/thread/index.ts` 通过 `mastra` 获取 agent memory，用于会话/线程
 
 ## 别名

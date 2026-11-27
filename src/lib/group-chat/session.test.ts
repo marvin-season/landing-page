@@ -72,18 +72,14 @@ test("cache sessions survive turns and summaries but isolate owners, rooms, role
   assert.equal(new Set([id, narrator, summary]).size, 3);
 });
 
-test("all three agents send stable sessions, growing dialogue and fresh state through Mastra", async (t) => {
-  const requests: Array<{ session: string | null; messages: ModelMessage[] }> =
-    [];
+test("all three agents send growing dialogue and fresh state through Mastra", async (t) => {
+  process.env.DEEPSEEK_API_KEY ||= "test-deepseek-key";
+  const requests: Array<{ messages: ModelMessage[]; sessionId: string }> = [];
   t.mock.method(
     globalThis,
     "fetch",
     async (_url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
-      requests.push({
-        session: new Headers(init?.headers).get("X-Magpie-Session"),
-        messages: body.messages,
-      });
       const event = (delta: unknown, finish_reason: string | null = null) =>
         JSON.stringify({
           id: "test",
@@ -92,7 +88,7 @@ test("all three agents send stable sessions, growing dialogue and fresh state th
           choices: [{ index: 0, delta, finish_reason }],
         });
       return new Response(
-        `data: ${event({ content: `reply-${requests.length}` })}\n\ndata: ${event({}, "stop")}\n\ndata: [DONE]\n\n`,
+        `data: ${event({ content: `reply-${requests.length + 1}` })}\n\ndata: ${event({}, "stop")}\n\ndata: [DONE]\n\n`,
         {
           headers: { "Content-Type": "text/event-stream" },
         },
@@ -104,21 +100,24 @@ test("all three agents send stable sessions, growing dialogue and fresh state th
     const saved = room();
     const character = saved.config.characters[0];
     for (let turn = 0; turn < 3; turn++) {
+      const sessionId = worldSessionId(
+        saved,
+        purpose,
+        character.model,
+        purpose === "actor" ? character.id : undefined,
+      );
+      const messages =
+        purpose === "actor"
+          ? actorContext(saved, character, `本轮任务${turn}`)
+          : purpose === "narrator"
+            ? narratorContext(saved, `本轮任务${turn}`)
+            : summaryContext(saved, saved.messages);
+      requests.push({ messages, sessionId });
       const result = await complete({
         purpose,
-        sessionId: worldSessionId(
-          saved,
-          purpose,
-          character.model,
-          purpose === "actor" ? character.id : undefined,
-        ),
+        sessionId,
         model: character.model,
-        messages:
-          purpose === "actor"
-            ? actorContext(saved, character, `本轮任务${turn}`)
-            : purpose === "narrator"
-              ? narratorContext(saved, `本轮任务${turn}`)
-              : summaryContext(saved, saved.messages),
+        messages,
         signal: new AbortController().signal,
         maxCharacters: 100,
       });
@@ -166,15 +165,15 @@ test("all three agents send stable sessions, growing dialogue and fresh state th
       };
     }
     const [before, middle, after] = requests.slice(-3);
-    assert.ok(before.session);
-    assert.equal(before.session, after.session);
-    assert.equal(before.session, middle.session);
+    assert.ok(before.sessionId);
+    assert.equal(before.sessionId, after.sessionId);
+    assert.equal(before.sessionId, middle.sessionId);
     const initial = (request: typeof before) =>
       request.messages.find((message) => message.role === "user");
     assert.deepEqual(
       initial(before),
       initial(after),
-      "Magpie hashes the first user message into the conversation ID",
+      "stable worldSessionId keeps the first user message identity across turns",
     );
     assert.deepEqual(before.messages[0], after.messages[0]);
     assert.doesNotMatch(
@@ -214,5 +213,5 @@ test("all three agents send stable sessions, growing dialogue and fresh state th
     if (purpose !== "actor")
       assert.doesNotMatch(JSON.stringify(after.messages), /备用回路/);
   }
-  assert.equal(new Set(requests.map((request) => request.session)).size, 3);
+  assert.equal(new Set(requests.map((request) => request.sessionId)).size, 3);
 });

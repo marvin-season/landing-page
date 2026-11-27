@@ -22,7 +22,7 @@
       "publicInfo": "发明了投石抬水位的办法",
       "privateInfo": "知道瓶底印记属于旧泉守，可能换来更大保护或更大麻烦",
       "style": "冷静、带计算感；爱把问题拆成步骤",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -35,7 +35,7 @@
       "publicInfo": "提出「大家轮流投石」",
       "privateInfo": "想趁乱把瓶子滚进自己的洞穴区",
       "style": "客气温柔，条件藏在后半句",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -48,7 +48,7 @@
       "publicInfo": "公开反对独占",
       "privateInfo": "若谈判破裂，会考虑撞翻瓶子让大家同输",
       "style": "短促有力；说到孩子时语气变硬",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     }
   ]

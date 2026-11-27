@@ -4,6 +4,8 @@ import { worldAgents } from "~/mastra-server/agents/world-agents";
 import { WorldError } from "./model";
 import { createTextCompletion } from "./provider";
 
+process.env.DEEPSEEK_API_KEY ||= "test-deepseek-key";
+
 function completion(t: TestContext, events: unknown[]) {
   const data =
     events.map((event) => `data: ${JSON.stringify(event)}\r\n\r\n`).join("") +
@@ -13,10 +15,12 @@ function completion(t: TestContext, events: unknown[]) {
     globalThis,
     "fetch",
     async (url: string, init?: RequestInit) => {
-      assert.match(String(url), /\/chat\/completions$/);
+      assert.match(
+        String(url),
+        /^https:\/\/api\.deepseek\.com\/.*chat\/completions/,
+      );
       const body = JSON.parse(String(init?.body));
-      assert.equal(body.model, "cursor/auto");
-      assert.equal(body.tool_choice, "none");
+      assert.equal(body.model, "deepseek-chat");
       assert.equal(body.tools, undefined);
       assert.equal(new Headers(init?.headers).get("X-Magpie-Session"), null);
       return new Response(
@@ -35,7 +39,7 @@ function completion(t: TestContext, events: unknown[]) {
 }
 function input(onText?: (text: string) => void) {
   return {
-    model: "cursor/auto",
+    model: "deepseek/deepseek-chat",
     messages: [{ role: "user" as const, content: "test" }],
     signal: new AbortController().signal,
     maxCharacters: 100,
@@ -46,7 +50,7 @@ function chunk(delta: unknown, finish_reason: string | null = null) {
   return {
     id: "test",
     created: 1,
-    model: "cursor/auto",
+    model: "deepseek-chat",
     choices: [{ index: 0, delta, finish_reason }],
   };
 }
@@ -61,7 +65,7 @@ test("Mastra adapter handles UTF-8, empty deltas and usage-only frames without e
     {
       id: "test",
       created: 1,
-      model: "cursor/auto",
+      model: "deepseek-chat",
       choices: [],
       usage: { prompt_tokens: 20, completion_tokens: 9 },
     },
@@ -142,10 +146,9 @@ test("a short selection deadline aborts the provider without cancelling the room
   assert.equal(request.signal.aborted, false);
 });
 
-test("simultaneous NPC calls keep their model and instructions isolated", async (t) => {
+test("simultaneous NPC calls keep their instructions isolated", async (t) => {
   const requests: Array<{
     model: string;
-    session: string | null;
     messages: Array<{ content: string }>;
   }> = [];
   t.mock.method(
@@ -153,15 +156,17 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
     "fetch",
     async (_url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body));
-      requests.push({
-        ...body,
-        session: new Headers(init?.headers).get("X-Magpie-Session"),
-      });
+      requests.push(body);
+      const name = String(
+        body.messages?.find(
+          (message: { role: string }) => message.role === "system",
+        )?.content ?? "",
+      ).slice("private-".length);
       await new Promise((resolve) =>
-        setTimeout(resolve, body.model === "npc/a" ? 10 : 1),
+        setTimeout(resolve, name === "a" ? 10 : 1),
       );
       return new Response(
-        `data: ${JSON.stringify(chunk({ content: body.model }))}\n\ndata: ${JSON.stringify(chunk({}, "stop"))}\n\ndata: [DONE]\n\n`,
+        `data: ${JSON.stringify(chunk({ content: `npc/${name}` }))}\n\ndata: ${JSON.stringify(chunk({}, "stop"))}\n\ndata: [DONE]\n\n`,
         { headers: { "Content-Type": "text/event-stream" } },
       );
     },
@@ -171,8 +176,6 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
     ["a", "b"].map((name) =>
       complete({
         ...input(),
-        model: `npc/${name}`,
-        sessionId: `world-${name}`,
         messages: [
           { role: "system", content: `private-${name}` },
           { role: "user", content: `context-${name}` },
@@ -185,8 +188,8 @@ test("simultaneous NPC calls keep their model and instructions isolated", async 
     ["npc/a", "npc/b"],
   );
   for (const request of requests) {
-    const name = request.model.slice(-1);
-    assert.equal(request.session, `world-${name}`);
+    assert.equal(request.model, "deepseek-chat");
+    const name = request.messages[0]?.content.slice("private-".length);
     assert.deepEqual(
       request.messages.map((message) => message.content),
       [`private-${name}`, `context-${name}`],

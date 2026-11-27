@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   characterSchema,
   configSchema,
+  defaultWorldCharacterModel,
   idSchema,
   WorldError,
   worldKindSchema,
@@ -60,7 +61,7 @@ export const extractTemplateInputSchema = z.object({
       }
     }),
   kind: worldKindSchema.default("novel"),
-  model: z.string().trim().min(1).max(160).default("cursor/auto"),
+  model: z.string().trim().min(1).max(160).default(defaultWorldCharacterModel),
   fileName: z.string().trim().max(200).optional(),
 });
 

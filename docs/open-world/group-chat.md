@@ -107,7 +107,7 @@ actor 和 narrator 的消息顺序：
 
 **事件**：`room`、`phase`、`message`、`delta`、`error`、`done`，每个事件带 `runId` 和递增的 `eventSeq`。
 
-**模型选择**：actor 使用被选中角色的模型；narrator 使用 `GROUP_CHAT_DIRECTOR_MODEL`，未设置时使用本轮选出的角色的模型；summary 使用第一个启用角色的模型。
+**模型选择**：World Agent 固定 DeepSeek Chat。角色 / `GROUP_CHAT_DIRECTOR_MODEL` 上的 model 字段仍参与会话标识计算，但不再切换底层供应商。
 
 **调用限制**（[`provider.ts`](../../src/lib/group-chat/provider.ts)）：
 
@@ -131,15 +131,14 @@ actor 和 narrator 的消息顺序：
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `GROUP_CHAT_BASE_URL` | `http://127.0.0.1:3425/v1` | OpenAI 兼容代理地址，剧本和小说共用 |
-| `GROUP_CHAT_API_KEY` | `magpie` | 代理密钥 |
-| `GROUP_CHAT_DIRECTOR_MODEL` | 未设置 | 旁白模型 |
+| `DEEPSEEK_API_KEY` | 未设置 | World Agent 与普通聊天共用；未配置无法生成 |
+| `GROUP_CHAT_DIRECTOR_MODEL` | 未设置 | 旁白选用的角色模型字段；实际生成仍固定 DeepSeek Chat |
 | `GROUP_CHAT_DATABASE_URL` | `file:./db/group-chat.db` | libSQL 地址 |
 | `GROUP_CHAT_DATABASE_TOKEN` | 未设置 | 远程 libSQL 令牌 |
 
 ## 9. 运行边界
 
-- 运行状态（中止控制器）保存在单个常驻 Node 进程里。远程部署时 `127.0.0.1` 指向服务器自身，必须配置服务器能访问的代理和持久化数据库。
+- 运行状态（中止控制器）保存在单个常驻 Node 进程里。远程部署须配置 `DEEPSEEK_API_KEY` 与可写的远程 libSQL（`GROUP_CHAT_DATABASE_*`）。
 - 每个房间只有一位操作者。没有多人协作、私聊、历史分支、媒体生成和工具执行。
 - 关闭页面或断开连接会取消当前一批。应用侧取消不代表上游一定停止计算或计费。
 - 上下文预算按字符估算，并非各模型的精确 token 窗口。

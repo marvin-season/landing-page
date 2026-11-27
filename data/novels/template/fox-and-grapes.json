@@ -22,7 +22,7 @@
       "publicInfo": "当众说过葡萄酸",
       "privateInfo": "夜里仍会绕回藤架，记下巡守换班时间",
       "style": "轻快、带刺；擅长把欲望说成挑剔",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -35,7 +35,7 @@
       "publicInfo": "负责巡守与剪枝",
       "privateInfo": "曾把部分藤架故意加高，以筛掉「不够格」的采买者",
       "style": "正式、短促；喜欢用规矩压人",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -48,7 +48,7 @@
       "publicInfo": "常在城门口收货",
       "privateInfo": "手里有一份宴会订单，缺的是能公开唱衰正货的声音",
       "style": "笑着谈条件；从不用「偷」这个词",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     }
   ]

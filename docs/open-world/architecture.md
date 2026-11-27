@@ -54,7 +54,7 @@
 | `characters` | 2～7 位，名称、ID 唯一 | NPC；`enabled` 控制能否发言 | 角色资料全部交给 Writer；第一个启用角色的 `model` 作为写作模型 |
 | `maxTurns` | 1～10 | 每批发言条数（模板为 3，编辑器不提供修改） | 不使用 |
 
-角色字段：`name`、`identity`、`personality`、`goal`、`publicInfo`、`privateInfo`、`style`、`model`（默认 `cursor/auto`）、`enabled`、可选 `avatar`。
+角色字段：`name`、`identity`、`personality`、`goal`、`publicInfo`、`privateInfo`、`style`、`model`（默认 `deepseek/deepseek-chat`）、`enabled`、可选 `avatar`。
 
 **前置剧情**：[`PriorContextField`](../../src/app/agent/worlds/_components/prior-context-field.tsx) 支持粘贴，或从 TXT / Markdown（≤2 MB）追加导入，合并后不超过 8000 字。导入小说的「背景总结」文件时只取总结正文，不读取文件里的元数据。前置剧情不生成剧本消息，也不增加章节数。
 
@@ -74,7 +74,7 @@
 
 | 方法与路径 | 作用 |
 | --- | --- |
-| `GET models` | 通过 OpenAI SDK 读取代理 `/models` |
+| `GET models` | 返回 DeepSeek 可选模型 ID 列表（供编辑器 datalist） |
 | `POST connection` | 用指定模型做一次纯文本连接测试 |
 | `GET/POST presets`，`PATCH/DELETE presets/:id` | 预设列表、新建、更新、删除 |
 | `GET rooms` / `POST rooms` | 作品列表（最多 200 个）/ 创建房间（必须带 `kind`） |
@@ -99,13 +99,11 @@
 | `world-summary` | 剧本公开历史摘要 | 同上 |
 | `world-writer` | 小说写章、润色、剧情整理、背景总结 | `novel.ts` → `handleChatStream` |
 
-- 统一连接 `GROUP_CHAT_BASE_URL`（默认 `http://127.0.0.1:3425/v1`），密钥为 `GROUP_CHAT_API_KEY`（默认 `magpie`）。模型 ID 原样传给代理。
-- 请求体强制加上 `tool_choice: "none"`，不注册工具，不启用自动 Memory。剧本收到工具流时直接报错。
+- World Agent（`actor` / `narrator` / `summary` / `writer`）与普通聊天一样，固定 `model: "deepseek/deepseek-chat"`，经 Mastra 直连 DeepSeek（`DEEPSEEK_API_KEY`），不再经 Magpie / `GROUP_CHAT_BASE_URL` 代理。
+- 剧本路径不注册工具；收到工具流时报错。小说 Writer 可在调用时挂载写作技法 toolset。不启用自动 Memory。
 - 每次调用的 system 指令由 `context.ts`（剧本）或小说 `model.ts`（小说）提供，Agent 自身只有一句通用指令。选人逻辑属于 `schedule.ts`，与 Agent 无关。
 
-**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，以 `X-Magpie-Session` 请求头发给代理。同一房间、同一角色、同一模型、同一配置下标识不变，因此连续批次、暂停后继续、重试和摘要都沿用同一个标识；修改配置或模型、复制世界或 Fork 小说时会换新标识。请求头里只有哈希，不含明文配置。
-
-本机 Magpie 代理根据会话标识和首条 user 消息派生上游会话，用来争取提示词缓存命中。每次调用仍然发送完整的有效上下文；缓存是否命中、能省多少，由代理和模型决定。
+**会话标识**：[`worldSessionId`](../../src/lib/group-chat/session.ts) 对 `[ownerId, roomId, purpose, characterId, model, config]` 做 SHA-256，生成 `world-<purpose>-<hash>`，供调用侧关联同一上下文。同一房间、同一角色、同一配置下标识不变；修改配置或复制 / Fork 时会换新标识。当前 DeepSeek 直连不再发送 Magpie 会话头。
 
 ## 7. 模板、预设与复制
 

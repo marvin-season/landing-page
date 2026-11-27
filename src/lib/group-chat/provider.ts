@@ -26,14 +26,6 @@ export type Complete = (input: {
 
 const maxCompletionTimeoutMs = 180_000;
 
-function client() {
-  return new OpenAI({
-    baseURL: process.env.GROUP_CHAT_BASE_URL || "http://127.0.0.1:3425/v1",
-    apiKey: process.env.GROUP_CHAT_API_KEY || "magpie",
-    maxRetries: 0,
-    timeout: 60000,
-  });
-}
 export function providerError(error: unknown): WorldError {
   if (error instanceof WorldError) return error;
   const status =
@@ -46,27 +38,27 @@ export function providerError(error: unknown): WorldError {
     if (status === 401 || status === 403)
       return new WorldError(
         "proxy_auth",
-        "代理鉴权失败，请检查服务端密钥",
+        "DeepSeek 鉴权失败，请检查 DEEPSEEK_API_KEY",
         502,
       );
     if (status === 429)
-      return new WorldError("rate_limit", "代理请求过于频繁，请稍后重试", 429);
+      return new WorldError("rate_limit", "模型请求过于频繁，请稍后重试", 429);
     if (status === 404)
       return new WorldError(
         "model_missing",
-        "代理地址或模型不存在，请检查配置",
+        "模型不存在，请检查 DeepSeek 模型配置",
         502,
       );
     if (status === 400)
       return new WorldError(
         "incompatible",
-        "代理拒绝了请求，请检查模型、上下文长度及纯文本参数兼容性",
+        "模型拒绝了请求，请检查上下文长度及参数兼容性",
         502,
       );
   }
   return new WorldError(
     "proxy_unavailable",
-    "代理连接失败或响应中断，请检查本地代理是否运行",
+    "模型连接失败或响应中断，请检查 DEEPSEEK_API_KEY 与网络",
     502,
   );
 }
@@ -181,12 +173,6 @@ export function createTextCompletion(
 }
 export const completeText = createTextCompletion();
 export async function listModels() {
-  try {
-    const result = await client().models.list({
-      signal: AbortSignal.timeout(10000),
-    });
-    return result.data.map((model) => model.id);
-  } catch (error) {
-    throw providerError(error);
-  }
+  // world agents 固定走 DeepSeek；编辑器「获取模型」给出可选 ID，不再依赖 Magpie 代理。
+  return ["deepseek/deepseek-chat", "deepseek/deepseek-reasoner"];
 }

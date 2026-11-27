@@ -22,7 +22,7 @@
       "publicInfo": "救蛇被咬；手腕肿起",
       "privateInfo": "曾听过蛇谷需要「会说话的人」当中间人，不确定是否该主动联系",
       "style": "朴素、结巴时重复；怒了会很短",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -35,7 +35,7 @@
       "publicInfo": "咬了救命者",
       "privateInfo": "这一口是试探标记，不是必杀；她需要向上汇报农夫的反应",
       "style": "慢、冷；用问句逼人表态",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     },
     {
@@ -48,7 +48,7 @@
       "publicInfo": "号召夜里巡田、准备火把",
       "privateInfo": "想用这次事件推动封山令，顺便清掉与蛇谷有私交的人",
       "style": "大声、带命令；爱把个人选择说成全村安危",
-      "model": "cursor/auto",
+      "model": "deepseek/deepseek-chat",
       "enabled": true
     }
   ]

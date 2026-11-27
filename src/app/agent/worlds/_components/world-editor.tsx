@@ -26,6 +26,7 @@ import { worldRequest } from "@/lib/group-chat/client";
 import {
   type Character,
   configSchema,
+  defaultWorldCharacterModel,
   type WorldConfig,
   type WorldKind,
   type WorldPreset,
@@ -233,7 +234,7 @@ export function WorldEditor({
       const model =
         config.characters.find((character) => character.enabled)?.model ??
         config.characters[0]?.model ??
-        "cursor/auto";
+        defaultWorldCharacterModel;
       const result = await worldRequest<{ template: { config: WorldConfig } }>(
         "templates/extract",
         "POST",
@@ -482,7 +483,7 @@ export function WorldEditor({
                         publicInfo: "",
                         privateInfo: "",
                         style: "",
-                        model: "cursor/auto",
+                        model: defaultWorldCharacterModel,
                         enabled: true,
                       },
                     ])
