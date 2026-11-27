@@ -116,6 +116,7 @@ export function useNovel(
     renameChapter,
     updateContext,
     ready: storageReady,
+    assumeIdle,
     loadFailed,
     saving,
     syncPrompt,
@@ -444,6 +445,7 @@ export function useNovel(
   const taskConnection = useNovelTask<NovelRun>({
     key,
     storageReady,
+    assumeIdle,
     onError: setError,
     onText: receiveText,
     onTools: setToolCalls,

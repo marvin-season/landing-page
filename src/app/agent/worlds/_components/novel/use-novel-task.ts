@@ -26,6 +26,7 @@ type ActiveRun<T> = {
 export function useNovelTask<T>({
   key,
   storageReady,
+  assumeIdle = false,
   onRestore,
   onText,
   onTools,
@@ -37,6 +38,8 @@ export function useNovelTask<T>({
 }: {
   key: string;
   storageReady: boolean;
+  /** 刚写入的空存档：首屏可先当无挂起任务，避免骨架屏与空状态打架。 */
+  assumeIdle?: boolean;
   onRestore: (entry: NovelRunRecord<T>) => boolean;
   onText: (text: string) => void;
   onTools?: (tools: NonNullable<NovelRunStatus["tools"]>) => void;
@@ -55,7 +58,9 @@ export function useNovelTask<T>({
   ) => Promise<void>;
   onError: (message: string) => void;
 }) {
-  const [checkedKey, setCheckedKey] = useState<string>();
+  const [checkedKey, setCheckedKey] = useState<string | undefined>(() =>
+    assumeIdle ? key : undefined,
+  );
   const [reconnecting, setReconnecting] = useState(false);
   const session = useMemo(
     () => ({

@@ -53,8 +53,23 @@ import {
 const chapterHistoryWriteError =
   "正文已保存。历史记录暂未写入，下次打开作品会重试。";
 
-export function addNovelCopy(key: string, novel: Novel) {
-  return novels.add({ key, novel, version: crypto.randomUUID() });
+/** 刚写入的空存档：下一次打开同 key 时跳过骨架屏，直接进空状态。 */
+const primedEmptyNovels = new Map<string, { novel: Novel; version: string }>();
+
+function peekPrimedEmptyNovel(key: string) {
+  return primedEmptyNovels.get(key);
+}
+
+function clearPrimedEmptyNovel(key: string) {
+  primedEmptyNovels.delete(key);
+}
+
+export async function addNovelCopy(key: string, novel: Novel) {
+  const version = crypto.randomUUID();
+  await novels.add({ key, novel, version });
+  if (novel.chapters.length === 0) {
+    primedEmptyNovels.set(key, { novel, version });
+  }
 }
 
 export function getNovelCopy(key: string) {
@@ -105,9 +120,12 @@ export function useNovelStorage(
   },
 ) {
   const key = `${room.ownerId}:${room.id}`;
-  const [novel, setNovel] = useState(() => createNovel(room.config));
+  const [initialEmpty] = useState(() => peekPrimedEmptyNovel(key));
+  const [novel, setNovel] = useState(
+    () => initialEmpty?.novel ?? createNovel(room.config),
+  );
   const [loadStatus, setLoadStatus] = useState<"loading" | "ready" | "failed">(
-    "loading",
+    () => (initialEmpty ? "ready" : "loading"),
   );
   const ready = loadStatus === "ready";
   const [draftBackupFailed, setDraftBackupFailed] = useState(false);
@@ -124,7 +142,8 @@ export function useNovelStorage(
   const [lineage, setLineage] = useState<ChapterLineage[]>([]);
   const latest = useRef(novel);
   const committed = useRef(novel);
-  const storageVersion = useRef<string | undefined>(undefined);
+  const storageVersion = useRef<string | undefined>(initialEmpty?.version);
+  const skipInitialLoad = useRef(Boolean(initialEmpty));
   const writes = useRef(Promise.resolve());
   const previousRef = useRef<Novel | undefined>(undefined);
   const serverCopy = useRef<ServerNovel | null>(null);
@@ -162,6 +181,43 @@ export function useNovelStorage(
   }
   useEffect(() => {
     let active = true;
+    if (skipInitialLoad.current) {
+      skipInitialLoad.current = false;
+      // 延后清预热，避免 React Strict Mode 重挂载时又变回骨架屏。
+      const releasePrimed = window.setTimeout(() => {
+        clearPrimedEmptyNovel(key);
+      }, 0);
+      if (isDevelopment) {
+        void loadServerNovel(roomIdRef.current).then(
+          (server) => {
+            if (!active) return;
+            serverCopy.current = server;
+            const status = novelSyncStatus(
+              latest.current,
+              server,
+              exportNovel(latest.current),
+            );
+            setSyncPrompt(status.kind === "diverged" ? status.reason : null);
+            setServerSynced(status.kind === "match");
+          },
+          () => {
+            if (active) setSyncReadFailed(true);
+          },
+        );
+      }
+      void flushSavedChapterHistory(key).then(
+        () => {
+          if (active) setChapterHistoryError("");
+        },
+        () => {
+          if (active) setChapterHistoryError(chapterHistoryWriteError);
+        },
+      );
+      return () => {
+        active = false;
+        window.clearTimeout(releasePrimed);
+      };
+    }
     Promise.all([
       novels.get(key),
       isDevelopment
@@ -433,6 +489,8 @@ export function useNovelStorage(
     renameChapter,
     updateContext,
     ready,
+    /** 刚创建的空存档：无需等生成任务检查，可直接进空状态。 */
+    assumeIdle: Boolean(initialEmpty),
     loadFailed: loadStatus === "failed",
     saving,
     syncPrompt,
