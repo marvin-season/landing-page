@@ -8,6 +8,7 @@ import {
   listPublicUsers,
   loadAuthUsers,
   updateUserPassword,
+  updateUserRole,
 } from "@/lib/auth-users/store";
 import { protectedProcedure, router } from "~/server/trpc";
 
@@ -23,7 +24,14 @@ const AUTH_STORE_TRPC: Record<
   user_already_exists: { code: "CONFLICT", message: "账号已存在" },
   username_empty: { code: "BAD_REQUEST", message: "用户名不能为空" },
   password_empty: { code: "BAD_REQUEST", message: "密码不能为空" },
-  role_not_creatable: { code: "BAD_REQUEST", message: "只能创建管理员或访客" },
+  role_not_creatable: {
+    code: "BAD_REQUEST",
+    message: "只能设为管理员或访客",
+  },
+  role_not_editable: {
+    code: "BAD_REQUEST",
+    message: "不能修改超级管理员的角色",
+  },
   invalid_role: { code: "INTERNAL_SERVER_ERROR", message: "读取用户失败" },
 };
 
@@ -89,6 +97,21 @@ export const userRouter = router({
       try {
         await requireSuperAdmin(ctx.userId, "只有超级管理员可以修改密码");
         return await updateUserPassword(input.username, input.password);
+      } catch (error) {
+        throw toTrpcError(error);
+      }
+    }),
+  updateRole: protectedProcedure
+    .input(
+      z.object({
+        username: z.string().min(1),
+        role: z.enum(["admin", "guest"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await requireSuperAdmin(ctx.userId, "只有超级管理员可以修改角色");
+        return await updateUserRole(input.username, input.role);
       } catch (error) {
         throw toTrpcError(error);
       }

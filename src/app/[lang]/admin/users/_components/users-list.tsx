@@ -22,7 +22,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import type { UserRole } from "@/lib/auth-users/roles";
+import type { CreatableRole, UserRole } from "@/lib/auth-users/roles";
 import { useTRPC } from "@/lib/trpc";
 import { CreateUserForm } from "./create-user-card";
 import { ROLE_ORDER, roleLabel } from "./roles";
@@ -107,12 +107,16 @@ export function UsersList() {
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [panel, setPanel] = useState<Panel>({ type: "idle" });
-  const [savedUsername, setSavedUsername] = useState("");
+  const [savedPasswordUsername, setSavedPasswordUsername] = useState("");
+  const [savedRoleUsername, setSavedRoleUsername] = useState("");
   const [flashUsername, setFlashUsername] = useState("");
   const listQuery = useQuery(trpc.user.list.queryOptions());
   const createMutation = useMutation(trpc.user.create.mutationOptions());
-  const updateMutation = useMutation(
+  const updatePasswordMutation = useMutation(
     trpc.user.updatePassword.mutationOptions(),
+  );
+  const updateRoleMutation = useMutation(
+    trpc.user.updateRole.mutationOptions(),
   );
   const users = listQuery.data?.users ?? [];
   const canManage = listQuery.data?.canManage === true;
@@ -222,7 +226,8 @@ export function UsersList() {
         onSubmit={async (input) => {
           await createMutation.mutateAsync(input);
           await refreshUsers();
-          setSavedUsername("");
+          setSavedPasswordUsername("");
+          setSavedRoleUsername("");
           flash(input.username);
           setPanel({ type: "user", username: input.username });
         }}
@@ -235,18 +240,34 @@ export function UsersList() {
         updatedAt={selectedUser.updatedAt}
         locale="zh"
         canManage={canManage}
-        pending={
-          updateMutation.isPending &&
-          updateMutation.variables?.username === selectedUser.username
+        pendingPassword={
+          updatePasswordMutation.isPending &&
+          updatePasswordMutation.variables?.username === selectedUser.username
         }
-        saved={savedUsername === selectedUser.username}
-        onSubmit={async (password) => {
-          await updateMutation.mutateAsync({
+        pendingRole={
+          updateRoleMutation.isPending &&
+          updateRoleMutation.variables?.username === selectedUser.username
+        }
+        savedPassword={savedPasswordUsername === selectedUser.username}
+        savedRole={savedRoleUsername === selectedUser.username}
+        onSubmitPassword={async (password) => {
+          await updatePasswordMutation.mutateAsync({
             username: selectedUser.username,
             password,
           });
           await refreshUsers();
-          setSavedUsername(selectedUser.username);
+          setSavedPasswordUsername(selectedUser.username);
+          setSavedRoleUsername("");
+          flash(selectedUser.username);
+        }}
+        onSubmitRole={async (role: CreatableRole) => {
+          await updateRoleMutation.mutateAsync({
+            username: selectedUser.username,
+            role,
+          });
+          await refreshUsers();
+          setSavedRoleUsername(selectedUser.username);
+          setSavedPasswordUsername("");
           flash(selectedUser.username);
         }}
       />

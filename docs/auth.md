@@ -148,11 +148,11 @@ Agent 侧边栏与开放世界大厅顶栏（首页 / 我的作品 / 预设模�
 
 | 角色 | 谁能创建 | 页面访问 | 账号管理 |
 |---|---|---|---|
-| `super_admin` | 仅种子写入，不能再创建 | 所有受保护页 | 可创建 `admin` / `guest`、改任何人密码 |
+| `super_admin` | 仅种子写入，不能再创建 | 所有受保护页 | 可创建 `admin` / `guest`、改任何人密码；可把 `admin` / `guest` 的角色互改（不能改超级管理员自身角色，也不能赋 `super_admin`） |
 | `admin` | 超级管理员 | 所有受保护页 | 只读用户列表 |
 | `guest` | 超级管理员 | 所有受保护页 | 只读用户列表 |
 
-页面门闩**只看是否登录**，不看角色。任何已登录角色都能打开 `/admin` 和 `/admin/users`。写操作在 tRPC 里再卡 `super_admin`。
+页面门闩**只看是否登录**，不看角色。任何已登录角色都能打开 `/admin` 和 `/admin/users`。写操作在 tRPC 里再卡 `super_admin`。角色遵循「高权限改低权限」：仅超级管理员可改，且只能赋低于自己的 `admin` / `guest`。
 
 Admin 页面本身不调 `auth()`；靠 proxy 挡未登录访问。
 
@@ -163,7 +163,7 @@ Admin 页面本身不调 `auth()`；靠 proxy 挡未登录访问。
 | 入口 | 规则 |
 |---|---|
 | `server/trpc.ts` 的 `protectedProcedure` | 无 `session.user.id` → `UNAUTHORIZED` |
-| `server/user` 的 `create` / `updatePassword` | 已登录 + `getUserRole === "super_admin"`，否则 `FORBIDDEN` |
+| `server/user` 的 `create` / `updatePassword` / `updateRole` | 已登录 + `getUserRole === "super_admin"`，否则 `FORBIDDEN`。`updateRole` 仅允许目标为 `admin` / `guest`，且目标当前也不能是 `super_admin` |
 | `server/user` 的 `list` | 已登录即可；`canManage` 表示是否超级管理员 |
 | `server/thread` | 全部 `protectedProcedure`，用 `ctx.userId` 当 Mastra `resourceId` |
 | `src/app/api/chat/route.ts` | `auth()`；无用户 → HTTP 401 |

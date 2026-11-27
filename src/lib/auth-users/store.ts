@@ -9,6 +9,7 @@ export type AuthStoreErrorCode =
   | "username_empty"
   | "password_empty"
   | "role_not_creatable"
+  | "role_not_editable"
   | "invalid_role";
 
 export class AuthStoreError extends Error {
@@ -209,6 +210,35 @@ export async function updateUserPassword(username: string, password: string) {
   return {
     username,
     role: parseUserRole(row.role),
+    updatedAt,
+  } satisfies PublicAuthUser;
+}
+
+export async function updateUserRole(username: string, role: UserRole) {
+  if (!isCreatableRole(role)) throw new AuthStoreError("role_not_creatable");
+
+  const client = await ensureReady();
+  const existing = await client.execute({
+    sql: "SELECT username, role FROM auth_users WHERE username = ?",
+    args: [username],
+  });
+  const row = existing.rows[0];
+  if (!row) throw new AuthStoreError("user_not_found");
+
+  const currentRole = parseUserRole(row.role);
+  if (currentRole === "super_admin") {
+    throw new AuthStoreError("role_not_editable");
+  }
+
+  const updatedAt = new Date().toISOString();
+  await client.execute({
+    sql: "UPDATE auth_users SET role = ?, updated_at = ? WHERE username = ?",
+    args: [role, updatedAt, username],
+  });
+
+  return {
+    username,
+    role,
     updatedAt,
   } satisfies PublicAuthUser;
 }

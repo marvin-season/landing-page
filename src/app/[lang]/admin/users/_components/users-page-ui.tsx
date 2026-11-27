@@ -16,7 +16,7 @@ export function UsersPageHeader() {
         账号
       </h1>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        查看登录账号。只有超级管理员可以创建账号或修改密码。
+        查看登录账号。只有超级管理员可以创建账号、修改角色或密码。
       </p>
     </header>
   );
