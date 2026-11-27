@@ -23,7 +23,7 @@ export type NovelTask = z.infer<typeof novelTaskSchema>;
 export const maxNovelPromptLength = 150000;
 export const maxNovelSummaryLength = 20000;
 export const minChapterTarget = 1000;
-export const defaultChapterTarget = 4000;
+export const defaultChapterTarget = 1000;
 export const maxChapterLength = 8000;
 
 export function isChapterTargetValid(value: string) {

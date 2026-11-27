@@ -158,7 +158,7 @@ test("the imported book starts fresh and continuation contains only its chapters
   assert.equal(next.title, "旧港");
   assert.equal(next.outline, config.storyGoal);
   assert.equal(next.chapterGoal, "");
-  assert.equal(next.words, "4000");
+  assert.equal(next.words, "1000");
   const prompt = JSON.parse(chapterPrompt(config, next));
   assert.deepEqual(prompt.completedChapters, [
     { title: "第1章", text: "新的一段正文。" },

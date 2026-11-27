@@ -1,6 +1,6 @@
-import { Input, Switch } from "@landing-page/design-system";
+import { Button, Input, Switch } from "@landing-page/design-system";
 import { cn } from "@landing-page/utils";
-import { PenLine, Trash2, WandSparkles } from "lucide-react";
+import { PenLine, Sparkles, Trash2, WandSparkles } from "lucide-react";
 import { type ReactNode, type Ref, useLayoutEffect, useRef } from "react";
 import {
   isChapterTargetValid,
@@ -22,18 +22,72 @@ export type ChapterGenerationOptions = {
   words: string;
 };
 
+export const emptyNovelQuickStarts = [
+  {
+    id: "farmer-and-snake",
+    title: "农夫和蛇",
+    description: "伊索寓言精简版",
+    prompt:
+      "写伊索寓言《农夫与蛇》精简版：寒冬里农夫救起冻僵的蛇，蛇苏醒后反咬恩人。用具体场景、动作和短对白呈现，章末点出忘恩负义的寓意，不要说教旁白。",
+  },
+  {
+    id: "crow-and-water",
+    title: "乌鸦喝水",
+    description: "经典寓言精简版",
+    prompt:
+      "写《乌鸦喝水》精简版：口渴的乌鸦发现瓶中水位太低，衔石子使水位上升后喝到水。用观察、试探和连续动作展开，突出聪明与坚持，不要写成说明文。",
+  },
+  {
+    id: "wusong-tiger",
+    title: "武松打虎",
+    description: "水浒开场白",
+    prompt:
+      "写《水浒传》武松打虎的开场：景阳冈酒店「三碗不过岗」、武松酒后执意上山，山路渐静、风动林响，遇见大虫前的气氛与人物神态。白话叙事，停在虎影将现处。",
+  },
+] as const;
+
 export function EmptyNovelContinuation({
   disabled,
   onOpen,
+  onSelectExample,
 }: {
   disabled: boolean;
   onOpen: () => void;
+  onSelectExample: (prompt: string) => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-4 py-10 text-center">
-      <p className="max-w-sm text-sm text-muted-foreground">
-        还没有章节。写下下一章要求开始续写，或从文件菜单导入已有小说。
-      </p>
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 py-10 text-center">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          还没有章节。写下下一章要求开始续写，或从下方案例快速开始。
+        </p>
+        <p className="text-xs text-muted-foreground">
+          也可从文件菜单导入已有小说。
+        </p>
+      </div>
+      <div className="w-full space-y-2 rounded-lg border bg-card p-3 text-left">
+        <div className="flex items-center gap-2 px-1 text-xs font-medium text-muted-foreground">
+          <Sparkles className="size-3.5" />
+          快速开始
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {emptyNovelQuickStarts.map((example) => (
+            <Button
+              key={example.id}
+              type="button"
+              variant="ghost"
+              disabled={disabled}
+              onClick={() => onSelectExample(example.prompt)}
+              className="h-auto flex-col items-start gap-1 px-3 py-3 text-left"
+            >
+              <span className="text-sm font-medium">{example.title}</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                {example.description}
+              </span>
+            </Button>
+          ))}
+        </div>
+      </div>
       <NovelActionButton
         hint={localActionHint(
           "展开下一章要求，填写后可手动写作或发起 AI 续写。",

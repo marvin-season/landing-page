@@ -1008,6 +1008,9 @@ export function NovelPanel({
             <EmptyNovelContinuation
               disabled={disabled}
               onOpen={() => setComposerRequest((count) => count + 1)}
+              onSelectExample={(prompt) => {
+                reuseChapterGoal(prompt);
+              }}
             />
           )}
         </div>
