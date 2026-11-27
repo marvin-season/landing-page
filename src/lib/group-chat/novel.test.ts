@@ -94,7 +94,11 @@ const mastra = new Mastra({ agents: { writer: worldAgents.writer } });
 test("novel writing, summaries and rewrites stream through DeepSeek with server-owned instructions and tool policy", async (t) => {
   const saved = room();
   const ctx = fixture(t);
-  const bodies: Array<{ messages: Array<{ content: string }> }> = [];
+  const bodies: Array<{
+    messages: Array<{ content: string }>;
+    tool_choice?: unknown;
+    tools?: unknown;
+  }> = [];
   t.mock.method(
     globalThis,
     "fetch",

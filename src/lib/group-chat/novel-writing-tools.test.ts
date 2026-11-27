@@ -25,6 +25,7 @@ test("apply_writing_skill only mounts skills from the pool", async () => {
   const execute = tools.apply_writing_skill.execute;
   assert.ok(execute);
   const mounted = await execute({ skillId: "scene-driven" }, {} as never);
+  assert.ok(mounted && typeof mounted === "object" && "id" in mounted);
   assert.equal(mounted.id, "scene-driven");
   await assert.rejects(
     () => execute({ skillId: "dialogue-first" }, {} as never),
