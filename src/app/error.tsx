@@ -2,6 +2,7 @@
 
 import { Button } from "@landing-page/design-system";
 import { BrandStatusPage } from "@/components/brand-status-page";
+import { jetbrainsMono } from "@/lib/fonts";
 import { SITE_NAME } from "@/lib/site";
 import "@/styles/globals.css";
 
@@ -19,7 +20,9 @@ export default function GlobalError({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
+      <body
+        className={`${jetbrainsMono.variable} ${jetbrainsMono.className} min-h-dvh bg-background font-sans text-foreground antialiased`}
+      >
         <BrandStatusPage
           eyebrow="哎呀"
           title="闹脾气了"

@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { LocatorRuntime } from "@/components/locator-runtime";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import TankQueryClientProvider from "@/components/trpc/provider";
+import { jetbrainsMono } from "@/lib/fonts";
 import { brandedTitle, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default async function AgentLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="h-dvh overflow-hidden bg-background font-sans text-foreground antialiased bg-none">
+      <body
+        className={`${jetbrainsMono.variable} ${jetbrainsMono.className} h-dvh overflow-hidden bg-background font-sans text-foreground antialiased bg-none`}
+      >
         <ThemeProvider>
           <TankQueryClientProvider>
             <div className="flex h-full flex-col md:flex-row">

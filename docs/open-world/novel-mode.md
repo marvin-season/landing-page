@@ -32,9 +32,6 @@
 | `chapter-rewrite.tsx`、`chapter-markdown.ts` | 阅读模式渲染与润色范围高亮 |
 | `plot-sheet.tsx`、`context-controls.tsx`、`background-controls.tsx` | 剧情整理、续写上下文压缩、导入导出与背景总结 |
 | [`novel.ts`](../../src/lib/group-chat/novel.ts) | `/api/novel` 服务端处理 |
-| [`layout.tsx`](../../src/app/agent/worlds/layout.tsx) | `/agent/worlds` 下统一使用本机「刘建毛草」字体 |
-
-`/agent/worlds`（含大厅、模板、小说与剧本房间）始终使用本机托管的刘建毛草（`src/fonts/LiuJianMaoCao-Regular.ttf`）。布局同时覆盖默认 `sans` / `serif`，避免子组件的 `font-sans`、`font-serif` 切回系统字体；等宽字（如 diff 行号）仍用 `font-mono`。Dialog / Sheet / Dropdown 等 Portal 挂在 `body` 下，因此同一套字体类和变量也会在停留本路由时写到 `body`，离开后还原。
 
 ## 3. 设定来源
 

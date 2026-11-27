@@ -2,7 +2,6 @@ import { msg } from "@lingui/core/macro";
 import { setI18n } from "@lingui/react/server";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Lora } from "next/font/google";
 import type { PropsWithChildren } from "react";
 import { LinguiClientProvider } from "@/components/language/lingui-client-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -16,11 +15,7 @@ import "@/styles/globals.css";
 import { LocatorRuntime } from "@/components/locator-runtime";
 import { PageFade } from "@/components/page-transition/page-fade";
 import { SettingsMenu } from "@/components/settings-menu/settings-menu";
-
-const lora = Lora({
-  weight: "400",
-  style: "normal",
-});
+import { jetbrainsMono } from "@/lib/fonts";
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -56,7 +51,7 @@ export default async function RootLayout({
   return (
     <html lang={lang as string} dir="ltr" suppressHydrationWarning>
       <body
-        className={`${lora.className} min-h-dvh antialiased shinchan:font-sans! apple:font-sans! loopy:font-sans!`}
+        className={`${jetbrainsMono.variable} ${jetbrainsMono.className} min-h-dvh font-sans antialiased`}
       >
         <LinguiClientProvider
           initialLocale={lang}
