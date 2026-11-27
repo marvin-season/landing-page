@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  novelRunPhase,
+  novelRunToolCall,
+} from "@/lib/group-chat/novel-run-contract";
 import { plotModes } from "./plot-edit";
 
 const chapterSchema = z.object({
@@ -6,6 +10,18 @@ const chapterSchema = z.object({
   title: z.string(),
   text: z.string(),
   brief: z.string().optional(),
+});
+
+const historyCommitSchema = z.object({
+  question: z.string().optional(),
+  tools: z.array(
+    novelRunToolCall.extend({
+      output: z.unknown().optional(),
+    }),
+  ),
+  answer: z.string().optional(),
+  phase: novelRunPhase.optional(),
+  incomplete: z.boolean().optional(),
 });
 
 const pendingSchema = z.discriminatedUnion("kind", [
@@ -23,6 +39,8 @@ const pendingSchema = z.discriminatedUnion("kind", [
     preview: z.string().min(1),
     version: z.number().int(),
     incomplete: z.boolean().optional(),
+    /** 润色结果暂存的提交元数据；确认保存正文时才写入创作历史。 */
+    historyCommit: historyCommitSchema.optional(),
   }),
   z.object({
     kind: z.literal("plot"),

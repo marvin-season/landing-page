@@ -32,8 +32,8 @@ import type { NovelHistoryWorkspace } from "./thinking-history-context";
 const blankChapter: Chapter = { id: "", title: "", text: "" };
 const startPosition = "history-first";
 const historyViews = [
-  { value: "current", label: "当前正文对比" },
   { value: "original", label: "当时改动" },
+  { value: "current", label: "当前正文对比" },
   { value: "raw", label: "生成结果" },
 ] as const;
 
@@ -71,7 +71,9 @@ export function NovelHistoryDetail({
 }) {
   const { book, lineage } = workspace;
   const [view, setView] = useState<"current" | "original" | "raw">(() =>
-    historicalChapters(content).length ? "current" : "raw",
+    historicalChapters(content).length || content.sources.length
+      ? "original"
+      : "raw",
   );
   const [savedVersion, setSavedVersion] = useState<"before" | "after">("after");
   const [part, setPart] = useState(0);
@@ -186,12 +188,12 @@ export function NovelHistoryDetail({
 
   return (
     <>
-      <DialogHeader className="shrink-0 flex-row items-center gap-2 border-b border-border px-3 pr-12 text-left sm:gap-3 sm:px-6 sm:pr-14">
+      <DialogHeader className="shrink-0 flex-row items-center gap-1.5 border-b border-border px-3 pr-12 text-left sm:px-4 sm:pr-14">
         <Button
           type="button"
           size="icon"
           variant="ghost"
-          className="size-8 shrink-0"
+          className="size-7 shrink-0"
           onClick={onBack}
           disabled={working}
           aria-label="返回创作历史"
@@ -200,7 +202,7 @@ export function NovelHistoryDetail({
           <ArrowLeft />
         </Button>
         <div className="min-w-0">
-          <DialogTitle className="truncate" title={entry.label}>
+          <DialogTitle className="truncate text-base" title={entry.label}>
             {entry.label}
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -210,15 +212,15 @@ export function NovelHistoryDetail({
       </DialogHeader>
 
       {hasProse ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-border px-4 py-2 sm:px-6">
-          <div className="inline-flex flex-wrap items-center gap-0.5 rounded-xl bg-muted/60 p-0.5">
+        <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-border px-3 py-1.5 sm:px-4">
+          <div className="inline-flex flex-wrap items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
             {historyViews.map(({ value, label }) => (
               <Button
                 type="button"
                 size="sm"
                 key={value}
                 variant={view === value ? "soft" : "ghost"}
-                className="px-2.5 sm:px-3"
+                className="h-7 px-2 text-xs sm:px-2.5"
                 aria-pressed={view === value}
                 onClick={() => changeView(value)}
               >
@@ -231,7 +233,7 @@ export function NovelHistoryDetail({
               type="button"
               size="sm"
               variant="ghost"
-              className="ml-auto shrink-0"
+              className="ml-auto h-7 shrink-0 px-2 text-xs"
               aria-expanded={adjustingPosition}
               onClick={() => {
                 if (showPositions) {
@@ -247,9 +249,9 @@ export function NovelHistoryDetail({
         </div>
       ) : null}
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-3 py-2 sm:px-4">
         {view === "raw" ? (
-          <pre className="whitespace-pre-wrap wrap-anywhere rounded-lg border border-border bg-background/55 p-4 font-serif text-sm leading-7 sm:p-6 sm:text-base">
+          <pre className="whitespace-pre-wrap wrap-anywhere rounded-md border border-border bg-background/55 p-3 font-serif text-sm leading-6">
             {isChapterSave
               ? originalResults[0]?.text || "该版本正文为空。"
               : content.raw || "这轮尚未收到结果。"}
@@ -257,11 +259,12 @@ export function NovelHistoryDetail({
         ) : (
           <>
             {view === "current" && isChapterSave && content.sources.length ? (
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                 <span className="text-xs text-muted-foreground">应用版本</span>
                 <Button
                   type="button"
                   size="sm"
+                  className="h-7 px-2 text-xs"
                   variant={savedVersion === "before" ? "soft" : "ghost"}
                   aria-pressed={savedVersion === "before"}
                   onClick={() => {
@@ -274,6 +277,7 @@ export function NovelHistoryDetail({
                 <Button
                   type="button"
                   size="sm"
+                  className="h-7 px-2 text-xs"
                   variant={savedVersion === "after" ? "soft" : "ghost"}
                   aria-pressed={savedVersion === "after"}
                   onClick={() => {
@@ -286,19 +290,20 @@ export function NovelHistoryDetail({
               </div>
             ) : null}
             {view === "current" && !automatic ? (
-              <Alert className="shrink-0 px-3 py-2">
-                <AlertDescription>
+              <Alert className="shrink-0 px-2.5 py-1.5">
+                <AlertDescription className="text-xs">
                   无法安全应用到原位置。请手动选择目标，或另存为新章。
                 </AlertDescription>
               </Alert>
             ) : null}
             {view === "current" && adjustingPosition ? (
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                 {book.chapters.length ? (
                   <>
                     <Button
                       type="button"
                       size="sm"
+                      className="h-7 px-2 text-xs"
                       variant={manual === "passage" ? "soft" : "outline"}
                       aria-pressed={manual === "passage"}
                       onClick={() => {
@@ -311,6 +316,7 @@ export function NovelHistoryDetail({
                     <Button
                       type="button"
                       size="sm"
+                      className="h-7 px-2 text-xs"
                       variant={manual === "whole" ? "soft" : "outline"}
                       aria-pressed={manual === "whole"}
                       onClick={() => {
@@ -325,6 +331,7 @@ export function NovelHistoryDetail({
                 <Button
                   type="button"
                   size="sm"
+                  className="h-7 px-2 text-xs"
                   variant={manual === "insert" ? "soft" : "outline"}
                   aria-pressed={manual === "insert"}
                   onClick={() => {
@@ -337,7 +344,7 @@ export function NovelHistoryDetail({
               </div>
             ) : null}
             {view === "current" && manual ? (
-              <div className="flex shrink-0 flex-col gap-2 rounded-lg border border-border bg-muted/25 p-3">
+              <div className="flex shrink-0 flex-col gap-1.5 rounded-md border border-border bg-muted/25 p-2">
                 <div className="flex flex-wrap gap-2">
                   <Select
                     value={targetId}
@@ -392,7 +399,7 @@ export function NovelHistoryDetail({
                 {target && manual === "passage" ? (
                   <Textarea
                     aria-label="在当前正文中选中要替换的文字"
-                    className="h-28 resize-none font-serif leading-6"
+                    className="h-24 resize-none font-serif text-sm leading-5"
                     value={target.text}
                     readOnly
                     onSelect={(event) => {
@@ -409,11 +416,12 @@ export function NovelHistoryDetail({
               </div>
             ) : null}
             {parts > 1 ? (
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-1">
                 {Array.from({ length: parts }, (_, i) => (
                   <Button
                     type="button"
                     size="sm"
+                    className="h-7 px-2 text-xs"
                     key={`${before[i]?.id ?? ""}:${after[i]?.id ?? ""}`}
                     variant={i === index ? "soft" : "ghost"}
                     aria-pressed={i === index}
@@ -460,7 +468,7 @@ export function NovelHistoryDetail({
       </div>
 
       {view === "current" && (plan || error) ? (
-        <DialogFooter className="shrink-0 flex-row items-center justify-between gap-3 border-t border-border px-4 py-3 sm:px-6">
+        <DialogFooter className="shrink-0 flex-row items-center justify-between gap-2 border-t border-border px-3 py-2 sm:px-4">
           <p
             role={error ? "alert" : undefined}
             className={

@@ -18,6 +18,8 @@ import type {
   WorldPreset,
   WorldRoom,
 } from "@/lib/group-chat/model";
+import { createNovel } from "./novel/model";
+import { addNovelCopy } from "./novel/use-novel-storage";
 import { WorldEditor } from "./world-editor";
 
 export type CreateWorkDraft = {
@@ -117,6 +119,31 @@ export function CreateWorkSheet({
                       : {}),
                   },
                 );
+                if (editing.kind === "novel") {
+                  try {
+                    await addNovelCopy(
+                      `${result.room.ownerId}:${result.room.id}`,
+                      {
+                        ...createNovel(config),
+                        updatedAt: Date.now(),
+                      },
+                    );
+                  } catch {
+                    try {
+                      await worldRequest(`rooms/${result.room.id}`, "DELETE");
+                    } catch {
+                      void queryClient.invalidateQueries({
+                        queryKey: ["world-rooms"],
+                      });
+                      throw new Error(
+                        "小说未能保存到本机，空作品也未能清理。请在作品列表删除空作品后重试。",
+                      );
+                    }
+                    throw new Error(
+                      "小说未能保存到本机。请检查浏览器存储空间后重试。",
+                    );
+                  }
+                }
                 void queryClient.invalidateQueries({
                   queryKey: ["world-rooms"],
                 });

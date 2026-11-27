@@ -46,8 +46,10 @@ export function useNovelTask<T>({
     snapshot?: NovelRunStatus,
     error?: string,
   ) => Promise<boolean>;
-  onStart: (entry: NovelRunRecord<T>) => Promise<void>;
-  onProgress: (
+  /** 可选：生成开始时的副作用。创作历史不在此写入，只在确认保存正文时记录。 */
+  onStart?: (entry: NovelRunRecord<T>) => Promise<void>;
+  /** 可选：流式进度检查点。创作历史不在此写入。 */
+  onProgress?: (
     entry: NovelRunRecord<T>,
     snapshot: NovelRunStatus,
   ) => Promise<void>;
@@ -128,7 +130,11 @@ export function useNovelTask<T>({
           onTools?.(snapshot.tools ?? []);
           onPhase?.(snapshot.phase);
           const now = Date.now();
-          if (snapshot.text && now - (operation.lastCheckpoint ?? 0) >= 3000) {
+          if (
+            onProgress &&
+            snapshot.text &&
+            now - (operation.lastCheckpoint ?? 0) >= 3000
+          ) {
             operation.lastCheckpoint = now;
             void onProgress(entry, snapshot).catch(() => {});
           }
@@ -169,7 +175,7 @@ export function useNovelTask<T>({
         throw new Error("另一页面正在处理此作品的生成，请刷新后查看。");
       session.journalId = entry.request.runId;
       operation.persisted = true;
-      await onStart(entry);
+      await onStart?.(entry);
       if (
         !operation.controller.signal.aborted &&
         !operation.terminal &&

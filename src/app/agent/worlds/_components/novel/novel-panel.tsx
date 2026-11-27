@@ -846,7 +846,7 @@ export function NovelPanel({
           {writer.missingLocal ? (
             <Alert>
               <AlertDescription>
-                当前浏览器没有这部作品的正文存档。若曾在其他设备写作，可从「文件」导入正文。
+                本机还没有同步过这部作品的正文，但服务器上已有存档。可从「文件」导入，或与服务器对账后再继续写。
               </AlertDescription>
             </Alert>
           ) : null}

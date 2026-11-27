@@ -38,10 +38,6 @@ import {
 } from "./model";
 import { createNovelChapterActions } from "./novel-chapter-actions";
 import {
-  archiveNovelRunOutput,
-  archiveNovelRunStart,
-} from "./novel-history-run";
-import {
   type ChapterRun,
   type Compression,
   editableNovelState,
@@ -60,7 +56,9 @@ import {
 import { incompleteNovelDraftNotice } from "./restore-pending-result";
 import {
   createThinkingHistoryStore,
+  sanitizeThinkingTools,
   type ThinkingHistoryEntry,
+  thinkingHistoryAnswer,
 } from "./thinking-history";
 import { addNovelCopy, useNovelStorage } from "./use-novel-storage";
 import { useNovelTask } from "./use-novel-task";
@@ -74,10 +72,14 @@ export function useNovel(
   onRunRestored: (run: RestoredNovelRun) => void = () => {},
 ) {
   const [error, setError] = useState("");
-  const [historyError, setHistoryError] = useState("");
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState("");
-  const [toolCalls, setToolCalls] = useState<NovelRunToolCall[]>([]);
+  const [toolCalls, setToolCallsState] = useState<NovelRunToolCall[]>([]);
+  const toolCallsRef = useRef<NovelRunToolCall[]>([]);
+  function setToolCalls(next: NovelRunToolCall[]) {
+    toolCallsRef.current = next;
+    setToolCallsState(next);
+  }
   const [runPhase, setRunPhase] = useState<NovelRunPhase | undefined>();
   const [thinkingHistory, setThinkingHistory] = useState<
     ThinkingHistoryEntry[]
@@ -147,7 +149,9 @@ export function useNovel(
     [key],
   );
   useEffect(() => {
-    setThinkingHistory(thinkingHistoryStore.list());
+    // 旧版会在生成时写入 localStorage 构思历史；创作历史改为仅保存正文时提交，
+    // 这里清空遗留条目，避免列表里继续冒出「未保存就入库」的 AI 记录。
+    setThinkingHistory(thinkingHistoryStore.clear());
   }, [thinkingHistoryStore]);
   const clearThinkingHistory = useCallback(() => {
     setThinkingHistory(thinkingHistoryStore.clear());
@@ -309,6 +313,16 @@ export function useNovel(
     }
     if (captured.task === "chapter") {
       backup.write(text);
+      const tools = sanitizeThinkingTools(toolCallsRef.current);
+      backup.setHistoryCommit({
+        question: captured.draft.chapter.brief,
+        tools,
+        answer: thinkingHistoryAnswer({
+          tools,
+          status: cutShort ? "cancelled" : "completed",
+        }),
+        incomplete: cutShort || undefined,
+      });
       backup.flush();
     }
     setPreview(text);
@@ -405,6 +419,7 @@ export function useNovel(
       return true;
     const chapter = run.novel.chapters.find(({ id }) => id === run.chapterId);
     if (!chapter) return false;
+    const tools = sanitizeThinkingTools(toolCallsRef.current);
     return pendingBackup.write({
       kind: "selection",
       chapterId: chapter.id,
@@ -414,6 +429,15 @@ export function useNovel(
       preview: output.current.trim(),
       version: run.version,
       incomplete: incomplete || undefined,
+      historyCommit: {
+        question: run.requirements,
+        tools,
+        answer: thinkingHistoryAnswer({
+          tools,
+          status: incomplete ? "cancelled" : "completed",
+        }),
+        incomplete: incomplete || undefined,
+      },
     });
   }
 
@@ -424,37 +448,8 @@ export function useNovel(
     onText: receiveText,
     onTools: setToolCalls,
     onPhase: setRunPhase,
-    async onStart(entry) {
-      try {
-        await archiveNovelRunStart(entry);
-      } catch {
-        setHistoryError("本机历史写入失败，请检查浏览器存储空间。");
-      }
-    },
-    onProgress: archiveNovelRunOutput,
     async onResult(entry, snapshot, message) {
       const { version, runId } = entry.request;
-      const archive = archiveNovelRunOutput(
-        entry,
-        snapshot ?? {
-          status: "failed",
-          text: output.current,
-          incomplete: Boolean(output.current.trim()),
-          tools: toolCalls,
-          error: message ?? null,
-        },
-      ).then(
-        () => {
-          setHistoryError("");
-          return true;
-        },
-        () => {
-          setHistoryError(
-            "本次结果未能存入历史，请保留草稿并检查浏览器存储空间。",
-          );
-          return false;
-        },
-      );
       const run = input.current;
       if (snapshot) {
         receiveText(snapshot.text);
@@ -469,7 +464,8 @@ export function useNovel(
         fail(message ?? snapshot?.error ?? "小说生成未完成。", version);
       }
 
-      if (run !== input.current) return archive;
+      // 创作历史只在确认保存正文时写入；生成过程本身不记，避免与「保存草稿」重复。
+      if (run !== input.current) return true;
       const isContinuation = run?.task === "chapter" && !("plot" in run);
       const draftSaved = persistRewrite(
         snapshot?.status !== "completed" || snapshot.incomplete,
@@ -478,7 +474,7 @@ export function useNovel(
         !isContinuation ||
         !output.current.trim() ||
         (await backup.checkpoint()) !== undefined;
-      return (await archive) && draftSaved && chapterSaved;
+      return draftSaved && chapterSaved;
     },
     onRestore(entry) {
       const current = latest.current;
@@ -747,6 +743,7 @@ export function useNovel(
     setPlotDraft,
     setPreview,
     setRewriteReady,
+    getTools: () => toolCallsRef.current,
   });
 
   return {
@@ -766,7 +763,7 @@ export function useNovel(
     loadFailed,
     error: reconnecting
       ? "连接已断开，正在重连原生成任务…"
-      : error || historyError || chapterHistoryError,
+      : error || chapterHistoryError,
     syncPrompt,
     serverSynced,
     hasLocalBackup,
@@ -787,7 +784,7 @@ export function useNovel(
     toolCalls,
     runPhase,
     thinkingHistory,
-    historyError: historyError || chapterHistoryError,
+    historyError: chapterHistoryError,
     clearThinkingHistory,
     task,
     generationStopped,

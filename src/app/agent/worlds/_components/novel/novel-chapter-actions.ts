@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import type { WorldRoom } from "@/lib/group-chat/model";
+import type { NovelRunToolCall } from "@/lib/group-chat/novel-run-contract";
 import type { ChapterTextRange } from "./chapter-text";
 import {
   applyChapterContinuation,
@@ -13,6 +14,10 @@ import {
   rewritePrompt,
 } from "./model";
 import { plotLineage } from "./novel-history-apply";
+import {
+  continuationHistoryCommit,
+  rewriteHistoryCommit,
+} from "./novel-history-commit";
 import type { ChapterRun, Compression, NovelRun } from "./novel-run";
 import {
   applyPlotDraft,
@@ -43,6 +48,7 @@ export function createNovelChapterActions({
   setPlotDraft,
   setPreview,
   setRewriteReady,
+  getTools,
 }: {
   room: WorldRoom;
   storage: Pick<
@@ -67,6 +73,7 @@ export function createNovelChapterActions({
   setPlotDraft: (value: PlotDraft | null) => void;
   setPreview: (value: string) => void;
   setRewriteReady: (value: boolean) => void;
+  getTools: () => NovelRunToolCall[];
 }) {
   const { latest, storageVersion, backup, pendingBackup, update } = storage;
 
@@ -140,6 +147,19 @@ export function createNovelChapterActions({
       next = applyChapterContinuation(current, stored, undefined);
       if (!next) return null;
     }
+    const savedIndex = next.chapters.findIndex(({ id }) => id === stored.id);
+    const afterId =
+      savedIndex > 0
+        ? (next.chapters[savedIndex - 1]?.id ?? null)
+        : (afterChapterId ?? null);
+    const commit = continuationHistoryCommit({
+      chapter: stored,
+      afterId,
+      question: brief || cached?.historyCommit?.question,
+      tools: cached?.historyCommit?.tools ?? getTools(),
+      raw: cached?.text || stored.text,
+      incomplete: cached?.historyCommit?.incomplete,
+    });
     if (
       !(await update(
         brief && brief === current.chapterGoal.trim()
@@ -150,6 +170,7 @@ export function createNovelChapterActions({
           backupPrevious: Boolean(cached?.history),
           expectedNovel: current,
           archiveChapterId: chapter.id,
+          historyCommit: commit,
         },
       ))
     )
@@ -237,11 +258,30 @@ export function createNovelChapterActions({
       setError("小说或世界设定已变更，无法应用这份润色草稿。");
       return false;
     }
+    const before = captured.novel.chapters.find(({ id }) => id === chapter.id);
+    if (!before) {
+      setError("无法应用这份润色草稿。草稿仍在，可复制正文。");
+      return false;
+    }
+    const pending = pendingBackup.read();
+    const staged =
+      pending?.kind === "selection" && pending.chapterId === chapter.id
+        ? pending.historyCommit
+        : undefined;
     const saved = await update(replaceChapter(captured.novel, chapter), {
       persistFirst: true,
       backupPrevious: Boolean(captured.novel.checkpoint),
       expectedNovel: captured.novel,
       archiveChapterId: chapter.id,
+      historyCommit: rewriteHistoryCommit({
+        before,
+        after: chapter,
+        question: staged?.question ?? captured.requirements,
+        range: captured.range,
+        tools: staged?.tools ?? getTools(),
+        raw: chapter.text,
+        incomplete: staged?.incomplete ?? (draftIncomplete || undefined),
+      }),
     });
     if (saved) discardRewrite();
     return saved;

@@ -1,5 +1,21 @@
 import Dexie, { type Table } from "dexie";
 import { z } from "zod";
+import {
+  novelRunPhase,
+  novelRunToolCall,
+} from "@/lib/group-chat/novel-run-contract";
+
+const historyCommitSchema = z.object({
+  question: z.string().optional(),
+  tools: z.array(
+    novelRunToolCall.extend({
+      output: z.unknown().optional(),
+    }),
+  ),
+  answer: z.string().optional(),
+  phase: novelRunPhase.optional(),
+  incomplete: z.boolean().optional(),
+});
 
 const draftSchema = z.object({
   mode: z.literal("chapter"),
@@ -15,6 +31,8 @@ const draftSchema = z.object({
   afterChapterId: z.string().min(1).nullable().optional(),
   manual: z.boolean().optional(),
   history: z.boolean().optional(),
+  /** 生成结果暂存的提交元数据；确认保存正文时才写入创作历史。 */
+  historyCommit: historyCommitSchema.optional(),
 });
 
 export type ChapterDraftBackup = z.infer<typeof draftSchema>;
@@ -119,6 +137,17 @@ export function createChapterDraftBackup(
       if (timer !== undefined) return;
       persist();
       timer = setTimeout(flush, 400);
+    },
+    setHistoryCommit(commit: NonNullable<ChapterDraftBackup["historyCommit"]>) {
+      if (!draft && !replacement) return;
+      if (replacement) {
+        replacement = { ...replacement, historyCommit: commit };
+        return;
+      }
+      if (!draft) return;
+      draft = { ...draft, historyCommit: commit };
+      pending = true;
+      persist();
     },
     flush,
     async checkpoint() {

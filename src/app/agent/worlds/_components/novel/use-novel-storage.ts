@@ -26,6 +26,7 @@ import {
   renameChapter as renameStoredChapter,
 } from "./model";
 import type { ChapterLineage } from "./novel-history-apply";
+import type { HistoryCommit } from "./novel-history-commit";
 import {
   changedInAnotherTab,
   flushSavedChapterHistory,
@@ -173,12 +174,38 @@ export function useNovelStorage(
       .then(async ([saved, server]) => {
         if (!active) return;
         let novel = saved?.novel ?? createNovel(configRef.current);
-        setMissingLocal(!saved);
+        const serverHasText = Boolean(server?.text.trim());
+        // 仅当本机没有记录、但服务器已有正文时，才提示可能在其他设备写过。
+        // 新建/模板派生的空书应静默建立本机存档，不误导用户去「导入」。
+        setMissingLocal(!saved && serverHasText);
         setLineage(saved?.lineage ?? []);
         storageVersion.current = saved?.version;
         previousRef.current = saved?.previous;
         setHasLocalBackup(Boolean(saved?.previous));
         serverCopy.current = server;
+        if (!saved) {
+          const version = crypto.randomUUID();
+          const seeded = {
+            ...novel,
+            updatedAt: novel.updatedAt ?? Date.now(),
+          };
+          try {
+            await novels.add({ key, novel: seeded, version });
+            if (!active) return;
+            novel = seeded;
+            storageVersion.current = version;
+          } catch {
+            const raced = await novels.get(key);
+            if (!active) return;
+            if (!raced) throw new Error("无法创建小说存档");
+            novel = raced.novel;
+            setLineage(raced.lineage ?? []);
+            storageVersion.current = raced.version;
+            previousRef.current = raced.previous;
+            setHasLocalBackup(Boolean(raced.previous));
+            setMissingLocal(false);
+          }
+        }
         const status = novelSyncStatus(novel, server, exportNovel(novel));
         if (
           status.kind === "match" &&
@@ -285,6 +312,7 @@ export function useNovelStorage(
       chapterLineage,
       expectedNovel,
       archiveChapterId,
+      historyCommit,
     }: {
       persistFirst?: boolean;
       touch?: boolean;
@@ -293,6 +321,7 @@ export function useNovelStorage(
       chapterLineage?: ChapterLineage[];
       expectedNovel?: Novel;
       archiveChapterId?: string;
+      historyCommit?: HistoryCommit;
     } = {},
   ) {
     if (expectedNovel && expectedNovel !== latest.current)
@@ -319,6 +348,7 @@ export function useNovelStorage(
           expectedVersion: storageVersion.current,
           chapterLineage,
           archiveChapterId,
+          historyCommit,
           isCurrent: () => !expectedNovel || expectedNovel === latest.current,
         },
       );

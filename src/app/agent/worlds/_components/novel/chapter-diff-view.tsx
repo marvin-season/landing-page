@@ -20,7 +20,7 @@ function DiffCell({
     <div
       className={cn(
         reading
-          ? "flex min-h-8 min-w-0 items-baseline gap-2 border-b border-border/35 px-2 py-1 font-serif text-sm leading-6 sm:px-3 sm:text-base sm:leading-7"
+          ? "flex min-h-7 min-w-0 items-baseline gap-1.5 border-b border-border/35 px-2 py-0.5 font-serif text-sm leading-5 sm:px-2.5"
           : "flex min-h-7 min-w-0 border-b border-border/50 px-3 py-1 font-mono text-sm leading-5",
         reading && side === "left" && "border-r border-r-border",
         line?.wholeLine &&
@@ -31,7 +31,7 @@ function DiffCell({
       <span
         className={cn(
           "w-10 shrink-0 select-none pr-3 text-right text-xs text-muted-foreground/70",
-          reading && "w-5 pr-0 font-mono tabular-nums sm:w-7",
+          reading && "w-4 pr-0 font-mono text-[10px] tabular-nums sm:w-5",
         )}
       >
         {line?.number ?? ""}
@@ -84,21 +84,23 @@ export function ChapterDiffView({
       <div
         className={cn(
           "border-r border-border px-3 py-1 text-muted-foreground",
-          reading && "min-w-0 px-2 py-2 sm:px-3",
+          reading && "min-w-0 px-2 py-1.5 sm:px-2.5",
         )}
       >
         <span>{baseLabel}</span>
         {reading && base.title ? (
-          <p className="truncate text-xs font-normal" title={base.title}>
+          <p className="truncate text-[11px] font-normal" title={base.title}>
             {base.title}
           </p>
         ) : null}
       </div>
-      <div className={cn("px-3 py-1", reading && "min-w-0 px-2 py-2 sm:px-3")}>
+      <div
+        className={cn("px-3 py-1", reading && "min-w-0 px-2 py-1.5 sm:px-2.5")}
+      >
         <span>{draftLabel}</span>
         {reading && draft.title ? (
           <p
-            className="truncate text-xs font-normal text-muted-foreground"
+            className="truncate text-[11px] font-normal text-muted-foreground"
             title={draft.title}
           >
             {draft.title}

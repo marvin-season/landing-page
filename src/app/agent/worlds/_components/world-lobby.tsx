@@ -9,7 +9,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoaderCircle, MessageSquare, Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn-io/tabs";
 import { worldRequest } from "@/lib/group-chat/client";
 import type {
@@ -69,10 +69,24 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
     });
     return () => subscription.unsubscribe();
   }, [rooms.data]);
-  const savedRooms =
-    workFilter === "all"
-      ? rooms.data?.rooms
-      : rooms.data?.rooms.filter((room) => room.kind === workFilter);
+  const savedRooms = useMemo(() => {
+    const filtered =
+      workFilter === "all"
+        ? rooms.data?.rooms
+        : rooms.data?.rooms.filter((room) => room.kind === workFilter);
+    if (!filtered) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aTime = Math.max(
+        Date.parse(a.updatedAt) || 0,
+        localNovels.get(a.id)?.updatedAt ?? 0,
+      );
+      const bTime = Math.max(
+        Date.parse(b.updatedAt) || 0,
+        localNovels.get(b.id)?.updatedAt ?? 0,
+      );
+      return bTime - aTime;
+    });
+  }, [localNovels, rooms.data?.rooms, workFilter]);
 
   async function createStandaloneNovel(imported?: ImportedNovel) {
     const config = standaloneNovelConfig(imported?.title ?? "", {
@@ -216,12 +230,9 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                   onClick={() => void createBlankNovel()}
                 >
                   {creatingBlank ? (
-                    <LoaderCircle
-                      data-icon="inline-start"
-                      className="animate-spin motion-reduce:animate-none"
-                    />
+                    <LoaderCircle className="size-8 animate-spin motion-reduce:animate-none" />
                   ) : (
-                    <Plus data-icon="inline-start" />
+                    <Plus className="size-8" strokeWidth={1.75} />
                   )}
                   {creatingBlank ? "正在创建…" : "新建空白小说"}
                 </Button>
