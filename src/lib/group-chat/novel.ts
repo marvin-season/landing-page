@@ -41,6 +41,21 @@ const instructionsByTask = {
 const snapshotIntervalMs = 900;
 const connectionEnded = "连接提前结束或没有生成内容。已收到的正文仍可编辑。";
 
+type NovelRunKey = Parameters<NovelRunStore["read"]>[0];
+const runtime = globalThis as typeof globalThis & {
+  novelActiveRuns?: Map<string, AbortController>;
+};
+runtime.novelActiveRuns ??= new Map<string, AbortController>();
+const activeNovelRuns = runtime.novelActiveRuns;
+
+function novelRunKeyId(key: NovelRunKey) {
+  return key.join("\0");
+}
+
+function abortNovelRun(key: NovelRunKey) {
+  activeNovelRuns.get(novelRunKeyId(key))?.abort();
+}
+
 function snapshotTools(tools: NovelRunToolCall[]) {
   return tools.length ? tools : undefined;
 }
@@ -50,12 +65,13 @@ async function generateNovel(
   room: WorldRoom,
   { prompt, task }: z.infer<typeof inputSchema>,
   runs: NovelRunStore,
-  key: Parameters<NovelRunStore["read"]>[0],
+  key: NovelRunKey,
 ) {
   if ((await runs.read(key))?.status !== "running") return;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), novelRunTimeoutMs);
   const { signal } = controller;
+  activeNovelRuns.set(novelRunKeyId(key), controller);
   let stepText = "";
   let committedText = "";
   let text = "";
@@ -166,14 +182,35 @@ async function generateNovel(
     const reader = stream.getReader();
     const cancelReader = () => void reader.cancel().catch(() => {});
     signal.addEventListener("abort", cancelReader, { once: true });
+    const readEvent = () =>
+      new Promise<Awaited<ReturnType<typeof reader.read>>>(
+        (resolve, reject) => {
+          if (signal.aborted) {
+            resolve({ done: true, value: undefined });
+            return;
+          }
+          const onAbort = () => resolve({ done: true, value: undefined });
+          signal.addEventListener("abort", onAbort, { once: true });
+          reader.read().then(
+            (result) => {
+              signal.removeEventListener("abort", onAbort);
+              resolve(result);
+            },
+            (error) => {
+              signal.removeEventListener("abort", onAbort);
+              reject(error);
+            },
+          );
+        },
+      );
     try {
       signal.throwIfAborted();
       let finish: { incomplete: boolean } | undefined;
       let sawStep = false;
       publish(true);
       while (!signal.aborted) {
-        const { value: event, done } = await reader.read();
-        if (done) break;
+        const { value: event, done } = await readEvent();
+        if (done || !event) break;
         if (event.type === "start-step") {
           if (sawStep && stepText.trim()) committedText = stepText;
           stepText = "";
@@ -274,6 +311,7 @@ async function generateNovel(
   } finally {
     clearTimeout(timer);
     clearInterval(interval);
+    activeNovelRuns.delete(novelRunKeyId(key));
     await pending;
     await runs.write(key, {
       ...result,
@@ -351,6 +389,7 @@ export function createNovelHandlers({
             "请在小说存档中创作章节",
             409,
           );
+        abortNovelRun(key);
         await runs.cancel(key);
       }
       const run = await runs.read(key);
