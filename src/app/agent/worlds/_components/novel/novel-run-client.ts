@@ -3,6 +3,7 @@ import {
   type NovelRunStatus,
   novelRunStatus,
 } from "@/lib/group-chat/novel-run-contract";
+import { getBrowserFingerprint } from "./browser-fingerprint";
 import type { NovelTask } from "./model";
 
 export type NovelRunRequest = {
@@ -66,6 +67,19 @@ async function requestNovelRun(
     method === "POST"
       ? "/api/novel"
       : `/api/novel?${new URLSearchParams({ roomId: request.roomId, runId: request.runId })}`;
+  let body: string | undefined;
+  if (method === "POST") {
+    let fingerprint: string | undefined;
+    try {
+      fingerprint = await getBrowserFingerprint();
+    } catch {
+      throw new RunHttpError(
+        400,
+        "无法识别当前浏览器，暂时不能创建。请换用常规浏览器或关闭指纹屏蔽后重试。",
+      );
+    }
+    body = JSON.stringify({ ...request, fingerprint });
+  }
   const response = await fetcher(url, {
     method,
     cache: "no-store",
@@ -73,7 +87,7 @@ async function requestNovelRun(
     ...(method === "POST"
       ? {
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request),
+          body,
         }
       : {}),
   });

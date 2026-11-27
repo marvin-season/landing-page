@@ -125,7 +125,7 @@ NextAuth `pages.signIn` 仍是 `/auth`（英文无前缀）。
 
 ### 4.5 登出
 
-Agent 侧边栏用客户端 `signOut({ callbackUrl: "/auth" })`。登出后落到英文登录页。
+Agent 侧边栏与开放世界大厅顶栏（首页 / 我的作品 / 预设模板）都用客户端 `signOut({ callbackUrl: "/auth" })`。登出后落到英文登录页。开放世界大厅按钮见 [`WorldSignOutButton`](../src/app/agent/worlds/_components/world-sign-out-button.tsx)。
 
 ## 5. Session
 
@@ -167,6 +167,7 @@ Admin 页面本身不调 `auth()`；靠 proxy 挡未登录访问。
 | `server/user` 的 `list` | 已登录即可；`canManage` 表示是否超级管理员 |
 | `server/thread` | 全部 `protectedProcedure`，用 `ctx.userId` 当 Mastra `resourceId` |
 | `src/app/api/chat/route.ts` | `auth()`；无用户 → HTTP 401 |
+| `src/app/api/novel/route.ts` | `auth()`；无用户 → HTTP 401。`guest` 另按浏览器指纹限制每日小说输入+输出 10,000 字符（UTC）；`admin` / `super_admin` 不限 |
 
 `Agent` layout 会 `auth()` 把 `user` 传给侧边栏，**不在 layout 里 redirect**。未登录进 `/agent` 由 proxy 处理。
 
@@ -194,6 +195,7 @@ Admin 页面本身不调 `auth()`；靠 proxy 挡未登录访问。
 | `src/lib/auth-users/store.ts` | Turso 账号 CRUD / 校验 |
 | `src/lib/auth-users/roles.ts` | 角色枚举 |
 | `src/lib/auth-users/password.ts` | 密码哈希 |
+| `src/lib/novel-quota/` | 小说模式按浏览器指纹的每日字数额度（Turso） |
 | `server/trpc.ts` | tRPC session 上下文与 `protectedProcedure` |
 | `server/user/index.ts` | 用户列表与超级管理员写操作 |
 | `src/app/api/chat/route.ts` | 聊天流式接口的 session 校验 |

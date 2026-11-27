@@ -8,6 +8,7 @@ import {
   summaryInstructions,
   writerInstructions,
 } from "@/app/agent/worlds/_components/novel/model";
+import { createNovelQuotaStore } from "@/lib/novel-quota/store";
 import { worldAgents } from "~/mastra-server/agents/world-agents";
 import { WorldError, type WorldRoom } from "./model";
 import { createNovelHandlers } from "./novel";
@@ -79,11 +80,18 @@ function statusRequest({ roomId, runId }: TestRun, method = "GET") {
 
 function fixture(t: import("node:test").TestContext, now?: () => number) {
   const db = createClient({ url: ":memory:" });
-  t.after(() => db.close());
+  const quotaDb = createClient({ url: ":memory:" });
+  t.after(() => {
+    db.close();
+    quotaDb.close();
+  });
   const runs = createNovelRunStore(() => db, now);
+  const quota = createNovelQuotaStore(() => quotaDb);
   const jobs: Array<() => Promise<void>> = [];
   return {
     runs,
+    quota,
+    getRole: async () => "super_admin" as const,
     jobs,
     schedule: (work: () => Promise<void>) => jobs.push(work),
   };
@@ -347,4 +355,54 @@ test("stop before acceptance prevents a late POST from starting the model and ex
   const status = await (await handle(statusRequest(slow))).json();
   assert.equal(status.status, "failed");
   assert.equal(status.text, "可保留的正文");
+});
+
+test("guest novel runs require fingerprint and enforce daily character quota", async (t) => {
+  const ctx = fixture(t);
+  const saved = room();
+  t.mock.method(
+    globalThis,
+    "fetch",
+    async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body));
+      const chunk = (delta: unknown, finish_reason: string | null = null) =>
+        `data: ${JSON.stringify({ id: "test", created: 1, model: body.model, choices: [{ index: 0, delta, finish_reason }] })}
+
+`;
+      return new Response(
+        `${chunk({ content: "输出正文" })}${chunk({}, "stop")}data: [DONE]
+
+`,
+        { headers: { "Content-Type": "text/event-stream" } },
+      );
+    },
+  );
+  const handle = createNovelHandlers({
+    ...ctx,
+    getUser: async () => "alice",
+    getRole: async () => "guest",
+    store: { get: async () => saved },
+    mastra,
+  });
+  const missing = runRequest(saved.id, "上下文");
+  const denied = await handle(request(missing));
+  assert.equal(denied.status, 400);
+  assert.match((await denied.json()).error, /浏览器标识/);
+
+  const first = runRequest(saved.id, "x".repeat(9_996));
+  assert.equal(
+    (await handle(request({ ...first, fingerprint: "fp-test-guest-1" })))
+      .status,
+    202,
+  );
+  await ctx.jobs.shift()?.();
+  const usage = await ctx.quota.readUsage("fp-test-guest-1");
+  assert.equal(usage.used, 9_996 + "输出正文".length);
+
+  const blocked = runRequest(saved.id, "再来一次");
+  const over = await handle(
+    request({ ...blocked, fingerprint: "fp-test-guest-1" }),
+  );
+  assert.equal(over.status, 429);
+  assert.match((await over.json()).error, /今日创作额度/);
 });

@@ -9,9 +9,13 @@ import {
   summaryInstructions,
   writerInstructions,
 } from "@/app/agent/worlds/_components/novel/model";
+import type { UserRole } from "@/lib/auth-users/roles";
 import { idSchema, WorldError, type WorldRoom } from "@/lib/group-chat/model";
 import { providerError } from "@/lib/group-chat/provider";
 import { worldSessionId } from "@/lib/group-chat/session";
+import { novelFingerprintSchema } from "@/lib/novel-quota/fingerprint";
+import { isNovelQuotaExempt } from "@/lib/novel-quota/limits";
+import { NovelQuotaError, type NovelQuotaStore } from "@/lib/novel-quota/store";
 import type {
   NovelRunPhase,
   NovelRunStatus,
@@ -30,6 +34,7 @@ const inputSchema = keySchema.extend({
   prompt: z.string().trim().min(1).max(maxNovelPromptLength),
   task: novelTaskSchema,
   version: z.number().int().nonnegative(),
+  fingerprint: novelFingerprintSchema.optional(),
 });
 
 const instructionsByTask = {
@@ -66,6 +71,7 @@ async function generateNovel(
   { prompt, task }: z.infer<typeof inputSchema>,
   runs: NovelRunStore,
   key: NovelRunKey,
+  billing?: { fingerprint: string; quota: NovelQuotaStore },
 ) {
   if ((await runs.read(key))?.status !== "running") return;
   const controller = new AbortController();
@@ -318,21 +324,32 @@ async function generateNovel(
       text,
       tools: snapshotTools(tools),
     });
+    if (billing) {
+      try {
+        await billing.quota.addOutput(billing.fingerprint, text.length);
+      } catch (error) {
+        console.error("Novel quota output write failed", error);
+      }
+    }
   }
 }
 
 export function createNovelHandlers({
   getUser,
+  getRole,
   store,
   mastra,
   runs,
   schedule,
+  quota,
 }: {
   getUser: () => Promise<string | null>;
+  getRole: (userId: string) => Promise<UserRole | null>;
   store: Pick<WorldStore, "get">;
   mastra: Mastra;
   runs: NovelRunStore;
   schedule: (work: () => Promise<void>) => void;
+  quota: NovelQuotaStore;
 }) {
   return async function handle(request: Request) {
     const ownerId = await getUser();
@@ -369,8 +386,44 @@ export function createNovelHandlers({
             "世界设定已变更，请刷新后重试。",
             409,
           );
-        if (await runs.create(key))
-          schedule(() => generateNovel(mastra, room, input, runs, key));
+        if (!(await runs.create(key)))
+          return new Response(null, { status: 202 });
+        const role = await getRole(ownerId);
+        const billing =
+          isNovelQuotaExempt(role) || !input.fingerprint
+            ? undefined
+            : { fingerprint: input.fingerprint, quota };
+        if (!isNovelQuotaExempt(role)) {
+          if (!input.fingerprint) {
+            await runs.write(key, {
+              status: "failed",
+              text: "",
+              incomplete: true,
+              error: "缺少浏览器标识，无法校验创作额度",
+            });
+            throw new WorldError(
+              "quota_fingerprint_required",
+              "缺少浏览器标识，无法校验创作额度",
+              400,
+            );
+          }
+          try {
+            await quota.reserveInput(input.fingerprint, input.prompt.length);
+          } catch (error) {
+            const message =
+              error instanceof NovelQuotaError
+                ? error.message
+                : "今日创作额度校验失败，请稍后重试。";
+            await runs.write(key, {
+              status: "failed",
+              text: "",
+              incomplete: true,
+              error: message,
+            });
+            throw error;
+          }
+        }
+        schedule(() => generateNovel(mastra, room, input, runs, key, billing));
         return new Response(null, { status: 202 });
       }
       const { roomId, runId } = keySchema.parse(
@@ -406,6 +459,11 @@ export function createNovelHandlers({
         return Response.json(
           { error: "小说请求格式无效或上下文过长" },
           { status: 400 },
+        );
+      if (error instanceof NovelQuotaError)
+        return Response.json(
+          { error: error.message },
+          { status: error.status },
         );
       if (error instanceof WorldError)
         return Response.json(
