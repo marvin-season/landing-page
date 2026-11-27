@@ -18,7 +18,8 @@ test("scans json world templates", () => {
     for (const character of template.config.characters)
       assert.ok(character.avatar);
   }
-  const fog = templates.find((template) => template.id === "fog-harbor");
-  assert.equal(fog?.kind, "script");
-  assert.equal(fog?.config.title, "雾港停电之夜");
+  const lion = templates.find((template) => template.id === "lion-and-mouse");
+  assert.equal(lion?.kind, "novel");
+  assert.equal(lion?.config.title, "狮子与老鼠：未结的债");
+  assert.equal(templates.length, 5);
 });

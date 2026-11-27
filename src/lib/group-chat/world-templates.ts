@@ -169,5 +169,5 @@ export function saveWorldTemplate(template: WorldTemplate) {
 
 const templates = loadWorldTemplates();
 export const exampleWorld = (templates.find(
-  (template) => template.id === "fog-harbor",
+  (template) => template.id === "lion-and-mouse",
 ) ?? templates[0])!.config;
