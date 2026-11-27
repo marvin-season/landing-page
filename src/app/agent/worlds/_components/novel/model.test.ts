@@ -300,6 +300,11 @@ test("opening insertion sends prior context and only the original opening excerp
           name: "意象与余韵",
           description: "偏散文：以感官意象与氛围收束，少硬推情节。",
         },
+        {
+          id: "bilingual-preserve",
+          name: "双语保真",
+          description: "扩写/润色时保留原文双语排版与对应关系，不压成单语。",
+        },
       ],
       task: {
         mode: "insert",

@@ -57,6 +57,14 @@ export const writingSkills: WritingSkill[] = [
     instructions:
       "以可感的物象、光影、气味与声音承载情绪，让氛围自然流转；少用情节硬推和结论式旁白。段末留一点未说尽的余味，避免主题升华、口号收束或抒情套话堆砌。",
   },
+  {
+    id: "bilingual-preserve",
+    name: "双语保真",
+    description: "扩写/润色时保留原文双语排版与对应关系，不压成单语。",
+    appliesTo: ["chapter", "rewrite", "plot"],
+    instructions:
+      "若原文已是双语或多语对照（如中英逐段/逐句、左右栏、原文+译文），扩写、润色、粘合时必须保留同一排版与语种对应：每种语言都写到位，不合并成单语，不删某一侧，不把双语压成规范简体中文。新增内容也按原文对照方式同步写出；仅当作者明确要求改为单语时才可放弃对照。",
+  },
 ];
 
 const skillById = new Map(writingSkills.map((skill) => [skill.id, skill]));

@@ -36,7 +36,7 @@ export default async function AgentLayout({
               </main>
             </div>
             <Toaster
-              position="top-right"
+              position="bottom-right"
               expand
               toastOptions={{ closeButtonAriaLabel: "关闭通知" }}
             />

@@ -1,4 +1,10 @@
-import { Aperture, Feather, MessageSquareText, Sparkles } from "lucide-react";
+import {
+  Aperture,
+  Feather,
+  Languages,
+  MessageSquareText,
+  Sparkles,
+} from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -8,6 +14,7 @@ const skillIcons: Record<string, Icon> = {
   "dialogue-first": MessageSquareText,
   "chapter-hook": Sparkles,
   "prose-imagery": Feather,
+  "bilingual-preserve": Languages,
 };
 
 export function WritingSkillIcon({

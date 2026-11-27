@@ -28,19 +28,31 @@ test("resolveWritingSkills filters by scope and stays within the shared budget",
   const ids = writingSkills.map(({ id }) => id);
   assert.deepEqual(
     resolveWritingSkills(ids, "chapter").map(({ id }) => id),
-    ["scene-driven", "dialogue-first", "chapter-hook", "prose-imagery"],
+    [
+      "scene-driven",
+      "dialogue-first",
+      "chapter-hook",
+      "prose-imagery",
+      "bilingual-preserve",
+    ],
   );
   assert.deepEqual(
     resolveWritingSkills(ids, "rewrite").map(({ id }) => id),
-    ["scene-driven", "dialogue-first", "prose-imagery"],
+    ["scene-driven", "dialogue-first", "prose-imagery", "bilingual-preserve"],
   );
   assert.deepEqual(
     resolveWritingSkills(ids, "plot").map(({ id }) => id),
-    ["scene-driven"],
+    ["scene-driven", "bilingual-preserve"],
   );
   assert.deepEqual(
     resolveWritingSkills(ids, ["chapter", "plot"]).map(({ id }) => id),
-    ["scene-driven", "dialogue-first", "chapter-hook", "prose-imagery"],
+    [
+      "scene-driven",
+      "dialogue-first",
+      "chapter-hook",
+      "prose-imagery",
+      "bilingual-preserve",
+    ],
   );
   assert.equal(writingSkillsField([], "chapter").skills, undefined);
   assert.equal(
@@ -49,7 +61,13 @@ test("resolveWritingSkills filters by scope and stays within the shared budget",
   );
   assert.deepEqual(
     resolveWritingSkillCatalog([], "chapter").map(({ id }) => id),
-    ["scene-driven", "dialogue-first", "chapter-hook", "prose-imagery"],
+    [
+      "scene-driven",
+      "dialogue-first",
+      "chapter-hook",
+      "prose-imagery",
+      "bilingual-preserve",
+    ],
   );
   assert.deepEqual(
     writingSkillCatalogField(["dialogue-first"], "rewrite").skillCatalog?.map(
