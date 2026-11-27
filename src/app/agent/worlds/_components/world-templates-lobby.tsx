@@ -18,8 +18,6 @@ import {
   startCreateWork,
 } from "./create-work-sheet";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
-import { WorldLobbyNav } from "./world-lobby-nav";
-import { WorldSignOutButton } from "./world-sign-out-button";
 
 export function WorldTemplatesLobby({
   templates,
@@ -60,17 +58,8 @@ export function WorldTemplatesLobby({
   }
 
   return (
-    <div className="min-h-full px-5 py-6 text-foreground sm:px-8 lg:px-12">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 @container">
-        <header className="flex flex-col gap-3 border-b border-border pb-4 @3xl:flex-row @3xl:items-center @3xl:justify-between">
-          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-            <h1 className="font-serif text-2xl font-normal">开放世界</h1>
-            <WorldLobbyNav />
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
-            <WorldSignOutButton />
-          </div>
-        </header>
+    <>
+      <div className="flex flex-col gap-6">
         {error || presets.error ? (
           <Alert className="text-destructive">
             <AlertDescription>
@@ -180,7 +169,7 @@ export function WorldTemplatesLobby({
         setEditing={setEditing}
         presets={presets.data?.presets}
       />
-    </div>
+    </>
   );
 }
 

@@ -5,8 +5,8 @@
 | 路由 | 组件 | 职责 |
 | --- | --- | --- |
 | `/agent/worlds` | [`WorldsPage`](../../src/app/agent/worlds/page.tsx) | 公开首页，介绍创作模式并链接到我的作品与预设模板；已登录时顶栏显示退出登录 |
-| `/agent/worlds/works` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选；按房间与本机正文的最近修改时间倒序）、新建空白小说、导入小说、创建作品；顶栏可退出登录 |
-| `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板（`data/novels/template/*.json`）与世界 / 角色预设；顶栏可退出登录 |
+| `/agent/worlds/works` | [`WorldLobby`](../../src/app/agent/worlds/_components/world-lobby.tsx) | 我的作品（全部 / 剧本 / 小说筛选；按房间与本机正文的最近修改时间倒序）、新建空白小说、导入小说、创建作品；与预设模板共用 `(lobby)` 顶栏，可退出登录 |
+| `/agent/worlds/templates` | [`WorldTemplatesLobby`](../../src/app/agent/worlds/_components/world-templates-lobby.tsx) | 预设模板（`data/novels/template/*.json`）与世界 / 角色预设；与我的作品共用 `(lobby)` 顶栏，可退出登录 |
 | `/agent/worlds/[roomId]` | [`WorldRoomView`](../../src/app/agent/worlds/_components/world-room/index.tsx) | 按房间 `kind` 渲染剧本对话区或 [`NovelPanel`](../../src/app/agent/worlds/_components/novel/novel-panel.tsx)，共用顶栏、世界侧栏和设定面板 |
 
 **创建作品**：作品页的「创建作品」以 `lion-and-mouse`（伊索寓言模板之一）为初始值；预设模板页的「使用模板」以所选模板派生，「我的预设 → 使用」以世界预设为初始值。创建面板顶部可切换剧本或小说，由 [`WorldEditor`](../../src/app/agent/worlds/_components/world-editor.tsx) 编辑设定，提交时 `POST /api/group-chat/rooms` 携带 `kind`，成功后进入详情。当前内置模板为 5 则可续写的伊索寓言（`data/novels/template/*.json`）。
@@ -21,7 +21,7 @@
 
 | 层 | 位置 | 内容 |
 | --- | --- | --- |
-| 页面与表单 | `src/app/agent/worlds/` | 作品页、预设模板页、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
+| 页面与表单 | `src/app/agent/worlds/` | 公开首页、`(lobby)` 共享顶栏（作品 / 预设模板切换时顶栏常驻，内容区淡入滑出）、详情、编辑器、剧本对话组件 `world-room/`、小说组件 `novel/` |
 | 房间读取与剧本运行 | [`use-world-room.ts`](../../src/app/agent/worlds/_components/use-world-room.ts) | 读取与轮询房间、剧本自动开场、发起 / 暂停 / 重试运行、加载更早消息 |
 | 小说状态 | [`novel/use-novel.ts`](../../src/app/agent/worlds/_components/novel/use-novel.ts)、[`novel/use-novel-storage.ts`](../../src/app/agent/worlds/_components/novel/use-novel-storage.ts) | 前者负责 Writer 请求、流式草稿、完成判定、上下文压缩归档和 Fork；后者负责 IndexedDB 读写、草稿恢复和存档同步 |
 | 小说纯函数 | `novel/model.ts`、`plot-edit.ts`、`context-compression.ts`、`import-novel.ts`、`chapter-*.ts` | 数据结构、Writer 指令与上下文、续写摘要归档、导入导出、章节文本与差异 |

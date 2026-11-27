@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { exampleWorld } from "@/lib/group-chat/world-templates";
-import { WorldLobby } from "../_components/world-lobby";
+import { WorldLobby } from "../../_components/world-lobby";
 
 export const metadata: Metadata = {
   title: "我的作品 · 开放世界",
