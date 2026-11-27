@@ -10,6 +10,7 @@ import {
 import {
   compactContextHint,
   localActionHint,
+  minimalContextHint,
   NovelActionButton,
   NovelActionTooltip,
   nextChapterActionHint,
@@ -247,6 +248,8 @@ export function ChapterRewriteForm({
   onSkillsChange,
   compactContext,
   onCompactContextChange,
+  minimalContext = false,
+  onMinimalContextChange,
   disabled,
   submitDisabled,
   embedded,
@@ -264,6 +267,8 @@ export function ChapterRewriteForm({
   onSkillsChange?: (skills: string[]) => void;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
+  minimalContext?: boolean;
+  onMinimalContextChange?: (checked: boolean) => void;
   disabled: boolean;
   submitDisabled?: boolean;
   embedded?: boolean;
@@ -303,16 +308,34 @@ export function ChapterRewriteForm({
         }}
       />
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <NovelActionTooltip hint={compactContextHint(isPassage)}>
-          <label className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Switch
-              checked={compactContext}
-              disabled={disabled}
-              onCheckedChange={onCompactContextChange}
-            />
-            精简上下文
-          </label>
-        </NovelActionTooltip>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <NovelActionTooltip hint={compactContextHint(isPassage)}>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Switch
+                checked={compactContext || minimalContext}
+                disabled={disabled || minimalContext}
+                onCheckedChange={onCompactContextChange}
+              />
+              精简上下文
+            </label>
+          </NovelActionTooltip>
+          {isPassage && onMinimalContextChange ? (
+            <NovelActionTooltip hint={minimalContextHint}>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Switch
+                  checked={minimalContext}
+                  disabled={disabled}
+                  onCheckedChange={(checked) => {
+                    onMinimalContextChange(checked);
+                    if (checked && !compactContext)
+                      onCompactContextChange(true);
+                  }}
+                />
+                极简模式
+              </label>
+            </NovelActionTooltip>
+          ) : null}
+        </div>
         <div className="ml-auto flex items-center gap-2">
           {onDelete ? (
             <NovelActionButton
@@ -341,7 +364,11 @@ export function ChapterRewriteForm({
             </NovelActionButton>
           ) : null}
           <NovelActionButton
-            hint={rewriteHint(isPassage, compactContext)}
+            hint={rewriteHint(
+              isPassage,
+              compactContext || minimalContext,
+              isPassage && minimalContext,
+            )}
             type="submit"
             size="sm"
             className="min-w-28 whitespace-nowrap"

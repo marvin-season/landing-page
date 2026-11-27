@@ -123,6 +123,7 @@ export function NovelPanel({
   const [thinkingChapter, setThinkingChapter] = useState<Chapter | null>(null);
   const [rewriteRequirements, setRewriteRequirements] = useState("");
   const [compactContext, setCompactContext] = useState(false);
+  const [minimalContext, setMinimalContext] = useState(false);
   const readingPanel = useRef<HTMLDivElement>(null);
   const chapterGoalInput = useRef<HTMLTextAreaElement>(null);
   const readingScroll = useRef<number | null>(null);
@@ -518,7 +519,8 @@ export function NovelPanel({
   function beginChapterRewrite(chapterId: string, range?: ChapterTextRange) {
     if (
       !writer.rewrite(chapterId, rewriteRequirements, {
-        compactContext,
+        compactContext: Boolean(range) || compactContext,
+        minimalContext: Boolean(range) && minimalContext,
         range,
       })
     )
@@ -648,6 +650,8 @@ export function NovelPanel({
         ended={ended}
         compactContext={compactContext}
         onCompactContextChange={setCompactContext}
+        minimalContext={minimalContext}
+        onMinimalContextChange={setMinimalContext}
         onHistoryBlockedChange={setEditorHasDraft}
         onSave={async (draft) => {
           if (mode === "chapter") {

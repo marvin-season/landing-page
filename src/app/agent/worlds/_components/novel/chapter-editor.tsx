@@ -56,6 +56,8 @@ export function ChapterEditor({
   ended,
   compactContext,
   onCompactContextChange,
+  minimalContext,
+  onMinimalContextChange,
   onSave,
   onSelectChapter,
   onExit,
@@ -100,6 +102,8 @@ export function ChapterEditor({
   ended: boolean;
   compactContext: boolean;
   onCompactContextChange: (checked: boolean) => void;
+  minimalContext: boolean;
+  onMinimalContextChange: (checked: boolean) => void;
   onSave: (chapter: Chapter) => Promise<boolean>;
   onSelectChapter: (id: string) => void;
   onExit: () => void | Promise<void>;
@@ -204,7 +208,7 @@ export function ChapterEditor({
     onHistoryBlockedChange(dirty || draftUnavailable || draftWriting || saving);
     return () => onHistoryBlockedChange(false);
   }, [dirty, draftUnavailable, draftWriting, onHistoryBlockedChange, saving]);
-  const exceedsLimit = draftText.length > maxChapterLength;
+  const exceedsSoftLimit = draftText.length > maxChapterLength;
   const selectedRange =
     target ??
     (!showingPreview && !appliedRange && draftText === base.text
@@ -221,7 +225,6 @@ export function ChapterEditor({
     draftUnavailable ||
     saving ||
     editorBusy ||
-    exceedsLimit ||
     ((generatingDraft || isNewChapter) && !draftText.trim());
   const isPassage = Boolean(target || rewriteRange);
   const polishLabel = isPassage ? "润色选段" : "润色本章";
@@ -556,6 +559,8 @@ export function ChapterEditor({
         onSkillsChange={onSkillsChange}
         compactContext={compactContext}
         onCompactContextChange={onCompactContextChange}
+        minimalContext={minimalContext}
+        onMinimalContextChange={onMinimalContextChange}
         disabled={
           ended ||
           saving ||
@@ -691,8 +696,13 @@ export function ChapterEditor({
               <span
                 className={cn(
                   "whitespace-nowrap text-xs text-muted-foreground",
-                  exceedsLimit && "text-destructive",
+                  exceedsSoftLimit && "text-amber-600 dark:text-amber-400",
                 )}
+                title={
+                  exceedsSoftLimit
+                    ? `已超过建议上限 ${maxChapterLength} 字，仍可保存；该上限主要约束模型生成`
+                    : undefined
+                }
               >
                 {visibleText.length} / {maxChapterLength} 字
               </span>
@@ -822,11 +832,6 @@ export function ChapterEditor({
                   aria-label="章节正文"
                   readOnly={editorBusy || saving || draftUnavailable}
                   value={editorText}
-                  maxLength={
-                    draftText.length > maxChapterLength
-                      ? undefined
-                      : maxChapterLength
-                  }
                   onScroll={(event) => {
                     const { scrollTop } = event.currentTarget;
                     if (generatingDraft && useGeneratedText) {
@@ -886,6 +891,7 @@ export function ChapterEditor({
                         return;
                       setAppliedRange(null);
                       setTarget(selection);
+                      if (!compactContext) onCompactContextChange(true);
                     }, 100);
                   }}
                   className={cn(

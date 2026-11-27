@@ -68,22 +68,32 @@ export function compactContextHint(selection: boolean): ActionHint {
   );
 }
 
+export const minimalContextHint = localActionHint(
+  "开启后，只发送选中段落和创作设定，不带本章未选正文与其他章节。",
+);
+
 export const stopGenerationHint = localActionHint("停止当前生成。");
 
-export function rewriteHint(selection: boolean, compact: boolean): ActionHint {
+export function rewriteHint(
+  selection: boolean,
+  compact: boolean,
+  minimal = false,
+): ActionHint {
   return {
     action: selection
-      ? "只生成所选文字的替换稿。"
+      ? "只生成所选文字的替换稿，不改选段之外的正文。"
       : "生成整章替换稿，确认后才更新正文。",
-    context: `完整世界设定、小说设定、润色要求和本章已保存正文。${
-      selection
-        ? compact
-          ? "标明选段位置，不带摘要或其他章节。"
-          : "标明选段位置；有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
-        : compact
-          ? "不带摘要或其他章节。"
-          : "有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
-    }`,
+    context: minimal
+      ? "完整世界设定、小说设定、润色要求和选中段落正文。不带本章未选正文、摘要或其他章节。"
+      : `完整世界设定、小说设定、润色要求和本章已保存正文。${
+          selection
+            ? compact
+              ? "标明选段位置，不带摘要或其他章节。"
+              : "标明选段位置；有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
+            : compact
+              ? "不带摘要或其他章节。"
+              : "有摘要时附带摘要和未被覆盖的前文，无摘要时附带此前各章的原文。"
+        }`,
   };
 }
 

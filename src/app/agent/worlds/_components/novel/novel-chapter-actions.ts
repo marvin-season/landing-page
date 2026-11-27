@@ -186,9 +186,11 @@ export function createNovelChapterActions({
     {
       range,
       compactContext = false,
+      minimalContext = false,
     }: {
       range?: ChapterTextRange;
       compactContext?: boolean;
+      minimalContext?: boolean;
     } = {},
   ) {
     if (!ready || generating.current || room.status === "ended") return false;
@@ -201,6 +203,7 @@ export function createNovelChapterActions({
         requirements,
         range,
         compactContext,
+        minimalContext,
       );
       start(
         {
@@ -236,12 +239,7 @@ export function createNovelChapterActions({
 
   async function saveChapterRewrite(chapter: Chapter) {
     const captured = input.current;
-    if (
-      generating.current ||
-      !chapter.text.trim() ||
-      chapter.text.length > maxChapterLength
-    )
-      return false;
+    if (generating.current || !chapter.text.trim()) return false;
     if (
       captured?.task !== "rewrite" ||
       "plot" in captured ||

@@ -418,6 +418,7 @@ export function rewritePrompt(
   requirements: string,
   range?: ChapterTextRange,
   compactContext = false,
+  minimalContext = false,
 ) {
   const index = novel.chapters.findIndex((chapter) => chapter.id === chapterId);
   if (index < 0 || !novel.chapters[index].text.trim())
@@ -425,35 +426,52 @@ export function rewritePrompt(
   const { title, text } = novel.chapters[index];
   const position = { chapter: index + 1, title };
   const selection = range ? splitChapterText(text, range) : undefined;
+  const minimal = Boolean(minimalContext && selection);
+  const compact = compactContext || minimal;
   const targetChapter = selection
-    ? { ...position, selection }
+    ? {
+        ...position,
+        selection: minimal
+          ? { text: selection.text }
+          : {
+              before: selection.before,
+              text: selection.text,
+              after: selection.after,
+            },
+      }
     : { ...position, text };
-  const history = novelHistory(novel, index, !compactContext);
+  const history = novelHistory(novel, index, !compact);
   const output =
     "严格不超过 task.maxCharacters 字符。不添加章名、说明、改动清单或代码围栏。";
   const scope = selection
-    ? "只输出 selection.text 的完整替换正文。与两侧未选正文自然衔接，不改写或重复它们。保持原选段的人称、时态、叙述视角和起止边界，确保可直接嵌回原位。"
+    ? minimal
+      ? "只输出 selection.text 的完整替换正文。客户端会原样嵌回原文选区；禁止扩写、复述或补写选段之外的任何内容，也不要输出未提供的上下文。保持原选段的人称、时态、叙述视角和起止边界。"
+      : "只输出 selection.text 的完整替换正文。before/after 仅供衔接参考，禁止改写、复述或输出它们。保持原选段的人称、时态、叙述视角和起止边界，确保可直接嵌回原位。"
     : "只输出 targetChapter.text 的完整替换正文。承接前文，保持原章的叙述视角和起止边界，保留关键事件和后文依赖的事实。";
+  const maxCharacters = selection
+    ? Math.max(
+        selection.text.length,
+        maxChapterLength - (text.length - selection.text.length),
+      )
+    : maxChapterLength;
   const prompt = JSON.stringify({
     ...history,
     ...writerPreset(config, novel, "rewrite"),
     targetChapter,
     task: {
       instructions: `${scope}${output}`,
-      maxCharacters: Math.max(
-        0,
-        maxChapterLength -
-          (selection ? text.length - selection.text.length : 0),
-      ),
+      maxCharacters,
       requirements:
         requirements.trim() || "改善语言、节奏和过渡，保留关键剧情。",
     },
   });
   if (prompt.length > maxNovelPromptLength)
     throw new Error(
-      compactContext
-        ? "精简上下文仍然过长，请压缩前文或缩短本章正文及设定后重试。"
-        : "润色上下文过长，请开启「精简上下文」后重试。",
+      minimal
+        ? "极简上下文仍然过长，请缩短选段或设定后重试。"
+        : compact
+          ? "精简上下文仍然过长，请压缩前文或缩短本章正文及设定后重试。"
+          : "润色上下文过长，请开启「精简上下文」后重试。",
     );
   return prompt;
 }

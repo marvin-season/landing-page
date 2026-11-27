@@ -344,7 +344,7 @@ test("a passage rewrite sends the unselected text and replaces only the selected
   assert.deepEqual(prompt.world.characters, config.characters);
   assert.equal(prompt.novel.style, novel.style);
   assert.match(prompt.task.instructions, /selection\.text 的完整替换正文/);
-  assert.match(prompt.task.instructions, /与两侧未选正文自然衔接/);
+  assert.match(prompt.task.instructions, /before\/after 仅供衔接参考/);
   assert.doesNotMatch(
     prompt.task.instructions,
     /followingChapters|targetChapter\.text|endingMaxCharacters|JSON/,
@@ -499,6 +499,27 @@ test("compact passage rewrite skips all other chapters and retains the target ch
   assert.equal(uncompressed.completedChapters, undefined);
   assert.equal(uncompressed.importedBackground, undefined);
   assert.deepEqual(uncompressed.targetChapter, prompt.targetChapter);
+
+  const minimal = JSON.parse(
+    rewritePrompt(config, novel, "c", "收紧节奏", range, true, true),
+  );
+  assert.equal(minimal.archivedChapters, undefined);
+  assert.equal(minimal.completedChapters, undefined);
+  assert.equal(minimal.importedBackground, undefined);
+  assert.deepEqual(minimal.targetChapter, {
+    chapter: 3,
+    title: "本章",
+    selection: { text: selected },
+  });
+  assert.match(minimal.task.instructions, /禁止扩写、复述或补写选段之外/);
+  assert.doesNotMatch(minimal.task.instructions, /before\/after/);
+  assert.equal(
+    minimal.task.maxCharacters,
+    Math.max(
+      selected.length,
+      8000 - (novel.chapters[2].text.length - selected.length),
+    ),
+  );
 });
 
 test("compact whole chapter rewrite keeps only the target and presets", () => {

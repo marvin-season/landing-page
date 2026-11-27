@@ -305,11 +305,12 @@ export function useNovel(
       return;
     }
     if (captured.task === "chapter") saveCheckpoint(captured.compression);
+    setDraftIncomplete(cutShort);
     if (text.length > maxChapterLength) {
-      setError(`草稿超过 ${maxChapterLength} 字，请缩短后保存。`);
-      setDraftIncomplete(cutShort);
+      setError(
+        `草稿超过建议上限 ${maxChapterLength} 字（主要约束模型生成），仍可保存。`,
+      );
     } else {
-      setDraftIncomplete(cutShort);
       setError(cutShort ? cutShortNotice : "");
     }
     if (captured.task === "chapter") {
