@@ -30,6 +30,7 @@ import { createNovel } from "./novel/model";
 import { addNovelCopy, observeNovelList } from "./novel/use-novel-storage";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldLobbyNav } from "./world-lobby-nav";
+import { WorldSignOutButton } from "./world-sign-out-button";
 
 const workFilters = [
   { value: "all", label: "全部" },
@@ -172,6 +173,7 @@ export function WorldLobby({ defaultConfig }: { defaultConfig?: WorldConfig }) {
                 创建作品
               </Button>
             ) : null}
+            <WorldSignOutButton />
           </div>
         </header>
         {error || rooms.error || presets.error ? (

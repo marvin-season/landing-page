@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verifyCredentials } from "@/lib/auth-users/store";
-import { devSession, isLocalDevelopment } from "@/lib/dev-session";
 
 const nextAuth = NextAuth({
   providers: [
@@ -54,11 +53,4 @@ const nextAuth = NextAuth({
   },
 });
 
-export const { handlers, signIn, signOut } = nextAuth;
-
-type Auth = typeof nextAuth.auth;
-
-export const auth = ((...args: unknown[]) => {
-  if (args.length === 0 && isLocalDevelopment()) return devSession();
-  return (nextAuth.auth as (...inner: unknown[]) => ReturnType<Auth>)(...args);
-}) as Auth;
+export const { handlers, auth, signIn, signOut } = nextAuth;

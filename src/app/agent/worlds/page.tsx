@@ -2,6 +2,7 @@ import { Button } from "@landing-page/design-system";
 import { ArrowRight, BookOpen, MessagesSquare } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "@/auth";
 import { getSiteOrigin } from "@/lib/site-origin";
 import {
   worldsHomePath,
@@ -9,6 +10,7 @@ import {
   worldsWorksPath,
 } from "@/lib/worlds-paths";
 import { WorldLobbyNav } from "./_components/world-lobby-nav";
+import { WorldSignOutButton } from "./_components/world-sign-out-button";
 
 const title = "开放世界｜AI 小说续写与多角色剧本创作";
 const description =
@@ -30,7 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function WorldsPage() {
+export default async function WorldsPage() {
+  const session = await auth();
+  const signedIn = Boolean(session?.user?.id);
   return (
     <div lang="zh-CN" className="min-h-full bg-background text-foreground">
       <header className="border-b border-border">
@@ -38,7 +42,10 @@ export default function WorldsPage() {
           <Link href={worldsHomePath} className="font-serif text-lg">
             开放世界
           </Link>
-          <WorldLobbyNav />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <WorldLobbyNav />
+            {signedIn ? <WorldSignOutButton /> : null}
+          </div>
         </div>
       </header>
 

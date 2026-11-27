@@ -1,5 +1,4 @@
 import { type Client, createClient } from "@libsql/client";
-import { DEV_USER_ID, isLocalDevelopment } from "@/lib/dev-session";
 import { hashPassword, verifyPassword } from "./password";
 import { isCreatableRole, isUserRole, type UserRole } from "./roles";
 
@@ -131,8 +130,6 @@ export async function loadAuthUsers() {
 }
 
 export async function getUserRole(username: string): Promise<UserRole | null> {
-  if (isLocalDevelopment() && username === DEV_USER_ID) return "super_admin";
-
   const client = await ensureReady();
   const result = await client.execute({
     sql: "SELECT role FROM auth_users WHERE username = ?",

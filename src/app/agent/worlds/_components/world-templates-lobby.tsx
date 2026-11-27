@@ -19,6 +19,7 @@ import {
 } from "./create-work-sheet";
 import { WorldCard, WorldCardFooter, WorldGrid } from "./world-card";
 import { WorldLobbyNav } from "./world-lobby-nav";
+import { WorldSignOutButton } from "./world-sign-out-button";
 
 export function WorldTemplatesLobby({
   templates,
@@ -65,6 +66,9 @@ export function WorldTemplatesLobby({
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <h1 className="font-serif text-2xl font-normal">开放世界</h1>
             <WorldLobbyNav />
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <WorldSignOutButton />
           </div>
         </header>
         {error || presets.error ? (
